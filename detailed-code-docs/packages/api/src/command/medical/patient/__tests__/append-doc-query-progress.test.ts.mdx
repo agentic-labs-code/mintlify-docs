@@ -1,0 +1,97 @@
+---
+title: "append-doc-query-progress.test.ts"
+---
+
+## High-level description
+The `appendDocQueryProgress` function updates a patient's document query progress in the database. It allows for appending progress information for both download and convert stages, handling scenarios like processing, completion, and errors. The function ensures atomic updates using database transactions.
+
+## Code Structure
+The code defines a main function `appendDocQueryProgress` that orchestrates the update process. It utilizes helper functions like `getPatientOrFail` and `aggregateDocQueryProgress` to fetch patient data and manage progress aggregation respectively. The `executeOnDBTx` function is used to wrap the update logic within a database transaction.
+
+## References
+- `Patient`: Represents a patient entity.
+- `DocumentQueryProgress`: Represents the progress of document query operations.
+- `PatientModel`: Sequelize model for interacting with the `patient` table.
+- `getPatientOrFail`: Function to retrieve a patient by ID or throw an error.
+- `executeOnDBTx`: Utility function to execute code within a database transaction.
+
+## Symbols
+
+### `appendDocQueryProgress`
+#### Description
+Updates a patient's document query progress in the database. It retrieves the existing progress, aggregates it with the provided updates, and then persists the changes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `{ id: string, cxId: string }` | The ID and CxID of the patient to update. |
+| downloadProgress | `Progress \| undefined \| null` | Optional. Progress information for the download stage. |
+| convertProgress | `Progress \| undefined \| null` | Optional. Progress information for the convert stage. |
+| convertibleDownloadErrors | `number \| undefined` | Optional. The number of download errors that affect the convertible count. |
+| increaseCountConvertible | `number \| undefined` | Optional. The number to increase the convertible count by. |
+| reset | `boolean \| undefined` | Optional. Whether to reset the progress before applying updates. Defaults to false. |
+| requestId | `string` | The ID of the request associated with the progress update. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| updatedPatient | `Promise&lt;Patient&gt;` | A promise that resolves to the updated patient object. |
+
+#### Internal Logic
+1. Fetches the existing patient record from the database using `getPatientOrFail`.
+2. Retrieves the current document query progress from the patient data.
+3. Calls `aggregateDocQueryProgress` to merge the existing progress with the provided updates, handling potential resets and error adjustments.
+4. Updates the patient's `documentQueryProgress` with the aggregated result.
+5. Persists the changes to the database using `PatientModel.update` within a transaction.
+6. Returns the updated patient object.
+
+### `updateProgressWebhookSent`
+#### Description
+Updates the `webhookSent` flag for a specific progress type in the patient's document query progress.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `{ id: string, cxId: string }` | The ID and CxID of the patient to update. |
+| type | `ProgressType` | The type of progress for which to update the webhook flag (e.g., 'download', 'convert'). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `Promise&lt;void&gt;` | A promise that resolves when the update is complete. |
+
+#### Internal Logic
+1. Fetches the existing patient record from the database using `getPatientOrFail`.
+2. Updates the `webhookSent` flag to `true` for the specified progress type within the patient's `documentQueryProgress`.
+3. Persists the changes to the database using `PatientModel.update` within a transaction.
+
+### `aggregateDocQueryProgress`
+#### Description
+Merges the existing document query progress with provided updates, handling resets, error adjustments, and convertible count modifications.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documentQueryProgress | `DocumentQueryProgress` | The existing document query progress to update. |
+| downloadProgress | `Progress \| undefined \| null` | Optional. Progress information for the download stage. |
+| convertProgress | `Progress \| undefined \| null` | Optional. Progress information for the convert stage. |
+| convertibleDownloadErrors | `number \| undefined` | Optional. The number of download errors that affect the convertible count. |
+| increaseCountConvertible | `number \| undefined` | Optional. The number to increase the convertible count by. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `DocumentQueryProgress` | The updated document query progress object. |
+
+#### Internal Logic
+1. Updates the `download` and `convert` properties of the `documentQueryProgress` object based on the provided `downloadProgress` and `convertProgress` values.
+2. If `convertibleDownloadErrors` is provided, adjusts the `total` count for the `convert` stage and recalculates the `status`.
+3. If `increaseCountConvertible` is provided, increases the `total` count for the `convert` stage and recalculates the `status`.
+4. Returns the updated `documentQueryProgress` object.
+
+## Side Effects
+- Modifies the patient's document query progress in the database.
+
+## Error Handling
+- Uses `getPatientOrFail` to ensure that the patient exists, throwing an error if not found.
+- Employs database transactions via `executeOnDBTx` to ensure atomicity of updates.

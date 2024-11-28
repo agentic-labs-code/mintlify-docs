@@ -1,0 +1,58 @@
+---
+title: "ServiceRequest.hbs"
+---
+
+## High-level description
+This Handlebars template file defines the structure for generating a FHIR ServiceRequest resource. It creates a JSON object representing a ServiceRequest with various properties such as identifier, status, code, priority, and occurrence date/time, based on the input data provided to the template.
+
+## Symbols
+
+### ServiceRequest Template
+#### Description
+This is the main Handlebars template that generates a FHIR ServiceRequest resource. It constructs a JSON object with the necessary properties for a ServiceRequest, including a fullUrl, resource details, and a request object for PUT operations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ID | string | Unique identifier for the ServiceRequest |
+| serviceEntry | object | Contains details about the service request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON object | object | A FHIR-compliant ServiceRequest resource |
+
+#### Internal Logic
+1. Generates a fullUrl using the provided ID.
+2. Creates a resource object of type "ServiceRequest" with the following properties:
+   - id: Uses the provided ID
+   - identifier: Iterates over serviceEntry.id array to create identifiers
+   - status: Determines the request status based on serviceEntry.statusCode.code
+   - code: Sets the code based on serviceEntry.code
+   - priority: Uses serviceEntry.priorityCode.displayName
+   - occuranceDateTime: Formats serviceEntry.effectiveTime.value as a date/time string
+3. Includes a request object specifying the HTTP method (PUT) and the resource URL.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Handlebars | Template engine used for generating the JSON structure |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| ID | string | N/A | Unique identifier for the ServiceRequest |
+
+## References
+This template references other partial templates:
+- DataType/Identifier.hbs
+- ValueSet/RequestStatus.hbs
+- DataType/CodeableConcept.hbs
+
+These partial templates are likely responsible for formatting specific data types within the ServiceRequest resource.
+
+## Notes
+1. The template includes a copyright notice at the beginning, indicating it's part of a larger project with multiple contributors.
+2. The template uses Handlebars syntax (e.g., `{{#each}}`, `{{&gt;}}`) for dynamic content generation and inclusion of partial templates.
+3. The `formatAsDateTime` helper function is used to format the effectiveTime value, suggesting there might be custom Handlebars helpers defined elsewhere in the project.
+4. The structure of the output JSON closely follows the FHIR specification for a ServiceRequest resource.

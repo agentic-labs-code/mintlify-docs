@@ -1,0 +1,64 @@
+---
+title: "get-patient-by-demo.ts"
+---
+
+## High-level description
+This code implements a patient matching function using Master Patient Index (MPI) techniques. It retrieves a patient based on demographic information by normalizing patient data, finding similar patients, matching them using various rules and similarity functions, and merging the results.
+
+## Code Structure
+The main function `getPatientByDemo` uses several helper functions and modules:
+- `normalizePatient`: Normalizes patient demographic data
+- `patientLoader.findBySimilarity`: Finds patients based on similarity criteria
+- `matchPatients`: Matches found patients using similarity functions and rules
+- `useFirstMatchingPatient`: Merges matching patients
+- `patientLoader.getOneOrFail`: Retrieves the final matched patient
+
+## Symbols
+
+### `getPatientByDemo`
+#### Description
+Retrieves a patient based on their demographic information using MPI techniques.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The ID of the patient in the external system |
+| demo | PatientData | The demographic information of the patient |
+| patientLoader | PatientLoader | An interface for loading patient data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Promise&lt;Patient \| undefined&gt; | The matched patient object if found, otherwise undefined |
+
+#### Internal Logic
+1. Normalize the patient demographic data
+2. Find patients based on matching DOB and gender at birth
+3. Sort found patients by creation time
+4. Match the found patients with the normalized patient using similarity functions and rules
+5. If multiple patients are matched, log a warning
+6. Merge the matching patients and return the result
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/shared | Provides utility functions |
+| ../domain/patient | Defines patient data types |
+| ../command/patient-loader | Defines the PatientLoader interface |
+| ./match-patients | Provides patient matching functions |
+| ./merge-patients | Provides patient merging functions |
+| ./normalize-patient | Provides patient data normalization |
+| ./shared | Provides shared utilities for MPI |
+| ../util/log | Provides logging functionality |
+| ../util/notifications | Provides notification and error capture functionality |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| SIMILARITY_THRESHOLD | number | 0.96 | The threshold for considering patients similar |
+
+## Error Handling
+The code uses the `capture.message` function to log warnings when multiple patients are matched. It also uses try-catch blocks internally in some of the imported functions to handle errors during patient normalization and matching.
+
+## Logging
+The code uses the `log` function to log warnings when multiple patients are matched. It includes details such as the patient demo data and the customer ID (cxId) in the log message.

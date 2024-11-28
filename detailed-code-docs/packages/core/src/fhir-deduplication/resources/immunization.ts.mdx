@@ -1,0 +1,90 @@
+---
+title: "immunization.ts"
+---
+
+## High-level description
+This code defines functions for deduplicating immunization records in a FHIR (Fast Healthcare Interoperability Resources) system. It groups and combines immunizations based on their date and vaccine code, using either CVX (Vaccine Administered) or NDC (National Drug Code) coding systems.
+
+## Code Structure
+The main function `deduplicateImmunizations` uses `groupSameImmunizations` to group similar immunizations. The `extractCodes` function is used to extract CVX and NDC codes from the immunization's vaccine code. These functions work together to create a deduplicated set of immunization records.
+
+## Symbols
+
+### `deduplicateImmunizations`
+#### Description
+This function takes an array of Immunization resources and returns deduplicated immunizations along with a reference replacement map.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| immunizations | Immunization[] | Array of Immunization resources to deduplicate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| combinedImmunizations | Immunization[] | Array of deduplicated Immunization resources |
+| refReplacementMap | Map&lt;string, string[]&gt; | Map of original references to replaced references |
+
+#### Internal Logic
+1. Calls `groupSameImmunizations` to group similar immunizations
+2. Uses `combineResources` to merge the grouped immunizations
+
+### `groupSameImmunizations`
+#### Description
+Groups immunizations based on date and vaccine code (CVX or NDC).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| immunizations | Immunization[] | Array of Immunization resources to group |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| immunizationsCvxMap | Map&lt;string, Immunization&gt; | Map of grouped immunizations by CVX code |
+| immunizationsNdcMap | Map&lt;string, Immunization&gt; | Map of grouped immunizations by NDC code |
+| refReplacementMap | Map&lt;string, string[]&gt; | Map of original references to replaced references |
+
+#### Internal Logic
+1. Iterates through immunizations
+2. Extracts date and vaccine codes
+3. Creates a key based on date and code
+4. Groups immunizations using `fillMaps` function
+5. Assigns the most descriptive status when combining immunizations
+
+### `extractCodes`
+#### Description
+Extracts CVX and NDC codes from a CodeableConcept.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| concept | CodeableConcept \| undefined | The CodeableConcept to extract codes from |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cvxCode | string \| undefined | Extracted CVX code |
+| ndcCode | string \| undefined | Extracted NDC code |
+
+#### Internal Logic
+1. Iterates through the codings in the CodeableConcept
+2. Checks for CVX or NDC system URIs
+3. Extracts and returns the corresponding codes
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides TypeScript types for FHIR resources |
+| ../../util/constants | Provides constants for code systems |
+| ../shared | Provides utility functions for deduplication |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| immunizationStatus | readonly ["entered-in-error", "completed", "not-done"] | N/A | Possible statuses for immunizations |
+| statusRanking | Record&lt;ImmunizationStatus, number&gt; | { "entered-in-error": 0, "not-done": 1, completed: 2 } | Ranking of immunization statuses |
+
+## TODOs
+- Consider whether to keep date as a mandatory field for deduplication
+- Consider adding a default date to the FHIR encounter if date is kept mandatory

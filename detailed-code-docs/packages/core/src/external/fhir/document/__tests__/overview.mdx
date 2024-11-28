@@ -1,0 +1,124 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains test files for the FHIR document-related functionality in the core package. It includes tests for creating FHIR DocumentReference resources and generating query filters for document retrieval.
+
+## What does it do?
+The code in this directory serves two main purposes:
+
+1. It provides a function to create mock FHIR DocumentReference resources for testing purposes. This allows developers to easily generate realistic DocumentReference objects with customizable properties.
+
+2. It contains unit tests for a function that generates query filters for retrieving documents. These tests ensure that the filter generation logic correctly handles various input parameters such as patient IDs, document IDs, and date ranges.
+
+## Key Files
+
+### document-reference.ts
+This file defines the `makeDocumentReference` function, which creates a FHIR DocumentReference resource. It's primarily used for testing purposes, allowing the creation of a DocumentReference with customizable properties.
+
+Key features:
+- Generates a DocumentReference with default values
+- Allows customization of ID, patient, binary attachment, base URL, and extensions
+- Uses helper functions to create related resources (Patient and Binary) if not provided
+
+### get-documents.test.ts
+This file contains unit tests for the `getFilters` function from the `get-documents` module. It tests various scenarios of filter generation based on different input parameters.
+
+Key test cases:
+- Empty input
+- Single and multiple patient IDs
+- Date range filters
+- Document ID filters
+- Combinations of different filter types
+
+## Dependencies
+The code in this directory relies on several external libraries:
+
+1. @medplum/fhirtypes (version not specified)
+   - Provides TypeScript types for FHIR resources
+   - Used in document-reference.ts for type definitions
+
+2. uuid (version not specified)
+   - Generates unique identifiers
+   - Used in both files for creating mock IDs
+
+3. @faker-js/faker (version not specified)
+   - Generates fake data for tests
+   - Used in get-documents.test.ts for creating random patient IDs and dates
+
+4. dayjs (version not specified)
+   - Date manipulation and formatting
+   - Used in get-documents.test.ts for working with date ranges
+
+5. lodash (version not specified)
+   - Utility functions
+   - The `trim` function is used in get-documents.test.ts
+
+## Configuration
+The tests use the following configuration:
+
+- ISO_DATE: "YYYY-MM-DD"
+  - This constant is imported from @metriport/shared/common/date
+  - It defines the date format used in the tests
+
+## Code Snippets
+
+Here's an example of how the `makeDocumentReference` function is structured:
+
+```typescript
+export function makeDocumentReference(options?: {
+  id?: string;
+  patient?: Patient;
+  binary?: Binary;
+  baseURL?: string;
+  extension?: Extension[];
+}): DocumentReference {
+  const patient = options?.patient ?? makePatient();
+  const binary = options?.binary ?? makeBinary();
+  const baseURL = options?.baseURL ?? 'https://example.com';
+
+  return {
+    resourceType: 'DocumentReference',
+    id: options?.id ?? randomUUID(),
+    status: 'current',
+    type: {
+      coding: [
+        {
+          system: 'http://loinc.org',
+          code: '34133-9',
+          display: 'Summarization of episode note',
+        },
+      ],
+    },
+    subject: {
+      reference: `Patient/${patient.id}`,
+    },
+    content: [
+      {
+        attachment: {
+          contentType: 'application/pdf',
+          url: `${baseURL}/Binary/${binary.id}`,
+        },
+      },
+    ],
+    context: {},
+    extension: options?.extension,
+  };
+}
+```
+
+And here's an example of one of the test cases in get-documents.test.ts:
+
+```typescript
+it('should handle multiple patient IDs', () =&gt; {
+  const patientId1 = faker.string.uuid();
+  const patientId2 = faker.string.uuid();
+  const result = getFilters({ patientId: [patientId1, patientId2] });
+  expect(result).toBe(
+    `subject=${encodeURIComponent(patientId1)},${encodeURIComponent(patientId2)}`
+  );
+});
+```
+
+These tests ensure that the document retrieval functionality works correctly with various input parameters, providing a robust foundation for the FHIR document handling features in the core package.

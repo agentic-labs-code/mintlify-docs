@@ -1,0 +1,66 @@
+---
+title: "Social_History.hbs"
+---
+
+## High-level description
+This Handlebars template file, `Social_History.hbs`, is designed to process and transform social history data from a Clinical Document Architecture (CDA) format into FHIR (Fast Healthcare Interoperability Resources) Observation resources. It specifically handles social history sections identified by the template ID '2.16.840.1.113883.10.20.22.2.17'.
+
+## Code Structure
+The template uses nested Handlebars helpers to iterate through the social history entries, generate Observation resources, and create references to related resources such as Patient, Practitioner, and Organization.
+
+## Symbols
+
+### Root Template
+#### Description
+The root template checks for the presence of a specific social history section and processes its entries.
+
+#### Internal Logic
+1. Checks if the message contains the social history template ID.
+2. If found, it retrieves the first CDA section with that template ID.
+3. Iterates through each entry in the social history section.
+4. For each entry, it generates an Observation resource and associated references.
+
+### Observation Resource Generation
+#### Description
+Generates an Observation resource for each social history entry.
+
+#### Internal Logic
+1. Uses the `Resources/Observation.hbs` partial to create the Observation resource.
+2. Sets the observation category to "social-history".
+3. Generates a unique ID for the Observation using UUID.
+
+### Patient Reference
+#### Description
+Creates a reference to the Patient resource.
+
+#### Internal Logic
+1. Uses the `Utils/GeneratePatientId.hbs` partial to generate a patient ID.
+2. Creates a reference to the Patient using the `References/Observation/subject.hbs` partial.
+
+### Practitioner and Organization References
+#### Description
+Creates references to Practitioner and Organization resources if author information is available.
+
+#### Internal Logic
+1. Iterates through each author in the observation entry.
+2. For Practitioners:
+   - Generates a Practitioner ID using `Utils/GeneratePractitionerId.hbs`.
+   - Creates a Practitioner resource using `Resources/Practitioner.hbs`.
+   - Adds a reference to the Practitioner using `References/Observation/performer.hbs`.
+3. For Organizations:
+   - Generates an Organization ID using `Utils/GenerateOrganizationId.hbs`.
+   - Creates an Organization resource using `Resources/Organization.hbs`.
+   - Adds a reference to the Organization using `References/Observation/performer.hbs`.
+
+## Dependencies
+This template relies on several other Handlebars partials and helpers, including:
+- `Resources/Observation.hbs`
+- `Utils/GeneratePatientId.hbs`
+- `References/Observation/subject.hbs`
+- `Utils/GeneratePractitionerId.hbs`
+- `Resources/Practitioner.hbs`
+- `References/Observation/performer.hbs`
+- `Utils/GenerateOrganizationId.hbs`
+- `Resources/Organization.hbs`
+
+Note: The actual implementation of these partials and helpers is not provided in the given code snippet.

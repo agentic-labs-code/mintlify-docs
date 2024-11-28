@@ -1,0 +1,72 @@
+---
+title: "mapi-access.ts"
+---
+
+## High-level description
+The code defines three asynchronous functions related to managing MAPI (most likely an acronym for Medical API) access for customers, identified by their `cxId`. It provides functionality to grant, check, and revoke MAPI access.
+
+## References
+- `MAPIAccess`: This symbol refers to a Sequelize model, likely defined in `src/models/medical/mapi-access.ts`, representing the persistence layer for MAPI access control.
+- `NotFoundError`: This symbol refers to a custom error class, likely defined in `src/errors/not-found.ts`, used to signal when a customer is not found.
+
+## Symbols
+
+### `allowMapiAccess`
+#### Description
+This function checks if a customer, identified by `cxId`, already has MAPI access. If they do, it returns "existing". If not, it creates a new MAPI access record for the customer and returns "new".
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The unique identifier of the customer. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | "new" \| "existing" | Indicates whether a new MAPI access record was created or if one already existed. |
+
+#### Internal Logic
+1. Queries the database for an existing `MAPIAccess` record associated with the given `cxId`.
+2. If a record is found, returns "existing".
+3. If no record is found, creates a new `MAPIAccess` record with the given `cxId` and returns "new".
+
+### `hasMapiAccess`
+#### Description
+This function checks if a customer, identified by `cxId`, has MAPI access.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The unique identifier of the customer. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| hasAccess | boolean | Indicates whether the customer has MAPI access. |
+
+#### Internal Logic
+1. Queries the database for an existing `MAPIAccess` record associated with the given `cxId`.
+2. If a record is found, returns `true`.
+3. If no record is found, returns `false`.
+
+### `revokeMapiAccess`
+#### Description
+This function revokes MAPI access for a customer, identified by `cxId`, by deleting their corresponding `MAPIAccess` record.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The unique identifier of the customer. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| void | void | This function does not return a value. |
+
+#### Internal Logic
+1. Queries the database for an existing `MAPIAccess` record associated with the given `cxId`.
+2. If no record is found, throws a `NotFoundError`.
+3. If a record is found, deletes the record.
+
+## Error Handling
+- Uses the custom `NotFoundError` to signal that a customer with the given `cxId` was not found when attempting to revoke MAPI access.

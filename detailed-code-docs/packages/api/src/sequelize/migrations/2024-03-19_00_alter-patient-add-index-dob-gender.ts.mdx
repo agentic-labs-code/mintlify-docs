@@ -1,0 +1,57 @@
+---
+title: "2024-03-19_00_alter-patient-add-index-dob-gender.ts"
+---
+
+## High-level description
+This migration script adds and removes an index on the `dob` field (extracted from the `data` JSONB column) in the `patient` table. 
+
+## Symbols
+
+### `up`
+#### Description
+This asynchronous function defines the steps to apply the migration. It adds an index named `patient_dob_index` to the `patient` table, specifically targeting the `dob` field within the `data` JSONB column.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | Object | An object containing the `queryInterface` object, which provides methods for interacting with the database schema. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. **Transaction:** The migration is wrapped in a database transaction to ensure atomicity.
+2. **Add Index:** It uses `queryInterface.addIndex` to create the index.
+    - `tableName`: Specifies the target table (`patient`).
+    - `indexName`: Sets the index name (`patient_dob_index`).
+    - `fields`: Defines the indexed field as `Sequelize.literal("((data-&gt;&gt;'dob'))")`, extracting the `dob` value from the `data` JSONB column using a PostgreSQL expression.
+    - `transaction`: Passes the transaction object to execute the operation within the transaction.
+
+### `down`
+#### Description
+This asynchronous function defines the steps to revert the migration. It removes the `patient_dob_index` index from the `patient` table.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | Object | An object containing the `queryInterface` object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise | A promise that resolves when the migration rollback is complete. |
+
+#### Internal Logic
+1. **Transaction:** The rollback is wrapped in a database transaction.
+2. **Remove Index:** It uses `queryInterface.removeIndex` to drop the index.
+    - `tableName`: Specifies the target table (`patient`).
+    - `indexName`: The name of the index to remove (`patient_dob_index`).
+    - `transaction`: Passes the transaction object.
+
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Sequelize | Provides the ORM and migration utilities. |

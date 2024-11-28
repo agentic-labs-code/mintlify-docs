@@ -1,0 +1,57 @@
+---
+title: "2022-12-23_01_alter-connected_user-add-index.ts"
+---
+
+## High-level description
+This migration script adds an index to the `cx_id` column of the `connected_user` table. This is intended to improve the performance of queries that filter or sort by this column.
+
+## Symbols
+
+### `up`
+#### Description
+This function defines the actions to be performed when the migration is applied (going up). It adds an index named `cx_id` to the `connected_user` table on the `cx_id` column. The operation is wrapped in a transaction to ensure atomicity.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | { context: QueryInterface } | An object containing the Sequelize QueryInterface, which provides methods for interacting with the database. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise\&lt;void\&gt; | A promise that resolves when the migration step is complete. |
+
+#### Internal Logic
+1. Starts a database transaction.
+2. Uses the `queryInterface.addIndex` method to add the index to the `connected_user` table, specifying the index name as `cx_id` and the column to index as `cx_id`.
+3. Commits the transaction if the index creation is successful. If an error occurs during the process, the transaction is rolled back.
+
+### `down`
+#### Description
+This function defines the actions to be performed when the migration is rolled back (going down). It removes the index named `cx_id` from the `connected_user` table. The operation is wrapped in a transaction to ensure atomicity.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | { context: QueryInterface } | An object containing the Sequelize QueryInterface, which provides methods for interacting with the database. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise\&lt;void\&gt; | A promise that resolves when the migration step is complete. |
+
+#### Internal Logic
+1. Starts a database transaction.
+2. Uses the `queryInterface.removeIndex` method to remove the index from the `connected_user` table, specifying the table name and the index name.
+3. Commits the transaction if the index removal is successful. If an error occurs during the process, the transaction is rolled back.
+
+## References
+- `ConnectedUser`: This migration script references the `ConnectedUser` model, which defines the structure of the `connected_user` table. The `NAME` property of the `ConnectedUser` model is used to specify the table name when adding and removing the index.
+- `queryInterface`: This is a Sequelize object that provides methods for interacting with the database schema. It is used to add and remove the index.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| "umzug" | Provides the migration framework used to manage database schema changes. |
+| "sequelize" |  Provides the ORM (Object-Relational Mapping) library used to interact with the database. |
+

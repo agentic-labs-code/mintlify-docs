@@ -1,0 +1,51 @@
+---
+title: "schedule-patient-discovery.ts"
+---
+
+## High-level description
+This code implements a function to schedule patient discovery for a specific medical data source. It updates the patient's external data with the scheduled patient discovery request information.
+
+## Code Structure
+The main function `schedulePatientDiscovery` uses `executeOnDBTx` to perform database operations within a transaction. It retrieves the existing patient, updates the external data with the new scheduled patient discovery request, and saves the changes.
+
+## Symbols
+
+### `schedulePatientDiscovery`
+#### Description
+This function schedules a patient discovery request for a specific medical data source.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId"&gt; | Patient object with id and cxId |
+| source | MedicalDataSource | The medical data source for the discovery |
+| requestId | string | Unique identifier for the request |
+| facilityId | string | Identifier of the facility |
+| orgIdExcludeList | string[] | Optional list of organization IDs to exclude |
+| rerunPdOnNewDemographics | boolean | Optional flag to rerun patient discovery on new demographics |
+| forceCommonwell | boolean | Optional flag to force Commonwell discovery |
+| forceCarequality | boolean | Optional flag to force Carequality discovery |
+
+#### Internal Logic
+1. Logs the scheduling of patient discovery
+2. Creates a patient filter object
+3. Executes a database transaction:
+   a. Retrieves the existing patient
+   b. Updates the external data with the new scheduled patient discovery request
+   c. Saves the updated patient data
+
+#### Side Effects
+- Updates the patient record in the database
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/external/index | Imports MedicalDataSource enum |
+| @metriport/core/domain/patient | Imports Patient type |
+| @metriport/core/util/log | Imports logging utility |
+| ../../command/medical/patient/get-patient | Imports getPatientOrFail function |
+| ../../models/medical/patient | Imports PatientModel |
+| ../../models/transaction-wrapper | Imports executeOnDBTx function |
+
+## TODOs
+- TODO #1572: Remove forceCommonwell and forceCarequality parameters

@@ -1,0 +1,56 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for generating Clinical Document Architecture (CDA) documents from FHIR (Fast Healthcare Interoperability Resources) data. It includes modules for building various components of a CDA document, such as the clinical document structure, author information, custodian details, record target, and structured body. The code also provides utility functions and constants for handling CDA-specific data structures, XML generation, and data mapping between FHIR and CDA formats.
+
+## What does it do?
+The code in this directory performs the following main tasks:
+
+1. Converts FHIR resources into CDA-compliant structures for various clinical data types, including allergies, medications, problems, procedures, vital signs, social history, and more.
+2. Generates the overall structure of a CDA document, including header information and the structured body.
+3. Creates human-readable tables and machine-readable entries for each clinical section.
+4. Handles date formatting, status code mapping, and coding system conversions between FHIR and CDA.
+5. Provides utility functions for building CDA elements, such as codes, identifiers, and addresses.
+6. Manages XML generation for the final CDA document.
+
+## Entry points
+The main entry point for generating a complete CDA XML document is the `buildClinicalDocumentXml` function in the `clinical-document.ts` file. This function orchestrates the creation of various parts of the CDA document by calling other specialized functions:
+
+1. `buildAuthor` from `author.ts` constructs the author information.
+2. `buildCustodian` from `custodian.ts` creates the custodian details.
+3. `buildRecordTargetFromFhirPatient` from `record-target.ts` generates the record target section with patient information.
+4. `buildStructuredBody` from `structured-body.ts` assembles the main content of the document by calling various section-building functions.
+
+The `components` subdirectory contains modules for processing specific types of clinical data (e.g., allergies, medications, vital signs) and converting them into CDA sections.
+
+## Key Files
+1. `clinical-document.ts`: Main orchestrator for generating the entire CDA XML document.
+2. `structured-body.ts`: Assembles various sections of the CDA document from a FHIR Bundle.
+3. `commons.ts`: Provides utility functions for building CDA elements and handling common tasks.
+4. `constants.ts`: Defines constants, OIDs, and system codes used throughout the conversion process.
+5. `components/*.ts`: Individual files for processing different types of clinical data (e.g., `allergies.ts`, `medications.ts`, `vital-signs.ts`).
+6. `create-table-rows-and-entries.ts`: Defines a reusable function for generating table rows and entries for CDA sections.
+7. `table.ts`: Provides utilities for creating and structuring tables in CDA format.
+
+## Dependencies
+The code relies on several external libraries and internal modules:
+
+1. `fast-xml-parser`: Used for XML generation.
+2. `@medplum/fhirtypes`: Provides FHIR type definitions.
+3. `@metriport/shared`: Contains shared constants and utilities.
+4. `dayjs`: Used for date manipulation and formatting.
+
+## Configuration
+The code uses various configuration options and constants:
+
+1. XML generation options in `shared.ts` for controlling XML output format.
+2. OIDs (Object Identifiers) for different sections and coding systems.
+3. LOINC codes for identifying specific types of observations and sections.
+4. Mapping tables for converting between FHIR and CDA status codes, vital sign categories, etc.
+5. Constants from `constants.ts` for template IDs, system codes, and other metadata.
+
+These configurations ensure that the generated CDA documents conform to the required standards and formats for healthcare data exchange.
+
+In summary, this directory contains a comprehensive set of modules and utilities for converting FHIR data to CDA format, handling various aspects of clinical data representation and document structure. It demonstrates careful attention to healthcare data standards and provides a flexible, modular approach to generating CDA documents from FHIR resources.

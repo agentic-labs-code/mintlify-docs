@@ -1,0 +1,87 @@
+---
+title: "provider.ts"
+---
+
+## High-level description
+This code defines an abstract `Provider` class that serves as a base for implementing various health data providers. It includes methods for retrieving different types of health data (activity, body, biometrics, nutrition, sleep, and user data) and a mechanism to check if a provider supports a specific data type.
+
+## Code Structure
+The `Provider` class is an abstract base class that other provider-specific classes will inherit from. It defines a set of methods for retrieving different types of health data, which are implemented by default to throw a `NotImplementedError`. The class also includes a `consumerHealthDataTypeSupported` method to check if a specific data type is supported by the provider.
+
+## Symbols
+
+### `ConsumerHealthDataType` (enum)
+#### Description
+An enumeration of different types of consumer health data that can be retrieved from providers.
+
+#### Enum Values
+- Activity
+- Body
+- Biometrics
+- Nutrition
+- Sleep
+- User
+
+### `DAPIParams` (type)
+#### Description
+A type definition for additional parameters that can be passed to data retrieval methods.
+
+#### Properties
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| timezoneId | string (optional) | The timezone ID for the request |
+| accessToken | string (optional) | An access token for authentication |
+
+### `ConsumerHealthDataTypeMap` (type)
+#### Description
+A type that maps each `ConsumerHealthDataType` to a boolean value, indicating whether the provider supports that data type.
+
+### `Provider` (abstract class)
+#### Description
+An abstract base class for implementing health data providers.
+
+#### Constructor
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| supportedDataTypes | ConsumerHealthDataTypeMap | A map of supported data types |
+
+#### Methods
+
+##### `consumerHealthDataTypeSupported`
+###### Description
+Checks if a specific data type is supported by the provider.
+
+###### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dataType | ConsumerHealthDataType | The data type to check |
+
+###### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | boolean | Whether the data type is supported |
+
+##### `getActivityData`, `getBodyData`, `getBiometricsData`, `getNutritionData`, `getSleepData`, `getUserData`
+###### Description
+These methods are placeholders for retrieving different types of health data. By default, they throw a `NotImplementedError`.
+
+###### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object |
+| date | string | The date for which to retrieve data |
+| params | DAPIParams | Additional parameters |
+| rawParams | RawParams (optional) | Raw request parameters |
+
+###### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | Promise&lt;Activity \| Body \| Biometrics \| Nutrition \| Sleep \| User&gt; | The requested health data |
+
+## Dependencies
+- `@metriport/api-sdk`: Provides types for different health data models.
+- `NotImplementedError`: A custom error class for unimplemented methods.
+- `ConnectedUser`: Represents a connected user in the system.
+- `RawParams`: Represents raw request parameters.
+
+This `Provider` class serves as a foundation for implementing specific health data providers, ensuring a consistent interface across different providers while allowing for provider-specific implementations of data retrieval methods.

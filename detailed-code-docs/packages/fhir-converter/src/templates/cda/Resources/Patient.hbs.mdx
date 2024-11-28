@@ -1,0 +1,66 @@
+---
+title: "Patient.hbs"
+---
+
+## High-level description
+This Handlebars template is used to generate a FHIR Patient resource from CDA (Clinical Document Architecture) data. It transforms patient information from the CDA format into the FHIR JSON structure, including details such as identifiers, names, birth date, gender, race, ethnicity, marital status, address, telecom, and language communication.
+
+## Code Structure
+The template defines a JSON structure for a FHIR Patient resource. It uses Handlebars helpers and partials to populate various sections of the resource with data from the CDA input. The main sections include patient identification, demographics, contact information, and communication preferences.
+
+## Symbols
+
+### Main Template
+#### Description
+This is the root template that constructs the entire FHIR Patient resource.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientRole | Object | Contains patient information from the CDA document |
+| ID | String | Unique identifier for the patient |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON | Object | A FHIR-compliant Patient resource |
+
+#### Internal Logic
+1. Sets the resource type and meta information
+2. Populates patient identifiers using a partial template
+3. Sets name, birth date, and gender
+4. Adds race and ethnicity extensions
+5. Sets marital status, address, and telecom information
+6. Adds language communication preferences
+
+### Partials
+The template uses several partial templates to populate specific sections:
+
+1. `DataType/Identifier.hbs`: For patient identifiers
+2. `DataType/HumanName.hbs`: For patient names
+3. `ValueSet/AdministrativeGender.hbs`: For gender coding
+4. `Extensions/Race.hbs` and `Extensions/Ethnicity.hbs`: For race and ethnicity extensions
+5. `DataType/CodeableConcept.hbs`: For marital status
+6. `DataType/Address.hbs`: For patient addresses
+7. `DataType/ContactPoint.hbs`: For telecom information
+8. `ValueSet/Language.hbs`: For language codes
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Handlebars | Template engine used for generating the JSON structure |
+
+## Configuration
+The template uses several Handlebars helpers:
+
+| Helper | Purpose |
+|:-------|:--------|
+| toArray | Converts a single item or array to an array |
+| addHyphensDate | Formats the birth date with hyphens |
+
+## TODOs
+There is a comment indicating a missing mapping:
+```handlebars
+{{!-- Missing providerOrganization &gt; managingOrganization --}}
+```
+This suggests that there might be a need to add a mapping for the managing organization in the future.

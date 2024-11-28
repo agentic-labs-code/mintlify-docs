@@ -1,0 +1,81 @@
+---
+title: "query-documents.ts"
+---
+
+## High-level description
+The `getDocumentsFromCQ` function is responsible for initiating and managing the retrieval of documents from Carequality for a given patient. It handles various scenarios, including scheduling document queries, initiating patient discovery if necessary, and polling for results from the IHE Gateway.
+
+## Code Structure
+The `getDocumentsFromCQ` function orchestrates the document retrieval process. It first checks for prerequisites like feature flag enablement and patient data availability. Depending on the patient's discovery status, it either schedules a document query or proceeds with retrieving documents based on available CQ links. The function utilizes helper functions like `getCQPatientData`, `getCqInitiator`, `getCQDirectoryEntry`, `createOutboundDocumentQueryRequests`, and `makeOutboundResultPoller` to accomplish its tasks.
+
+## References
+- `getCQPatientData`: Retrieves patient data from Carequality.
+- `getCqInitiator`: Determines the initiator for the document query.
+- `getCQDirectoryEntry`: Fetches directory entry for a given organization OID.
+- `createOutboundDocumentQueryRequests`: Generates document query requests for the IHE Gateway.
+- `makeOutboundResultPoller`: Creates an instance of the outbound result poller.
+- `scheduleDocQuery`: Schedules a document query for later execution.
+- `setDocQueryProgress`: Updates the document query progress.
+- `setDocQueryStartAt`: Sets the start time for the document query.
+- `makeIHEGatewayV2`: Creates an instance of the IHE Gateway V2.
+- `isFacilityEnabledToQueryCQ`: Checks if the facility is enabled to query Carequality.
+- `filterCqLinksByManagingOrg`: Filters CQ links based on the managing organization.
+
+## Symbols
+
+### `getDocumentsFromCQ`
+#### Description
+This function orchestrates the process of retrieving documents from Carequality for a given patient. It handles scheduling document queries, initiating patient discovery, and polling for results.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| requestId | string | Unique identifier for the request. |
+| facilityId | string (optional) | ID of the facility initiating the request. |
+| patient | Patient | Patient object containing relevant information. |
+| cqManagingOrgName | string (optional) | Name of the Carequality managing organization. |
+| forcePatientDiscovery | boolean (optional) | Flag to force patient discovery even if data exists. Defaults to `false`. |
+| triggerConsolidated | boolean (optional) | Flag to indicate if a consolidated document query should be triggered. Defaults to `false`. |
+
+#### Outputs
+This function does not return a value directly. It updates the document query progress and potentially triggers document retrieval.
+
+#### Internal Logic
+1. **Check Prerequisites:**
+    - Verify if the IHE DQ result poller is enabled.
+    - Check if Carequality Direct is enabled for the patient's CX.
+    - Ensure the facility is enabled to query Carequality.
+2. **Retrieve Patient Data:**
+    - Fetch patient data from Carequality using `getCQPatientData`.
+    - Determine the initiator for the document query using `getCqInitiator`.
+    - Set the initial document query progress to "processing".
+3. **Handle Patient Discovery:**
+    - If patient data is missing, being processed, or forced discovery is requested:
+        - Schedule a document query using `scheduleDocQuery`.
+        - If forced discovery is requested and not already processing, initiate patient discovery.
+        - Return early as document retrieval will happen after discovery.
+4. **Process CQ Links:**
+    - If the patient has no CQ links, log a message and return.
+    - Set the document query start time using `setDocQueryStartAt`.
+    - For each CQ link:
+        - Retrieve the gateway information using `getCQDirectoryEntry`.
+        - If the gateway is found and has a document query URL, add it to the list of links to process.
+    - Filter the links based on the managing organization if provided.
+5. **Create and Send Document Query Requests:**
+    - Generate document query requests using `createOutboundDocumentQueryRequests`.
+    - If there are requests, initiate the document query through the IHE Gateway V2.
+6. **Poll for Results:**
+    - Poll for outbound document query results using the `resultPoller`.
+7. **Error Handling:**
+    - If an error occurs during the process:
+        - Log an error message and capture the error.
+        - Set the document query progress to "failed".
+        - Re-throw the error.
+
+## Side Effects
+- Updates the patient's document query progress in the database.
+- Initiates patient discovery if necessary.
+- Sends document query requests to the IHE Gateway.
+
+## Error Handling
+The function includes a try-catch block to handle errors during the document retrieval process. Errors are logged, captured using the `capture.error` function, and the document query progress is updated to "failed".

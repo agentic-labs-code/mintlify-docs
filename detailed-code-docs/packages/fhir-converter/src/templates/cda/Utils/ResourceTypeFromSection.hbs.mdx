@@ -1,0 +1,48 @@
+---
+title: "ResourceTypeFromSection.hbs"
+---
+
+## High-level description
+This Handlebars template defines a mapping between CDA (Clinical Document Architecture) section template IDs and corresponding FHIR resource types. It's used to determine the appropriate FHIR resource type based on the template ID of a CDA section.
+
+## Symbols
+
+### resourceType
+#### Description
+This is the main symbol in the template. It's a Handlebars expression that determines the FHIR resource type based on the `section.templateId` of the CDA document.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| section.templateId | String | The template ID of the CDA section |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resourceType | String | The corresponding FHIR resource type |
+
+#### Internal Logic
+The template uses a series of conditional statements to check the `section.templateId` against known CDA template IDs and returns the corresponding FHIR resource type. For example:
+- If the template ID contains "2.16.840.1.113883.10.20.22.2.6.1", it returns "AllergyIntolerance"
+- If the template ID contains "2.16.840.1.113883.10.20.22.2.1.1", it returns "MedicationStatement"
+- And so on for various other template IDs
+
+If no match is found and a section exists, it returns an empty string.
+
+## Dependencies
+This template relies on the following Handlebars helpers:
+- `contains`: Used to check if the `section.templateId` contains a specific string
+- `toJsonString`: Used to convert the `section.templateId` to a JSON string for comparison
+
+## Error Handling
+There's no explicit error handling in this template. If the `section.templateId` doesn't match any of the defined conditions and there's no section, no resource type will be returned.
+
+## Performance Considerations
+The template uses a series of `if-else` statements, which could potentially impact performance for large documents with many sections. However, for typical use cases, this should not be a significant concern.
+
+## TODOs
+There's a comment suggesting a potential improvement:
+```handlebars
+{{!-- Why not also 2.16.840.1.113883.10.20.22.2.7, optional? --}}
+```
+This indicates that there might be an additional template ID that could be considered for the "Procedure" resource type.

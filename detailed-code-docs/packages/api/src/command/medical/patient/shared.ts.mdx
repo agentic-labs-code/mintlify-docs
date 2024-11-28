@@ -1,0 +1,132 @@
+---
+title: "shared.ts"
+---
+
+## High-level description
+The `shared.ts` file provides utility functions for sanitizing, validating, and generating file names related to patient data in a medical context. These functions are used across different patient-related commands like create, update, and match.
+
+## Code Structure
+This file contains a set of independent utility functions that are used by other modules related to patient management. The functions `sanitize` and `validate` are used for input processing, while `createSandboxMRSummaryFileName` is used for file naming conventions.
+
+## Symbols
+
+### `sanitize`
+#### Description
+This function sanitizes patient data by removing empty personal identifiers. It's used to clean up patient data before further processing or storage.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `PatientCreateCmd \| PatientUpdateCmd \| PatientMatchCmd` | The patient object to sanitize. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `T` | The sanitized patient object. |
+
+#### Internal Logic
+1. Deep clones the input patient object to avoid modifying the original.
+2. Filters the `personalIdentifiers` array, removing entries where the `value` is an empty string after trimming.
+3. Returns the sanitized patient object.
+
+### `validate`
+#### Description
+This function validates patient data, ensuring that the address is provided and any provided time periods associated with personal identifiers are valid.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `PatientCreateCmd \| PatientUpdateCmd \| PatientMatchCmd` | The patient object to validate. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `boolean` | True if the patient data is valid, false otherwise. |
+
+#### Internal Logic
+1. Checks if the `address` property is present and has at least one entry. If not, returns false.
+2. Iterates through each `personalIdentifier` and validates its associated `period` using the `validatePeriod` function.
+3. Returns true if all checks pass, indicating valid patient data.
+
+### `validatePeriod`
+#### Description
+This function validates a time period, ensuring that the start date is in the past and the end date (if provided) is after the start date.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| period | `Period` | The time period object to validate. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `boolean` | True if the period is valid, false otherwise. |
+
+#### Internal Logic
+1. If both `start` and `end` dates are provided:
+    - Validates that the `start` date is in the past using `validateIsPast`.
+    - Validates that the `start` date is before the `end` date using `validateDateRange`.
+2. If only the `start` date is provided, validates that it's in the past using `validateIsPast`.
+3. Returns true if all checks pass, indicating a valid time period.
+
+### `validateIsPast`
+#### Description
+This function checks if a given date string represents a date in the past.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| date | `string` | The date string to validate. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `boolean` | True if the date is in the past, throws an error otherwise. |
+
+#### Internal Logic
+1. Parses the input `date` string using `dayjs`.
+2. Checks if the parsed date is before the current date.
+3. If the date is not in the past, throws a `BadRequestError` with a message indicating the issue.
+4. If the date is in the past, returns true.
+
+### `validateDateRange`
+#### Description
+This function validates that a start date is before an end date.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| start | `string` | The start date string. |
+| end | `string` | The end date string. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `boolean` | True if the start date is before the end date, throws an error otherwise. |
+
+#### Internal Logic
+1. Parses the `start` and `end` date strings using `dayjs`.
+2. Checks if the `start` date is before the `end` date.
+3. If the `start` date is not before the `end` date, throws a `BadRequestError` with a message indicating the issue.
+4. If the `start` date is before the `end` date, returns true.
+
+### `createSandboxMRSummaryFileName`
+#### Description
+This function generates a file name for a sandbox medical record summary based on the patient's first name and the desired file extension.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| firstName | `string` | The patient's first name. |
+| extension | `"pdf" \| "html"` | The desired file extension for the medical record summary. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `string` | The generated file name for the sandbox medical record summary. |
+
+#### Internal Logic
+1. Constructs the file name based on the provided `firstName` and `extension`.
+2. If the `extension` is "pdf", the file name will be in the format: `{firstName}_MR.html.pdf`.
+3. If the `extension` is "html", the file name will be in the format: `{firstName}_MR.html`.
+4. Returns the generated file name.

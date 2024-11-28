@@ -1,0 +1,76 @@
+---
+title: "internal-mpi.ts"
+---
+
+## High-level description
+This code defines an Express router for handling internal MPI (Master Patient Index) operations. It provides an endpoint for finding patients across all customers based on specific criteria such as date of birth, gender, and name initials.
+
+## Code Structure
+The main components of this code are:
+1. The Express router setup
+2. A GET endpoint for patient lookup
+3. Utility functions for patient data handling
+
+## Symbols
+
+### `router`
+#### Description
+An Express router instance for handling MPI-related routes.
+
+### `patientLoader`
+#### Description
+An instance of `PatientLoaderLocal` used for patient data retrieval operations.
+
+### GET `/patient`
+#### Description
+An endpoint for finding patients across all customers based on specific criteria.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dob | string | Date of birth |
+| genderAtBirth | string | Gender at birth |
+| firstNameInitial | string (optional) | First name initial |
+| lastNameInitial | string (optional) | Last name initial |
+
+#### Outputs
+| Name | Type | Description |
+| List of patients | Patient[] | Array of patient objects matching the criteria |
+
+#### Internal Logic
+1. Extracts query parameters from the request
+2. Calls `patientLoader.findBySimilarityAcrossAllCxs()` to find matching patients
+3. Creates a unique ID for each patient
+4. Returns the list of patients as a JSON response
+
+### `createPatientUniqueId()`
+#### Description
+A utility function that creates a unique patient ID by combining customer ID and patient ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| uniqueId | string | Base64 encoded unique patient ID |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides schema for gender at birth |
+| dayjs | Date manipulation library |
+| express | Web application framework |
+| http-status | HTTP status codes |
+| @metriport/core/external/carequality/shared | Utility functions for patient ID creation |
+| @metriport/core/domain/patient | Patient domain model |
+
+## Error Handling
+The endpoint uses the `asyncHandler` wrapper, which likely handles any errors thrown within the route handler and passes them to Express's error handling middleware.
+
+___
+
+This code implements an internal API endpoint for patient lookup across all customers, which is crucial for MPI functionality. It uses a local patient loader to perform the search and applies additional processing to ensure unique patient identifiers are created for each result.

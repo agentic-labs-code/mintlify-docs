@@ -1,0 +1,151 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains API reference documentation for managing facilities within the Metriport medical API. It provides endpoints for creating, retrieving, updating, deleting, and listing facilities where patients receive care.
+
+## What does it do?
+The code in this directory enables developers to interact with the Metriport API to manage healthcare facilities. It allows users to:
+
+1. Create new facilities with details like name, NPI (National Provider Identifier), TIN (Tax Identification Number), address, and active status.
+2. Retrieve information about a specific facility using its ID.
+3. Update existing facility information.
+4. Delete a facility (if it's not associated with any patients).
+5. List all facilities associated with the user's organization.
+
+These operations are essential for healthcare applications that need to manage multiple care facilities and associate patients with specific locations.
+
+## Entry points
+The main entry points for this API are:
+
+1. `create-facility.mdx`: POST request to create a new facility.
+2. `get-facility.mdx`: GET request to retrieve a specific facility's information.
+3. `update-facility.mdx`: PUT request to update an existing facility's information.
+4. `delete-facility.mdx`: DELETE request to remove a facility.
+5. `list-facilities.mdx`: GET request to retrieve a list of all facilities.
+
+Each file corresponds to a specific API endpoint and provides details on the request parameters, response format, and example usage using the Metriport SDK.
+
+## Dependencies
+The API documentation references the Metriport SDK, specifically the `@metriport/api-sdk` package. This SDK is used in the code examples to demonstrate how to interact with the API programmatically. The SDK version is not explicitly specified in the provided content.
+
+## Configuration
+The API requires an API key for authentication. This is demonstrated in the code examples where the MetriportMedicalApi is initialized with "YOUR_API_KEY".
+
+Example:
+```javascript
+import { MetriportMedicalApi } from "@metriport/api-sdk";
+
+const metriport = new MetriportMedicalApi("YOUR_API_KEY");
+```
+
+The API uses standard RESTful conventions:
+- POST for creating resources
+- GET for retrieving resources
+- PUT for updating resources
+- DELETE for removing resources
+
+The base URL for all endpoints is not explicitly stated but follows the pattern `/medical/v1/facility`.
+
+## Key concepts and data structures
+
+1. Facility Object:
+   The core data structure used across these endpoints is the Facility object. It typically includes the following properties:
+
+   ```javascript
+   {
+     id: string,
+     oid: string,
+     name: string,
+     npi: string,
+     tin: string,
+     active: boolean,
+     address: {
+       addressLine1: string,
+       addressLine2?: string,
+       city: string,
+       state: string,
+       zip: string,
+       country: string
+     }
+   }
+   ```
+
+   - `id`: A unique identifier for the facility.
+   - `oid`: Object Identifier, likely used for interoperability purposes.
+   - `name`: The name of the facility.
+   - `npi`: National Provider Identifier, a unique 10-digit identification number for covered healthcare providers.
+   - `tin`: Tax Identification Number.
+   - `active`: A boolean indicating if the facility is currently active.
+   - `address`: An object containing the facility's address details.
+
+2. USState Enum:
+   The SDK includes a `USState` enum for specifying US states in a standardized format.
+
+3. Error Handling:
+   The documentation doesn't explicitly cover error handling, but it's important to note that the delete operation returns a 400 error if there are patients associated with the facility being deleted.
+
+## Usage examples
+
+Here are some key usage examples from the documentation:
+
+1. Creating a facility:
+
+```javascript
+const facility = await metriport.createFacility({
+  name: "Care Facility, LLC",
+  npi: "1234567891",
+  tin: "12-3456789",
+  active: true,
+  address: {
+    addressLine1: "2261 Market Street",
+    addressLine2: "#4818",
+    city: "San Francisco",
+    state: USState.CA,
+    zip: "94114",
+    country: "USA",
+  },
+});
+```
+
+2. Retrieving a facility:
+
+```javascript
+const facility = await metriport.getFacility("018a80c4-292a-7486-a1234-9uiu76yhe234");
+```
+
+3. Updating a facility:
+
+```javascript
+const facility = await metriport.updateFacility({
+  id: "018a80c4-292a-7486-a1234-9uiu76yhe234",
+  name: "Care Facility, LLC",
+  npi: "1234567891",
+  tin: "12-3456789",
+  active: true,
+  address: {
+    addressLine1: "2261 Market Street",
+    addressLine2: "#4818",
+    city: "San Francisco",
+    state: USState.CA,
+    zip: "94114",
+    country: "USA",
+  },
+});
+```
+
+4. Deleting a facility:
+
+```javascript
+const facilityId = "018a80c4-292a-7486-a1234-9uiu76yhe234";
+await metriport.deleteFacility(facilityId);
+```
+
+5. Listing all facilities:
+
+```javascript
+const facilities = await metriport.listFacilities();
+```
+
+These examples demonstrate how to use the Metriport SDK to interact with the facility management API endpoints. The SDK abstracts away the details of making HTTP requests, allowing developers to work with simple method calls and JavaScript objects.

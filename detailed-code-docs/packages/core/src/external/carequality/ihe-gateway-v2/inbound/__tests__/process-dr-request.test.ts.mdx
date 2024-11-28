@@ -1,0 +1,81 @@
+---
+title: "process-dr-request.test.ts"
+---
+
+## High-level description
+This file contains unit tests for processing inbound Document Retrieval (DR) requests and responses in the context of an IHE (Integrating the Healthcare Enterprise) gateway. It tests the functionality of creating, signing, processing, and handling responses for ITI-39 (Cross-Community Access) transactions.
+
+## Code Structure
+The code is organized into two main test suites: "Process Inbound Dr Request" and "Process Inbound Dr Response". Each suite contains multiple test cases that verify different aspects of the document retrieval process, including successful and error scenarios.
+
+## Symbols
+
+### `describe("Process Inbound Dr Request", ...)`
+#### Description
+This test suite focuses on testing the processing of inbound Document Retrieval requests.
+
+#### Internal Logic
+1. Mocks the S3 file upload functionality.
+2. Tests the successful processing of an ITI-39 request.
+3. Tests the handling of an invalid ITI-39 request.
+
+### `describe("Process Inbound Dr Response", ...)`
+#### Description
+This test suite focuses on testing the processing of inbound Document Retrieval responses.
+
+#### Internal Logic
+1. Mocks S3 file upload and download functionalities.
+2. Tests the successful processing of an ITI-39 response.
+3. Tests the handling of an ITI-38 error response.
+
+### `it("should process ITI-39 request", ...)`
+#### Description
+This test case verifies the correct processing of a valid ITI-39 request.
+
+#### Internal Logic
+1. Creates a SOAP envelope for the ITI-39 request.
+2. Signs the envelope with a timestamp.
+3. Processes the inbound DR request.
+4. Compares the processed request's document references with the expected values.
+
+### `it("should process invalid ITI-39 request correctly", ...)`
+#### Description
+This test case verifies that an invalid ITI-39 request is handled correctly by throwing an error.
+
+#### Internal Logic
+1. Creates an unsigned SOAP envelope for the ITI-39 request.
+2. Attempts to process the inbound DR request.
+3. Expects the processing to throw an error with the message "Failed to parse ITI-39 request".
+
+### `it("should process successful Iti-39 Response", ...)`
+#### Description
+This test case verifies the correct processing of a successful ITI-39 response.
+
+#### Internal Logic
+1. Creates a mock inbound document retrieval response.
+2. Converts the response to an MTOM (Message Transmission Optimization Mechanism) format.
+3. Processes the DR response.
+4. Verifies that the processed response contains the expected document reference information.
+
+### `it("should process ITI-38 error response", ...)`
+#### Description
+This test case verifies the correct processing of an ITI-38 error response.
+
+#### Internal Logic
+1. Creates a mock error response without document references.
+2. Converts the response to an MTOM format.
+3. Processes the DR response.
+4. Verifies that the processed response contains the expected operation outcome (error information).
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/ihe-gateway-sdk | Provides types and utilities for IHE gateway operations |
+| uuid | Generates unique identifiers |
+| fs | File system operations |
+| path | File path manipulations |
+
+## Error Handling
+The tests include scenarios for handling invalid requests and error responses, ensuring that the code properly manages and reports errors in the document retrieval process.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

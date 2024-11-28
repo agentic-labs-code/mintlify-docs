@@ -1,0 +1,64 @@
+---
+title: "index.tsx"
+---
+
+## High-level description
+This code defines a React Native component called `MetriportWidget` that renders either a native iOS widget or a WebView for Android. It's designed to integrate Metriport's functionality into React Native applications, allowing developers to embed a widget that can interact with Metriport's services.
+
+## Code Structure
+The code consists of two main parts: the native widget component for iOS and the WebView-based component for Android. The `MetriportWidget` function acts as a wrapper, choosing the appropriate implementation based on the platform.
+
+## Symbols
+
+### `MetriportWidgetProps`
+#### Description
+An interface defining the props for the MetriportWidget component.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| clientApiKey | string | API key for client authentication |
+| token | string | Authentication token |
+| sandbox | boolean | Flag to indicate sandbox mode |
+| colorMode | string (optional) | Color mode for the widget |
+| customColor | string (optional) | Custom color for the widget |
+| providers | [string] (optional) | Array of provider strings |
+| url | string (optional) | Custom URL for the widget |
+| apiUrl | string (optional) | Custom API URL |
+| style | ViewStyle | Style object for the widget |
+
+### `NativeWidget`
+#### Description
+A variable that holds either the native iOS widget component or a function that throws an error if the native module is not properly linked.
+
+### `MetriportWidget`
+#### Description
+The main component that renders either the native iOS widget or a WebView for Android.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| props | MetriportWidgetProps & WebViewProps | Combined props for MetriportWidget and WebView |
+
+#### Internal Logic
+1. Checks if the platform is iOS
+   - If true, renders the `NativeWidget` with the provided props
+2. If not iOS (Android):
+   - Constructs a URL with the necessary parameters
+   - Renders a `WebView` component with the constructed URL and additional props
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| react-native | Provides core React Native components and APIs |
+| react-native-webview | Provides the WebView component for Android |
+
+## Error Handling
+The code includes a `LINKING_ERROR` constant that provides a detailed error message if the native module is not properly linked. This error is thrown when attempting to use the `NativeWidget` on iOS if the module is not available.
+
+## Platform-specific Behavior
+The component behaves differently based on the platform:
+- On iOS, it uses a native widget component (`NativeWidget`)
+- On Android, it uses a WebView to load a URL with the necessary parameters
+
+This platform-specific behavior ensures optimal performance and native integration on iOS while providing a fallback solution for Android using WebView.

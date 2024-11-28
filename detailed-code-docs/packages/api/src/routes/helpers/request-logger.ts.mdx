@@ -1,0 +1,74 @@
+---
+title: "request-logger.ts"
+---
+
+## High-level description
+This code defines a request logger middleware for Express.js applications. It logs incoming HTTP requests, including details such as request ID, method, URL, parameters, query, and customer ID. It also measures and logs the response time when the request is completed.
+
+## Code Structure
+The main function `requestLogger` is an Express middleware that logs request details and sets up a response listener to log completion details. It uses an async local storage to maintain a unique request ID across asynchronous operations.
+
+## Symbols
+
+### `requestLogger`
+#### Description
+An Express middleware function that logs details about incoming requests and their responses.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req | Request | The Express request object |
+| res | Response | The Express response object |
+| next | NextFunction | The next middleware function in the Express pipeline |
+
+#### Internal Logic
+1. Generates a unique request ID using `nanoid`.
+2. Runs the logging logic within an async local storage context.
+3. Logs the start of the request with details like method, URL, params, query, and customer ID.
+4. Sets up a listener for the response 'close' event to log the completion of the request.
+5. Calls the next middleware in the pipeline.
+
+### `replaceParamWithKey`
+#### Description
+A helper function that replaces parameter values in the URL with their corresponding keys.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | The URL to process |
+| params | Record&lt;string, string&gt; | An object containing the parameters and their values |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string | string | The URL with parameter values replaced by their keys |
+
+### `toString`
+#### Description
+A helper function that converts an object to a JSON string or returns an empty string if the input is falsy.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| obj | unknown | The object to convert to a string |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string | string | The stringified object or an empty string |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/util/local-storage | For accessing local storage functionality |
+| express | For Express.js types |
+| nanoid | For generating unique IDs |
+| ./request-analytics | For analyzing route requests |
+
+## Logging
+The code implements extensive logging of request and response details, including:
+- Request start: method, URL, parameters, query, and customer ID
+- Request completion: method, URL, status code, and elapsed time
+
+## TODOs
+- Move the asyncLocalStorage logic to its own, dedicated middleware

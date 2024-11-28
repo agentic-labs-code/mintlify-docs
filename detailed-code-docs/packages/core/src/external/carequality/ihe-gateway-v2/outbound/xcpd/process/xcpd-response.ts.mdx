@@ -1,0 +1,95 @@
+---
+title: "xcpd-response.ts"
+---
+
+## High-level description
+This code processes XCPD (Cross-Community Patient Discovery) responses in an IHE (Integrating the Healthcare Enterprise) Gateway implementation. It converts XML responses into structured data, handles patient matching, and creates standardized response objects for patient discovery operations.
+
+## Code Structure
+The main function `processXCPDResponse` orchestrates the processing of XCPD responses. It uses helper functions to parse XML, validate schemas, and create response objects. The code interacts with various data models and schemas defined in related files.
+
+## Symbols
+
+### `processXCPDResponse`
+#### Description
+This function processes an XCPD response, handling both successful and error cases.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| xcpdResponse | XCPDSamlClientResponse | The XCPD response object |
+| patientId | string (optional) | Patient identifier |
+| cxId | string (optional) | Context identifier |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | OutboundPatientDiscoveryResp | Processed patient discovery response |
+
+#### Internal Logic
+1. Checks if the response was successful
+2. Parses the XML response
+3. Validates the response against a schema
+4. Extracts patient registry profile
+5. Determines if there's a patient match
+6. Handles different response scenarios (match, no match, error)
+
+### `handlePatientMatchResponse`
+#### Description
+Processes a successful patient match response.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientRegistryProfile | PatientRegistryProfile | Patient registry data |
+| outboundRequest | OutboundPatientDiscoveryReq | Original outbound request |
+| gateway | XCPDGateway | Gateway information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | OutboundPatientDiscoveryResp | Processed patient discovery response |
+
+#### Internal Logic
+1. Extracts patient information from the registry profile
+2. Converts IHE data formats to standardized formats
+3. Constructs a patient resource object
+4. Creates a response object with patient match information
+
+### `handlePatientNoMatchResponse`
+#### Description
+Processes a response when no patient match is found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| outboundRequest | OutboundPatientDiscoveryReq | Original outbound request |
+| gateway | XCPDGateway | Gateway information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | OutboundPatientDiscoveryResp | Processed patient discovery response with no match |
+
+#### Internal Logic
+1. Creates an operation outcome indicating no patient found
+2. Constructs a response object with no patient match
+
+## Dependencies
+The code relies on several external libraries and internal modules:
+- `fast-xml-parser` for XML parsing
+- `@metriport/ihe-gateway-sdk` for IHE Gateway related types and functions
+- `@metriport/shared` for utility functions
+- Various internal modules for logging, schema validation, and data mapping
+
+## Error Handling
+The code includes error handling for different scenarios:
+- HTTP errors (handled by `handleHttpErrorResponse`)
+- Schema validation errors (handled by `handleSchemaErrorResponse`)
+- Patient-related errors (handled by `handlePatientErrorResponse`)
+
+## Logging
+The code uses a custom logging utility (`out`) to log processing information and errors.
+
+## Performance Considerations
+The code involves XML parsing and schema validation, which can be computationally expensive for large responses. Care should be taken when processing large volumes of XCPD responses to ensure adequate performance.

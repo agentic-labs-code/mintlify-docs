@@ -1,0 +1,89 @@
+---
+title: "patient-external-data.ts"
+---
+
+## High-level description
+This code defines functions and types related to managing patient data in the CommonWell Health Alliance system. It includes operations for creating, updating, and retrieving patient information, as well as handling patient discovery and document querying processes.
+
+## Code Structure
+The main symbols in this code are interconnected functions and types that work together to manage patient data in CommonWell. The `PatientWithCWData` type extends the `Patient` type with CommonWell-specific data. The `getPatientWithCWData`, `updateCommonwellIdsAndStatus`, and `updatePatientDiscoveryStatus` functions are key operations for managing patient data.
+
+## Symbols
+
+### `PatientWithCWData`
+#### Description
+A type that extends the `Patient` type with CommonWell-specific external data.
+
+### `getPatientWithCWData`
+#### Description
+Retrieves a patient with CommonWell data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient to retrieve CommonWell data for |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Promise&lt;PatientWithCWData \| undefined&gt; | The patient with CommonWell data, or undefined if not found |
+
+#### Internal Logic
+- Attempts to retrieve the patient with CommonWell data using `_getPatientWithCWData`
+- Uses `executeWithRetriesSafe` to retry the operation if needed
+
+### `updateCommonwellIdsAndStatus`
+#### Description
+Updates the CommonWell IDs and integration status for a patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId"&gt; | The patient to update |
+| commonwellPatientId | string \| undefined | The CommonWell patient ID |
+| commonwellPersonId | string \| undefined | The CommonWell person ID |
+| cqLinkStatus | CQLinkStatus \| undefined | The CareQuality link status |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Promise&lt;Patient&gt; | The updated patient |
+
+#### Internal Logic
+- Retrieves the existing patient
+- Updates the CommonWell external data with new IDs and status
+- Saves the updated patient to the database
+
+### `updatePatientDiscoveryStatus`
+#### Description
+Updates the patient discovery status for CommonWell integration.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId"&gt; | The patient to update |
+| status | LinkStatus | The new status |
+| params | DiscoveryParams \| undefined | Additional discovery parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Promise&lt;Patient&gt; | The updated patient |
+
+#### Internal Logic
+- Retrieves the existing patient
+- Updates the CommonWell external data with the new status and discovery parameters
+- Saves the updated patient to the database
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core | Core domain types and utilities |
+| @metriport/shared | Shared utilities |
+| dayjs | Date manipulation library |
+
+## Error Handling
+The code uses `MetriportError` for handling specific error cases, such as missing CommonWell data or patient IDs.
+
+## Performance Considerations
+The code uses `executeWithRetriesSafe` for `getPatientWithCWData`, which implements a retry mechanism with exponential backoff to handle potential transient failures when retrieving patient data.

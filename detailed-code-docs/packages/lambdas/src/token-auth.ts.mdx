@@ -1,0 +1,75 @@
+---
+title: "token-auth.ts"
+---
+
+## High-level description
+This code implements an AWS Lambda function that serves as a token-based authentication mechanism for an API Gateway. It validates API tokens stored in DynamoDB and generates appropriate IAM policy documents to allow or deny access to API resources.
+
+## Code Structure
+The main handler function is wrapped with Sentry for error tracking. It processes the incoming event, extracts the token, validates it against a DynamoDB table, and returns an IAM policy document with the appropriate effect (Allow or Deny) based on the token's validity.
+
+## References
+- The code references the `capture` module from "./shared/capture" for error tracking initialization.
+- It uses the `getEnvOrFail` function from "./shared/env" to retrieve environment variables.
+
+## Symbols
+
+### `curSecSinceEpoch`
+#### Description
+A helper function that calculates the current UTC time in seconds since the Unix epoch.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | number | Current UTC time in seconds since the Unix epoch |
+
+#### Internal Logic
+1. Creates a new Date object
+2. Calculates UTC milliseconds by adding the timezone offset
+3. Converts milliseconds to seconds and rounds the result
+
+### `handler`
+#### Description
+The main Lambda function handler that processes the authentication request and generates an IAM policy document.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | lambda.APIGatewayRequestAuthorizerEvent | The API Gateway request event containing headers and query parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | object | An object containing the principal ID, policy document, and context |
+
+#### Internal Logic
+1. Extracts the API token from the request headers or query parameters
+2. If a token is present, queries DynamoDB to validate the token
+3. Checks if the token is valid and not expired
+4. Generates an IAM policy document with the appropriate effect (Allow or Deny)
+5. Returns the policy document along with context information
+
+## Side Effects
+- The function interacts with DynamoDB to retrieve token information
+- Logs are written to the console for debugging purposes
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @sentry/serverless | Error tracking and monitoring |
+| aws-lambda | Types for AWS Lambda functions |
+| aws-sdk | AWS SDK for interacting with DynamoDB |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| TOKEN_TABLE_NAME | string | N/A | The name of the DynamoDB table storing API tokens |
+
+## Error Handling
+Errors during DynamoDB operations are caught and logged to the console. However, they do not affect the function's flow, and the function continues to return a "Deny" effect in case of errors.
+
+## Logging
+The code uses `console.log` and `console.error` for logging event information and errors, respectively.
+
+## TODOs
+There is a commented question: "Don't we want to throw an error here?" in the catch block of the DynamoDB query. This suggests that error handling might need to be reviewed and potentially improved.

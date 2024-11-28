@@ -1,0 +1,166 @@
+---
+title: "document-query.ts"
+---
+
+## High-level description
+The `queryDocumentsAcrossHIEs` function initiates document queries across multiple Health Information Exchanges (HIEs), specifically Commonwell and Carequality. It checks the current document query status, resets progress if necessary, and triggers asynchronous document retrieval processes for each enabled HIE.
+
+## Code Structure
+The code defines several functions related to document querying and progress tracking. `queryDocumentsAcrossHIEs` is the main function that orchestrates the process. It utilizes helper functions like `isProgressEqual`, `isDocumentQueryProgressEqual`, `createQueryResponse`, `updateConversionProgress`, and `getOrGenerateRequestId` to manage and track the progress of document queries.
+
+## References
+- `getDocumentsFromCQ`: Initiates document query from Carequality.
+- `getDocumentsFromCW`: Initiates document query from Commonwell.
+- `resetDocQueryProgress`: Resets the document query progress for a patient.
+- `storeQueryInit`: Stores the initial query information for a patient.
+- `areDocumentsProcessing`: Checks if document queries are currently in progress.
+- `getPatientOrFail`: Retrieves a patient by ID or throws an error if not found.
+
+## Symbols
+
+### `queryDocumentsAcrossHIEs`
+#### Description
+This function initiates document queries across multiple HIEs (Commonwell and Carequality) for a given patient. It checks the current document query status, resets progress if necessary, and triggers asynchronous document retrieval processes for each enabled HIE.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer's ID. |
+| patientId | string | The patient's ID. |
+| facilityId | string (optional) | The facility's ID. |
+| override | boolean (optional) | Whether to force download of documents, even if they already exist. |
+| cxDocumentRequestMetadata | unknown (optional) | Metadata associated with the document request. |
+| forceQuery | boolean (optional) | Whether to force a new query, even if one is already in progress. |
+| forcePatientDiscovery | boolean (optional) | Whether to force patient discovery before querying documents. |
+| forceCommonwell | boolean (optional) | Whether to force querying Commonwell, even if it's not enabled. |
+| forceCarequality | boolean (optional) | Whether to force querying Carequality, even if it's not enabled. |
+| cqManagingOrgName | string (optional) | The name of the Carequality managing organization. |
+| triggerConsolidated | boolean (optional) | Whether to trigger consolidated document processing after the query. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| DocumentQueryProgress | `DocumentQueryProgress` | An object representing the progress of the document query. |
+
+#### Internal Logic
+1. Retrieves the patient using `getPatientOrFail`.
+2. Validates the facility ID against the patient's facilities.
+3. Checks if a document query is already in progress. If so, returns the current progress.
+4. Resets the document query progress for the patient using `resetDocQueryProgress`.
+5. Stores the initial query information using `storeQueryInit`.
+6. Sends an analytics event for the document query.
+7. Checks if Commonwell is enabled and initiates document retrieval using `getDocumentsFromCW` if applicable.
+8. Checks if Carequality is enabled and initiates document retrieval using `getDocumentsFromCQ` if applicable.
+9. Returns a `DocumentQueryProgress` object indicating that the query is in progress.
+
+### `isProgressEqual`
+#### Description
+This function compares two `Progress` objects and returns `true` if they are equal, `false` otherwise.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| a | `Progress` (optional) | The first `Progress` object. |
+| b | `Progress` (optional) | The second `Progress` object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| boolean | `boolean` | `true` if the `Progress` objects are equal, `false` otherwise. |
+
+### `isDocumentQueryProgressEqual`
+#### Description
+This function compares two `DocumentQueryProgress` objects and returns `true` if they are equal, `false` otherwise.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| a | `DocumentQueryProgress` (optional) | The first `DocumentQueryProgress` object. |
+| b | `DocumentQueryProgress` (optional) | The second `DocumentQueryProgress` object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| boolean | `boolean` | `true` if the `DocumentQueryProgress` objects are equal, `false` otherwise. |
+
+### `createQueryResponse`
+#### Description
+This function creates a `DocumentQueryProgress` object with the given status and optional patient data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | `DocumentQueryStatus` | The status of the document query. |
+| patient | `Patient` (optional) | The patient object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| DocumentQueryProgress | `DocumentQueryProgress` | A `DocumentQueryProgress` object with the given status and optional patient data. |
+
+### `updateConversionProgress`
+#### Description
+This function updates the conversion progress for a given patient. It retrieves the patient, calculates the new conversion progress, and updates the patient record in the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `Pick&lt;Patient, "id" | "cxId"&gt;` | An object containing the patient's ID and CX ID. |
+| convertResult | `ConvertResult` | The result of the document conversion. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Patient | `Patient` | The updated patient object. |
+
+#### Internal Logic
+1. Retrieves the patient using `getPatientOrFail` with a lock to prevent concurrent updates.
+2. Calculates the new conversion progress using `calculateConversionProgress`.
+3. Updates the patient record in the database with the new conversion progress.
+
+### `getOrGenerateRequestId`
+#### Description
+This function returns the existing request ID if the previous query has not been entirely completed. Otherwise, it returns a newly-generated request ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docQueryProgress | `DocumentQueryProgress` (optional) | The progress of the previous query. |
+| forceNew | `boolean` (optional) | Whether to force creating a new request ID. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string | `string` | The request ID. |
+
+#### Internal Logic
+1. If `forceNew` is true, generates a new request ID using `generateRequestId`.
+2. If `docQueryProgress` indicates that documents are still processing and a request ID exists, returns the existing request ID.
+3. Otherwise, generates a new request ID using `generateRequestId`.
+
+### `generateRequestId`
+#### Description
+This function generates a new UUIDv7 request ID.
+
+#### Inputs
+None
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string | `string` | A new UUIDv7 request ID. |
+
+## Dependencies
+- `@metriport/core`: Provides domain models and utility functions.
+- `@metriport/shared`: Provides shared utility functions.
+- `uuidv7`: Generates UUIDv7 identifiers.
+- `posthog-node`: Sends analytics events to PostHog.
+
+## Error Handling
+The code uses try-catch blocks to handle errors during document retrieval and processing. Errors are logged and reported to a monitoring service using `capture.error`.
+
+## Logging
+The code uses the `Util.out` function to create a logger with a specific prefix. This logger is used to log information and errors during document querying and processing.
+
+## TODOs
+None.

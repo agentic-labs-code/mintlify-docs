@@ -1,0 +1,64 @@
+---
+title: "create-cq-directory-entry.ts"
+---
+
+## High-level description
+The `create-cq-directory-entry.ts` file provides functionality to bulk insert entries into the Carequality (CQ) directory database table. It defines a helper function `createKeys` to generate a comma-separated string of column names for the insert query and the main function `bulkInsertCQDirectoryEntries` to perform the bulk insertion.
+
+## Code Structure
+The `bulkInsertCQDirectoryEntries` function depends on the `createKeys` function to generate the column names for the SQL query. The `createKeys` function defines constants for each column name and then combines them into a comma-separated string.
+
+## Symbols
+
+### `createKeys`
+#### Description
+This function generates a comma-separated string of column names for the `cq_directory_entry` table. It defines constants for each column name, ensuring type safety by using keyof operator on the `CQDirectoryEntryModel` interface.
+
+#### Inputs
+_This function has no inputs._
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | `string` | Comma-separated string of column names for the `cq_directory_entry` table. |
+
+#### Internal Logic
+1. Defines constants for each column name in the `cq_directory_entry` table, using the `keyof` operator to ensure type safety with the `CQDirectoryEntryModel` interface.
+2. Creates an array `allKeys` containing all the column names, handling optional columns by conditionally adding them to the array.
+3. Joins the elements of the `allKeys` array with a comma and space separator, resulting in a comma-separated string of column names.
+
+### `bulkInsertCQDirectoryEntries`
+#### Description
+This function inserts multiple entries into the `cq_directory_entry` table in the database. It takes an array of `CQDirectoryEntryData` objects, constructs a parameterized SQL query, and executes it using Sequelize.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `sequelize` | `Sequelize` | Sequelize instance connected to the database. |
+| `orgDataArray` | `CQDirectoryEntryData[]` | Array of `CQDirectoryEntryData` objects representing the entries to be inserted. |
+| `tableName` | `string` | Name of the table to insert the data into. |
+
+#### Outputs
+_This function does not return any value._
+
+#### Side Effects
+This function modifies the database by inserting new entries into the specified table.
+
+#### Internal Logic
+1. Checks if the `orgDataArray` is empty. If so, it returns early without performing any database operations.
+2. Generates a string of placeholders (`(?, ?, ?, ...)`), one for each entry in the `orgDataArray`, to be used in the SQL query.
+3. Gets the current date and time in ISO format.
+4. Flattens the `orgDataArray` into a single array where each element represents a value to be inserted. It handles optional fields by inserting `null` if the field is not present.
+5. Constructs the SQL query string using the generated placeholders and the column names returned by the `createKeys` function.
+6. Executes the query using `sequelize.query` with the flattened data as replacements. The query type is set to `INSERT` and logging is disabled for performance reasons.
+
+## References
+- `CQDirectoryEntryData`: This type is used to define the structure of the data being inserted into the database.
+- `CQDirectoryEntryModel`: This model defines the structure of the `cq_directory_entry` table in the database.
+
+## Dependencies
+- `sequelize`: This library is used to interact with the database.
+- `QueryTypes`: This enum is used to specify the type of SQL query being executed.
+
+## Error Handling
+This code does not implement specific error handling beyond basic exception raising. Any errors during the database operations will be propagated to the caller.

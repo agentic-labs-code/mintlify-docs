@@ -1,0 +1,182 @@
+---
+title: "dexcom.ts"
+---
+
+## High-level description
+This code defines a `Dexcom` class that extends the `Provider` class and implements the `OAuth2` interface. It provides functionality to interact with the Dexcom API, including authentication, token management, and data retrieval for biometrics and nutrition.
+
+## Code Structure
+The `Dexcom` class inherits from `Provider` and implements `OAuth2`. It uses an `OAuth2DefaultImpl` instance for OAuth2 operations. The class provides methods for authentication, token management, and data retrieval from the Dexcom API.
+
+## References
+- `Provider` class
+- `OAuth2` interface
+- `OAuth2DefaultImpl` class
+- `ConnectedUser` model
+- Various utility functions and constants from shared modules
+
+## Symbols
+
+### `Dexcom`
+#### Description
+A class that represents the Dexcom provider, extending the `Provider` class and implementing the `OAuth2` interface.
+
+#### Inputs
+- `oauth`: An instance of `OAuth2DefaultImpl` (optional)
+
+#### Internal Logic
+- Initializes the provider with supported data types
+- Sets up OAuth2 configuration for Dexcom
+- Implements methods for authentication, token management, and data retrieval
+
+___
+
+### `getAccessToken`
+#### Description
+Retrieves the access token for a connected user.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| accessToken | string | The access token for the user |
+
+#### Internal Logic
+1. Retrieves the provider token from the connected user
+2. Checks and refreshes the token if necessary
+3. Returns the access token
+
+___
+
+### `checkRefreshToken`
+#### Description
+Checks if the token is expired and refreshes it if necessary.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| token | string | The current token |
+| connectedUser | ConnectedUser | The connected user object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| refreshedToken | Token | The refreshed token object |
+
+#### Internal Logic
+1. Checks if the token is expired
+2. If expired, refreshes the token using the refresh token
+3. Updates the provider data with the new token
+4. Returns the refreshed token
+
+___
+
+### `getAuthUri`
+#### Description
+Generates the authorization URI for Dexcom OAuth2 flow.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| state | string | The state parameter for OAuth2 |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| authUri | string | The authorization URI |
+
+___
+
+### `getTokenFromAuthCode`
+#### Description
+Exchanges an authorization code for an access token.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | string | The authorization code |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| token | string | The access token (stringified) |
+
+___
+
+### `revokeProviderAccess`
+#### Description
+Revokes the provider access for a connected user.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object |
+
+___
+
+### `getBiometricsData`
+#### Description
+Retrieves biometrics data for a connected user on a specific date.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object |
+| date | string | The date for which to retrieve data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| biometrics | Biometrics | The biometrics data |
+
+#### Internal Logic
+1. Retrieves the access token
+2. Constructs the API query parameters
+3. Fetches the data from the Dexcom API
+4. Maps the response to the Biometrics model
+
+___
+
+### `getNutritionData`
+#### Description
+Retrieves nutrition data for a connected user on a specific date.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object |
+| date | string | The date for which to retrieve data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| nutrition | Nutrition | The nutrition data |
+
+#### Internal Logic
+1. Retrieves the access token
+2. Constructs the API query parameters
+3. Fetches the data from the Dexcom API
+4. Maps the response to the Nutrition model
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides types and models for API responses |
+| dayjs | Date manipulation library |
+| simple-oauth2 | OAuth2 implementation |
+
+## Configuration
+The Dexcom class uses the following configuration options:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| DEXCOM_CLIENT_ID | string | N/A | Dexcom API client ID |
+| DEXCOM_CLIENT_SECRET | string | N/A | Dexcom API client secret |
+
+These configuration options are retrieved from environment variables using the `Config` class.
+
+## Error Handling
+The class uses try-catch blocks to handle errors in API calls and token refreshing. Errors are typically wrapped in a `MetriportError` with additional context information.

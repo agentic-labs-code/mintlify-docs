@@ -1,0 +1,122 @@
+---
+title: "Overview"
+---
+
+## High-level description
+
+This directory contains code for handling inbound Cross-Community Access (XCA) requests in the context of a Carequality IHE (Integrating the Healthcare Enterprise) Gateway. It specifically deals with Document Query (DQ) and Document Retrieval (DR) operations, which correspond to ITI-38 and ITI-39 transactions respectively. The code is responsible for processing incoming requests, creating appropriate responses, and managing the flow of healthcare information exchange.
+
+## What does it do?
+
+The code in this directory handles two main workflows:
+
+1. Document Query (DQ) Workflow:
+   - Parses and validates incoming XML requests for document queries.
+   - Extracts relevant information such as patient data and SAML attributes.
+   - Processes the query and generates a response containing document metadata or error information.
+   - Constructs a SOAP envelope with the query results or error details.
+   - Generates an XML response adhering to the ITI-38 (Cross Gateway Query) standard.
+
+2. Document Retrieval (DR) Workflow:
+   - Parses and validates incoming XML requests for document retrievals.
+   - Extracts document references and other metadata from the request.
+   - For successful retrievals, downloads documents from an S3 bucket and encodes them in base64.
+   - Constructs a SOAP envelope with the retrieved documents or error information.
+   - Generates an XML response adhering to the ITI-39 (Cross Gateway Retrieve) standard.
+
+Both workflows involve parsing requests, validating their structure, processing the required information, and generating standardized SOAP XML responses. This enables interoperable health information exchange across different healthcare communities.
+
+## Key Files
+
+1. dq-request.ts (in the 'process' subdirectory)
+   - Contains the `processInboundDqRequest` function for parsing and processing Document Query requests.
+   - Extracts patient data and SAML attributes from the XML request.
+   - Returns a structured object representing the inbound request.
+
+2. dr-request.ts (in the 'process' subdirectory)
+   - Contains the `processInboundDrRequest` function for parsing and processing Document Retrieval requests.
+   - Extracts document references and metadata from the XML request.
+   - Returns a standardized object representing the inbound DR request.
+
+3. schema.ts (in the 'process' subdirectory)
+   - Defines Zod schemas for validating ITI-38 and ITI-39 request structures.
+   - Exports TypeScript types inferred from these schemas for type safety.
+
+4. dq-response.ts (in the 'create' subdirectory)
+   - Contains the `createInboundDqResponse` function for generating Document Query responses.
+   - Utilizes helper functions like `createIti38SoapBody` to structure the SOAP body.
+   - Handles both successful queries and error scenarios.
+
+5. dr-response.ts (in the 'create' subdirectory)
+   - Contains the `createInboundDrResponse` function for generating Document Retrieval responses.
+   - Manages document downloads from S3 and includes document content in the response.
+   - Handles both successful retrievals and error scenarios.
+
+These files work together to provide a comprehensive solution for processing inbound XCA requests and generating appropriate responses in a healthcare interoperability context.
+
+## Dependencies
+
+The code relies on several external libraries and internal modules:
+
+1. fast-xml-parser: Used for parsing and building XML structures.
+2. uuid: Used for generating UUIDs for messages and documents.
+3. @metriport/ihe-gateway-sdk: Provides type definitions and schemas for IHE gateway operations.
+4. aws-sdk: Used for S3 operations in document retrieval.
+5. @metriport/shared: Contains utility functions and shared configurations.
+6. zod: Employed for schema definition and validation of request structures.
+
+## Configuration
+
+The code uses configuration values from a `Config` class, particularly for AWS-related settings:
+
+- AWS_REGION: Specifies the AWS region for S3 operations.
+- MEDICAL_DOCUMENTS_BUCKET_NAME: Defines the S3 bucket name for storing and retrieving medical documents.
+
+Additionally, the schemas defined in `schema.ts` act as a form of configuration, specifying the expected structure of incoming requests.
+
+## Code Snippets
+
+Here's an example of how the SOAP body is created for a Document Query response:
+
+```typescript
+function createIti38SoapBody(response: InboundDocumentQueryResp) {
+  const parser = new XMLParser(xmlParserOptions);
+  const isSuccess = response.extrinsicObjectXmls && response.extrinsicObjectXmls.length &gt; 0;
+
+  let registryObjectList;
+  if (isSuccess) {
+    registryObjectList = response.extrinsicObjectXmls.map((xml) =&gt; parser.parse(xml));
+  }
+
+  const soapBody = {
+    "ns2:AdhocQueryResponse": {
+      "@_xmlns:ns2": namespaces.rim,
+      "@_xmlns:ns3": namespaces.lcm,
+      "@_xmlns:ns4": namespaces.rs,
+      "@_status": isSuccess ? "urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Success" : "urn:oasis:names:tc:ebxml-regrep:ResponseStatusType:Failure",
+      ...(isSuccess
+        ? {
+            "ns2:RegistryObjectList": {
+              "ns2:ExtrinsicObject": registryObjectList,
+            },
+          }
+        : {
+            "ns2:RegistryErrorList": {
+              "ns2:RegistryError": response.registryErrors?.map((error) =&gt; ({
+                "@_codeContext": error.codeContext,
+                "@_errorCode": error.errorCode,
+                "@_severity": "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error",
+                "#text": error.location,
+              })),
+            },
+          }),
+    },
+  };
+
+  return soapBody;
+}
+```
+
+This function demonstrates how the code structures the SOAP body based on the success or failure of the query, including appropriate namespaces and error handling.
+
+In conclusion, this directory contains crucial components for processing inbound XCA requests and generating standardized responses in healthcare interoperability scenarios, specifically for Document Query and Document Retrieval operations in the context of Carequality's IHE Gateway. The code ensures proper parsing, validation, and transformation of requests and responses, facilitating seamless health information exchange across different healthcare communities.

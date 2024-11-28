@@ -1,0 +1,62 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains helper functions and utilities for handling various aspects of API route processing in an Express.js application. It includes modules for error handling, request logging, analytics, query parameter processing, and other common tasks related to API route management.
+
+## What does it do?
+The helpers in this directory provide essential functionality for API route handling:
+
+1. Error Handling: It defines a custom error handler that formats different types of errors (including Metriport errors, Zod validation errors, and FHIR OperationOutcome errors) into a consistent RFC 7807 compliant format.
+
+2. Request Logging: It implements a request logger that captures detailed information about incoming requests and their responses, including timing information.
+
+3. Analytics: It provides functions to analyze API routes and send usage data to an analytics service (PostHog).
+
+4. Query Processing: It includes utilities to convert query parameters into URLSearchParams objects, which is useful for constructing URLs with query parameters.
+
+5. Not Found Handling: It defines handlers for 404 (Not Found) errors, with optional logging of client errors based on environment and request headers.
+
+6. Provider Data Retrieval: It offers a helper function to fetch health data from multiple connected providers for a given user and date range.
+
+7. Client Error Reporting: It provides middleware and utilities to enable and check for client-side error reporting flags on requests.
+
+8. String Sanitization: It includes a utility function for standardizing string inputs by converting to lowercase and trimming whitespace.
+
+## Key Files
+
+1. `default-error-handler.ts`: Defines the main error handling middleware for the Express application.
+
+2. `request-logger.ts`: Implements the request logging middleware that captures detailed request and response information.
+
+3. `request-analytics.ts`: Contains functions for analyzing API routes and sending usage data to an analytics service.
+
+4. `query.ts`: Provides utilities for converting query parameters to URLSearchParams objects.
+
+5. `not-found-handler.ts`: Defines handlers for 404 (Not Found) errors.
+
+6. `provider-route-helper.ts`: Offers a helper function for retrieving health data from multiple connected providers.
+
+7. `report-client-errors.ts`: Implements middleware and utilities for client-side error reporting.
+
+8. `string.ts`: Contains a utility function for sanitizing string inputs.
+
+## Dependencies
+The helpers in this directory rely on several external libraries and internal modules:
+
+1. Express.js: For handling HTTP requests and responses.
+2. Zod: For schema validation and error handling.
+3. @medplum/core: For FHIR-related functionality.
+4. @metriport/core and @metriport/shared: For core Metriport functionality and shared utilities.
+5. PostHog: For analytics data collection.
+6. nanoid: For generating unique request IDs.
+
+## Configuration
+The helpers use various configuration settings, primarily accessed through a `Config` object. This includes environment checks (e.g., `Config.isProdEnv()`, `Config.isSandbox()`), which affect behavior such as error logging and analytics collection.
+
+Some helpers also use environment variables or request headers for configuration. For example, the not-found handler checks for an `x-log-client-errors` header to determine whether to log client errors in non-production environments.
+
+The error handler may use Sentry for error tracking, depending on the configuration.
+
+Overall, these helpers provide a robust set of utilities for managing common API route-related tasks, enhancing the maintainability and consistency of the API implementation.

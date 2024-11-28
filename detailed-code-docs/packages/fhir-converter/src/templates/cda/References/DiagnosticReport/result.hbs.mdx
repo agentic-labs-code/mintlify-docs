@@ -1,0 +1,44 @@
+---
+title: "result.hbs"
+---
+
+## High-level description
+This Handlebars template file defines the structure for creating a FHIR DiagnosticReport resource. It's designed to convert data from a CDA (Clinical Document Architecture) format to FHIR (Fast Healthcare Interoperability Resources) format, specifically for diagnostic report results.
+
+## Symbols
+
+### DiagnosticReport Template
+#### Description
+This template creates a FHIR DiagnosticReport resource with specific attributes including a unique identifier, code, status, and result reference.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ID | String | Unique identifier for the DiagnosticReport |
+| diagReport.code | Object | Code representing the type of diagnostic report |
+| diagReport.title._ | String | Title of the diagnostic report |
+| diagReport.statusCode.code | String | Status code of the diagnostic report |
+| REF | String | Reference to the result associated with this report |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON | Object | A FHIR-compliant DiagnosticReport resource |
+
+#### Internal Logic
+1. Creates a FHIR DiagnosticReport resource with a unique `fullUrl` and `id`.
+2. Sets the `code` using the `CodeableConcept` partial template, allowing for unknown values.
+3. Sets the `status` using the `DiagnosticReportStatus` partial template.
+4. Includes a `result` array with a single reference to the associated result.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| DataType/CodeableConcept.hbs | Used to format the `code` field |
+| ValueSet/DiagnosticReportStatus.hbs | Used to format the `status` field |
+
+## Notes
+- This template is part of a larger system for converting CDA documents to FHIR resources.
+- The template uses partial templates (indicated by `&gt;` in Handlebars syntax) to format specific fields like `CodeableConcept` and `DiagnosticReportStatus`.
+- The `canBeUnknown=true` parameter in the `CodeableConcept` partial suggests that the code can be set to an "unknown" value if not provided.
+- The result reference is currently hardcoded to include only one result, but the structure (using an array) suggests it could be extended to include multiple results if needed.

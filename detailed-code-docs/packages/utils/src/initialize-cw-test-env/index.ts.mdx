@@ -1,0 +1,70 @@
+---
+title: "index.ts"
+---
+
+## High-level description
+This code initializes a test environment for CommonWell (CW) in a staging setting. It creates patients, adds documents to S3, and creates corresponding FHIR DocumentReference resources for each patient.
+
+## Code Structure
+The main function `main()` orchestrates the process of creating patients and their associated documents. It uses the `MetriportMedicalApi` to interact with the API, and the `addDocumentToS3AndToFHIRServer` function to handle document creation and upload.
+
+## Symbols
+
+### `main()`
+#### Description
+This asynchronous function is the entry point of the script. It initializes the Metriport API client, retrieves existing patients, creates new patients if needed, and adds documents for each patient.
+
+#### Internal Logic
+1. Initialize the Metriport API client
+2. Retrieve existing patients for the facility
+3. Iterate through predefined patient data
+4. For each patient:
+   - Check if the patient already exists
+   - If not, create a new patient
+   - Add documents for the patient
+
+### `addDocumentToS3AndToFHIRServer(patientId: string, doc: Doc)`
+#### Description
+This function adds a document to S3 and creates a corresponding FHIR DocumentReference resource.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient associated with the document |
+| doc | Doc | An object containing document information |
+
+#### Internal Logic
+1. Initialize the FHIR API client
+2. Retrieve the document from the seed bucket
+3. Upload the document to the target S3 bucket
+4. Create a FHIR DocumentReference resource
+5. Send the DocumentReference to the FHIR server
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides the MetriportMedicalApi client |
+| @metriport/core/util/env-var | Utility for retrieving environment variables |
+| aws-sdk | AWS SDK for interacting with S3 |
+| axios | HTTP client for making API requests |
+| dotenv | Loads environment variables from a .env file |
+
+## Configuration
+The script uses several environment variables for configuration:
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| COMMONWELL_ORG_PRIVATE_KEY | string | API key for the CommonWell organization |
+| FACILITY_ID | string | ID of the facility |
+| DOCUMENT_CONTRIBUTION_ORGANIZATION_ID | string | ID of the organization contributing documents |
+| DOCUMENT_CONTRIBUTION_ORGANIZATION_NAME | string | Name of the organization contributing documents |
+| DOCUMENT_CONTRIBUTION_URL | string | URL for document contribution |
+| METRIPORT_API_URL | string | URL of the Metriport API |
+| S3_BUCKET_NAME | string | Name of the target S3 bucket |
+| S3_SEED_BUCKET_NAME | string | Name of the seed S3 bucket |
+| REGION | string | AWS region |
+
+## Error Handling
+The code uses try-catch blocks implicitly through the use of async/await. Any errors that occur during the execution of the script will be thrown and should be handled by the caller.
+
+## Performance Considerations
+The script processes patients and documents sequentially, which may be slow for large datasets. Consider implementing parallel processing for improved performance in production environments.

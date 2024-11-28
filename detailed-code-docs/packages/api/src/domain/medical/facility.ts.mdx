@@ -1,0 +1,135 @@
+---
+title: "facility.ts"
+---
+
+## High-level description
+This code defines the structure and functionality of a Facility in a medical context. It includes types, enums, and functions for creating, validating, and managing facilities, as well as integrating with health information exchanges (HIEs) like Carequality and CommonWell.
+
+## Code Structure
+The main `Facility` interface extends `BaseDomain` and includes properties for HIE-related data. The code also defines helper functions for creating facility OIDs, checking facility types, and determining HIE activity status. The related files provide implementations for creating, updating, and managing facilities in the system and HIEs.
+
+## Symbols
+
+### `FacilityType`
+#### Description
+An enum representing the types of facilities.
+
+#### Inputs
+N/A
+
+#### Outputs
+- `initiatorAndResponder`: Facility can initiate and respond to requests
+- `initiatorOnly`: Facility can only initiate requests
+
+### `FacilityData`
+#### Description
+A type representing the basic data of a facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | string | The name of the facility |
+| npi | string | National Provider Identifier |
+| tin | string (optional) | Tax Identification Number |
+| active | boolean (optional) | Whether the facility is active |
+| address | AddressStrict | The address of the facility |
+
+### `FacilityCreate`
+#### Description
+An interface for creating a new facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| data | FacilityData | Basic facility data |
+| cqActive | boolean (optional) | Carequality active status |
+| cwActive | boolean (optional) | CommonWell active status |
+| cqOboOid | string or null (optional) | Carequality OBO OID |
+| cwOboOid | string or null (optional) | CommonWell OBO OID |
+| cwType | FacilityType (optional) | CommonWell facility type |
+| cqType | FacilityType (optional) | Carequality facility type |
+| cqApproved | boolean (optional) | Carequality approval status |
+| cwApproved | boolean (optional) | CommonWell approval status |
+
+### `Facility`
+#### Description
+An interface representing a complete facility entity.
+
+#### Inputs
+Extends `BaseDomain` and `Required&lt;FacilityCreate&gt;`, adding:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| oid | string | Object Identifier for the facility |
+| facilityNumber | number | Unique number for the facility |
+
+### `makeFacilityOid`
+#### Description
+Creates a facility OID based on organization and facility numbers.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| orgNumber | number | Organization number |
+| facilityNumber | number | Facility number |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| oid | string | Generated facility OID |
+
+### `isOboFacility`
+#### Description
+Checks if a facility is an "On Behalf Of" (OBO) facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facilityType | FacilityType (optional) | The type of facility |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| isObo | boolean | True if the facility is OBO, false otherwise |
+
+### `isNonOboFacility`
+#### Description
+Checks if a facility is not an "On Behalf Of" (OBO) facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facilityType | FacilityType (optional) | The type of facility |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| isNonObo | boolean | True if the facility is not OBO, false otherwise |
+
+### `isFacilityActiveForHie`
+#### Description
+Determines if a facility is active for a specific Health Information Exchange (HIE).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facility | Facility | The facility to check |
+| hie | MedicalDataSource | The HIE to check against |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| isActive | boolean | True if the facility is active for the specified HIE, false otherwise |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/base-domain | Provides base domain interfaces |
+| @metriport/core/domain/location-address | Defines address types |
+| @metriport/core/domain/oid | Defines OID types |
+| @metriport/core/external/index | Provides MedicalDataSource enum |
+| @metriport/core/util/error/metriport-error | Custom error handling |
+| ../../shared/config | Configuration settings |
+
+## Error Handling
+The code uses `MetriportError` for custom error handling, particularly in the `isFacilityActiveForHie` function when an invalid HIE type is provided.

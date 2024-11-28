@@ -1,0 +1,79 @@
+---
+title: "docker-compose-opensearch.yml"
+---
+
+## High-level description
+This Docker Compose file defines a multi-node OpenSearch cluster with two OpenSearch nodes and an OpenSearch Dashboards instance. It sets up the necessary configurations for a basic OpenSearch deployment, including networking, volumes, and environment variables.
+
+## Code Structure
+The Docker Compose file defines three services: `opensearch-node1`, `opensearch-node2`, and `opensearch-dashboards`. It also specifies volumes for data persistence and a custom network for inter-service communication.
+
+## Symbols
+
+### `opensearch-node1`
+#### Description
+This service defines the first node of the OpenSearch cluster.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| image | string | The Docker image to use for the OpenSearch node |
+| environment | list | Environment variables for configuring the OpenSearch node |
+| ulimits | object | System resource limits for the container |
+| volumes | list | Volume mappings for data persistence |
+| ports | list | Port mappings for external access |
+| networks | list | Networks the container should join |
+
+#### Internal Logic
+- Sets up cluster and node configuration
+- Configures memory settings and disables swapping
+- Exposes ports for OpenSearch API and Performance Analyzer
+
+### `opensearch-node2`
+#### Description
+This service defines the second node of the OpenSearch cluster, similar to `opensearch-node1` but without exposed ports.
+
+#### Inputs
+(Similar to `opensearch-node1`, excluding the `ports` section)
+
+#### Internal Logic
+- Sets up cluster and node configuration
+- Configures memory settings and disables swapping
+
+### `opensearch-dashboards`
+#### Description
+This service sets up OpenSearch Dashboards, a user interface for visualizing data from OpenSearch.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| image | string | The Docker image to use for OpenSearch Dashboards |
+| ports | list | Port mappings for external access |
+| expose | list | Ports to expose to other containers |
+| environment | object | Environment variables for configuring OpenSearch Dashboards |
+| networks | list | Networks the container should join |
+
+#### Internal Logic
+- Exposes port 5601 for web access
+- Configures connection to OpenSearch nodes
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| opensearchproject/opensearch:latest | OpenSearch engine |
+| opensearchproject/opensearch-dashboards:latest | OpenSearch Dashboards UI |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| cluster.name | string | opensearch-cluster | Name of the OpenSearch cluster |
+| node.name | string | opensearch-node1/2 | Name of each OpenSearch node |
+| discovery.seed_hosts | string | opensearch-node1,opensearch-node2 | Hosts to use for cluster discovery |
+| cluster.initial_cluster_manager_nodes | string | opensearch-node1,opensearch-node2 | Initial manager nodes for the cluster |
+| bootstrap.memory_lock | boolean | true | Disables swapping for better performance |
+| OPENSEARCH_JAVA_OPTS | string | -Xms512m -Xmx512m | Java heap size settings |
+
+## Performance Considerations
+- Memory locking is enabled to prevent swapping and improve performance.
+- Java heap size is set to 512MB minimum and maximum, which should be adjusted based on available system resources.
+- The `nofile` ulimit is set to 65536 to allow for a high number of open files, which is important for OpenSearch performance.

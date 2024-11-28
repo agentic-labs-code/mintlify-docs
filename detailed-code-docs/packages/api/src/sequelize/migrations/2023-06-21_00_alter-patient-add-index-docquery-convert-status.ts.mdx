@@ -1,0 +1,56 @@
+---
+title: "2023-06-21_00_alter-patient-add-index-docquery-convert-status.ts"
+---
+
+## High-level description
+This migration script adds two indices to the `patient` table in the database. These indices are designed to improve query performance for accessing the 'status' field within the nested JSON structure of `data-&gt;'documentQueryProgress'-&gt;'download'` and `data-&gt;'documentQueryProgress'-&gt;'convert'`.
+
+## Symbols
+
+### `up`
+#### Description
+This asynchronous function defines the operations to be performed during the database migration "up" process. It adds two indices to the `patient` table within a transaction.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| context | object | An object containing the Sequelize queryInterface object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. Starts a database transaction to ensure atomicity.
+2. Adds an index named `patient_docquery_download_status_index` to the `patient` table, targeting the `status` field within the `data-&gt;'documentQueryProgress'-&gt;'download'` JSON path.
+3. Adds another index named `patient_docquery_convert_status_index` to the `patient` table, targeting the `status` field within the `data-&gt;'documentQueryProgress'-&gt;'convert'` JSON path.
+4. Commits the transaction if both index additions are successful.
+
+### `down`
+#### Description
+This asynchronous function defines the operations to be performed during the database migration "down" process, essentially reverting the changes made by the `up` function. It removes the two indices added by the `up` function from the `patient` table within a transaction.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| context | object | An object containing the Sequelize queryInterface object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise | A promise that resolves when the migration rollback is complete. |
+
+#### Internal Logic
+1. Starts a database transaction to ensure atomicity.
+2. Removes the index named `patient_docquery_convert_status_index` from the `patient` table.
+3. Removes the index named `patient_docquery_download_status_index` from the `patient` table.
+4. Commits the transaction if both index removals are successful.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Provides database interaction functionality. |
+
+## Error Handling
+The code uses database transactions to ensure that index creation and removal operations are performed atomically. If any operation within the transaction fails, the entire transaction is rolled back, preventing the database from being left in an inconsistent state.

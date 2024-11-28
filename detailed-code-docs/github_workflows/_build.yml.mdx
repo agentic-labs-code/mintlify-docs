@@ -1,0 +1,64 @@
+---
+title: "_build.yml"
+---
+
+## High-level description
+This YAML file defines a reusable GitHub Actions workflow named "Reusable Build workflow". It is designed to perform linting, building, and testing of a Node.js project, with flexibility to handle different build environments and package structures.
+
+## Code Structure
+The workflow is structured as a single job named "lint-build-test" with multiple steps that handle different aspects of the build process, including environment setup, dependency installation, linting, building, and testing.
+
+## Symbols
+
+### Workflow
+#### Description
+This GitHub Actions workflow is triggered by other workflows using the `workflow_call` event. It accepts several input parameters and secrets to customize its behavior.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| path | string | Sub-directory where the workflow should execute lint and build |
+| treat-as-package | boolean | Whether to treat the project as a package (default: true) |
+| build_env | string | The build environment, either 'staging' or 'production' (default: 'production') |
+
+#### Secrets
+| Name | Description |
+|:-----|:------------|
+| DOCKERHUB_USERNAME | DockerHub username for authentication |
+| DOCKERHUB_TOKEN | DockerHub token for authentication |
+
+### Job: lint-build-test
+#### Description
+This job runs on the latest Ubuntu runner and performs the following tasks: logging the environment, logging in to DockerHub, setting up Node.js, checking out the code, installing dependencies, running linter, building the project, and running tests.
+
+#### Steps
+1. **Log Environment**: Prints the environment variables.
+2. **Login to Docker Hub**: Authenticates with DockerHub using provided credentials.
+3. **Setup NodeJS**: Sets up Node.js version 18.14.
+4. **Checkout**: Checks out the repository code.
+5. **Log Git Ref**: Prints the current Git reference.
+6. **Install on root**: Installs dependencies at the root level.
+7. **Run Linter**: Executes the linter in the specified path.
+8. **Build/compile on root**: Builds the project for production or staging environment.
+9. **Build/compile on sub-folder/package**: Builds the project in a sub-folder if not treated as a package.
+10. **Run Tests**: Executes tests in the specified path.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| actions/setup-node@v3 | Sets up Node.js environment |
+| actions/checkout@v3 | Checks out the repository code |
+| docker/login-action@v2 | Authenticates with DockerHub |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| path | string | N/A | Sub-directory for lint and build execution |
+| treat-as-package | boolean | true | Whether to treat the project as a package |
+| build_env | string | "production" | The build environment (staging or production) |
+
+## Error Handling
+The workflow does not implement specific error handling mechanisms. It relies on GitHub Actions' default behavior of stopping the workflow if any step fails.
+
+## Performance Considerations
+The workflow uses Ubuntu's latest runner for optimal performance. It also leverages caching for Node.js dependencies to speed up subsequent runs.

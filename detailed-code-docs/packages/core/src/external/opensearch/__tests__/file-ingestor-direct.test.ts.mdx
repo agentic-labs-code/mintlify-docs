@@ -1,0 +1,63 @@
+---
+title: "file-ingestor-direct.test.ts"
+---
+
+## High-level description
+This file contains unit tests for the `OpenSearchFileIngestorDirect` class, specifically focusing on the `cleanUpContents` method. The tests verify that the method correctly processes and cleans up XML content from a CDA (Clinical Document Architecture) file, ensuring that important information is retained while removing unnecessary markup and formatting.
+
+## Code Structure
+The main test suite is defined using `describe("cleanUpContents", ...)`. It contains multiple test cases that check different aspects of the content cleaning process. The tests use a `Tester` class that extends `OpenSearchFileIngestorDirect` to access the `cleanUpContents` method.
+
+## Symbols
+
+### `Tester` class
+#### Description
+A test class that extends `OpenSearchFileIngestorDirect` to expose the `cleanUpContents` method for testing purposes.
+
+#### Methods
+##### `testIt(contents: string, trace?: boolean): string`
+Calls the `cleanUpContents` method with the given contents and optional tracing.
+
+### `describe("cleanUpContents", ...)`
+#### Description
+The main test suite for the `cleanUpContents` method.
+
+#### Internal Logic
+1. Reads the contents of a test XML file.
+2. Processes the file contents using the `cleanUpContents` method.
+3. Writes the cleaned contents to a new file for debugging purposes.
+4. Runs multiple test cases to verify that specific content is retained or removed as expected.
+
+### Test cases
+Multiple test cases are defined using `it(...)` statements. Each test case checks for the presence or absence of specific content in the cleaned result. The tests use custom `contains` and `notContains` functions to perform case-insensitive whole-word matching.
+
+#### Notable test cases:
+- Keeping various XML attributes and values (e.g., id, code, codeSystem, displayName)
+- Retaining specific medical codes and terminology
+- Preserving author and participant information
+- Keeping HTML content while removing HTML tags
+- Removing city tags while keeping the city name
+- Detailed checks for HTML tag removal
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| fs | File system operations for reading and writing test files |
+| OpenSearchFileIngestorDirect | The main class being tested |
+| OpenSearchFileIngestorDirectConfig | Configuration type for the tested class |
+
+## Configuration
+The tests use a minimal configuration object:
+```typescript
+const config = {} as OpenSearchFileIngestorDirectConfig;
+```
+
+## Error Handling
+The tests don't explicitly handle errors. They rely on Jest's assertion mechanisms to catch and report any unexpected behavior.
+
+## TODOs
+There is one TODO item in the test suite:
+```typescript
+test.todo("removes markup stuff");
+```
+This indicates that a test for removing markup should be implemented in the future.

@@ -1,0 +1,97 @@
+---
+title: "fhir-converter-connector.ts"
+---
+
+## High-level description
+This code defines infrastructure for a FHIR (Fast Healthcare Interoperability Resources) converter connector in AWS CDK. It sets up an SQS queue, a dead-letter queue, an S3 bucket, and a Lambda function to process messages from the queue and convert them to FHIR format.
+
+## Code Structure
+The main functions `createQueueAndBucket` and `createLambda` set up the necessary AWS resources. They use helper functions and configurations from other modules to create and configure these resources according to the environment and specific requirements.
+
+## Symbols
+
+### `settings()`
+#### Description
+Defines and returns configuration settings for the FHIR converter connector.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectorName | string | Name of the connector |
+| lambdaMemory | number | Memory allocation for Lambda function |
+| lambdaBatchSize | number | Number of messages Lambda processes in one batch |
+| maxConcurrency | number | Maximum concurrent Lambda invocations |
+| lambdaTimeout | Duration | Timeout for Lambda function |
+| axiosTimeout | Duration | Timeout for Axios requests |
+| maxReceiveCount | number | Maximum number of times a message can be received |
+| visibilityTimeout | Duration | Time a message is invisible after being received |
+
+#### Internal Logic
+- Retrieves FHIR converter service settings
+- Calculates timeouts based on the maximum execution timeout
+- Sets concurrency based on CPU amount and task count
+
+### `createQueueAndBucket()`
+#### Description
+Creates an SQS queue, a dead-letter queue, and an S3 bucket for the FHIR converter.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| stack | Construct | The CDK construct representing the stack |
+| lambdaLayers | LambdaLayers | Lambda layers to be used |
+| envType | EnvType | Environment type (e.g., production, staging) |
+| alarmSnsAction | SnsAction | Optional SNS action for alarms |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queue | IQueue | The created SQS queue |
+| dlq | IQueue | The created dead-letter queue |
+| bucket | s3.IBucket | The created or existing S3 bucket |
+
+#### Internal Logic
+- Creates an SQS queue with specified settings
+- Sets up a dead-letter queue
+- Creates or retrieves an S3 bucket
+- Configures alarms for the queue
+
+### `createLambda()`
+#### Description
+Creates a Lambda function to process messages from the SQS queue and convert them to FHIR format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lambdaLayers | LambdaLayers | Lambda layers to be used |
+| envType | EnvType | Environment type |
+| stack | Construct | The CDK construct representing the stack |
+| vpc | IVpc | VPC for the Lambda function |
+| sourceQueue | IQueue | Source SQS queue |
+| destinationQueue | IQueue | Destination SQS queue |
+| dlq | IQueue | Dead-letter queue |
+| fhirConverterBucket | s3.IBucket | S3 bucket for FHIR converter |
+| apiServiceDnsAddress | string | DNS address of the API service |
+| conversionResultQueueUrl | string | URL of the conversion result queue |
+| alarmSnsAction | SnsAction | Optional SNS action for alarms |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Lambda | Lambda function created |
+
+#### Internal Logic
+- Creates a Lambda function with specified settings
+- Configures environment variables for the Lambda
+- Sets up SQS event source for the Lambda
+- Grants necessary permissions to the Lambda function
+
+## Dependencies
+- aws-cdk-lib: Various CDK constructs
+- constructs: For defining custom constructs
+- ../env-type: For environment type definitions
+- ../shared/config: For configuration settings
+- ../shared/lambda: For Lambda-related utilities
+- ../shared/lambda-layers: For Lambda layers
+- ../shared/sqs: For SQS-related utilities
+- ./fhir-converter-service: For FHIR converter service settings

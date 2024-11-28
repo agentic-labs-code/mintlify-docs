@@ -1,0 +1,45 @@
+---
+title: "count-failed.ts"
+---
+
+## High-level description
+This code defines an asynchronous function `countFailedAndProcessingRequests` that counts the number of webhook requests in "processing" and "failure" states for a given customer ID. 
+
+It retrieves the counts by querying the database for webhook requests associated with the provided customer ID and specific statuses. The function returns an object containing the counts for both "processing" and "failure" states, handling potential errors during the database queries.
+
+## Symbols
+
+### `countFailedAndProcessingRequests`
+#### Description
+This asynchronous function counts the number of webhook requests that are in "processing" and "failure" states for a given customer ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The ID of the customer. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `{ processing: number, failure: number }` | object | An object containing the count of "processing" and "failure" webhook requests. If either query fails, the corresponding count will be -1. |
+
+#### Internal Logic
+1. **Define two asynchronous operations:**
+    - Count webhook requests with `status: ["processing"]`.
+    - Count webhook requests with `status: ["failure"]`.
+2. **Execute both operations concurrently using `Promise.allSettled`:** This function returns an array of objects, each representing the outcome of the corresponding promise (fulfilled or rejected).
+3. **Extract the results:**
+    - For each promise, check if its status is "fulfilled".
+    - If fulfilled, retrieve the count from the `value` property of the result object.
+    - If rejected, set the count to -1.
+4. **Return an object:**
+    - The object contains the counts for "processing" and "failure" requests.
+
+## References
+- `WebhookRequest`: This symbol is used to interact with the webhook requests data, likely a database model.
+
+## Error Handling
+The function uses `Promise.allSettled` to handle potential errors during the database queries. If a query fails, the corresponding count will be set to -1, indicating an error occurred.
+
+## Logging
+This code does not implement any logging mechanisms. 

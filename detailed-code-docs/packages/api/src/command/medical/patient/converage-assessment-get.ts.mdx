@@ -1,0 +1,115 @@
+---
+title: "converage-assessment-get.ts"
+---
+
+## High-level description
+The code defines the function `getCoverageAssessments`, which retrieves and calculates coverage assessment data for a list of patients. This assessment includes information about document download and conversion status, FHIR resource counts, and a pre-signed URL for downloading a medical record summary.
+
+## Code Structure
+The code defines two main functions: `getCoverageAssessments` and `getCoverageAssessment`. `getCoverageAssessments` iterates through a list of patients and calls `getCoverageAssessment` for each patient to retrieve their individual assessment data. `getCoverageAssessment` retrieves data from the patient model, generates a pre-signed URL for the medical record summary, and combines this information into a `CoverageAssessment` object.
+
+## References
+- `PatientModel` from "../../../models/medical/patient"
+- `internalDtoFromModel` from "../../../routes/medical/dtos/patientDTO"
+- `countResources` from "../../../external/fhir/patient/count-resources"
+- `createMRSummaryFileName` from "@metriport/core/domain/medical-record-summary"
+- `S3Utils` from "@metriport/core/external/aws/s3"
+- `Config` from "../../../shared/config"
+- `executeAsynchronously` from "@metriport/core/util/concurrency"
+- `out` from "@metriport/core/util/log"
+- `capture` from "@metriport/core/util/notifications"
+- `errorToString` from "@metriport/shared"
+
+## Symbols
+
+### `getCoverageAssessments`
+#### Description
+This asynchronous function retrieves coverage assessment data for a list of patients. It iterates through the patients, retrieves individual assessment data using `getCoverageAssessment`, and returns an array of `PatientWithCoverageAssessment` objects containing both patient and assessment information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The ID of the customer. |
+| patients | PatientModel[] | An array of `PatientModel` objects representing the patients to retrieve coverage assessments for. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;PatientWithCoverageAssessment[]&gt; | Promise&lt;PatientWithCoverageAssessment[]&gt; | A promise that resolves to an array of `PatientWithCoverageAssessment` objects, each containing patient data and their corresponding coverage assessment. |
+
+#### Internal Logic
+1. Initializes an empty array `patientsWithAssessment` to store the results.
+2. Initializes an empty array `wrapperErrors` to store errors encountered during individual patient assessment retrieval.
+3. Defines an asynchronous wrapper function `getCoverageAssessmentWrapper` that handles individual patient assessment retrieval and error handling.
+4. Uses `executeAsynchronously` to retrieve coverage assessments for each patient concurrently, with a maximum of 20 parallel executions.
+5. If any errors occurred during individual patient assessment retrieval, captures an error message with details.
+6. Returns the `patientsWithAssessment` array containing patient data and their coverage assessments.
+
+### `getCoverageAssessment`
+#### Description
+This asynchronous function retrieves coverage assessment data for a single patient. It retrieves data from the patient model, generates a pre-signed URL for the medical record summary, and combines this information into a `CoverageAssessment` object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The ID of the customer. |
+| patient | PatientModel | The `PatientModel` object representing the patient to retrieve the coverage assessment for. |
+| log | typeof console.log | A logging function. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;CoverageAssessment&gt; | Promise&lt;CoverageAssessment&gt; | A promise that resolves to a `CoverageAssessment` object containing the patient's coverage assessment data. |
+
+#### Internal Logic
+1. Generates the file name for the medical record summary using `createMRSummaryFileName`.
+2. Retrieves the count of FHIR resources and the pre-signed URL for the medical record summary concurrently using `Promise.all`.
+3. Extracts document download and conversion status, document count, FHIR resource count and details from the patient data and the results of the previous step.
+4. Constructs and returns a `CoverageAssessment` object containing the retrieved data.
+
+### `getMrSummaryUrl`
+#### Description
+This asynchronous function generates a pre-signed URL for downloading a medical record summary from S3.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The name of the medical record summary file. |
+| log | typeof console.log | A logging function. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;string \| undefined&gt; | Promise&lt;string \| undefined&gt; | A promise that resolves to the pre-signed URL for the medical record summary, or `undefined` if the file does not exist or an error occurred. |
+
+#### Internal Logic
+1. Creates an instance of `S3Utils` for interacting with S3.
+2. Attempts to retrieve file information from S3 using `s3Utils.getFileInfoFromS3`.
+3. If the file exists, generates a pre-signed URL for the file using `s3Utils.getSignedUrl` with a duration of 1 hour.
+4. If the file does not exist, returns `undefined`.
+5. If an error occurs during file information retrieval or pre-signed URL generation, logs an error message and returns `undefined`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dayjs | Date and time manipulation. |
+| duration (dayjs plugin) | Duration handling for dayjs. |
+| @metriport/core/util/concurrency | Provides asynchronous execution utilities. |
+| @metriport/core/domain/medical-record-summary | Provides functions for generating medical record summary file names. |
+| @metriport/core/external/aws/s3 | Provides utilities for interacting with AWS S3. |
+| @metriport/core/util/log | Provides logging utilities. |
+| @metriport/core/util/notifications | Provides utilities for sending notifications. |
+| @metriport/shared | Provides shared utilities. |
+
+### Configuration
+The code utilizes the following configuration options from the `Config` class:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| `getAWSRegion` | () =&gt; string | N/A | Returns the AWS region. |
+| `getMedicalDocumentsBucketName` | () =&gt; string | N/A | Returns the name of the S3 bucket containing medical documents. |
+
+## Error Handling
+The code implements error handling using try-catch blocks and the `capture.error` function to log and report errors encountered during coverage assessment retrieval and pre-signed URL generation.
+
+## Logging
+The code utilizes the `out` function from `@metriport/core/util/log` for logging messages during coverage assessment retrieval and pre-signed URL generation.

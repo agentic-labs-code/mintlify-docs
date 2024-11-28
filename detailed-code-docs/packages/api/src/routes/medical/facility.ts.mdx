@@ -1,0 +1,126 @@
+---
+title: "facility.ts"
+---
+
+## High-level description
+This code defines an Express router for handling CRUD operations on medical facilities. It provides endpoints for creating, updating, retrieving, and deleting facilities, with proper error handling and input validation.
+
+## Code Structure
+The main router is defined using `express-promise-router`. It contains five route handlers for different HTTP methods (POST, PUT, GET, DELETE) on the `/facility` endpoint. Each handler uses the `asyncHandler` wrapper for error handling and calls specific command functions to perform the requested operations.
+
+## Symbols
+
+### `router`
+#### Description
+An Express router instance that defines the routes for facility operations.
+
+### POST "/"
+#### Description
+Creates a new facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.body | object | Facility data parsed by `facilityCreateSchema` |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res | FacilityDTO | The created facility data |
+
+#### Internal Logic
+1. Extracts customer ID from the request
+2. Parses and validates the request body
+3. Calls `createFacility` command
+4. Returns the created facility as DTO
+
+### PUT "/:id"
+#### Description
+Updates an existing facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.id | string | Facility ID |
+| req.body | object | Facility data parsed by `facilityUpdateSchema` |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res | FacilityDTO | The updated facility data |
+
+#### Internal Logic
+1. Extracts customer ID and facility ID
+2. Parses and validates the request body
+3. Calls `updateFacility` command
+4. Returns the updated facility as DTO
+
+### GET "/"
+#### Description
+Retrieves all facilities for a customer.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.cxId | string | Customer ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res | { facilities: FacilityDTO[] } | List of facilities |
+
+#### Internal Logic
+1. Extracts customer ID
+2. Calls `getFacilities` command
+3. Returns the list of facilities as DTOs
+
+### GET "/:id"
+#### Description
+Retrieves a specific facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.id | string | Facility ID |
+| req.cxId | string | Customer ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res | FacilityDTO | The requested facility data |
+
+#### Internal Logic
+1. Extracts customer ID and facility ID
+2. Calls `getFacilities` command with specific ID
+3. Throws NotFoundError if no facility is found
+4. Returns the facility as DTO
+
+### DELETE "/:id"
+#### Description
+Deletes a facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.id | string | Facility ID |
+| req.cxId | string | Customer ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res | - | 204 No Content status |
+
+#### Internal Logic
+1. Extracts customer ID and facility ID
+2. Calls `deleteFacility` command
+3. Returns 204 No Content status
+
+## Dependencies
+- express
+- express-promise-router
+- http-status
+- @metriport/core/util/error/not-found
+- Various internal modules for commands, DTOs, and schemas
+
+## Error Handling
+The code uses the `asyncHandler` wrapper to catch and forward errors to Express error handling middleware. It also uses `NotFoundError` for cases where a requested facility doesn't exist.

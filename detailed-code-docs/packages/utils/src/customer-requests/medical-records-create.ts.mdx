@@ -1,0 +1,93 @@
+---
+title: "medical-records-create.ts"
+---
+
+## High-level description
+This code is a utility script for generating and downloading Medical Records (MRs) as PDFs for a subset of a customer's patients. It creates a new folder, retrieves consolidated patient data as PDFs, and stores them in the designated folder.
+
+## Code Structure
+The main function orchestrates the process, calling helper functions to get medical record URLs and download files. It uses environment variables for configuration and external APIs for data retrieval.
+
+## Symbols
+
+### `main()`
+#### Description
+The main function that orchestrates the process of generating and downloading medical records for the specified patients.
+
+#### Internal Logic
+1. Initializes the runs folder
+2. Retrieves customer data
+3. Creates a directory for storing the medical records
+4. Iterates through the list of patient IDs:
+   - Generates a medical record URL for each patient
+   - Downloads the medical record file
+5. Logs the total duration of the process
+
+### `getMedicalRecordURL(patientId: string)`
+#### Description
+Retrieves the URL for a patient's medical record PDF.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string \| undefined | The URL of the medical record PDF, if available |
+
+#### Internal Logic
+1. Constructs the API endpoint URL with query parameters
+2. Makes a GET request to the API
+3. Extracts the medical record URL from the response
+
+### `downloadFile(url: string, patientId: string, dirName: string)`
+#### Description
+Downloads a file from the given URL and saves it to the specified directory.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | The URL of the file to download |
+| patientId | string | The ID of the patient (used for naming the file) |
+| dirName | string | The directory to save the file in |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Promise&lt;string&gt; | A promise that resolves to "success" when the download is complete |
+
+#### Internal Logic
+1. Creates a write stream for the file
+2. Makes an HTTPS GET request to the URL
+3. Pipes the response to the write stream
+4. Resolves the promise when the file is fully written
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | Loading environment variables |
+| @medplum/fhirtypes | Type definitions for FHIR resources |
+| @metriport/core/util/env-var | Utility for getting environment variables |
+| @metriport/shared/common/error | Error handling utility |
+| @metriport/shared/common/numbers | Number formatting utility |
+| axios | Making HTTP requests |
+| dayjs | Date and time manipulation |
+| fs | File system operations |
+| https | HTTPS requests for file downloads |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| API_URL | string | N/A | The base URL for the API |
+| CX_ID | string | N/A | The customer ID |
+
+## Error Handling
+The script uses try-catch blocks to handle errors during the medical record generation and download process. Errors are logged with patient IDs for easier debugging.
+
+## Logging
+The script uses console.log for logging progress, errors, and timing information throughout the process.
+
+## TODOs
+- The `patientIds` array is empty in the provided code. It should be populated with the desired patient IDs before running the script.

@@ -1,0 +1,497 @@
+---
+title: "metriport.ts"
+---
+
+## High-level description
+This file contains the implementation of the `MetriportMedicalApi` class, which serves as a client for interacting with Metriport's Medical API. It provides methods for various operations such as managing organizations, facilities, patients, documents, and consolidated data queries. The class handles authentication, request formatting, and response parsing for the API endpoints.
+
+## Code Structure
+The `MetriportMedicalApi` class is the main symbol in this file. It contains methods that correspond to different API endpoints, handling the HTTP requests and responses. The class uses axios for making HTTP requests and includes utility functions for data validation and transformation.
+
+## Symbols
+
+### `MetriportMedicalApi`
+#### Description
+This class is the main client for interacting with Metriport's Medical API. It provides methods for various API operations and handles authentication and request formatting.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| apiKey | string | The API key for authentication |
+| options | Options | Optional configuration for the API client |
+
+#### Internal Logic
+- Initializes an axios instance with the provided configuration
+- Provides methods for different API operations, each corresponding to a specific endpoint
+- Handles request formatting, authentication, and response parsing
+
+### `getSettings`
+#### Description
+Retrieves the settings for the account.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| settings | SettingsResponse | The account settings |
+
+### `updateSettings`
+#### Description
+Updates the settings for the account.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhookUrl | string | The new webhook URL |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| settings | SettingsResponse | The updated account settings |
+
+### `getWebhookStatus`
+#### Description
+Gets the status of communication with the app's webhook.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | WebhookStatusResponse | The webhook communication status |
+
+### `retryWebhookRequests`
+#### Description
+Retries failed webhook requests.
+
+### `createOrganization`
+#### Description
+Creates a new organization if one does not already exist.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | OrganizationCreate | The data for creating the organization |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The created organization |
+
+### `updateOrganization`
+#### Description
+Updates an existing organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization data to be updated |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The updated organization |
+
+### `getOrganization`
+#### Description
+Retrieves the organization representing the account.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | undefined | The organization, or undefined if no organization has been created |
+
+### `createFacility`
+#### Description
+Creates a new facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | FacilityCreate | The data for creating the facility |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facility | Facility | The created facility |
+
+### `getFacility`
+#### Description
+Retrieves a facility by ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The ID of the facility |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facility | Facility | The retrieved facility |
+
+### `updateFacility`
+#### Description
+Updates an existing facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facility | Facility | The facility data to be updated |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facility | Facility | The updated facility |
+
+### `listFacilities`
+#### Description
+Lists all facilities associated with the account.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facilities | Facility[] | The list of facilities |
+
+### `deleteFacility`
+#### Description
+Deletes a facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facilityId | string | The ID of the facility to delete |
+| eTag | string | undefined | Optional ETag for concurrency control |
+
+### `createPatient`
+#### Description
+Creates a new patient at Metriport and HIEs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | PatientCreate | The data for creating the patient |
+| facilityId | string | The facility ID |
+| additionalQueryParams | Record&lt;string, string | number | boolean&gt; | Optional additional query parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | PatientDTO | The created patient |
+
+### `getPatient`
+#### Description
+Retrieves a patient by ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The ID of the patient |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | PatientDTO | The retrieved patient |
+
+### `matchPatient`
+#### Description
+Searches for a patient previously created at Metriport, based on demographics.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | Demographics | The demographic data to match |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | PatientDTO | undefined | The matched patient, if found |
+
+### `updatePatient`
+#### Description
+Updates a patient at Metriport and at HIEs the patient is linked to.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | PatientUpdate | The patient data to be updated |
+| facilityId | string | undefined | Optional facility ID |
+| additionalQueryParams | Record&lt;string, string | number | boolean&gt; | Optional additional query parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | PatientDTO | The updated patient |
+
+### `getPatientConsolidated`
+#### Description
+Returns a patient's consolidated data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient |
+| resources | string[] | undefined | Optional array of resources to be returned |
+| dateFrom | string | undefined | Optional start date for filtering resources |
+| dateTo | string | undefined | Optional end date for filtering resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | Bundle&lt;Resource&gt; | The patient's consolidated data |
+
+### `startConsolidatedQuery`
+#### Description
+Starts a query for the patient's consolidated data (FHIR resources).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient |
+| resources | readonly ResourceTypeForConsolidation[] | undefined | Optional array of resources to be returned |
+| dateFrom | string | undefined | Optional start date for filtering resources |
+| dateTo | string | undefined | Optional end date for filtering resources |
+| conversionType | string | undefined | Optional conversion type for the medical record |
+| metadata | Record&lt;string, string&gt; | undefined | Optional metadata to be sent with the webhook request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | StartConsolidatedQueryProgressResponse | The consolidated data query status |
+
+### `getConsolidatedQueryStatus`
+#### Description
+Gets the consolidated data query status for a given patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | GetConsolidatedQueryProgressResponse | The consolidated data query status |
+
+### `createPatientConsolidated`
+#### Description
+Adds patient data as FHIR resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient |
+| payload | Bundle | The FHIR Bundle to create resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | Bundle&lt;Resource&gt; | FHIR Bundle with operation outcome |
+
+### `countPatientConsolidated`
+#### Description
+Returns the amount of resources available for a given patient, per resource type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient |
+| resources | readonly ResourceTypeForConsolidation[] | undefined | Optional array of resources to be considered |
+| dateFrom | string | undefined | Optional start date for filtering resources |
+| dateTo | string | undefined | Optional end date for filtering resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | ConsolidatedCountResponse | The amount of resources available per resource type |
+
+### `deletePatient`
+#### Description
+Removes a patient at Metriport and at HIEs the patient is linked to.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient to be deleted |
+| facilityId | string | The facility ID |
+| eTag | string | undefined | Optional ETag for concurrency control |
+
+### `listPatients`
+#### Description
+Returns the patients associated with a given facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facilityId | string | The ID of the facility |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patients | PatientDTO[] | The list of patients |
+
+### `listDocuments`
+#### Description
+Returns document references for the given patient across HIEs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient |
+| filters | ListDocumentFilters | Optional filters for the document query |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | ListDocumentResult | The list of document references |
+
+### `listDocumentsAsDTO`
+#### Description
+Returns document references for the given patient across HIEs, in the DTO format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient |
+| filters | ListDocumentFilters | Optional filters for the document query |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documents | DocumentReference[] | The list of document references |
+
+### `startDocumentQuery`
+#### Description
+Starts a document query for the given patient across HIEs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient |
+| facilityId | string | undefined | Optional facility ID |
+| metadata | Record&lt;string, string&gt; | undefined | Optional metadata to be sent with the webhook request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| query | DocumentQuery | The document query request ID, progress & status |
+
+### `startBulkGetDocumentUrl`
+#### Description
+Starts a bulk document download for a given patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient |
+| metadata | Record&lt;string, string&gt; | undefined | Optional metadata to be sent with the webhook request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| query | BulkGetDocumentUrlQuery | The document query request ID, progress, and status |
+
+### `getDocumentQueryStatus`
+#### Description
+Returns the document query status for the specified patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| query | DocumentQuery | The document query request ID, progress & status |
+
+### `getDocumentUrl`
+#### Description
+Returns a URL that can be used to download the document.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The file name of the document in S3 |
+| conversionType | "html" | "pdf" | undefined | Optional document type to convert to |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | { url: string } | The presigned URL for document download |
+
+### `getDocumentUploadUrl`
+#### Description
+Returns a URL to upload a file to Metriport and make the document available to other HIEs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient |
+| docRef | Partial&lt;FHIRDocumentReference&gt; | A FHIR Document Reference for this file upload |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | A URL string to be used for subsequent file upload |
+
+### `createDocumentReference`
+#### Description
+Creates a DocumentReference and returns its ID along with a URL to upload the respective Document file.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient |
+| docRef | Partial&lt;FHIRDocumentReference&gt; | A FHIR Document Reference for this file upload |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | UploadDocumentResult | The DocumentReference ID and the URL for file upload |
+
+### `verifyWebhookSignature`
+#### Description
+Verifies the signature of a webhook request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wh_key | string | The webhook key |
+| reqBody | string | The body of the webhook request |
+| signature | string | The signature obtained from the webhook request header |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| isValid | boolean | True if the signature is verified, false otherwise |
+
+### `parseWebhookResponse`
+#### Description
+Parses a webhook request received from the Metriport API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| requestBody | unknown | The request body received from the Metriport API |
+| throwOnError | boolean | Whether to throw an Error if the request body is not a valid webhook request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| request | WebhookRequest | WebhookRequestParsingFailure | The parsed webhook request or a parsing failure object |
+
+## Dependencies
+The code relies on several external libraries and internal modules:
+- @medplum/fhirtypes
+- @metriport/shared/medical
+- axios
+- crypto
+- http-status
+- zod
+
+It also imports various models and schemas from local files within the project structure.
+
+## Error Handling
+The code includes error handling for API responses, parsing failures, and input validation. It uses custom error types and the `zod` library for schema validation.
+
+## Performance Considerations
+- The class uses axios for HTTP requests, which can be configured with timeouts and other performance-related options.
+- Some methods include optional pagination parameters for handling large datasets.
+- The code includes rate limiting considerations, with sleep functions between certain API calls.

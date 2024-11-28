@@ -1,0 +1,55 @@
+---
+title: "get-webhook.mdx"
+---
+
+---
+title: "Get Webhook status"
+description: "Gets the status of communication with your app's webhook."
+api: "GET /settings/webhook"
+---
+
+## Response
+
+Might return an empty body if there's no settings yet stored for your account.
+
+&lt;ResponseField name="webhookEnabled" type="string" required&gt;
+  Indicates whether the webhook is currently enabled, and working properly.
+&lt;/ResponseField&gt;
+
+&lt;ResponseField name="webhookStatusDetail" type="string"&gt;
+  The message indicating the reason for the webhook being disabled, or 'OK' if the webhook is
+  enabled. This gets updated with the message of the last failed request to the webhook.
+&lt;/ResponseField&gt;
+
+&lt;ResponseField name="webhookRequestsProcessing" type="number" required&gt;
+  The number of webhook requests currently being processed. It gets updated as the requests are
+  processed.
+&lt;/ResponseField&gt;
+
+&lt;ResponseField name="webhookRequestsFailed" type="number" required&gt;
+  The number of failed webhook requests for your acccount. It gets updated as the retries are
+  attempted.
+&lt;/ResponseField&gt;
+
+&lt;ResponseExample&gt;
+
+```javascript Metriport SDK
+import { MetriportMedicalApi } from "@metriport/api-sdk";
+
+const metriportClient = new MetriportMedicalApi("YOUR_API_KEY");
+
+const response = await metriportClient.getWebhookStatus();
+```
+
+&lt;/ResponseExample&gt;
+
+Example response:
+
+```json
+{
+  "webhookEnabled": false,
+  "webhookStatusDetail": "Request failed with status code 404",
+  "webhookRequestsProcessing": 0,
+  "webhookRequestsFailed": 3
+}
+```

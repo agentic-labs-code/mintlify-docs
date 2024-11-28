@@ -1,0 +1,44 @@
+---
+title: "create-or-update-cq-facility.ts"
+---
+
+## High-level description
+The `createOrUpdateFacilityInCq` function is responsible for creating or updating a facility's representation within the Carequality (CQ) directory. It leverages the `createOrUpdateCQOrganization` function to handle the actual creation or update operation, passing in facility-specific details like name, address, and active status.
+
+## References
+- `createOrUpdateCQOrganization`: This function is called to create or update the organization in the CQ directory.
+- `buildCqOrgNameForFacility`: This function is used to construct the appropriate organization name for the facility in the CQ directory.
+- `getCqAddress`: This function retrieves the address details of the facility, including coordinates, for use in the CQ directory.
+- `metriportOid`: A constant representing the Metriport system's root OID.
+- `metriportIntermediaryOid`: A constant representing the Metriport intermediary's OID.
+- `isOboFacility`: A function that checks if a facility is of type "initiatorOnly", indicating an OBO (on behalf of) relationship.
+
+## Symbols
+
+### `createOrUpdateFacilityInCq`
+#### Description
+This function creates or updates a facility's representation in the Carequality directory. It determines whether the facility is an OBO facility and constructs the organization name and parent organization OID accordingly. It then retrieves the facility's address and coordinates and calls the `createOrUpdateCQOrganization` function to perform the actual creation or update operation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The ID of the customer. |
+| facility | Facility | The facility object containing details like name, address, and active status. |
+| facilityCurrentActive | boolean | The current active status of the facility in the CQ directory. |
+| cxOrgName | string | The name of the customer organization. |
+| cxOrgBizType | OrganizationBizType | The business type of the customer organization. |
+| cqOboOid | string \| undefined | The OBO OID of the facility, if applicable. |
+
+#### Outputs
+This function does not return any value, it's return type is `Promise&lt;void&gt;`.
+
+#### Internal Logic
+1. **Build Organization Name:** Constructs the organization name for the facility in the CQ directory using the `buildCqOrgNameForFacility` function. The name includes the customer organization name, facility name, and OBO OID (if applicable).
+2. **Get Address and Coordinates:** Retrieves the facility's address and coordinates using the `getCqAddress` function.
+3. **Create or Update Organization:** Calls the `createOrUpdateCQOrganization` function to create or update the organization in the CQ directory. The function is passed the constructed organization name, address details, active status, and other relevant information. The parent organization OID is set to `metriportIntermediaryOid` for OBO facilities and `metriportOid` for non-OBO facilities.
+
+## Side Effects
+This function modifies the Carequality directory by creating or updating a facility's representation.
+
+## Error Handling
+This function does not implement specific error handling beyond basic exception raising. Any errors encountered during the execution of the function will be propagated up the call stack.

@@ -1,0 +1,88 @@
+---
+title: "_default.ts"
+---
+
+## High-level description
+This file defines base model classes and utility functions for Sequelize models in the Metriport API. It provides common attributes, options, and methods for database models, including versioning and error handling for concurrent updates.
+
+## Code Structure
+The file defines two main abstract classes: `BaseModelNoId` and `BaseModel`, which extend Sequelize's `Model` class. These classes provide common attributes and options for models with and without an ID field. The file also includes utility functions for version validation, string normalization, and a constant for maximum varchar length.
+
+## Symbols
+
+### `MAX_VARCHAR_LENGTH`
+#### Description
+A constant defining the maximum length for varchar fields in the database.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| MAX_VARCHAR_LENGTH | number | The maximum length for varchar fields (255) |
+
+### `ModelSetup`
+#### Description
+A type definition for a function that sets up a Sequelize model.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sequelize | Sequelize | The Sequelize instance to use for model setup |
+
+### `BaseModelNoId`
+#### Description
+An abstract class extending Sequelize's Model class, providing common attributes and options for models without an ID field.
+
+#### Internal Logic
+- Defines `createdAt` and `updatedAt` fields
+- Provides static methods for common attributes and model options
+
+### `BaseModel`
+#### Description
+An abstract class extending `BaseModelNoId`, adding an ID field and versioning support.
+
+#### Internal Logic
+- Adds `id`, `version`, and `eTag` fields
+- Implements versioning logic using the `version` field
+- Generates an `eTag` based on the `id` and `version`
+
+### `validateVersionForUpdate`
+#### Description
+A function to validate the version of an entity before updating it, preventing concurrent update conflicts.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| entity | Pick&lt;BaseDomain, "id" \| "eTag"&gt; | The entity to validate |
+| eTag | string \| undefined | The eTag to compare against |
+
+#### Internal Logic
+Throws a `VersionMismatchError` if the provided eTag doesn't match the entity's eTag.
+
+### `normalizeString`
+#### Description
+A function to normalize and limit the length of a string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| value | T extends string \| null \| undefined | The string to normalize |
+| maxLength | number | The maximum length for the string (default: MAX_VARCHAR_LENGTH) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| normalizedString | T | The normalized and length-limited string |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/base-domain | Importing base domain interfaces |
+| @metriport/shared | Importing utility functions |
+| sequelize | ORM for database operations |
+| ../errors/version-mismatch | Importing VersionMismatchError |
+| ../shared/util | Importing utility functions |
+
+## Error Handling
+The `validateVersionForUpdate` function throws a `VersionMismatchError` when there's a version mismatch during an update operation.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

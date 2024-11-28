@@ -1,0 +1,70 @@
+---
+title: "coverage-enhancement-complete.ts"
+---
+
+## High-level description
+This code implements a function to complete enhanced coverage (EC) for patients in a CommonWell Health Alliance integration. It updates the CareQuality (CQ) link status for multiple patients, triggers document queries, and stores the results of these queries.
+
+## Code Structure
+The main function `completeEnhancedCoverage` orchestrates the process, using `setCQLinkStatus` to update patient statuses and `finishEnhancedCoverage` to perform document queries. It utilizes `executeAsynchronously` for parallel processing of patient updates.
+
+## Symbols
+
+### `completeEnhancedCoverage`
+#### Description
+This asynchronous function completes the enhanced coverage process for a list of patients by updating their CQ link status and triggering document queries.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ecId | string \| undefined | Enhanced coverage ID |
+| cxId | string | Customer ID |
+| patientIds | string[] | Array of patient IDs |
+| cqLinkStatus | CQLinkStatus | CareQuality link status to set |
+
+#### Internal Logic
+1. Logs the start of the process.
+2. Defines an async function `completeECForPatient` to process each patient.
+3. Uses `executeAsynchronously` to process patients in parallel.
+4. For each patient, it updates the CQ link status and, if linked, finishes the enhanced coverage.
+
+### `finishEnhancedCoverage`
+#### Description
+This function completes the enhanced coverage process for a single patient by triggering and querying document references.
+
+#### Inputs
+| Name | Type | Description |
+| ecId | string \| undefined | Enhanced coverage ID |
+| patient | Patient | Patient object |
+| log | Function | Logging function (optional) |
+
+#### Internal Logic
+1. Checks if the patient has a facility ID.
+2. Triggers and queries document references for the patient.
+3. If an ecId is provided, stores the EC results after the document query.
+4. Logs the duration of the process.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/util/concurrency | For executing asynchronous operations |
+| @metriport/core/util/error/metriport-error | For custom error handling |
+| @metriport/core/util/log | For logging |
+| dayjs | For date and time operations |
+| TriggerAndQueryDocRefsLocal | For triggering and querying document references |
+| Patient | Patient domain model |
+| CQLinkStatus | Enum for CQ link status |
+| setCQLinkStatus | Function to set CQ link status |
+| ECUpdaterLocal | Class for updating enhanced coverage |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| PARALLEL_UPDATES | number | 25 | Number of parallel patient updates |
+| triggerWHNotificationsToCx | boolean | true | Whether to trigger webhook notifications to the customer |
+
+## Error Handling
+The code uses `MetriportError` for custom error handling, particularly when a patient has no facility ID.
+
+## Performance Considerations
+The code uses parallel processing (`executeAsynchronously`) to handle multiple patient updates efficiently. It also logs the duration of the document query process for each patient.

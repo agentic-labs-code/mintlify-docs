@@ -1,0 +1,99 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for creating Evidence FHIR resources with different reference types. These templates are part of a FHIR converter system, specifically designed to transform Clinical Document Architecture (CDA) data into FHIR format. The templates focus on three different aspects of Evidence resources: exposureBackground, exposureVariant, and outcome.
+
+## What does it do?
+These templates generate JSON structures for Evidence FHIR resources. Each template specializes in creating a specific type of reference within the Evidence resource:
+
+1. The exposureBackground template creates an Evidence resource with a reference to the background exposure.
+2. The exposureVariant template creates an Evidence resource with a reference to a variant exposure.
+3. The outcome template creates an Evidence resource with a reference to an outcome.
+
+These templates allow the FHIR converter to generate standardized FHIR Evidence resources from CDA data, ensuring that different types of evidence references are properly structured according to the FHIR specification.
+
+## Key Files
+1. exposureBackground.hbs:
+   - Creates an Evidence resource with an "exposureBackground" reference.
+   - Uses inputs: ID (resource identifier) and REF (reference value).
+
+2. exposureVariant.hbs:
+   - Creates an Evidence resource with an "exposureVariant" reference.
+   - Uses inputs: ID (resource identifier) and REF (reference value).
+
+3. outcome.hbs:
+   - Creates an Evidence resource with an "outcome" reference.
+   - Uses inputs: ID (resource identifier) and REF (reference value).
+
+Each file follows a similar structure, creating a JSON object with the appropriate fields for an Evidence resource, including the specific reference type it's designed for.
+
+## Dependencies
+These templates are part of a larger FHIR converter system and depend on:
+
+| Dependency | Purpose | Version |
+|:-----------|:--------|:--------|
+| Handlebars | Template engine for generating JSON structures | Not specified |
+
+Handlebars was likely chosen for its simplicity and flexibility in creating dynamic templates for JSON structures.
+
+## Configuration
+These templates don't include specific configuration options. They rely on input variables to be provided when the templates are rendered:
+
+| Variable | Description |
+|:---------|:------------|
+| {{ID}}   | The unique identifier for the Evidence resource |
+| {{REF}}  | The reference value for the specific type of evidence (exposureBackground, exposureVariant, or outcome) |
+
+These variables should be replaced with actual values when the templates are used within the FHIR converter system.
+
+Here's an example of how the exposureBackground.hbs template is structured:
+
+```handlebars
+{
+  "resource": {
+    "resourceType": "Evidence",
+    "id": "{{ID}}",
+    "exposureBackground": {
+      "reference": "{{REF}}"
+    }
+  }
+}
+```
+
+The exposureVariant.hbs and outcome.hbs templates follow a similar structure, with the appropriate field name changed:
+
+```handlebars
+{
+  "resource": {
+    "resourceType": "Evidence",
+    "id": "{{ID}}",
+    "exposureVariant": [
+      {
+        "reference": "{{REF}}"
+      }
+    ]
+  }
+}
+```
+
+```handlebars
+{
+  "resource": {
+    "resourceType": "Evidence",
+    "id": "{{ID}}",
+    "outcome": [
+      {
+        "reference": "{{REF}}"
+      }
+    ]
+  }
+}
+```
+
+It's worth noting that these templates don't include error handling or validation. The system using these templates would need to ensure that the correct values are provided for the {{ID}} and {{REF}} placeholders.
+
+The templates are designed to be simple and focused, each creating a specific type of Evidence resource. This modular approach allows for flexibility in the FHIR conversion process, as different types of evidence references can be created as needed based on the input CDA data.
+
+All files in this directory are licensed under AGPLv3 by Metriport Inc., and incorporate work from Microsoft Corporation under a permissive license. This licensing information is included at the top of each template file.

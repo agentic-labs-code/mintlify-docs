@@ -1,0 +1,108 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `packages/shared/src/domain` directory contains utility functions and type definitions for handling various domain-specific data types and operations. It includes modules for address validation, contact information processing, date of birth normalization, external ID handling, gender normalization, and company details storage.
+
+## What does it do?
+This directory provides a set of tools and utilities that perform the following functions:
+
+1. Address handling: Validates and normalizes US states and zip codes.
+2. Contact information processing: Validates and normalizes email addresses and phone numbers.
+3. Date of birth (DOB) normalization: Converts date strings to a standardized ISO date format.
+4. External ID normalization: Trims whitespace from external IDs.
+5. Gender normalization: Converts various gender representations to standardized formats.
+6. Company details storage: Maintains a constant object with Metriport's company information.
+
+These utilities ensure consistency and accuracy in data handling across the application, particularly for user-related information and address data.
+
+## Key Files
+
+### address/state.ts and address/zip.ts
+These files handle US state and zip code processing:
+- Define enums and functions for normalizing state names and abbreviations.
+- Validate and normalize zip codes, handling both 5-digit and 9-digit formats.
+
+### contact/email.ts and contact/phone.ts
+These files manage email and phone number operations:
+- Validate and normalize email addresses.
+- Validate and normalize phone numbers, including US-specific handling.
+
+### dob.ts
+This file provides functions for normalizing date of birth strings:
+- Converts various date formats to a standardized ISO date format.
+- Offers both safe and strict normalization options.
+
+### externalId.ts
+This file contains a simple function for normalizing external IDs:
+- Removes leading and trailing whitespace from ID strings.
+
+### gender.ts
+This file handles gender-related operations:
+- Defines types for gender representation.
+- Provides functions to normalize gender values to standardized formats.
+
+### metriport.ts
+This file stores constant company details for Metriport:
+- Maintains an object with company name, address, and contact information.
+
+## Dependencies
+The codebase relies on the following external libraries:
+
+1. Zod: Used for email validation in the contact module.
+2. dayjs: Utilized for date parsing and formatting in the DOB module.
+3. @metriport/shared: Used for utility functions like `stripNonNumericChars`.
+
+## Configuration
+The directory does not use specific configuration files or environment variables. Instead, it relies on constants defined within the code, such as `phoneLength` and `examplePhoneNumber` in the phone module.
+
+## Code Snippets and Examples
+
+### Normalizing a US State
+```typescript
+import { normalizeState, USState } from './address/state';
+
+const state = normalizeState('California');
+console.log(state); // Output: USState.CA
+```
+
+### Validating and Normalizing an Email
+```typescript
+import { normalizeEmailStrict } from './contact/email';
+
+try {
+  const normalizedEmail = normalizeEmailStrict('  User@Example.COM  ');
+  console.log(normalizedEmail); // Output: "user@example.com"
+} catch (error) {
+  console.error("Invalid email:", error.message);
+}
+```
+
+### Normalizing a Date of Birth
+```typescript
+import { normalizeDate } from './dob';
+
+try {
+  const normalizedDate = normalizeDate('1990-01-15');
+  console.log(normalizedDate); // Output: "1990-01-15" (ISO format)
+} catch (error) {
+  console.error("Invalid date:", error.message);
+}
+```
+
+### Normalizing Gender
+```typescript
+import { normalizeGender } from './gender';
+
+try {
+  const normalizedGender = normalizeGender('male');
+  console.log(normalizedGender); // Output: "M"
+} catch (error) {
+  console.error("Invalid gender:", error.message);
+}
+```
+
+These utilities provide a robust way to handle various types of user data, ensuring consistency and validity across the application. They are particularly useful for form validation, data processing, and maintaining clean user data in databases.
+
+The modular structure of the codebase allows for easy maintenance and extension of functionality. Each module focuses on a specific domain, making it simple to add new features or modify existing ones without affecting other parts of the system.

@@ -1,0 +1,53 @@
+---
+title: "ihe-outbound-patient-discovery.ts"
+---
+
+## High-level description
+This Lambda function polls outbound patient discovery results for Carequality IHE Gateway. It initializes error capturing, retrieves necessary environment variables and database credentials, and uses the OutboundResultPollerDirect class to poll and process the results.
+
+## Code Structure
+The main handler function is wrapped with Sentry for error tracking. It uses environment variables and AWS Secrets Manager to configure the OutboundResultPollerDirect, which then polls for outbound patient discovery results.
+
+## Symbols
+
+### handler
+#### Description
+The main Lambda function handler that processes the incoming event and polls for outbound patient discovery results.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| requestId | string | The ID of the request |
+| numOfGateways | number | The number of gateways to poll |
+| patientId | string | The ID of the patient |
+| cxId | string | The customer ID |
+
+#### Internal Logic
+1. Initializes error capturing
+2. Retrieves environment variables and database credentials
+3. Creates an instance of OutboundResultPollerDirect
+4. Calls pollOutboundPatientDiscoveryResults with the provided parameters
+5. Catches and logs any errors that occur during the process
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core | Provides utility functions and classes for environment variables, error handling, and AWS interactions |
+| @sentry/serverless | Used for error tracking and monitoring |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| DB_CREDS | string | N/A | ARN of the database credentials secret |
+| API_URL | string | N/A | URL of the API |
+| AWS_REGION | string | N/A | AWS region |
+| MAX_POLLING_DURATION | string | N/A | Maximum duration for polling (in milliseconds) |
+
+## Error Handling
+Errors are caught in the main handler function, logged to the console, and captured using the Sentry error tracking system.
+
+## Logging
+The function logs the environment type, request ID, number of gateways, customer ID, and patient ID at the beginning of execution. Errors are also logged to the console.
+
+## Performance Considerations
+The function uses the OutboundResultPollerDirect class, which is designed for direct database access. This approach may have performance implications depending on the database size and query complexity.

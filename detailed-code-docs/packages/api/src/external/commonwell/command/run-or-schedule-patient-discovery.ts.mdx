@@ -1,0 +1,48 @@
+---
+title: "run-or-schedule-patient-discovery.ts"
+---
+
+## High-level description
+This code defines a function `runOrScheduleCwPatientDiscovery` that manages the patient discovery process for CommonWell Health Alliance. It either runs a patient discovery immediately or schedules it for later execution, depending on the current status of the patient in the CommonWell system.
+
+## Code Structure
+The main function `runOrScheduleCwPatientDiscovery` uses helper functions and modules to perform its tasks. It interacts with the patient data, CommonWell-specific data, and scheduling mechanisms.
+
+## Symbols
+
+### `runOrScheduleCwPatientDiscovery`
+#### Description
+This asynchronous function determines whether to run a patient discovery immediately or schedule it for later, based on the current status of the patient in the CommonWell system.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient object |
+| facilityId | string | The ID of the facility |
+| requestId | string | The ID of the request |
+| getOrgIdExcludeList | () =&gt; Promise&lt;string[]&gt; | A function that returns a list of organization IDs to exclude |
+| rerunPdOnNewDemographics | boolean (optional) | Flag to rerun patient discovery on new demographics |
+| forceCommonwell | boolean (optional) | Flag to force CommonWell update |
+
+#### Internal Logic
+1. Retrieves the existing patient data.
+2. Extracts CommonWell-specific data from the patient's external data.
+3. Checks the current status and scheduled patient discovery request for CommonWell.
+4. If the status is "processing" and there's no scheduled request, it schedules a patient discovery.
+5. If the status is not "processing", it updates the patient data in CommonWell.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/patient | Imports Patient type |
+| @metriport/core/external/index | Imports MedicalDataSource enum |
+| @metriport/core/util/error/shared | Imports processAsyncError function |
+
+## TODOs
+There is a TODO comment (TODO #1572) indicating that the `forceCommonwell` parameter should be removed in the future.
+
+## Error Handling
+The function uses `processAsyncError` to handle asynchronous errors that may occur during the CommonWell update process.
+
+## Side Effects
+This function may schedule a patient discovery task or update patient data in the CommonWell system, depending on the current status.

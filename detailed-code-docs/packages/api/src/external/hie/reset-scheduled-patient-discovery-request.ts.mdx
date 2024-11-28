@@ -1,0 +1,48 @@
+---
+title: "reset-scheduled-patient-discovery-request.ts"
+---
+
+## High-level description
+This code defines a function `resetScheduledPatientDiscovery` that resets the scheduled patient discovery request for a specific patient and medical data source. It updates the patient's data in the database, removing the scheduled patient discovery request information.
+
+## Code Structure
+The main function `resetScheduledPatientDiscovery` uses the `executeOnDBTx` function to perform a database transaction. It retrieves the patient, updates the external data by removing the scheduled patient discovery request, and then updates the patient record in the database.
+
+## Symbols
+
+### `resetScheduledPatientDiscovery`
+#### Description
+This function resets the scheduled patient discovery request for a given patient and medical data source.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId"&gt; | Object containing patient's id and cxId |
+| source | MedicalDataSource | The medical data source (e.g., CAREQUALITY, COMMONWELL) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| updatedPatient | Patient | The updated patient object |
+
+#### Internal Logic
+1. Uses `executeOnDBTx` to perform a database transaction.
+2. Retrieves the existing patient using `getPatientOrFail`.
+3. Creates a new `updatedExternalData` object, removing the `scheduledPdRequest` for the specified source.
+4. Updates the patient record in the database using `PatientModel.update`.
+5. Returns the updated patient object.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/external/index | Imports MedicalDataSource enum |
+| ../../command/medical/patient/get-patient | Imports getPatientOrFail function |
+| @metriport/core/domain/patient | Imports Patient type |
+| ../../models/medical/patient | Imports PatientModel |
+| ../../models/transaction-wrapper | Imports executeOnDBTx function |
+
+## Error Handling
+The function doesn't implement specific error handling. Errors that occur during the database transaction or patient retrieval will be propagated to the caller.
+
+## Performance Considerations
+The function uses a database transaction, which ensures data consistency but may impact performance if used frequently. It's important to use this function judiciously, especially in high-concurrency scenarios.

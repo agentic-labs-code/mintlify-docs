@@ -1,0 +1,104 @@
+---
+title: "resourceMerger.js"
+---
+
+## High-level description
+This code implements a resource merging functionality for FHIR (Fast Healthcare Interoperability Resources) JSON objects. It processes entries in a FHIR bundle, merging resources with the same key and handling text replacements. The module is designed to work with the FHIR Converter library, focusing on efficient resource management and deduplication.
+
+## Code Structure
+The main function `Process` iterates through the entries in a FHIR bundle, merging resources with the same key. It uses helper functions like `getKey`, `merge`, and `concatAndDedup` to handle the merging process. The `merge` function is also exported for external use.
+
+## References
+This code references the `resourceMover` module, which is used for text replacement in resources.
+
+## Symbols
+
+### `Process`
+#### Description
+The main function that processes a FHIR JSON object, merging resources with the same key.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| jsonObj | Object | The input FHIR JSON object to be processed |
+| replacementDictionary | Object | A dictionary of text replacements to be applied |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| jsonObj | Object | The processed FHIR JSON object with merged resources |
+
+#### Internal Logic
+1. Initializes an empty array for merged entries and a map for resource keys to indices.
+2. Iterates through the entries in the input JSON object.
+3. For each entry, generates a key using the `getKey` function.
+4. If the key exists in the map, merges the current entry with the existing one.
+5. If the key is new, adds the entry to the merged array and updates the map.
+6. Replaces the original entries with the merged entries in the JSON object.
+
+### `merge`
+#### Description
+Merges two resources using deep merge with custom array merging.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| r1 | Object | The first resource to merge |
+| r2 | Object | The second resource to merge |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| merged | Object | The merged resource |
+
+#### Internal Logic
+Uses the `deepmerge` library with a custom array merge function `concatAndDedup`.
+
+### `concatAndDedup`
+#### Description
+Concatenates and deduplicates arrays during the merge process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| target | Array | The target array |
+| source | Array | The source array to be merged |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| destination | Array | The concatenated and deduplicated array |
+
+#### Internal Logic
+1. Concatenates the target and source arrays.
+2. Uses `underscore.uniq` to remove duplicates based on MD5 hash of stringified items.
+
+### `getKey`
+#### Description
+Generates a unique key for a resource based on its type, version, and ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res | Object | The resource object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| key | String | The generated key for the resource |
+
+#### Internal Logic
+1. Extracts the resource type from the input object.
+2. Appends the version ID if available.
+3. Appends the resource ID if available.
+4. If the input is not a valid resource, returns its stringified form.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| deepmerge | Used for deep merging of objects |
+| underscore | Used for array deduplication |
+| crypto | Used for generating MD5 hashes for deduplication |
+
+## Error Handling
+The main `Process` function is wrapped in a try-catch block. If an error occurs, it returns the original input object without processing.

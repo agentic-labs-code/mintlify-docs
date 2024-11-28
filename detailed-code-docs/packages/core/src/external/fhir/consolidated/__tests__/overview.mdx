@@ -1,0 +1,71 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This file contains unit tests for the `getConsolidatedFhirBundle` function, which is responsible for retrieving and consolidating FHIR resources. The tests cover pagination and resource hydration scenarios, ensuring that the function correctly handles multiple pages of results and properly resolves resource references.
+
+## Code Structure
+The file is structured as a Jest test suite, with setup and teardown functions, and individual test cases. It uses mocking to simulate API responses and verify function calls.
+
+## Symbols
+
+### `getConsolidatedFhirBundle`
+#### Description
+This is the main function being tested. It retrieves FHIR resources and consolidates them into a bundle, including referenced resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | { cxId: string, id: string } | Patient information |
+| resources | string[] | Array of resource types to retrieve |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resp | Bundle | Consolidated FHIR bundle |
+
+#### Internal Logic
+The function queries for specified resources, paginates through results, and hydrates referenced resources up to three levels deep.
+
+### `beforeEach`
+#### Description
+Sets up the test environment before each test case.
+
+#### Internal Logic
+- Restores all mocks
+- Mocks the `Config.getFHIRServerUrl` function
+- Sets up spies for `HapiFhirClient.prototype.searchResourcePages`, `fhirBundle.getReferencesFromResources`, and `fhirReferences.getReferencesFromFHIR`
+
+### `afterAll`
+#### Description
+Cleans up the test environment after all tests have run.
+
+#### Internal Logic
+Restores all mocks.
+
+### `describe("getConsolidatedFhirBundle")`
+#### Description
+Groups tests for the `getConsolidatedFhirBundle` function.
+
+### Individual test cases
+#### Description
+Each test case (`it` block) tests a specific scenario for the `getConsolidatedFhirBundle` function.
+
+#### Internal Logic
+- Sets up mock data and function responses
+- Calls `getConsolidatedFhirBundle` with test parameters
+- Asserts expected outcomes using Jest's expect functions
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides TypeScript types for FHIR resources |
+| uuid | Generates unique identifiers for test data |
+| Config | Provides configuration values |
+| HapiFhirClient | FHIR client implementation |
+| fhirBundle | Contains utility functions for working with FHIR bundles |
+| fhirReferences | Contains utility functions for working with FHIR references |
+
+## Error Handling
+The tests do not explicitly cover error handling scenarios. They focus on successful execution paths.

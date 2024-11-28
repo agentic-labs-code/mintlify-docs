@@ -1,0 +1,68 @@
+---
+title: "coverage-enhancement-init.ts"
+---
+
+## High-level description
+This code defines an Express router for handling internal patient-related operations in a medical API. It includes endpoints for managing patient data, enhancing coverage, retrieving consolidated patient information, and performing various administrative tasks related to patient records and health information exchanges (HIEs).
+
+## Code Structure
+The code is structured as a series of route handlers for different HTTP methods and endpoints. Each handler typically extracts parameters from the request, performs some operations (often involving database queries or external service calls), and sends a response. The code uses various imported functions and utilities to handle specific tasks.
+
+## Symbols
+
+### `router`
+#### Description
+An Express router instance that defines all the routes for internal patient operations.
+
+### `initEnhancedCoverage`
+#### Description
+Triggers the job to enhance coverage of provided patients and checks/fixes any stale enhanced coverage process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string (optional) | The customer ID |
+| patientIds | string[] (optional) | List of patient IDs to enhance coverage |
+| fromOrgPos | number (optional) | Position on the array of CQ Orgs to start the Enhanced Coverage from |
+
+#### Internal Logic
+1. Validates input parameters
+2. Retrieves customer IDs based on feature flags
+3. Checks for stale enhanced coverage if necessary
+4. Initiates the enhanced coverage process
+5. Returns the updated patient IDs
+
+### `getConsolidated`
+#### Description
+Returns a patient's consolidated data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer ID |
+| patientId | string | The ID of the patient |
+| documentIds | string[] (optional) | List of document reference IDs to filter by |
+| resources | string[] (optional) | List of resources to be returned |
+| dateFrom | Date (optional) | Start date for filtering resources |
+| dateTo | Date (optional) | End date for filtering resources |
+| conversionType | string (optional) | Indicates how the medical record should be rendered |
+
+#### Internal Logic
+1. Retrieves the patient from the database
+2. Calls the `getConsolidated` function with the provided parameters
+3. Returns the consolidated data as a JSON response
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| express-promise-router | Creates an Express router that allows the use of async handlers |
+| @metriport/core | Provides various utility functions and domain-specific operations |
+| @metriport/shared | Provides shared schemas and utility functions |
+| lodash | Provides utility functions like `chunk` |
+| zod | Used for input validation |
+
+## Error Handling
+The code uses try-catch blocks and the `asyncHandler` wrapper to handle errors in route handlers. It also uses custom error classes like `BadRequestError` and `NotFoundError` for specific error scenarios.
+
+## Logging
+The code uses console.log statements for logging various operations and errors. It also uses a custom `out` function for more structured logging in some cases.

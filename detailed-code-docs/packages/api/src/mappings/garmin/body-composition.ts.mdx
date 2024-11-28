@@ -1,0 +1,99 @@
+---
+title: "body-composition.ts"
+---
+
+## High-level description
+The code defines functions for mapping Garmin body composition data to the Metriport Body data model. It includes data validation using Zod schemas, unit conversion, and grouping by user access tokens.
+
+## Code Structure
+The `mapToBody` function uses `groupBy` to organize Garmin body composition data by user access token. It then iterates through each group, converting the Garmin data to Metriport Body data using `garminBodyCompositionToBody` and packaging it with user information. The `garminBodyCompositionToBody` function performs the actual data mapping and unit conversion. Zod schemas define the expected data structures for validation.
+
+## References
+- `Body`: The Metriport data model for body composition data.
+- `GarminBodyComposition`: The Zod schema defining the expected structure of Garmin body composition data.
+- `GarminBodyCompositionList`: The Zod schema defining an array of `GarminBodyCompositionWithMeta`.
+- `User`: An interface representing a user with a `userAccessToken`.
+- `UserData`: An interface combining user information with typed Metriport data.
+- `PROVIDER_GARMIN`: A constant representing the Garmin data source.
+- `secondsToISODate`: A utility function for converting seconds to ISO date format.
+
+## Symbols
+
+### `mapToBody`
+#### Description
+This function takes an array of Garmin body composition data with metadata (`GarminBodyCompositionList`) and maps it to an array of `UserData&lt;Body&gt;`, grouping the data by user access token.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| items | `GarminBodyCompositionList` | An array of Garmin body composition data with metadata. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `UserData&lt;Body&gt;[]` | An array of user data objects, each containing user information and an array of mapped body composition data. |
+
+#### Internal Logic
+1. Groups the input `items` by `userAccessToken` using `groupBy`.
+2. Iterates through each group (user) and their corresponding Garmin body composition data.
+3. For each user, maps the Garmin data to `Body` objects using `garminBodyCompositionToBody`.
+4. Packages the mapped data with user information into `UserData&lt;Body&gt;` objects.
+
+### `garminBodyCompositionToBody`
+#### Description
+This function maps a single Garmin body composition data object (`GarminBodyComposition`) to a Metriport `Body` object, performing unit conversions as needed.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| gBody | `GarminBodyComposition` | A Garmin body composition data object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `Body` | A Metriport `Body` object containing the mapped data. |
+
+#### Internal Logic
+1. Creates a new `Body` object.
+2. Sets the `metadata` property with the date (converted from seconds to ISO date) and source (Garmin).
+3. Maps and converts the following fields if they are not null:
+    - `muscleMassInGrams` to `muscle_mass_kg` (grams to kilograms)
+    - `boneMassInGrams` to `bone_mass_kg` (grams to kilograms)
+    - `bodyFatInPercent` to `body_fat_pct`
+    - `weightInGrams` to `weight_kg` (grams to kilograms)
+4. Returns the mapped `Body` object.
+
+### `garminBodyCompositionSchema`
+#### Description
+A Zod schema defining the expected structure and data types for Garmin body composition data.
+
+### `GarminBodyComposition`
+#### Description
+A type alias for the inferred type of the `garminBodyCompositionSchema`.
+
+### `garminBodyCompositionWithMetaSchema`
+#### Description
+A Zod schema that merges the `garminMetaSchema` (containing user access token) with the `garminBodyCompositionSchema`.
+
+### `GarminBodyCompositionWithMeta`
+#### Description
+A type alias for the inferred type of the `garminBodyCompositionWithMetaSchema`.
+
+### `garminBodyCompositionListSchema`
+#### Description
+A Zod schema defining an array of `GarminBodyCompositionWithMeta` objects.
+
+### `GarminBodyCompositionList`
+#### Description
+A type alias for the inferred type of the `garminBodyCompositionListSchema`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides the Metriport data models, including `Body`. |
+| convert-units | Used for unit conversions (grams to kilograms). |
+| lodash (groupBy) | Used to group the Garmin data by user access token. |
+| zod | Used for data validation and schema definition. |
+
+## Error Handling
+The code uses Zod schemas for data validation. If the input data does not match the schema, Zod will throw an error.

@@ -1,0 +1,66 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `packages/shared/src/interface` directory serves as a central hub for defining and exporting interfaces, schemas, and types used across the application. It focuses on two main areas: internal consolidated medical records and a feedback system. The directory uses Zod for schema definition and validation, ensuring type safety and consistency in data structures throughout the application.
+
+## What does it do?
+This directory provides a structured way to define, validate, and export data schemas and types for two primary purposes:
+
+1. Consolidated Medical Records: It defines the structure and validation rules for sending consolidated medical records internally. This includes details such as bundle location, filename, request ID, conversion type, and optional parameters like date ranges and specific resources to include.
+
+2. Feedback System: It establishes schemas and types for creating feedback and feedback entries. This includes fields like customer ID, entity ID, content, and optional information like version and location for feedback, as well as feedback ID and comment for feedback entries.
+
+By centralizing these definitions, the code promotes consistency and reduces the likelihood of errors when handling these types of data across different parts of the application. It also simplifies the process of validating input data and ensuring type safety in TypeScript.
+
+## Key Files
+
+1. `index.ts`: Serves as the main entry point, re-exporting all symbols from the "internal" and "schema" subdirectories.
+
+2. `internal/consolidated.ts`: Defines the `internalSendConsolidatedSchema` using Zod and exports the `InternalSendConsolidated` TypeScript type for consolidated medical record data.
+
+3. `internal/index.ts`: Re-exports all symbols from the `consolidated.ts` file.
+
+4. `schema/feedback.ts`: Contains schema definitions and types for the feedback system, including `createFeedbackSchema` and `createFeedbackEntrySchema`.
+
+5. `schema/index.ts`: Re-exports all symbols from the `feedback.ts` file.
+
+## Dependencies
+The main external dependency for this directory is Zod, a TypeScript-first schema declaration and validation library. Zod is used for creating and validating schemas, chosen for its TypeScript-first approach and powerful schema definition capabilities.
+
+Internally, the code also depends on the `@metriport/shared/medical` module, which provides enums for `consolidationConversionType` and `resourceTypeForConsolidation`.
+
+## Configuration
+While there are no explicit configuration files, the schemas defined in `consolidated.ts` and `feedback.ts` act as configurations for the structure of consolidated medical record data and feedback data, respectively. 
+
+For example, the `internalSendConsolidatedSchema` in `consolidated.ts` defines fields such as:
+
+```typescript
+export const internalSendConsolidatedSchema = z.object({
+  bundleLocation: z.string(),
+  bundleFilename: z.string(),
+  requestId: z.string(),
+  conversionType: consolidationConversionType.optional(),
+  generateAiBrief: z.boolean().optional(),
+  resources: z.array(resourceTypeForConsolidation).optional(),
+  dateFrom: z.string().optional(),
+  dateTo: z.string().optional(),
+});
+```
+
+Similarly, the `createFeedbackSchema` in `feedback.ts` defines:
+
+```typescript
+export const createFeedbackSchema = z.object({
+  cxId: z.string(),
+  entityId: z.string(),
+  content: z.string(),
+  version: z.string().nullable().optional(),
+  location: z.string().nullable().optional(),
+});
+```
+
+These schemas can be adjusted to modify the structure and validation rules for consolidated medical record data and feedback data throughout the application.
+
+The centralized nature of these definitions allows for easy modification and ensures consistency across the application when working with these data structures.

@@ -1,0 +1,58 @@
+---
+title: "Notes.hbs"
+---
+
+## High-level description
+This Handlebars template is designed to process Clinical Document Architecture (CDA) sections related to notes and generate corresponding FHIR DiagnosticReport resources. It also creates associated Practitioner and Organization resources when applicable, and establishes the necessary references between these resources.
+
+## Code Structure
+The template is structured as a series of nested conditional blocks and loops that extract information from CDA sections and map it to FHIR resources. It uses several partial templates (referenced with `&gt;`) to generate specific parts of the FHIR resources.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template processes CDA sections with specific template IDs related to notes and generates FHIR resources.
+
+#### Internal Logic
+1. Checks if the input message contains specific template IDs.
+2. Retrieves all CDA sections matching these template IDs.
+3. Iterates through each section and its entries.
+4. For each note entry:
+   - Generates a DiagnosticReport resource.
+   - Creates references to Patient and Encounter (if available).
+   - Creates Practitioner and Organization resources if author information is present.
+   - Establishes references between DiagnosticReport and Practitioner/Organization.
+
+### Partial Templates
+The code uses several partial templates to generate specific parts of the FHIR resources:
+- `Resources/DiagnosticReport.hbs`
+- `References/DiagnosticReport/subject.hbs`
+- `References/DiagnosticReport/encounter.hbs`
+- `Utils/GeneratePatientId.hbs`
+- `Utils/GeneratePractitionerId.hbs`
+- `Resources/Practitioner.hbs`
+- `References/DiagnosticReport/performer.hbs`
+- `Utils/GenerateOrganizationId.hbs`
+- `Resources/Organization.hbs`
+
+These partial templates are responsible for generating specific FHIR resources or references.
+
+## Dependencies
+The template relies on several Handlebars helpers and functions:
+- `contains`
+- `toString`
+- `toJsonString`
+- `getAllCdaSectionsByTemplateId`
+- `multipleToArray`
+- `generateUUID`
+- `evaluate`
+- `concat`
+
+## TODOs
+There is a TODO comment indicating that additional references, author information, etc., need to be added:
+```handlebars
+{{!-- TODO need to add references, author, etc --}}
+```
+
+This suggests that the template may need further development to include more comprehensive information in the generated FHIR resources.

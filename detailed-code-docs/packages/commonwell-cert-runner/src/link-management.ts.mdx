@@ -1,0 +1,55 @@
+---
+title: "link-management.ts"
+---
+
+## High-level description
+This code implements link management operations for the CommonWell Health Alliance API. It demonstrates the process of linking a patient to a person, upgrading and downgrading link assurance levels, and deleting links. The code is part of a certification runner for CommonWell integration.
+
+## Code Structure
+The main function `linkManagement` orchestrates a series of API calls to the CommonWell SDK to perform various link management operations. It uses helper functions from the CommonWell SDK to handle API responses and extract necessary information.
+
+## References
+This code references the CommonWell SDK (`@metriport/commonwell-sdk`) and uses helper functions and types from it.
+
+## Symbols
+
+### `linkManagement`
+#### Description
+This async function demonstrates the link management process for CommonWell certification. It performs a series of operations including enrolling a person, registering a patient, linking them, upgrading and downgrading the link assurance level, and finally deleting the link and created entities.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| commonWell | CommonWell | An instance of the CommonWell SDK client |
+| queryMeta | RequestMetadata | Metadata for the API requests |
+
+#### Internal Logic
+1. Enrolls a person and registers a patient
+2. Links the patient to the person (LOLA 1 to LOLA 2)
+3. Upgrades the link from LOLA 2 to LOLA 3
+4. Downgrades the link from LOLA 3 to LOLA 2
+5. Deletes the patient/person link
+6. Cleans up by deleting the created person and patient
+
+## Side Effects
+This function makes several API calls to the CommonWell service, which modifies the state of patient and person records in the CommonWell system.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/commonwell-sdk | Provides the CommonWell SDK for API interactions |
+
+## Error Handling
+The code uses simple error throwing when expected data is not present in API responses. For example:
+
+```typescript
+if (!personId) throw new Error("No personId on response from enrollPerson");
+```
+
+This approach ensures that the process fails fast if any unexpected responses are received.
+
+## Performance Considerations
+This function makes multiple sequential API calls, which could impact performance for large-scale operations. In a production environment, consider implementing retry logic and potentially parallelizing operations where possible.
+
+## TODOs
+There are no explicit TODOs in the code, but it's worth noting that this appears to be a certification runner, so it may need updates if the CommonWell certification process changes.

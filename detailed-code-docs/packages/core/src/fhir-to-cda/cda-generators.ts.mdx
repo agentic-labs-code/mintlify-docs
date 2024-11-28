@@ -1,0 +1,66 @@
+---
+title: "cda-generators.ts"
+---
+
+## High-level description
+This code is responsible for generating Clinical Document Architecture (CDA) documents from FHIR (Fast Healthcare Interoperability Resources) bundles. It provides functionality to convert FHIR data into CDA format, which is a widely used standard for clinical document exchange in healthcare.
+
+## Code Structure
+The main function `generateCdaFromFhirBundle` takes a FHIR bundle and an organization OID as input and returns a CDA document as a string. It uses various helper functions to build different sections of the CDA document, such as record target, author, custodian, encompassing encounter, and structured body.
+
+## Symbols
+
+### `generateCdaFromFhirBundle`
+#### Description
+This function is the main entry point for converting a FHIR bundle to a CDA document.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fhirBundle | Bundle | A FHIR bundle containing patient and organization resources |
+| oid | string | Organization OID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cdaDocument | string | The generated CDA document as an XML string |
+
+#### Internal Logic
+1. Extracts patient and organization resources from the FHIR bundle
+2. Builds various sections of the CDA document using helper functions
+3. Generates the CDA XML using the `buildClinicalDocumentXml` function
+4. Post-processes the XML to handle special characters and formatting
+
+### `postProcessXml`
+#### Description
+This function performs final formatting and cleanup on the generated CDA XML.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| xml | any | The raw CDA XML |
+| oid | string | Organization OID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| processedXml | string | The cleaned and formatted CDA XML string |
+
+#### Internal Logic
+1. Prepends XML styling
+2. Replaces placeholders and special characters
+3. Removes unnecessary text tags
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides TypeScript types for FHIR resources |
+| ../external/fhir/shared | Contains utility functions for working with FHIR resources |
+| ../util/error/bad-request | Provides a custom error class for handling bad requests |
+| ./cda-templates/* | Contains functions for building various CDA sections |
+
+## Error Handling
+The code uses a `BadRequestError` class to handle cases where required resources are missing from the FHIR bundle or when the bundle lacks meaningful data to generate a CDA document.
+
+## Performance Considerations
+The code processes the entire FHIR bundle to generate the CDA document, which could be resource-intensive for large bundles. Consider optimizing the data extraction and XML generation process for better performance with large datasets.

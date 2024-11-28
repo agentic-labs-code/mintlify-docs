@@ -1,0 +1,77 @@
+---
+title: "create-organization.test.ts"
+---
+
+## High-level description
+The `create-organization.test.ts` file contains unit tests for the `createOrganization` function, which is responsible for creating new medical organizations in the system. The tests cover various scenarios, including handling existing organizations, generating unique identifiers, and interacting with external services.
+
+## References
+- `createOrganization` from `../create-organization`
+- `OrganizationModel` from `../../../../models/medical/organization`
+- `makeOrganization` from `../../../../domain/medical/__tests__/organization`
+- `makeOrganizationOID` from `../../../../shared/oid`
+- `createOrganizationId` from `../../customer-sequence/create-id`
+- `createTenantIfNotExists` from `../../../../external/fhir/admin`
+- `upsertOrgToFHIRServer` from `../../../../external/fhir/organization/upsert-organization`
+- `cwCommands` from `../../../../external/commonwell`
+- `cqCommands` from `../../../../external/carequality`
+- `address` from `../../../../domain/medical/address`
+- `addressWithCoordinates` from `./register-organization`
+
+## Symbols
+### `describe`
+#### Description
+This block defines a test suite named "createOrganization" to group together tests related to the `createOrganization` function.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+The block contains several `it` blocks, each representing an individual test case.
+
+### `it`
+#### Description
+Each `it` block within the `describe` block represents a specific test case for the `createOrganization` function.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+Each test case sets up specific conditions and expectations:
+- **"throws if org exists for customer"**: Tests that attempting to create an organization for a customer that already has one throws an error.
+- **"creates org with oid and number from createOrganizationId"**: Verifies that the function correctly uses the `createOrganizationId` function to generate and assign a unique organization ID (OID) and number to the new organization.
+- **"returns creates org"**: Checks that the function successfully creates and returns the new organization object.
+- **"calls createTenant"**: Ensures that the function calls the `createTenantIfNotExists` function to create a tenant for the new organization in the FHIR server.
+
+### `beforeAll`
+#### Description
+This block defines setup logic to be executed once before all tests in the suite.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+- Mocks the `createOrganizationId` function to return a predefined organization ID and number.
+- Mocks the `createTenantIfNotExists`, `upsertOrgToFHIRServer`, `cwCommands.default.organization.createOrUpdate`, `cqCommands.default.organization.createOrUpdate`, and `address.getAddressWithCoordinates` functions to prevent actual external calls during testing.
+
+### `beforeEach`
+#### Description
+This block defines setup logic to be executed before each test case within the suite.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+Clears all mocks before each test to ensure a clean testing environment.

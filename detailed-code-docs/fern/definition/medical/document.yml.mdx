@@ -1,0 +1,147 @@
+---
+title: "document.yml"
+---
+
+## High-level description
+This YAML file defines the API specification for a medical document service. It outlines various endpoints for querying, listing, downloading, and uploading medical documents, as well as managing document references for patients across different healthcare information exchanges (HIEs).
+
+## Code Structure
+The file is structured into two main sections: `service` and `types`. The `service` section defines the API endpoints, their request/response structures, and examples. The `types` section defines the data structures used by these endpoints.
+
+## Symbols
+
+### service
+#### Description
+Defines the base configuration and endpoints for the medical document API service.
+
+#### Internal Logic
+- Sets the base path to `/medical/v1/document`
+- Requires authentication for all endpoints
+- Defines several endpoints for document management
+
+### startQuery
+#### Description
+Triggers an asynchronous document query for a specified patient across HIEs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the Patient for which to list available Documents |
+| facilityId | string | The ID of the Facility where the patient is receiving care |
+| body | optional&lt;map&lt;string, string&gt;&gt; | Metadata with custom key-value pairs |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | DocumentQuery | Contains download and convert progress information |
+
+#### Internal Logic
+1. Initiates an asynchronous document query across HIEs
+2. Downloads documents from HIEs
+3. Converts C-CDA/XML documents to FHIR format
+4. Updates document references and status
+
+### getQueryStatus
+#### Description
+Returns the document query status for a specified patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the Patient for which to list available Documents |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | DocumentQuery | Contains download and convert progress information |
+
+### list
+#### Description
+Lists all available documents for a patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the Patient for which to list available Documents |
+| dateFrom | optional&lt;string&gt; | Start date for filtering documents |
+| dateTo | optional&lt;string&gt; | End date for filtering documents |
+| content | optional&lt;string&gt; | Value to search within document reference and contents |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | ListDocumentReferences | List of available document references |
+
+### getURL
+#### Description
+Gets a downloadable URL for a specified document.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The file name of the document |
+| conversionType | optional&lt;ConversionType&gt; | The document type to convert to (html or pdf) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | DocumentUrl | Contains the downloadable URL |
+
+### createDocumentReference
+#### Description
+Creates a DocumentReference and returns its ID and a URL for document upload.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the Patient for which to list available Documents |
+| body | fhir.DocumentReference | A FHIR DocumentReference |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | UploadDocumentResponse | Contains DocumentReference ID and upload URL |
+
+### startBulkGetDocumentUrl
+#### Description
+Triggers a process to generate download URLs for all of a patient's documents.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient for which to initiate the bulk URL generation |
+| body | optional&lt;map&lt;string, string&gt;&gt; | Metadata with custom key-value pairs |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | BulkGetDocumentUrlQuery | Contains status of URL generation process and request ID |
+
+## Types
+The file defines several custom types used in the API:
+
+1. `DocumentQuery`: Represents the progress of document download and conversion
+2. `Progress`: Describes the progress of a document operation
+3. `DocumentQueryStatus`: Enum for possible statuses of a document query
+4. `ConversionType`: Enum for document conversion types
+5. `ListDocumentReferences`: Contains a list of FHIR DocumentReference objects
+6. `UploadDocumentResponse`: Contains DocumentReference ID and upload URL
+7. `DocumentUrl`: Contains a presigned URL for document download
+8. `BulkGetDocumentUrlQuery`: Represents the status of bulk URL generation process
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| fhir | Imports FHIR-related types and definitions |
+
+## API/Interface Reference
+| Endpoint | Method | Path | Description |
+|:---------|:-------|:-----|:------------|
+| startQuery | POST | /query | Start a document query for a patient |
+| getQueryStatus | POST | /query | Get document query status |
+| list | GET | "" | List available documents for a patient |
+| getURL | GET | /download-url | Get downloadable URL for a document |
+| createDocumentReference | POST | /upload | Create a DocumentReference and get upload URL |
+| startBulkGetDocumentUrl | POST | /download-url/bulk | Start bulk URL generation for patient documents |
+
+This API specification provides a comprehensive set of endpoints for managing medical documents, including querying, listing, downloading, and uploading functionalities, with a focus on patient-centric operations and integration with HIEs.

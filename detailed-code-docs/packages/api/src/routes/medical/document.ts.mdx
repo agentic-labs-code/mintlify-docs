@@ -1,0 +1,125 @@
+---
+title: "document.ts"
+---
+
+## High-level description
+This code defines an Express router for handling medical document-related operations. It includes endpoints for listing, querying, downloading, and uploading documents for patients. The router implements various functionalities such as document search, conversion, and management of document references in a FHIR server.
+
+## Code Structure
+The main router is defined using `express-promise-router`. It contains several route handlers for different HTTP methods (GET and POST) on various endpoints. These handlers interact with other modules to perform operations like searching documents, querying document status, and managing document references. The code also includes helper functions for input validation, error handling, and data transformation.
+
+## Symbols
+
+### `router`
+#### Description
+An Express router instance that defines the routes for document-related operations.
+
+### GET `/`
+#### Description
+Lists all documents that can be retrieved for a patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.query.patientId | string | Patient ID for which to list documents |
+| req.query.dateFrom | string (optional) | Start date to filter documents |
+| req.query.dateTo | string (optional) | End date to filter documents |
+| req.query.content | string (optional) | Value to search on the document reference |
+| req.query.output | string (optional) | Output format (fhir or dto) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documents | Array | Available documents, including query status and progress |
+
+### GET `/query`
+#### Description
+Returns the document query status for the specified patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.query.patientId | string | Patient ID for which to retrieve document query status |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documentQueryProgress | Object | Status of document querying across HIEs |
+
+### POST `/query`
+#### Description
+Triggers a document query for the specified patient across HIEs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.query.patientId | string | Patient ID for which to retrieve document metadata |
+| req.query.facilityId | string (optional) | The facility providing NPI for the document query |
+| req.query.override | boolean (optional) | Whether to override files already downloaded |
+| req.body | Object (optional) | Metadata to be sent through Webhook |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docQueryProgress | Object | Status of document querying |
+
+### GET `/downloadUrl` and GET `/download-url`
+#### Description
+Fetches the document from S3 and sends a presigned URL.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.query.fileName | string | The file name of the document in S3 |
+| req.query.conversionType | string (optional) | The doc type to convert to |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | Presigned URL for downloading the document |
+
+### POST `/download-url/bulk`
+#### Description
+Triggers a webhook payload containing the list of downloadable URLs for all the patient's documents.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.query.patientId | string | Patient ID for which to retrieve document metadata |
+| req.body | Object (optional) | Metadata for the bulk download request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| BulkGetDocumentsUrlProgress | Object | Status of the bulk signing process |
+
+### POST `/upload-url` and POST `/upload`
+#### Description
+Uploads a medical document and creates a Document Reference for that file on the FHIR server.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.query.patientId | string | The ID of the patient |
+| req.body | Object | The DocumentReference with context for the file to be uploaded |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documentReferenceId | string | The ID of the created Document Reference |
+| uploadUrl | string | The URL for document upload |
+
+## Dependencies
+- @metriport/api-sdk
+- @metriport/core
+- express
+- http-status
+- zod
+
+## Error Handling
+The code uses custom error classes like `ForbiddenError` and `NotFoundError` for specific error scenarios. It also utilizes the `asyncHandler` wrapper for route handlers to catch and forward errors to the Express error handling middleware.
+
+## Logging
+The code uses a `requestLogger` middleware for logging incoming requests and their processing time.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

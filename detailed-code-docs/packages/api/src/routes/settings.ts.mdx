@@ -1,0 +1,83 @@
+---
+title: "settings.ts"
+---
+
+## High-level description
+This code defines a router for handling settings-related API endpoints in an Express.js application. It provides functionality for retrieving, creating, and updating settings, as well as managing webhook configurations and statuses.
+
+## Code Structure
+The code is structured around a main router object that defines various routes for handling different settings-related operations. It imports several helper functions and models from other parts of the application to handle database operations, error handling, and request processing.
+
+## Symbols
+
+### `router`
+#### Description
+An Express.js router object that defines the routes for settings-related operations.
+
+### `SettingsDTO`
+#### Description
+A Data Transfer Object class for representing settings information.
+
+#### Internal Logic
+- Constructs a DTO with `id`, `webhookUrl`, and `webhookKey`.
+- Provides a static method `fromEntity` to create a DTO from a Settings entity.
+
+### `WebhookStatusDTO`
+#### Description
+A Data Transfer Object class for representing webhook status information.
+
+#### Internal Logic
+- Constructs a DTO with `webhookEnabled`, `webhookStatusDetail`, `webhookRequestsProcessing`, and `webhookRequestsFailed`.
+- Provides a static method `fromEntity` to create a DTO from individual status components.
+
+### `GET /`
+#### Description
+Retrieves or creates settings for the API customer.
+
+#### Internal Logic
+1. Gets the customer ID from the request.
+2. Attempts to retrieve existing settings.
+3. If settings don't exist, creates new settings.
+4. Returns the settings as a SettingsDTO.
+
+### `POST /`
+#### Description
+Updates the settings for the API customer.
+
+#### Internal Logic
+1. Validates the incoming request body using a Zod schema.
+2. Checks the webhook URL against a blacklist.
+3. Updates the settings using the `updateSettings` function.
+4. Returns the updated settings as a SettingsDTO.
+
+### `GET /webhook`
+#### Description
+Retrieves webhook status information.
+
+#### Internal Logic
+1. Gets the customer ID from the request.
+2. Retrieves the settings and counts of failed and processing webhook requests.
+3. Returns the status information as a WebhookStatusDTO.
+
+### `POST /webhook/retry`
+#### Description
+Retries failed webhook requests.
+
+#### Internal Logic
+1. Gets the customer ID from the request.
+2. Calls the `retryFailedRequests` function to retry failed requests.
+3. Returns a 200 OK status.
+
+## Dependencies
+The code relies on several external libraries and internal modules:
+- Express.js for routing
+- Zod for request validation
+- Various internal modules for settings management, webhook handling, and error handling
+
+## Error Handling
+The code uses custom error classes (e.g., `BadRequestError`) and the `asyncHandler` wrapper to handle and propagate errors consistently.
+
+## Configuration
+The code defines constants for webhook URL validation, including blacklists for certain URL patterns and exact matches.
+
+This router provides a comprehensive API for managing settings and webhook configurations, with proper error handling and data validation.

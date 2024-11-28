@@ -1,0 +1,60 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for managing events in a medical API, specifically focusing on patient-related events and integration with external systems like CommonWell Health Alliance (CW) and Canvas. The code is structured to provide a centralized event management system, utilizing the EventEmitter pattern and implementing a singleton design for consistent event handling across the application.
+
+## What does it do?
+The code in this directory sets up and manages a system for handling various patient-related events in a medical API. Here's a breakdown of its functionality:
+
+1. Event Initialization: It provides a centralized function (`initEvents()`) to initialize all event listeners when the API server starts. This includes setting up listeners for both CommonWell Health Alliance and Canvas integration events.
+
+2. Patient Event Management: It defines a `PatientEvents` class that handles different types of patient-related events, such as patient creation, updates, deletions, and Canvas integration events. This class extends the EventEmitter, allowing other parts of the application to listen for and react to these events.
+
+3. Singleton Pattern: The code implements a singleton pattern for the `PatientEvents` class, ensuring that only one instance of this event manager is used throughout the application. This promotes consistency in event handling and prevents potential conflicts or duplication of event emissions.
+
+4. Event Emission: The `PatientEvents` class provides methods to emit specific events with relevant data. For example, when a patient is created, updated, or deleted, the corresponding event can be emitted with the patient's information.
+
+5. Integration with External Systems: The code sets up event listeners for integration with external systems like CommonWell Health Alliance and Canvas, allowing the API to react to events from these systems and maintain synchronization.
+
+In essence, this code creates a robust event system that allows different parts of the medical API to communicate and react to patient-related changes and integrations in a decoupled and efficient manner.
+
+## Entry points
+The main entry point for this directory is the `index.ts` file. This file exports the `initEvents()` function, which serves as the central point for initializing all event listeners in the API. When the API server starts up, it calls this function to set up the necessary event handling infrastructure.
+
+The event system's functionality is primarily implemented in the `medical` subdirectory, specifically in the file that defines the `PatientEvents` class (likely named something like `patient-events.ts`). This class is the core of the event management system, providing methods to emit various patient-related events.
+
+The flow of control typically follows this pattern:
+1. The API server calls `initEvents()` during startup.
+2. `initEvents()` sets up listeners for CommonWell and Canvas integration events.
+3. Throughout the application's lifecycle, various components can access the `PatientEvents` instance through the `patientEvents()` function to emit or listen for patient-related events.
+4. When relevant actions occur (e.g., patient creation, updates, or deletions), the appropriate event is emitted using the `PatientEvents` methods.
+5. Listeners set up for these events (either within the API or in external integrations) can then react to these events as needed.
+
+## Dependencies
+The code relies on the following external dependencies:
+
+1. Node.js `events` module: Used to extend the EventEmitter class, providing the foundation for the event management system.
+
+2. `@metriport/core/domain/patient`: Imports the Patient type, likely used for type checking and ensuring consistency in patient data structures.
+
+3. Internal dependencies:
+   - `../external/commonwell/cq-bridge/patient-event-listener`: Provides the `initCWEvents` function for initializing CommonWell Health Alliance event listeners.
+   - `../external/canvas/canvas-event-listener`: Provides the `initCanvasIntegrationEvents` function for initializing Canvas integration event listeners.
+   - `../../domain/webhook`: Imports the MAPIWebhookType, likely used for typing webhook-related events.
+
+These dependencies suggest that the event system is designed to work closely with both internal API components and external integrations, providing a flexible and extensible architecture for handling patient-related events.
+
+## Configuration
+While there are no explicit configuration files mentioned in the provided summaries, the event system appears to be configurable through the initialization process. The `initEvents()` function in `index.ts` serves as a configuration point, allowing the application to set up specific event listeners as needed.
+
+The `PatientEvents` class also defines static constants for event types:
+- `CREATED`
+- `UPDATED`
+- `DELETED`
+- `CANVAS_INTEGRATION`
+
+These constants can be considered a form of configuration, as they define the types of events that the system can handle. If new event types need to be added in the future, they would likely be defined here.
+
+Additionally, the use of a singleton pattern for the `PatientEvents` class suggests that any configuration or state related to patient events is centralized and consistent across the application. This design choice allows for easier management and potential future expansion of the event system's capabilities.

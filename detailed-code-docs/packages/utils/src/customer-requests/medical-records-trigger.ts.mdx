@@ -1,0 +1,74 @@
+---
+title: "medical-records-trigger.ts"
+---
+
+## High-level description
+This script triggers the generation of consolidated medical records for a list of patients using the Metriport API. It allows for customization of date ranges, resources to include, and conversion type, while handling authentication and rate limiting between requests.
+
+## Code Structure
+The script imports necessary dependencies, sets up configuration variables, and defines the main function that iterates through patient IDs to make API requests for consolidated medical records.
+
+## Symbols
+
+### `main`
+#### Description
+The main function that orchestrates the process of triggering consolidated medical record generation for a list of patients.
+
+#### Internal Logic
+1. Logs the start of the process with customer ID and number of patients.
+2. Iterates through the list of patient IDs.
+3. For each patient, makes an API call to trigger the consolidated record generation.
+4. Implements a delay between requests to avoid overwhelming the API.
+5. Logs the progress and timing information.
+
+### Configuration Variables
+#### Description
+Several configuration variables are defined at the top of the file to customize the script's behavior.
+
+| Variable | Type | Description |
+|:---------|:-----|:------------|
+| patientIds | string[] | List of patient IDs to process |
+| fromDate | string \| undefined | Start date for the date range (inclusive) |
+| toDate | string \| undefined | End date for the date range (inclusive) |
+| resources | string[] \| undefined | List of resources to include in the consolidated record |
+| conversionType | string | Type of conversion for the consolidated record (set to "pdf") |
+| cxId | string | Customer ID retrieved from environment variables |
+| apiUrl | string | API URL retrieved from environment variables |
+| timeBetweenPatients | number | Delay between API calls in milliseconds |
+
+### `axiosConfig`
+#### Description
+Configuration object for Axios HTTP client.
+
+#### Internal Logic
+- Sets a timeout of 120 seconds for requests
+- Uses the `apiUrl` as the base URL for requests
+- Includes an `x-api-key` header with the encoded customer ID for authentication
+
+### `api`
+#### Description
+Axios instance created with the `axiosConfig` for making API requests.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | Load environment variables from a .env file |
+| @metriport/core/util/env-var | Retrieve environment variables |
+| @metriport/shared | Utility functions (sleep, formatNumber) |
+| axios | HTTP client for making API requests |
+| base64url | Encode customer ID for authentication |
+| dayjs | Date manipulation and formatting |
+
+## Error Handling
+The script does not implement explicit error handling. Errors from API calls or other operations will cause the script to terminate.
+
+## Logging
+The script uses console.log for logging progress, including:
+- Start of the process with customer ID and number of patients
+- Progress for each patient request
+- Total execution time at the end of the process
+
+## TODOs
+- Consider adding error handling for API calls and other potential failure points.
+- Implement a mechanism to resume the process from where it left off in case of interruption.
+- Add command-line arguments or a configuration file for easier customization of script parameters.

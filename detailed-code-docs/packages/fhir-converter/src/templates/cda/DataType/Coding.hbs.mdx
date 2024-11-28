@@ -1,0 +1,55 @@
+---
+title: "Coding.hbs"
+---
+
+## High-level description
+This Handlebars template file, `Coding.hbs`, is designed to generate a JSON object representing a FHIR Coding data type. It transforms input data from a CDA (Clinical Document Architecture) format into the corresponding FHIR Coding structure, handling various scenarios including unknown or missing values.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template generates a JSON object for a FHIR Coding data type. It populates the fields `code`, `display`, `version`, and `system` based on the input data and conditions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | Object | Contains code-related information from the CDA input |
+| canBeUnknown | Boolean | Indicates if the coding can have unknown values |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON Object | Object | A FHIR Coding data type representation |
+
+#### Internal Logic
+1. Sets the `code` field:
+   - Uses `code.code` if available
+   - Uses "UNK" if `canBeUnknown` is true and `code.code` is not available
+2. Sets the `display` field:
+   - Uses `code.displayName` if available, parsing it through `parseReferenceData` helper
+   - Uses "unknown" if `canBeUnknown` is true and `code.displayName` is not available
+3. Sets the `version` field using `code.codeSystemVersion`
+4. Sets the `system` field:
+   - If `code.codeSystem` is available, uses the `ValueSet/SystemReference.hbs` template to determine the system OID
+   - If `canBeUnknown` is true and `code.codeSystem` is not available, uses "http://terminology.hl7.org/ValueSet/v3-Unknown"
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ValueSet/SystemReference.hbs | Used to determine the system OID based on the code system |
+
+## Helper Functions
+| Helper | Purpose |
+|:-------|:--------|
+| trim | Removes whitespace from the beginning and end of a string |
+| parseReferenceData | Parses and potentially transforms the display name |
+| evaluate | Evaluates another Handlebars template (used for SystemReference.hbs) |
+
+Note: The exact implementation of these helper functions is not provided in this file.
+
+## Error Handling
+This template does not implement explicit error handling. It uses conditional statements to handle cases where expected input data might be missing.
+
+## Configuration
+The template uses a `canBeUnknown` flag to determine how to handle missing data. When true, it provides default "unknown" values for missing code and display information.

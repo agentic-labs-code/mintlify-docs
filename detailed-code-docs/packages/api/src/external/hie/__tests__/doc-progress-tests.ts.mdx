@@ -1,0 +1,76 @@
+---
+title: "doc-progress-tests.ts"
+---
+
+## High-level description
+This file contains utility functions for creating and manipulating Progress objects used in document query operations. These functions are primarily used for testing purposes, generating mock data, and performing operations on Progress objects.
+
+## Symbols
+
+### createProgressFromStatus
+#### Description
+Creates a Progress object based on a given DocumentQueryStatus.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | DocumentQueryStatus | The status to base the Progress object on |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Progress | object | A Progress object with properties based on the input status |
+
+#### Internal Logic
+- Generates random numbers for total, errors, and successful fields using faker.
+- Constructs the Progress object differently based on the status:
+  - For "completed": total is the sum of successful and errors.
+  - For "failed": uses the generated total.
+  - For other statuses: total is the sum of successful, errors, and 1.
+
+### createProgress
+#### Description
+Creates a Progress object, optionally based on an input Progress object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| progress | Progress (optional) | An optional Progress object to base the new object on |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Progress | object | A new Progress object |
+
+#### Internal Logic
+- Generates random numbers for total, errors, and successful fields using faker.
+- Uses values from the input progress object if provided, otherwise uses the generated values.
+- Randomly selects a status if not provided in the input.
+
+### addProgresses
+#### Description
+Combines two Progress objects and sets a specified status.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| progress1 | Progress | First Progress object |
+| progress2 | Progress | Second Progress object |
+| status | DocumentQueryStatus | The status to set on the resulting Progress object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Progress | object | A new Progress object combining the inputs |
+
+#### Internal Logic
+- Adds the total, errors, and successful fields from both input Progress objects.
+- Sets the status to the provided status.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/document-query | Imports Progress, DocumentQueryStatus, and documentQueryStatus types |
+| @faker-js/faker | Used to generate random data for testing purposes |
+
+Note: This file is primarily used for testing purposes, as indicated by its location in the `__tests__` directory and its use of faker for generating mock data.

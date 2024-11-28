@@ -1,0 +1,93 @@
+---
+title: "sqs-to-converter.ts"
+---
+
+## High-level description
+This code implements a Lambda function that processes SQS messages containing CDA (Clinical Document Architecture) documents, converts them to FHIR (Fast Healthcare Interoperability Resources) format, and stores the results in S3. It handles various aspects of the conversion process, including error handling, retries, and reporting metrics to CloudWatch.
+
+## Code Structure
+The main handler function processes SQS events, retrieves CDA documents from S3, converts them to FHIR using an external converter service, post-processes the results, and stores them back in S3. It uses various utility functions and services for AWS interactions, error handling, and metrics reporting.
+
+## Symbols
+
+### `handler`
+#### Description
+The main Lambda function handler that processes SQS events containing CDA document information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | SQSEvent | The SQS event containing messages with CDA document information |
+
+#### Internal Logic
+1. Initializes Sentry for error tracking
+2. Processes each record in the SQS event
+3. Retrieves CDA document from S3
+4. Converts CDA to FHIR using an external converter service
+5. Post-processes the FHIR result (replaces IDs, adds extensions, etc.)
+6. Stores the conversion result in S3
+7. Sends the result info to another SQS queue
+8. Reports metrics to CloudWatch
+
+### `parseBody`
+#### Description
+Parses the body of an SQS message to extract relevant information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| body | unknown | The body of the SQS message |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| EventBody | object | Parsed information including S3 bucket name, file name, and document extension |
+
+### `replaceIDs`
+#### Description
+Replaces IDs in the FHIR bundle to ensure uniqueness.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fhirBundle | FHIRBundle | The FHIR bundle to process |
+| patientId | string | The patient ID to preserve |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| FHIRBundle | object | The processed FHIR bundle with replaced IDs |
+
+### `sendConversionResult`
+#### Description
+Uploads the conversion result to S3 and sends a message to an SQS queue.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+| sourceFileName | string | Original file name |
+| conversionPayload | FHIRBundle | Converted FHIR bundle |
+| jobStartedAt | string \| undefined | Job start timestamp |
+| jobId | string \| undefined | Job ID |
+| source | string \| undefined | Source of the conversion |
+| log | Log | Logging function |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core | Core utilities and AWS interactions |
+| @metriport/shared | Shared utilities for error handling and retries |
+| aws-sdk | AWS SDK for interacting with AWS services |
+| axios | HTTP client for making requests to the converter service |
+| uuid | Generating unique IDs |
+
+## Error Handling
+The code uses try-catch blocks to handle errors and reports them to Sentry. It also implements retries for network operations using the `executeWithNetworkRetries` function.
+
+## Logging
+The code uses console.log for logging and a custom `prefixedLog` function for adding context to log messages.
+
+## Performance Considerations
+The code implements batching for SQS message processing and uses parallel processing for some operations (e.g., converting payload and storing pre-conversion payload). It also reports memory usage and other metrics to CloudWatch for monitoring performance.

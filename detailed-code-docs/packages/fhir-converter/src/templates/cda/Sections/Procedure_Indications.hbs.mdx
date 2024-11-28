@@ -1,0 +1,46 @@
+---
+title: "Procedure_Indications.hbs"
+---
+
+## High-level description
+This Handlebars template is designed to process and transform Clinical Document Architecture (CDA) data related to procedure indications into FHIR (Fast Healthcare Interoperability Resources) Observation resources. It specifically targets the CDA section with the template ID '2.16.840.1.113883.10.20.22.2.29'.
+
+## Code Structure
+The template iterates through procedure entries in the specified CDA section, generating FHIR Observation resources for each entry and creating references to the patient.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template processes the CDA section for procedure indications and generates corresponding FHIR resources.
+
+#### Internal Logic
+1. Retrieves the first CDA section with the template ID '2.16.840.1.113883.10.20.22.2.29'.
+2. Iterates through each entry in the retrieved section.
+3. For each entry:
+   - Generates an Observation resource using the `Resources/Observation.hbs` partial.
+   - Creates a subject reference for the Observation using the `References/OBservation/subject.hbs` partial.
+
+### Partial: Resources/Observation.hbs
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| observationEntry | Object | The observation entry from the CDA document |
+| ID | String | A generated UUID for the observation |
+
+### Partial: References/OBservation/subject.hbs
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ID | String | The generated UUID for the observation |
+| REF | String | The reference to the patient resource |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Utils/GeneratePatientId.hbs | Generates a patient ID |
+
+## Notes
+- The template uses custom Handlebars helpers such as `getFirstCdaSectionsByTemplateId`, `toArray`, `generateUUID`, and `evaluate`.
+- The patient ID is generated using the `Utils/GeneratePatientId.hbs` partial and the `@metriportPatientId` context variable.
+- The template is part of a larger FHIR conversion system, focusing on transforming CDA procedure indication data to FHIR Observation resources.

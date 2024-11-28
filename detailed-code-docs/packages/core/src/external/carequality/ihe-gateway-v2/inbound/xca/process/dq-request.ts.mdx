@@ -1,0 +1,69 @@
+---
+title: "dq-request.ts"
+---
+
+## High-level description
+This code processes inbound Document Query (DQ) requests for the Carequality IHE Gateway. It parses XML requests, extracts relevant information, and creates a structured object representing the inbound request.
+
+## Code Structure
+The main function `processInboundDqRequest` uses helper functions like `extractExternalGatewayPatient` and imported utilities to parse and process the XML request. It also interacts with other modules for logging, error handling, and request storage.
+
+## Symbols
+
+### `extractExternalGatewayPatient`
+#### Description
+Extracts patient information from the request slots.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| slots | Slot[] | Array of slot objects containing request metadata |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| XCPDPatientId | object | Object containing patient id and system |
+
+#### Internal Logic
+1. Finds the slot with name "$XDSDocumentEntryPatientId"
+2. Extracts patient id and system using regex
+3. Removes unwanted characters from the extracted values
+4. Returns an object with id and system properties
+
+### `processInboundDqRequest`
+#### Description
+Processes an inbound Document Query request by parsing the XML and extracting relevant information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| request | string | XML string containing the inbound request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| InboundDocumentQueryReq | object | Structured object representing the processed request |
+
+#### Internal Logic
+1. Logs the incoming request
+2. Parses the XML using XMLParser
+3. Validates the parsed object against a schema
+4. Extracts SAML attributes, patient information, and other metadata
+5. Creates a structured inbound request object
+6. Stores the request and returns the processed object
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/ihe-gateway-sdk | Provides types and utilities for IHE Gateway |
+| @metriport/shared | Provides utility functions |
+| fast-xml-parser | Parses XML into JavaScript objects |
+
+## Error Handling
+The main function `processInboundDqRequest` is wrapped in a try-catch block. If an error occurs during processing, it logs the error and throws a new error with a descriptive message.
+
+## Logging
+The code uses a custom logging utility `out` to log the incoming request and any errors that occur during processing.
+
+## TODOs
+There are no explicit TODOs in the code.

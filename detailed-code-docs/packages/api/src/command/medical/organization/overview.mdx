@@ -1,0 +1,101 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the core functionality for managing medical organizations within the API. It includes operations for creating, retrieving, and updating organizations, as well as synchronizing this data with external systems like FHIR servers and health information exchanges (CommonWell and Carequality).
+
+## What does it do?
+The code in this directory handles the following main tasks:
+
+1. Creating new medical organizations:
+   - Generates unique identifiers for organizations
+   - Persists organization data in the database
+   - Creates corresponding tenants in the FHIR server
+   - Converts organization data to FHIR format and syncs it with the FHIR server
+
+2. Retrieving organization information:
+   - Fetches organization data based on customer ID and/or database ID
+   - Provides options to throw errors if an organization is not found or if identifiers don't match
+
+3. Updating existing organizations:
+   - Validates update requests using optimistic locking
+   - Applies changes to organization data in the database
+   - Synchronizes updated information with the FHIR server
+
+4. Managing health information exchange statuses:
+   - Tracks approval and active statuses for CommonWell and Carequality
+
+5. Testing the organization management functionality:
+   - Includes unit tests for creation and registration processes
+   - Uses mock data and services to isolate tests from external dependencies
+
+## Key Files
+
+1. `create-organization.ts`:
+   This file contains the `createOrganization` function, which is responsible for creating new organizations. It handles the entire process from generating unique IDs to persisting data in the database and syncing with the FHIR server. It also includes retry logic for handling potential ID collisions.
+
+   Example usage:
+   ```typescript
+   const newOrg = await createOrganization(
+     customerId,
+     OrganizationBizType.PROVIDER,
+     organizationData,
+     cqApproved,
+     cqActive,
+     cwApproved,
+     cwActive
+   );
+   ```
+
+2. `get-organization.ts`:
+   This file provides functions for retrieving organization data from the database. It includes `getOrganization`, `getOrganizationOrFail`, and `getOrganizationByOidOrFail`, offering different levels of error handling and validation.
+
+   Example usage:
+   ```typescript
+   const org = await getOrganizationOrFail({ cxId: customerId, id: orgId });
+   ```
+
+3. `update-organization.ts`:
+   This file contains the `updateOrganization` function, which handles updating existing organizations. It includes validation, database updates, and FHIR server synchronization.
+
+   Example usage:
+   ```typescript
+   const updatedOrg = await updateOrganization(
+     orgId,
+     eTag,
+     customerId,
+     updatedData,
+     cqApproved,
+     cqActive,
+     cwApproved,
+     cwActive
+   );
+   ```
+
+4. `__tests__/create-organization.test.ts`:
+   This file contains unit tests for the `createOrganization` function, covering various scenarios and edge cases.
+
+5. `__tests__/register-organization.ts`:
+   This file defines test data for a medical organization's address with coordinates, using Faker.js to generate realistic-looking data.
+
+## Dependencies
+1. @metriport/core: Provides domain models and utility functions for organizations and addresses.
+2. @metriport/shared: Supplies shared types and enums.
+3. sequelize: Used for database interactions and model definitions.
+4. @faker-js/faker: Utilized in tests for generating realistic test data.
+
+## Configuration
+The code in this directory relies on several external configurations and services:
+
+1. Database configuration: The `OrganizationModel` is used to interact with the database, assuming proper database connection and model setup.
+
+2. FHIR server configuration: Functions like `createTenantIfNotExists` and `upsertOrgToFHIRServer` interact with an external FHIR server, requiring proper configuration for server endpoints and authentication.
+
+3. Logging and error tracking: The code uses a `capture` object for logging, which should be properly configured for the production environment.
+
+4. Environment variables: While not explicitly shown in the provided code, it's likely that some configurations (e.g., database connection, FHIR server URLs) are set through environment variables.
+
+The test files use mocking strategies to isolate the tested functionality from external dependencies, ensuring consistent and reliable test results.
+
+This directory plays a crucial role in managing medical organizations within the API, handling the complexities of data persistence, external system synchronization, and maintaining consistency across different health information exchange networks.

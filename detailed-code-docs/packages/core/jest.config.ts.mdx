@@ -1,0 +1,69 @@
+---
+title: "jest.config.ts"
+---
+
+## High-level description
+This file configures Jest for testing a TypeScript project. It sets up different configurations for end-to-end (E2E) tests and regular unit tests, specifying the test environment, file patterns, and setup files.
+
+## Symbols
+
+### `config`
+#### Description
+This constant defines the Jest configuration object, which is of type `JestConfigWithTsJest`. It sets various options for running tests in the project.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | N/A | This symbol doesn't have explicit inputs as it's a configuration object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | JestConfigWithTsJest | The Jest configuration object |
+
+#### Internal Logic
+1. Sets the preset to "ts-jest" for TypeScript support.
+2. Configures the test environment as "node".
+3. Enables verbose output.
+4. Ignores test files in "/node_modules/" and "/dist/" directories.
+5. Sets different test file patterns based on whether it's an E2E test or not.
+6. Specifies a setup file to run after the test environment is set up.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ts-jest | Provides TypeScript support for Jest |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| preset | string | "ts-jest" | Specifies the Jest preset to use |
+| testEnvironment | string | "node" | Sets the test environment to Node.js |
+| verbose | boolean | true | Enables verbose output during test execution |
+| testPathIgnorePatterns | string[] | ["/node_modules/", "/dist/"] | Specifies patterns for test files to ignore |
+| testMatch | string[] | Conditional | Defines patterns to match test files |
+| setupFilesAfterEnv | string[] | ["./src/__tests__/env-setup.ts"] | Specifies files to run after the test environment is set up |
+
+## Side Effects
+The script sets the `ENV_TYPE` environment variable to "dev":
+```typescript
+process.env.ENV_TYPE = "dev";
+```
+
+This may affect the behavior of tests or the application being tested, depending on how this environment variable is used elsewhere in the project.
+
+## Error Handling
+This configuration file does not implement any specific error handling mechanisms.
+
+## Notes
+1. The configuration uses a conditional statement to determine whether to run E2E tests or regular tests:
+   ```typescript
+   const isE2E = process.env.E2E === "true";
+   ```
+   This allows for different test file patterns to be used based on the `E2E` environment variable.
+
+2. The `testMatch` option is set conditionally:
+   - For E2E tests: `["**/__tests__/**/(*.)+(spec|test).e2e.[jt]s?(x)"]`
+   - For regular tests: `["**/__tests__/**/(*.)+(spec|test).[jt]s?(x)"]`
+
+3. The configuration is exported as the default export, allowing it to be easily imported and used in other parts of the project.

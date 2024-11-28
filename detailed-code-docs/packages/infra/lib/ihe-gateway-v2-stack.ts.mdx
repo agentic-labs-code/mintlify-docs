@@ -1,0 +1,111 @@
+---
+title: "ihe-gateway-v2-stack.ts"
+---
+
+## High-level description
+This code defines a nested stack for AWS CDK that sets up Lambda functions and related resources for an IHE (Integrating the Healthcare Enterprise) Gateway. It creates S3 buckets for storing responses, sets up Glue tables for parsed responses, and configures Lambda functions for patient discovery, document query, and document retrieval operations.
+
+## Code Structure
+The main class `IHEGatewayV2LambdasNestedStack` extends `NestedStack` and contains methods to set up various components of the IHE Gateway. It creates S3 buckets, Glue tables, and Lambda functions, granting necessary permissions and configuring environment variables.
+
+## Symbols
+
+### `IHEGatewayV2LambdasNestedStack`
+#### Description
+This class represents a nested stack for IHE Gateway V2 Lambda functions and related resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | Construct | The parent construct |
+| id | string | The construct ID |
+| props | IHEGatewayV2LambdasNestedStackProps | Configuration properties for the stack |
+
+#### Internal Logic
+1. Creates S3 buckets for IHE responses and parsed responses
+2. Sets up Glue tables for parsed responses
+3. Creates Lambda functions for patient discovery, document query, and document retrieval
+4. Grants necessary permissions to Lambda functions and S3 buckets
+
+### `createParsedReponseTables`
+#### Description
+Creates a Glue table for storing parsed IHE responses.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| iheParsedResponsesBucket | s3.Bucket | The S3 bucket for storing parsed responses |
+
+### `grantSecretsReadAccess`
+#### Description
+Grants read access to specified secrets for a Lambda function.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lambdaFunction | Lambda | The Lambda function to grant access to |
+| secrets | Secrets | The secrets object containing all available secrets |
+| secretKeys | string[] | The keys of the secrets to grant access to |
+
+### `setupIHEGatewayV2PatientDiscoveryLambda`
+#### Description
+Sets up the Lambda function for patient discovery operations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ownProps | Object | Configuration properties for the Lambda function |
+| iheResponsesBucket | s3.Bucket | The S3 bucket for storing IHE responses |
+| iheParsedResponsesBucket | s3.Bucket | The S3 bucket for storing parsed IHE responses |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Lambda | Lambda | The created Lambda function for patient discovery |
+
+### `setupIHEGatewayV2DocumentQueryLambda`
+#### Description
+Sets up the Lambda function for document query operations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ownProps | Object | Configuration properties for the Lambda function |
+| iheResponsesBucket | s3.Bucket | The S3 bucket for storing IHE responses |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Lambda | Lambda | The created Lambda function for document query |
+
+### `setupIHEGatewayV2DocumentRetrievalLambda`
+#### Description
+Sets up the Lambda function for document retrieval operations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ownProps | Object | Configuration properties for the Lambda function |
+| iheResponsesBucket | s3.Bucket | The S3 bucket for storing IHE responses |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Lambda | Lambda | The created Lambda function for document retrieval |
+
+## Dependencies
+- AWS CDK libraries (aws-cdk-lib)
+- Construct library
+- Custom imports from local modules (./env-type, ./shared/lambda, ./shared/lambda-layers, ./shared/secrets)
+
+## Configuration
+The stack uses various configuration options passed through the `props` parameter, including VPC settings, secrets, S3 bucket names, and environment-specific variables.
+
+## Error Handling
+The code includes basic error handling, such as throwing an error when required secrets are not defined. However, more comprehensive error handling could be implemented for robustness.
+
+## Logging
+There is no explicit logging implemented in this code. Logging would typically be handled within the Lambda functions themselves.
+
+## TODOs
+There are no explicit TODOs in the code.

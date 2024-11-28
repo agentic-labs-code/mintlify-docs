@@ -1,0 +1,45 @@
+---
+title: "pick-most-descriptive-status.test.ts"
+---
+
+## High-level description
+This code is a unit test suite for the `pickMostDescriptiveStatus` function, which is part of a FHIR (Fast Healthcare Interoperability Resources) deduplication system. The tests verify that the function correctly selects the more descriptive status between two given medication statement statuses based on a predefined ranking.
+
+## References
+The test file references the following symbols from other parts of the codebase:
+- `MedicationStatementStatus` and `statusRanking` from "../resources/medication-statement"
+- `pickMostDescriptiveStatus` from "../shared"
+
+## Symbols
+
+### `describe("pickMostDescriptiveStatus", () =&gt; {...})`
+#### Description
+This is the main test suite for the `pickMostDescriptiveStatus` function. It contains a single test case with multiple assertions.
+
+### `it("correctly picks the more descriptive status", () =&gt; {...})`
+#### Description
+This test case verifies that the `pickMostDescriptiveStatus` function correctly selects the more descriptive status between two given medication statement statuses.
+
+#### Internal Logic
+The test case follows this pattern:
+1. Arrange: Set up two status variables (`status1` and `status2`) with different `MedicationStatementStatus` values.
+2. Act: Call the `pickMostDescriptiveStatus` function with `statusRanking` and the two status variables.
+3. Assert: Use `expect().toEqual()` to check if the returned status matches the expected more descriptive status.
+
+This pattern is repeated five times with different combinations of statuses:
+1. "unknown" vs "stopped" (expects "stopped")
+2. "stopped" vs "unknown" (expects "stopped")
+3. "active" vs "stopped" (expects "stopped")
+4. "active" vs "completed" (expects "completed")
+5. "intended" vs "active" (expects "active")
+
+## Dependencies
+The test file depends on a testing framework, likely Jest, as evidenced by the use of `describe`, `it`, and `expect` functions.
+
+## Notes
+1. The test cases cover various scenarios to ensure the `pickMostDescriptiveStatus` function works correctly for different status combinations.
+2. The `statusRanking` imported from "../resources/medication-statement" is used to determine the relative descriptiveness of statuses.
+3. The test file doesn't explicitly test all possible combinations of statuses but focuses on key scenarios that demonstrate the function's behavior.
+4. The `MedicationStatementStatus` type is used to ensure type safety when assigning status values.
+
+This test suite plays a crucial role in ensuring the reliability of the status selection logic in the FHIR deduplication system, particularly for medication statements.

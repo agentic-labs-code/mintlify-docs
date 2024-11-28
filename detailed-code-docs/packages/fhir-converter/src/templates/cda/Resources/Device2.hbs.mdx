@@ -1,0 +1,64 @@
+---
+title: "Device2.hbs"
+---
+
+## High-level description
+This Handlebars template file generates a FHIR Device resource in JSON format. It's designed to convert CDA (Clinical Document Architecture) data into FHIR-compliant Device resources, including identifiers, device type, and manufacturer information.
+
+## Symbols
+
+### Root Template
+#### Description
+The root template defines the structure of a FHIR Device resource, including its fullUrl, resource details, and request information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ID | String | Unique identifier for the Device resource |
+| deviceEntry | Object | Contains device information from the CDA document |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON | Object | A FHIR-compliant Device resource |
+
+#### Internal Logic
+1. Sets the fullUrl and resource id using the provided ID.
+2. Generates identifier array using the `DataType/Identifier.hbs` partial.
+3. Sets the device type using the `DataType/CodeableConcept.hbs` partial.
+4. Sets the manufacturer from the CDA data.
+5. Defines the request method and URL for the resource.
+
+### Partial: DataType/Identifier.hbs
+#### Description
+This partial template is used to generate FHIR Identifier datatype objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | Object | Contains identifier information |
+
+### Partial: DataType/CodeableConcept.hbs
+#### Description
+This partial template is used to generate FHIR CodeableConcept datatype objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | Object | Contains code information for the device type |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Handlebars | Template engine used for generating the JSON output |
+
+## Configuration
+The template uses conditional statements to handle different data structures in the input CDA document:
+
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| deviceEntry.code | Object | N/A | If present, used for device type |
+| deviceEntry.participant.participantRole.playingDevice.code | Object | N/A | Used for device type if deviceEntry.code is not present |
+
+## TODOs
+There are no explicit TODOs in the code.

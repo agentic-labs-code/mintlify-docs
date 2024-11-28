@@ -1,0 +1,48 @@
+---
+title: "validate-npi.ts"
+---
+
+## High-level description
+This code defines a function `validateNPI` that checks the validity of a 10-digit National Provider Identifier (NPI) number using the ISO standard mod 10 Luhn algorithm. The function is designed to ensure that NPI numbers conform to the specified format and pass the checksum validation.
+
+## Symbols
+
+### `validateNPI`
+#### Description
+This function validates a given NPI number by checking its length, first digit, and applying the Luhn algorithm to verify the check digit.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| npi | string | The NPI number to validate, must be 10 digits |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | boolean | Returns true if the NPI is valid, false otherwise |
+
+#### Internal Logic
+1. Check if the NPI is null, undefined, or not 10 digits long. If so, return false.
+2. Verify that the first digit is either 1 or 2. If not, return false.
+3. Apply the Luhn algorithm:
+   - Initialize sum to 0 and a boolean flag for doubling digits.
+   - Iterate through the first 9 digits:
+     - Double every other digit, starting with the first.
+     - If a doubled digit is greater than 9, subtract 9.
+     - Add each processed digit to the sum.
+   - Add 24 to the sum (to account for the NPI prefix).
+   - Calculate the check digit by finding the difference from the next multiple of 10.
+4. Compare the calculated check digit with the last digit of the NPI.
+5. Return true if they match, false otherwise.
+
+## References
+The `validateNPI` function is used in other parts of the codebase:
+1. In `packages/ihe-gateway-sdk/src/models/shared.ts`, it's used to refine a Zod schema for NPI strings.
+2. In `packages/commonwell-sdk/src/common/make-jwt.ts`, it's used to validate an NPI before creating a JWT token.
+3. In `packages/api/src/routes/medical/schemas/facility.ts`, it's used to refine Zod schemas for facility creation, update, and internal details.
+
+## Dependencies
+This code doesn't have any external dependencies. It uses only built-in JavaScript functions and operators.
+
+## Performance Considerations
+The function has a time complexity of O(n), where n is the length of the NPI string (always 10 in this case). It performs a single pass through the digits, making it efficient for its purpose.

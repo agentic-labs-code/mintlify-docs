@@ -1,0 +1,61 @@
+---
+title: "reset-doc-query-progress.ts"
+---
+
+## High-level description
+This code defines functions for querying and processing documents from CommonWell Health Alliance (CW) for a given patient. It handles document reference retrieval, document downloading, conversion to FHIR format, and storage in S3 and a FHIR server.
+
+## Code Structure
+The main function `resetDocQueryProgress` resets the document query progress for a given Health Information Exchange (HIE) source. It interacts with other functions like `aggregateAndSetHIEProgresses` and `processDocQueryProgressWebhook` to update and process the progress information.
+
+## Symbols
+
+### `resetDocQueryProgress`
+#### Description
+Resets the document query progress for a given HIE source (CommonWell or Carequality) or both.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId"&gt; | Patient information |
+| source | MedicalDataSource | HIE source to reset |
+| requestId | string \| undefined | Optional request ID |
+
+#### Internal Logic
+1. Retrieves the existing patient data
+2. Resets the document query progress for the specified source(s)
+3. Updates the patient data in the database
+4. If a requestId is provided, processes the document query progress webhook
+
+### `buildInterrupt`
+#### Description
+Creates a function to handle interruptions in the document query process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | Patient ID |
+| cxId | string | Customer ID |
+| source | MedicalDataSource | HIE source |
+| requestId | string | Request ID |
+| log | typeof console.log | Logging function |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| interrupt | (reason: string) =&gt; Promise&lt;void&gt; | Function to handle interruptions |
+
+#### Internal Logic
+Returns a function that logs the interruption reason and resets the document query progress for the specified patient and source.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core | Core functionality and types |
+| ../../models/medical/patient | Patient model |
+| ../../models/transaction-wrapper | Database transaction wrapper |
+| ../../command/medical/patient/get-patient | Retrieve patient data |
+| ./set-doc-query-progress | Set document query progress |
+| ../../command/medical/document/process-doc-query-webhook | Process document query webhook |
+
+This code is part of a larger system for managing patient data and document queries across different Health Information Exchanges. It provides functionality to reset and manage the progress of document queries, which is crucial for maintaining up-to-date patient information and handling potential issues in the query process.

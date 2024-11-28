@@ -1,0 +1,57 @@
+---
+title: "2023-07-20_03_rename-customer-sequence.ts"
+---
+
+## High-level description
+This migration script renames the `customer_sequence` table to `customer_sequence_704_20230720` and vice versa. This is likely done to prevent conflicts during a database migration process.
+
+## References
+- This code references the `Migration` type from an external module, likely "umzug".
+- It also uses the `queryInterface` object, which is provided by the Umzug library and allows interaction with the database.
+
+## Symbols
+### `up`
+#### Description
+This asynchronous function renames the `customer_sequence` table to `customer_sequence_704_20230720`. It performs the renaming operation within a database transaction to ensure atomicity.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | { context: QueryInterface } | An object containing the `queryInterface` object, which is an instance of the `QueryInterface` class from the Sequelize library. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (implicit) | Promise\&lt;void\&gt; | A promise that resolves when the table has been renamed successfully. |
+
+#### Internal Logic
+1. Starts a database transaction using `queryInterface.sequelize.transaction`.
+2. Renames the `customer_sequence` table to `customer_sequence_704_20230720` using `queryInterface.renameTable`, passing the `transaction` object to ensure the operation is part of the transaction.
+
+### `down`
+#### Description
+This asynchronous function reverts the changes made by the `up` migration. It renames the `customer_sequence_704_20230720` table back to its original name, `customer_sequence`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | { context: QueryInterface } | An object containing the `queryInterface` object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (implicit) | Promise\&lt;void\&gt; | A promise that resolves when the table has been renamed successfully. |
+
+#### Internal Logic
+1. Starts a database transaction using `queryInterface.sequelize.transaction`.
+2. Renames the `customer_sequence_704_20230720` table back to `customer_sequence` using `queryInterface.renameTable`, passing the `transaction` object.
+
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Migration (type) | Defines the structure of a migration function. |
+| queryInterface | Provides methods for interacting with the database schema. |
+
+## Error Handling
+The code uses database transactions to ensure that the renaming operations are atomic. If any error occurs during the `up` or `down` migrations, the transaction will be rolled back, preventing the database from being left in an inconsistent state.

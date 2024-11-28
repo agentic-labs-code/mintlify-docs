@@ -1,0 +1,102 @@
+---
+title: "workerPool.js"
+---
+
+## High-level description
+This code defines a `WorkerPool` class that manages a pool of worker threads for efficient task execution. It provides methods to create, manage, and communicate with worker threads, allowing for parallel processing of tasks in a Node.js environment.
+
+## Code Structure
+The `WorkerPool` class contains methods for creating and managing worker threads, as well as executing tasks and broadcasting messages to all workers. The main symbols (methods) in the class interact with the worker threads and handle task execution.
+
+## Symbols
+
+### `WorkerPool` (class)
+#### Description
+The `WorkerPool` class creates and manages a pool of worker threads, providing methods for task execution and worker management.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filename | string | Path to the worker script file |
+| size | number | Number of worker threads to create |
+
+#### Internal Logic
+- Creates a specified number of worker threads
+- Manages worker replacement in case of unexpected exits
+- Implements round-robin task assignment to workers
+
+### `constructor(filename, size)`
+#### Description
+Initializes the `WorkerPool` by creating the specified number of worker threads.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filename | string | Path to the worker script file |
+| size | number | Number of worker threads to create |
+
+### `_createSingleWorker(index)`
+#### Description
+Creates a single worker thread and sets up event listeners for worker management.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| index | number | Index of the worker in the pool |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| worker | Worker | Created worker thread |
+
+### `destroy()`
+#### Description
+Terminates all worker threads in the pool and clears the workers array.
+
+### `_replace(worker, index)`
+#### Description
+Replaces a worker thread at the specified index with a new one.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| worker | Worker | Worker to be replaced |
+| index | number | Index of the worker in the pool |
+
+### `exec(msg)`
+#### Description
+Executes a task by sending a message to a worker thread using round-robin selection.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| msg | any | Message to be sent to the worker |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise | Promise | Promise resolving with the worker's response |
+
+#### Internal Logic
+- Creates a `MessageChannel` for communication
+- Selects a worker using round-robin
+- Sets up message and error handling
+- Posts the message to the selected worker
+
+### `broadcast(msg)`
+#### Description
+Broadcasts a message to all worker threads in the pool.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| msg | any | Message to be broadcast to all workers |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| worker_threads | Provides the `Worker` and `MessageChannel` classes for managing worker threads |
+| promise | Used for creating and working with Promises |
+
+## Performance Considerations
+The `WorkerPool` class is designed for efficient parallel processing of tasks. It uses a round-robin approach for task distribution, which helps in load balancing across worker threads. The use of `MessageChannel` for communication is noted to be significantly faster than creating new workers for each task.

@@ -1,0 +1,126 @@
+---
+title: "hydrate-bundle.ts"
+---
+
+## High-level description
+This code defines a function `hydrateBundle` that processes a FHIR Bundle, removing the Patient resource, adding Metriport and Document extensions to all resources, and ensuring all resources have valid UUIDs for IDs. It's designed to prepare a FHIR Bundle for further processing or storage.
+
+## Code Structure
+The main function `hydrateBundle` calls several helper functions to perform its tasks. These helper functions include `removePatientResource`, `validateUuidsAndAddExtensions`, `verifyPatientReferences`, `comparePatientIds`, and `addUniqueExtension`. Each function handles a specific aspect of the bundle processing.
+
+## Symbols
+
+### `hydrateBundle`
+#### Description
+This function processes a FHIR Bundle by removing the Patient resource, adding extensions, and validating UUIDs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | ValidBundle | The input FHIR Bundle to be processed |
+| patient | Patient | The patient object associated with the bundle |
+| fhirBundleDestinationKey | string | A key used to create a document ID extension |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundleWithExtensions | ValidBundle | The processed FHIR Bundle |
+
+#### Internal Logic
+1. Remove the Patient resource from the bundle
+2. Create a document ID extension
+3. Validate UUIDs and add extensions to the bundle
+
+### `validateUuidsAndAddExtensions`
+#### Description
+This function validates UUIDs of resources in the bundle and adds extensions to each resource.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | ValidBundle | The FHIR Bundle to process |
+| docExtension | Extension | The document ID extension to add |
+| patientId | string | The ID of the patient |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | ValidBundle | The processed FHIR Bundle |
+
+#### Internal Logic
+1. Iterate through each entry in the bundle
+2. Validate the UUID of each resource
+3. Verify patient references
+4. Add Metriport and document extensions to each resource
+
+### `verifyPatientReferences`
+#### Description
+This function checks if the patient references in a resource match the given patient ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resource | Resource | The FHIR resource to check |
+| patientId | string | The ID of the patient to compare against |
+
+#### Internal Logic
+1. Check if the resource has a 'subject' or 'patient' field
+2. If present, compare the reference to the given patient ID
+
+### `comparePatientIds`
+#### Description
+This function compares a patient reference to a given patient ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| reference | Reference \| undefined | The patient reference to check |
+| patientId | string | The ID of the patient to compare against |
+
+#### Internal Logic
+1. Extract the patient ID from the reference
+2. Compare it to the given patient ID
+3. Throw an error if they don't match
+
+### `addUniqueExtension`
+#### Description
+This function adds an extension to a resource if it doesn't already exist.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resource | any | The resource to add the extension to |
+| extension | Extension | The extension to add |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resource | any | The resource with the added extension |
+
+### `removePatientResource`
+#### Description
+This function removes the Patient resource from a bundle and verifies its ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | ValidBundle | The FHIR Bundle to process |
+| id | string | The expected ID of the Patient resource |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | ValidBundle | The FHIR Bundle with the Patient resource removed |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides FHIR type definitions |
+| @metriport/core/domain/patient | Provides the Patient type |
+| @metriport/core/external/fhir/shared/extensions/doc-id-extension | Provides the function to build a document ID extension |
+| @metriport/core/external/fhir/shared/extensions/metriport | Provides the Metriport data source extension |
+| @metriport/core/util/uuid-v7 | Provides UUID validation function |
+| @metriport/shared | Provides the BadRequestError class |
+
+## Error Handling
+The code uses `BadRequestError` to handle various error conditions, such as invalid UUIDs, duplicate resource IDs, and mismatched patient references.

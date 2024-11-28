@@ -1,0 +1,48 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for mapping data from the Whoop API to standardized formats used in the Metriport API SDK. It includes functions for transforming various types of data such as activities, biometrics, body measurements, sleep data, and user information.
+
+## What does it do?
+The code in this directory serves as a bridge between the Whoop API's data structures and the standardized data models used in the Metriport API SDK. It performs the following main functions:
+
+1. Transforms activity data from Whoop workouts into a standardized Activity object.
+2. Converts biometric data from Whoop recovery and cycle information into a standardized Biometrics object.
+3. Maps body measurements from Whoop to a standardized Body object, including unit conversions.
+4. Transforms sleep data from Whoop into a standardized Sleep object, including sleep stages and durations.
+5. Converts Whoop user data into a standardized User object.
+
+Each mapping function takes raw data from the Whoop API, extracts relevant information, performs necessary calculations or unit conversions, and structures the data according to the Metriport API SDK's data models.
+
+## Key Files
+1. `activity.ts`: Contains the `mapToActivity` function for transforming Whoop workout data into standardized Activity objects.
+2. `biometrics.ts`: Includes the `mapToBiometrics` function for converting Whoop recovery and cycle data into Biometrics objects.
+3. `body.ts`: Defines the `mapToBody` function for transforming Whoop body measurements into standardized Body objects.
+4. `sleep.ts`: Contains the `mapToSleep` function for converting Whoop sleep data into standardized Sleep objects.
+5. `user.ts`: Includes the `mapToUser` function for transforming Whoop user data into standardized User objects.
+6. `models/`: A subdirectory containing TypeScript models and Zod schemas for various Whoop API data structures, ensuring type safety and data validation.
+
+## Dependencies
+The main dependencies used across this directory are:
+
+1. `@metriport/api-sdk`: Provides the standardized data models (Activity, Biometrics, Body, Sleep, User) used as output formats for the mapping functions.
+2. `zod`: Used in the `models/` subdirectory for schema validation and type inference of Whoop API responses.
+3. `convert-units`: Utilized for unit conversions, such as converting height from meters to centimeters or time durations from milliseconds to seconds.
+
+## Configuration
+While there's no explicit configuration file, the code in this directory relies on certain constants and type definitions:
+
+1. `PROVIDER_WHOOP`: A constant representing the Whoop data source, used in metadata fields of mapped objects.
+2. Various type definitions in the `models/` subdirectory that define the structure of Whoop API responses.
+
+These act as implicit configuration, ensuring that the mapping functions can correctly interpret and transform Whoop API data.
+
+## Error Handling
+The mapping functions include basic error handling:
+
+1. In `biometrics.ts` and `sleep.ts`, errors are thrown if expected data is missing when certain conditions are met (e.g., when a recovery or sleep record is marked as "SCORED" but lacks the corresponding score data).
+2. The Zod schemas in the `models/` subdirectory provide runtime type checking, which can help catch data inconsistencies early in the process.
+
+Overall, this directory plays a crucial role in standardizing data from the Whoop API for use within the larger application, ensuring consistency and type safety when working with health and fitness data from Whoop devices.

@@ -1,0 +1,64 @@
+---
+title: "populate-fhir.ts"
+---
+
+## High-level description
+The `populateFhirServer` function is a deprecated function that was used to populate a FHIR server with patient and organization data from the database. It is no longer in use and does not support multiple HIEs.
+
+## References
+- `BadRequestError` from `../../../errors/bad-request`
+- `tenantExists` from `../../../external/fhir/admin`
+- `makeFhirAdminApi`, `makeFhirApi` from `../../../external/fhir/api/api-factory`
+- `orgToFHIR` from `../../../external/fhir/organization`
+- `patientToFHIR` from `@metriport/core/external/fhir/patient/index`
+- `Util` from `../../../shared/util`
+- `queryDocumentsAcrossHIEs` from `../document/document-query`
+- `getOrganizationOrFail` from `../organization/get-organization`
+- `getPatients` from `../patient/get-patient`
+
+## Symbols
+
+### `populateFhirServer`
+#### Description
+This function is deprecated and should no longer be used. It retrieves organization and patient data from the database and attempts to create or update corresponding resources on a FHIR server. It also has an option to trigger document queries for each patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The ID of the customer. |
+| createIfNotExists | boolean | Whether to create the tenant on the FHIR server if it does not exist (default: false). |
+| triggerDocQuery | boolean | Whether to trigger a new document query for each patient (default: false). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `{ patientsOK, patientsError }` | `PopulateFhirServerResponse` | An object containing the number of patients successfully created/updated (`patientsOK`) and the number of patients that failed to be created/updated (`patientsError`). |
+
+#### Internal Logic
+1. Checks if the tenant exists on the FHIR server. If not, it either throws an error or creates the tenant based on the `createIfNotExists` flag.
+2. Retrieves organization data from the database and creates/updates the corresponding organization resource on the FHIR server.
+3. Retrieves patient data from the database and iterates over them in chunks.
+4. For each patient chunk:
+    - Adds a random jitter delay to avoid overloading the FHIR server.
+    - Creates/updates the corresponding patient resource on the FHIR server.
+    - Optionally triggers a document query for the patient based on the `triggerDocQuery` flag.
+    - Adds a delay between chunks.
+5. Returns the number of successful and failed patient creations/updates.
+
+#### Side Effects
+- Creates/updates organization and patient resources on the FHIR server.
+- May trigger document queries for patients.
+
+#### Performance Considerations
+- The function uses chunking and random delays to avoid overloading the FHIR server.
+- Document queries are triggered asynchronously to improve performance.
+
+## Error Handling
+- Throws a `BadRequestError` if the tenant does not exist and `createIfNotExists` is false, or if both `cxId` and `allCustomers` are provided.
+- Logs errors encountered during patient creation/update and document query triggering.
+
+## Logging
+- Logs key steps and errors encountered during the process.
+
+## TODOs
+- This function is deprecated and should be replaced with a solution that supports multiple HIEs.

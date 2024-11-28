@@ -1,0 +1,181 @@
+---
+title: "biometrics.ts"
+---
+
+## High-level description
+The code defines a function `mapToBiometrics` that transforms raw biometric data from the Tenovi platform into a standardized `Biometrics` object according to the `@metriport/api-sdk` specifications. This transformation involves parsing, mapping, and potentially converting units of measurement for various biometric readings.
+
+## Code Structure
+The `mapToBiometrics` function iterates through an array of raw Tenovi biometric readings. For each reading, it extracts relevant data points and calls a series of helper functions (`updateBiometricsWithBP`, `updateBiometricsWithHR`, etc.) to populate the corresponding fields in the `Biometrics` object. Each helper function is responsible for mapping a specific type of biometric data.
+
+## References
+- `Biometrics`: Interface defining the structure of biometric data from `@metriport/api-sdk`.
+- `TenoviMeasurementData`: Type defining the structure of raw biometric data from Tenovi.
+- `SourceType`: Enum from `@metriport/api-sdk/devices/models/common/source-info` defining the source of the data.
+- `PROVIDER_TENOVI`: Constant representing the Tenovi provider.
+- `getFloatValue`: Utility function from `@metriport/shared/common/numbers` to safely parse float values.
+
+## Symbols
+
+### `mapToBiometrics`
+#### Description
+This function transforms raw biometric data from Tenovi into a standardized `Biometrics` object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| date | string | The date of the biometric readings. |
+| tenoviBiometrics | `TenoviMeasurementData` | An array of raw biometric readings from Tenovi. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| biometrics | `Biometrics` | A standardized `Biometrics` object containing the mapped biometric data. |
+
+#### Internal Logic
+1. Initializes an empty `Biometrics` object with metadata containing the date and source (Tenovi).
+2. Iterates through each biometric reading in the `tenoviBiometrics` array.
+3. For each reading, extracts relevant data points like metric name, device information, values, and timestamp.
+4. Calls a series of helper functions to map specific biometric data points to the `Biometrics` object.
+5. Returns the populated `Biometrics` object.
+
+### `updateBiometricsWithBP`
+#### Description
+Maps blood pressure data from the raw Tenovi reading to the `Biometrics` object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| biometrics | `Biometrics` | The `Biometrics` object being populated. |
+| metric | string | The metric name from the Tenovi reading. |
+| timestamp | string | The timestamp of the reading. |
+| value | number | The first value (systolic blood pressure). |
+| value2 | number \| undefined | The second value (diastolic blood pressure), if available. |
+| sourceInfo | `SourceInfo` \| undefined | Information about the data source. |
+
+#### Internal Logic
+1. Checks if the `metric` is "blood_pressure".
+2. If so, populates the `biometrics.blood_pressure` field with systolic and diastolic values (if available) along with timestamp and source information.
+
+### `updateBiometricsWithHR`
+#### Description
+Maps heart rate data from the raw Tenovi reading to the `Biometrics` object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| biometrics | `Biometrics` | The `Biometrics` object being populated. |
+| metric | string | The metric name from the Tenovi reading. |
+| timestamp | string | The timestamp of the reading. |
+| value | number | The heart rate value. |
+| value2 | number \| undefined | The standard deviation of the heart rate, if available. |
+| sourceInfo | `SourceInfo` \| undefined | Information about the data source. |
+
+#### Internal Logic
+1. Checks if the `metric` is "pulse".
+2. If so, populates the `biometrics.heart_rate` field with heart rate value, standard deviation (if available), timestamp, and source information.
+
+### `updateBiometricsWithSPO2`
+#### Description
+Maps oxygen saturation (SpO2) data from the raw Tenovi reading to the `Biometrics` object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| biometrics | `Biometrics` | The `Biometrics` object being populated. |
+| metric | string | The metric name from the Tenovi reading. |
+| value | number | The average SpO2 value. |
+| value2 | number \| undefined | The standard deviation of the SpO2, if available. |
+
+#### Internal Logic
+1. Checks if the `metric` is "spO2".
+2. If so, populates the `biometrics.respiration.spo2` field with average SpO2 value and standard deviation (if available).
+
+### `updateBiometricsWithPerfIndex`
+#### Description
+Maps perfusion index data from the raw Tenovi reading to the `Biometrics` object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| biometrics | `Biometrics` | The `Biometrics` object being populated. |
+| metric | string | The metric name from the Tenovi reading. |
+| value | number | The perfusion index value. |
+
+#### Internal Logic
+1. Checks if the `metric` is "perfusion_index".
+2. If so, populates the `biometrics.perfusion_index_pct` field with the perfusion index value.
+
+### `updateBiometricsWithTemperature`
+#### Description
+Maps temperature data from the raw Tenovi reading to the `Biometrics` object. Converts temperature from Fahrenheit to Celsius.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| biometrics | `Biometrics` | The `Biometrics` object being populated. |
+| metric | string | The metric name from the Tenovi reading. |
+| timestamp | string | The timestamp of the reading. |
+| value | number | The temperature value in Fahrenheit. |
+| sourceInfo | `SourceInfo` \| undefined | Information about the data source. |
+
+#### Internal Logic
+1. Checks if the `metric` is "temperature".
+2. If so:
+    - Converts the temperature value from Fahrenheit to Celsius using the `convert` library.
+    - Populates the `biometrics.temperature.core.samples_celcius` field with the converted temperature value, timestamp, and source information.
+
+### `updateBiometricsWithBloodGluc`
+#### Description
+Maps blood glucose data from the raw Tenovi reading to the `Biometrics` object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| biometrics | `Biometrics` | The `Biometrics` object being populated. |
+| metric | string | The metric name from the Tenovi reading. |
+| timestamp | string | The timestamp of the reading. |
+| value | number | The blood glucose value. |
+| sourceInfo | `SourceInfo` \| undefined | Information about the data source. |
+
+#### Internal Logic
+1. Checks if the `metric` is "glucose" or "blood_glucose".
+2. If so, populates the `biometrics.blood_glucose.samples_mg_dL` field with the blood glucose value, timestamp, and source information.
+
+### `updateBiometricsWithPeakFlow`
+#### Description
+Maps peak expiratory flow data from the raw Tenovi reading to the `Biometrics` object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| biometrics | `Biometrics` | The `Biometrics` object being populated. |
+| metric | string | The metric name from the Tenovi reading. |
+| value | number | The peak expiratory flow value. |
+
+#### Internal Logic
+1. Checks if the `metric` is "peak_expiratory_flow".
+2. If so, populates the `biometrics.respiration.peak_flow_L_min` field with the peak expiratory flow value.
+
+### `updateBiometricsWithForcedExpVol`
+#### Description
+Maps forced expiratory volume data from the raw Tenovi reading to the `Biometrics` object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| biometrics | `Biometrics` | The `Biometrics` object being populated. |
+| metric | string | The metric name from the Tenovi reading. |
+| value | number | The forced expiratory volume value. |
+
+#### Internal Logic
+1. Checks if the `metric` is "forced_expiratory_volume".
+2. If so, populates the `biometrics.respiration.forced_volume_L` field with the forced expiratory volume value.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides data models and types for standardized biometric data. |
+| convert-units | Used for converting temperature values between Fahrenheit and Celsius. |
+| @metriport/shared/common/numbers | Provides utility functions for handling numbers. |
+

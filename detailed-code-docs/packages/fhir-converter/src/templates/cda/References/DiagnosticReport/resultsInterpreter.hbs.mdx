@@ -1,0 +1,51 @@
+---
+title: "resultsInterpreter.hbs"
+---
+
+## High-level description
+This Handlebars template file defines the structure for creating a FHIR DiagnosticReport resource with a focus on the `resultsInterpreter` field. It's designed to convert CDA (Clinical Document Architecture) data to FHIR format, specifically for diagnostic report information.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template creates a FHIR DiagnosticReport resource structure with specific fields populated from the input data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ID | String | Unique identifier for the DiagnosticReport resource |
+| diagReport | Object | Contains diagnostic report data from the CDA document |
+| REF | String | Reference to the results interpreter |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON | Object | A FHIR-compliant DiagnosticReport resource |
+
+#### Internal Logic
+1. Creates a `fullUrl` using the provided `ID`.
+2. Sets the `resourceType` to "DiagnosticReport".
+3. Populates the `id` field with the provided `ID`.
+4. Uses a partial template to set the `code` field based on `diagReport.code` and `diagReport.title._`.
+5. Uses a partial template to set the `status` field based on `diagReport.statusCode.code`.
+6. Sets the `resultsInterpreter` field with a reference to the interpreter.
+
+## Dependencies
+The template relies on several partial templates:
+| Dependency | Purpose |
+|:-----------|:--------|
+| DataType/CodeableConcept.hbs | Used to format the `code` field |
+| ValueSet/DiagnosticReportStatus.hbs | Used to format the `status` field |
+
+## Configuration
+The template uses the following configuration options:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| canBeUnknown | Boolean | true | Used in the CodeableConcept partial to indicate if the code can be unknown |
+
+## Notes
+1. The template includes a comprehensive copyright notice at the beginning, indicating it's based on work by Microsoft but modified and licensed under AGPLv3 by Metriport Inc.
+2. The template is designed to be part of a larger system for converting CDA documents to FHIR resources.
+3. The `resultsInterpreter` field is set up as an array with a single element, suggesting it could potentially support multiple interpreters in future iterations.
+4. The use of partial templates (indicated by `{{&gt;...}}`) suggests a modular approach to template design, promoting reusability and maintainability.

@@ -1,0 +1,57 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for generating various components of FHIR VerificationResult resources. These templates are part of the FHIR Converter project, which is designed to transform Clinical Document Architecture (CDA) data into FHIR format. Each template focuses on a specific aspect of the VerificationResult resource, such as attestation, primary source, target, and validator organization.
+
+## What does it do?
+These templates work together to create different parts of a FHIR VerificationResult resource. A VerificationResult in FHIR is used to describe the outcome of a validation process for healthcare-related information. The templates in this directory allow for the creation of:
+
+1. Attestation references, including who made the attestation and on whose behalf it was made.
+2. Primary source information, specifically who the primary source is.
+3. The target of the verification.
+4. The organization that performed the validation.
+
+When used in the FHIR Converter, these templates would be combined and populated with data from CDA documents to create complete VerificationResult resources in FHIR format.
+
+## Key Files
+
+1. `attestation.onBehalfOf.hbs`: Creates the structure for the attestation's onBehalfOf reference.
+2. `attestation.who.hbs`: Defines the structure for the attestation's who reference.
+3. `primarySource.who.hbs`: Generates the structure for the primary source's who reference.
+4. `target.hbs`: Produces the structure for the verification target reference.
+5. `validator.organization.hbs`: Creates the structure for the validator organization reference.
+
+Each of these templates focuses on a specific part of the VerificationResult resource, allowing for modular construction of the complete resource.
+
+## Dependencies
+These templates are designed to be used with the Handlebars templating engine, which is commonly employed in the FHIR Converter project for transforming CDA to FHIR. The templates themselves do not specify versions, as version management would typically be handled at the project level.
+
+## Configuration
+While the templates don't have explicit configuration options, they are designed to be flexible through the use of input parameters. Each template typically accepts two main inputs:
+
+1. `ID`: A unique identifier for the VerificationResult resource or its components.
+2. `REF`: A reference value that points to another resource or entity, such as the person making the attestation or the organization performing the validation.
+
+These inputs allow the templates to be dynamically populated with the appropriate data when rendering the FHIR resources.
+
+Here's an example of how one of these templates (attestation.who.hbs) structures its output:
+
+```json
+{
+  "resource": {
+    "resourceType": "VerificationResult",
+    "id": "{{ID}}",
+    "attestation": {
+      "who": {
+        "reference": "{{REF}}"
+      }
+    }
+  }
+}
+```
+
+This structure allows for easy integration into larger FHIR resources or bundles, with the `ID` and `REF` values being supplied at runtime based on the specific data being converted from CDA to FHIR format.
+
+The modular nature of these templates allows for flexible composition of VerificationResult resources, enabling the FHIR Converter to create resources that accurately represent the original CDA data while conforming to the FHIR standard.

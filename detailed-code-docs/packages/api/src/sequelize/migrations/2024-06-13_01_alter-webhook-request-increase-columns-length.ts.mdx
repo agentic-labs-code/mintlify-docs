@@ -1,0 +1,61 @@
+---
+title: "2024-06-13_01_alter-webhook-request-increase-columns-length.ts"
+---
+
+## High-level description
+This migration script increases the length of the `request_url` and `status_detail` columns in the `webhook_request` table. It provides both `up` and `down` functions to apply and revert the changes respectively.
+
+## Symbols
+
+### `up`
+#### Description
+This function increases the length of the `request_url` and `status_detail` columns in the `webhook_request` table to 2048 characters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | object | An object containing the queryInterface object, which provides access to Sequelize's query methods. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. Starts a transaction to ensure both column alterations are executed together.
+2. Uses `queryInterface.changeColumn` to modify the `request_url` column:
+    - Sets the data type to `DataTypes.STRING(2048)`, allowing up to 2048 characters.
+    - Sets `allowNull` to `true`, permitting null values.
+3. Similarly, modifies the `status_detail` column with the same data type and `allowNull` setting.
+4. Commits the transaction if both column alterations are successful.
+
+### `down`
+#### Description
+This function reverts the changes made by the `up` function, restoring the original length of the `request_url` and `status_detail` columns.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | object | An object containing the queryInterface object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise | A promise that resolves when the migration rollback is complete. |
+
+#### Internal Logic
+1. Starts a transaction to ensure both column alterations are executed together.
+2. Uses `queryInterface.changeColumn` to revert the `status_detail` column:
+    - Sets the data type back to `DataTypes.STRING`, using the default length.
+    - Sets `allowNull` to `true`, maintaining the previous setting.
+3. Similarly, reverts the `request_url` column with the same data type and `allowNull` setting.
+4. Commits the transaction if both column alterations are successful.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Provides database interaction using Sequelize ORM. |
+| umzug | Handles database migrations. |
+
+## Error Handling
+The code uses transactions to ensure atomicity of operations. If any of the column alterations fail, the transaction will be rolled back, preventing partial updates to the database schema.

@@ -1,0 +1,79 @@
+---
+title: "index-get-authors.test.ts"
+---
+
+## High-level description
+This file contains unit tests for the `getAuthors` function from the FHIR document conversion module. It tests various scenarios of author references in CommonWell document content and their corresponding contained resources.
+
+## Code Structure
+The test suite is organized around the `getAuthors` function, with different test cases covering various scenarios of author references and contained resources.
+
+## Symbols
+
+### `getAuthors`
+#### Description
+This function extracts author references from CommonWell document content and matches them with contained resources to create FHIR-compliant author references.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| content | DocumentContent | CommonWell document content |
+| contained | Resource[] | FHIR-compliant resources built from CommonWell resources |
+| docId | string | Document ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| authors | Reference&lt;AuthorTypes&gt;[] | FHIR-compliant author references |
+
+#### Internal Logic
+The function extracts author references from the content, filters the contained resources to match these references, and creates FHIR-compliant author references.
+
+### `describe("getAuthors")`
+#### Description
+This is the main test suite for the `getAuthors` function.
+
+#### Internal Logic
+It contains multiple test cases covering different scenarios of author references and contained resources.
+
+### `it("returns multiple authors when multiple contained")`
+#### Description
+This test case verifies that the function returns multiple authors when there are multiple contained resources.
+
+#### Internal Logic
+- Arranges: Sets up mock data for contained resources and document content.
+- Acts: Calls the `getAuthors` function with the mock data.
+- Asserts: Checks if the returned authors match the expected authors.
+
+### `describe("returns single author... ")`
+#### Description
+This nested describe block contains tests for scenarios where a single author should be returned despite multiple contained resources.
+
+#### Internal Logic
+It iterates through predefined document references (`docRefsWithOneAuthorPointingToMultipleContained`) and tests each one.
+
+### `it("returns empty authors when no matching contained")`
+#### Description
+This test case verifies that the function returns an empty array when there are no matching contained resources.
+
+#### Internal Logic
+- Arranges: Sets up mock data with non-matching contained resources.
+- Acts: Calls the `getAuthors` function with the mock data.
+- Asserts: Checks if the returned authors array is empty.
+
+### `describe("does not return as author")`
+#### Description
+This nested describe block contains tests for scenarios where certain resource types should not be returned as authors.
+
+#### Internal Logic
+It iterates through a list of resource types that should not be considered as authors and tests each one.
+
+## Dependencies
+- @medplum/fhirtypes
+- @metriport/commonwell-sdk
+- uuid
+- ../index (the module being tested)
+- ./cw-payloads (mock data for tests)
+
+## Performance Considerations
+The tests use mock data and don't involve any actual API calls or database operations, so performance should not be a concern in this context.

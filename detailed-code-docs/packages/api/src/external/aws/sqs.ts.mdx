@@ -1,0 +1,107 @@
+---
+title: "sqs.ts"
+---
+
+## High-level description
+This code defines AWS SQS (Simple Queue Service) utility functions for sending and receiving messages, as well as managing message attributes. It provides a set of deprecated functions and types that are intended to be replaced by a core library implementation.
+
+## Code Structure
+The main symbols in this code are utility functions for interacting with AWS SQS. The `sqs` object is created using AWS SDK, and various functions like `sendMessageToQueue`, `getMessagesFromQueue`, and `deleteMessagesFromQueue` are defined to handle SQS operations. These functions use the `sqs` object to perform their respective tasks.
+
+## Symbols
+
+### `sqs`
+#### Description
+An instance of AWS SQS service, configured with the specified API version and region.
+
+#### Inputs
+- `apiVersion`: string
+- `region`: string
+
+### `sendMessageToQueue`
+#### Description
+Sends a message to the specified SQS queue.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queueUrl | string | The URL of the SQS queue |
+| messageBody | string | The body of the message to be sent |
+| sqsParams | SQSParameters | Optional parameters for the message |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Promise&lt;PromiseResult&lt;SQS.SendMessageResult, AWSError&gt;&gt; | The result of the send operation |
+
+#### Internal Logic
+1. Constructs the message parameters based on the input.
+2. Calls `sqs.sendMessage` with the constructed parameters.
+3. Returns the promise result.
+
+### `getMessagesFromQueue`
+#### Description
+Reads and removes messages from the specified SQS queue.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queueUrl | string | The URL of the SQS queue |
+| sqsParams | GetMessageSQSParameters | Parameters for retrieving messages |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| messages | Promise&lt;SQS.Message[]&gt; | Array of retrieved messages |
+
+#### Internal Logic
+1. Calls `_getMessagesFromQueue` with the provided parameters and additional options.
+2. If `poolUntilEmpty` is true, it continues to retrieve messages until the queue is empty or the maximum number of messages is reached.
+
+### `peekMessagesFromQueue`
+#### Description
+Reads messages from the queue without removing them.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queueUrl | string | The URL of the SQS queue |
+| sqsParams | GetMessageSQSParameters | Parameters for retrieving messages |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| messages | Promise&lt;SQS.Message[]&gt; | Array of retrieved messages |
+
+#### Internal Logic
+1. Calls `_getMessagesFromQueue` with the provided parameters and additional options to peek at messages without removing them.
+
+### `deleteMessagesFromQueue`
+#### Description
+Deletes specified messages from the SQS queue.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queueUrl | string | The URL of the SQS queue |
+| messages | MessageToDelete[] | Array of messages to be deleted |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Promise&lt;{ successful: SQS.DeleteMessageBatchResultEntryList; failed: SQS.BatchResultErrorEntryList }&gt; | The result of the delete operation |
+
+#### Internal Logic
+1. Constructs the delete message batch request.
+2. Calls `sqs.deleteMessageBatch` with the constructed parameters.
+3. Returns the result, including successful and failed deletions.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-sdk | AWS SDK for interacting with SQS |
+| ../../shared/config | Configuration settings |
+| ../../shared/util | Utility functions |
+
+## TODOs
+The code contains multiple `@deprecated` tags, indicating that these functions and types should be replaced with implementations from `@metriport/core`.

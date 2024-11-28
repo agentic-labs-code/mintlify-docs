@@ -1,0 +1,67 @@
+---
+title: "withings.ts"
+---
+
+## High-level description
+The code defines a webhook processor for Withings, handling incoming data from Withings webhooks and processing it for a specific user. It maps the Withings data to Metriport's data format and sends it to the appropriate webhook endpoint defined in the user's settings.
+
+## Code Structure
+The `processData` function acts as the main entry point, receiving the webhook data, fetching user and settings information, mapping the data, and triggering the webhook request. The `mapData` function handles the mapping of Withings data to Metriport's format based on the data category.
+
+## References
+- `getConnectedUserByTokenOrFail` from `../connected-user/get-connected-user`
+- `getSettingsOrFail` from `../settings/getSettings`
+- `reportDevicesUsage`, `WebhookUserDataPayload` from `./devices`
+- `processRequest` from `./webhook`
+- `buildWebhookRequestData` from `./webhook-request`
+
+## Symbols
+### `processData`
+#### Description
+This function processes incoming Withings webhook data. It retrieves the connected user, maps the Withings data to the Metriport format, builds a webhook request, and sends it using the `processRequest` function.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | `WithingsWebhook` | The raw webhook data received from Withings. |
+
+#### Outputs
+This function does not explicitly return any value.
+
+#### Internal Logic
+1. Extracts relevant data from the `WithingsWebhook` object.
+2. Fetches the connected user using `getConnectedUserByTokenOrFail`.
+3. Retrieves the user's settings using `getSettingsOrFail`.
+4. Maps the Withings data to the Metriport format using `mapData`.
+5. Builds the webhook request data using `buildWebhookRequestData`.
+6. Sends the webhook request using `processRequest`.
+7. Reports device usage using `reportDevicesUsage`.
+8. Logs any errors encountered during the process.
+
+### `mapData`
+#### Description
+This function maps Withings data to the Metriport format based on the data category.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| categoryNum | `string` | The category of the Withings data. |
+| connectedUser | `ConnectedUser` | The connected user object. |
+| startdate | `string` | The start date of the data. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payload | `WebhookUserDataPayload` | The mapped data in Metriport's format. |
+
+#### Internal Logic
+1. Initializes an empty `WebhookUserDataPayload` object.
+2. Based on the `categoryNum`, fetches the corresponding data from the Withings provider using methods like `getActivityData`, `getBodyData`, `getBiometricsData`, or `getSleepData`.
+3. Populates the `payload` object with the fetched and mapped data.
+4. Returns the `payload` object.
+
+## Error Handling
+The `processData` function includes a try-catch block to handle any errors during the processing of Withings webhook data. Errors are logged to the console.
+
+## Logging
+The code uses `console.log` for logging errors and the received webhook payload. 

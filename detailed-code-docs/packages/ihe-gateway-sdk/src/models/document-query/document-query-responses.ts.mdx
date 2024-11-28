@@ -1,0 +1,92 @@
+---
+title: "document-query-responses.ts"
+---
+
+## High-level description
+This code defines schemas and types for document query responses in an IHE (Integrating the Healthcare Enterprise) Gateway SDK. It includes structures for both inbound (to external gateway) and outbound (from external gateway) document query responses, using Zod for schema validation.
+
+## Code Structure
+The code defines several interconnected schemas and types:
+1. Inbound document query response schemas (successful and fault)
+2. Outbound document query response schemas (successful and fault)
+3. Union types for both inbound and outbound responses
+4. A utility function to check if an outbound response is successful
+
+## Symbols
+
+### `inboundDocumentQueryRespSuccessfulSchema`
+#### Description
+Defines the schema for a successful inbound document query response.
+
+#### Internal Logic
+Extends the `baseResponseSchema` and adds an array of `extrinsicObjectXmls`.
+
+### `InboundDocumentQueryRespSuccessful`
+#### Description
+Type definition for a successful inbound document query response.
+
+### `inboundDocumentQueryRespFaultSchema`
+#### Description
+Defines the schema for a fault inbound document query response.
+
+#### Internal Logic
+Extends the `baseErrorResponseSchema` and ensures `extrinsicObjectXmls` is never present or undefined.
+
+### `InboundDocumentQueryRespFault`
+#### Description
+Type definition for a fault inbound document query response.
+
+### `inboundDocumentQueryRespSchema`
+#### Description
+Defines a union schema for inbound document query responses, combining successful and fault schemas.
+
+### `InboundDocumentQueryResp`
+#### Description
+Type definition for an inbound document query response (either successful or fault).
+
+### `documentQueryRespFromExternalSuccessfulSchema`
+#### Description
+Defines the schema for a successful outbound document query response from an external gateway.
+
+#### Internal Logic
+Extends the `baseResponseSchema` and adds an array of `documentReference` and a `gateway` object.
+
+### `documentQueryRespFromExternalFaultSchema`
+#### Description
+Defines the schema for a fault outbound document query response from an external gateway.
+
+#### Internal Logic
+Extends the `baseErrorResponseSchema` and ensures `documentReference` is never present or undefined, and includes a `gateway` object.
+
+### `outboundDocumentQueryRespSchema`
+#### Description
+Defines a union schema for outbound document query responses, combining successful and fault schemas from external gateways.
+
+### `OutboundDocumentQueryResp`
+#### Description
+Type definition for an outbound document query response (either successful or fault) from an external gateway.
+
+### `isSuccessfulOutboundDocQueryResponse`
+#### Description
+A type guard function to check if an outbound document query response is successful.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| obj | BaseResponse | The response object to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| boolean | boolean | True if the response is successful, false otherwise |
+
+#### Internal Logic
+Checks if the `documentReference` property exists in the object.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| zod | Used for schema definition and validation |
+| @metriport/ihe-gateway-sdk | Imports shared schemas and types |
+
+This code is crucial for handling document query responses in the IHE Gateway SDK, providing type safety and validation for both inbound and outbound responses.

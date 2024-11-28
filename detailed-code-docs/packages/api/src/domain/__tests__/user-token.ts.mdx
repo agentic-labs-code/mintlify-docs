@@ -1,0 +1,48 @@
+---
+title: "user-token.ts"
+---
+
+## High-level description
+This code defines a function `makeUserToken` that creates and returns a `UserToken` object with default or provided values. It's primarily used for testing purposes, allowing the creation of mock `UserToken` objects with customizable properties.
+
+## Symbols
+
+### `makeUserToken`
+#### Description
+This function creates a `UserToken` object with default values for its properties, which can be overridden by passing partial `UserToken` data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| token | Partial&lt;UserToken&gt; | An object containing partial `UserToken` data to override default values |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| UserToken | object | A `UserToken` object with all required properties |
+
+#### Internal Logic
+1. The function uses the spread operator (`...`) to merge the input `token` object with default values.
+2. Default values are generated using various methods:
+   - `nanoid()` for `token`, `oauthUserAccessToken`, and `oauthUserAccessSecret`
+   - `uuidv4()` for `cxId` and `userId`
+   - `faker.date.past().getTime()` for `expiryTime`
+   - Empty strings for `oauthRequestToken` and `oauthRequestSecret`
+3. A `clone` method is added to the object, which creates a new `UserToken` by calling `makeUserToken` with the current object's data.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| nanoid | Generates unique IDs for token-related fields |
+| uuid | Generates UUIDs for `cxId` and `userId` |
+| @faker-js/faker | Generates a past date for `expiryTime` |
+
+## References
+This code is referenced in other parts of the codebase, particularly in test files:
+- `packages/api/src/providers/__tests__/oauth1-deregister.test.ts`: Uses `makeUserToken` to create mock user tokens for testing OAuth1 deregistration.
+- `packages/api/src/domain/user-token.ts`: Defines the actual `UserToken` class that this test helper is based on.
+
+## Notes
+1. This code is located in a test file (`__tests__` folder), indicating its primary use is for testing purposes.
+2. The `makeUserToken` function provides a convenient way to create `UserToken` objects with default values, which can be partially overridden. This is useful for setting up test scenarios with different `UserToken` configurations.
+3. The inclusion of a `clone` method allows for easy duplication of `UserToken` objects, which can be helpful in testing scenarios where you need to create variations of a base token.

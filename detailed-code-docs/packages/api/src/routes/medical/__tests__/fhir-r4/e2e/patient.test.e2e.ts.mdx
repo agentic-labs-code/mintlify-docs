@@ -1,0 +1,102 @@
+---
+title: "patient.test.e2e.ts"
+---
+
+## High-level description
+This file contains end-to-end tests for the FHIR R4 Patient API endpoints. It tests the creation, retrieval, search, and deletion of patient resources using the FHIR standard.
+
+## Code Structure
+The code is structured as a Jest test suite with multiple test cases for different API operations. It uses a shared API client and a fake patient data generator. The tests are organized into describe blocks for different operations, with helper functions for validating responses.
+
+## Symbols
+
+### `describe("Integration FHIR Patient", ...)`
+#### Description
+This is the main test suite for the FHIR Patient API integration tests.
+
+#### Internal Logic
+1. Sets up the test environment
+2. Defines individual test cases for different API operations
+3. Uses helper functions to validate responses
+
+### `test("create patient", ...)`
+#### Description
+Tests the creation of a new patient resource.
+
+#### Internal Logic
+1. Sends a PUT request to create a new patient
+2. Expects a 201 status code
+3. Validates the response using the `validatePatient` function
+
+### `test("get patient", ...)`
+#### Description
+Tests the retrieval of an existing patient resource.
+
+#### Internal Logic
+1. Sends a GET request to retrieve the patient
+2. Expects a 200 status code
+3. Validates the response using the `validatePatient` function
+
+### `test("search patient by name", ...)`
+#### Description
+Tests the search functionality for patients by name.
+
+#### Internal Logic
+1. Checks if the patient has a valid name
+2. Sends a GET request with a name query parameter
+3. Expects a 200 status code
+4. Validates the response structure and content
+
+### `describe("delete", ...)`
+#### Description
+A nested describe block for delete operations.
+
+#### Internal Logic
+Contains two test cases:
+1. Deleting a patient
+2. Attempting to delete an already deleted patient
+
+### `validatePatient(body)`
+#### Description
+Helper function to validate the structure and content of a patient resource.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| body | any | The response body to validate |
+
+#### Internal Logic
+Checks various properties of the patient resource, including resourceType, id, and identifier.
+
+### `validateDeleteResponse(res, expectedResponse)`
+#### Description
+Helper function to validate the response of a delete operation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res | AxiosResponse | The API response object |
+| expectedResponse | string | The expected response code |
+
+#### Internal Logic
+Validates the structure and content of the OperationOutcome resource returned by a delete operation.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | Loading environment variables |
+| @faker-js/faker | Generating fake data for tests |
+| @metriport/core/external/fhir/__tests__/patient | Providing a patient data generator |
+| axios | Making HTTP requests |
+| api (from shared file) | Shared API client for making requests |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| jest.setTimeout | number | 15000 | Sets the timeout for Jest tests |
+
+## Error Handling
+The code includes basic error handling by throwing errors when expected data is missing, such as when a patient doesn't have a name or identifier.
+
+## TODOs
+The comment "Could validate more data here" in the `validatePatient` function suggests that additional validation could be added in the future.

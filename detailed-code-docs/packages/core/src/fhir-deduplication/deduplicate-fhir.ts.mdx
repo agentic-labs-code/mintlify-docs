@@ -1,0 +1,60 @@
+---
+title: "deduplicate-fhir.ts"
+---
+
+## High-level description
+This code implements a function to deduplicate FHIR (Fast Healthcare Interoperability Resources) data. It processes various types of FHIR resources, such as practitioners, conditions, allergies, medications, and more, removing duplicates and combining similar entries to create a more concise and accurate representation of the medical data.
+
+## Code Structure
+The main function `deduplicateFhir` takes a FHIR Bundle as input and returns a deduplicated Bundle. It uses various helper functions to process different types of resources. The `replaceResourceReferences` function is used to update references to deduplicated resources throughout the bundle.
+
+## Symbols
+
+### `deduplicateFhir`
+#### Description
+This is the main function that orchestrates the deduplication process for a FHIR Bundle.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fhirBundle | Bundle&lt;Resource&gt; | The input FHIR Bundle to be deduplicated |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| deduplicatedBundle | Bundle&lt;Resource&gt; | The deduplicated FHIR Bundle |
+
+#### Internal Logic
+1. Extracts FHIR types from the input bundle.
+2. Processes each resource type (e.g., practitioners, conditions, allergies) using specific deduplication functions.
+3. Updates references throughout the bundle to reflect deduplicated resources.
+4. Combines deduplicated entries into a new bundle.
+
+### `replaceResourceReferences`
+#### Description
+This function updates references to deduplicated resources throughout the bundle.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resourceArrays | ExtractedFhirTypes | The extracted FHIR resources |
+| idMap | Map&lt;string, string[]&gt; | A map of original IDs to deduplicated IDs |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| updatedArrays | ExtractedFhirTypes | The updated FHIR resources with replaced references |
+
+#### Internal Logic
+1. Converts the resource arrays to a string.
+2. Iterates through the ID map, replacing old references with new ones.
+3. Parses the updated string back into an object.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides TypeScript types for FHIR resources |
+| lodash | Utility functions, particularly `cloneDeep` |
+
+## TODOs
+- Add unit tests for the ID replacements

@@ -1,0 +1,122 @@
+---
+title: "lambda.ts"
+---
+
+## High-level description
+This code provides utility functions for interacting with AWS Lambda services. It includes functions for creating Lambda clients, handling Lambda invocation responses, and processing Lambda errors. The code is designed to be used in a TypeScript/JavaScript environment and relies on the AWS SDK.
+
+## Code Structure
+The code defines several functions and types related to Lambda operations. The main functions include `makeLambdaClient`, `defaultLambdaInvocationResponseHandler`, `getLambdaResultPayload`, and error-related functions like `isLambdaError` and `getLambdaError`. These functions work together to provide a comprehensive interface for Lambda interactions.
+
+## Symbols
+
+### `makeLambdaClient`
+#### Description
+Creates and returns an AWS Lambda client with specified configuration options.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| region | string | The AWS region for the Lambda client |
+| timeoutInMillis | number | (Optional) Timeout for HTTP requests |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lambdaClient | AWS.Lambda | Configured AWS Lambda client |
+
+### `defaultLambdaInvocationResponseHandler`
+#### Description
+Returns a function that handles Lambda invocation responses, using `getLambdaResultPayload`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | object | Configuration parameters |
+| params.lambdaName | string | (Optional) Name of the Lambda function |
+| params.failGracefully | boolean | (Optional) Whether to fail gracefully |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| handler | function | Function to handle Lambda invocation responses |
+
+### `logResultToString`
+#### Description
+Converts a base64-encoded log result to a string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| logResult | string \| undefined | Base64-encoded log result |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string \| undefined | Decoded log result as a string |
+
+### `isLambdaError`
+#### Description
+Checks if a Lambda invocation result contains an error.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | PromiseResult&lt;AWS.Lambda.InvocationResponse, AWS.AWSError&gt; | Lambda invocation result |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| isError | boolean | True if the result contains an error, false otherwise |
+
+### `getLambdaError`
+#### Description
+Extracts error details from a Lambda invocation result if an error occurred.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | PromiseResult&lt;AWS.Lambda.InvocationResponse, AWS.AWSError&gt; | Lambda invocation result |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| error | LambdaError \| undefined | Error details if an error occurred, undefined otherwise |
+
+### `getLambdaResultPayload`
+#### Description
+Processes the Lambda invocation result and returns the payload or throws an error based on the configuration.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | object | Configuration parameters |
+| params.result | PromiseResult&lt;AWS.Lambda.InvocationResponse, AWS.AWSError&gt; | Lambda invocation result |
+| params.lambdaName | string | (Optional) Name of the Lambda function |
+| params.failGracefully | boolean | (Optional) Whether to fail gracefully |
+| params.failOnEmptyResponse | boolean | (Optional) Whether to fail on empty responses |
+| params.log | function | (Optional) Logging function |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payload | string \| undefined | The payload of the Lambda invocation result |
+
+#### Internal Logic
+1. Checks if the status code indicates success (200-299 range).
+2. Verifies if the payload exists.
+3. Checks for Lambda errors using `isLambdaError`.
+4. Handles specific error types (BadRequestError, NotFoundError).
+5. Returns the payload as a string if successful.
+
+## Error Handling
+The code implements custom error handling for Lambda invocations. It uses `MetriportError`, `BadRequestError`, and `NotFoundError` classes to throw specific errors based on the invocation result. The `getLambdaResultPayload` function includes comprehensive error checking and handling logic.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-sdk | Provides the AWS SDK for interacting with Lambda services |
+| @metriport/core/util/base64 | Used for base64 decoding |
+| @metriport/core/util/error/* | Custom error classes for error handling |
+
+Note: The code relies on several custom error classes and utility functions from the @metriport/core package.

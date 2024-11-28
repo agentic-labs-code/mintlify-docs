@@ -1,0 +1,43 @@
+---
+title: "nutrition.ts"
+---
+
+## High-level description
+The `mapToNutrition` function transforms a `CronometerDiarySummary` object, which represents nutrition data from the Cronometer API, into a `Nutrition` object used within the application. This transformation involves extracting and mapping relevant fields from the Cronometer data structure to the application's `Nutrition` structure.
+
+## References
+- `Nutrition`: This symbol is referenced but not defined in the current file. It is a type definition from the `@metriport/api-sdk` package, representing the application's internal structure for nutrition data.
+- `Food`: Similar to `Nutrition`, this symbol is a type definition from `@metriport/api-sdk`, representing a single food item within the `Nutrition` object.
+- `PROVIDER_CRONOMETER`: A constant imported from `../../shared/constants`, likely representing a string identifier for the Cronometer data source.
+- `CronometerDiarySummary`: A type definition imported from `./models/diary-summary`, representing the structure of the raw data received from the Cronometer API.
+
+## Symbols
+### `mapToNutrition`
+#### Description
+This function takes a `CronometerDiarySummary` object and a date string as input and returns a `Nutrition` object populated with the mapped data. It extracts macros, nutrients, and food log information from the `CronometerDiarySummary` and formats them according to the `Nutrition` structure.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| diarySummary | `CronometerDiarySummary` | The raw nutrition data received from the Cronometer API. |
+| date | `string` | The date for which the nutrition data applies. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| nutrition | `Nutrition` | The transformed nutrition data in the application's internal format. |
+
+#### Internal Logic
+1. **Extract data:** The function first extracts the `macros`, `nutrients`, and `foods` properties from the input `diarySummary`.
+2. **Process food log:** It iterates through the `foods` array (if present), extracting the food name, consumed amount, and unit from each food item and populating a `foodsLog` array with `Food` objects.
+3. **Construct `Nutrition` object:** The function creates a `Nutrition` object with the following structure:
+    - `metadata`: Contains the date and source of the data (Cronometer).
+    - `summary`: Contains three objects:
+        - `macros`: Maps Cronometer macro values to corresponding fields in the `Nutrition` object.
+        - `micros`: Maps Cronometer micronutrient values to corresponding fields.
+        - `aminos`: Maps Cronometer amino acid values to corresponding fields.
+    - `foods`: Contains the `foodsLog` array populated in step 2.
+4. **Return `Nutrition` object:** The function returns the constructed `Nutrition` object.
+
+## TODOs
+- **Confirm units:** The code contains a "TODO" comment indicating uncertainty about the units of measurement for certain values. This needs to be clarified and documented.

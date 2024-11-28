@@ -1,0 +1,46 @@
+---
+title: "run-or-schedule-patient-discovery.ts"
+---
+
+## High-level description
+This code defines a function `runOrSchedulePatientDiscoveryAcrossHies` that initiates or schedules patient discovery processes across multiple Health Information Exchanges (HIEs), specifically for Carequality and CommonWell. It handles patient data, facility information, and various optional parameters to control the discovery process.
+
+## Code Structure
+The main function `runOrSchedulePatientDiscoveryAcrossHies` orchestrates the patient discovery process by calling separate functions for Carequality and CommonWell. It uses imported functions and utilities from various modules to handle patient data, UUID generation, and error processing.
+
+## Symbols
+
+### `runOrSchedulePatientDiscoveryAcrossHies`
+#### Description
+This function initiates or schedules patient discovery processes for both Carequality and CommonWell HIEs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient object for discovery |
+| facilityId | string | The ID of the facility |
+| rerunPdOnNewDemographics | boolean | Optional flag to rerun discovery on new demographics |
+| forceCommonwell | boolean | Optional flag to force CommonWell discovery |
+| forceCarequality | boolean | Optional flag to force Carequality discovery |
+| requestId | string | Optional request ID, defaults to a generated UUID |
+
+#### Internal Logic
+1. Retrieves the existing patient data using `getPatientOrFail`.
+2. Initiates Carequality patient discovery using `runOrScheduleCqPatientDiscovery`.
+3. Initiates CommonWell patient discovery using `runOrScheduleCwPatientDiscovery`.
+4. Both discovery processes are executed asynchronously and errors are handled using `processAsyncError`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/patient | Provides Patient type |
+| @metriport/core/util/uuid-v7 | Generates UUID v7 |
+| @metriport/core/util/error/shared | Processes async errors |
+
+## TODOs
+- TODO #1572: Remove `forceCommonwell` and `forceCarequality` parameters
+
+## Notes
+- The function uses async/await for handling asynchronous operations.
+- Error handling is implemented for both Carequality and CommonWell discovery processes.
+- The function allows for optional parameters to control the discovery process, including forcing discovery for specific HIEs and rerunning discovery on new demographics.

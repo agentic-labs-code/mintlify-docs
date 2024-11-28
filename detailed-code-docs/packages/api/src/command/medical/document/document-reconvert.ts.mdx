@@ -1,0 +1,223 @@
+---
+title: "document-reconvert.ts"
+---
+
+## High-level description
+The `document-reconvert.ts` file provides functionality to re-convert medical documents for a given customer and/or patient. It retrieves document references, deletes existing consolidated data, and triggers the re-conversion process. This process involves fetching CDA documents from S3, converting them to FHIR, and updating the FHIR server.
+
+## Code Structure
+The code defines a main function `reConvertDocuments` that orchestrates the re-conversion process. It utilizes helper functions like `getDocRefsByCreatedAt`, `getDocumentsFromFHIR`, `reConvertByPatient`, and `reConvertDocumentsInternal` to perform specific tasks. The `addS3InfoToDocRef` function is used to enrich document references with S3 file information.
+
+## References
+- `@medplum/fhirtypes` for FHIR data types.
+- `@metriport/api-sdk` for API related constants and types.
+- `@metriport/core/external/aws/s3` for interacting with AWS S3.
+- `@metriport/core/util/concurrency` for asynchronous execution.
+- `@metriport/core/external/fhir/shared/extensions/metriport` for Metriport specific FHIR extensions.
+- `@metriport/core/util/log` for logging.
+- `@metriport/core/util/mime` for MIME type utilities.
+- `@metriport/core/util/notifications` for error capturing.
+- `dayjs` for date and time manipulation.
+- `lodash` for utility functions like `groupBy`.
+- `DocRefMapping` from `../../../domain/medical/docref-mapping` representing document reference mappings.
+- `Patient` from `@metriport/core/domain/patient` representing a patient.
+- `convertCDAToFHIR` from `../../../external/fhir-converter/converter` for converting CDA to FHIR.
+- `getDocumentsFromFHIR` from `../../../external/fhir/document/get-documents` for fetching documents from FHIR server.
+- `countResources` from `../../../external/fhir/patient/count-resources` for counting FHIR resources.
+- `downloadedFromHIEs` from `@metriport/core/external/fhir/shared/index` for checking if a document was downloaded from HIEs.
+- `Config` from `../../../shared/config` for configuration settings.
+- `errorToString` from `../../../shared/log` for converting errors to strings.
+- `formatNumber` from `@metriport/shared/common/numbers` for formatting numbers.
+- `getDocRefMappings` from `../docref-mapping/get-docref-mapping` for retrieving document reference mappings.
+- `deleteConsolidated` from `../patient/consolidated-delete` for deleting consolidated data on FHIR server.
+- `getPatientOrFail` from `../patient/get-patient` for retrieving a patient or throwing an error.
+- `setDisableDocumentRequestWHFlag` from `../patient/webhook` for disabling document request webhook flag.
+- `docRefContentToFileFunction`, `SimplerFile` from `./document-query-storage-info` for file related utilities.
+
+## Symbols
+
+### `reConvertDocuments`
+#### Description
+This function orchestrates the re-conversion of medical documents for a given customer and/or patient. It retrieves document references based on provided criteria, deletes existing consolidated data, and triggers the re-conversion process for each patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | `ReConvertDocumentsCommand` | An object containing parameters for the re-conversion process. |
+
+#### Outputs
+This function does not return any value.
+
+#### Internal Logic
+1. Retrieves document references based on provided criteria using `getDocRefsByCreatedAt`.
+2. Groups document references by patient ID.
+3. Optionally counts and logs consolidated data before re-conversion.
+4. For each patient, calls `reConvertByPatient` to perform the re-conversion process.
+5. Logs the total duration of the re-conversion process.
+
+### `getDocumentsFromFHIR`
+#### Description
+This function retrieves document references from the FHIR server and enriches them with S3 file information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | `string` | The customer's ID. |
+| documentIds | `string[]` | An array of document IDs to retrieve. |
+| log | `typeof console.log` | A logging function. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documents | `DocRefWithS3Info[]` | An array of document references with S3 file information. |
+
+#### Internal Logic
+1. Retrieves document references from the FHIR server using `getDocumentsFromFHIRServer`.
+2. Filters document references to include only those downloaded from HIEs.
+3. For each document reference, calls `addS3InfoToDocRef` to enrich it with S3 file information.
+4. Logs the number of document references retrieved and processed.
+
+### `reConvertByPatient`
+#### Description
+This function performs the re-conversion process for a single patient. It disables the document request webhook flag, retrieves document references, deletes existing consolidated data, and triggers the re-conversion of each document.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `{ id: string; cxId: string }` | An object containing the patient's ID and customer ID. |
+| documentIds | `string[]` | An array of document IDs to re-convert. |
+| requestId | `string` | The ID of the request. |
+| isDisableWH | `boolean` | Whether to disable the document request webhook flag. |
+| dryRun | `boolean` | Whether to simulate the execution without making any changes. |
+
+#### Outputs
+This function does not return any value.
+
+#### Internal Logic
+1. Disables the document request webhook flag using `setDisableDocumentRequestWHFlag` or retrieves the patient if in dry run mode.
+2. Retrieves document references from the FHIR server using `getDocumentsFromFHIR`.
+3. Deletes existing consolidated data on the FHIR server using `deleteConsolidatedOnFHIRServer`.
+4. Calls `reConvertDocumentsInternal` to trigger the re-conversion of each document.
+5. Logs the completion of the re-conversion process for the patient.
+
+### `addS3InfoToDocRef`
+#### Description
+This function enriches a document reference with S3 file information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| doc | `DocumentReference` | The document reference to enrich. |
+| log | `typeof console.log` | A logging function. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docWithS3Info | `DocRefWithS3Info \| undefined` | The enriched document reference with S3 file information, or `undefined` if the document is not eligible for re-conversion. |
+
+#### Internal Logic
+1. Extracts the document ID from the document reference.
+2. Retrieves the Metriport content from the document reference.
+3. Determines the file information from the Metriport content.
+4. Retrieves the S3 file information using `s3Utils.getFileInfoFromS3`.
+5. Checks if the document content type is XML.
+6. Returns the enriched document reference if all checks pass, otherwise returns `undefined`.
+
+### `reConvertDocumentsInternal`
+#### Description
+This function triggers the re-conversion of a list of documents.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `Patient` | The patient object. |
+| documents | `DocRefWithS3Info[]` | An array of document references with S3 file information. |
+| requestId | `string` | The ID of the request. |
+| dryRun | `boolean` | Whether to simulate the execution without making any changes. |
+| log | `typeof console.log` | A logging function. |
+
+#### Outputs
+This function does not return any value.
+
+#### Internal Logic
+1. If in dry run mode, logs a message indicating the number of documents that would be re-converted and returns.
+2. For each document, calls `reConvertDocument` to trigger the re-conversion process.
+3. Logs any errors encountered during the re-conversion process.
+
+### `reConvertDocument`
+#### Description
+This function triggers the re-conversion of a single document.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `Patient` | The patient object. |
+| docWithS3Info | `DocRefWithS3Info` | The document reference with S3 file information. |
+| requestId | `string` | The ID of the request. |
+
+#### Outputs
+This function does not return any value.
+
+#### Internal Logic
+1. Extracts the document reference and file information from the input.
+2. Calls `convertCDAToFHIR` to trigger the CDA to FHIR conversion process.
+
+### `countAndLogConsolidated`
+#### Description
+This function counts and logs the number of consolidated resources for each patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | `string` | The customer's ID. |
+| patientIds | `string[]` | An array of patient IDs. |
+| log | `typeof console.log` | A logging function. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| consolidatedBeforeMap | `Record&lt;string, number&gt;` | A map of patient IDs to the number of consolidated resources. |
+
+#### Internal Logic
+1. For each patient, calls `countResources` to count the number of consolidated resources.
+2. Logs the consolidated resource count for each patient.
+
+### `getDocRefsByCreatedAt`
+#### Description
+This function retrieves document reference mappings based on the provided criteria, including customer ID, document IDs, patient IDs, and a date range for creation time.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | `string` | The customer's ID. |
+| documentIds | `string[]` | An array of document IDs to filter by. |
+| patientIds | `string[]` | An array of patient IDs to filter by. |
+| dateFrom | `string` | The start date for the creation time range. |
+| dateTo | `string` | The end date for the creation time range. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docRefMappings | `DocRefMapping[]` | An array of document reference mappings matching the criteria. |
+
+#### Internal Logic
+1. Constructs a date range object based on the provided `dateFrom` and `dateTo` values.
+2. Calls the `getDocRefMappings` function with the provided criteria and the constructed date range to retrieve the matching document reference mappings.
+
+### `getDryRunPrefix`
+#### Description
+This function returns a prefix string indicating whether the operation is a dry run.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dryRun | `boolean` | A boolean value indicating whether the operation is a dry run. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| prefix | `string` | A string prefix indicating whether the operation is a dry run. |
+
+#### Internal Logic
+1. If `dryRun` is true, returns the string "--DRY-RUN-- ".
+2. Otherwise, returns an empty string.

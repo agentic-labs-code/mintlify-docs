@@ -1,0 +1,80 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains test files for the domain logic of the core package. It includes unit tests for various functionalities, particularly focusing on file path generation for Hive partitions and utility functions for generating mock data.
+
+## What does it do?
+The test files in this directory serve two main purposes:
+
+1. Verifying the correctness of the `createHivePartitionFilePath` function:
+   - This function is responsible for generating file paths for Hive partitions based on various parameters such as customer ID, patient ID, keys, date, and date granularity.
+   - The tests ensure that the function correctly handles different scenarios, including various date granularities (second, minute, hour, day), optional parameters, and case sensitivity.
+
+2. Providing utility functions for generating mock data:
+   - The `makeOrgNumber` function generates random organization numbers for use in testing scenarios.
+
+These tests and utilities play a crucial role in ensuring the reliability and correctness of the core package's domain logic, particularly in areas related to data storage and organization.
+
+## Key Files
+
+1. `filename.test.ts`:
+   - Contains comprehensive unit tests for the `createHivePartitionFilePath` function.
+   - Verifies the function's behavior with different input combinations and date granularities.
+   - Ensures proper handling of optional parameters and case sensitivity.
+
+2. `organization.ts`:
+   - Defines the `makeOrgNumber` utility function.
+   - Generates random organization numbers for use in testing scenarios.
+
+## Dependencies
+The test files rely on the following external libraries:
+
+1. Jest: Used as the testing framework, evident from the use of `describe`, `it`, and `expect` functions in `filename.test.ts`.
+
+2. @faker-js/faker (version not specified): Used in `organization.ts` to generate random numbers for organization IDs.
+
+Jest was likely chosen for its popularity, extensive feature set, and good integration with TypeScript projects. Faker is a common choice for generating realistic mock data in testing scenarios.
+
+## Configuration
+No specific configuration files are mentioned for this directory. However, the tests may rely on the general Jest configuration for the project, which is typically defined in a `jest.config.js` file at the root of the project or package.
+
+The `createHivePartitionFilePath` function being tested appears to use some configuration for date granularity, with options including "second", "minute", "hour", and "day". This configuration is likely defined in the main implementation file rather than in the test directory.
+
+Here's an example of how the `createHivePartitionFilePath` function is tested with different configurations:
+
+```typescript
+it("full", () =&gt; {
+  const result = createHivePartitionFilePath(
+    "cx123",
+    "pat456",
+    { key1: "value1", key2: "value2" },
+    new Date("2023-04-18T12:34:56Z"),
+    "second"
+  );
+  expect(result).toBe("cx=cx123/pat=pat456/key1=value1/key2=value2/dt=2023-04-18/hr=12/min=34/sec=56");
+});
+
+it("full - minute granularity", () =&gt; {
+  const result = createHivePartitionFilePath(
+    "cx123",
+    "pat456",
+    { key1: "value1", key2: "value2" },
+    new Date("2023-04-18T12:34:56Z"),
+    "minute"
+  );
+  expect(result).toBe("cx=cx123/pat=pat456/key1=value1/key2=value2/dt=2023-04-18/hr=12/min=34");
+});
+```
+
+These tests demonstrate how the function handles different date granularities and how the resulting file paths are structured.
+
+The `makeOrgNumber` function in `organization.ts` is configured to generate numbers between 0 and 1,000,000,000:
+
+```typescript
+export const makeOrgNumber = () =&gt;
+  faker.number.int({ min: 0, max: 1_000_000_000 });
+```
+
+This configuration suggests that organization numbers are expected to be up to 10 digits long in the system being tested.

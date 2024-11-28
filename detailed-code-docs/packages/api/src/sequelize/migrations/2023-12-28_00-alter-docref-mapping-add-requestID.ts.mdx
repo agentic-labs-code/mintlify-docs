@@ -1,0 +1,56 @@
+---
+title: "2023-12-28_00-alter-docref-mapping-add-requestID.ts"
+---
+
+## High-level description
+This migration script adds a new column `request_id` to the `docref_mapping` table and creates an index on this column. This likely allows for tracking document reference mappings back to specific user requests.
+
+## Symbols
+
+### `up`
+#### Description
+This asynchronous function defines the steps to apply the migration. It adds a new column `request_id` of type `STRING` to the `docref_mapping` table, allowing null values. It also creates an index on the `request_id` column for faster lookups.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | Object | An object containing the `queryInterface` object, which provides methods for interacting with the database schema. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. Starts a database transaction to ensure atomicity.
+2. Uses `queryInterface.addColumn` to add the `request_id` column to the `docref_mapping` table.
+3. Uses `queryInterface.addIndex` to create an index on the `request_id` column.
+4. Commits the transaction if all operations are successful.
+
+### `down`
+#### Description
+This asynchronous function defines the steps to revert the migration. It removes the `request_id` column from the `docref_mapping` table and drops the index on this column.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | Object | An object containing the `queryInterface` object, which provides methods for interacting with the database schema. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise | A promise that resolves when the migration rollback is complete. |
+
+#### Internal Logic
+1. Starts a database transaction to ensure atomicity.
+2. Uses `queryInterface.removeColumn` to remove the `request_id` column from the `docref_mapping` table.
+3. Uses `queryInterface.removeIndex` to drop the index on the `request_id` column.
+4. Commits the transaction if all operations are successful.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Provides the database interface and transaction management. |
+| umzug |  Manages the execution of migrations. |
+
+

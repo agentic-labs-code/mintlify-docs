@@ -1,0 +1,83 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains modules for mapping Apple Health data to the Metriport API data model. It includes functions to transform data for various health metrics such as activity, biometrics, body composition, nutrition, and sleep. The code is designed to process raw Apple Health data and convert it into standardized formats that can be used within the Metriport ecosystem.
+
+## What does it do?
+The code in this directory performs the following main tasks:
+
+1. Transforms raw Apple Health data into structured objects that conform to the Metriport API specifications.
+2. Handles various types of health data, including:
+   - Activity data (steps, energy expenditure, workouts)
+   - Biometric data (heart rate, blood pressure, temperature, respiration)
+   - Body composition data (height, weight, body fat percentage)
+   - Nutrition data (macronutrients, micronutrients)
+   - Sleep data (sleep stages, durations)
+3. Aggregates data points by date, creating daily summaries of health metrics.
+4. Converts units where necessary to ensure consistency with the Metriport API requirements.
+5. Generates metadata for each data point, including source information and timestamps.
+6. Provides utility functions to check for the presence of specific data types in the raw Apple Health data.
+
+## Entry points
+The main entry point for this directory is the `index.ts` file, which exports the `mapData` function. This function orchestrates the mapping process for all types of health data. It calls specific mapping functions for each data type, which are defined in separate files:
+
+- `activity.ts`: Handles mapping of activity-related data
+- `biometrics.ts`: Processes biometric data
+- `body.ts`: Manages body composition data
+- `nutrition.ts`: Handles nutrition-related information
+- `sleep.ts`: Processes sleep data
+
+The `index.ts` file also defines schemas for validating the structure of incoming Apple Health data and exports utility functions for checking the presence of specific data types.
+
+## Key Files
+1. `index.ts`: 
+   - Defines the main `mapData` function
+   - Exports utility functions and schemas
+   - Orchestrates the overall mapping process
+
+2. `activity.ts`:
+   - Contains the `mapDataToActivity` function
+   - Processes activity data, including steps, energy expenditure, and workouts
+
+3. `biometrics.ts`:
+   - Implements the `mapDataToBiometrics` function
+   - Handles various biometric data types like heart rate, blood pressure, and temperature
+
+4. `body.ts`:
+   - Defines the `mapDataToBody` function
+   - Processes body composition data such as height, weight, and body fat percentage
+
+5. `nutrition.ts`:
+   - Contains the `mapDataToNutrition` function
+   - Handles nutrition-related data, including macronutrients and micronutrients
+
+6. `sleep.ts`:
+   - Implements the `mapDataToSleep` function
+   - Processes sleep data, including different sleep stages and durations
+
+7. `activity-types.ts`:
+   - Defines a mapping of activity type IDs to human-readable activity names
+
+## Dependencies
+The code in this directory relies on several external libraries and internal modules:
+
+1. `@metriport/api-sdk`: Provides the data models and types for the Metriport API.
+2. `dayjs`: Used for date manipulation and formatting throughout the codebase.
+3. `zod`: Utilized for schema validation and type inference of the Apple Health data structure.
+
+Internal dependencies include:
+- `../../shared/constants`: Likely defines constants such as `PROVIDER_APPLE`.
+- `../../shared/date`: Probably contains date-related utilities or constants.
+
+## Configuration
+The code does not appear to use any specific configuration files or environment variables. However, it does use several constants and type definitions that are likely defined in shared modules or the API SDK. These include:
+
+- `PROVIDER_APPLE`: A constant representing Apple as the data provider.
+- `ISO_DATE`: A constant or format string for ISO date representation.
+- Various type definitions from `@metriport/api-sdk` such as `Activity`, `Biometrics`, `Body`, `Nutrition`, and `Sleep`.
+
+The mapping functions generally accept a boolean `hourly` parameter, which determines whether the data should be processed with hourly granularity or aggregated daily. This parameter affects the metadata generation and potentially the data grouping logic.
+
+In summary, this directory contains a comprehensive set of functions for transforming Apple Health data into a format compatible with the Metriport API. It handles various health metrics and provides a flexible, modular approach to data mapping that can be easily extended or modified as needed.

@@ -1,0 +1,80 @@
+---
+title: "admin.ts"
+---
+
+## High-level description
+This code provides functionality to interact with a FHIR (Fast Healthcare Interoperability Resources) server for managing tenants. It includes functions to create tenants, check if a tenant exists, and create a tenant if it doesn't already exist. The code uses a singleton pattern for the API client to ensure efficient resource usage.
+
+## Code Structure
+The main symbols in this code are functions that interact with the FHIR server through an API client. The `getApi()` function ensures a single instance of the API client is used throughout the module. The other functions (`createTenant`, `createTenantIfNotExists`, and `tenantExists`) use this API client to perform operations on the FHIR server.
+
+## Symbols
+
+### `getApi()`
+#### Description
+This function implements a singleton pattern to create and return a single instance of the FHIR Admin API client.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| api | FhirAdminClient | The FHIR Admin API client instance |
+
+#### Internal Logic
+If the `api` variable is not initialized, it calls `makeFhirAdminApi()` to create a new instance. Otherwise, it returns the existing instance.
+
+### `createTenant(organization: OrgToCreateTenant)`
+#### Description
+Creates a new tenant on the FHIR server for the given organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | OrgToCreateTenant | Object containing organizationNumber and cxId |
+
+#### Internal Logic
+Calls the `createTenant` method of the FHIR Admin API client with the provided organization data.
+
+### `createTenantIfNotExists(organization: OrgToCreateTenant)`
+#### Description
+Checks if a tenant exists for the given organization, and creates it if it doesn't.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | OrgToCreateTenant | Object containing organizationNumber and cxId |
+
+#### Internal Logic
+1. Checks if the tenant exists using the `tenantExists` function.
+2. If the tenant doesn't exist, calls the `createTenant` method of the FHIR Admin API client.
+
+### `tenantExists(tenantId: string)`
+#### Description
+Checks whether a tenant with the given ID exists on the FHIR server.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tenantId | string | The ID of the tenant to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| exists | boolean | True if the tenant exists, false otherwise |
+
+#### Internal Logic
+1. Retrieves the list of all tenants using the FHIR Admin API client.
+2. Checks if the provided tenantId is in the list of tenants.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/organization | Provides the Organization type |
+| @metriport/core/external/fhir/api/api | Provides the FhirAdminClient type |
+| ./api/api-factory | Provides the makeFhirAdminApi function |
+
+## References
+This code is referenced by:
+- `packages/api/src/command/medical/organization/create-organization.ts`: Uses `createTenantIfNotExists` when creating a new organization.
+- `packages/api/src/external/fhir/__tests__/admin.test.ts`: Contains unit tests for the functions in this file.
+
+The code relies on the FHIR server configuration, which is likely managed elsewhere in the application (possibly in a configuration file or environment variables).

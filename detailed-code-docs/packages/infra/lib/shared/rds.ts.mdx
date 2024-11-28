@@ -1,0 +1,73 @@
+---
+title: "rds.ts"
+---
+
+## High-level description
+This code defines a function `addDBClusterPerformanceAlarms` that creates CloudWatch alarms for various performance metrics of an Amazon RDS database cluster. It sets up alarms for metrics such as freeable memory, CPU utilization, volume read/write IOPs, ACU utilization, and free local storage.
+
+## Code Structure
+The main function `addDBClusterPerformanceAlarms` takes several parameters and creates multiple alarms using a helper function `createAlarm`. Each alarm is configured with specific metrics, thresholds, and evaluation criteria.
+
+## Symbols
+
+### `addDBClusterPerformanceAlarms`
+#### Description
+This function sets up CloudWatch alarms for various performance metrics of an RDS database cluster.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | Construct | The construct scope in which to create the alarms |
+| dbCluster | rds.DatabaseCluster | The RDS database cluster to monitor |
+| dbClusterName | string | The name of the database cluster |
+| thresholds | RDSAlarmThresholds | Optional. Threshold values for different metrics |
+| alarmAction | SnsAction | Optional. The action to take when an alarm is triggered |
+
+#### Internal Logic
+1. If no thresholds are provided, the function returns without creating any alarms.
+2. It defines a helper function `createAlarm` to create individual alarms.
+3. It creates alarms for the following metrics:
+   - Freeable Memory
+   - CPU Utilization
+   - Volume Read IOPs
+   - Volume Write IOPs
+   - ACU Utilization
+   - Free Local Storage
+
+### `createAlarm` (internal helper function)
+#### Description
+This internal function creates a CloudWatch alarm for a given metric and configuration.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | string | The name of the alarm |
+| metric | cloudwatch.Metric | The metric to monitor |
+| threshold | number | The threshold value for the alarm |
+| evaluationPeriods | number | The number of periods to evaluate the alarm |
+| comparisonOperator | cloudwatch.ComparisonOperator | Optional. The comparison operator for the alarm |
+| treatMissingData | cloudwatch.TreatMissingData | Optional. How to treat missing data |
+
+#### Internal Logic
+1. Creates a CloudWatch alarm using the provided metric and configuration.
+2. If an `alarmAction` is provided, it adds it as both an alarm action and an OK action.
+3. Returns the created alarm.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-cdk-lib/aws-cloudwatch | For creating CloudWatch alarms and metrics |
+| aws-cdk-lib/aws-cloudwatch-actions | For SNS actions on alarms |
+| aws-cdk-lib/aws-rds | For working with RDS database clusters |
+| constructs | For working with CDK constructs |
+| ../../config/aws/rds | For RDSAlarmThresholds type |
+| ../shared/util | For the mbToBytes utility function |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| DEFAULT_MIN_LOCAL_STORAGE_MB_ALARM | number | 10000 | Default minimum local storage in MB for the alarm |
+
+## Notes
+- The Free Local Storage alarm is always created, even for Aurora Serverless, due to compliance controls (SOC2).
+- The function uses the `mbToBytes` utility to convert MB to bytes for certain thresholds.

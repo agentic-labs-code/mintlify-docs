@@ -1,0 +1,83 @@
+---
+title: "apple.ts"
+---
+
+## High-level description
+This code defines the `Apple` class, which is a provider for Apple Health data in a health data integration system. It extends the `Provider` class and implements the `NoAuth` interface, indicating that it doesn't require authentication for data access.
+
+## Code Structure
+The `Apple` class extends `Provider` and implements `NoAuth`. It initializes with all data types disabled and provides a method to revoke provider access.
+
+## References
+- `Provider` and `ConsumerHealthDataType` from "./provider"
+- `updateProviderData` from "../command/connected-user/save-connected-user"
+- `ConnectedUser` from "../models/connected-user"
+- `PROVIDER_APPLE` from "../shared/constants"
+- `NoAuth` from "./shared/noauth"
+
+## Symbols
+
+### Apple
+#### Description
+The `Apple` class represents the Apple Health data provider. It initializes with all data types disabled and provides a method to revoke provider access.
+
+#### Inputs
+None for the constructor.
+
+#### Outputs
+None directly, but it creates an instance of the Apple provider.
+
+#### Internal Logic
+The constructor initializes the `Apple` provider with all data types set to `false`, indicating that synchronous mode is disabled for all data types.
+
+### revokeProviderAccess
+#### Description
+This method revokes the provider access for a connected user by updating the provider data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object for which to revoke access |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise&lt;void&gt; | A promise that resolves when the access is revoked |
+
+#### Internal Logic
+The method calls `updateProviderData` with the following parameters:
+- `id`: The connected user's ID
+- `cxId`: The connected user's customer ID
+- `provider`: Set to `PROVIDER_APPLE`
+- `providerItem`: Set to `undefined` to remove the provider data
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Provider | Base class for all providers |
+| ConsumerHealthDataType | Enum for different types of health data |
+| updateProviderData | Function to update provider data for a connected user |
+| ConnectedUser | Model representing a connected user |
+| PROVIDER_APPLE | Constant representing the Apple provider |
+| NoAuth | Interface for providers that don't require authentication |
+
+## Configuration
+The `Apple` provider is configured with all data types disabled:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| Activity | boolean | false | Activity data synchronization |
+| Body | boolean | false | Body data synchronization |
+| Biometrics | boolean | false | Biometrics data synchronization |
+| Nutrition | boolean | false | Nutrition data synchronization |
+| Sleep | boolean | false | Sleep data synchronization |
+| User | boolean | false | User data synchronization |
+
+## Error Handling
+No specific error handling is implemented in this code. Errors from the `updateProviderData` function would be propagated to the caller.
+
+## API/Interface Reference
+The `Apple` class implements the `NoAuth` interface, which requires the implementation of the `revokeProviderAccess` method.
+
+| Method | Parameters | Return Type | Description |
+|:-------|:-----------|:------------|:------------|
+| revokeProviderAccess | connectedUser: ConnectedUser | Promise&lt;void&gt; | Revokes provider access for the given connected user |

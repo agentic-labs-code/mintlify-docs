@@ -1,0 +1,67 @@
+---
+title: "2023-01-11_00_create-medical-models.ts"
+---
+
+## High-level description
+This code defines database migrations for creating and dropping tables related to medical entities: `organization`, `facility`, and `patient`. It uses Sequelize ORM and its migration framework, Umzug, to manage database schema changes.
+
+## Code Structure
+The code exports two asynchronous functions: `up` and `down`. 
+- `up` is responsible for creating the tables. 
+- `down` is responsible for dropping the tables. 
+Both functions use a transaction to ensure atomicity of operations. 
+They utilize the `createTable` function from `migrations-shared.ts` to define and create tables with common columns and triggers.
+
+## References
+- `shared`: refers to functions and types imported from `migrations-shared.ts`, used for common table creation logic and types.
+
+## Symbols
+
+### `up`
+#### Description
+This asynchronous function defines the 'up' migration, responsible for creating the `organization`, `facility`, and `patient` tables in the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | { context: QueryInterface } | An object containing the Sequelize QueryInterface instance, used to execute SQL queries. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise\&lt;void\&gt; | A promise that resolves when all tables are created successfully. |
+
+#### Internal Logic
+1. Starts a database transaction to ensure atomicity of table creation.
+2. Calls `shared.createTable` to create each table (`organization`, `facility`, `patient`) with their respective columns and constraints.
+3. Defines unique constraints for `facility` and `patient` tables using `uniqueKeys` option.
+4. Commits the transaction if all table creations are successful.
+
+### `down`
+#### Description
+This asynchronous function defines the 'down' migration, responsible for dropping the `patient`, `facility`, and `organization` tables from the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | { context: QueryInterface } | An object containing the Sequelize QueryInterface instance, used to execute SQL queries. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise\&lt;void\&gt; | A promise that resolves when all tables are dropped successfully. |
+
+#### Internal Logic
+1. Starts a database transaction to ensure atomicity of table dropping.
+2. Calls `queryInterface.dropTable` to drop each table in reverse order (`patient`, `facility`, `organization`).
+3. Commits the transaction if all table drops are successful.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Provides the ORM and migration framework. |
+| umzug     | Manages the execution of migrations. |
+| @metriport/core/util/error/metriport-error | Provides custom error class for error handling. |
+
+## Error Handling
+The code uses database transactions to ensure atomicity of operations. If any error occurs during the 'up' or 'down' migration, the transaction will be rolled back, preventing partial database changes.

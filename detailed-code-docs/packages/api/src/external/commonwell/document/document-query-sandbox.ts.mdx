@@ -1,0 +1,70 @@
+---
+title: "document-query-sandbox.ts"
+---
+
+## High-level description
+This code implements a sandbox environment for document querying and processing in a medical API. It simulates the process of retrieving, converting, and storing patient document references, mimicking the behavior of a production environment but with predefined data and controlled delays.
+
+## Code Structure
+The main function `sandboxGetDocRefsAndUpsert` orchestrates the document querying process. It uses helper functions and imported modules to handle various aspects such as data retrieval, document conversion, and progress tracking. The code interacts with external systems like FHIR servers and uses sandbox seed data to simulate real patient information.
+
+## Symbols
+
+### `sandboxGetDocRefsAndUpsert`
+#### Description
+This function simulates the process of retrieving document references for a patient, converting them if necessary, and upserting them to a FHIR server in a sandbox environment.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient object containing id and cxId |
+| requestId | string | A unique identifier for the request |
+
+#### Internal Logic
+1. Retrieves sandbox seed data for the patient
+2. Simulates a delay to mimic document downloading
+3. Processes each document reference:
+   - Checks if the document already exists
+   - Converts CDA documents to FHIR if necessary
+   - Adds sandbox-specific fields to the document reference
+   - Upserts the document reference to the FHIR server
+4. Updates the document query progress
+5. Processes the patient document request (webhook)
+
+### `addSandboxFields`
+#### Description
+Adds sandbox-specific fields to a document reference to simulate real-world data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docRef | DocumentReference | The document reference to modify |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docRef | DocumentReference | The modified document reference |
+
+#### Internal Logic
+- Adds random creation dates
+- Sets document status (current or superseded)
+- Adds description and type based on file extension
+- Adds a sample organization to the contained resources
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides FHIR type definitions |
+| @metriport/core | Utilities and domain models |
+| uuid-v7 | Generates UUIDs |
+
+## Error Handling
+The code uses try-catch blocks to handle errors during document processing and conversion. Errors are logged but not propagated to the caller.
+
+## Performance Considerations
+The code uses `Math.random() * sandboxSleepTime` to simulate realistic delays in document processing, which helps in mimicking real-world performance characteristics.
+
+## TODOs
+- There is a TODO comment suggesting to move the XML MIME type check to a core function `isMimeTypeXML()`.
+
+This sandbox implementation provides a controlled environment for testing and developing document querying functionality without interacting with real patient data or external systems.

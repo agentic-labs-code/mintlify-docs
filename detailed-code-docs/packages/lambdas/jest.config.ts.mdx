@@ -1,0 +1,52 @@
+---
+title: "jest.config.ts"
+---
+
+## High-level description
+This file defines the Jest configuration for testing Lambda functions in a TypeScript project. It sets up the testing environment, specifies test file patterns, and configures TypeScript compilation for tests, with support for both unit and end-to-end (E2E) testing.
+
+## Symbols
+
+### `config`
+#### Description
+This constant defines the Jest configuration object of type `JestConfigWithTsJest`. It specifies various settings for running tests in the project.
+
+#### Inputs
+N/A (This is a configuration object)
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | JestConfigWithTsJest | Jest configuration object |
+
+#### Internal Logic
+1. Sets the preset to "ts-jest" for TypeScript support.
+2. Configures the test environment as "node".
+3. Enables verbose output.
+4. Ignores test files in "/node_modules/" and "/dist/" directories.
+5. Defines test file patterns based on whether it's an E2E test or not.
+6. Specifies a setup file for the test environment.
+7. Configures the TypeScript transformation using ts-jest with a custom tsconfig path.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| path | Used for resolving file paths |
+| ts-jest | TypeScript preprocessor for Jest |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| ENV_TYPE | string | "dev" | Sets the environment type for testing |
+| E2E | string | N/A | Determines if E2E tests should be run when set to "true" |
+
+## Side Effects
+The script sets the `ENV_TYPE` environment variable to "dev".
+
+## Performance Considerations
+The configuration dynamically resolves the `tsconfig.json` file path, which may have a slight impact on startup time but ensures the correct TypeScript configuration is used regardless of the current working directory.
+
+## Notes
+1. The configuration supports both unit tests and E2E tests, determined by the `E2E` environment variable.
+2. The `tsconfig` path is dynamically resolved to support different project structures (monorepo vs. single package).
+3. The setup file `./src/__tests__/env-setup.ts` is used to configure the test environment before running tests.

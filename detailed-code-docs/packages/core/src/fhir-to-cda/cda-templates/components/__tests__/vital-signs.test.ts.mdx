@@ -1,0 +1,75 @@
+---
+title: "vital-signs.test.ts"
+---
+
+## High-level description
+This file contains unit tests for the `buildVitalSigns` function, which is responsible for converting FHIR vital signs observations into a CDA (Clinical Document Architecture) format. The tests verify the correct mapping and grouping of vital signs observations, including handling of different dates and non-vital sign observations.
+
+## Code Structure
+The test suite uses Jest and includes several test cases that check different aspects of the `buildVitalSigns` function. It uses mock data and helper functions to create test scenarios and validate the output.
+
+## Symbols
+
+### `describe.skip("buildVitalSigns", () =&gt; { ... })`
+#### Description
+This is the main test suite for the `buildVitalSigns` function. The `skip` indicates that these tests are currently skipped and not running.
+
+#### Internal Logic
+The suite contains multiple test cases that check different scenarios for vital signs conversion.
+
+### `beforeEach(() =&gt; { ... })`
+#### Description
+This function runs before each test case, setting up the initial test environment.
+
+#### Internal Logic
+- Generates a random UUID for `observationId`
+- Creates a mock observation using `makeObservation`
+- Initializes an empty FHIR bundle
+
+### `it("does not pick up non-vital-signs Observations", () =&gt; { ... })`
+#### Description
+This test case verifies that the `buildVitalSigns` function only processes vital signs observations and ignores others.
+
+#### Internal Logic
+1. Adds a vital sign observation and a non-vital sign observation to the bundle
+2. Calls `buildVitalSigns` with the bundle
+3. Checks that the result contains the vital sign observation ID but not the non-vital sign observation ID
+
+### `it("correctly maps a vital-signs Observation", () =&gt; { ... })`
+#### Description
+This test case checks if a single vital signs observation is correctly mapped to the CDA format.
+
+#### Internal Logic
+1. Adds a vital sign observation to the bundle
+2. Calls `buildVitalSigns` with the bundle
+3. Compares the result with an expected XML template
+
+### `it("correctly maps and groups a handful of vital-signs Observations taken on the same date", () =&gt; { ... })`
+#### Description
+This test case verifies that multiple vital signs observations taken on the same date are correctly grouped and mapped.
+
+#### Internal Logic
+1. Adds multiple vital sign observations with the same date to the bundle
+2. Calls `buildVitalSigns` with the bundle
+3. Compares the result with an expected XML template
+
+### `it("correctly maps and groups a handful of vital-signs Observations taken on different dates", () =&gt; { ... })`
+#### Description
+This test case checks if vital signs observations taken on different dates are correctly grouped and mapped.
+
+#### Internal Logic
+1. Adds multiple vital sign observations with different dates to the bundle
+2. Calls `buildVitalSigns` with the bundle
+3. Compares the result with an expected XML template
+
+## Dependencies
+- `@faker-js/faker`: Used for generating random data
+- `@medplum/fhirtypes`: Provides FHIR type definitions
+- `lodash`: Utility library
+- `path`: Node.js path module
+- Various imported functions and constants from local modules
+
+## Notes
+- The tests are currently skipped (`describe.skip`), which means they are not being executed. This might indicate that the tests are under development or temporarily disabled.
+- The tests rely on external XML files for expected output comparisons, which are loaded using the `getXmlContentFromFile` function.
+- The `removeEmptyFields` function is used to clean up the output before comparison, likely to handle optional fields or null values.

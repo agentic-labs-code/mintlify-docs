@@ -1,0 +1,111 @@
+---
+title: "recreate-patients-at-hies.ts"
+---
+
+## High-level description
+This code defines functions for creating, updating, and managing patient records in CommonWell, a health information exchange system. It handles patient discovery, linking patients to persons, and managing patient data across different healthcare organizations.
+
+## Code Structure
+The main functions in this file interact with the CommonWell API to perform operations on patient records. These functions use helper functions for setting up API connections, validating CommonWell enablement, and managing patient data. The code also integrates with other parts of the system, such as analytics and error capturing.
+
+## Symbols
+
+### `create`
+#### Description
+Creates a new patient record in CommonWell.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient object to be created |
+| facilityId | string | The ID of the facility |
+| getOrgIdExcludeList | function | Function to get organization IDs to exclude |
+| requestId | string (optional) | Request ID for tracking |
+| forceCWCreate | boolean (optional) | Force creation even if CW is disabled |
+| rerunPdOnNewDemographics | boolean (optional) | Rerun patient discovery on new demographics |
+| initiator | HieInitiator (optional) | The initiator of the HIE operation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | { commonwellPatientId: string; personId: string } \| void | The created patient's CommonWell ID and person ID, or void if creation is skipped |
+
+#### Internal Logic
+1. Validates if CommonWell is enabled for the patient and facility
+2. Updates patient discovery status to "processing"
+3. Calls `registerAndLinkPatientInCW` to create the patient in CommonWell
+4. Handles patient discovery and document querying based on the result
+
+### `update`
+#### Description
+Updates an existing patient record in CommonWell.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient object to be updated |
+| facilityId | string | The ID of the facility |
+| getOrgIdExcludeList | function | Function to get organization IDs to exclude |
+| requestId | string (optional) | Request ID for tracking |
+| forceCWUpdate | boolean (optional) | Force update even if CW is disabled |
+| rerunPdOnNewDemographics | boolean (optional) | Rerun patient discovery on new demographics |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | void | No return value |
+
+#### Internal Logic
+1. Validates if CommonWell is enabled for the patient and facility
+2. Updates patient discovery status to "processing"
+3. Calls `updatePatientAndLinksInCw` to update the patient in CommonWell
+4. Handles patient discovery and document querying based on the result
+
+### `get`
+#### Description
+Retrieves a patient record from CommonWell.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient object to retrieve |
+| facilityId | string | The ID of the facility |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | CommonwellPatient \| undefined | The retrieved CommonWell patient object or undefined if not found |
+
+### `remove`
+#### Description
+Removes a patient record from CommonWell.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient object to remove |
+| facilityId | string | The ID of the facility |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | void | No return value |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/commonwell-sdk | Provides CommonWell API functionality |
+| @metriport/core | Core domain models and utilities |
+| @metriport/shared | Shared utilities and functions |
+
+## Error Handling
+The code uses try-catch blocks to handle errors in API calls and other operations. Errors are logged and captured using a capture utility, likely for monitoring and debugging purposes.
+
+## Logging
+The code uses a custom logging utility (`out`) to log information and debug messages throughout the execution of various functions.
+
+## TODOs
+- TODO paginate this
+- TODO consider moving this to Promise.all()
+- TODO 1646 Move to a single hit to the DB
+- TODO Internal #1832 (rework)

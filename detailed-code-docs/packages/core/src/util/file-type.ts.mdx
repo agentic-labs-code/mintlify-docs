@@ -1,0 +1,99 @@
+---
+title: "file-type.ts"
+---
+
+## High-level description
+This code provides utility functions for detecting and handling file types, primarily focusing on MIME types and file extensions. It includes functions to detect file types from buffers or strings, check if a MIME type is XML, and parse files from strings or buffers, with special handling for XML files containing non-XML bodies.
+
+## Code Structure
+The main functions `detectFileType`, `isASCIIChar`, `isLikelyTextFile`, and `isContentTypeAccepted` work together to identify file types. The `detectFileType` function is the core functionality, using magic numbers to determine file types. Other functions like `isXMLContentType` and `isContentTypeAccepted` provide specific checks for XML and accepted content types.
+
+## Symbols
+
+### `isASCIIChar`
+#### Description
+Checks if a given character code represents an ASCII character.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| char | number | The character code to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | boolean | True if the character is ASCII, false otherwise |
+
+### `isLikelyTextFile`
+#### Description
+Determines if a file is likely to be a text file based on the proportion of readable ASCII characters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileBuffer | Buffer | The file content as a buffer |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | boolean | True if the file is likely a text file, false otherwise |
+
+### `detectFileType`
+#### Description
+Detects the file type based on magic numbers or content analysis.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| param | Buffer \| string | The file content as a buffer or string |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | DetectedFileType | Object containing mimeType and fileExtension |
+
+#### Internal Logic
+1. Convert input to Buffer if it's a string
+2. Check for known magic numbers to identify file types
+3. If no match, check if it's likely a text file
+4. Return default octet-stream type if unidentified
+
+### `isContentTypeAccepted`
+#### Description
+Checks if a given MIME type is in the list of accepted content types.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| mimeType | string \| undefined | The MIME type to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | boolean | True if the MIME type is accepted, false otherwise |
+
+### `isXMLContentType`
+#### Description
+Checks if a buffer starts with XML magic numbers.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bytesBuffer | Buffer | The buffer to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | boolean | True if the buffer starts with XML magic numbers, false otherwise |
+
+## Dependencies
+The code relies on the following external libraries:
+| Dependency | Purpose |
+|:-----------|:--------|
+| Buffer | For handling binary data |
+
+## Configuration
+The code defines several constants for magic numbers and ASCII character codes, which are used in the file type detection process.
+
+## Performance Considerations
+The `detectFileType` function uses a series of conditional checks, which may impact performance for large numbers of files. Consider optimizing this if processing large volumes of files.

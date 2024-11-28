@@ -1,0 +1,79 @@
+---
+title: "example.js"
+---
+
+## High-level description
+This code defines three functions used in Artillery.io for load testing HTTP endpoints. These functions serve as hooks for processing requests and responses, as well as a processor function for modifying the user context during test execution.
+
+## Symbols
+
+### `functionFromProcessor`
+#### Description
+An asynchronous function that modifies the user context by adding a new variable. It's designed to be used as a processor function in Artillery scenarios.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| userContext | Object | The context object for the current user/virtual user |
+| events | Object | Event emitter for the current scenario |
+| done | Function | Callback function to signal completion |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Promise | A promise that resolves when `done()` is called |
+
+#### Internal Logic
+1. Adds a new property `requestBodyFromProcessor` to `userContext.vars` with the value "something".
+2. Calls the `done()` callback to continue scenario execution.
+
+### `setJSONBody`
+#### Description
+A function intended to be used as a `beforeRequest` hook in Artillery scenarios. It's designed to modify the request parameters before sending the request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| requestParams | Object | The current request parameters |
+| context | Object | The context for the current virtual user |
+| ee | Object | Event emitter for the current scenario |
+| next | Function | Callback function to signal completion |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | undefined | No explicit return value |
+
+#### Internal Logic
+The function is currently empty, with only a comment placeholder. It's intended to set the JSON body of the request before it's sent. The `next()` function is called to continue the scenario execution.
+
+### `logHeaders`
+#### Description
+A function designed to be used as an `afterResponse` hook in Artillery scenarios. It logs the response headers after receiving a response.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| requestParams | Object | The request parameters used |
+| response | Object | The received response object |
+| context | Object | The context for the current virtual user |
+| ee | Object | Event emitter for the current scenario |
+| next | Function | Callback function to signal completion |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | undefined | No explicit return value |
+
+#### Internal Logic
+1. Logs the response headers to the console using `console.log(response.headers)`.
+2. Calls the `next()` function to continue the scenario execution.
+
+## Side Effects
+- `logHeaders` function logs response headers to the console, which could affect system performance if there are many requests or large header sets.
+
+## Dependencies
+The code relies on the Artillery.io framework for load testing, as evidenced by the function signatures and comments referencing Artillery documentation.
+
+## TODOs
+The `setJSONBody` function is currently empty with only a comment placeholder. It needs to be implemented to set the JSON body of the request before sending.

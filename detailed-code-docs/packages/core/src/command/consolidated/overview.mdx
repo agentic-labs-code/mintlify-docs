@@ -1,0 +1,74 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for handling consolidated patient data in a medical data system. It provides functionality for executing consolidated data requests, both synchronously and asynchronously, and interacting with AWS S3 for storage and retrieval of consolidated FHIR bundles. The code is designed to work in both development and production environments, using different connectors based on the current environment.
+
+## What does it do?
+The code in this directory performs the following main functions:
+
+1. Defines interfaces and types for consolidated data requests and responses.
+2. Provides a factory function to create the appropriate data connector based on the environment (development or production).
+3. Implements connectors for local development and AWS Lambda-based production environments.
+4. Handles the process of generating consolidated FHIR bundles from patient data.
+5. Manages the storage and retrieval of consolidated bundles in AWS S3.
+6. Supports both synchronous and asynchronous data request processing.
+7. Implements error handling and retry logic for network operations.
+
+For example, when a user or system requests consolidated patient data, this code will:
+1. Receive the request with specified parameters (e.g., patient ID, date range, resource types).
+2. Generate a consolidated FHIR bundle containing the requested data.
+3. Upload the bundle to S3 for storage.
+4. For asynchronous requests, notify an API endpoint about the completed consolidation.
+5. Return information about the location and filename of the stored bundle.
+
+## Entry points
+The main entry point for this directory is the `buildConsolidatedDataConnector()` function in the `consolidated-connector-factory.ts` file. This function determines whether to use the local or Lambda-based connector based on the current environment.
+
+The data flow typically follows this path:
+1. The factory function creates the appropriate connector.
+2. The connector's `execute()` method is called with the request parameters.
+3. For local execution, the process involves generating the FHIR bundle, uploading it to S3, and optionally notifying an API.
+4. For Lambda-based execution, the process involves invoking an AWS Lambda function to handle the consolidation.
+
+## Key Files
+1. `consolidated-connector.ts`: Defines the main interfaces and types used throughout the directory.
+2. `consolidated-connector-factory.ts`: Contains the factory function for creating the appropriate connector.
+3. `consolidated-connector-local.ts`: Implements the connector for local development environments.
+4. `consolidated-connector-lambda.ts`: Implements the connector for AWS Lambda-based production environments.
+5. `consolidated-on-s3.ts`: Provides functions for interacting with AWS S3 for storing and retrieving consolidated bundles.
+
+## Dependencies
+The code relies on several external libraries and internal modules:
+
+1. AWS SDK: Used for interacting with AWS services, particularly Lambda and S3.
+2. dayjs: A lightweight date manipulation library.
+3. axios: Used for making HTTP requests in the local connector.
+4. @medplum/fhirtypes: Provides FHIR resource type definitions.
+5. @metriport/shared: Contains utility functions and shared types.
+6. @metriport/api-sdk: Provides types related to consolidation conversion.
+
+Internal dependencies include various utility modules for configuration, AWS interactions, and FHIR data handling.
+
+## Configuration
+The code uses a `Config` utility to manage environment-specific settings. Key configurable aspects include:
+
+1. Environment detection (development vs. production)
+2. S3 bucket names for storing medical documents
+3. API URLs for notifications
+4. AWS region settings
+5. Lambda function names and timeouts
+
+Example configuration usage:
+```typescript
+const isDev = Config.isDev();
+const bucketName = Config.getMedicalDocumentsBucketName();
+const apiUrl = Config.getApiUrl();
+```
+
+The code also includes some hardcoded configuration values, such as:
+- Maximum number of API notification attempts: 5
+- Timeout for Lambda function calls: 15 minutes and 2 seconds
+
+These configurations allow the system to adapt to different environments and adjust its behavior accordingly.

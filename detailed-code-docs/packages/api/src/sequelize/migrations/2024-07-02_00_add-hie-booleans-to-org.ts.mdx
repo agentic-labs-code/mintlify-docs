@@ -1,0 +1,57 @@
+---
+title: "2024-07-02_00_add-hie-booleans-to-org.ts"
+---
+
+## High-level description
+This migration script adds two new boolean columns, `cq_active` and `cw_active`, to the `organization` table in the database. These columns likely indicate whether certain features (CQ and CW) are active for a given organization.
+
+## Symbols
+
+### `up`
+#### Description
+This asynchronous function defines the steps to apply the migration, adding the `cq_active` and `cw_active` columns to the `organization` table.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | { context: QueryInterface } | An object containing the `queryInterface` object, which provides methods for interacting with the database schema. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise\&lt;void\&gt; | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. **Start a transaction:** It begins a database transaction to ensure both column additions are atomic.
+2. **Add `cq_active` column:** It uses `queryInterface.addColumn` to add the `cq_active` column to the `organization` table. The column is defined as a `BOOLEAN` with a default value of `false` and is not nullable.
+3. **Add `cw_active` column:** Similarly, it adds the `cw_active` column with the same data type, default value, and nullability constraints.
+4. **Commit transaction:** The transaction is implicitly committed if all operations within it succeed.
+
+### `down`
+#### Description
+This asynchronous function defines the steps to revert the migration, removing the `cq_active` and `cw_active` columns from the `organization` table.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | { context: QueryInterface } | An object containing the `queryInterface` object, which provides methods for interacting with the database schema. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise\&lt;void\&gt; | A promise that resolves when the migration rollback is complete. |
+
+#### Internal Logic
+1. **Start a transaction:** It begins a database transaction to ensure both column removals are atomic.
+2. **Remove `cw_active` column:** It uses `queryInterface.removeColumn` to remove the `cw_active` column from the `organization` table.
+3. **Remove `cq_active` column:** Similarly, it removes the `cq_active` column.
+4. **Commit transaction:** The transaction is implicitly committed if all operations within it succeed.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Provides the database interface and data types. |
+| umzug |  Manages database migrations. |
+
+## References
+- This migration script is referenced and executed by the `getUmzug` and `updateDB` functions in the `packages/api/src/sequelize/index.ts` file. 

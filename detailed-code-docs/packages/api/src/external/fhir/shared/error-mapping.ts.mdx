@@ -1,0 +1,91 @@
+---
+title: "error-mapping.ts"
+---
+
+## High-level description
+This code provides functionality for mapping and categorizing FHIR (Fast Healthcare Interoperability Resources) errors. It includes functions to determine the type of FHIR error, group errors by resource type and element, and report these errors.
+
+## Code Structure
+The main symbols in this code are `tryDetermineFhirError`, `groupFHIRErrors`, and `reportFHIRError`. These functions work together to process, categorize, and report FHIR errors. The `tryDetermineFhirError` function is used to determine the type of error, `groupFHIRErrors` is used to group similar errors, and `reportFHIRError` is used to log and capture these errors.
+
+## References
+This code references other parts of the codebase, including:
+- `@medplum/core` for `OperationOutcomeError`
+- `@metriport/core/util/notifications` for `capture`
+- `@metriport/core/util/log` for logging utilities
+
+## Symbols
+
+### `tryDetermineFhirError`
+#### Description
+This function attempts to determine the type of FHIR error from a given error object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| error | unknown | The error object to analyze |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | FhirError | An object describing the type and details of the FHIR error |
+
+#### Internal Logic
+1. Checks if the error is an `OperationOutcomeError`
+2. If so, it processes the issues in the error
+3. If not, it checks for specific error strings to determine if it's a timeout error
+4. If none of the above, it returns an unknown error type
+
+### `groupFHIRErrors`
+#### Description
+This function groups FHIR errors by their resource type and element.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| errors | FhirErrorMapping[] | An array of FHIR error mappings |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | FhirErrorGroup | An object grouping errors by resource type and element |
+
+#### Internal Logic
+1. Uses the `groupBy` function from lodash to group errors
+2. The grouping key is created by combining the resource type and element (if present)
+
+### `reportFHIRError`
+#### Description
+This function reports FHIR errors by logging them and capturing them for further analysis.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docId | string | The document ID associated with the error |
+| error | unknown | The error object |
+| context | string | The context in which the error occurred |
+| log | Function | A logging function |
+| extra | Extras | Additional information to include with the error |
+
+#### Internal Logic
+1. Determines the type of error using `tryDetermineFhirError`
+2. If it's a mapping error, it groups the errors using `groupFHIRErrors`
+3. Logs the errors and captures them using the provided `capture.error` function
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/core | Provides `OperationOutcomeError` type |
+| lodash | Used for utility functions like `capitalize` and `groupBy` |
+| @sentry/types | Provides `Extras` type for error reporting |
+| @metriport/core/util/notifications | Provides `capture` function for error reporting |
+| @metriport/core/util/log | Provides logging utilities |
+
+## Error Handling
+This code is primarily focused on handling and categorizing FHIR-related errors. It provides a structured way to determine the type of error (mapping, timeout, or unknown) and group similar errors together.
+
+## Logging
+The code uses a provided logging function to log error details. The logging is done in the `reportFHIRError` function.
+
+## TODOs
+There are no explicit TODOs in this code.

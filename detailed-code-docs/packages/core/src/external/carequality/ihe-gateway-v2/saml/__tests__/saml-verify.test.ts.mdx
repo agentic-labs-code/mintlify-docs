@@ -1,0 +1,64 @@
+---
+title: "saml-verify.test.ts"
+---
+
+## High-level description
+This code contains unit tests for the SAML (Security Assertion Markup Language) verification functionality, specifically testing edge cases of the `verifySaml` function. The tests cover scenarios with valid and invalid inputs, including different public certificates and XML strings.
+
+## Symbols
+
+### `describe("SAML Verification Edge Cases", () =&gt; { ... })`
+#### Description
+This is the main test suite for SAML verification edge cases. It contains multiple test cases to ensure the `verifySaml` function behaves correctly under various conditions.
+
+### `it("should return true when verifying SAML signature with valid public key in XML", () =&gt; { ... })`
+#### Description
+This test case verifies that the `verifySaml` function returns `true` when given a valid XML string and a valid public certificate.
+
+#### Internal Logic
+1. Reads a valid SAML XML from a file.
+2. Uses a test certificate (`TEST_CERT`) as the public key.
+3. Calls `verifySaml` with the XML string and public certificate.
+4. Expects the result to be `true`.
+
+### `it("should return false when verifying SAML signature with invalid public key in XML", () =&gt; { ... })`
+#### Description
+This test case checks that the `verifySaml` function returns `false` when given a valid XML string but an invalid public certificate.
+
+#### Internal Logic
+1. Uses the same valid SAML XML as the previous test.
+2. Provides an invalid certificate string.
+3. Calls `verifySaml` with the XML string and invalid certificate.
+4. Expects the result to be `false`.
+
+### `it("should return false when verifying SAML signature with invalid XML", () =&gt; { ... })`
+#### Description
+This test case ensures that the `verifySaml` function returns `false` when given an invalid XML string.
+
+#### Internal Logic
+1. Uses an invalid XML string.
+2. Calls `verifySaml` with the invalid XML string and a valid test certificate.
+3. Expects the result to be `false`.
+
+### `it("should return false when verifying SAML signature with empty xml", () =&gt; { ... })`
+#### Description
+This test case verifies that the `verifySaml` function returns `false` when given an empty XML string.
+
+#### Internal Logic
+1. Provides an empty string as the XML input.
+2. Calls `verifySaml` with the empty XML string and a valid test certificate.
+3. Expects the result to be `false`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| `verifySaml` | The main function being tested, imported from "../security/verify" |
+| `fs` | Used to read the test XML file |
+| `path` | Used to construct the file path for the test XML file |
+| `TEST_CERT` | A constant containing a test certificate, imported from "../../outbound/__tests__/constants" |
+
+## References
+- The `verifySaml` function from "../security/verify" is the main subject of these tests.
+- `TEST_CERT` from "../../outbound/__tests__/constants" is used as a valid test certificate.
+
+This test file ensures that the SAML verification function handles various edge cases correctly, including valid and invalid inputs for both the XML string and the public certificate. It helps maintain the reliability and security of the SAML verification process in the application.

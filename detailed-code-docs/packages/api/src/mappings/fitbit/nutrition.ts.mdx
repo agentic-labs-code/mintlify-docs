@@ -1,0 +1,52 @@
+---
+title: "nutrition.ts"
+---
+
+## High-level description
+This code defines a function `mapToNutrition` that transforms Fitbit food and water data into the standardized `Nutrition` type used in the application. It extracts relevant information from Fitbit's data structures and maps them to corresponding fields in the `Nutrition` object, including macros, food details, and water intake.
+
+## Symbols
+
+### `mapToNutrition`
+#### Description
+This function takes Fitbit food and water data for a specific date and maps it to a `Nutrition` object, which represents nutritional information in a standardized format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| date | string | The date for which the nutrition data is being mapped (in YYYY-MM-DD format). |
+| food | FitbitFood | An object containing Fitbit food data. |
+| water | FitbitWater | An object containing Fitbit water consumption data. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| nutrition | Nutrition | A `Nutrition` object containing the mapped nutrition data. |
+
+#### Internal Logic
+1. **Initialize `Nutrition` object:**
+   - Creates a `metadata` object with the provided `date` and `PROVIDER_FITBIT` as the source.
+   - Initializes an empty `Nutrition` object with the `metadata` and an empty `foods` array. The `summary` object is initialized with an empty `macros` object.
+2. **Process Food Data (if provided):**
+   - If `food` data is provided:
+     - Extracts macro nutrients (carbs, fat, fiber, protein, sodium) from `food.summary` and populates the `nutrition.summary.macros` object.
+     - Iterates through each `foodItem` in `food.foods`:
+       - Creates a `Food` object with details like `name`, `brand`, `amount`, and `unit`.
+       - If `nutritionalValues` exist for the `foodItem`, it extracts and maps the macro nutrients to the `Food` object's `nutrition_facts.macros` object.
+       - Pushes the created `Food` object to the `nutrition.foods` array.
+3. **Process Water Data (if provided):**
+   - If `water` data is provided:
+     - Extracts total water consumption (`water.summary.water`) and adds it to the `nutrition.summary.macros` object as `water_ml`.
+4. **Return `Nutrition` object:**
+   - Returns the fully populated `Nutrition` object.
+
+## References
+- `Nutrition`: This type is referenced from the `@metriport/api-sdk` package, indicating a shared data model across the application.
+- `PROVIDER_FITBIT`: A constant likely defining the string "Fitbit" to denote the data source.
+- `FitbitFood`: A type representing Fitbit food data structure.
+- `FitbitWater`: A type representing Fitbit water consumption data structure.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides the standardized `Nutrition` type and potentially other shared data models. | 

@@ -1,0 +1,65 @@
+---
+title: "get-cw-data.ts"
+---
+
+## High-level description
+This code provides functionality to retrieve CommonWell (CW) patient data from a database. It offers two main functions: one to fetch the data and return undefined if not found, and another to fetch the data and throw a NotFoundError if not found.
+
+## Symbols
+
+### `getCwPatientData`
+#### Description
+This function retrieves CommonWell patient data from the database based on the provided id and customer id (cxId).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The patient's identifier |
+| cxId | string | The customer's identifier |
+| transaction | Transaction (optional) | A Sequelize transaction object |
+| lock | boolean (optional) | Whether to lock the row for update (default: false) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cwPatientData | CwPatientDataModel \| undefined | The retrieved CW patient data or undefined if not found |
+
+#### Internal Logic
+1. Uses Sequelize's `findOne` method to query the database.
+2. Applies the `where` clause with `cxId` and `id`.
+3. Optionally uses a transaction and row lock.
+4. Returns the found data or undefined.
+
+### `getCwPatientDataOrFail`
+#### Description
+This function retrieves CommonWell patient data and throws a NotFoundError if the data is not found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | GetCwData | An object containing id, cxId, and optional transaction and lock properties |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cwPatientData | CwPatientDataModel | The retrieved CW patient data |
+
+#### Internal Logic
+1. Calls `getCwPatientData` with the provided parameters.
+2. If data is not found, throws a NotFoundError with details about the failed lookup.
+3. Returns the found data.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/util/error/not-found | Provides the NotFoundError class for error handling |
+| sequelize | Used for database transactions |
+
+## Error Handling
+The `getCwPatientDataOrFail` function throws a `NotFoundError` when the requested patient data is not found in the database. This error includes the `id` and `cxId` used in the lookup attempt.
+
+## References
+- The `CwPatientDataModel` is referenced but not defined in this file. It's likely defined in a related model file.
+- The `GetCwData` type is defined in this file and used as the parameter type for both functions.
+
+This code is part of a larger system dealing with CommonWell patient data, as evidenced by the related files that handle creation, updating, and deletion of CW patient data. It provides a crucial data retrieval functionality that can be used in various parts of the application where CommonWell patient data is needed.

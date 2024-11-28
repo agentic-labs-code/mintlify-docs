@@ -1,0 +1,67 @@
+---
+title: "pull-request_carequality-sdk.yml"
+---
+
+## High-level description
+This GitHub Actions workflow file defines automated checks for pull requests and merge groups related to the Carequality SDK. It triggers on pull requests that modify files in the "packages/carequality-sdk" directory, merge group events, and manual workflow dispatches.
+
+## Code Structure
+The workflow consists of two jobs: "check-commits" and "check-pr", both of which use reusable workflows defined in separate files.
+
+## Symbols
+
+### `name`
+#### Description
+Specifies the name of the GitHub Actions workflow.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | string | The name of the workflow |
+
+### `on`
+#### Description
+Defines the events that trigger the workflow.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| pull_request | object | Configures the workflow to run on pull request events |
+| merge_group | null | Triggers the workflow on merge group events |
+| workflow_dispatch | null | Allows manual triggering of the workflow |
+
+### `jobs`
+#### Description
+Defines the jobs to be executed as part of the workflow.
+
+#### Internal Logic
+1. `check-commits`: Uses a reusable workflow defined in `_check-commits.yml`
+2. `check-pr`: Uses a reusable workflow defined in `_build.yml` with specific inputs
+
+### `check-commits` (job)
+#### Description
+Runs a reusable workflow to check commits.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| uses | string | Path to the reusable workflow file |
+| secrets | string | Specifies that all secrets should be passed to the reusable workflow |
+
+### `check-pr` (job)
+#### Description
+Runs a reusable workflow to build and check the pull request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| uses | string | Path to the reusable workflow file |
+| with | object | Input parameters for the reusable workflow |
+| secrets | string | Specifies that all secrets should be passed to the reusable workflow |
+
+## Dependencies
+This workflow depends on two other workflow files:
+| Dependency | Purpose |
+|:-----------|:--------|
+| ./.github/workflows/_check-commits.yml | Reusable workflow for checking commits |
+| ./.github/workflows/_build.yml | Reusable workflow for building and checking the pull request |

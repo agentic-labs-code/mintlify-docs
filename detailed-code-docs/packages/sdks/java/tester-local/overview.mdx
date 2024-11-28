@@ -1,0 +1,82 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the local Java SDK tester for the Metriport API. It includes a set of JUnit test classes that demonstrate the usage of the Metriport Java SDK, covering various functionalities such as patient management, document creation, and data querying. The project is designed to use the locally generated Fern Java SDK and run tests against the Metriport API.
+
+## What does it do?
+The tester performs the following tasks:
+
+1. Initializes the Metriport client using API credentials stored in environment variables.
+2. Creates new patient records with personal identifiers and address information.
+3. Retrieves patient information, both for all patients and for specific patients by ID.
+4. Creates and uploads FHIR-compliant DocumentReferences.
+5. Matches existing patients based on demographic information.
+6. Starts consolidated queries for patient data, specifically for Encounter resources within a date range.
+
+These tests serve as examples of how to use the Metriport SDK in a Java application, covering key API functionalities and data structures.
+
+## Key Files
+
+1. **TestClient.java**: 
+   - Demonstrates basic client initialization and a simple API call to list patients.
+   - Serves as a sanity check for SDK setup and connectivity.
+
+2. **TestCreatePatient.java**: 
+   - Shows how to create a new patient record with detailed information.
+   - Demonstrates the use of various data structures like PersonalIdentifier, DriversLicense, and Address.
+
+3. **TestGetPatient.java**: 
+   - Contains two tests: one for retrieving all patients and another for getting a specific patient by ID.
+   - Illustrates different query methods available in the SDK.
+
+4. **TestCreateDocumentReference.java**: 
+   - Demonstrates the creation of a FHIR-compliant DocumentReference.
+   - Shows how to construct complex FHIR objects and upload them to the Metriport API.
+
+5. **TestMatchPatient.java**: 
+   - Illustrates the process of creating a patient and then matching the same patient using demographic information.
+   - Useful for understanding patient matching capabilities of the API.
+
+6. **TestStartConsolidatedQuery.java**: 
+   - Shows how to initiate a consolidated query for patient data.
+   - Focuses on retrieving Encounter resources for a specific date range and converting the result to PDF format.
+
+## Dependencies
+The test classes rely on the following main dependencies:
+
+1. **com.metriport.generated.Metriport**: The core Metriport SDK client, used for interacting with the Metriport API.
+2. **org.junit.jupiter.api.Test**: JUnit 5 testing framework, used for structuring and running the tests.
+3. **io.github.cdimascio.dotenv.Dotenv**: Library for loading environment variables from a .env file, used for managing API credentials and configuration.
+
+## Configuration
+The tests use environment variables for configuration, which are typically loaded from a .env file. Key configuration options include:
+
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| API_KEY | String | API key for authenticating with the Metriport API |
+| BASE_URL | String | Base URL for the Metriport API |
+| PATIENT_ID | String | ID of a specific patient (used in some tests) |
+| FACILITY_ID | String | ID of the facility (used in patient creation) |
+
+These environment variables should be properly set before running the tests to ensure successful API interactions.
+
+To regenerate the Java SDK locally for testing, run:
+```bash
+fern generate --group test
+```
+
+To run the tests, execute:
+```bash
+./gradlew test
+```
+
+For adding more tests, it's recommended to open the java directory in IntelliJ to get autocomplete and intellisense support.
+
+## Notes
+1. The tests are primarily designed to demonstrate SDK usage rather than perform comprehensive assertions. In a production environment, more robust error handling and assertions would be necessary.
+2. Some tests use hardcoded values for patient details, which should be replaced with dynamic or parameterized data in real-world scenarios.
+3. The tests cover a range of Metriport API functionalities, providing a good starting point for developers to understand how to use the SDK for various tasks related to patient data management and querying.
+4. Error handling in these tests is minimal, often just printing error messages. In a production environment, more sophisticated error handling and logging would be advisable.
+5. The tests demonstrate the use of FHIR-compliant data structures, which is important for healthcare data interoperability.

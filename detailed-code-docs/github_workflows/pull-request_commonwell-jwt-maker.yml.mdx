@@ -1,0 +1,60 @@
+---
+title: "pull-request_commonwell-jwt-maker.yml"
+---
+
+## High-level description
+This GitHub Actions workflow file defines a set of checks to be run on pull requests that affect the `commonwell-jwt-maker` package. It ensures that commits are properly formatted and that the package builds successfully before allowing the pull request to be merged.
+
+## Code Structure
+The workflow consists of two main jobs: `check-commits` and `check-pr`, both of which use reusable workflows defined in separate files.
+
+## Symbols
+
+### Workflow
+#### Description
+This GitHub Actions workflow is triggered on pull requests that modify files in the `packages/commonwell-jwt-maker` directory, when a merge group is created, or manually via workflow dispatch.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| pull_request | event | Pull request event data |
+| merge_group | event | Merge group event data |
+| workflow_dispatch | event | Manual workflow dispatch event data |
+
+#### Internal Logic
+1. Defines the trigger events for the workflow.
+2. Specifies two jobs to be run: `check-commits` and `check-pr`.
+
+### Job: check-commits
+#### Description
+This job uses a reusable workflow defined in `.github/workflows/_check-commits.yml` to verify the format and content of commits in the pull request.
+
+#### Inputs
+None specified in this file.
+
+#### Internal Logic
+Uses the reusable workflow `.github/workflows/_check-commits.yml` with inherited secrets.
+
+### Job: check-pr
+#### Description
+This job uses a reusable workflow defined in `.github/workflows/_build.yml` to build and check the `commonwell-jwt-maker` package.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| path | string | The path to the package directory |
+
+#### Internal Logic
+Uses the reusable workflow `.github/workflows/_build.yml` with the specified path and inherited secrets.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ./.github/workflows/_check-commits.yml | Reusable workflow for checking commits |
+| ./.github/workflows/_build.yml | Reusable workflow for building and checking the package |
+
+## Notes
+- The workflow is specifically tailored for the `commonwell-jwt-maker` package.
+- It uses reusable workflows, which helps maintain consistency across different packages and reduces duplication.
+- The `secrets: inherit` statement ensures that necessary secrets are passed to the reusable workflows.
+- The workflow is triggered only when changes are made to files within the `packages/commonwell-jwt-maker` directory, optimizing CI/CD resources.

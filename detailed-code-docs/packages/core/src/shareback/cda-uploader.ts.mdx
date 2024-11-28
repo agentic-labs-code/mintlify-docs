@@ -1,0 +1,68 @@
+---
+title: "cda-uploader.ts"
+---
+
+## High-level description
+This code defines a function `cdaDocumentUploaderHandler` that handles the uploading of CDA (Clinical Document Architecture) documents to an S3 bucket. It also creates and uploads associated metadata files for these documents.
+
+## Code Structure
+The main function `cdaDocumentUploaderHandler` uses utility functions from other modules to create file paths, upload files to S3, and create metadata files. It also uses error handling and logging utilities.
+
+## References
+- `createUploadFilePath` and `createUploadMetadataFilePath` from "../domain/document/upload"
+- `S3Utils` from "../external/aws/s3"
+- `MetriportError` from "../util/error/metriport-error"
+- `out` from "../util/log"
+- `XML_APP_MIME_TYPE` from "../util/mime"
+- `sizeInBytes` from "../util/string"
+- `createAndUploadDocumentMetadataFile` from "./create-and-upload-extrinsic-object"
+
+## Symbols
+
+### `cdaDocumentUploaderHandler`
+#### Description
+This asynchronous function handles the uploading of a CDA document to an S3 bucket and creates an associated metadata file.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+| bundle | string | CDA document content |
+| medicalDocumentsBucket | string | S3 bucket name for medical documents |
+| region | string | AWS region |
+| organization | Organization | Organization information |
+| docId | string | Document ID |
+| docRef | DocumentReference | (Optional) Document reference |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Promise&lt;void&gt; | Resolves when the upload is complete |
+
+#### Internal Logic
+1. Creates a logger with customer and patient IDs.
+2. Calculates the file size of the CDA document.
+3. Creates an S3Utils instance.
+4. Generates the destination key for the file in S3.
+5. Uploads the CDA document to S3.
+6. Creates a metadata file name.
+7. Creates and uploads the metadata file using `createAndUploadDocumentMetadataFile`.
+
+#### Error Handling
+- Catches and logs errors during file upload and metadata creation.
+- Throws `MetriportError` with additional context information.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides types for FHIR resources |
+| @metriport/shared | Provides utility functions |
+
+## Error Handling
+The function uses try-catch blocks to handle errors during file upload and metadata creation. It logs the errors and throws a `MetriportError` with additional context information.
+
+## Logging
+The code uses a custom logging utility (`out`) to log information about the upload process and any errors that occur.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

@@ -1,0 +1,59 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for handling inbound Cross-Community Patient Discovery (XCPD) requests and responses in an Integrating the Healthcare Enterprise (IHE) gateway. It focuses on processing and creating ITI-55 messages, which are used for patient discovery across different healthcare communities. The code is divided into two main parts: one for processing incoming requests and another for creating outbound responses.
+
+## What does it do?
+The code in this directory performs several key functions:
+
+1. Processing inbound XCPD requests:
+   - Validates the structure of incoming XCPD requests using Zod schemas.
+   - Parses XML-based requests and transforms them into standardized patient resource formats.
+   - Extracts patient information including demographics, identifiers, and other required data.
+   - Handles authentication by processing SAML (Security Assertion Markup Language) headers.
+   - Stores processed requests for monitoring purposes.
+
+2. Creating XCPD responses:
+   - Generates SOAP XML responses for patient discovery queries.
+   - Creates different parts of the response, such as security headers, query parameters, and patient information.
+   - Handles patient demographic information and query acknowledgments.
+   - Determines acknowledgment and query response codes based on patient match results.
+
+In simpler terms, this code acts as both a translator and a responder for patient discovery requests in a healthcare interoperability context. It ensures that incoming information is correct and complete, converts it into a standardized format, and then generates appropriate responses based on the processed data.
+
+## Key Files
+
+### schema.ts (in the 'process' subdirectory)
+Defines Zod schemas for validating XCPD requests, including structures for patient names, identification numbers, query parameters, and the overall ITI-55 request structure.
+
+### xcpd-request.ts (in the 'process' subdirectory)
+Contains the main logic for processing XCPD requests, including:
+- `transformIti55RequestToPatientResource`: Converts parsed ITI-55 requests into standardized patient resource formats.
+- `processInboundXcpdRequest`: Handles the entire process of receiving, validating, and processing an XCPD request.
+
+### create.ts (in the 'create' subdirectory)
+Defines functions for creating XCPD responses, including:
+- `createInboundXcpdResponse`: Orchestrates the creation of the XCPD response in XML format.
+- `createQueryByParameter`: Generates the query parameters section of the response.
+- `createSubjectAndRegistrationEvent`: Creates the subject and registration event section with patient demographic information.
+- `createAckAndQueryResponseCode`: Determines acknowledgment and query response codes.
+- `createIti55SoapBody`: Constructs the main SOAP body for the XCPD response.
+
+## Dependencies
+The code relies on several external libraries and internal modules:
+
+1. Zod: Used for schema declaration and validation.
+2. fast-xml-parser: Employed for efficient parsing and building of XML.
+3. dayjs: Used for date manipulation.
+4. uuid: Generates unique identifiers.
+5. @metriport/ihe-gateway-sdk: Provides types and schemas specific to the IHE gateway.
+6. @metriport/shared: Contains utility functions used throughout the code.
+
+These dependencies were chosen for their performance, ease of use, and specific functionality required for processing healthcare-related data and protocols.
+
+## Configuration
+While there are no explicit configuration files, the code uses several imported schemas and utility functions from other parts of the project. It also uses a custom logging function `out` for consistent log formatting across the application.
+
+In conclusion, this directory plays a crucial role in the IHE gateway by handling both the ingress of patient discovery requests and the creation of appropriate responses. It ensures data integrity, standardizes the format of patient information, and prepares the data for further processing within the system. The use of strong typing and schema validation helps maintain data quality and reduces the likelihood of errors in downstream processes.

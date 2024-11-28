@@ -1,0 +1,74 @@
+---
+title: "validate-converted-xmls.ts"
+---
+
+## High-level description
+This code implements a validation process for converted XML files in a FHIR (Fast Healthcare Interoperability Resources) context. It reads XML files, converts them to FHIR format, and then validates the converted data against a FHIR schema, logging any validation errors encountered.
+
+## Code Structure
+The main function `main()` orchestrates the entire process, calling `convert()` to transform XML files and `validateXml()` to check the converted data. The `Validator` from the `jsonschema` library is used for schema validation, and `Axios` is employed for making API calls to the converter service.
+
+## Symbols
+
+### `main()`
+#### Description
+This asynchronous function is the entry point of the script. It processes XML files, converts them to FHIR format, validates the converted data, and logs any validation errors.
+
+#### Internal Logic
+1. Retrieves XML file names from a specified folder.
+2. Iterates through each file, converting and validating it.
+3. Logs validation errors and writes them to an output file.
+
+### `validateXml(bundle: FHIRBundle)`
+#### Description
+Validates a FHIR bundle against a schema, filtering and processing validation errors.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | FHIRBundle | The FHIR bundle to validate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| outputs | ValidationErrorWithResourceType[] | Array of validation errors with resource type information |
+
+#### Internal Logic
+1. Iterates through each entry in the bundle.
+2. Filters the schema to match the resource type of the current entry.
+3. Validates the resource against the filtered schema.
+4. Filters and processes the validation errors.
+
+### `convert(baseFolderName: string, fileName: string, converterApi: AxiosInstance, fhirExtension: string)`
+#### Description
+Converts an XML file to FHIR format using an external converter API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| baseFolderName | string | Base folder path |
+| fileName | string | Name of the file to convert |
+| converterApi | AxiosInstance | Axios instance for API calls |
+| fhirExtension | string | File extension for FHIR files |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| updatedConversionResult | FHIRBundle | Converted and processed FHIR bundle |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| jsonschema | For JSON schema validation |
+| fs | File system operations |
+| axios | Making HTTP requests to the converter API |
+| uuid | Generating unique identifiers |
+
+## Error Handling
+The code implements try-catch blocks to handle errors during file processing and conversion. Errors are logged to the console and, in some cases, written to error files.
+
+## Logging
+The code uses `console.log` and `console.error` for logging information and errors throughout the process.
+
+## TODOs
+- Move the logic for adding missing requests, replacing IDs, and adding extensions to a shared file, as it's currently duplicated from another lambda function.

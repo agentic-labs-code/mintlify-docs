@@ -1,0 +1,70 @@
+---
+title: "index-to-fhir.test.ts"
+---
+
+## High-level description
+This file contains unit tests for the `cwToFHIR` and `getBestDateFromCWDocRef` functions, which are part of the FHIR document conversion process. The tests ensure that these functions correctly handle various scenarios when converting CommonWell documents to FHIR format and extracting the best date from a CommonWell document reference.
+
+## Symbols
+
+### `cwToFHIR`
+#### Description
+This function converts a CommonWell document to FHIR format. The test focuses on verifying that the function correctly handles the `format` property of the document's content.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | UUID of the document |
+| doc | CWDocumentWithMetriportData | CommonWell document with additional Metriport data |
+| patient | Patient | Patient information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res | FHIRDocument | Converted FHIR document |
+
+#### Internal Logic
+The test creates a mock CommonWell document with a specific `format` value, calls the `cwToFHIR` function, and verifies that the resulting FHIR document's content includes the correct `format` code.
+
+### `getBestDateFromCWDocRef`
+#### Description
+This function determines the best date to use from a CommonWell document reference based on various date fields.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| content | DocumentContent | Content of the CommonWell document |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res | string | The best date extracted from the document |
+
+#### Internal Logic
+The function prioritizes dates in the following order:
+1. `indexed` date if it's not today
+2. `period.start` date if present and `indexed` is today
+3. `period.end` date if `start` is not present and `indexed` is today
+4. `indexed` date if no other dates are available
+
+The tests cover all these scenarios to ensure the function behaves correctly in each case.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @faker-js/faker | Generating fake data for tests |
+| @metriport/commonwell-sdk | Importing CommonWell SDK types and test helpers |
+| dayjs | Date manipulation and comparison |
+| uuid | Generating UUIDs |
+
+## References
+- `makeDocument` and `makeDocumentContent` from `@metriport/commonwell-sdk/models/__tests__/document`
+- `makePatient` from `../../../../domain/medical/__tests__/patient`
+- `CWDocumentWithMetriportData` from `../../../commonwell/document/shared`
+- `makePeriod` from `../../shared/__tests__/date`
+
+## Error Handling
+The tests use Jest's assertion functions to check for expected outcomes. If any assertion fails, the test will fail and provide detailed error information.
+
+## TODOs
+There are no explicit TODOs in this test file.

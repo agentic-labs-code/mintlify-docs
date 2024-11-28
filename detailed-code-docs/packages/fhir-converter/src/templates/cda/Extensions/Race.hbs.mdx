@@ -1,0 +1,49 @@
+---
+title: "Race.hbs"
+---
+
+## High-level description
+This Handlebars template generates a FHIR extension for representing race information in the US Core Race extension format. It processes race codes from a CDA document and maps them to the appropriate FHIR structure, handling both standard OMB race categories and detailed race codes.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template generates a JSON object representing the US Core Race extension. It includes logic for handling race codes, null flavors, and text representations of race.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Object | Contains race information from the CDA document |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON Object | Object | Represents the US Core Race extension |
+
+#### Internal Logic
+1. Checks if `patient.raceCode` exists.
+2. Sets the `url` to the US Core Race extension URL.
+3. Creates an `extension` array with race information:
+   - Iterates over `patient.raceCode` and `patient.sdtc:raceCode`.
+   - Handles null flavors and standard race codes differently.
+   - Maps race codes to appropriate FHIR structures (ombCategory or detailed).
+4. Adds a text representation of the race.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| DataType/Coding.hbs | Used to generate the `valueCoding` object for race codes |
+
+## Error Handling
+The template includes conditional checks to handle various scenarios, such as missing race codes or null flavors. This prevents errors when processing incomplete or varying data.
+
+## API/Interface Reference
+This template is part of a larger FHIR conversion system. It expects input data in a specific format (CDA patient object) and produces output conforming to the US Core Race extension in FHIR.
+
+| Input Field | Description |
+|:------------|:------------|
+| patient.raceCode | Primary race code |
+| patient.sdtc:raceCode | Additional race codes (for multiple races) |
+
+The output conforms to the [US Core Race extension](http://hl7.org/fhir/us/core/StructureDefinition/us-core-race) structure in FHIR.

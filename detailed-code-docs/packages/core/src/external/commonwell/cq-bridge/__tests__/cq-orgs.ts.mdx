@@ -1,0 +1,50 @@
+---
+title: "cq-orgs.ts"
+---
+
+## High-level description
+This code defines a utility function `makeSimpleOrg` for creating mock CQOrgHydrated objects. It's primarily used for testing purposes, generating fake organization data with customizable properties.
+
+## Symbols
+
+### `makeSimpleOrg`
+#### Description
+This function creates a mock CQOrgHydrated object with optional customization. It uses the Faker library to generate random data for various fields when not explicitly provided.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| p | Partial&lt;CQOrgHydrated&gt; & { mockStates?: string[]; amountOfStates?: number; } | An optional object to partially override default values and provide additional configuration |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| CQOrgHydrated | object | A mock CQOrgHydrated object with generated or provided data |
+
+#### Internal Logic
+1. The function uses the spread operator to merge default values with any provided overrides.
+2. It generates a random UUID for the `id` if not provided.
+3. It creates a random word for the `name` if not provided.
+4. For `states`, it either uses the provided states or generates a random number of unique states (between 1 and 5 by default).
+   - If `mockStates` is provided, it selects from this array; otherwise, it generates random US state names.
+5. It generates a random word for the `gateway` if not provided.
+6. It sets the `prio` value if provided.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @faker-js/faker | Used to generate fake data for testing |
+| lodash | Used for the `uniq` function to ensure unique state names |
+
+## References
+- `CQOrgHydrated`: This type is imported from "../get-orgs" and represents the structure of a hydrated CQ organization object.
+
+## Performance Considerations
+The function uses `uniq` from lodash to ensure unique state names, which may have a slight performance impact for large numbers of states. However, this is unlikely to be a concern in typical testing scenarios.
+
+## Usage in Tests
+This utility function is used in various test files to create mock CQOrgHydrated objects. For example:
+1. In "organization.test.ts", it's used to create mock organizations for testing the `initCQOrgIncludeList` function.
+2. In "coverate-enhancer.test.ts", it's used extensively to create mock organizations with different priorities and states for testing the CoverageEnhancer class.
+
+These tests demonstrate how `makeSimpleOrg` can be used to create both simple and complex mock data scenarios, allowing for thorough testing of functions that deal with CQ organizations.

@@ -1,0 +1,62 @@
+---
+title: "_restart-ecs.yml"
+---
+
+## High-level description
+This GitHub Actions workflow file defines a reusable workflow for restarting an Amazon ECS (Elastic Container Service) service. It's designed to be called by other workflows and provides flexibility in specifying the deployment environment, AWS resources, and necessary credentials.
+
+## Code Structure
+The workflow consists of a single job named "restart" with several steps that configure the AWS CLI, checkout the repository, and execute a restart script.
+
+## Symbols
+
+### Workflow: Reusable Restart API
+#### Description
+This workflow is designed to be reusable across different projects or environments. It restarts an ECS service using specified AWS resources and credentials.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| script_name | string | The name of the script under the scripts/ folder to run (default: "restart-ecs.sh") |
+| deploy_env | string | The environment for deployment (staging, production, or sandbox) |
+| ECR_REPO_URI | string | The URI of the ECR repository to push the Docker image to |
+| ECS_CLUSTER | string | The ARN of the ECS cluster containing the service to be restarted |
+| ECS_SERVICE | string | The ARN of the ECS service to be restarted |
+| AWS_REGION | string | The AWS region where the resources are located |
+
+#### Secrets
+| Name | Description |
+|:-----|:------------|
+| AWS_ACCESS_KEY_ID | AWS access key ID for authentication |
+| AWS_SECRET_ACCESS_KEY | AWS secret access key for authentication |
+| DOCKERHUB_USERNAME | DockerHub username for authentication |
+| DOCKERHUB_TOKEN | DockerHub token for authentication |
+
+#### Internal Logic
+1. Sets up concurrency to prevent multiple deployments to the same environment simultaneously.
+2. Runs on the latest Ubuntu runner.
+3. Sets the environment based on the input.
+4. Logs the environment variables and inputs for debugging.
+5. Configures the AWS CLI with provided credentials.
+6. Checks out the repository, using sparse checkout to only retrieve the necessary script.
+7. Executes the restart script with the provided environment variables.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| actions/checkout@v3 | To checkout the repository and access the restart script |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| script_name | string | restart-ecs.sh | The name of the script to run for restarting the ECS service |
+
+## TODOs
+- Consider the solution provided in the link: https://github.com/tj-actions/aws-cdk/blob/main/action.yml for handling concurrent deployments.
+
+## Notes
+1. The workflow uses concurrency to prevent multiple deployments to the same environment simultaneously. This is based on a serverless first approach, as mentioned in the comment.
+2. The workflow uses sparse checkout to only retrieve the necessary script file, optimizing the checkout process.
+3. AWS credentials and DockerHub credentials are required as secrets, indicating that this workflow might involve interactions with both AWS and DockerHub.
+4. The actual restart logic is contained in the script specified by `script_name`, which is executed in the final step of the job.
+5. The workflow is designed to be flexible, allowing different environments (staging, production, sandbox) and different AWS resources (ECR repository, ECS cluster, ECS service) to be specified as inputs.

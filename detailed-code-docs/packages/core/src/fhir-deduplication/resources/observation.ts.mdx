@@ -1,0 +1,84 @@
+---
+title: "observation.ts"
+---
+
+## High-level description
+This code implements deduplication functionality for FHIR Observation resources. It groups and combines similar observations based on their date, code, and value, removing duplicates and merging information from multiple observations into a single, more comprehensive record.
+
+## Code Structure
+The main function `deduplicateObservations` uses `groupSameObservations` to group similar observations. The `groupSameObservations` function creates a map of observations based on a composite key of date, code, and value. It also handles post-processing of merged observations, including status selection and code filtering.
+
+## Symbols
+
+### `deduplicateObservations`
+#### Description
+This function takes an array of Observation resources and returns deduplicated observations along with a reference replacement map.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| observations | Observation[] | An array of FHIR Observation resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| combinedObservations | Observation[] | An array of deduplicated Observation resources |
+| refReplacementMap | Map&lt;string, string[]&gt; | A map for replacing references to merged observations |
+
+#### Internal Logic
+1. Calls `groupSameObservations` to group similar observations
+2. Uses `combineResources` to merge the grouped observations
+
+### `groupSameObservations`
+#### Description
+This function groups similar observations based on their date, code, and value.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| observations | Observation[] | An array of FHIR Observation resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| observationsMap | Map&lt;string, Observation&gt; | A map of grouped observations |
+| refReplacementMap | Map&lt;string, string[]&gt; | A map for replacing references to merged observations |
+
+#### Internal Logic
+1. Iterates through each observation
+2. Extracts key information (date, code, value)
+3. Creates a composite key from this information
+4. Uses `fillMaps` to populate the maps, applying post-processing
+
+#### Performance Considerations
+The function uses Map data structures for efficient lookup and storage of grouped observations.
+
+### `postProcess`
+#### Description
+This function is used to post-process merged observations, filtering out unknown codes and selecting the most descriptive status.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| master | Observation | The master (combined) observation |
+| existing | Observation | The existing observation in the map |
+| target | Observation | The target observation being merged |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| master | Observation | The updated master observation |
+
+#### Internal Logic
+1. Filters out unknown codes from the master observation
+2. Selects the most descriptive status using `pickMostDescriptiveStatus`
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides TypeScript types for FHIR resources |
+| ../shared | Provides utility functions for resource combination and map filling |
+| ./observation-shared | Provides utility functions specific to Observation resources |
+
+## Error Handling
+The code does not implement explicit error handling. It relies on the correctness of input data and the robustness of the imported utility functions.

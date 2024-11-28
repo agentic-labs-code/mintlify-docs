@@ -1,0 +1,89 @@
+---
+title: "family-history.ts"
+---
+
+Here's a comprehensive documentation for the `family-history.ts` file:
+
+## High-level description
+This file contains functions to build the Family History section of a CDA (Clinical Document Architecture) document from FHIR (Fast Healthcare Interoperability Resources) data. It processes FamilyMemberHistory resources from a FHIR Bundle and converts them into a structured CDA format.
+
+## Code Structure
+The main function `buildFamilyHistory` takes a FHIR Bundle as input and returns a FamilyHistorySection object. It uses helper functions to create table rows and entries for each FamilyMemberHistory resource. The `AugmentedFamilyMemberHistory` class is used to wrap the FHIR resources with additional metadata.
+
+## Symbols
+
+### `buildFamilyHistory`
+#### Description
+This function builds the Family History section of a CDA document from a FHIR Bundle.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fhirBundle | Bundle | A FHIR Bundle containing FamilyMemberHistory resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| familyHistorySection | FamilyHistorySection | The constructed Family History section for the CDA document |
+
+#### Internal Logic
+1. Extracts FamilyMemberHistory resources from the input Bundle.
+2. If no family history is found, returns a placeholder section.
+3. Creates AugmentedFamilyMemberHistory objects for each FamilyMemberHistory resource.
+4. Generates table rows and entries using `createTableRowsAndEntries`.
+5. Constructs the final FamilyHistorySection object with the generated data.
+
+### `createTableRowsFromMemberHistory`
+#### Description
+Creates table rows for a family member's history, including any conditions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| augHistory | AugmentedFamilyMemberHistory | An augmented FamilyMemberHistory object |
+| referenceId | string | A unique reference ID for the table row |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tableRows | ObservationTableRow \| ObservationTableRow[] | One or more table rows representing the family member's history |
+
+### `createEntryFromMemberHistory`
+#### Description
+Creates a CDA entry for a family member's history.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| augHistory | AugmentedFamilyMemberHistory | An augmented FamilyMemberHistory object |
+| referenceId | string | A unique reference ID for the entry |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| entry | ObservationOrganizer | A CDA ObservationOrganizer entry representing the family member's history |
+
+### Helper Functions
+Several helper functions are defined to assist in mapping FHIR data to CDA format:
+- `createConditionReference`
+- `createTableRowFromMemberHistory`
+- `getMedicalCondition`
+- `getConditionOnset`
+- `buildSubject`
+- `mapRelationship`
+- `buildComponents`
+- `mapFamilyHistoryStatusCode`
+
+## Dependencies
+The code relies on various imported types and functions from other modules, including FHIR types, CDA types, and utility functions for building CDA elements.
+
+## Configuration
+The code uses several constants for section names, table headers, and OIDs (Object Identifiers) defined in the `constants.ts` file.
+
+## Error Handling
+The code does not implement explicit error handling. It uses optional chaining and nullish coalescing operators to handle potential undefined values.
+
+## Performance Considerations
+The code processes each FamilyMemberHistory resource individually, which may impact performance for large datasets. Consider optimizing if dealing with a large number of family history records.
+
+This documentation provides a comprehensive overview of the `family-history.ts` file, explaining its purpose, main functions, and how it fits into the larger context of converting FHIR data to CDA format.

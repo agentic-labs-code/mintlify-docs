@@ -1,0 +1,67 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for generating various aspects of FHIR GuidanceResponse resources. These templates are part of a larger FHIR converter system, specifically designed to transform Clinical Document Architecture (CDA) data into FHIR format. Each template focuses on a specific field or reference within the GuidanceResponse resource, allowing for modular and flexible resource construction.
+
+## What does it do?
+These templates work together to create different parts of a FHIR GuidanceResponse resource. A GuidanceResponse in FHIR represents the result of invoking a decision support service. The templates in this directory allow for the creation of various components of a GuidanceResponse, such as:
+
+1. Setting the encounter reference
+2. Adding evaluation messages
+3. Specifying output parameters
+4. Identifying the performer of the guidance
+5. Providing reason references
+6. Setting the result of the guidance
+7. Specifying the subject of the guidance
+
+Each template generates a JSON structure for a specific part of the GuidanceResponse resource, using placeholders for dynamic values like IDs and references. These can be combined or used individually to construct complete GuidanceResponse resources as part of the CDA to FHIR conversion process.
+
+## Key Files
+1. `encounter.hbs`: Creates a GuidanceResponse with an encounter reference.
+2. `evaluationMessage.hbs`: Generates a GuidanceResponse with an evaluationMessage array.
+3. `outputParameters.hbs`: Produces a GuidanceResponse with a reference to output parameters.
+4. `performer.hbs`: Constructs a GuidanceResponse with a performer reference.
+5. `reasonReference.hbs`: Creates a GuidanceResponse with a reasonReference array.
+6. `result.hbs`: Generates a GuidanceResponse with a result reference.
+7. `subject.hbs`: Produces a GuidanceResponse with a subject reference.
+
+Each of these templates follows a similar structure, using Handlebars syntax to create a partial JSON representation of a GuidanceResponse resource. They all include placeholders for an ID and a reference value, which are meant to be filled in when the template is rendered.
+
+## Dependencies
+These templates are part of a larger FHIR converter system and depend on:
+
+| Dependency | Purpose | Version |
+|:-----------|:--------|:--------|
+| Handlebars | Template engine for generating JSON output | Not specified |
+
+The Handlebars templating engine is crucial for processing the placeholders and generating the final JSON structures.
+
+## Configuration
+While the templates themselves don't include specific configuration options, they are designed to be flexible through the use of placeholders. The main configuration points for each template are:
+
+1. `{{ID}}`: The unique identifier for the GuidanceResponse resource.
+2. `{{REF}}`: The reference value, which varies depending on the specific field (e.g., encounter reference, performer reference, etc.).
+
+These placeholders are meant to be replaced with actual values when the templates are rendered as part of the FHIR conversion process.
+
+Here's an example of how the `subject.hbs` template is structured:
+
+```handlebars
+{
+    "resource": {
+        "resourceType": "GuidanceResponse",
+        "id": "{{ID}}",
+        "subject": {
+            "reference": "{{REF}}"
+        }
+    }
+}
+```
+
+This structure is consistent across all templates in the directory, with variations only in the specific field being populated (e.g., "subject", "performer", "result", etc.).
+
+It's important to note that these templates generate partial representations of a GuidanceResponse resource. In a complete FHIR conversion process, these partial representations would likely be combined or used alongside other templates to create full, valid FHIR resources.
+
+The templates are designed to be used within a larger system that handles the actual rendering and value insertion. This system would need to provide the appropriate values for the ID and REF placeholders, as well as manage the combination of multiple template outputs if necessary to create complete FHIR resources.

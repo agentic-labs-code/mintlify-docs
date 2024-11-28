@@ -1,0 +1,67 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains test files for the outbound operations of the Carequality IHE Gateway v2 implementation. It includes tests for processing Document Query (DQ), Document Retrieve (DR), and Cross-Community Patient Discovery (XCPD) responses, as well as utility functions for MTOM (Message Transmission Optimization Mechanism) message handling and file type detection.
+
+## What does it do?
+The test suite in this directory verifies the correct functioning of various components of the Carequality IHE Gateway v2 outbound operations:
+
+1. It tests the processing of Document Query (DQ) responses, ensuring that successful responses, empty responses, and error responses are handled correctly.
+2. It verifies the processing of Document Retrieve (DR) responses, including MTOM messages with and without attachments, for different file types.
+3. It checks the Cross-Community Patient Discovery (XCPD) response processing, covering scenarios such as successful matches, multiple addresses and names, no matches, and error responses.
+4. It tests the file type detection functionality for various file formats in non-XML body flows.
+5. It provides utility functions for creating and parsing MTOM messages with and without attachments.
+
+These tests ensure that the outbound operations of the Carequality IHE Gateway v2 implementation correctly handle different response scenarios, maintain data integrity, and properly manage errors.
+
+## Key Files
+1. `constants.ts`: Contains test data, sample requests, and responses used across the test suite.
+2. `detect-file-type.test.ts`: Tests the `detectFileType` function for various file types in non-XML body flows.
+3. `mtom.ts`: Provides utility functions for creating and parsing MTOM messages.
+4. `process-dq.test.ts`: Contains tests for processing Document Query responses.
+5. `process-dr.test.ts`: Includes tests for processing Document Retrieve responses, focusing on MTOM handling.
+6. `process-xcpd.test.ts`: Tests the processing of Cross-Community Patient Discovery responses.
+
+## Dependencies
+The test suite relies on several external libraries and internal modules:
+
+1. Jest: Used as the testing framework for all test files.
+2. fs and path: Node.js built-in modules for file system operations and path handling.
+3. uuid: For generating unique identifiers in test data.
+4. dayjs: Used for date manipulation and formatting in test data.
+5. @metriport/ihe-gateway-sdk: Provides types and schemas for IHE Gateway interactions.
+6. Internal utility functions: Such as `detectFileType`, `parseFileFromString`, and `processDqResponse`.
+
+## Configuration
+The test suite uses various configuration files and test data:
+
+1. Sample XML files: Used to simulate different response scenarios for DQ, DR, and XCPD operations.
+2. Test certificates and keys: Used for testing SAML signing and verification (TEST_CERT and TEST_KEY in constants.ts).
+3. Mock S3 operations: Used in process-dr.test.ts to isolate tests from actual S3 interactions.
+
+The tests are designed to be run in a controlled environment and do not require external services or databases. They use mocked data and responses to simulate various scenarios and edge cases.
+
+Code snippet from `process-dr.test.ts` showing the setup of S3 mocks:
+
+```typescript
+beforeAll(() =&gt; {
+  jest.spyOn(S3Utils, "uploadFile").mockResolvedValue({
+    ETag: "mockETag",
+    Location: "mockLocation",
+    Key: "mockKey",
+    Bucket: "mockBucket",
+  });
+  jest.spyOn(S3Utils, "getFileInfoFromS3").mockResolvedValue({
+    exists: false,
+    size: 0,
+  });
+});
+
+afterAll(() =&gt; {
+  jest.restoreAllMocks();
+});
+```
+
+This test suite plays a crucial role in ensuring the reliability and correctness of the Carequality IHE Gateway v2 outbound operations, covering a wide range of scenarios and edge cases.

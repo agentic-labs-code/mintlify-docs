@@ -1,0 +1,59 @@
+---
+title: "auth.test.ts"
+---
+
+## High-level description
+This file contains unit tests for the `getCxIdFromApiKey` function, which is responsible for extracting a customer ID (cxId) from an encoded API key. The tests cover various scenarios, including valid and invalid inputs, to ensure the function behaves correctly under different conditions.
+
+## Symbols
+
+### `describe("getCxIdFromApiKey", () =&gt; { ... })`
+#### Description
+This is the main test suite for the `getCxIdFromApiKey` function. It contains multiple test cases to verify the function's behavior.
+
+#### Internal Logic
+The test suite uses a helper function `makeEncodedKey` to generate encoded API keys for testing. It then runs several test cases to check the function's behavior with different inputs.
+
+### `makeEncodedKey(cxId?: string | undefined)`
+#### Description
+A helper function that creates an encoded API key for testing purposes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string \| undefined | An optional customer ID to include in the encoded key |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| encodedKey | string | A base64 encoded API key |
+
+#### Internal Logic
+1. If `cxId` is provided, create a string with a random ID (using `nanoid()`) and the `cxId` separated by a colon.
+2. If `cxId` is not provided, create a string with just a random ID.
+3. Encode the resulting string to base64 and return it.
+
+### Individual Test Cases
+Each test case is implemented using Jest's `it` function. Here's a summary of the test cases:
+
+1. Test that the function throws when no encoded API key is provided.
+2. Test that the function throws when an empty encoded string is provided.
+3. Test that the function throws when an invalid encoded string is provided.
+4. Test that the function throws when the API key doesn't include a separator and cxId.
+5. Test that the function throws when the API key doesn't include a cxId.
+6. Test that the function returns the correct cxId when it's encoded correctly.
+
+#### Internal Logic (for the last test case)
+1. Generate a random UUID as the expected cxId.
+2. Create an encoded key using the `makeEncodedKey` function with the expected cxId.
+3. Call `getCxIdFromApiKey` with the encoded key.
+4. Assert that the returned cxId matches the expected cxId.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @faker-js/faker | Used to generate random UUIDs for testing |
+| nanoid | Used to generate random IDs for creating encoded keys |
+
+## References
+The test file references the `getCxIdFromApiKey` function, which is imported from the `../auth` module. This function is the main subject of the tests and is likely defined in the `packages/api/src/routes/middlewares/auth.ts` file.

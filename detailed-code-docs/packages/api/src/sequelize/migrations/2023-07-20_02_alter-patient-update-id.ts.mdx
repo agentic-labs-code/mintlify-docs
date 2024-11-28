@@ -1,0 +1,96 @@
+---
+title: "2023-07-20_02_alter-patient-update-id.ts"
+---
+
+## High-level description
+This code defines database migration scripts for altering the `patient` table. Specifically, it adds and removes an `old_id` column and updates the `id` column to use UUIDv7.
+
+## Code Structure
+The code defines two migration functions: `up` and `down`. 
+- `up` is used to apply the migration, adding the `old_id` column and updating the `id` column. 
+- `down` is used to revert the migration, removing the `old_id` column and restoring the original `id` values. 
+Both functions use the `bulkUpdate` function to update the table data in batches.
+
+## References
+- `uuidv7` from "@metriport/core/util/uuid-v7"
+
+## Symbols
+### `queryFacilityIdsUp`
+#### Description
+This function constructs an SQL query to retrieve the `id` values from the `facility` table based on the `old_id` values associated with a given `patientId`. This is used during the migration up process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient for which to retrieve facility IDs. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string | The constructed SQL query string. |
+
+### `queryFacilityIdsDown`
+#### Description
+This function constructs an SQL query to retrieve the `old_id` values from the `facility` table based on the `id` values associated with a given `patientId`. This is used during the migration down process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient for which to retrieve facility IDs. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string | The constructed SQL query string. |
+
+### `bulkUpdate`
+#### Description
+This asynchronous function performs a bulk update on the `patient` table. It retrieves all patient IDs, then iterates through them, updating the `old_id`, `facility_ids`, and `id` columns based on the provided update and query functions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queryInterface | QueryInterface | The Sequelize QueryInterface instance. |
+| transaction | Transaction | The Sequelize transaction object. |
+| updateFn | (id: string, facilityIds: string[]) =&gt; string | A function that takes a patient ID and an array of facility IDs and returns an SQL update query string. |
+| queryFacilityIdsFn | (id: string) =&gt; string | A function that takes a patient ID and returns an SQL query string to retrieve facility IDs. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | A promise that resolves when the bulk update is complete. |
+
+### `up`
+#### Description
+This asynchronous function defines the up migration script. It adds an `old_id` column to the `patient` table and then updates the `id` column to use UUIDv7, preserving the original ID in the `old_id` column.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | MigrationParams&lt;QueryInterface&gt; | An object containing the Sequelize QueryInterface instance. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | A promise that resolves when the migration is complete. |
+
+### `down`
+#### Description
+This asynchronous function defines the down migration script. It reverts the changes made by the `up` migration, restoring the original `id` values from the `old_id` column and removing the `old_id` column.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | MigrationParams&lt;QueryInterface&gt; | An object containing the Sequelize QueryInterface instance. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | A promise that resolves when the migration is complete. |
+
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Database ORM for interacting with the database. |
+| @metriport/core/util/uuid-v7 | Provides the `uuidv7` function for generating UUIDv7 values. |

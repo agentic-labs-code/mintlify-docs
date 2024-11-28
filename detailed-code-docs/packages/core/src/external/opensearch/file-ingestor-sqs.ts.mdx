@@ -1,0 +1,105 @@
+---
+title: "file-ingestor-sqs.ts"
+---
+
+## High-level description
+This code defines an OpenSearchFileIngestorSQS class that extends OpenSearchFileIngestor. It implements a file ingestion process for OpenSearch using Amazon SQS (Simple Queue Service) for message handling. The class provides methods to ingest files and store them in S3 before ingestion.
+
+## Code Structure
+The main class OpenSearchFileIngestorSQS extends OpenSearchFileIngestor and uses SQSClient and S3 clients for AWS interactions. It implements the ingest method and adds additional functionality for storing and ingesting files.
+
+## References
+- OpenSearchFileIngestor (parent class)
+- SQSClient (for SQS operations)
+- S3 (for S3 operations)
+- uuidv4 (for generating unique identifiers)
+
+## Symbols
+
+### OpenSearchFileIngestorSQS
+#### Description
+A class that extends OpenSearchFileIngestor to provide file ingestion functionality using SQS and S3.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | OpenSearchFileIngestorSQSConfig | Configuration object for the ingestor |
+
+#### Internal Logic
+- Initializes SQS and S3 clients
+- Implements ingest and storeAndIngest methods
+
+### ingest
+#### Description
+Sends a message to SQS for file ingestion.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | IngestRequest | Parameters for ingestion |
+
+#### Internal Logic
+- Creates a payload with ingestion details
+- Sends the payload as a message to SQS
+
+### storeAndIngest
+#### Description
+Stores file content in S3 and then triggers ingestion.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | StoreAndIngestRequest | Parameters for storing and ingesting |
+
+#### Internal Logic
+- Uploads content to S3
+- Calls ingest method to trigger ingestion
+
+### getIngestionFileName
+#### Description
+Generates a filename for ingestion.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docId | string | Document ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | Generated filename for ingestion |
+
+### multipleContentToSingleString
+#### Description
+Converts multiple content entries into a single XML-like string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| entries | string[] | Array of content entries |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| contentString | string | Combined content as a single string |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/util/log | Logging utility |
+| @metriport/shared | Shared utilities |
+| aws-sdk | AWS SDK for S3 operations |
+| dayjs | Date manipulation library |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| queueUrl | string | N/A | URL of the SQS queue |
+
+## Error Handling
+The class relies on the error handling mechanisms of the underlying AWS SDK and the parent OpenSearchFileIngestor class.
+
+## Logging
+Logging is performed using the `out` function from the `@metriport/core/util/log` module.
+
+This class provides a robust implementation for ingesting files into OpenSearch using SQS for message handling and S3 for file storage. It extends the functionality of the base OpenSearchFileIngestor class to work with AWS services.

@@ -1,0 +1,69 @@
+---
+title: "coverage-enhancer-api-local.ts"
+---
+
+## High-level description
+This code defines a `CoverageEnhancerApiLocal` class that implements an Enhanced Coverage flow for CommonWell Health Alliance's API. It extends the `CoverageEnhancerLocal` class and provides functionality to enhance patient coverage by linking patients to organizations and performing document queries.
+
+## Code Structure
+The `CoverageEnhancerApiLocal` class extends `CoverageEnhancerLocal` and overrides the `enhanceCoverage` method. It uses various dependencies like `CommonWellManagementAPI`, `PatientLoaderLocal`, `PatientUpdaterCommonWell`, and `ECUpdaterLocal` to perform its operations.
+
+## Symbols
+
+### `CoverageEnhancerApiLocal`
+#### Description
+This class implements the Enhanced Coverage flow with logic running on the local API environment.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cwManagementApi | CommonWellManagementAPI | API for CommonWell management operations |
+| getOrgIdExcludeList | () =&gt; Promise&lt;string[]&gt; | Function to get organization IDs to exclude |
+| prefix | string \| undefined | Optional prefix for logging |
+
+#### Internal Logic
+1. Initializes the parent class with the provided dependencies.
+2. Overrides the `enhanceCoverage` method to add additional functionality:
+   - Calls the parent's `enhanceCoverage` method.
+   - Waits for a specified duration to allow patients to be updated at CommonWell.
+   - Completes the enhanced coverage process.
+   - Logs the total duration of the operation.
+
+### `enhanceCoverage`
+#### Description
+This method performs the enhanced coverage process for given patients.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | CoverageEnhancementParams & { waitBetweenLinkingAndDocQuery: duration.Duration; startedAt?: number; } | Parameters for coverage enhancement |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ecId | string | The ID of the enhanced coverage process |
+
+#### Internal Logic
+1. Calls the parent's `enhanceCoverage` method.
+2. Waits for a specified duration.
+3. Calls `completeEnhancedCoverage` to finalize the process.
+4. Calculates and logs the total duration of the operation.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core | Importing various utility functions and types |
+| dayjs | Date and time manipulation |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| WAIT_BETWEEN_LINKING_AND_DOC_QUERY | duration.Duration | 30 seconds | Wait time between linking patients and performing document queries |
+
+## Error Handling
+The code uses a `capture` function to log errors and warnings, which is likely connected to an error reporting system.
+
+## Logging
+The code uses a custom logging utility (`out`) to log information about the coverage enhancement process.
+
+This implementation provides a local API-based approach to enhancing patient coverage in the CommonWell Health Alliance system, with built-in waiting periods and error handling to ensure smooth operation.

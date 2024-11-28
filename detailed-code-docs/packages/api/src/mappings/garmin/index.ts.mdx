@@ -1,0 +1,130 @@
+---
+title: "index.ts"
+---
+
+## High-level description
+This code defines TypeScript types and schemas for representing and validating data received from the Garmin API. It includes units, data structures, and schemas for various health metrics like sleep, activity, body composition, and heart rate variability (HRV). These types and schemas are used for parsing, validating, and mapping Garmin data to the Metriport data model.
+
+## Code Structure
+The code defines several types and schemas related to Garmin data:
+
+- **garminMetaSchema**: Defines the schema for common metadata like `userAccessToken`.
+- **garminUnits**: Defines individual units and their validation rules using Zod.
+- **garminTypes**: Combines individual units into more complex types like `sleepLevelsSchema`.
+- **Specific data schemas**: Defines schemas for specific data points like `garminActivitySummarySchema`, `garminBloodPressureSchema`, etc.
+- **Mapping functions**:  These functions (in other files) use the defined schemas to parse and map Garmin data to Metriport's data model.
+
+## References
+- `@metriport/api-sdk/devices/models/metriport-data`
+- `dayjs`
+- `zod`
+- `../../shared/date`
+
+## Symbols
+
+### `garminMetaSchema`
+#### Description
+Defines the Zod schema for common metadata associated with Garmin data, specifically the `userAccessToken`.
+
+#### Inputs
+None
+
+#### Outputs
+- `z.object`: A Zod object schema with the `userAccessToken` property.
+
+### `GarminMeta`
+#### Description
+A TypeScript type alias representing the inferred type of the `garminMetaSchema`. It describes an object with a `userAccessToken` property, which is a string.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+### `User`
+#### Description
+An interface representing a Garmin user with a `userAccessToken` property.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+### `UserData`
+#### Description
+A generic interface representing data associated with a Garmin user. It includes the `user` object and `typedData` which is a `TypedData` object containing the actual health data.
+
+#### Inputs
+- `T`: A type parameter extending `MetriportData`, representing the specific type of health data.
+
+#### Outputs
+None
+
+### `garminUnits`
+#### Description
+An object containing Zod schemas for individual units of measurement used in Garmin data. Each property represents a unit and its corresponding validation rule.
+
+#### Inputs
+None
+
+#### Outputs
+- An object where keys are unit names and values are Zod schemas.
+
+### `timeRange`
+#### Description
+A Zod schema defining a time range with `startTimeInSeconds` and `endTimeInSeconds` properties, both using the `garminUnits.time` schema.
+
+#### Inputs
+None
+
+#### Outputs
+- `z.object`: A Zod object schema representing a time range.
+
+### `sleepLevelsSchema`
+#### Description
+A Zod schema defining the structure of sleep level data, with optional arrays of `timeRange` for "deep" and "light" sleep.
+
+#### Inputs
+None
+
+#### Outputs
+- `z.object`: A Zod object schema representing sleep level data.
+
+### `respirationMeasurements`
+#### Description
+A Zod schema defining a record of respiration measurements, where keys are time keys (`garminUnits.timeKey`) and values are respiration values (`garminUnits.respiration`).
+
+#### Inputs
+None
+
+#### Outputs
+- `z.record`: A Zod record schema representing respiration measurements.
+
+### `spo2Measurements`
+#### Description
+A Zod schema defining a record of SpO2 measurements, similar to `respirationMeasurements`.
+
+#### Inputs
+None
+
+#### Outputs
+- `z.record`: A Zod record schema representing SpO2 measurements.
+
+### `garminTypes`
+#### Description
+An object containing Zod schemas for various data types used in Garmin data. It combines individual units from `garminUnits` and other schemas to define complex types like `sleepLevels`, `timeOffsetHeartRateSamples`, etc.
+
+#### Inputs
+None
+
+#### Outputs
+- An object where keys are type names and values are Zod schemas.
+
+## Dependencies
+- `@metriport/api-sdk/devices/models/metriport-data`
+- `dayjs`
+- `dayjs/plugin/customParseFormat`
+- `zod`
+

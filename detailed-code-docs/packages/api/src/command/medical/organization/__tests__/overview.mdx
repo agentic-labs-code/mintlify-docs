@@ -1,0 +1,48 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains test files for the medical organization-related functionality in the API. It includes tests for creating and registering organizations, covering various scenarios and edge cases.
+
+## What does it do?
+The tests in this directory ensure that the process of creating and registering medical organizations works correctly. They verify that:
+
+1. New organizations can be created with proper identifiers and details.
+2. The system prevents duplicate organizations for the same customer.
+3. The creation process interacts correctly with external services and databases.
+4. Address information for organizations is properly handled, including geographical coordinates.
+
+These tests help maintain the reliability and correctness of the organization management features in the medical API.
+
+## Key Files
+
+1. `create-organization.test.ts`:
+   This file contains unit tests for the `createOrganization` function. It tests various scenarios such as:
+   - Preventing creation of duplicate organizations for a customer
+   - Correct generation and assignment of organization IDs and numbers
+   - Proper creation and return of organization objects
+   - Interaction with external services like FHIR servers and CommonWell/Carequality systems
+
+2. `register-organization.ts`:
+   This file defines test data for a medical organization's address with coordinates. It uses the Faker.js library to generate realistic-looking data for testing purposes. The file includes:
+   - A `coordinates` constant with latitude and longitude
+   - An `addressWithCoordinates` constant with a complete address including geographical coordinates
+
+## Dependencies
+1. @faker-js/faker: Used for generating realistic test data, particularly for addresses and coordinates.
+2. @metriport/shared: Provides the USState enum used in address generation.
+3. @metriport/core/domain/address: Supplies types like Coordinates and AddressWithCoordinates.
+
+These dependencies are crucial for creating realistic and type-safe test data, ensuring that the tests accurately represent real-world scenarios.
+
+## Configuration
+The tests use various mocking strategies to isolate the tested functionality from external dependencies:
+
+- `createOrganizationId` is mocked to return predefined organization IDs and numbers.
+- External service calls like `createTenantIfNotExists`, `upsertOrgToFHIRServer`, and CommonWell/Carequality commands are mocked to prevent actual external calls during testing.
+- `address.getAddressWithCoordinates` is mocked to provide consistent address data.
+
+These mocks are set up in the `beforeAll` block and cleared before each test in the `beforeEach` block, ensuring a clean testing environment for each test case.
+
+The use of Faker.js in `register-organization.ts` allows for the generation of varied but realistic address data, which can be consistently used across tests without hardcoding values.

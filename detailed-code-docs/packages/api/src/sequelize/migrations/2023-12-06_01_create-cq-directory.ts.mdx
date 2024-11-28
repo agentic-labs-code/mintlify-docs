@@ -1,0 +1,75 @@
+---
+title: "2023-12-06_01_create-cq-directory.ts"
+---
+
+## High-level description
+This code defines two database migration functions, `up` and `down`, for creating and dropping a table named "cq_directory_entry" respectively. This table seems to store entries related to community centers, potentially with location data and URLs for different services.
+
+## References
+- `shared`: This symbol refers to a module named "migrations-shared" which likely contains helper functions for database migrations. Specifically, it uses the `createTable` function from this module.
+
+## Symbols
+
+### `tableName`
+#### Description
+A constant string variable that holds the name of the table being managed by this migration.
+
+#### Inputs
+_N/A_ This is a constant variable.
+
+#### Outputs
+_N/A_ This is a constant variable.
+
+#### Internal Logic
+The value is set to `"cq_directory_entry"`.
+
+### `up`
+#### Description
+An asynchronous function representing the "up" migration. It creates the "cq_directory_entry" table with its defined columns.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | Object | An object containing the `queryInterface` object, which is used to interact with the database. |
+
+#### Outputs
+_N/A_ This function does not explicitly return a value.
+
+#### Internal Logic
+1. **Starts a database transaction.** This ensures that all operations within the migration are executed together.
+2. **Calls the `createTable` function from the `shared` module.** This function handles the actual table creation logic, including defining columns and adding a trigger for updating the `updatedAt` column.
+3. **Passes the following arguments to `createTable`:**
+    - `queryInterface`: The object used to interact with the database.
+    - `tableName`: The name of the table to be created.
+    - **Table definition object:** Defines the columns of the table, including their types, constraints, and other properties.
+    - **Options object:** Includes the `transaction` object and sets `addVersion` to `true`, indicating that a version column should be added to the table.
+
+### `down`
+#### Description
+An asynchronous function representing the "down" migration. It drops the "cq_directory_entry" table.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | Object | An object containing the `queryInterface` object, which is used to interact with the database. |
+
+#### Outputs
+_N/A_ This function does not explicitly return a value.
+
+#### Internal Logic
+1. **Starts a database transaction.** This ensures that the table dropping operation is executed atomically.
+2. **Calls the `dropTable` function on the `queryInterface` object.** This function handles the actual table deletion logic.
+3. **Passes the following arguments to `dropTable`:**
+    - `tableName`: The name of the table to be dropped.
+    - **Options object:** Includes the `transaction` object to execute the drop within the transaction.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Provides the ORM and database interaction functionalities. |
+| .. (migrations) | Imports types and potentially other utilities related to database migrations. |
+| migrations-shared | Provides shared helper functions for database migrations, including the `createTable` function used in the `up` migration. |
+
+## Side Effects
+- **Database Schema Modification:** Both `up` and `down` functions directly modify the database schema by creating and dropping a table, respectively.
+- **Data Persistence:** The `up` migration creates a persistent table in the database. Data stored in this table will persist until explicitly deleted or the table is dropped.

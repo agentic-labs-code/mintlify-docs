@@ -1,0 +1,64 @@
+---
+title: "crud-hapi.yml"
+---
+
+## High-level description
+This YAML file defines a load testing configuration for FHIR CRUD operations using Artillery. It targets a HAPI FHIR server and simulates various create, read, and delete operations for Patient, Organization, and DocumentReference resources.
+
+## Code Structure
+The configuration is divided into several main sections: `config`, `scenarios`, and various HTTP requests within the `flow` of the scenario. The `config` section sets up the test environment, while the `scenarios` section defines the actual test flow.
+
+## Symbols
+
+### config
+#### Description
+Configures the load test environment, including target URL, HTTP settings, plugins, test phases, and variables.
+
+#### Internal Logic
+- Sets the target URL from an environment variable
+- Configures HTTP timeout
+- Sets up CloudWatch metrics publishing
+- Defines three test phases: warm-up, two ramp-up phases
+- Sets a tenant ID variable from an environment variable
+- Specifies a processor file for custom functions
+
+### scenarios
+#### Description
+Defines the test scenario "FHIR CRUD HAPI" with a series of CRUD operations on FHIR resources.
+
+#### Internal Logic
+The scenario includes:
+1. A loop that creates, reads, and deletes Patient resources twice
+2. Creation, reading, and deletion of an Organization resource
+3. Creation, reading, and deletion of a DocumentReference resource
+
+Each operation captures relevant data for use in subsequent requests.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Artillery | Load testing framework |
+| CloudWatch | Metrics publishing |
+| base-processor.js | Custom functions for data generation |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| HAPI_URL | string | N/A | Target HAPI FHIR server URL |
+| REGION | string | N/A | AWS region for CloudWatch metrics |
+| HAPI_TENANT_ID | string | N/A | Tenant ID for FHIR requests |
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /fhir/{tenantId}/Patient/{id} | PUT | Patient resource | Created Patient | Create a Patient resource |
+| /fhir/{tenantId}/Patient/{id} | GET | N/A | Patient resource | Retrieve a Patient by ID |
+| /fhir/{tenantId}/Patient?name={name} | GET | N/A | Bundle of Patients | Search Patients by name |
+| /fhir/{tenantId}/Patient/{id} | DELETE | N/A | N/A | Delete a Patient resource |
+| /fhir/{tenantId}/Organization/{id} | PUT | Organization resource | Created Organization | Create an Organization resource |
+| /fhir/{tenantId}/Organization/{id} | GET | N/A | Organization resource | Retrieve an Organization by ID |
+| /fhir/{tenantId}/Organization?name={name} | GET | N/A | Bundle of Organizations | Search Organizations by name |
+| /fhir/{tenantId}/Organization/{id} | DELETE | N/A | N/A | Delete an Organization resource |
+| /fhir/{tenantId}/DocumentReference/{id} | PUT | DocumentReference resource | Created DocumentReference | Create a DocumentReference resource |
+| /fhir/{tenantId}/DocumentReference/{id} | GET | N/A | DocumentReference resource | Retrieve a DocumentReference by ID |
+| /fhir/{tenantId}/DocumentReference/{id} | DELETE | N/A | N/A | Delete a DocumentReference resource |

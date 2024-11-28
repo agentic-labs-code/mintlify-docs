@@ -1,0 +1,72 @@
+---
+title: "resourceDeduplicator.js"
+---
+
+## High-level description
+This code implements a resource deduplication process for FHIR Encounter resources. It identifies duplicate encounters based on their identifiers, merges them, and updates the JSON object accordingly. The module also provides utility functions for deduplicating identifiers and selecting the most informative status.
+
+## Code Structure
+The main functionality is exposed through the `Process` function, which is the entry point for deduplication. It uses helper functions `deduplicateIdentifiers` and `selectMostInformativeStatus` to handle specific aspects of the merging process. The code also imports a `merge` function from a separate `resourceMerger` module.
+
+## Symbols
+
+### Process
+#### Description
+This function processes a JSON object containing FHIR resources, identifying and merging duplicate Encounter resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| jsonObj | Object | A JSON object representing a FHIR Bundle containing Encounter resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| jsonObj | Object | The processed JSON object with deduplicated Encounter resources |
+
+#### Internal Logic
+1. Filter Encounter resources from the input JSON object.
+2. Identify duplicate encounters based on their identifiers.
+3. For each set of duplicates:
+   - Merge the duplicate encounters using the `merge` function.
+   - Deduplicate the identifiers of the merged encounter.
+   - Select the most informative status for the merged encounter.
+   - Update the JSON object by removing duplicate encounters and adding the merged one.
+4. Return the processed JSON object.
+
+### deduplicateIdentifiers
+#### Description
+This function removes duplicate identifiers from an array of FHIR Identifier objects, keeping the most informative version of each identifier.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| identifiers | Array | An array of FHIR Identifier objects |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| deduplicated | Array | An array of deduplicated FHIR Identifier objects |
+
+### selectMostInformativeStatus
+#### Description
+This function selects the most informative status from two given status values, preferring non-"unknown" statuses.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status1 | String | The first status value |
+| status2 | String | The second status value |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | String | The most informative status |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| resourceMerger | Provides the `merge` function for merging Encounter resources |
+
+## Error Handling
+The main `Process` function is wrapped in a try-catch block. If an error occurs during processing, the original input `jsonObj` is returned unchanged.

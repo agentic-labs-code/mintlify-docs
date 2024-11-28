@@ -1,0 +1,39 @@
+---
+title: "GenerateLocationId.hbs"
+---
+
+## High-level description
+This Handlebars template generates a unique identifier (UUID) for a location based on available location information such as address, name, and code. It's designed to work with different location data structures within a FHIR (Fast Healthcare Interoperability Resources) context.
+
+## Symbols
+
+### Handlebars Template
+#### Description
+This template creates a JSON object with an "Id" field. The value of this field is a UUID generated from concatenated location information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| location | Object | An object containing location information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON Object | Object | A JSON object with an "Id" field containing a generated UUID |
+
+#### Internal Logic
+1. The template checks for the presence of `location.location.addr`.
+2. If `location.location.addr` exists, it generates a UUID using `location.location.addr`, `location.location.name`, and `location.code`.
+3. If `location.location.addr` doesn't exist but `location.addr` does, it generates a UUID using `location.addr`, `location.playingEntity.name`, and `location.code`.
+4. The UUID is generated using the `generateUUID` helper function, which takes the concatenated string produced by the `concatDefined` helper function.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| generateUUID | Helper function to generate a UUID from a string |
+| concatDefined | Helper function to concatenate defined values |
+
+## Notes
+1. The template is designed to handle two different location data structures, likely to accommodate variations in the input data format.
+2. The use of the `concatDefined` helper suggests that it only includes defined (non-null, non-undefined) values in the concatenation, which helps in creating a consistent identifier even when some fields are missing.
+3. The template is part of a larger FHIR converter system, as indicated by the copyright notice and the context of use.

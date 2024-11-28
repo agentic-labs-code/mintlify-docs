@@ -1,0 +1,91 @@
+---
+title: "document.ts"
+---
+
+## High-level description
+This code defines the Metriport Medical API SDK, which provides a client for interacting with Metriport's medical data services. It includes models for various medical entities such as documents, patients, facilities, and organizations, as well as utility functions for handling webhooks and API responses.
+
+## Code Structure
+The main class `MetriportMedicalApi` serves as the client for interacting with the Metriport Medical API. It provides methods for various operations such as creating and updating organizations, facilities, and patients, as well as querying and processing medical documents. The code also defines several data models and schemas used throughout the API interactions.
+
+## Symbols
+
+### `MetriportMedicalApi`
+#### Description
+The main class for interacting with the Metriport Medical API. It provides methods for various operations related to medical data management.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| apiKey | string | The API key for authentication |
+| options | Options | Optional configuration for the API client |
+
+#### Internal Logic
+- Initializes an Axios instance for making HTTP requests to the Metriport API
+- Provides methods for various API operations, including CRUD operations for organizations, facilities, and patients
+- Handles document queries and processing
+- Manages webhook verification and parsing
+
+### `createOrganization`
+#### Description
+Creates a new organization in the Metriport system.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | OrganizationCreate | The data for creating the organization |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The created organization |
+
+### `queryAndProcessDocuments`
+#### Description
+Queries CommonWell for DocumentReferences, downloads and converts documents to FHIR, and stores the FHIR results on the FHIR server.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient to query for |
+| facilityId | string | (optional) The facility to query for |
+| forceQuery | boolean | (optional) Whether to force a query |
+| forcePatientDiscovery | boolean | (optional) Whether to force patient discovery |
+| forceDownload | boolean | (optional) Whether to force download of documents |
+| ignoreDocRefOnFHIRServer | boolean | (optional) Whether to ignore existing doc refs on FHIR server |
+| ignoreFhirConversionAndUpsert | boolean | (optional) Whether to ignore FHIR conversion and upsert |
+| requestId | string | The request ID |
+| getOrgIdExcludeList | function | Function to get organization IDs to exclude |
+| triggerConsolidated | boolean | (optional) Whether to trigger consolidated query |
+
+#### Internal Logic
+1. Checks if CommonWell is enabled for the customer and facility
+2. Initiates document query progress
+3. Retrieves patient data from CommonWell
+4. Queries for documents
+5. Downloads and processes documents
+6. Updates query progress
+
+## Dependencies
+The code relies on several external libraries and modules, including:
+- @medplum/fhirtypes
+- @metriport/commonwell-sdk
+- @metriport/core
+- axios
+- zod
+
+## Error Handling
+The code implements error handling throughout its operations, capturing and logging errors, and in some cases, rethrowing them with additional context.
+
+## Logging
+The code uses a custom logging utility (`Util.out`) for logging operations and errors throughout the execution.
+
+## API/Interface Reference
+The `MetriportMedicalApi` class serves as the main interface for interacting with the Metriport Medical API. It provides methods for various operations, including:
+- Organization management (create, update, get)
+- Facility management (create, get, update, list, delete)
+- Patient management (create, get, update, delete, list)
+- Document operations (list, query, download)
+- Webhook handling (verification, parsing)
+
+Each method corresponds to a specific API endpoint and operation.

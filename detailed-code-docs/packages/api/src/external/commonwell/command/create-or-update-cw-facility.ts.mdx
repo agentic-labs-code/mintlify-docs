@@ -1,0 +1,49 @@
+---
+title: "create-or-update-cw-facility.ts"
+---
+
+## High-level description
+This code defines a function `createOrUpdateFacilityInCw` that creates or updates a facility in CommonWell Health Alliance (CW). It takes facility information and organization details as input, constructs the necessary data, and calls the `createOrUpdateCWOrganization` function to perform the actual creation or update operation in CommonWell.
+
+## Symbols
+
+### `createOrUpdateFacilityInCw`
+#### Description
+This function is responsible for creating or updating a facility in CommonWell. It prepares the organization data based on the input parameters and calls the `createOrUpdateCWOrganization` function to perform the operation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer ID |
+| facility | Facility | The facility object containing details of the facility |
+| cxOrgName | string | The name of the customer organization |
+| cxOrgType | OrgType | The type of the customer organization |
+| cwOboOid | string \| undefined | The CommonWell On Behalf Of (OBO) Organization ID |
+
+#### Internal Logic
+1. Constructs the organization name using `buildCwOrgNameForFacility` function.
+2. Calls `createOrUpdateCWOrganization` with the prepared data, including:
+   - Customer ID
+   - Organization details (OID, name, type, location)
+   - Active status
+   - Whether it's an OBO (On Behalf Of) organization
+
+#### Side Effects
+This function indirectly modifies the CommonWell system by creating or updating an organization.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/organization | Imports the OrgType enum |
+| ../../../domain/medical/facility | Imports Facility type and isOboFacility function |
+| ./create-or-update-cw-organization | Imports createOrUpdateCWOrganization function |
+| ../shared | Imports buildCwOrgNameForFacility function |
+
+## References
+This code is referenced and used in:
+1. `packages/api/src/routes/medical/internal-facility.ts`: In the PUT /internal/facility route handler, where it's called to sync facility data with CommonWell when certain conditions are met.
+2. `packages/api/src/external/commonwell/__tests__/cw.register-facility.test.ts`: In unit tests that verify the correct behavior of the `createOrUpdateFacilityInCw` function.
+
+## Notes
+- The function handles both regular facilities and OBO (On Behalf Of) facilities, determining the appropriate organization name and OBO status based on the input.
+- Error handling is not explicitly implemented within this function, suggesting that errors are expected to be handled by the caller.

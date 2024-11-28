@@ -1,0 +1,72 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for generating FHIR Linkage resources. These templates are part of a larger FHIR converter project, specifically designed to work with CDA (Clinical Document Architecture) data. The templates focus on creating JSON structures that represent different aspects of a FHIR Linkage resource.
+
+## What does it do?
+The templates in this directory are used to create standardized FHIR Linkage resources from CDA data. A Linkage resource in FHIR is used to assert that two or more resources are in fact about the same real-world entity. The templates here specifically handle two aspects of a Linkage resource:
+
+1. Creating a Linkage resource with an author reference
+2. Creating a Linkage resource with an item reference to another resource
+
+These templates take simple inputs like IDs and references, and transform them into structured JSON objects that conform to the FHIR Linkage resource specification. This process helps in converting CDA data to FHIR format, ensuring interoperability and standardization of health data.
+
+## Key Files
+
+1. `author.hbs`: This template creates a Linkage resource with an author reference. It takes an ID and a reference (REF) as inputs and generates a JSON structure with the Linkage resource type, ID, and author information.
+
+   Example usage:
+   ```handlebars
+   {{&gt; References/Linkage/author ID="12345" REF="Practitioner/67890"}}
+   ```
+
+   Output:
+   ```json
+   {
+     "resource": {
+       "resourceType": "Linkage",
+       "id": "12345",
+       "author": {
+         "reference": "Practitioner/67890"
+       }
+     },
+   }
+   ```
+
+2. `item.resource.hbs`: This template creates a Linkage resource with an item reference to another resource. It also takes an ID and a reference (REF) as inputs, but generates a JSON structure with the Linkage resource type, ID, and an item array containing the reference.
+
+   Example usage:
+   ```handlebars
+   {{&gt; References/Linkage/item.resource ID="54321" REF="Patient/98765"}}
+   ```
+
+   Output:
+   ```json
+   {
+     "resource": {
+       "resourceType": "Linkage",
+       "id": "54321",
+       "item": [
+         {
+           "resource": {
+             "reference": "Patient/98765"
+           }
+         }
+       ]
+     },
+   }
+   ```
+
+Both templates are designed to be part of a larger JSON structure, as indicated by the trailing commas in their outputs.
+
+## Dependencies
+These templates rely on the Handlebars templating engine to process the placeholders ({{ID}} and {{REF}}). They are meant to be used within a larger FHIR conversion system, likely the fhir-converter package mentioned in the directory structure.
+
+## Configuration
+There are no specific configuration options defined in these templates. They are designed to be simple and focused on their specific tasks within the FHIR conversion process.
+
+The templates include comprehensive copyright and license notices at the beginning, indicating they are part of a larger project with contributions from both Metriport Inc. and Microsoft Corporation.
+
+In summary, this directory provides essential building blocks for creating FHIR Linkage resources from CDA data, focusing on author and item references. These templates play a crucial role in the larger FHIR conversion process, enabling the transformation of clinical documents into a standardized, interoperable format.

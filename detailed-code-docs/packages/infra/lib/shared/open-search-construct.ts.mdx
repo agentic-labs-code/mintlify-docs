@@ -1,0 +1,67 @@
+---
+title: "open-search-construct.ts"
+---
+
+## High-level description
+This code defines an OpenSearchConstruct class that creates and configures an Amazon OpenSearch domain with associated resources and alarms. It provides a reusable construct for setting up OpenSearch in AWS CDK projects, including security groups, access policies, and CloudWatch alarms.
+
+## Code Structure
+The main class `OpenSearchConstruct` extends `Construct` and contains methods for creating the OpenSearch domain and associated alarms. It uses various AWS CDK constructs like `Domain`, `SecurityGroup`, and `Secret` to set up the OpenSearch infrastructure.
+
+## Symbols
+
+### OpenSearchConstruct
+#### Description
+A CDK construct that creates an OpenSearch domain with associated resources and alarms.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | Construct | The parent construct |
+| id | string | The construct's logical ID |
+| props | OpenSearchConstructProps | Configuration properties for the OpenSearch domain |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| domain | IDomain | The created OpenSearch domain |
+| creds | { username: string; secret: ISecret } | Credentials for accessing the OpenSearch domain |
+
+#### Internal Logic
+1. Creates a secret for the master user password
+2. Sets up a security group for the OpenSearch domain
+3. Configures zone awareness based on the number of data nodes and available subnets
+4. Creates an access policy for the domain
+5. Creates the OpenSearch domain with specified configuration
+6. Sets up CloudWatch alarms for various metrics
+7. Outputs the domain ID and endpoint
+
+### createAlarms (private method)
+#### Description
+Creates CloudWatch alarms for various OpenSearch metrics.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The base name for the alarms |
+| alarmThresholds | OpenSearchAlarmThresholds | Threshold values for different alarms |
+| alarmAction | SnsAction | Optional SNS action for alarm notifications |
+
+#### Internal Logic
+Creates alarms for cluster status, free storage, CPU utilization, JVM memory pressure, and search latency using the OpenSearch domain's metrics.
+
+## Dependencies
+- aws-cdk-lib: Provides core CDK constructs and classes
+- constructs: Provides the base Construct class
+- Various AWS service constructs from aws-cdk-lib (e.g., ec2, iam, opensearchservice, secretsmanager)
+
+## Configuration
+The construct accepts various configuration options through the `OpenSearchConstructProps` interface, including VPC settings, capacity configuration, EBS options, and alarm thresholds.
+
+## Error Handling
+The code includes basic error handling, such as throwing an error if an invalid availability zone count is provided.
+
+## Logging
+The construct enables logging for slow searches, slow index operations, and application logs on the OpenSearch domain.
+
+This OpenSearchConstruct provides a comprehensive and configurable way to set up an OpenSearch domain in AWS, including necessary security settings and monitoring alarms. It encapsulates the complexity of creating and configuring an OpenSearch domain, making it easier to integrate into larger CDK stacks.

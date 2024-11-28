@@ -1,0 +1,89 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains test files for the medical facility-related functionality in the API. It includes tests for creating, deleting, and updating facilities, as well as verifying access permissions for different types of organizations.
+
+## What does it do?
+The tests in this directory ensure that the API correctly handles various scenarios related to medical facilities, such as:
+
+1. Creating new facilities with proper validation of input data, including OBO (Organization Based Onboarding) information.
+2. Deleting facilities, including checks for associated patients and proper error handling.
+3. Updating facility information.
+4. Verifying access permissions for healthcare providers and healthcare IT vendors when interacting with facilities.
+
+These tests help maintain the integrity and security of the medical facility management system by validating the behavior of key functions and ensuring that only authorized organizations can perform certain actions.
+
+## Key Files
+
+1. `create-facility.test.ts`:
+   - Contains unit tests for the `createFacility` and `validateObo` functions.
+   - Ensures proper handling of facility creation with and without OBO data.
+   - Validates OBO-related rules and error handling.
+
+2. `create-facility.ts`:
+   - Provides factory functions `makeFacilityCreateCmd` and `makeFacilityCreate` for generating test data.
+   - Used to create `FacilityCreate` objects with pre-populated data for testing purposes.
+
+3. `delete-facility.test.ts`:
+   - Tests the `deleteFacility` function.
+   - Covers scenarios such as facility existence checks, handling associated patients, and successful deletion.
+
+4. `update-facility.ts`:
+   - Contains the `makeFacilityUpdateCmd` function for creating test data for facility updates.
+
+5. `verify-access.test.ts`:
+   - Tests the `verifyCxProviderAccess` and `verifyCxItVendorAccess` functions.
+   - Ensures proper authorization checks for healthcare providers and IT vendors.
+
+## Dependencies
+The test files rely on several external libraries and internal modules:
+
+1. Jest: Used as the testing framework for all test files.
+2. @faker-js/faker: Generates realistic fake data for tests.
+3. ts-essentials: Provides utility types like `DeepNullable`.
+4. @metriport/core: Contains domain-specific types, errors, and utilities.
+5. @metriport/shared: Provides shared utilities and error types.
+
+Internal dependencies include various models, domain objects, and utility functions from the API codebase.
+
+## Configuration
+The tests use Jest's configuration, which is likely defined in a separate Jest configuration file for the entire project. No specific configuration files are present in this directory.
+
+Here's an example of how these tests work together to ensure the reliability of the medical facility management system:
+
+1. When creating a new facility:
+   ```typescript
+   it("creates a facility without OBO data", async () =&gt; {
+     const facilityData = makeFacilityCreateCmd();
+     await createFacility(facilityData);
+     expect(FacilityModel.create).toHaveBeenCalledWith(expect.objectContaining(facilityData));
+   });
+   ```
+   This test ensures that a facility can be created without OBO data and that the correct data is passed to the database model.
+
+2. When deleting a facility:
+   ```typescript
+   it("throws if facility contains patients", async () =&gt; {
+     const facility = makeFacilityModel();
+     mockGetFacilityOrFail.mockResolvedValueOnce(facility);
+     mockGetPatients.mockResolvedValueOnce([makePatientModel()]);
+     await expect(deleteFacility(facility.id)).rejects.toThrow(BadRequestError);
+   });
+   ```
+   This test verifies that the system prevents the deletion of a facility that still has associated patients, throwing a `BadRequestError`.
+
+3. When verifying access:
+   ```typescript
+   it("returns true for healthcare provider", async () =&gt; {
+     mockGetOrganizationOrFail.mockResolvedValueOnce({
+       type: OrganizationBizType.healthcareProvider,
+     });
+     const result = await verifyCxProviderAccess("test-cx-id");
+     expect(result).toBe(true);
+   });
+   ```
+   This test ensures that the `verifyCxProviderAccess` function correctly identifies and allows access for healthcare provider organizations.
+
+These tests work together to create a comprehensive suite that validates the behavior of the medical facility management system, ensuring data integrity, proper access control, and correct handling of various scenarios.

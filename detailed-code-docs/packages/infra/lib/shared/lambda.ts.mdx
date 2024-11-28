@@ -1,0 +1,112 @@
+---
+title: "lambda.ts"
+---
+
+## High-level description
+This code defines a set of utility functions and configurations for creating and managing AWS Lambda functions within an infrastructure-as-code setup using AWS CDK. It provides a standardized way to create Lambda functions with consistent settings, error handling, and monitoring capabilities.
+
+## Code Structure
+The main symbols in this code are:
+
+1. `createLambda`: A function to create a Lambda function with standardized settings.
+2. `createRetryLambda`: A function to create a Lambda function for retrying messages from a dead letter queue.
+3. `addErrorAlarmToLambdaFunc`: A function to add error alarms to Lambda functions.
+4. `buildPolicy`: A function to create an IAM policy statement.
+5. `LambdaProps`: An interface defining the properties for creating a Lambda function.
+
+These symbols are interconnected, with `createLambda` and `createRetryLambda` using the other utility functions and interfaces to create and configure Lambda functions.
+
+## Symbols
+
+### `createLambda`
+#### Description
+Creates a Lambda function with standardized settings, including error alarms and metric permissions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| props | LambdaProps | Configuration properties for the Lambda function |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lambda | Lambda | The created Lambda function |
+
+#### Internal Logic
+1. Sets up the function name and basic Lambda configuration.
+2. Configures environment variables, including version information.
+3. Grants permission to publish metrics to CloudWatch.
+4. Sets up error alarms for general errors and out-of-memory errors.
+
+### `createRetryLambda`
+#### Description
+Creates a Lambda function to retry messages from a dead letter queue.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| props | RetryLambdaProps | Configuration properties for the retry Lambda function |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lambda | Lambda | The created retry Lambda function |
+
+#### Internal Logic
+1. Sets up the retry Lambda function using `createLambda`.
+2. Configures environment variables specific to the retry functionality.
+3. Grants necessary permissions to interact with source and destination queues.
+
+### `addErrorAlarmToLambdaFunc`
+#### Description
+Adds an error alarm to a Lambda function.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| construct | Construct | The CDK construct |
+| lambdaFunc | SingletonFunction \| NodejsFunction | The Lambda function to add the alarm to |
+| alarmName | string | The name of the alarm |
+| alarmAction | SnsAction \| undefined | Optional SNS action for the alarm |
+
+### `buildPolicy`
+#### Description
+Creates an IAM policy statement.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| actionToAllow | string | The action to allow in the policy |
+| instanceARN | string \| string[] | The ARN(s) of the resource(s) to apply the policy to |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| policy | PolicyStatement | The created IAM policy statement |
+
+### `getLambdaUrl`
+#### Description
+Generates the URL for invoking a Lambda function.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| arn | string | The ARN of the Lambda function |
+| region | string | The AWS region of the Lambda function |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | The URL for invoking the Lambda function |
+
+## Dependencies
+- AWS CDK libraries (aws-cdk-lib)
+- Constructs library
+
+## Configuration
+The code defines several configuration constants:
+- `DEFAULT_LAMBDA_TIMEOUT`: Default timeout for Lambda functions (30 seconds)
+- `MAXIMUM_LAMBDA_TIMEOUT`: Maximum allowed timeout for Lambda functions (15 minutes)
+
+## Error Handling
+The code implements error alarms for Lambda functions, including general errors and out-of-memory errors. These alarms are configured to trigger based on specific metrics and can be connected to SNS actions for notifications.

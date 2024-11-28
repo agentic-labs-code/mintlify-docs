@@ -1,0 +1,98 @@
+---
+title: "consolidated-on-s3.ts"
+---
+
+## High-level description
+This code provides functionality to handle consolidated patient data in S3 storage. It includes functions to retrieve consolidated bundles from S3, upload consolidated bundles to S3, and create filenames for consolidated data. The code is designed to work with FHIR resources and handles metadata for the uploaded files.
+
+## Code Structure
+The main functions in this file are `getConsolidatedBundleFromS3` and `uploadConsolidatedBundleToS3`. These functions interact with S3 storage to retrieve and store consolidated patient data. The `createConsolidatedFileName` function is used to generate appropriate filenames for the consolidated data.
+
+## Symbols
+
+### getConsolidatedBundleFromS3
+#### Description
+This function retrieves a consolidated bundle from S3 storage.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundleLocation | string | The S3 bucket name |
+| bundleFilename | string | The filename of the bundle in S3 |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | SearchSetBundle&lt;Resource&gt; | The retrieved and parsed FHIR bundle |
+
+#### Internal Logic
+1. Creates an S3Utils instance with the AWS region from Config.
+2. Retrieves the file contents as a string from S3.
+3. Parses the string content into a JSON object.
+4. Returns the parsed bundle.
+
+### uploadConsolidatedBundleToS3
+#### Description
+This function uploads a consolidated bundle to S3 storage.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "cxId" \| "id"&gt; | Patient information |
+| requestId | string | Optional request ID |
+| documentIds | string[] | Optional array of document IDs |
+| resources | ResourceTypeForConsolidation[] | Optional array of resource types |
+| dateFrom | string | Optional start date |
+| dateTo | string | Optional end date |
+| bundle | unknown | The bundle to be uploaded |
+| s3BucketName | string | The S3 bucket name |
+| dedupEnabled | boolean | Optional flag for deduplication |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bucket | string | The S3 bucket name |
+| key | string | The S3 object key |
+
+#### Internal Logic
+1. Creates a filename using `createConsolidatedFileName`.
+2. Creates an S3Utils instance with the AWS region from Config.
+3. Prepares the upload payload.
+4. Attempts to upload the file with full metadata.
+5. If the upload fails due to metadata size, retries with simplified metadata.
+6. Returns the bucket name and object key.
+
+### createConsolidatedFileName
+#### Description
+This function creates a filename for consolidated data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+| requestId | string | Optional request ID |
+| dedupEnabled | boolean | Optional flag for deduplication |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filename | string | The generated filename |
+
+#### Internal Logic
+1. Generates a timestamp.
+2. Constructs the filename using the provided parameters and timestamp.
+3. Uses the `createFilePath` function to create the full file path.
+
+## Dependencies
+- @medplum/fhirtypes: For FHIR type definitions
+- @metriport/shared/medical: For the SearchSetBundle type
+- "../../domain/filename": For file path creation utilities
+- "../../external/aws/s3": For S3 utilities
+- "../../util/config": For configuration settings
+
+## Error Handling
+The code includes basic error handling, particularly in the `uploadConsolidatedBundleToS3` function, where it attempts to upload with full metadata and falls back to simplified metadata if the initial upload fails.
+
+## Performance Considerations
+The code uses the S3Utils class for S3 operations, which likely includes optimizations for S3 interactions. The fallback mechanism in `uploadConsolidatedBundleToS3` helps handle potential issues with large metadata payloads.

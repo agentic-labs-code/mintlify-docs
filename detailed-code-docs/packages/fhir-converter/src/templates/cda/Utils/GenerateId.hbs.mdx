@@ -1,0 +1,43 @@
+---
+title: "GenerateId.hbs"
+---
+
+## High-level description
+This Handlebars template generates a unique identifier (UUID) for a FHIR resource based on the input CDA (Clinical Document Architecture) data. It handles different scenarios of input data to ensure a consistent and unique ID generation.
+
+## Symbols
+
+### GenerateId.hbs
+#### Description
+This Handlebars template is responsible for generating a unique identifier (UUID) for a FHIR resource. It processes the input CDA data and creates an ID based on available information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| obj | Object | The input CDA object containing identification information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Id | String | A generated UUID for the FHIR resource |
+
+#### Internal Logic
+1. The template uses the `elementAt` helper to access the first element of the `obj.id` array.
+2. It then checks for different scenarios to generate the UUID:
+   a. If both `root` and `extension` are present, it concatenates them with a '|' separator and generates a UUID.
+   b. If only `root` is present, it generates a UUID using the `root` value.
+   c. If neither `root` nor `extension` is available, it generates a UUID using the entire `obj` stringified.
+3. The `generateUUID` helper function is used to create the actual UUID based on the input string.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Handlebars | Template engine used for rendering the template |
+
+## Error Handling
+The template includes implicit error handling by providing fallback options when expected data is not available. It progresses from the most specific identifier (root + extension) to the least specific (entire object) to ensure an ID is always generated.
+
+## Performance Considerations
+The template uses conditional statements to determine the best method for generating the UUID. This approach ensures that the most appropriate and available data is used, potentially improving the uniqueness and consistency of the generated IDs.
+
+Note: The actual implementation of the `generateUUID` helper function is not provided in this template, but it's assumed to be a function that generates a UUID based on an input string.

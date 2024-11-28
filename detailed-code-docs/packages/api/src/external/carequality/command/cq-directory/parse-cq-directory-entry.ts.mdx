@@ -1,0 +1,78 @@
+---
+title: "parse-cq-directory-entry.ts"
+---
+
+## High-level description
+The `parseCQDirectoryEntries` function processes an array of Carequality (CQ) `Organization` objects and transforms them into an array of `CQDirectoryEntryData` objects. This transformation extracts relevant information from the CQ `Organization` objects, normalizes data formats, and prepares the data for storage in the Metriport system.
+
+## Code Structure
+The `parseCQDirectoryEntries` function iterates over an array of `Organization` objects. For each organization, it extracts relevant data like OID, URLs, coordinates, address, and managing organization details. It then constructs a `CQDirectoryEntryData` object with this information and returns an array of these objects. The function also utilizes helper functions like `getOid`, `getUrls`, `getCoordinates`, `getAddressFields`, and `getManagingOrg` to extract and format specific data points from the `Organization` object.
+
+## References
+- `@metriport/carequality-sdk/common/util`: Used for importing constants related to organization position and transaction URL.
+- `@metriport/carequality-sdk/models/*`: Used for importing types related to address, organization, and contained resources.
+- `@metriport/core/external/aws/location`: Used for importing the `Coordinates` type.
+- `@metriport/core/util/log`: Used for logging.
+- `@metriport/core/util/notifications`: Used for sending notifications.
+- `@metriport/shared`: Used for importing utility functions for error handling, URL validation, and zip code normalization.
+- `../../cq-directory`: Used for importing the `CQDirectoryEntryData` type.
+- `../../shared`: Used for importing the `CQOrgUrls` type.
+
+## Symbols
+
+### `parseCQDirectoryEntries`
+#### Description
+This function takes an array of `Organization` objects (from Carequality directory) and returns an array of `CQDirectoryEntryData` objects, which represent parsed and normalized organization data ready for storage in the Metriport system.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| orgsInput | `Organization[]` | An array of `Organization` objects representing healthcare organizations fetched from the Carequality directory. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `CQDirectoryEntryData[]` | An array of `CQDirectoryEntryData` objects, each representing a parsed and normalized healthcare organization from the input. |
+
+#### Internal Logic
+1. **Iterates** through the input `orgsInput` array.
+2. For each organization:
+    - **Extracts** the OID using `getOid`.
+    - **Retrieves** relevant URLs using `getUrls`.
+    - **Gets** coordinates from the address using `getCoordinates`.
+    - **Computes** the Earth point from coordinates using `computeEarthPoint`.
+    - **Fetches** managing organization details using `getManagingOrg` and `getManagingOrgId`.
+    - **Extracts** address fields using `getAddressFields`.
+    - **Constructs** a `CQDirectoryEntryData` object with the extracted and normalized data.
+3. **Returns** the array of `CQDirectoryEntryData` objects.
+
+### `computeEarthPoint`
+#### Description
+This function calculates the Earth point (a 3D point representation) for a given latitude and longitude, using a formula based on the Earth's radius.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lat | `number` | Latitude of the location. |
+| lon | `number` | Longitude of the location. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| point | `string` | A string representation of the Earth point in the format "(x,y,z)". |
+
+#### Internal Logic
+1. **Converts** input latitude and longitude from degrees to radians.
+2. **Calculates** the x, y, and z coordinates of the Earth point using the provided formula and Earth's radius.
+3. **Returns** the calculated Earth point as a string.
+
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/carequality-sdk | Provides types and utilities for interacting with the Carequality API. |
+| @metriport/core | Provides core utilities for logging, notifications, and AWS interactions. |
+| @metriport/shared | Provides shared utilities for error handling, URL validation, and data normalization. |
+
+## Error Handling
+The code uses a try-catch block within the loop to handle potential errors during the parsing of individual organizations. If an error occurs, the error is logged, and the parsing continues to the next organization. This ensures that errors in processing one organization do not halt the entire parsing process.

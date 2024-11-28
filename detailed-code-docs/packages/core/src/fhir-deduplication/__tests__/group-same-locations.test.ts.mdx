@@ -1,0 +1,84 @@
+---
+title: "group-same-locations.test.ts"
+---
+
+## High-level description
+This file contains unit tests for the `groupSameLocations` function from the `location.ts` module. The tests verify the function's ability to correctly group duplicate locations based on their names and addresses, and handle various edge cases such as locations with different addresses, names, or missing information.
+
+## Code Structure
+The test file uses Jest as the testing framework and imports necessary dependencies and helper functions. It defines a set of test cases within a `describe` block, each testing different scenarios for the `groupSameLocations` function.
+
+## References
+- `groupSameLocations` function from `../resources/location`
+- `makeLocation` and `exampleAddress` from `../../fhir-to-cda/cda-templates/components/__tests__/make-encounter`
+
+## Symbols
+
+### `beforeEach`
+#### Description
+This function sets up the test environment before each test case by initializing test data.
+
+#### Internal Logic
+1. Generates unique UUIDs for `locationId` and `locationId2`.
+2. Creates two `Location` objects (`location` and `location2`) using the `makeLocation` function with the generated IDs and the name "Planet Express".
+
+### `describe("groupSameLocations", ...)`
+#### Description
+This describe block contains all the test cases for the `groupSameLocations` function.
+
+### Test: "correctly groups duplicate locations based on names and addresses"
+#### Description
+Verifies that the function correctly groups locations with the same name and address.
+
+#### Internal Logic
+1. Assigns the same `exampleAddress` to both locations.
+2. Calls `groupSameLocations` with both locations.
+3. Asserts that the resulting `locationsMap` has a size of 1, indicating that the locations were grouped together.
+
+### Test: "does not group locations with different addresses"
+#### Description
+Ensures that locations with the same name but different addresses are not grouped together.
+
+#### Internal Logic
+1. Assigns `exampleAddress` to the first location.
+2. Assigns a modified version of `exampleAddress` with a different city to the second location.
+3. Calls `groupSameLocations` with both locations.
+4. Asserts that the resulting `locationsMap` has a size of 2, indicating that the locations were not grouped together.
+
+### Test: "does not group locations with different names"
+#### Description
+Verifies that locations with the same address but different names are not grouped together.
+
+#### Internal Logic
+1. Assigns the same `exampleAddress` to both locations.
+2. Changes the name of the second location.
+3. Calls `groupSameLocations` with both locations.
+4. Asserts that the resulting `locationsMap` has a size of 2, indicating that the locations were not grouped together.
+
+### Test: "removes locations without names"
+#### Description
+Checks that locations without names are removed from the grouping.
+
+#### Internal Logic
+1. Assigns the same `exampleAddress` to both locations.
+2. Removes the name from the second location.
+3. Calls `groupSameLocations` with both locations.
+4. Asserts that the resulting `locationsMap` has a size of 1, indicating that only one location was included in the grouping.
+
+### Test: "removes locations without addresses"
+#### Description
+Ensures that locations without addresses are removed from the grouping.
+
+#### Internal Logic
+1. Assigns `exampleAddress` only to the first location.
+2. Calls `groupSameLocations` with both locations.
+3. Asserts that the resulting `locationsMap` has a size of 1, indicating that only one location was included in the grouping.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @faker-js/faker | Used to generate random UUIDs for test data |
+| @medplum/fhirtypes | Provides TypeScript types for FHIR resources |
+
+## Error Handling
+This test file does not implement specific error handling mechanisms. It relies on Jest's built-in assertion functions to catch and report any failures in the test cases.

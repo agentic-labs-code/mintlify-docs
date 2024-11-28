@@ -1,0 +1,123 @@
+---
+title: "activity.ts"
+---
+
+## High-level description
+The code defines a function `mapToActivity` that transforms Fitbit activity log data into a standardized `Activity` object as defined in the `@metriport/api-sdk`. This transformation involves filtering logs by date, converting units, and mapping Fitbit-specific data fields to their corresponding Metriport equivalents. 
+
+## Code Structure
+The `mapToActivity` function is the main symbol, utilizing helper functions `filterLogsByDate`, `findAndConvertActivityLevelToSec`, and `findMinMaxHeartRate` to process the Fitbit activity data. The `filterLogsByDate` function selects logs for a specific date. The `findAndConvertActivityLevelToSec` function extracts and converts activity level durations. The `findMinMaxHeartRate` function, currently unused, aims to determine minimum and maximum heart rate values from heart rate zones.
+
+## References
+- `Activity`: Interface from `@metriport/api-sdk` defining the structure of a standardized activity object.
+- `ActivityLog`: Interface from `@metriport/api-sdk/devices/models/common/activity-log` defining the structure of a standardized activity log object.
+- `FitbitActivityLogs`: Type from `./models/activity-log` representing the raw Fitbit activity log data.
+- `PROVIDER_FITBIT`: Constant from `../../shared/constants` representing the Fitbit data source.
+- `Util`: Class from `../../shared/util` providing utility functions for data manipulation.
+- `ISO_DATE`: Constant from `../../shared/date` defining the ISO date format.
+
+## Symbols
+
+### `mapToActivity`
+#### Description
+This function transforms raw Fitbit activity log data into a standardized `Activity` object. It filters the logs by date, iterates through each log entry, maps relevant data fields to their corresponding Metriport equivalents, performs unit conversions where necessary, and constructs an `Activity` object containing an array of `ActivityLog` objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fitbitActiveLogs | `FitbitActivityLogs` | Raw activity log data retrieved from Fitbit API. |
+| date | `string` | Date string in ISO format (YYYY-MM-DD) used to filter the activity logs. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| activity | `Activity` | Standardized activity object containing the transformed Fitbit activity data. |
+
+#### Internal Logic
+1. **Filter Logs by Date:** Invokes `filterLogsByDate` to extract logs specific to the provided `date`.
+2. **Initialize Activity Object:** Creates an empty `Activity` object with metadata indicating the date and source (Fitbit).
+3. **Iterate through Filtered Logs:** Loops through each `FitbitActivityLog` in the filtered logs.
+4. **Map Data Fields:** For each log entry:
+   - Extracts and converts `activeDuration` from milliseconds to seconds.
+   - Maps `activityName`, `originalStartTime`, `steps`, `calories`, `elevationGain`, `speed`, and `distance` to corresponding fields in an `ActivityLog` object.
+   - Performs unit conversions for `elevationGain` (km to m) and `distance` (km to m).
+   - Extracts activity level durations (sedentary, lightly, fairly, very) from `activityLevel` and converts minutes to seconds.
+   - Extracts average heart rate from `averageHeartRate`.
+   - Constructs and appends the `ActivityLog` object to the `activityLogs` array within the `Activity` object.
+5. **Return Activity Object:** Returns the populated `Activity` object.
+
+### `filterLogsByDate`
+#### Description
+This function filters an array of Fitbit activity logs, returning only the logs that match the specified date.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| logs | `FitbitActivityLogs` | An array of Fitbit activity log objects. |
+| date | `string` | The date to filter by, in ISO format (YYYY-MM-DD). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filteredLogs | `FitbitActivityLogs` | An array of Fitbit activity log objects that match the specified date. |
+
+#### Internal Logic
+1. Iterates through each log in the `logs` array.
+2. For each log, extracts the date from the `originalStartTime` property and formats it as ISO date.
+3. Compares the extracted date with the input `date`.
+4. If the dates match, the log is included in the `filteredLogs` array.
+5. Returns the `filteredLogs` array.
+
+### `findAndConvertActivityLevelToSec`
+#### Description
+This function finds the activity level of a specific type within an array of activity levels and converts its duration from minutes to seconds.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| type | `string` | The type of activity level to find (e.g., "sedentary", "lightly"). |
+| arr | `Array&lt;{ name: string; minutes: number }&gt; ` | An array of activity level objects, each containing a `name` and `minutes`. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| seconds | `number \| undefined` | The duration of the specified activity level in seconds, or `undefined` if not found. |
+
+#### Internal Logic
+1. Uses the `find` method to search for an activity level object in the `arr` that has a matching `name` property.
+2. If a matching activity level is found:
+   - Accesses its `minutes` property.
+   - Multiplies the `minutes` by 60 to convert it to seconds.
+   - Returns the calculated seconds.
+3. If no matching activity level is found, returns `undefined`.
+
+### `findMinMaxHeartRate`
+#### Description
+This function is intended to find the minimum and maximum heart rate values from an array of `HeartRateZone` objects. However, it is currently unused in the code.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| heartRateZones | `HeartRateZone[]` | An array of `HeartRateZone` objects, each potentially containing `min` and `max` heart rate values. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| minMax | `MinMaxItem` | An object containing the `min_item` and `max_item` representing the minimum and maximum heart rate values found. |
+
+#### Internal Logic
+1. Filters the `heartRateZones` array to keep only zones with non-null and non-zero `minutes`.
+2. Iterates through the filtered zones and extracts the `min` and `max` values, adding them to an accumulator array.
+3. Uses the `Util.getMinMaxItem` utility function to determine the minimum and maximum values from the accumulated heart rate values.
+4. Returns the minimum and maximum values as a `MinMaxItem` object.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides interfaces for standardized activity and activity log objects. |
+| dayjs | Used for date manipulation and formatting. |
+| convert-units | Used for unit conversions (e.g., milliseconds to seconds, kilometers to meters). |
+
+## TODOs
+- **#805: Include a more thorough breakdown of the heart rate data to get the actual min and max bpm, instead of relying on heartRateZones**
+  - This TODO suggests that the current implementation of `findMinMaxHeartRate` might not be accurate and a more robust method for determining minimum and maximum heart rate is needed. 

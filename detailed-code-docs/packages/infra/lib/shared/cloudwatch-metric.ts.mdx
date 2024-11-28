@@ -1,0 +1,53 @@
+---
+title: "cloudwatch-metric.ts"
+---
+
+## High-level description
+This code defines a function `addAlarmToMetric` that creates and configures a CloudWatch alarm for a given metric in AWS CDK. It allows for easy setup of alarms with customizable parameters and optional SNS actions for alarm and OK states.
+
+## Symbols
+
+### `addAlarmToMetric`
+#### Description
+This function creates a CloudWatch alarm for a given metric with specified parameters. It also optionally adds alarm and OK actions to the created alarm.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | Construct | The construct scope in which to create the alarm |
+| metric | Metric | The CloudWatch metric to create the alarm for |
+| alarmName | string | The name of the alarm |
+| threshold | number | The threshold value for the alarm |
+| evaluationPeriods | number | The number of periods to evaluate the alarm |
+| comparisonOperator | ComparisonOperator (optional) | The comparison operator for the alarm |
+| treatMissingData | TreatMissingData (optional) | How to treat missing data |
+| alarmAction | SnsAction (optional) | The SNS action to trigger when the alarm state changes |
+| includeOkAction | boolean (optional) | Whether to include the OK action (default: true) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| alarm | Alarm | The created CloudWatch alarm |
+
+#### Internal Logic
+1. Creates an alarm using the provided metric and configuration parameters.
+2. If an `alarmAction` is provided, it adds it as an alarm action.
+3. If `includeOkAction` is true (default) and an `alarmAction` is provided, it also adds the action as an OK action.
+4. Returns the created alarm.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-cdk-lib/aws-cloudwatch | Importing Alarm, ComparisonOperator, Metric, and TreatMissingData for CloudWatch functionality |
+| aws-cdk-lib/aws-cloudwatch-actions | Importing SnsAction for SNS integration |
+| constructs | Importing Construct for CDK construct handling |
+
+## Error Handling
+This function does not implement explicit error handling. It relies on the underlying CDK libraries to throw errors if invalid parameters are provided.
+
+## API/Interface Reference
+| Function | Inputs | Output | Description |
+|:---------|:-------|:-------|:------------|
+| addAlarmToMetric | Object with configuration parameters | Alarm | Creates and configures a CloudWatch alarm for a given metric |
+
+The function provides a simplified interface for creating CloudWatch alarms with optional SNS actions, abstracting away some of the complexity of directly using the CDK Alarm construct.

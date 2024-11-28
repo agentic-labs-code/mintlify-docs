@@ -1,0 +1,57 @@
+---
+title: "release-node-sdk.yml"
+---
+
+## High-level description
+This GitHub Actions workflow, named "Release Node SDK," is designed to automate the release process for a Node.js SDK. It can be manually triggered and requires a version input. The workflow checks out the repository, sets up Node.js, installs the Fern CLI, and uses it to generate and release the SDK with the specified version.
+
+## Symbols
+
+### `Release Node SDK` (Workflow)
+#### Description
+This is the main workflow defined in the YAML file. It is triggered manually and performs the release process for the Node SDK.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| version | string | The version of the SDKs to be released |
+
+#### Internal Logic
+1. The workflow runs on the latest Ubuntu environment.
+2. It checks out the repository.
+3. Sets up Node.js.
+4. Installs the Fern CLI globally.
+5. Runs the Fern generate command to release the SDK with the specified version.
+
+### `release` (Job)
+#### Description
+This job contains the steps necessary to release the Node SDK.
+
+#### Internal Logic
+1. Checks out the repository using `actions/checkout@v3`.
+2. Sets up Node.js using `actions/setup-node@v3`.
+3. Downloads and installs the Fern CLI globally using npm.
+4. Runs the Fern generate command to release the SDK.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| actions/checkout@v3 | To check out the repository |
+| actions/setup-node@v3 | To set up Node.js environment |
+| fern-api | CLI tool used for generating and releasing the SDK |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| FERN_TOKEN | secret | N/A | Authentication token for Fern API |
+| NPM_TOKEN | secret | N/A | Authentication token for npm |
+
+## Error Handling
+The workflow does not implement explicit error handling. It relies on GitHub Actions' default behavior of stopping the workflow if any step fails.
+
+## Logging
+The Fern generate command includes the `--log-level debug` flag, which enables detailed logging for troubleshooting purposes.
+
+___
+
+This workflow automates the release process for a Node.js SDK using the Fern API. It's designed to be manually triggered, allowing the user to specify the version to be released. The workflow uses GitHub Actions to set up the necessary environment, install dependencies, and run the Fern CLI to generate and release the SDK. It requires two secret tokens (FERN_TOKEN and NPM_TOKEN) for authentication with the Fern API and npm, respectively. The use of the debug log level in the Fern generate command suggests that this workflow might be used for both releases and debugging the release process.

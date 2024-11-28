@@ -1,0 +1,105 @@
+---
+title: "search-documents.ts"
+---
+
+## High-level description
+This code defines functions for searching and retrieving medical documents from various healthcare information exchanges (HIEs) and external systems. It provides functionality to search documents based on patient ID, date range, and content filters, as well as to query documents across different HIEs.
+
+## Code Structure
+The main function `searchDocuments` uses helper functions like `getDocuments` to retrieve document references from a FHIR server. It then processes these documents using functions like `searchOnCCDAFiles` and `searchOnDocumentReferences` to filter and search based on specific criteria. The code also includes utility functions for handling extensions and converting between different data formats.
+
+## Symbols
+
+### `searchDocuments`
+#### Description
+This function searches for documents based on the provided criteria, including patient ID, date range, and content filter.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer ID |
+| patientId | string | The patient ID |
+| dateRange | object | Optional date range for filtering documents |
+| contentFilter | string | Optional content filter for searching within documents |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documents | DocumentReferenceWithId[] | An array of document references matching the search criteria |
+
+#### Internal Logic
+1. Retrieves documents from the FHIR server using `getDocuments`.
+2. Performs searches on CCDA files and document references concurrently.
+3. Combines and filters the results, removing duplicates and ensuring only ready documents are returned.
+
+### `searchOnDocumentReferences`
+#### Description
+Searches for documents within the provided document references based on the content filter.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docs | DocumentReferenceWithId[] | Array of document references to search |
+| contentFilter | string | Optional content filter for searching within documents |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | DocumentReferenceWithId[] | Filtered array of document references |
+
+### `searchOnCCDAFiles`
+#### Description
+Searches for documents within CCDA files based on the content filter.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docs | DocumentReferenceWithId[] | Array of document references to search |
+| cxId | string | The customer ID |
+| patientId | string | The patient ID |
+| contentFilter | string | Optional content filter for searching within documents |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | DocumentReferenceWithId[] | Filtered array of document references |
+
+### `checkExtensions`
+#### Description
+Checks if a document reference has the required extensions (Metriport, CommonWell, or Carequality).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| doc | DocumentReference | The document reference to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | boolean | True if the document has the required extensions, false otherwise |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides FHIR type definitions |
+| @metriport/commonwell-sdk | Provides CommonWell SDK functionality |
+| @metriport/core | Provides core functionality and utilities |
+| lodash | Provides utility functions like `uniqBy` |
+
+## Configuration
+The code uses configuration values from the `Config` object, which likely comes from environment variables or a configuration file. Some important configuration options include:
+
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| isSandbox | function | Determines if the current environment is a sandbox |
+| getAWSRegion | function | Retrieves the AWS region |
+| getSearchEndpoint | function | Retrieves the search endpoint URL |
+| getSearchIndexName | function | Retrieves the search index name |
+| getSearchUsername | function | Retrieves the search username |
+| getSearchPassword | function | Retrieves the search password |
+
+## Error Handling
+The code uses a `capture.message` function to log errors and warnings. It also includes error handling for failures during the document search process.
+
+## Performance Considerations
+The code uses `Promise.allSettled` to perform concurrent searches on CCDA files and document references, which can improve performance when dealing with large numbers of documents.

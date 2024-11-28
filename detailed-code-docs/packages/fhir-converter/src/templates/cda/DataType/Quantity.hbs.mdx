@@ -1,0 +1,51 @@
+---
+title: "Quantity.hbs"
+---
+
+## High-level description
+This Handlebars template is designed to convert and format quantity data from CDA (Clinical Document Architecture) to FHIR (Fast Healthcare Interoperability Resources) format. It handles various input formats, including feet and inches, comparators, and decimal values, and outputs a standardized JSON structure for quantity representation in FHIR.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template processes the input quantity value through a series of nested conditional blocks, each handling a specific format or case.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| quantity | Object | The input quantity object containing value and unit properties |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON | Object | A FHIR-compliant quantity representation |
+
+#### Internal Logic
+1. Decode HTML entities in the quantity value
+2. Attempt to convert feet and inches to centimeters
+3. If not feet and inches, try to extract a comparator
+4. If no comparator, attempt to extract a number and unit
+5. If all else fails, try to extract a decimal value
+6. For each successful extraction, output a formatted JSON object with appropriate properties
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| decodeHtmlEntities | Decodes HTML entities in the input string |
+| convertFeetAndInchesToCm | Converts feet and inches measurements to centimeters |
+| extractComparator | Extracts a comparator (e.g., &gt;, &lt;, &gt;=, &lt;=) from the input string |
+| extractNumberAndUnit | Extracts a numeric value and its associated unit from the input string |
+| extractDecimal | Extracts a decimal value from the input string |
+
+## Error Handling
+The template uses a series of conditional checks to handle different input formats. If none of the conditions are met, no output is generated, effectively handling invalid or unrecognized inputs.
+
+## API/Interface Reference
+The template expects an input object with the following structure:
+| Property | Type | Description |
+|:---------|:-----|:------------|
+| quantity.value | String | The numeric value of the quantity, possibly including units or comparators |
+| quantity.unit | String | The unit of measurement (optional) |
+
+The output is a JSON object conforming to the FHIR Quantity data type specification, always using "http://unitsofmeasure.org" as the system.

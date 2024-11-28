@@ -1,0 +1,58 @@
+---
+title: "get-cq-data.ts"
+---
+
+## High-level description
+The code defines two functions, `getCQPatientData` and `getCQPatientDataOrFail`, for retrieving patient data from CareQuality (CQ). 
+
+`getCQPatientData` attempts to fetch patient data based on provided parameters and returns the data if found, otherwise it returns undefined. `getCQPatientDataOrFail` builds upon `getCQPatientData` and throws a `NotFoundError` if the data is not found.
+
+## References
+- `CQPatientDataModel`: Represents the CareQuality patient data model.
+- `NotFoundError`: Custom error class for indicating a resource not found.
+
+## Symbols
+
+### `getCQPatientData`
+#### Description
+This function attempts to retrieve patient's CareQuality data from the database based on the provided `id` and `cxId`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The ID of the patient. |
+| cxId | string | The customer ID associated with the patient. |
+| transaction | Transaction | (Optional) A Sequelize transaction object for database operations. |
+| lock | boolean | (Optional) Whether to acquire a lock on the retrieved data. Defaults to false. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cqPatientData | Promise&lt;CQPatientDataModel \| undefined\&gt; | A promise that resolves to the `CQPatientDataModel` if found, otherwise `undefined`. |
+
+#### Internal Logic
+The function uses the `CQPatientDataModel.findOne` method to query the database for a matching record based on the provided `id` and `cxId`. The `transaction` and `lock` options are passed to the query if provided.
+
+### `getCQPatientDataOrFail`
+#### Description
+This function retrieves patient's CareQuality data from the database or throws a `NotFoundError` if not found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | GetCQData | An object containing the `id`, `cxId`, optional `transaction`, and optional `lock` parameters. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cqPatientData | Promise&lt;CQPatientDataModel&gt; | A promise that resolves to the `CQPatientDataModel` if found. |
+
+#### Internal Logic
+The function calls `getCQPatientData` to retrieve the patient data. If no data is found, it throws a `NotFoundError` with a message indicating the data could not be found. The error also includes the `id` and `cxId` for debugging purposes.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/util/error/not-found | Provides the `NotFoundError` class. |
+| sequelize | Used for database transactions. |
+| ../../models/cq-patient-data | Provides the `CQPatientDataModel`. | 

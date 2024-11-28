@@ -1,0 +1,197 @@
+---
+title: "check-doc-queries.ts"
+---
+
+## High-level description
+The `checkDocumentQueries` function is an operationally driven function that checks and potentially fixes the status of document queries for patients. It identifies patients with document queries in progress that have exceeded a predefined processing time or have inconsistent status/count values in their progress data. The function then updates the status of these queries to 'completed' and sends webhook notifications.
+
+## Code Structure
+The code defines a main function `checkDocumentQueries` and several helper functions. `checkDocumentQueries` orchestrates the process by first identifying patients with potentially invalid document query statuses using `getPatientsToUpdate`. It then iterates through these patients, validating their document query progress data and populating a map of patients to update (`patientsToUpdate`). Finally, it updates the patients' data using `updateDocQueryStatus` and sends webhook notifications using `sendWHNotifications`.
+
+## References
+- `executeAsynchronously`: From `@metriport/core/util/concurrency`, used for parallel processing of patient updates.
+- `getPatientOrFail`: From `../patient/get-patient`, used to retrieve patient data.
+- `sendWHNotifications`: From `./check-doc-queries-notification`, used to send webhook notifications.
+- `executeOnDBTx`: From `../../../models/transaction-wrapper`, used to execute database operations within a transaction.
+- `PatientModel`: From `../../../models/medical/patient`, represents the patient data model.
+
+## Symbols
+
+### `checkDocumentQueries`
+#### Description
+This function checks and potentially fixes the status of document queries for patients. It identifies patients with document queries in progress that have exceeded a predefined processing time or have inconsistent status/count values in their progress data. The function then updates the status of these queries to 'completed' and sends webhook notifications.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientIds | string[] | An optional array of patient IDs to check. If not provided, all patients will be checked. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | void | This function does not return any value. |
+
+#### Internal Logic
+1. **Identify patients to update:**
+   - Calls `getPatientsToUpdate` to retrieve a list of patients with potentially invalid document query statuses.
+   - Iterates through the retrieved patients and validates their document query progress data using the `checkInvalid` helper function.
+   - Populates a map (`patientsToUpdate`) with patient IDs as keys and an object containing the validation results and cxId as values.
+2. **Update document query status:**
+   - Calls `updateDocQueryStatus` to update the status of document queries for the identified patients.
+3. **Send webhook notifications:**
+   - Calls `sendWHNotifications` to send webhook notifications for the updated patients.
+4. **Log and capture events:**
+   - Logs messages to track the progress and any errors encountered.
+   - Uses the `capture` object from `../../../shared/notifications` to capture events for monitoring and debugging purposes.
+
+### `isValidStatus`
+#### Description
+Checks if a given document query status is valid. A valid status is any status other than "processing".
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | DocumentQueryStatus | The document query status to check. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | boolean | Returns `true` if the status is valid, `false` otherwise. |
+
+### `getStatus`
+#### Description
+Returns the status of a document query progress object. If the status is valid (not "processing"), it returns the original status. Otherwise, it returns "completed".
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| prop | Progress | The document query progress object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | DocumentQueryStatus | Returns the status of the document query progress. |
+
+### `calculateTotal`
+#### Description
+Calculates the total number of document query attempts based on the number of successful and failed attempts.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| prop | Progress | The document query progress object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | number | Returns the total number of document query attempts. |
+
+### `updateDocQueryStatus`
+#### Description
+Updates the document query status for a list of patients. It processes the patients in parallel, with a maximum of `MAX_CONCURRENT_UDPATES` concurrent updates.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patients | PatientsWithValidationResult | A map of patient IDs to their corresponding validation results and cxId. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Promise&lt;void&gt; | This function does not return any value. |
+
+#### Internal Logic
+1. **Execute updates asynchronously:**
+   - Uses `executeAsynchronously` from `@metriport/core/util/concurrency` to process the patients in parallel.
+   - Calls the `updatePatientsInSequence` helper function for each patient.
+
+### `updatePatientsInSequence`
+#### Description
+Updates the document query status for a single patient within a database transaction.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| [patientId, { cxId, ...whatToUpdate }] | [string, GroupedValidationResult] | A tuple containing the patient ID and an object containing the validation results and cxId. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Promise&lt;void&gt; | This function does not return any value. |
+
+#### Internal Logic
+1. **Retrieve patient data:**
+   - Retrieves the patient data using `getPatientOrFail` within a database transaction managed by `executeOnDBTx`.
+2. **Update document query progress:**
+   - Updates the `convert` and `download` properties of the patient's `documentQueryProgress` object based on the validation results.
+3. **Update patient data:**
+   - Updates the patient data in the database with the modified `documentQueryProgress` object.
+
+### `getPatientsToUpdate`
+#### Description
+Retrieves a list of patients with potentially invalid document query statuses from the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientIds | string[] | An optional array of patient IDs to filter the results. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Promise&lt;Patient[]&gt; | Returns a promise that resolves to an array of `Patient` objects. |
+
+#### Internal Logic
+1. **Construct SQL query:**
+   - Constructs a SQL query to retrieve patients based on the following criteria:
+     - `updatedAt` is older than `MAX_TIME_TO_PROCESS` (30 minutes).
+     - The `total` count in the `convert` or `download` progress objects does not match the sum of `successful` and `errors`.
+     - The `status` in the `convert` or `download` progress objects is "processing".
+2. **Execute query:**
+   - Executes the SQL query using `PatientModel.sequelize?.query`.
+3. **Handle query results:**
+   - Checks if the query result is valid (not undefined/null and an array).
+   - Manually sets the `updatedAt` property for each patient object as it's not automatically set by Sequelize.
+4. **Return patient list:**
+   - Returns the array of `Patient` objects.
+
+### `getQuery`
+#### Description
+Constructs a SQL query to retrieve patients with potentially invalid document query statuses.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientIds | string[] | An optional array of patient IDs to filter the results. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | string | Returns the constructed SQL query string. |
+
+#### Internal Logic
+1. **Define query components:**
+   - Defines various components of the SQL query, including column names, conditions, and placeholders.
+2. **Construct base query:**
+   - Constructs the base SQL query that selects all columns from the `patient` table based on the criteria mentioned in `getPatientsToUpdate`.
+3. **Apply patient ID filter:**
+   - Appends an optional `WHERE` clause to the query to filter by patient IDs if provided.
+4. **Return complete query:**
+   - Returns the complete SQL query string.
+
+## Side Effects
+- Modifies the `documentQueryProgress` property of patients in the database.
+- Sends webhook notifications for patients with updated document query statuses.
+- Logs messages and captures events for monitoring and debugging purposes.
+
+## Error Handling
+- The `checkDocumentQueries` function uses a `try...catch` block to handle any errors that occur during the process.
+- Errors are logged using the `log` object from `@metriport/core/util/log`.
+- The `capture` object from `../../../shared/notifications` is used to capture errors for monitoring and debugging purposes.
+
+## Logging
+- The code uses the `log` object from `@metriport/core/util/log` to log messages at various stages of the process.
+- Messages are logged to track the progress, report the number of patients updated, and log any errors encountered.
+
+## TODOs
+- None.

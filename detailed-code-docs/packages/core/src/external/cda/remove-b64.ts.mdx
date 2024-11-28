@@ -1,0 +1,53 @@
+---
+title: "remove-b64.ts"
+---
+
+## High-level description
+This code defines a function `removeBase64PdfEntries` that processes an XML payload, specifically targeting Clinical Document Architecture (CDA) documents. It removes base64-encoded PDF entries from the notes section of the document, returning the modified XML if any entries were removed, or the original payload if no changes were made.
+
+## Code Structure
+The main function `removeBase64PdfEntries` uses the `XMLParser` and `XMLBuilder` from the `fast-xml-parser` library to parse and rebuild the XML. It also utilizes utility functions and constants from other parts of the codebase.
+
+## References
+- `@metriport/shared`: Used for the `toArray` function.
+- `../../util/mime`: Imports `BINARY_MIME_TYPES` constant.
+
+## Symbols
+
+### `removeBase64PdfEntries`
+#### Description
+This function processes an XML payload to remove base64-encoded PDF entries from the notes section of a CDA document.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payloadRaw | string | The raw XML payload to process |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string | string | The processed XML payload, with base64 PDF entries removed if any were found, or the original payload if no changes were made |
+
+#### Internal Logic
+1. Parse the input XML into a JSON object.
+2. Iterate through the components of the structured body.
+3. For each component with a matching template ID for notes:
+   - Filter out entries that are binary MIME types and have base64 representation.
+4. Count the number of removed entries.
+5. Rebuild the XML from the modified JSON object.
+6. Return the rebuilt XML if entries were removed, otherwise return the original payload.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/shared | Provides the `toArray` utility function |
+| fast-xml-parser | Used for parsing and building XML |
+
+## Constants
+| Constant | Value | Description |
+|:---------|:------|:------------|
+| notesTemplateId | "2.16.840.1.113883.10.20.22.2.65" | Template ID for identifying the notes section |
+| b64Representation | "B64" | Identifier for base64 representation |
+
+## Performance Considerations
+The function processes the entire XML document, which could be computationally expensive for large documents. It uses in-memory parsing and manipulation, which might have memory implications for very large payloads.

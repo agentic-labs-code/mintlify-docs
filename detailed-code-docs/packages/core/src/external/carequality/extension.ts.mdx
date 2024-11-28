@@ -1,0 +1,74 @@
+---
+title: "extension.ts"
+---
+
+## High-level description
+This code defines extensions and utility functions for handling Carequality-related data in a FHIR-based healthcare system. It provides a way to identify and work with Carequality-specific extensions in FHIR resources, particularly in DocumentReference resources.
+
+## Symbols
+
+### `cqExtension`
+#### Description
+Defines a Metriport data source extension specific to Carequality.
+
+#### Inputs
+None
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cqExtension | MetriportDataSourceExtension | An object representing the Carequality extension |
+
+#### Internal Logic
+- Spreads the `dataSourceExtensionDefaults` object
+- Overrides the `valueCoding.code` with `MedicalDataSource.CAREQUALITY`
+
+### `isCarequalityExtension`
+#### Description
+Checks if a given Extension is a Carequality extension.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| e | Extension | The extension to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | boolean | True if the extension is a Carequality extension, false otherwise |
+
+#### Internal Logic
+Compares the `valueCoding.code` of the input extension with the `cqExtension.valueCoding.code`
+
+### `isCarequalityContent`
+#### Description
+Checks if a DocumentReferenceContent contains a Carequality extension.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| content | DocumentReferenceContent | The content to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | boolean | True if the content contains a Carequality extension, false otherwise |
+
+#### Internal Logic
+Uses the `Array.some()` method to check if any extension in the content's extension array is a Carequality extension (using `isCarequalityExtension`)
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides FHIR type definitions |
+| @metriport/api-sdk | Provides the MedicalDataSource enum |
+| ../fhir/shared/extensions/extension | Provides default extension data |
+| ../fhir/shared/extensions/metriport | Provides the MetriportDataSourceExtension type |
+
+## References
+This code references:
+- `MedicalDataSource` enum from the Metriport API SDK
+- `dataSourceExtensionDefaults` from the shared FHIR extensions
+- `MetriportDataSourceExtension` type from the shared Metriport extensions
+
+The `cqExtension` and related functions are likely used in other parts of the codebase that deal with Carequality data integration and processing.

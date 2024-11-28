@@ -1,0 +1,118 @@
+---
+title: "trigger-and-query.ts"
+---
+
+## High-level description
+This code defines an abstract class `TriggerAndQueryDocRefs` that implements a strategy for querying and retrieving document references for a patient. It includes configurable parameters for managing the query process, such as delay times, polling duration, and retry attempts.
+
+## Code Structure
+The main class `TriggerAndQueryDocRefs` contains an abstract method `triggerDocQuery` and `getDocQueryStatus`, which are implemented by subclasses. The primary public method `queryDocsForPatient` orchestrates the document querying process.
+
+## Symbols
+
+### `disableWHMetadata`
+#### Description
+A constant object used to disable webhook notifications.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| disableWHMetadata | object | An object with a key-value pair to disable webhook notifications |
+
+### `DetailedConfig`
+#### Description
+A type definition for configuration options used in the document querying process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientChunkDelayJitterMs | number \| undefined | Delay jitter for patient chunk processing |
+| queryPollDurationMs | number \| undefined | Duration between query status checks |
+| maxQueryDurationMs | number \| undefined | Maximum duration for a document query |
+| maxDocQueryAttempts | number \| undefined | Maximum number of document query attempts |
+| minDocsToConsiderCompleted | number \| undefined | Minimum number of documents to consider the query complete |
+
+### `QueryParams`
+#### Description
+A type definition for the parameters required to query documents for a patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+| triggerWHNotificationsToCx | boolean | Whether to trigger webhook notifications to the customer |
+| config | DetailedConfig \| undefined | Configuration options for the query process |
+| log | function \| undefined | Logging function (defaults to console.log) |
+
+### `TriggerAndQueryDocRefs`
+#### Description
+An abstract class that defines the structure for triggering and querying document references.
+
+#### Methods
+
+##### `triggerDocQuery` (abstract)
+###### Description
+An abstract method to trigger a document query for a patient.
+
+###### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+| triggerWHNotifs | boolean | Whether to trigger webhook notifications |
+
+##### `getDocQueryStatus` (abstract)
+###### Description
+An abstract method to get the status of a document query for a patient.
+
+###### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+
+###### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | DocumentQuery \| undefined | The status of the document query |
+
+##### `queryDocsForPatient`
+###### Description
+The main method to query documents for a patient, implementing the retry and polling logic.
+
+###### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | QueryParams | Parameters for the query process |
+
+###### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | object | An object containing the number of query attempts, documents found, and query completion status |
+
+###### Internal Logic
+1. Initialize configuration parameters with default values if not provided.
+2. Define an inner function `triggerDQAndCheckResults` to trigger a document query and poll for results.
+3. Execute document queries in a loop, with a maximum number of attempts.
+4. Handle the case where webhook notifications need to be triggered separately.
+5. Return the query results, including the number of attempts, documents found, and completion status.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Importing the DocumentQuery type |
+| ../../util/sleep | Importing the sleep function for adding delays |
+| ../webhook | Importing the webhookDisableFlagName constant |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| patientChunkDelayJitterMs | number | 1000 | Delay jitter for patient chunk processing |
+| queryPollDurationMs | number | 10000 | Duration between query status checks |
+| maxQueryDurationMs | number | 71000 | Maximum duration for a document query |
+| maxDocQueryAttempts | number | 1 | Maximum number of document query attempts |
+| minDocsToConsiderCompleted | number | 1 | Minimum number of documents to consider the query complete |
+
+## Performance Considerations
+The code implements a polling mechanism with configurable delays and maximum duration to balance between quick results and avoiding excessive API calls. The use of jitter in delays helps prevent thundering herd problems when processing multiple patients.

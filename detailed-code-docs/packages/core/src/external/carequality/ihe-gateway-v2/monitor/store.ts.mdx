@@ -1,0 +1,124 @@
+---
+title: "store.ts"
+---
+
+## High-level description
+This code provides functionality for storing and retrieving IHE (Integrating the Healthcare Enterprise) requests and responses in AWS S3 buckets. It handles different types of IHE transactions, including XCPD (Cross-Community Patient Discovery), DQ (Document Query), and DR (Document Retrieval), for both inbound and outbound requests.
+
+## Code Structure
+The code defines several functions for storing different types of IHE requests and responses. These functions use a shared S3Utils instance to interact with AWS S3. The code also includes utility functions for building S3 keys and managing the S3Utils instance.
+
+## Symbols
+
+### `storeXcpdResponses`
+#### Description
+Stores XCPD responses in an S3 bucket.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | string | The XCPD response content |
+| outboundRequest | OutboundPatientDiscoveryReq | The outbound XCPD request details |
+| gateway | XCPDGateway | The XCPD gateway information |
+
+#### Internal Logic
+1. Checks if the outbound bucket is configured
+2. Builds the S3 key using `buildIheResponseKey`
+3. Uploads the response to S3 using the S3Utils instance
+
+### `storeDqResponse`
+#### Description
+Stores Document Query responses in an S3 bucket.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | string | The DQ response content |
+| outboundRequest | OutboundDocumentQueryReq | The outbound DQ request details |
+| gateway | XCAGateway | The XCA gateway information |
+
+#### Internal Logic
+Similar to `storeXcpdResponses`, but for Document Query responses.
+
+### `storeDrResponse`
+#### Description
+Stores Document Retrieval responses in an S3 bucket.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Buffer | The DR response content |
+| outboundRequest | OutboundDocumentRetrievalReq | The outbound DR request details |
+| gateway | XCAGateway | The XCA gateway information |
+| requestChunkId | string \| undefined | Optional chunk ID for the request |
+
+#### Internal Logic
+Similar to `storeXcpdResponses`, but for Document Retrieval responses. Includes an optional `requestChunkId` parameter.
+
+### `storeXcpdRequest`, `storeDqRequest`, `storeDrRequest`
+#### Description
+These functions store inbound XCPD, DQ, and DR requests in an S3 bucket.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| request | string | The request content |
+| inboundRequest | InboundPatientDiscoveryReq \| InboundDocumentQueryReq \| InboundDocumentRetrievalReq | The inbound request details |
+
+#### Internal Logic
+1. Checks if the inbound bucket is configured
+2. Builds the S3 key using `buildIheRequestKey`
+3. Uploads the request to S3 using the S3Utils instance
+
+### `storeXcpdReqRespJson`
+#### Description
+Stores both the inbound XCPD request and response as a JSON object in an S3 bucket.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| inboundRequest | InboundPatientDiscoveryReq | The inbound XCPD request |
+| inboundResponse | InboundPatientDiscoveryResp | The inbound XCPD response |
+
+#### Internal Logic
+1. Checks if the inbound bucket is configured
+2. Builds the S3 key using `buildIheRequestKey`
+3. Creates a JSON object with both request and response
+4. Uploads the JSON object to S3 using the S3Utils instance
+
+### `buildIheResponseKey`, `buildIheRequestKey`
+#### Description
+Utility functions to generate S3 keys for storing IHE responses and requests.
+
+#### Inputs
+Various parameters including type, cxId, patientId, requestId, oid, timestamp, and others.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| key | string | The generated S3 key |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dayjs | Date manipulation and formatting |
+| @metriport/ihe-gateway-sdk | Types for IHE gateway requests and responses |
+| S3Utils | Utility class for S3 operations |
+| Config | Configuration management |
+
+## Configuration
+The code uses the following configuration options:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| bucketOutbound | string | undefined | S3 bucket name for outbound responses |
+| bucketInbound | string | undefined | S3 bucket name for inbound requests |
+
+These are retrieved from the Config class.
+
+## Error Handling
+The code includes basic error handling, logging errors that occur during S3 operations.
+
+## Logging
+The code uses a custom logging utility (`out`) to log errors and other information.
+
+This code provides a comprehensive solution for storing and managing IHE-related data in AWS S3, supporting various types of IHE transactions and handling both inbound and outbound communications.

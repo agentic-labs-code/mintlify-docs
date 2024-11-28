@@ -1,0 +1,68 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains models for document retrieval operations in an IHE (Integrating the Healthcare Enterprise) gateway system. It defines schemas and types for both requests and responses, covering inbound and outbound scenarios. The code uses Zod for schema definition and validation, ensuring type safety and structured data handling in healthcare information exchange contexts.
+
+## What does it do?
+The code in this directory facilitates the process of retrieving medical documents in a healthcare interoperability setting. It provides a structured way to:
+
+1. Create and validate requests for document retrieval, both for outbound (from the system to external sources) and inbound (from external sources to the system) operations.
+2. Define and validate responses for these document retrieval operations, including successful retrievals and fault scenarios.
+
+For example, when a healthcare provider needs to retrieve a patient's medical document from another institution, this code helps structure the request with necessary details like patient ID and document references. When the document is retrieved, it helps parse and validate the response, ensuring all required information is present and correctly formatted.
+
+The models also include utility functions to check the type of responses, which can be useful in handling different scenarios in the application logic.
+
+## Key Files
+
+1. `document-retrieval-requests.ts`:
+   - Defines schemas and types for document retrieval requests.
+   - Includes `outboundDocumentRetrievalReqSchema` for requests going out of the system and `inboundDocumentRetrievalReqSchema` for incoming requests.
+   - Provides type definitions like `OutboundDocumentRetrievalReq` and `InboundDocumentRetrievalReq`.
+
+2. `document-retrieval-responses.ts`:
+   - Defines schemas and types for document retrieval responses.
+   - Includes schemas for both successful and fault responses, for both inbound and outbound scenarios.
+   - Provides utility functions like `isSuccessfulOutboundDocRetrievalResponse` for type checking.
+
+These files work together to provide a comprehensive model for document retrieval operations, covering both the request and response aspects of the process.
+
+## Dependencies
+The code relies on the following external libraries:
+
+1. Zod (version not specified):
+   - Used for schema definition and validation.
+   - Chosen for its powerful type inference capabilities and runtime type checking.
+
+2. @metriport/ihe-gateway-sdk (version not specified):
+   - Used for importing shared types and schemas.
+   - Likely chosen to maintain consistency across the IHE gateway SDK.
+
+## Configuration
+The code doesn't define specific configuration options or environment variables. It relies on predefined schemas from the shared module, which may have their own configuration settings.
+
+The schemas defined in these files act as a form of configuration, specifying the structure and validation rules for document retrieval requests and responses. For example:
+
+```typescript
+const outboundDocumentRetrievalReqSchema = documentRetrievalReqDefaultSchema.extend({
+  gateway: z.string(),
+  patientId: z.string(),
+  cxId: z.string(),
+});
+```
+
+This schema configuration ensures that outbound document retrieval requests must include `gateway`, `patientId`, and `cxId` fields, all as strings, in addition to the fields defined in the default schema.
+
+Similarly, response schemas define the expected structure of retrieval responses:
+
+```typescript
+const inboundDocumentRetrievalRespSuccessfulSchema = baseResponseSchema.extend({
+  documentReference: z.array(documentReferenceSchema),
+});
+```
+
+This configuration ensures that successful inbound document retrieval responses include an array of document references, structured according to the `documentReferenceSchema`.
+
+These schema definitions serve as both configuration and validation rules, ensuring that the data flowing through the document retrieval process adheres to the expected structure and types.

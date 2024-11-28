@@ -1,0 +1,66 @@
+---
+title: "shared-person.ts"
+---
+
+## High-level description
+This code defines functions for finding or creating a person and patient in the CommonWell Health Alliance system. It handles the process of searching for existing patients and persons, creating new ones if necessary, and managing the links between them.
+
+## Code Structure
+The main functions `findOrCreatePerson` and `findOrCreatePatient` work together to manage patient and person records in the CommonWell system. They use the `CommonWell` SDK to interact with the API and handle various scenarios such as finding existing records or creating new ones.
+
+## Symbols
+
+### `findOrCreatePerson`
+#### Description
+This function searches for an existing person and patient in the CommonWell system, or creates new records if they don't exist.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| commonWell | CommonWell | Instance of the CommonWell SDK |
+| queryMeta | RequestMetadata | Metadata for the API request |
+| patientData | ReturnType&lt;typeof makeDocPerson&gt; \| ReturnType&lt;typeof makePatient&gt; | Patient data for search or creation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | { patientId: string; personId: string } | Object containing the patient and person IDs |
+
+#### Internal Logic
+1. Calls `findOrCreatePatient` to search for or create a patient record.
+2. If a new patient is created, it enrolls a new person and links the patient to the person.
+3. If an existing patient is found, it returns the patient and person IDs.
+
+### `findOrCreatePatient`
+#### Description
+This function searches for an existing patient in the CommonWell system, or creates a new patient record if one doesn't exist.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| commonWell | CommonWell | Instance of the CommonWell SDK |
+| queryMeta | RequestMetadata | Metadata for the API request |
+| patientData | ReturnType&lt;typeof makeDocPerson&gt; \| ReturnType&lt;typeof makePatient&gt; | Patient data for search or creation |
+| personId | string \| undefined | Optional person ID to link with the patient |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | FindOrCreatePatientResult | Object containing the result type and relevant IDs |
+
+#### Internal Logic
+1. Searches for a patient using demographic information.
+2. If a patient is found, it searches for the associated person.
+3. If no patient is found, it creates a new patient record.
+4. If a person ID is provided, it links the new patient to the person.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/commonwell-sdk | Provides the CommonWell SDK for interacting with the CommonWell Health Alliance API |
+
+## Error Handling
+The code includes error handling for scenarios such as missing person IDs or patient links in API responses. It throws errors with descriptive messages to help identify the source of the problem.
+
+## Logging
+The code uses `console.log` statements to provide information about the process, including when patients or persons are found or created, and when linking operations are performed.

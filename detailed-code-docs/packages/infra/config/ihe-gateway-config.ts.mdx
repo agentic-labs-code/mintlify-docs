@@ -1,0 +1,63 @@
+---
+title: "ihe-gateway-config.ts"
+---
+
+## High-level description
+This code defines configuration types for an IHE (Integrating the Healthcare Enterprise) Gateway in an AWS ECS (Elastic Container Service) environment. It specifies the structure for ECS task properties, Java runtime properties, and general IHE Gateway properties, providing a comprehensive configuration interface for deploying and managing an IHE Gateway service.
+
+## Symbols
+
+### `IHEGatewayEcsProps`
+#### Description
+This type defines the configuration properties for the ECS task that will run the IHE Gateway service.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| memory | ECS_MEMORY | The amount of memory allocated to the ECS task |
+| cpu | ECS_CPU | The amount of CPU allocated to the ECS task |
+| minCapacity | number | Minimum number of tasks to run |
+| maxCapacity | number | Maximum number of tasks to run |
+| maxRequestTimeout | Duration | Maximum time allowed for a request before it's closed by the Load Balancer |
+
+#### Internal Logic
+The type enforces specific constraints on memory and CPU allocation based on AWS ECS task size requirements. It also defines scaling limits and request timeout settings.
+
+### `IHEGatewayJavaProps`
+#### Description
+This type defines Java-specific runtime properties for the IHE Gateway service.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| maxHeapSize | string | Maximum heap size for the Java runtime (-Xmx) |
+| initialHeapSize | string | Initial heap size for the Java runtime (-Xms) |
+
+### `IHEGatewayProps`
+#### Description
+This type defines general properties for the IHE Gateway service deployment.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| vpcId | string | ID of the VPC where the service will be deployed |
+| certArn | string | ARN of the SSL certificate for HTTPS |
+| ownershipCertArn | string (optional) | ARN of the ownership certificate |
+| trustStoreBucketName | string | Name of the S3 bucket containing the trust store |
+| trustStoreKey | string | Key of the trust store file in the S3 bucket |
+| subdomain | string | Subdomain for IHE integrations |
+| snsTopicArn | string (optional) | ARN of the SNS topic for notifications |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-cdk-lib | Importing the Duration type for time-related configurations |
+
+## References
+This code references the `ECS_CPU` and `ECS_MEMORY` types from the `./aws/ecs` module, which define the valid CPU and memory configurations for ECS tasks.
+
+## Performance Considerations
+The configuration of `memory` and `cpu` in `IHEGatewayEcsProps` directly impacts the performance and cost of the ECS tasks. Proper sizing is crucial for optimal performance and resource utilization.
+
+## Error Handling
+The code doesn't implement explicit error handling, but it uses TypeScript's type system to enforce correct configuration values, which can prevent runtime errors due to misconfiguration.

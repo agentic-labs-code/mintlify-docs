@@ -1,0 +1,54 @@
+---
+title: "local-storage.ts"
+---
+
+## High-level description
+This code defines a utility for managing request-specific context using Node.js's AsyncLocalStorage. It provides a foundation for storing and accessing request-specific data, such as request IDs, throughout the asynchronous execution of a request.
+
+## Symbols
+
+### `AsyncLocalStorage`
+#### Description
+`AsyncLocalStorage` is imported from Node.js's `async_hooks` module. It provides a way to store and retrieve data that is local to the current asynchronous context.
+
+### `LocalStorage`
+#### Description
+A type alias defining the possible keys for local storage. Currently, it only includes "reqId".
+
+### `reqIdAsyncLocalStorage`
+#### Description
+An instance of `AsyncLocalStorage&lt;string&gt;` created to store request IDs.
+
+### `getLocalStorage`
+#### Description
+A function that returns the appropriate `AsyncLocalStorage` instance based on the provided key.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| _ | LocalStorage | The key to determine which storage to return (currently unused) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| AsyncLocalStorage&lt;string&gt; | AsyncLocalStorage&lt;string&gt; | The AsyncLocalStorage instance for storing request IDs |
+
+#### Internal Logic
+The function currently ignores the input parameter and always returns `reqIdAsyncLocalStorage`. The unused parameter is marked with an underscore to indicate it's intentionally unused.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| node:async_hooks | Provides the AsyncLocalStorage class for managing asynchronous context |
+
+## TODOs
+The code includes a comment suggesting future expansion:
+"To add more information on the request, like cx/user id, create a new storage and return the correct one based on the param to `getLocalStorage()`."
+
+## Performance Considerations
+Using `AsyncLocalStorage` can have a slight performance impact, but it provides a clean way to manage request-specific data without passing context through every function call. It's particularly useful in asynchronous environments where maintaining context can be challenging.
+
+## Notes
+1. The code is set up to potentially handle multiple types of local storage (as indicated by the `LocalStorage` type), but currently only implements storage for request IDs.
+2. The `getLocalStorage` function is marked with an ESLint disable comment for the unused parameter, indicating that this is intentional and may be used in future implementations.
+3. This utility is likely used in a server environment to track request-specific data across asynchronous operations, improving traceability and context management in complex workflows.

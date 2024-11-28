@@ -1,0 +1,87 @@
+---
+title: "allergies.test.ts"
+---
+
+## High-level description
+This file contains unit tests for the `buildAllergies` function, which is responsible for converting FHIR AllergyIntolerance resources into CDA (Clinical Document Architecture) format. The tests verify the correct mapping of allergy data from FHIR to CDA, including scenarios with no allergies, a single allergy, and multiple allergies.
+
+## Code Structure
+The test file is organized into a single `describe` block (currently skipped) containing multiple test cases. It uses Jest as the testing framework and relies on helper functions and mock data to set up the test scenarios.
+
+## References
+- `buildAllergies` function from "../allergies"
+- `removeEmptyFields` function from "../../clinical-document/clinical-document"
+- `xmlBuilder` from "../../clinical-document/shared"
+- Helper functions and mock data from "./allergy-examples" and "./make-allergy"
+- Utility functions from "./shared"
+
+## Symbols
+
+### `beforeAll` hook
+#### Description
+Sets up the initial allergy data used across multiple tests.
+
+#### Internal Logic
+- Generates a random UUID for the allergy ID
+- Creates a mock allergy using the `makeAllergy` function with medication allergy data
+
+### `beforeEach` hook
+#### Description
+Resets the bundle before each test.
+
+#### Internal Logic
+- Creates an empty FHIR Bundle using the `createEmptyBundle` function
+
+### `describe.skip("buildAllergies")`
+#### Description
+A skipped test suite for the `buildAllergies` function.
+
+#### Internal Logic
+Contains three test cases:
+1. Checks if an empty section is returned when no resources are found
+2. Verifies correct mapping of a single AllergyIntolerance resource
+3. Ensures correct mapping of two AllergyIntolerance resources
+
+### Test: "returns an empty section if no resources found"
+#### Description
+Verifies that the `buildAllergies` function returns an empty section when the bundle contains no allergy resources.
+
+#### Internal Logic
+- Calls `buildAllergies` with an empty bundle
+- Removes empty fields from the result
+- Converts the result to XML
+- Checks if the XML contains "Not on file"
+
+### Test: "correctly maps a single AllergyIntolerance"
+#### Description
+Ensures that a single AllergyIntolerance resource is correctly mapped to CDA format.
+
+#### Internal Logic
+- Adds a single allergy resource to the bundle
+- Loads expected XML content from a file
+- Calls `buildAllergies` with the bundle
+- Compares the generated XML with the expected XML
+
+### Test: "correctly maps two AllergyIntolerances"
+#### Description
+Verifies that multiple AllergyIntolerance resources are correctly mapped to CDA format.
+
+#### Internal Logic
+- Adds two allergy resources to the bundle
+- Loads expected XML content from a file
+- Calls `buildAllergies` with the bundle
+- Compares the generated XML with the expected XML
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @faker-js/faker | Generating random data for tests |
+| lodash | Utility functions |
+| @medplum/fhirtypes | FHIR type definitions |
+| path | Handling file paths |
+
+## Error Handling
+The tests do not implement specific error handling mechanisms beyond the default Jest assertion behavior.
+
+## TODOs
+The entire `describe` block is currently skipped (`describe.skip`), indicating that these tests are not currently being run. This might be due to ongoing development or issues that need to be addressed before enabling the tests.

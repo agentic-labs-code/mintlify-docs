@@ -1,0 +1,171 @@
+---
+title: "shared.ts"
+---
+
+## High-level description
+This code provides utility functions for deduplicating and combining FHIR resources, particularly focusing on handling various types of medical data such as procedures, medications, locations, and observations. It implements strategies to merge similar resources based on specific criteria, maintaining data integrity and preserving important information from each source.
+
+## Code Structure
+The main symbols in this code are utility functions that work together to deduplicate and combine FHIR resources. The `combineResources` function is a central piece that uses other helper functions like `fillMaps`, `getDateFromResource`, and `pickMostDescriptiveStatus` to process and merge the resources. These functions are used across different resource-specific deduplication functions.
+
+## Symbols
+
+### `createCompositeKey`
+#### Description
+Creates a composite key object from a code and date.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | string | A code representing the resource |
+| date | string \| undefined | A date associated with the resource |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| CompositeKey | object | An object containing the code and date |
+
+### `getDateFromString`
+#### Description
+Converts a date string to a standardized format based on the specified date format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dateString | string | The date string to convert |
+| dateFormat | "date" \| "datetime" \| undefined | The desired output format |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| formattedDate | string | The formatted date string |
+
+### `combineTwoResources`
+#### Description
+Combines two resources of the same type, merging their properties and handling extensions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| r1 | T extends Resource | The first resource |
+| r2 | T extends Resource | The second resource |
+| isExtensionIncluded | boolean | Whether to include extensions in the merge |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| combined | T extends Resource | The combined resource |
+
+### `deepMerge`
+#### Description
+Recursively merges two objects, handling arrays and nested objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| target | any | The target object to merge into |
+| source | any | The source object to merge from |
+| isExtensionIncluded | boolean | Whether to include extensions in the merge |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| combined | any | The merged object |
+
+### `mergeArrays`
+#### Description
+Merges two arrays, removing duplicates based on stringified comparison.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| targetArray | any[] | The target array to merge into |
+| sourceArray | any[] | The source array to merge from |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| combinedArray | any[] | The merged array without duplicates |
+
+### `combineResources`
+#### Description
+Combines resources from multiple maps into a single array.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| combinedMaps | Map&lt;string, T&gt;[] | An array of maps containing resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| combinedResources | T[] | An array of combined resources |
+
+### `fillMaps`
+#### Description
+Fills existing maps with resources, handling duplicates and applying special modifications.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| map | Map&lt;string, T&gt; | The map to fill |
+| key | string | The key for the resource |
+| targetResource | T | The resource to add or merge |
+| refReplacementMap | Map&lt;string, string[]&gt; | A map for tracking reference replacements |
+| isExtensionIncluded | boolean | Whether to include extensions |
+| applySpecialModifications | Function \| undefined | Optional function to apply special modifications |
+
+#### Outputs
+This function doesn't return a value but modifies the input maps.
+
+### `getDateFromResource`
+#### Description
+Extracts a date from a FHIR resource based on various date-related properties.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resource | T extends Resource | The FHIR resource to extract the date from |
+| dateFormat | DateFormats \| undefined | The desired date format |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| date | string \| undefined | The extracted date string or undefined if not found |
+
+### `getPerformedDateFromResource`
+#### Description
+Extracts a performed date from a FHIR resource based on various performed date-related properties.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resource | T extends Resource | The FHIR resource to extract the performed date from |
+| dateFormat | DateFormats \| undefined | The desired date format |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| date | string \| undefined | The extracted performed date string or undefined if not found |
+
+### `pickMostDescriptiveStatus`
+#### Description
+Selects the most descriptive status from two given statuses based on a ranking system.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| statusRanking | Record&lt;T, number&gt; | A record of status rankings |
+| status1 | T \| undefined | The first status to compare |
+| status2 | T \| undefined | The second status to compare |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | T | The most descriptive status |
+
+## Dependencies
+- dayjs: Used for date manipulation and formatting.
+- lodash: Used for deep cloning and other utility functions.
+
+This code is part of a larger system for handling FHIR resources and provides essential functionality for deduplicating and combining medical data in a standardized format.

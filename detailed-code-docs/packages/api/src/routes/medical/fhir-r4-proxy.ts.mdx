@@ -1,0 +1,68 @@
+---
+title: "fhir-r4-proxy.ts"
+---
+
+## High-level description
+This code defines a proxy router for FHIR R4 requests. It forwards requests to a FHIR server, modifying the request path and response data. If the FHIR server URL is not configured, it returns a "Not Found" error.
+
+## Code Structure
+The main components are:
+1. `fhirRouter`: A proxy function that handles FHIR requests.
+2. `dummyRouter`: A router that returns a "Not Found" error when FHIR server is disabled.
+3. `router`: The exported router, which is either `fhirRouter` or `dummyRouter` based on the FHIR server configuration.
+
+## Symbols
+
+### `fhirRouter`
+#### Description
+Creates a proxy router for FHIR R4 requests using the `express-http-proxy` library.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fhirServerUrl | string | The URL of the FHIR server to proxy requests to |
+
+#### Internal Logic
+1. Modifies the request path by adding `/fhir/{cxId}` to the original URL.
+2. Logs original headers and URL, and the updated URL.
+3. Modifies the response data by replacing the API URL with the base URL.
+
+### `dummyRouter`
+#### Description
+A router that returns a "Not Found" error for all requests when the FHIR server is disabled.
+
+#### Internal Logic
+Uses `asyncHandler` to throw a `NotFoundError` with the message "FHIR server is disabled".
+
+### `router`
+#### Description
+The main router exported by the module. It's either `fhirRouter` or `dummyRouter` based on whether `fhirServerUrl` is configured.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| express-http-proxy | Used to create the proxy router |
+| express-promise-router | Used to create the dummy router |
+| ../../errors/not-found | Provides the NotFoundError class |
+| ../../shared/config | Provides configuration settings |
+| ../../shared/util | Provides logging utility |
+| ../util | Provides utility functions for request handling |
+
+## Configuration
+The code relies on the following configuration:
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| FHIR_SERVER_URL | string | The URL of the FHIR server to proxy requests to |
+
+## Error Handling
+- If the FHIR server URL is not configured, all requests will result in a NotFoundError with the message "FHIR server is disabled".
+- Any errors occurring during the proxy request will be handled by the express-http-proxy library.
+
+## Logging
+The code uses a custom logging utility (`log` function) to log:
+- Original request headers
+- Original request URL
+- Updated URL for proxying to the FHIR server
+
+## TODOs
+There are no explicit TODOs in the code.

@@ -1,0 +1,77 @@
+---
+title: "sleep.ts"
+---
+
+## High-level description
+The code defines a TypeScript module that maps Oura sleep data to the standardized Metriport Sleep format. It includes data transformation logic, type definitions for Oura sleep responses, and utility functions for time manipulation and data aggregation.
+
+## References
+- `MetriportSleep` type from `@metriport/api-sdk`
+- `z` (zod) for schema validation
+- `dayjs` for date and time manipulation
+- `PROVIDER_OURA` constant from `../../shared/constants`
+- `Util` class from `../../shared/util`
+- `streamingDataSchema` from local module
+
+## Symbols
+
+### `mapToSleep`
+#### Description
+This function maps raw sleep data retrieved from the Oura API to the standardized Metriport Sleep format. It extracts relevant fields like sleep durations, biometrics (HRV, respiration, heart rate), and timestamps, performs unit conversions, and structures the data according to the Metriport schema.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ouraSleep | `OuraSleep` | Raw sleep data object from the Oura API. |
+| date | `string` | Date string representing the day of the sleep data. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `MetriportSleep` |  A `MetriportSleep` object containing the mapped sleep data. |
+
+#### Internal Logic
+1. **Initialize default payload:** Creates a `MetriportSleep` object with default metadata (date, source).
+2. **Extract basic sleep data:** Extracts `start_time`, `end_time`, and calculates sleep durations (total, awake, deep, REM, light) from the `ouraSleep` object.
+3. **Extract HRV data:** Extracts average HRV and individual HRV samples with timestamps from the `ouraSleep` object.
+4. **Extract respiration data:** Extracts average breaths per minute from the `ouraSleep` object.
+5. **Extract heart rate data (conditional):** If heart rate data exists, calculates minimum, maximum, and average heart rate, and extracts individual heart rate samples with timestamps.
+6. **Return mapped sleep data:** Returns the fully populated `MetriportSleep` object.
+
+### `addIntervalToTimestamp`
+#### Description
+This utility function adds a calculated time interval to a given timestamp string and returns the result in ISO format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| timestamp | `string` | The base timestamp string. |
+| interval | `number` | The time interval in seconds to add to the timestamp. |
+| itemIndex | `number` | The index of the current item, used to calculate the total interval to add. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `string` | The resulting timestamp string in ISO format after adding the calculated interval. |
+
+#### Internal Logic
+1. **Calculate total interval:** Multiplies the `interval` by `itemIndex + 1` to get the total seconds to add.
+2. **Add interval to timestamp:** Uses `dayjs` to parse the `timestamp`, add the calculated interval in seconds, and format the result in ISO format.
+3. **Return updated timestamp:** Returns the updated timestamp string.
+
+### `ouraSleepResponse`
+#### Description
+A zod schema defining the expected structure and data types for an Oura sleep response object. It ensures that the received data conforms to the defined schema, improving data reliability and preventing runtime errors.
+
+### `OuraSleep`
+#### Description
+A TypeScript type alias representing the inferred type of the `ouraSleepResponse` schema. It provides type safety and code clarity when working with validated Oura sleep data.
+
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides the `MetriportSleep` type for standardized sleep data. |
+| zod | Used for schema validation of Oura API responses. |
+| dayjs | Used for date and time manipulation. |
+

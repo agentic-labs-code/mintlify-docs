@@ -1,0 +1,52 @@
+---
+title: "body.ts"
+---
+
+## High-level description
+The `mapToBody` function in `packages/api/src/mappings/oura/body.ts` is responsible for transforming Oura personal information data into a standardized `Body` object as defined in the Metriport API. This transformation involves extracting relevant fields like height and weight, converting them to the appropriate units (centimeters and kilograms, respectively), and packaging them into the `Body` object along with metadata indicating the data source and date.
+
+## References
+- `Body`: This symbol is referenced from the `@metriport/api-sdk` package, indicating its role in representing body metrics data within the application.
+- `PROVIDER_OURA`: This constant is referenced from the shared constants file and is used to identify Oura as the data source in the metadata.
+- `OuraPersonalInfo`: This type definition, likely defined within the same file or a related file, represents the structure of personal information data received from the Oura API.
+
+## Symbols
+
+### `mapToBody`
+#### Description
+This function maps Oura personal information data to a `Body` object. It extracts height and weight, converts them to the desired units, and adds metadata.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `ouraPersonalInfo` | `OuraPersonalInfo` |  The personal information data retrieved from the Oura API. |
+| `date` | `string` | The date associated with the data. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | `Body` | The transformed `Body` object containing height, weight, and metadata. |
+
+#### Internal Logic
+1. **Metadata Creation:**
+   - A `metadata` object is created, storing the `date` and the source as `PROVIDER_OURA`.
+2. **Body Object Initialization:**
+   - A `body` object of type `Body` is initialized with the `metadata`.
+3. **Height Mapping (Conditional):**
+   - If `ouraPersonalInfo.height` exists:
+     - It is converted from meters to centimeters using the `convert` library.
+     - The converted value is assigned to `body.height_cm`.
+4. **Weight Mapping (Conditional):**
+   - If `ouraPersonalInfo.weight` exists:
+     - It is directly assigned to `body.weight_kg` (assuming Oura provides weight in kilograms).
+5. **Return:**
+   - The populated `body` object is returned.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| `@metriport/api-sdk` | Provides the `Body` type definition. |
+| `convert-units` | Used for unit conversion (meters to centimeters in this case). |
+
+## Side Effects
+This function has no side effects as it only transforms data and doesn't modify any external state.

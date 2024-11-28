@@ -1,0 +1,93 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the implementation of a FHIR (Fast Healthcare Interoperability Resources) API client for interacting with a HAPI FHIR server. It provides interfaces and classes for both standard FHIR operations and administrative functions, including tenant management. The code is designed to be flexible and extensible, allowing for easy integration with different FHIR server implementations.
+
+## What does it do?
+The code in this directory enables applications to interact with a FHIR server, specifically a HAPI FHIR implementation. It provides functionality for:
+
+1. Searching, creating, and managing FHIR resources on the server.
+2. Handling tenant-specific operations, allowing for multi-tenancy support.
+3. Performing administrative tasks such as creating, listing, and deleting tenants.
+
+The API client is built on top of the Medplum client, extending its functionality to work seamlessly with HAPI FHIR servers. It handles the complexities of FHIR server interactions, including URL structure modifications and pagination, making it easier for developers to work with FHIR data.
+
+## Entry points
+The main entry points for this API client are:
+
+1. `api-factory.ts`: This file provides factory functions for creating instances of the FHIR API client. It's the starting point for applications that need to interact with the FHIR server.
+
+2. `api.ts`: This file defines the interfaces for the FHIR client, setting the contract for what operations are available.
+
+3. `api-hapi.ts`: This file contains the actual implementation of the FHIR client for HAPI FHIR servers.
+
+The typical flow of control starts with the application using the factory functions from `api-factory.ts` to create a client instance. This instance, implementing the interfaces defined in `api.ts`, is then used to perform operations on the FHIR server. The actual implementation of these operations is handled by the classes in `api-hapi.ts`.
+
+## Key Files
+
+1. `api-factory.ts`:
+   - Exports `makeFhirApi` and `makeFhirAdminApi` functions.
+   - These functions create instances of `HapiFhirClient` and `HapiFhirAdminClient` respectively.
+   - Provides a clean interface for creating properly configured FHIR client instances.
+
+2. `api.ts`:
+   - Defines `FhirClient` and `FhirAdminClient` interfaces.
+   - `FhirClient` extends `MedplumClient` for standard FHIR operations.
+   - `FhirAdminClient` defines methods for tenant management.
+
+3. `api-hapi.ts`:
+   - Implements `HapiFhirClient` and `HapiFhirAdminClient` classes.
+   - `HapiFhirClient` extends `MedplumClient` and implements `FhirClient`.
+   - `HapiFhirAdminClient` extends `HapiFhirClient` and implements `FhirAdminClient`.
+   - Provides HAPI FHIR-specific implementations of search, create, and tenant management operations.
+
+4. `__tests__/api.test.ts`:
+   - Contains end-to-end tests for the FHIR API client.
+   - Currently skipped due to VPN connectivity issues.
+   - Tests tenant creation, listing, and deletion using the FHIR admin API.
+
+## Dependencies
+The main external dependencies for this FHIR API client are:
+
+1. `@medplum/core` (version not specified):
+   - Provides the base `MedplumClient` class which is extended by the FHIR client.
+   - Used for core FHIR operations and types.
+
+2. `@medplum/fhirtypes` (version not specified):
+   - Provides TypeScript definitions for FHIR resource types.
+
+3. `dotenv` (version not specified):
+   - Used in tests for loading environment variables.
+
+4. `uuid` (version not specified):
+   - Used in tests for generating unique identifiers.
+
+5. `jest` (version not specified):
+   - Testing framework used for the API client tests.
+
+These dependencies were chosen to provide a robust foundation for FHIR operations (`@medplum/core` and `@medplum/fhirtypes`), facilitate testing (`jest`), and handle environment configuration (`dotenv`).
+
+## Configuration
+The FHIR API client uses the following configuration options:
+
+1. `FHIR_SERVER_URL`: The base URL of the FHIR server. This is typically set as an environment variable.
+
+2. `DEFAULT_TENANT`: A constant set to "DEFAULT", used as the default tenant ID for admin operations.
+
+3. `cxId`: A customer ID used to identify the tenant when creating a standard FHIR client.
+
+These configuration options allow the API client to be flexible and work with different FHIR server setups and multi-tenant environments.
+
+Example usage of the factory functions with configuration:
+
+```typescript
+const baseUrl = getEnvVarOrFail('FHIR_SERVER_URL');
+const cxId = 'customer123';
+
+const fhirClient = makeFhirApi(cxId, baseUrl);
+const fhirAdminClient = makeFhirAdminApi(baseUrl);
+```
+
+This configuration approach allows for easy setup and customization of the FHIR API client for different environments and use cases.

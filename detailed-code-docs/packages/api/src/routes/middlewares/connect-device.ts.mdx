@@ -1,0 +1,76 @@
+---
+title: "connect-device.ts"
+---
+
+## High-level description
+This code defines a middleware function `saveRpmDevice` that stores a user's RPM (Remote Patient Monitoring) device IDs and user ID in the provider map. It also includes a helper function `getConnectedDeviceIds` to merge and return the IDs of all connected devices for the user.
+
+## Code Structure
+The main function `saveRpmDevice` uses several imported functions to authenticate the user, retrieve user information, and update the provider data. The `getConnectedDeviceIds` function is a helper that merges existing and new device IDs.
+
+## Symbols
+
+### `saveRpmDevice`
+#### Description
+This asynchronous function saves RPM device information for a user in the provider map.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| provider | RPMDeviceProviderOptions | A medical device provider (e.g., Tenovi) |
+| token | string | Connect Token |
+| deviceIds | string[] | A list of device IDs |
+| deviceUserId | string | Device User ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| updatedConnectedUser | Promise&lt;ConnectedUser&gt; | The updated ConnectedUser object |
+
+#### Internal Logic
+1. Retrieves the user token using the provided token
+2. Extracts cxId and userId from the user token
+3. Validates the presence of provider, cxId, and userId
+4. Retrieves the connected user
+5. Merges existing and new device IDs
+6. Updates the provider data with new information
+7. Returns the updated connected user
+
+### `getConnectedDeviceIds`
+#### Description
+This function merges and returns the IDs of all connected devices for the user.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | Connected User object |
+| provider | RPMDeviceProviderOptions | A healthcare provider |
+| deviceIds | string[] | A list of device IDs |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedDeviceIds | string[] | Merged list of unique device IDs |
+
+#### Internal Logic
+1. Checks if the user has a provider map
+2. If exists, merges previous connected devices with new device IDs
+3. Removes duplicates using Set
+4. If no provider map exists, returns the input deviceIds
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Importing types and constants |
+| ../../command/connected-user/get-connected-user | Retrieving connected user information |
+| ../../command/connected-user/save-connected-user | Updating provider data |
+| ../../command/cx-user/get-user-token | Getting user token |
+| ../../errors/unauthorized | Handling unauthorized errors |
+| ../../models/connected-user | ConnectedUser model |
+| ../../providers/tenovi | Tenovi-specific constants |
+| ../../shared/constants | Shared constants and types |
+
+## TODOs
+- If duplicates are found in the device list, consider notifying the user that the device was already connected.
+
+This code is part of a larger system for managing connected users and their devices in a healthcare-related application. It specifically handles the process of saving and updating RPM device information for users.

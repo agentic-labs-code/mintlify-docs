@@ -1,0 +1,84 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code related to handling and validating address-related information, specifically focusing on US states and zip codes. It provides utility functions for normalizing and validating these address components, ensuring consistency and accuracy in address data processing.
+
+## What does it do?
+The code in this directory performs several key functions related to address data:
+
+1. US State Handling:
+   - Defines an enum of all US states using their two-letter abbreviations.
+   - Provides functions to normalize state names or abbreviations to a standard format.
+   - Allows conversion between full state names and their abbreviations.
+
+2. Zip Code Processing:
+   - Validates zip codes to ensure they meet specific format requirements.
+   - Normalizes zip codes by extracting the first 4-5 characters, handling both 5-digit and 9-digit (ZIP+4) formats.
+
+3. Error Handling:
+   - Offers both "safe" and "strict" versions of normalization functions, allowing flexible error handling based on the use case.
+
+These utilities can be used in various scenarios where address data needs to be processed, validated, or standardized, such as in e-commerce applications, mailing systems, or any software dealing with US addresses.
+
+## Key Files
+
+### state.ts
+This file contains the core functionality for handling US state data:
+
+- Defines the `USState` enum with all US state abbreviations.
+- Implements `normalizeStateSafe` and `normalizeState` functions for converting various state inputs (full names or abbreviations) to standardized `USState` enum values.
+- Provides a `states` object mapping full state names to their abbreviations.
+
+### zip.ts
+This file focuses on zip code processing:
+
+- Implements `isValidZipCode` function to check if a given zip code is valid.
+- Provides `normalizeZipCode` and `normalizeZipCodeSafe` functions to standardize zip code formats.
+- Handles both 5-digit and 9-digit (ZIP+4) zip code formats.
+
+### __tests__/zip.test.ts
+This file contains unit tests for the zip code normalization function:
+
+- Tests various scenarios including different zip code lengths, special characters, and error cases.
+- Ensures the `normalizeZipCode` function behaves correctly for valid and invalid inputs.
+
+## Dependencies
+The code in this directory does not rely on external libraries or frameworks. It uses native TypeScript/JavaScript functionality and is designed to be self-contained within the shared package of the project.
+
+## Configuration
+There are no specific configuration files or environment variables used in this directory. The code is designed to work with predefined US state and zip code formats without requiring additional configuration.
+
+## Code Snippets and Examples
+
+### Normalizing a US State
+```typescript
+import { normalizeState, USState } from './state';
+
+const state = normalizeState('California');
+console.log(state); // Output: USState.CA
+
+const abbreviation = normalizeState('NY');
+console.log(abbreviation); // Output: USState.NY
+```
+
+### Validating and Normalizing a Zip Code
+```typescript
+import { isValidZipCode, normalizeZipCode } from './zip';
+
+const zipCode = '12345-6789';
+
+if (isValidZipCode(zipCode)) {
+  const normalizedZip = normalizeZipCode(zipCode);
+  console.log(normalizedZip); // Output: '12345'
+} else {
+  console.log('Invalid zip code');
+}
+```
+
+These utilities provide a robust way to handle US address components, ensuring consistency and accuracy in address data processing. They can be particularly useful in applications that deal with user input for addresses, need to validate shipping information, or work with large datasets of US addresses.
+
+The code is designed with error handling in mind, providing both "safe" versions that return undefined for invalid inputs and "strict" versions that throw errors. This allows developers to choose the appropriate error handling strategy based on their specific use case.
+
+A notable TODO in the zip code processing is to refactor the `normalize` function to return a zip code of a certain format or undefined if it cannot, while a separate `validate` function would throw an error. This separation of concerns could provide more flexibility in how the functions are used in different contexts.

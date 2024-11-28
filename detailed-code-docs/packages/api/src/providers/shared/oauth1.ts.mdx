@@ -1,0 +1,102 @@
+---
+title: "oauth1.ts"
+---
+
+## High-level description
+This code implements an OAuth1 authentication flow for connecting external providers to the Metriport API. It handles the OAuth1 process, including token generation, user authorization, and token management. The code also provides functionality for deregistering users and revoking access tokens.
+
+## Code Structure
+The main class `OAuth1DefaultImpl` implements the `OAuth1` interface, providing methods for the OAuth1 flow. It interacts with external services and internal data stores to manage user tokens and provider connections. The code uses various utility functions and configurations from other parts of the application.
+
+## Symbols
+
+### OAuth1DefaultImpl
+#### Description
+This class implements the OAuth1 authentication flow for connecting external providers.
+
+#### Inputs
+- `providerName`: The name of the provider (e.g., "garmin")
+- `consumerKey`: The OAuth1 consumer key
+- `consumerSecret`: The OAuth1 consumer secret
+- `userApproveUrl`: The URL where users approve access
+- `requestTokenUrl`: The URL to request OAuth tokens
+- `requestAccessUrl`: The URL to request access tokens
+
+#### Methods
+
+##### processStep1
+###### Description
+Generates the URL where the user will be asked to authorize access.
+
+###### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| token | string | The user's token |
+
+###### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | The authorization URL for the user |
+
+###### Internal Logic
+1. Retrieves the user token from the database
+2. Obtains a request token and secret from the provider
+3. Stores the request token and secret in the database
+4. Builds and returns the authorization URL
+
+##### processStep2
+###### Description
+Processes the callback after user authorization and obtains access tokens.
+
+###### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| userToken | UserToken | The user's token object |
+| oauth_verifier | string | The OAuth verifier returned by the provider |
+
+###### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| userAccessToken | string | The user's access token |
+| userAccessTokenSecret | string | The user's access token secret |
+
+###### Internal Logic
+1. Retrieves the request token and secret from the user token
+2. Obtains the access token and secret from the provider
+3. Stores the access token and secret in the database
+4. Returns the access token and secret
+
+##### deregister
+###### Description
+Deregisters users and revokes their access tokens.
+
+###### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| userAccessTokens | string[] | List of user access tokens to deregister |
+| cxId | string | (Optional) Customer ID to deregister for a specific customer |
+
+###### Internal Logic
+1. Iterates through the provided access tokens
+2. Retrieves user tokens associated with each access token
+3. Removes the access token and secret from the user token
+4. Updates the user token in the database
+5. Updates the provider data in the connected user record
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| axios | Making HTTP requests |
+| dayjs | Date manipulation |
+| nanoid | Generating unique IDs |
+| oauth-signature | Generating OAuth signatures |
+| zod | Runtime type checking |
+
+## Error Handling
+The code includes basic error handling, such as checking for missing tokens or secrets. It also uses try-catch blocks to handle potential errors during the deregistration process.
+
+## Performance Considerations
+The code makes multiple database and external API calls, which could impact performance for large numbers of users or frequent operations. Caching and batch processing could be considered for optimization if needed.
+
+## TODOs
+The code includes a deprecation notice for the entire OAuth1 implementation due to a critical security vulnerability in the `oauth-signature` library. This should be addressed as a high priority.

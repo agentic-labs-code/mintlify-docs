@@ -1,0 +1,147 @@
+---
+title: "oura.ts"
+---
+
+## High-level description
+This code defines the Oura class, which is a provider for the Oura Ring device. It implements the OAuth2 interface and extends the Provider class to fetch various types of health data from the Oura API, including activity, biometrics, body, sleep, and user information.
+
+## Code Structure
+The Oura class extends the Provider class and implements the OAuth2 interface. It uses an OAuth2DefaultImpl instance for authentication and token management. The class provides methods to fetch different types of health data from the Oura API, mapping the responses to standardized Metriport data models.
+
+## Symbols
+
+### Oura
+#### Description
+The Oura class is responsible for interacting with the Oura API to fetch health data for a connected user.
+
+#### Internal Logic
+- Initializes with OAuth2 configuration and supported data types
+- Implements OAuth2 methods for authentication and token management
+- Provides methods to fetch various types of health data from the Oura API
+- Maps Oura API responses to standardized Metriport data models
+
+### getActivityData
+#### Description
+Fetches activity data for a given date from the Oura API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object |
+| date | string | The date for which to fetch activity data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| activity | Activity | The mapped activity data |
+
+#### Internal Logic
+1. Fetches the access token for the connected user
+2. Makes parallel requests for daily activity, biometrics, sessions, and workouts
+3. Maps the responses to the Metriport Activity model
+
+### getBiometricsData
+#### Description
+Fetches biometrics data for a given date from the Oura API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object |
+| date | string | The date for which to fetch biometrics data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| biometrics | Biometrics | The mapped biometrics data |
+
+#### Internal Logic
+1. Calculates the start and end datetime for the given date
+2. Fetches the access token for the connected user
+3. Makes a request to the Oura API for heart rate data
+4. Maps the response to the Metriport Biometrics model
+
+### getBodyData
+#### Description
+Fetches body data for a given date from the Oura API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object |
+| date | string | The date for which to fetch body data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| body | Body | The mapped body data |
+
+#### Internal Logic
+1. Fetches the access token for the connected user
+2. Makes a request to the Oura API for personal info data
+3. Maps the response to the Metriport Body model
+
+### getSleepData
+#### Description
+Fetches sleep data for a given date from the Oura API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object |
+| date | string | The date for which to fetch sleep data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sleep | Sleep | The mapped sleep data |
+
+#### Internal Logic
+1. Calculates the start and end date for the given date
+2. Fetches the access token for the connected user
+3. Makes a request to the Oura API for sleep data
+4. Maps the response to the Metriport Sleep model
+
+### getUserData
+#### Description
+Fetches user data for a given date from the Oura API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object |
+| date | string | The date for which to fetch user data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| user | User | The mapped user data |
+
+#### Internal Logic
+1. Fetches the access token for the connected user
+2. Makes a request to the Oura API for personal info data
+3. Maps the response to the Metriport User model
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides data models for health data |
+| axios | Used for making HTTP requests to the Oura API |
+| dayjs | Used for date manipulation and formatting |
+| simple-oauth2 | Implements OAuth2 authentication flow |
+| zod | Used for data validation and parsing |
+
+## Configuration
+The Oura class uses the following configuration options:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| PROVIDER_OURA | string | N/A | The provider name for Oura |
+| URL | string | "https://api.ouraring.com" | The base URL for the Oura API |
+| AUTHORIZATION_URL | string | "https://cloud.ouraring.com" | The authorization URL for Oura OAuth |
+| API_PATH | string | "v2/usercollection" | The API path for Oura API endpoints |
+
+## Error Handling
+The class uses the OAuth2DefaultImpl for error handling during authentication and token management. For API requests, it uses try-catch blocks to handle errors and throws MetriportError with relevant error information.
+
+## TODOs
+- Need to support multiple sleep sessions in the sleep model, as someone could sleep twice in the same day. This is especially important when supporting date ranges.

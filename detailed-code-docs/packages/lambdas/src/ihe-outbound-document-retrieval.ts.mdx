@@ -1,0 +1,58 @@
+---
+title: "ihe-outbound-document-retrieval.ts"
+---
+
+## High-level description
+This code defines a Lambda function handler for processing outbound document retrieval results in a healthcare information exchange (IHE) system. It uses the Sentry error tracking service and implements a polling mechanism to retrieve and process results from multiple gateways.
+
+## Code Structure
+The main component is the Lambda handler, which is wrapped with Sentry for error tracking. It uses environment variables for configuration and initializes a poller to process outbound document retrieval results.
+
+## Symbols
+
+### `handler`
+#### Description
+This is the main Lambda function handler, wrapped with Sentry for error tracking. It initializes and executes the outbound result poller.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| requestId | string | Unique identifier for the request |
+| numOfGateways | number | Number of gateways to poll |
+| patientId | string | Identifier for the patient |
+| cxId | string | Customer identifier |
+
+#### Internal Logic
+1. Logs the execution environment and input parameters.
+2. Retrieves database credentials from AWS Secrets Manager.
+3. Initializes an `OutboundResultPollerDirect` instance.
+4. Calls the `pollOutboundDocRetrievalResults` method with the provided parameters and configuration.
+5. Catches and logs any errors, reporting them to Sentry.
+
+## Side Effects
+- Logs information to the console.
+- Interacts with AWS Secrets Manager to retrieve database credentials.
+- Potentially modifies external state through the `OutboundResultPollerDirect` instance.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core | Provides various utility functions and classes |
+| @sentry/serverless | Error tracking and monitoring |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| DB_CREDS | string | N/A | ARN for database credentials in AWS Secrets Manager |
+| API_URL | string | N/A | URL for the API |
+| AWS_REGION | string | N/A | AWS region |
+| MAX_POLLING_DURATION | string | N/A | Maximum duration for polling (in milliseconds) |
+
+## Error Handling
+Errors are caught in the main try-catch block, logged to the console, and reported to Sentry with additional context information.
+
+## Logging
+The code uses `console.log` for logging execution details and errors.
+
+## TODOs
+There are no explicit TODOs in the code.

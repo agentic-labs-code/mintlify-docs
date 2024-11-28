@@ -1,0 +1,88 @@
+---
+title: "coverage-enhancement-check-stale.ts"
+---
+
+## High-level description
+This code implements a function to check for patients with stale enhanced coverage in the CommonWell Health Alliance system. It identifies patients whose enhanced coverage processing has exceeded a maximum duration, notifies about these cases, and forces the completion of their enhanced coverage.
+
+## Code Structure
+The main function `checkStaleEnhancedCoverage` uses helper functions `getPatientsWithStaleEC` and `notifyStaleEC`. It also imports and uses the `completeEnhancedCoverage` function from another module.
+
+## Symbols
+
+### `checkStaleEnhancedCoverage`
+#### Description
+This function checks for patients with stale enhanced coverage and completes their processing.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxIds | string[] | Array of customer IDs to check for stale enhanced coverage |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Promise&lt;void&gt; | This function doesn't return a value, but performs operations asynchronously |
+
+#### Internal Logic
+1. Retrieves patients with stale enhanced coverage using `getPatientsWithStaleEC`.
+2. Notifies about stale enhanced coverage cases using `notifyStaleEC`.
+3. Groups patients by customer ID.
+4. Iterates through grouped patients and calls `completeEnhancedCoverage` for each group.
+
+### `getPatientsWithStaleEC`
+#### Description
+Retrieves patients whose enhanced coverage processing has exceeded the maximum duration.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxIds | string[] | Array of customer IDs to filter patients |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Promise&lt;SimplifiedPatient[]&gt; | Array of patients with stale enhanced coverage |
+
+#### Internal Logic
+1. Calculates the earliest date for stale enhanced coverage.
+2. Queries the database for patients with specific conditions:
+   - Matching customer IDs (if provided)
+   - CQ link status is "processing"
+   - Created before the earliest date
+
+### `notifyStaleEC`
+#### Description
+Logs and captures a message about patients with stale enhanced coverage.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patients | SimplifiedPatient[] | Array of patients with stale enhanced coverage |
+
+#### Internal Logic
+1. Groups patients by customer ID.
+2. Logs a message with the count of affected patients.
+3. Captures a warning message with patient details.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dayjs | Date and time manipulation |
+| lodash | Utility functions (groupBy) |
+| sequelize | Database ORM |
+| @metriport/core | Core domain models and utilities |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| MAX_EC_DURATON | dayjs.Duration | 40 minutes | Maximum duration for enhanced coverage processing |
+
+## Error Handling
+This code doesn't implement specific error handling mechanisms beyond basic Promise rejection. Errors would propagate to the caller.
+
+## Logging
+The code uses `console.log` for logging messages about stale enhanced coverage cases.
+
+## Side Effects
+The code interacts with the database to retrieve and update patient records. It also sends notifications using the `capture.message` function.

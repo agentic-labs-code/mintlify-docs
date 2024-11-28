@@ -1,0 +1,76 @@
+---
+title: "complex_dead_resource_counter.py"
+---
+
+## High-level description
+This Python script analyzes JSON and HBS files in a specified directory to identify and count "dead responses" in FHIR resources. It focuses on finding specific phrases that indicate a lack of data or information in various resource types, including both plaintext and base64-encoded content.
+
+## Code Structure
+The script consists of two main functions: `find_dead_responses` and `find_dead_responses_in_b64`, which analyze different file types. The main execution block calls both functions and prints the results.
+
+## Symbols
+
+### `find_dead_responses(directory)`
+#### Description
+This function walks through the specified directory, reads JSON files, and identifies "dead responses" in FHIR resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| directory | str | Path to the directory containing JSON files to analyze |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dead_responses | dict | A dictionary containing identified dead responses, their counts, and associated resource types |
+
+#### Internal Logic
+1. Walks through the directory and its subdirectories
+2. Reads each JSON file
+3. Examines specific fields in each resource
+4. Checks for predefined phrases indicating lack of data
+5. Counts occurrences and tracks associated resource types
+
+### `find_dead_responses_in_b64(directory)`
+#### Description
+This function analyzes HBS files in the specified directory, focusing on base64-encoded content within Observation resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| directory | str | Path to the directory containing HBS files to analyze |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dead_responses | dict | A dictionary containing identified dead responses in base64-encoded content, their counts, and associated resource types |
+
+#### Internal Logic
+1. Walks through the directory and its subdirectories
+2. Reads each HBS file containing "Observation"
+3. Identifies base64-encoded content
+4. Decodes the content and checks for predefined phrases
+5. Counts occurrences and tracks associated resource types
+
+### Main Execution Block
+#### Description
+The main execution block processes command-line arguments, calls the analysis functions, and prints the results.
+
+#### Internal Logic
+1. Checks for correct command-line usage
+2. Calls `find_dead_responses` and prints results
+3. Calls `find_dead_responses_in_b64` and prints results
+4. Calculates and prints the total count of resources with dead responses
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| os | File system operations |
+| json | JSON parsing |
+| sys | Command-line argument handling |
+| base64 | Decoding base64-encoded strings |
+
+## TODOs
+- The script needs to process the base64-encoded content, as indicated by the comment: "TODO gotta get the ones in the b64 still"
+
+This script is a useful tool for identifying and quantifying instances where FHIR resources contain placeholder or null responses, which can be valuable for data quality assessment and improvement in healthcare information systems.

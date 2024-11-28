@@ -1,0 +1,67 @@
+---
+title: "redrive-dlq.ts"
+---
+
+## High-level description
+This file contains code for redriving messages from a Dead Letter Queue (DLQ) to a regular SQS queue, with the ability to process and deduplicate messages before redriving. However, the main functionality is currently commented out, and the file only exports an empty object.
+
+## Code Structure
+The file contains two main functions: `redriveDLQ` and `redriveSQSUnique`, both of which are currently commented out. These functions work together to retrieve messages from a source queue, deduplicate them, and send them to a destination queue.
+
+## Symbols
+
+### `redriveDLQ` (commented out)
+#### Description
+This function is designed to retrieve all messages from a Dead Letter Queue (DLQ), deduplicate them, and send the unique messages to a regular queue for re-processing.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| maxNumberOfMessages | number | The maximum number of messages to process |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object | { originalCount: number, uniqueCount: number } | An object containing the original message count and the count of unique messages |
+
+#### Internal Logic
+1. Checks if the DLQ and regular queue URLs are available
+2. Calls `redriveSQSUnique` with the appropriate parameters, including a custom content comparator function
+
+### `redriveSQSUnique` (commented out)
+#### Description
+This function retrieves messages from a source queue, deduplicates them, and sends the unique messages to a destination queue.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sourceQueueUrl | string | The URL of the source SQS queue |
+| destinationQueueUrl | string | The URL of the destination SQS queue |
+| maxNumberOfMessages | number | The maximum number of messages to process |
+| contentComparator | function (optional) | A function to compare message contents for deduplication |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object | { originalCount: number, uniqueCount: number } | An object containing the original message count and the count of unique messages |
+
+#### Internal Logic
+1. Calculates the actual maximum number of messages to process
+2. Retrieves the message count from the source queue
+3. Fetches messages from the source queue in parallel
+4. Deduplicates the messages using the provided content comparator
+5. Sends the unique messages to the destination queue
+6. Returns the original and unique message counts
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-sdk | For interacting with AWS SQS |
+| lodash | For utility functions like `uniq` and `uniqBy` |
+| @metriport/core/util/uuid-v7 | For generating UUIDs |
+
+## TODOs
+- Consider exposing the `redriveSQSUnique` function to a shared library in core, along with Lambda's SQSUtils
+
+## Notes
+The code is currently commented out, with only an empty object being exported. The comment at the top suggests that this code should only be built if there's a need to process messages before redriving them. Otherwise, it recommends using the `sqsmover` tool (https://github.com/mercury2269/sqsmover) for simple redriving.

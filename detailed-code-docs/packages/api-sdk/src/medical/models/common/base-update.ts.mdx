@@ -1,0 +1,57 @@
+---
+title: "base-update.ts"
+---
+
+## High-level description
+This code defines a base schema and type for updating entities in a medical API, using the Zod library for schema validation. It also provides a utility function to generate an ETag header for optimistic concurrency control.
+
+## Symbols
+
+### `baseUpdateSchema`
+#### Description
+Defines a Zod schema for the base structure of update operations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The identifier of the entity to be updated |
+| eTag | string (optional) | An optional ETag for optimistic concurrency control |
+
+#### Outputs
+A Zod schema object that can be used for validation and type inference.
+
+### `BaseUpdate`
+#### Description
+A TypeScript type inferred from the `baseUpdateSchema`, representing the structure of update operations.
+
+### `getETagHeader`
+#### Description
+A utility function that generates an ETag header for HTTP requests if an ETag is provided.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| entity | Pick&lt;BaseUpdate, "eTag"&gt; | An object containing an optional eTag property |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| header | { "If-Match": string } \| undefined | An object containing the If-Match header if eTag is present, otherwise undefined |
+
+#### Internal Logic
+1. Checks if the input `entity` has an `eTag` property.
+2. If `eTag` is present, returns an object with the "If-Match" header set to the eTag value.
+3. If `eTag` is not present, returns `undefined`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| zod | Used for schema definition and validation |
+
+## References
+The `baseUpdateSchema` and `BaseUpdate` type are used in other parts of the codebase, specifically:
+- In `patient.ts`, `patientUpdateSchema` is created by merging `patientCreateSchema` with `baseUpdateSchema`.
+- In `facility.ts`, `facilitySchema` is created by merging `facilityCreateSchema` with `baseUpdateSchema`.
+- In `organization.ts`, `organizationSchema` is created by merging with `baseUpdateSchema`.
+
+These usages indicate that the base update structure is applied consistently across different entity types in the medical API.

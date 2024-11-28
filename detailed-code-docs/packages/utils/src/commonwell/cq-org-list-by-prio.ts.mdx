@@ -1,0 +1,53 @@
+---
+title: "cq-org-list-by-prio.ts"
+---
+
+## High-level description
+This code defines a data structure `priorityOrgs` that categorizes CommonWell Health Alliance (CW) organizations by priority levels (high and medium) using their Object Identifiers (OIDs). It's used to prioritize organizations in CommonWell Query (CQ) operations, likely for efficient data retrieval or processing.
+
+## Code Structure
+The code exports a single constant `priorityOrgs`, which is a record with two keys: "high" and "medium". Each key contains an array of string OIDs representing organizations of that priority level.
+
+## References
+This code imports `OrgPrio` from "@metriport/core/external/commonwell/cq-bridge/get-orgs", which is likely an enum or type definition for organization priorities.
+
+## Symbols
+
+### `priorityOrgs`
+#### Description
+A constant object that categorizes CommonWell Health Alliance organizations by their priority levels (high and medium) using their Object Identifiers (OIDs).
+
+#### Type
+`Record&lt;Exclude&lt;OrgPrio, "low"&gt;, string[]&gt;`
+
+This type indicates that `priorityOrgs` is an object where the keys are of type `OrgPrio` (excluding "low"), and the values are arrays of strings.
+
+#### Internal Logic
+The `priorityOrgs` object contains two properties:
+1. `high`: An array of string OIDs representing high-priority organizations.
+2. `medium`: An array of string OIDs representing medium-priority organizations.
+
+Each array contains multiple OIDs, which are unique identifiers for organizations in the CommonWell Health Alliance network.
+
+## Performance Considerations
+The use of a Record structure allows for efficient lookup of an organization's priority based on its OID. This can be particularly useful in scenarios where quick priority determination is needed for a large number of organizations.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/external/commonwell/cq-bridge/get-orgs | Imports the `OrgPrio` type used in the `priorityOrgs` definition |
+
+## Usage in Related Code
+The `cq-org-builder.ts` file uses this `priorityOrgs` object in its `getPrio` function:
+
+```typescript
+function getPrio(org: OrgWithGateway): OrgPrio {
+  if (priorityOrgs.high.includes(org.id)) return "high";
+  if (priorityOrgs.medium.includes(org.id)) return "medium";
+  return "low";
+}
+```
+
+This function determines the priority of an organization based on its presence in the `high` or `medium` arrays of `priorityOrgs`. If the organization's ID is not found in either array, it's considered "low" priority.
+
+The `priorityOrgs` object is crucial for the organization building process in `cq-org-builder.ts`, as it helps assign priority levels to organizations when creating or updating the CQ organization list.

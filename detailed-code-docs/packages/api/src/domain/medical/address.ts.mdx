@@ -1,0 +1,51 @@
+---
+title: "address.ts"
+---
+
+## High-level description
+This code defines a function `getAddressWithCoordinates` that takes an address and a customer ID, geocodes the address to add coordinates, and returns the address with coordinates. It's designed to enhance address data with geographic coordinates for use in medical-related applications.
+
+## Symbols
+
+### `getAddressWithCoordinates`
+#### Description
+This function takes an input address and a customer ID, adds geographic coordinates to the address, and returns the enhanced address. It uses the `addCoordinatesToAddresses` function to perform the geocoding.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| inputAddress | AddressStrict | The input address without coordinates |
+| cxId | string | The customer ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| AddressWithCoordinates | object | The input address enhanced with coordinates |
+
+#### Internal Logic
+1. Calls `addCoordinatesToAddresses` with the input address and customer ID.
+2. Extracts the first (and only) address from the result.
+3. Checks if the address was successfully geocoded and has coordinates.
+4. Throws an error if geocoding failed or coordinates are missing.
+5. Returns the address with coordinates, ensuring the country is set (defaulting to "USA" if not provided).
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/location-address | Provides types for address data |
+| @metriport/core/util/error/metriport-error | Provides custom error type |
+| ../../command/medical/patient/add-coordinates | Provides function to add coordinates to addresses |
+
+## Error Handling
+The function throws errors in two cases:
+1. If geocoding fails (no address returned from `addCoordinatesToAddresses`).
+2. If the geocoded address doesn't have coordinates.
+
+## Performance Considerations
+The function makes an asynchronous call to `addCoordinatesToAddresses`, which likely involves an external API call for geocoding. This could be a potential performance bottleneck, especially if called frequently or with large batches of addresses.
+
+## References
+- The `addCoordinatesToAddresses` function from `../../command/medical/patient/add-coordinates` is crucial for understanding the geocoding process.
+- The `AddressStrict` and `AddressWithCoordinates` types from `@metriport/core/domain/location-address` define the structure of the input and output addresses.
+
+This function plays a key role in enhancing address data with geographic coordinates, which is likely used in various parts of the medical-related application for location-based services or analysis.

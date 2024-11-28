@@ -1,0 +1,65 @@
+---
+title: "2022-12-01_00_init.ts"
+---
+
+## High-level description
+This migration script sets up the `connected_user` table in the database, which stores information about users connected to the platform. It also creates a database function `update_trigger_fn` to automatically update the `updated_at` column on table updates.
+
+## References
+- `shared`: refers to utility functions and constants defined in `migrations-shared.ts`.
+- `ConnectedUser`: refers to the `ConnectedUser` model defined in `connected-user.ts`.
+
+## Symbols
+### `up`
+#### Description
+This asynchronous function defines the actions to be performed during the database migration "up" process. It creates the `connected_user` table and the `update_trigger_fn` function within a database transaction.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | { context: QueryInterface } | An object containing the `queryInterface` object, which provides methods for interacting with the database schema. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise\&lt;void\&gt; | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. **Begin Transaction:** Starts a database transaction to ensure atomicity of the operations.
+2. **Create `update_trigger_fn` Function:** Creates a PL/pgSQL function named `update_trigger_fn` that updates the `updated_at` column of a row to the current timestamp whenever an update occurs.
+3. **Create `connected_user` Table:** Creates the `connected_user` table with the following columns:
+    - `id`: UUID primary key.
+    - `cxId`: UUID foreign key referencing the `cx` table.
+    - `cxUserId`: String representing the user ID within the context of a specific `cx`.
+    - `providerMap`: JSONB object storing user-specific data for different providers.
+4. **Commit Transaction:** Commits the transaction, persisting the changes to the database.
+
+### `down`
+#### Description
+This asynchronous function defines the actions to be performed during the database migration "down" process, essentially rolling back the changes made by `up`. It drops the `connected_user` table and the `update_trigger_fn` function within a database transaction.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | { context: QueryInterface } | An object containing the `queryInterface` object, which provides methods for interacting with the database schema. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise\&lt;void\&gt; | A promise that resolves when the migration rollback is complete. |
+
+#### Internal Logic
+1. **Begin Transaction:** Starts a database transaction to ensure atomicity of the operations.
+2. **Drop `connected_user` Table:** Drops the `connected_user` table.
+3. **Drop `update_trigger_fn` Function:** Drops the `update_trigger_fn` function.
+4. **Commit Transaction:** Commits the transaction, persisting the changes to the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Provides database interaction functionality. |
+| umzug | Handles database migrations. |
+| @metriport/core/util/error/metriport-error | Provides custom error classes. |
+
+## Error Handling
+The code uses a try-catch block within the `updateDB` function in `index.ts` to handle potential errors during the migration process. If an error occurs during the "up" migration, it attempts to roll back to the last executed migration. If an error occurs during the rollback, it logs the error and re-throws the original error.

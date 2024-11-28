@@ -1,0 +1,61 @@
+---
+title: "lambda-layers.ts"
+---
+
+## High-level description
+This file defines Lambda layers and a function to set up Lambda layers for an AWS CDK stack. It exports types and functions related to Lambda layers, which are reusable components that can be shared across multiple Lambda functions.
+
+## Code Structure
+The code defines a constant array of layer names, a type for Lambda layers, and a function to set up Lambda layers. The main symbols are interconnected as follows:
+- `layers` is a constant array of layer names
+- `LambdaLayer` is a type derived from the `layers` array
+- `LambdaLayers` is a type representing a record of Lambda layers
+- `setupLambdasLayers` is a function that creates and returns Lambda layers
+
+## Symbols
+
+### `layers`
+#### Description
+A constant array of strings representing the names of Lambda layers.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| layers | readonly ["shared", "chromium", "dig", "playwright"] | An array of layer names |
+
+### `LambdaLayer`
+#### Description
+A type representing a single Lambda layer, derived from the `layers` array.
+
+### `LambdaLayers`
+#### Description
+A type representing a record of Lambda layers, where each key is a layer name and the value is an `ILayerVersion`.
+
+### `setupLambdasLayers`
+#### Description
+A function that creates and returns Lambda layers for a given stack.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| stack | Stack | The CDK stack to add the layers to |
+| prefixStackName | boolean | Optional. Whether to prefix layer names with the stack name |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| LambdaLayers | Record&lt;LambdaLayer, ILayerVersion&gt; | A record of created Lambda layers |
+
+#### Internal Logic
+1. Determines the prefix based on the `prefixStackName` parameter
+2. Creates a new `LayerVersion` for each layer defined in the `layers` array
+3. Returns an object with all created layers
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-cdk-lib | Provides core CDK constructs |
+| aws-cdk-lib/aws-lambda | Provides Lambda-specific constructs |
+
+## Performance Considerations
+The function creates multiple `LayerVersion` instances, which may have an impact on deployment time and resources. Consider the necessity of each layer and their sizes to optimize performance.

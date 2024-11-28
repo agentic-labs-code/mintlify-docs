@@ -1,0 +1,89 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for generating partial FHIR MeasureReport resources. These templates are part of a larger system designed to convert Clinical Document Architecture (CDA) data to FHIR format. Each template focuses on a specific field within the MeasureReport resource, allowing for modular and flexible resource construction.
+
+## What does it do?
+These templates work together to create different parts of a FHIR MeasureReport resource. They provide a structured way to convert CDA data into FHIR format, specifically for MeasureReports. Each template generates a JSON snippet that represents a portion of the MeasureReport, such as the evaluated resource, the reporter, or the subject. When combined, these snippets can form a complete MeasureReport resource.
+
+The process works like this:
+1. CDA data is processed and relevant information is extracted.
+2. This information is passed to the appropriate template(s) as variables.
+3. The templates use this data to generate JSON structures that conform to the FHIR MeasureReport resource specification.
+4. These JSON structures can then be combined to create a complete MeasureReport resource.
+
+This modular approach allows for flexibility in resource creation and makes it easier to maintain and update individual components of the MeasureReport.
+
+## Key Files
+
+1. `evaluatedResource.hbs`:
+   This template generates the `evaluatedResource` field of a MeasureReport. It creates an array containing references to resources that were evaluated as part of the measure.
+
+   Example output:
+   ```json
+   {
+     "resource": {
+       "resourceType": "MeasureReport",
+       "id": "{{ID}}",
+       "evaluatedResource": [
+         {
+           "reference": "{{REF}}"
+         }
+       ]
+     }
+   }
+   ```
+
+2. `reporter.hbs`:
+   This template creates the `reporter` field of a MeasureReport. It specifies the organization or individual responsible for reporting the results of the measure.
+
+   Example output:
+   ```json
+   {
+     "resource": {
+       "resourceType": "MeasureReport",
+       "id": "{{ID}}",
+       "reporter": {
+         "reference": "{{REF}}"
+       }
+     }
+   }
+   ```
+
+3. `subject.hbs`:
+   This template generates the `subject` field of a MeasureReport. It identifies the individual, group, or other entity that is the subject of the measure report.
+
+   Example output:
+   ```json
+   {
+     "resource": {
+       "resourceType": "MeasureReport",
+       "id": "{{ID}}",
+       "subject": {
+         "reference": "{{REF}}"
+       }
+     }
+   }
+   ```
+
+Each of these templates contributes to different aspects of the MeasureReport resource, allowing for a modular approach to resource construction.
+
+## Dependencies
+These templates are designed to work with the Handlebars templating engine, which is commonly used in JavaScript environments for generating text-based formats like HTML or, in this case, JSON. The templates are likely part of a larger Node.js-based conversion system.
+
+## Configuration
+While the templates themselves don't have explicit configuration options, they are designed to be flexible through the use of variables. The main configurable elements are:
+
+1. `ID`: Used to set the unique identifier for the MeasureReport resource.
+2. `REF`: Used to set references to other resources (e.g., the evaluated resource, the reporter, or the subject).
+
+These variables would be populated with appropriate values when the templates are rendered as part of the CDA to FHIR conversion process.
+
+## Notes
+1. These templates are part of a larger FHIR Converter project, which appears to be maintained by Metriport Inc. and incorporates work from Microsoft Corporation.
+2. The templates focus on specific fields of the MeasureReport resource, indicating that they are meant to be used as part of a larger template system for creating complete MeasureReport resources.
+3. The modular nature of these templates allows for easy maintenance and updates to specific parts of the MeasureReport resource without affecting the entire structure.
+4. While these templates provide the basic structure for key fields in a MeasureReport, a complete FHIR MeasureReport would typically include additional fields and nested structures. The conversion process would likely involve combining these templates with others to produce a fully-formed MeasureReport resource.
+5. The templates use a consistent structure and naming convention, which suggests a well-organized approach to the overall conversion system.

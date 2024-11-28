@@ -1,0 +1,77 @@
+---
+title: "fhir-server-connector.ts"
+---
+
+## High-level description
+This code defines a `createConnector` function that sets up infrastructure for connecting a FHIR server to an AWS environment. It creates an SQS queue, a Lambda function, and necessary IAM permissions to process messages from the queue and send them to a FHIR server.
+
+## Code Structure
+The main function `createConnector` orchestrates the creation of various AWS resources. It uses helper functions like `settings()`, `defaultCreateQueue()`, and `defaultCreateLambda()` to configure and create these resources. The function returns the created SQS queue or undefined if the necessary configuration is missing.
+
+## Symbols
+
+### `settings()`
+#### Description
+This function returns an object containing configuration settings for the connector, including Lambda function settings and SQS queue settings.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| settings | object | An object containing various configuration settings |
+
+#### Internal Logic
+- Retrieves the configuration using `getConfig()`
+- Determines if it's a production environment using `isProd()`
+- Calculates Lambda timeout based on FHIR server ALB timeout
+- Sets various configuration values for Lambda and SQS
+
+### `createConnector()`
+#### Description
+This function creates the necessary AWS resources for the FHIR server connector, including an SQS queue and a Lambda function.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| envType | EnvType | The environment type (e.g., production, sandbox) |
+| stack | Construct | The CDK stack construct |
+| vpc | IVpc | The VPC to deploy resources in |
+| fhirConverterBucket | s3.IBucket | The S3 bucket for FHIR conversion |
+| lambdaLayers | LambdaLayers | Lambda layers to be used |
+| alarmSnsAction | SnsAction (optional) | SNS action for alarms |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queue | Queue \| undefined | The created SQS queue, or undefined if not created |
+
+#### Internal Logic
+1. Checks for necessary configuration (FHIR server URL and API URL)
+2. Creates an SQS queue using `defaultCreateQueue()`
+3. Creates a Lambda function using `defaultCreateLambda()`
+4. Sets up IAM permissions for the Lambda function
+5. Configures the Lambda function to process messages from the SQS queue
+6. Returns the created SQS queue
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-cdk-lib | AWS CDK core library for defining cloud infrastructure |
+| constructs | Base class for CDK constructs |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| connectorName | string | "FHIRServer" | Name of the connector |
+| lambdaMemory | number | 1024 | Memory allocation for the Lambda function |
+| lambdaBatchSize | number | 1 | Number of messages the Lambda processes at once |
+| maxConcurrency | number | 384 (prod) / 4 (non-prod) | Maximum concurrent Lambda invocations |
+| lambdaTimeout | Duration | 14.5 minutes | Timeout for the Lambda function |
+| maxReceiveCount | number | 1 | Maximum number of times a message is received |
+| visibilityTimeout | Duration | 2 * lambdaTimeout + 1 second | SQS message visibility timeout |
+| retryAttempts | number | 2 | Number of retry attempts for the Lambda function |
+
+## Error Handling
+The code includes error handling for missing configuration values (FHIR server URL and API URL). It logs messages and returns undefined if these values are not provided.
+
+## Performance Considerations
+The code sets up various performance-related configurations, such as Lambda concurrency, memory allocation, and SQS visibility timeout. These settings are optimized differently for production and non-production environments.

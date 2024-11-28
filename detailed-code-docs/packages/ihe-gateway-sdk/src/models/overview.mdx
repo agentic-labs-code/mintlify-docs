@@ -1,0 +1,70 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains models and schemas for various operations within an IHE (Integrating the Healthcare Enterprise) Gateway SDK. It includes structures for document queries, document retrieval, patient discovery, and shared components. The code primarily uses Zod for schema validation and TypeScript for type definitions, ensuring type safety and structured data handling in healthcare information exchange contexts.
+
+## What does it do?
+The code in this directory facilitates several key processes in healthcare interoperability:
+
+1. Document Queries: It defines structures for requesting and receiving information about medical documents, allowing healthcare providers to search for relevant patient records across different systems.
+
+2. Document Retrieval: It provides models for requesting and receiving actual medical documents, enabling the secure transfer of patient records between healthcare institutions.
+
+3. Patient Discovery: It offers structures for finding and matching patient information across different healthcare systems, supporting the identification of patients across multiple providers.
+
+4. Shared Components: It defines common data structures and utilities used across various operations, ensuring consistency in data handling throughout the SDK.
+
+These models enable healthcare systems to exchange information securely and in a standardized format, supporting interoperability between different healthcare providers and systems.
+
+## Key Files
+
+1. Document Query Models:
+   - `document-query-requests.ts`: Defines schemas for document query requests, including patient information and various classification codes.
+   - `document-query-responses.ts`: Outlines structures for responses to document queries, handling both successful and fault scenarios.
+
+2. Document Retrieval Models:
+   - `document-retrieval-requests.ts`: Provides schemas for document retrieval requests, covering both outbound and inbound scenarios.
+   - `document-retrieval-responses.ts`: Defines response structures for document retrieval operations, including success and fault cases.
+
+3. Patient Discovery Models:
+   - `patient-discovery-requests.ts`: Contains schemas for patient discovery requests, both outbound and inbound.
+   - `patient-discovery-responses.ts`: Defines structures for patient discovery responses, including match, no-match, and error scenarios.
+   - `patient.ts`: Provides a comprehensive patient data model, including personal details and identifiers.
+
+4. Shared Components:
+   - `shared.ts`: Defines common schemas and types used across the SDK, including structures for NPI, OID, SAML attributes, and base request/response types.
+
+## Dependencies
+The main external dependency for this directory is the Zod library, which is used extensively for schema definition and validation. Zod provides runtime type checking and static type inference, enhancing the reliability and maintainability of the code.
+
+The code also relies on shared utilities and types from the `@metriport/shared` and `@metriport/ihe-gateway-sdk` packages, indicating that it's part of a larger SDK ecosystem for IHE gateways.
+
+## Configuration
+While there are no explicit configuration files in this directory, the schemas themselves serve as a form of configuration. They define the expected structure of requests and responses, effectively configuring how the SDK interacts with various healthcare information exchange systems.
+
+Key configurable aspects include:
+- Patient attributes (e.g., name, address, identifiers)
+- Document classification codes
+- Request and response structures for different operations
+- SAML attributes for security assertions
+
+Developers using this SDK would need to ensure that they provide the correct information in these fields when making requests or handling responses. For example, the `patientResourceSchema` in `patient.ts` defines what information can be included for a patient:
+
+```typescript
+const patientResourceSchema = z.object({
+  resourceType: z.literal("Patient").optional(),
+  id: z.string().optional(),
+  name: z.array(nameSchema),
+  gender: genderSchema,
+  birthDate: z.string(),
+  address: z.array(addressSchema).optional(),
+  telecom: z.array(telecomSchema).optional(),
+  identifier: z.array(personalIdentifierSchema).optional(),
+});
+```
+
+This schema configuration ensures that patient data adheres to a specific structure, with required fields like name, gender, and birthDate, and optional fields like address and telecom information.
+
+In conclusion, this directory provides a robust and type-safe foundation for handling various healthcare interoperability operations, ensuring that data exchange follows IHE standards and can be reliably processed by both the SDK and the systems it interacts with.

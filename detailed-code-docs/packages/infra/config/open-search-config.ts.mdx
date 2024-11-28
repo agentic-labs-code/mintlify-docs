@@ -1,0 +1,43 @@
+---
+title: "open-search-config.ts"
+---
+
+## High-level description
+This code defines configuration types for OpenSearch and related Lambda functions in an AWS CDK infrastructure project. It provides a structured way to specify OpenSearch cluster properties and Lambda function settings, which are likely used in other parts of the infrastructure setup.
+
+## Symbols
+
+### `LambdaConfig`
+#### Description
+Defines the configuration for a Lambda function, including memory allocation, batch size for SQS message processing, concurrency, and timeout.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| memory | number | The amount of memory allocated to the Lambda function |
+| batchSize | number | Number of messages the Lambda function pulls from SQS at once |
+| maxConcurrency | number | Maximum number of concurrent instances of the Lambda function that can be invoked by an Amazon SQS event source |
+| timeout | Duration | Maximum execution time for the Lambda function |
+
+### `OpenSearchConnectorConfig`
+#### Description
+Defines the configuration for an OpenSearch connector, including OpenSearch cluster properties and associated Lambda function settings.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| openSearch | Omit&lt;OpenSearchConstructProps, "region" \| "vpc" \| "awsAccount"&gt; & { indexName: string } | OpenSearch cluster configuration, excluding region, VPC, and AWS account, but including an index name |
+| lambda | LambdaConfig | Configuration for the associated Lambda function |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-cdk-lib | Importing the Duration type for specifying time durations |
+
+## References
+This code references the `OpenSearchConstructProps` type from the `../lib/shared/open-search-construct` module, which is likely defined in the related file `packages/infra/lib/shared/open-search-construct.ts`.
+
+## Notes
+1. The `LambdaConfig` type includes a comment specifying that the `maxConcurrency` value should be between 2 and 1000.
+2. The `OpenSearchConnectorConfig` type uses TypeScript's utility type `Omit` to exclude certain properties from `OpenSearchConstructProps` while adding a new `indexName` property.
+3. This configuration file is likely used in conjunction with other parts of the infrastructure setup, particularly for deploying OpenSearch clusters and associated Lambda functions in AWS.

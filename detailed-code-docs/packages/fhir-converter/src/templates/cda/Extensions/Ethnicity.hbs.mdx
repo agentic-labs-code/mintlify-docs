@@ -1,0 +1,57 @@
+---
+title: "Ethnicity.hbs"
+---
+
+## High-level description
+This Handlebars template generates a FHIR extension for ethnicity information based on the US Core Implementation Guide. It transforms CDA (Clinical Document Architecture) ethnicity data into the FHIR format, handling various scenarios such as multiple ethnicities, null flavors, and specific ethnicity codes.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template generates a FHIR extension object for ethnicity, following the US Core StructureDefinition for ethnicity.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Object | Contains ethnicity information from the CDA document |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| extension | Object | FHIR extension object for ethnicity |
+
+#### Internal Logic
+1. Checks if ethnicity information exists (`patient.ethnicGroupCode`).
+2. Sets the URL for the US Core ethnicity extension.
+3. Creates an array of extensions for each ethnicity code:
+   - Handles null flavors (unknown or asked but no answer).
+   - Determines if the code is an OMB category or detailed ethnicity.
+   - Uses a partial template (`DataType/Coding.hbs`) to generate the coding object.
+4. Adds a text representation of the ethnicity:
+   - Handles multiple ethnicities, null flavors, and single ethnicity scenarios.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| DataType/Coding.hbs | Partial template for generating FHIR Coding datatype |
+
+## Configuration
+The template uses specific ethnicity codes to determine OMB categories:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| OMB Category Codes | String | '2135-2', '2186-5' | Codes that represent OMB ethnicity categories |
+
+## Error Handling
+The template includes conditional checks to handle various data scenarios, including missing data and null flavors, to prevent errors in the output.
+
+## API/Interface Reference
+This template is designed to be used within a larger FHIR conversion system. It expects a `patient` object with ethnicity information and produces a FHIR-compliant extension object.
+
+| Input Field | Description |
+|:------------|:------------|
+| patient.ethnicGroupCode | Primary ethnicity code |
+| patient.sdtc:ethnicGroupCode | Additional ethnicity codes (optional) |
+
+The output conforms to the US Core Ethnicity extension structure:
+http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity

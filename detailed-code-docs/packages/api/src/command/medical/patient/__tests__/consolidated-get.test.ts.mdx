@@ -1,0 +1,67 @@
+---
+title: "consolidated-get.test.ts"
+---
+
+## High-level description
+The `consolidated-get.test.ts` file contains unit tests for the `consolidated-get.ts` module, which handles retrieving and processing consolidated patient data. These tests cover functions like retrieving current consolidation progress, comparing resource arrays, and filtering out preliminary document references.
+
+## Code Structure
+The code consists of a series of test suites (`describe` blocks) that group related test cases (`it` blocks). Each test case sets up specific input conditions and assertions to validate the behavior of the functions under test.
+
+## Symbols
+### `getCurrentConsolidatedProgress`
+#### Description
+This function checks if there is a matching in-progress consolidated query based on provided parameters and returns the query progress if found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| consolidatedQueriesProgress | `ConsolidatedQuery[] \| undefined` | An array of consolidated query progress objects. |
+| queryParams | `GetConsolidatedFilters` | An object containing filter parameters for the query. |
+| progressStatus | `string` | (Optional) The status of the query progress to filter by. Defaults to "processing". |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `ConsolidatedQuery \| undefined` | The matching consolidated query progress object, or undefined if not found. |
+
+#### Internal Logic
+The function iterates through the `consolidatedQueriesProgress` array and compares each query's parameters (resources, dateFrom, dateTo, conversionType, and status) with the provided `queryParams` and `progressStatus`. If a match is found, the corresponding query progress object is returned. Otherwise, `undefined` is returned.
+
+### `getIsSameResources`
+#### Description
+This function compares two arrays of resource types to determine if they represent the same set of resources, considering potential empty arrays and the full list of resources searchable by patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queryResources | `ResourceTypeForConsolidation[] \| undefined` | The first array of resource types. |
+| currentResources | `ResourceTypeForConsolidation[] \| undefined` | The second array of resource types. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `boolean` | True if both arrays represent the same set of resources, false otherwise. |
+
+#### Internal Logic
+The function checks for various conditions:
+- If both arrays have the same length and all elements from `queryResources` are present in `currentResources`, it returns true.
+- If one array is empty and the other contains all resources searchable by patient (`resourcesSearchableByPatient`), it returns true.
+- Otherwise, it returns false.
+
+### `filterOutPrelimDocRefs`
+#### Description
+This function filters out preliminary `DocumentReference` resources from a bundle entry array.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| entries | `BundleEntry&lt;Resource&gt;[] \| undefined` | An array of bundle entries. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `BundleEntry&lt;Resource&gt;[] \| undefined` | The filtered array of bundle entries, excluding preliminary `DocumentReference` resources. |
+
+#### Internal Logic
+The function iterates through the `entries` array and checks if each entry's resource is a `DocumentReference`. If it is, it further checks if the `docStatus` is not "preliminary". Only entries that pass this check are included in the returned array.

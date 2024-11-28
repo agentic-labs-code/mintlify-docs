@@ -1,0 +1,73 @@
+---
+title: "Medication.hbs"
+---
+
+## High-level description
+This Handlebars template file is responsible for converting CDA (Clinical Document Architecture) medication-related sections into FHIR (Fast Healthcare Interoperability Resources) format. It processes medication entries, creating FHIR resources such as MedicationStatement, Medication, MedicationRequest, Practitioner, and Organization.
+
+## Code Structure
+The template uses nested Handlebars helpers and partials to process different parts of the CDA document and generate corresponding FHIR resources. It iterates through medication entries and creates related resources based on the available data.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template checks for specific CDA section template IDs related to medications and processes the entries within those sections.
+
+#### Internal Logic
+1. Checks for specific CDA section template IDs.
+2. Iterates through medication entries.
+3. For each entry, generates FHIR resources like MedicationStatement, Medication, MedicationRequest, Practitioner, and Organization.
+4. Uses partial templates to generate specific FHIR resources and references.
+
+### Partial Templates
+#### Description
+The template uses several partial templates to generate specific FHIR resources and references.
+
+#### Inputs
+- Data from CDA medication entries
+
+#### Outputs
+- FHIR resource representations in JSON format
+
+#### Internal Logic
+- `Resources/MedicationStatement.hbs`: Generates a FHIR MedicationStatement resource.
+- `References/MedicationStatement/subject.hbs`: Creates a reference to the patient for the MedicationStatement.
+- `Resources/Medication.hbs`: Generates a FHIR Medication resource.
+- `References/MedicationStatement/medicationReference.hbs`: Creates a reference to the Medication for the MedicationStatement.
+- `Resources/MedicationRequest.hbs`: Generates a FHIR MedicationRequest resource.
+- `References/MedicationRequest/subject.hbs`: Creates a reference to the patient for the MedicationRequest.
+- `References/MedicationRequest/medicationReference.hbs`: Creates a reference to the Medication for the MedicationRequest.
+- `Resources/Practitioner.hbs`: Generates a FHIR Practitioner resource.
+- `References/MedicationRequest/requester.hbs`: Creates a reference to the Practitioner or Organization for the MedicationRequest.
+- `Resources/Organization.hbs`: Generates a FHIR Organization resource.
+
+### Helper Functions
+#### Description
+The template uses several custom helper functions to process data and generate unique identifiers.
+
+#### Inputs
+- Various data from CDA entries
+
+#### Outputs
+- Processed data or generated identifiers
+
+#### Internal Logic
+- `generateUUID`: Generates a unique identifier based on the input string.
+- `evaluate`: Evaluates a template with given parameters.
+- `multipleToArray`: Converts multiple inputs into an array.
+- `toArray`: Converts an input to an array.
+- `contains`: Checks if a string contains specific substrings.
+- `toString`: Converts input to a string.
+- `toJsonString`: Converts input to a JSON string.
+
+## Dependencies
+The template relies on several external Handlebars helpers and partials, which are not defined in this file but are referenced throughout the template.
+
+## Configuration
+The template uses specific CDA template IDs to identify relevant sections:
+- '2.16.840.1.113883.10.20.22.2.1.1'
+- '2.16.840.1.113883.10.20.22.2.1'
+- '2.16.840.1.113883.10.20.22.2.38'
+
+These IDs are used to locate the medication-related sections in the CDA document.

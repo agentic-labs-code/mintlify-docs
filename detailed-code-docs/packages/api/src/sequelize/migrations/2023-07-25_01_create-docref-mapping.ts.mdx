@@ -1,0 +1,68 @@
+---
+title: "2023-07-25_01_create-docref-mapping.ts"
+---
+
+## High-level description
+This code defines a database migration script for creating a table named `docref_mapping`. This table likely stores mappings between internal document references and external identifiers from different data sources. 
+
+## Code Structure
+The code defines two main functions: `up` and `down`. The `up` function handles the database migration to create the table and its associated indexes. The `down` function handles the rollback by dropping the table. Both functions use transactions to ensure atomicity.
+
+## References
+- `shared.createTable`: This function is imported from `../migrations-shared` and is responsible for creating the table with common default columns and triggers.
+
+## Symbols
+
+### `up`
+#### Description
+This asynchronous function defines the steps to create the `docref_mapping` table and its indexes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| context | { queryInterface: QueryInterface } | An object containing the Sequelize QueryInterface instance for interacting with the database. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. Starts a database transaction to ensure atomicity.
+2. Calls the `shared.createTable` function to create the `docref_mapping` table with the specified columns:
+    - `id`: A string primary key.
+    - `externalId`: A string representing the external document identifier.
+    - `cxId`: A UUID representing an internal identifier.
+    - `patientId`: A string representing the patient identifier.
+    - `source`: A string indicating the source of the document reference.
+3. Defines a unique constraint named `external_unique` on the combination of `external_id`, `patient_id`, `cx_id`, and `source` columns.
+4. Creates an index named `docref_mapping_alternative_unique_idx` on the `cx_id`, `patient_id`, and `source` columns.
+5. Commits the transaction if all operations are successful.
+
+### `down`
+#### Description
+This asynchronous function defines the steps to rollback the migration by dropping the `docref_mapping` table.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| context | { queryInterface: QueryInterface } | An object containing the Sequelize QueryInterface instance for interacting with the database. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise | A promise that resolves when the rollback is complete. |
+
+#### Internal Logic
+1. Starts a database transaction to ensure atomicity.
+2. Calls `queryInterface.dropTable` to drop the `docref_mapping` table.
+3. Commits the transaction if the table is successfully dropped.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | ORM for interacting with the database. |
+| ../migrations-shared | Provides shared functions for database migrations. |
+
+## Error Handling
+The code uses database transactions to ensure that either all operations within the `up` and `down` functions are successful or the entire transaction is rolled back. This prevents the database from being left in an inconsistent state if an error occurs during the migration.

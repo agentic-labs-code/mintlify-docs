@@ -1,0 +1,118 @@
+---
+title: "webhook.ts"
+---
+
+## High-level description
+The code defines functions for setting and unsetting a flag in the patient's data that disables webhooks for document requests and consolidated requests. This is done by updating the patient's data in the database.
+
+## Code Structure
+The code defines several functions related to managing a "disable webhook" flag in a patient's data:
+- `setDisableWHFlag`: Sets the disable webhook flag for a specific field in the patient's data.
+- `setDisableDocumentRequestWHFlag`: Sets the disable webhook flag specifically for document requests.
+- `setDisableConsolidatedRequestWHFlag`: Sets the disable webhook flag specifically for consolidated requests.
+
+These functions work together to provide a way to control whether webhooks are triggered for specific types of requests related to a patient.
+
+## References
+- `Patient`: Represents a patient and their data.
+- `PatientModel`: Sequelize model for interacting with the `patient` table in the database.
+- `executeOnDBTx`: A helper function for executing database operations within a transaction.
+- `getPatientOrFail`: Retrieves a patient from the database or throws an error if not found.
+
+## Symbols
+
+### `setDisableWHMeta`
+#### Description
+A type alias representing the structure of the metadata object containing the webhook disable flag.
+
+#### Inputs
+N/A - This is a type alias, not a function.
+
+#### Outputs
+N/A - This is a type alias, not a function.
+
+### `DisableWH`
+#### Description
+A type alias representing the structure of an object containing metadata with the webhook disable flag.
+
+#### Inputs
+N/A - This is a type alias, not a function.
+
+#### Outputs
+N/A - This is a type alias, not a function.
+
+### `DisableWHCommand`
+#### Description
+A type alias representing the structure of the command object used to disable/enable webhooks.
+
+#### Inputs
+N/A - This is a type alias, not a function.
+
+#### Outputs
+N/A - This is a type alias, not a function.
+
+### `setDisableWHFlag`
+#### Description
+Sets the disable webhook flag for a specific field in the patient's data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cmd | `DisableWHCommand` | An object containing the patient ID, cxId, field to update, and the desired state of the disable webhook flag. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `Promise&lt;Patient&gt;` | `Promise&lt;Patient&gt;` | A promise that resolves to the updated `Patient` object. |
+
+#### Internal Logic
+1. Extracts the patient ID, cxId, field to update, and the desired state of the disable webhook flag from the `cmd` object.
+2. Executes a database transaction using `executeOnDBTx`.
+3. Retrieves the patient from the database using `getPatientOrFail`, locking the record for the duration of the transaction.
+4. Updates the specified field in the patient's data, setting the `webhookDisableFlagName` to the desired value.
+5. Saves the updated patient object to the database.
+6. Returns the updated `Patient` object.
+
+### `setDisableDocumentRequestWHFlag`
+#### Description
+Sets the disable webhook flag specifically for document requests.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cmd | `Omit&lt;DisableWHCommand, "field"&gt;` | An object containing the patient ID, cxId, and the desired state of the disable webhook flag for document requests. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `Promise&lt;Patient&gt;` | `Promise&lt;Patient&gt;` | A promise that resolves to the updated `Patient` object. |
+
+#### Internal Logic
+Calls `setDisableWHFlag` with the `field` property set to `"cxDocumentRequestMetadata"`.
+
+### `setDisableConsolidatedRequestWHFlag`
+#### Description
+Sets the disable webhook flag specifically for consolidated requests.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cmd | `Omit&lt;DisableWHCommand, "field"&gt;` | An object containing the patient ID, cxId, and the desired state of the disable webhook flag for consolidated requests. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `Promise&lt;Patient&gt;` | `Promise&lt;Patient&gt;` | A promise that resolves to the updated `Patient` object. |
+
+#### Internal Logic
+Calls `setDisableWHFlag` with the `field` property set to `"cxConsolidatedRequestMetadata"`.
+
+## Side Effects
+- Modifies the patient's data in the database.
+
+## Dependencies
+- `@metriport/core/domain/webhook`: Provides the `webhookDisableFlagName` constant.
+- `@metriport/core/domain/patient`: Provides the `Patient` interface.
+- `../../../models/medical/patient`: Provides the `PatientModel` Sequelize model.
+- `../../../models/transaction-wrapper`: Provides the `executeOnDBTx` helper function.
+- `./get-patient`: Provides the `getPatientOrFail` function.

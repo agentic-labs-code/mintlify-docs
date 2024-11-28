@@ -1,0 +1,69 @@
+---
+title: "ihe-gateway-v2-inbound-document-retrieval.ts"
+---
+
+## High-level description
+This code implements a Lambda function handler for processing inbound document retrieval requests in an IHE (Integrating the Healthcare Enterprise) Gateway. It parses MTOM (Message Transmission Optimization Mechanism) responses, processes the document retrieval request, and generates a SOAP response.
+
+## Code Structure
+The main handler function processes the incoming event, extracts the MTOM parts, processes the document retrieval request, generates a response, and optionally sends analytics data. It uses various imported functions for parsing, processing, and response creation.
+
+## Symbols
+
+### `handler`
+#### Description
+The main Lambda function handler that processes the incoming API Gateway event for inbound document retrieval.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | APIGatewayProxyEventV2 | The API Gateway event containing the request data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | object | An object containing statusCode, headers, and body |
+
+#### Internal Logic
+1. Checks if the event body is empty
+2. Extracts the boundary from the content-type header
+3. Parses the MTOM response or converts SOAP response to MTOM format
+4. Processes the inbound document retrieval request
+5. Generates the inbound document retrieval response
+6. Optionally sends analytics data if multiple documents are retrieved
+7. Returns the response with appropriate status code and body
+
+### `buildResponse`
+#### Description
+A helper function to build the response object for the Lambda function.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | number | The HTTP status code |
+| body | unknown | The response body (optional) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | object | An object containing statusCode, headers, and body |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/ihe-gateway-sdk | Provides types for document retrieval requests and responses |
+| @metriport/shared | Provides utility functions like errorToString |
+| @metriport/core | Provides various utility functions and external integrations |
+
+## Error Handling
+The code implements try-catch blocks to handle errors at different levels:
+1. Outer try-catch block for handling server errors (500 status code)
+2. Inner try-catch block for handling client errors (400 status code)
+
+Errors are logged using the `log` function from the `@metriport/core/util/log` module.
+
+## Logging
+The code uses a custom `log` function from `@metriport/core/util/log` for logging errors and important information.
+
+## Performance Considerations
+The code uses asynchronous operations for parsing MTOM responses, processing requests, and sending analytics data, which helps in maintaining good performance for I/O-bound operations.

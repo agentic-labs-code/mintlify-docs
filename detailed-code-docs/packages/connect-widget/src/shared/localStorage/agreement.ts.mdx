@@ -1,0 +1,83 @@
+---
+title: "agreement.ts"
+---
+
+## High-level description
+This code manages the user agreement state for a connect widget, utilizing local storage to persist the agreement status and providing functions to set and accept the agreement. It also integrates with an analytics system to track when users accept the agreement.
+
+## Code Structure
+The code defines three main functions: `setAgreementState`, `getLocalStorageAgreement`, and `acceptAgreement`. These functions work together to manage the agreement state, with `setAgreementState` initializing the state from local storage, `getLocalStorageAgreement` retrieving the stored value, and `acceptAgreement` updating both the state and local storage.
+
+## References
+This code references the `Analytics` module from "../analytics".
+
+## Symbols
+
+### `setAgreementState`
+#### Description
+Initializes the agreement state by checking local storage and updating the provided state setter function.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| setAgreement | (value: boolean) =&gt; void | Function to update the agreement state |
+
+#### Internal Logic
+1. Retrieves the agreement state from local storage
+2. If a value is found, updates the agreement state using the provided setter function
+
+### `getLocalStorageAgreement`
+#### Description
+Retrieves the agreement state from local storage.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| agreement | boolean | The stored agreement state, or false if not found |
+
+#### Internal Logic
+1. Checks if localStorage is available
+2. Retrieves the value stored under the `agreementLocalStorageKey`
+3. If a value is found, parses it from JSON and returns the result
+4. Returns false if no value is found or localStorage is unavailable
+
+### `acceptAgreement`
+#### Description
+Updates the agreement state, stores it in local storage (if not in demo mode), and emits an analytics event.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| setAgreement | (value: boolean) =&gt; void | Function to update the agreement state |
+| isDemo | boolean | Flag indicating if the application is in demo mode |
+
+#### Internal Logic
+1. If not in demo mode and localStorage is available, stores the agreement state
+2. Emits an analytics event for accepting the agreement
+3. Updates the agreement state to true using the provided setter function
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Analytics | Used to emit an event when the agreement is accepted |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| agreementLocalStorageKey | string | "agreement-accepted-v1" | Key used for storing the agreement state in local storage |
+
+## Error Handling
+The code includes basic error handling by checking for the availability of localStorage before attempting to use it. However, it does not explicitly handle potential errors that could occur during JSON parsing or localStorage operations.
+
+## Logging
+This code does not implement any logging mechanisms.
+
+## API/Interface Reference
+While not strictly an API, the module exports two functions that serve as its public interface:
+
+| Function | Inputs | Description |
+|:---------|:-------|:------------|
+| setAgreementState | (setAgreement: (value: boolean) =&gt; void) | Initializes the agreement state |
+| acceptAgreement | (setAgreement: (value: boolean) =&gt; void, isDemo: boolean) | Accepts the agreement and updates the state |
+
+These functions are used in the ConnectPage component (as seen in the related code snippets) to manage the agreement state and handle user acceptance of the agreement.

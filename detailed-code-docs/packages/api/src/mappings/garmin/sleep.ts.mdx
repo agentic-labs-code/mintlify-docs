@@ -1,0 +1,107 @@
+---
+title: "sleep.ts"
+---
+
+## High-level description
+The code defines functions for mapping Garmin sleep data to the standardized `Sleep` type used in the Metriport API. It includes functions for mapping the overall sleep data, durations of different sleep stages, and biometrics.
+
+## Code Structure
+The `mapToSleep` function takes an array of Garmin sleep data, groups it by user, and maps each sleep entry to the `Sleep` type using the `garminSleepToSleep` function. The `garminSleepToSleep` function maps individual Garmin sleep entries to the `Sleep` type, utilizing the `toDurations` and `toBiometrics` functions to map specific data fields.
+
+## References
+- `Sleep`: Type definition from the `@metriport/api-sdk` package representing standardized sleep data.
+- `SleepDurations`: Type definition from the `@metriport/api-sdk` package representing durations of different sleep stages.
+- `SleepBiometrics`: Type definition from the `@metriport/api-sdk` package representing sleep-related biometrics.
+- `User`: Type definition representing a user with a `userAccessToken`.
+- `UserData`: Type definition representing user-specific data.
+- `PROVIDER_GARMIN`: Constant representing the Garmin data source.
+- `secondsToISODateTime`: Utility function for converting seconds to ISO date-time format.
+
+## Symbols
+
+### `mapToSleep`
+#### Description
+This function takes a list of Garmin sleep data, groups it by user, and maps each entry to the standardized `Sleep` type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sleepList | `GarminSleepList` | An array of Garmin sleep data. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `UserData&lt;Sleep&gt;[]` | An array of user-specific sleep data mapped to the `Sleep` type. |
+
+#### Internal Logic
+1. Groups the input `sleepList` by `userAccessToken`.
+2. Iterates through each user's sleep data.
+3. Maps each Garmin sleep entry to the `Sleep` type using `garminSleepToSleep`.
+4. Returns an array of `UserData&lt;Sleep&gt;`, containing the user and their mapped sleep data.
+
+### `garminSleepToSleep`
+#### Description
+This function maps a single Garmin sleep data entry to the standardized `Sleep` type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| gSleep | `GarminSleep` | A single Garmin sleep data entry. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `Sleep` | The mapped sleep data in the standardized `Sleep` type. |
+
+#### Internal Logic
+1. Creates a new `Sleep` object.
+2. Sets the `metadata` with the date and source (Garmin).
+3. Converts and sets the `start_time` from seconds to ISO date-time format.
+4. Calculates and sets the `end_time` based on `startTimeInSeconds` and `durationInSeconds`.
+5. Maps and sets the `durations` using the `toDurations` function.
+6. Maps and sets the `biometrics` using the `toBiometrics` function.
+7. Returns the mapped `Sleep` object.
+
+### `toDurations`
+#### Description
+This function maps Garmin sleep duration data to the `SleepDurations` type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| gSleep | `GarminSleep` | A single Garmin sleep data entry. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `SleepDurations \| undefined` | The mapped sleep durations or undefined if no durations are found. |
+
+#### Internal Logic
+1. Creates a new `SleepDurations` object.
+2. Maps relevant duration fields from the `gSleep` object to the `SleepDurations` object.
+3. Returns the `SleepDurations` object if it contains any data, otherwise returns undefined.
+
+### `toBiometrics`
+#### Description
+This function is intended to map Garmin sleep biometrics data to the `SleepBiometrics` type. However, it currently returns undefined as the mapping logic is not yet implemented.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| gSleep | `GarminSleep` | A single Garmin sleep data entry. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `SleepBiometrics \| undefined` | Currently returns undefined as the mapping logic is not implemented. |
+
+## Dependencies
+- `@metriport/api-sdk`: Provides type definitions for standardized sleep data.
+- `lodash`: Used for the `groupBy` function.
+- `zod`: Used for data validation and type inference.
+- `./`: Local module containing shared types and constants.
+- `../../shared/constants`: Provides the `PROVIDER_GARMIN` constant.
+- `../../shared/date`: Provides the `secondsToISODateTime` utility function.
+
+## TODOs
+- Implement the mapping logic for `toBiometrics` to extract and map sleep biometrics data from Garmin sleep data.

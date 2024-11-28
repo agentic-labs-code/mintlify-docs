@@ -1,0 +1,63 @@
+---
+title: "group-same-conditions.test.ts"
+---
+
+## High-level description
+This file contains unit tests for the `groupSameConditions` function, which is responsible for grouping and deduplicating FHIR Condition resources based on their SNOMED and ICD-10 codes, as well as their onset dates. The tests cover various scenarios to ensure the function behaves correctly under different conditions.
+
+## Code Structure
+The test file is structured using Jest's testing framework. It includes a `beforeEach` block to set up common test data and a `describe` block containing multiple test cases for the `groupSameConditions` function.
+
+## References
+The code references the following external modules and functions:
+- `@faker-js/faker` for generating random UUIDs
+- `@medplum/fhirtypes` for the Condition type
+- `makeCondition` from a local utility file
+- `groupSameConditions` from the target implementation file
+- Various constants and example data from local files
+
+## Symbols
+
+### `beforeEach`
+#### Description
+Sets up common test data before each test case runs.
+
+#### Internal Logic
+- Generates unique UUIDs for two condition IDs
+- Creates two condition objects using the `makeCondition` function
+
+### `describe("groupSameConditions", ...)`
+#### Description
+Contains all the test cases for the `groupSameConditions` function.
+
+### Test Cases
+Each test case is implemented as an `it` block. Here's a summary of the test cases:
+
+1. Correctly groups duplicate conditions based on SNOMED codes
+2. Correctly groups duplicate conditions based on ICD-10 codes
+3. Does not group duplicate conditions that don't have overlapping codes
+4. Removes conditions that have neither SNOMED nor ICD-10 codes
+5. Does not group conditions with different SNOMED codes
+6. Does not group conditions with different ICD-10 codes
+7. Does not group conditions with different onset dates
+8. Strips away codes that aren't SNOMED or ICD-10
+
+#### Internal Logic
+Each test case follows this general structure:
+1. Arrange: Set up the condition objects with specific codes and onset dates
+2. Act: Call the `groupSameConditions` function with the prepared conditions
+3. Assert: Check the resulting maps (snomedMap and icd10Map) for expected sizes or contents
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @faker-js/faker | Generating random UUIDs for test data |
+| @medplum/fhirtypes | Providing the Condition type definition |
+| makeCondition | Utility function for creating test Condition objects |
+| groupSameConditions | The function being tested |
+
+## Error Handling
+This test file does not implement specific error handling mechanisms. It relies on Jest's built-in assertion functions to catch and report any unexpected behavior.
+
+## Performance Considerations
+The tests in this file are not specifically designed to test performance. However, they do cover various scenarios that could impact the performance of the `groupSameConditions` function, such as handling different code types and filtering out irrelevant codes.

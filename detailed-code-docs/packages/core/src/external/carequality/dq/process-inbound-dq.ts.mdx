@@ -1,0 +1,85 @@
+---
+title: "process-inbound-dq.ts"
+---
+
+## High-level description
+This code implements the processing of inbound Document Query (DQ) requests in a healthcare interoperability system. It handles the retrieval of patient documents from an S3 bucket, generates CCDs if necessary, and constructs the appropriate response for the querying system.
+
+## Code Structure
+The main function `processInboundDq` orchestrates the entire process. It uses various utility functions and classes from other modules to validate the request, decode patient IDs, check for existing documents, generate new ones if needed, and construct the response.
+
+## Symbols
+
+### `processInboundDq`
+#### Description
+This is the main function that processes an inbound Document Query request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payload | InboundDocumentQueryReq | The incoming Document Query request |
+| apiUrl | string | The URL of the API to be used for generating CCDs |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | InboundDocumentQueryResp | The response to the Document Query request |
+
+#### Internal Logic
+1. Validates the incoming payload
+2. Decodes the patient ID
+3. Checks if a CCD exists for the patient
+4. If no CCD exists, triggers the generation of one
+5. Retrieves the document contents from S3
+6. Constructs and returns the response
+
+### `getDocumentContents`
+#### Description
+Retrieves the XML contents of metadata files from S3 for a given patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer ID |
+| patientId | string | The patient ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documentContents | string[] | An array of XML strings representing the document contents |
+
+### `retrieveXmlContentsFromMetadataFilesOnS3`
+#### Description
+Retrieves XML contents from metadata files stored in S3 for a specific patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer ID |
+| patientId | string | The patient ID |
+| bucketName | string | The name of the S3 bucket |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documentContents | string[] | An array of XML strings representing the document contents |
+
+## Dependencies
+- @metriport/ihe-gateway-sdk
+- @metriport/shared
+- axios
+- AWS SDK (S3)
+
+## Error Handling
+The code uses try-catch blocks to handle errors. If an error occurs, it constructs an appropriate error response using the `constructDQErrorResponse` function.
+
+## Configuration
+The code relies on several configuration values from the `Config` class, including AWS region and S3 bucket names.
+
+## Side Effects
+- Makes API calls to generate CCDs
+- Reads from and potentially writes to S3 buckets
+
+## Performance Considerations
+- The code uses `executeWithNetworkRetries` and `executeWithRetriesS3` for improved reliability when making network requests and S3 operations.
+- It checks for the existence of a CCD before attempting to generate a new one, potentially saving unnecessary processing.

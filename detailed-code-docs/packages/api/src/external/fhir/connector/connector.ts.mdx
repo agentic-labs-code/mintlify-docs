@@ -1,0 +1,80 @@
+---
+title: "connector.ts"
+---
+
+## High-level description
+This code defines types and interfaces for interacting with a FHIR (Fast Healthcare Interoperability Resources) server. It includes utility functions for creating and parsing job IDs, which are used to uniquely identify requests and documents in the FHIR system.
+
+## Symbols
+
+### `FHIRServerRequest`
+#### Description
+A type definition representing a request to the FHIR server.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Likely represents a customer or context ID |
+| patientId | string | Identifier for the patient |
+| documentId | string | Identifier for the document |
+| payload | string | The data to be sent to the FHIR server |
+| requestId | string (optional) | An optional identifier for the request |
+
+### `FHIRServerConnector`
+#### Description
+An interface defining the contract for a FHIR server connector.
+
+#### Inputs
+N/A
+
+#### Outputs
+N/A
+
+#### Internal Logic
+The interface declares a single method:
+- `upsertBatch`: Takes a `FHIRServerRequest` and returns a Promise that resolves to void.
+
+### `createJobId`
+#### Description
+A function that creates a job ID by combining the `requestId` and `documentId`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| requestId | string \| undefined | An optional identifier for the request |
+| documentId | string | Identifier for the document |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| jobId | string | A combined identifier using requestId and documentId |
+
+#### Internal Logic
+The function concatenates the `requestId` and `documentId` with an underscore separator.
+
+### `parseJobId`
+#### Description
+A function that parses a job ID back into its constituent `requestId` and `documentId`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| jobId | string \| undefined | The combined job identifier to be parsed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | { requestId?: string; documentId?: string } \| undefined | An object containing the parsed requestId and documentId, or undefined if no jobId was provided |
+
+#### Internal Logic
+1. If no `jobId` is provided, the function returns `undefined`.
+2. If a `jobId` is provided, it splits the string by the underscore character.
+3. The function then returns an object with `requestId` and `documentId` properties, which may be undefined if the split operation doesn't yield two parts.
+
+## TODOs
+- There is a TODO comment suggesting to make the `requestId` required in the future.
+
+## Notes
+- The code uses TypeScript, providing type safety for the FHIR server interactions.
+- The `createJobId` and `parseJobId` functions are inverses of each other, allowing for easy creation and parsing of job identifiers.
+- The `FHIRServerConnector` interface suggests that this code is part of a larger system that interacts with FHIR servers, possibly for batch operations on patient documents.

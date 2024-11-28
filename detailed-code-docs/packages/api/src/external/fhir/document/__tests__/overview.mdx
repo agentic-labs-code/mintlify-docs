@@ -1,0 +1,84 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains unit tests for the FHIR document conversion module, specifically focusing on the conversion of CommonWell (CW) resources to FHIR-compliant resources. The tests cover various aspects of the conversion process, including author extraction, resource conversion, and date handling.
+
+## What does it do?
+The tests in this directory ensure that the FHIR document conversion module correctly handles different scenarios when converting CommonWell documents to FHIR format. They verify:
+
+1. The extraction of author information from CommonWell document content and matching with contained resources.
+2. The conversion of CommonWell resources (like Practitioner and Patient) to FHIR-compliant resources.
+3. The handling of organization references in Practitioner resources.
+4. The correct setting of patient IDs during conversion.
+5. The extraction of the most appropriate date from CommonWell document references.
+6. The proper handling of document format information during conversion.
+
+These tests help maintain the integrity and reliability of the FHIR conversion process, ensuring that the converted documents adhere to FHIR standards and correctly represent the original CommonWell data.
+
+## Key Files
+
+1. `cw-payloads.ts`:
+   - Contains test data and payloads for CommonWell Health Alliance (CW) document references.
+   - Defines sample document references with various author configurations and a contained patient with an organization reference.
+   - Used across other test files to provide consistent test data.
+
+2. `index-convert-to-fhir-resource.test.ts`:
+   - Tests the `convertToFHIRResource` function.
+   - Focuses on verifying the correct conversion of Practitioner and Patient resources.
+   - Checks handling of organization references and patient IDs.
+
+3. `index-get-authors.test.ts`:
+   - Tests the `getAuthors` function.
+   - Verifies extraction of author references from CommonWell document content.
+   - Checks matching of author references with contained resources.
+   - Ensures creation of FHIR-compliant author references.
+
+4. `index-to-fhir.test.ts`:
+   - Tests the `cwToFHIR` and `getBestDateFromCWDocRef` functions.
+   - Verifies correct handling of document format during conversion.
+   - Checks extraction of the best date from CommonWell document references.
+
+## Dependencies
+The test files rely on several external libraries and internal modules:
+
+1. @faker-js/faker: Used for generating random test data.
+2. @metriport/commonwell-sdk: Provides types and utilities for working with CommonWell data.
+3. uuid: Used for generating unique identifiers in test data.
+4. dayjs: Utilized for date manipulation and comparison in tests.
+5. @medplum/fhirtypes: Provides FHIR type definitions.
+
+Internal dependencies include various utility functions and types from the main codebase, such as `makePatient`, `makePeriod`, and `CWDocumentWithMetriportData`.
+
+## Configuration
+The tests use Jest as the testing framework. While there are no explicit configuration files in this directory, the tests likely rely on Jest configuration set at the project level.
+
+Here's an example of how the `getAuthors` function is tested in `index-get-authors.test.ts`:
+
+```typescript
+describe("getAuthors", () =&gt; {
+  it("returns multiple authors when multiple contained", () =&gt; {
+    const contained = [
+      { resourceType: "Practitioner", id: "authRef1" },
+      { resourceType: "Practitioner", id: "authRef2" },
+    ];
+    const content = {
+      author: [{ reference: "#authRef1" }, { reference: "#authRef2" }],
+    };
+    const docId = "doc123";
+
+    const result = getAuthors(content as DocumentContent, contained, docId);
+
+    expect(result).toHaveLength(2);
+    expect(result[0]).toEqual({ reference: "Practitioner/authRef1" });
+    expect(result[1]).toEqual({ reference: "Practitioner/authRef2" });
+  });
+
+  // ... more test cases ...
+});
+```
+
+This test case verifies that the `getAuthors` function correctly handles multiple authors and contained resources, returning the expected FHIR-compliant author references.
+
+The tests in this directory play a crucial role in ensuring the reliability and accuracy of the FHIR document conversion process, which is essential for maintaining interoperability in healthcare data exchange.

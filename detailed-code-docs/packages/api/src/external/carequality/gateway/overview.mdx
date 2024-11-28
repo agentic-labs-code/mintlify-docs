@@ -1,0 +1,59 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code related to the Carequality gateway functionality within the API. It primarily focuses on gathering and managing XCPD (Cross-Community Patient Discovery) gateways for patients, with considerations for different environments (E2E testing and production) and Epic integration.
+
+## What does it do?
+The main functionality of this directory is to retrieve a list of XCPD gateways for a given patient. This process involves:
+
+1. Determining if the current environment is for E2E (End-to-End) testing or production.
+2. Checking if Epic functionality is enabled for the patient's context.
+3. Searching for healthcare organizations near the patient's addresses that have XCPD capabilities.
+4. Filtering these organizations based on various criteria, including Epic enablement.
+5. Converting the filtered organizations into XCPD gateway objects that can be used for patient discovery across different healthcare communities.
+
+The code also includes functionality to filter healthcare facilities based on whether Epic (a major electronic health record system) is enabled or not. This allows for flexibility in including or excluding Epic-managed facilities from the search results.
+
+## Key Files
+
+### index.ts
+This is the main file of the directory, containing the core functionality for gathering XCPD gateways. It includes the following key functions:
+
+1. `gatherXCPDGateways`: The main entry point for retrieving XCPD gateways for a patient.
+2. `facilitiesWithEpicFilter`: Filters healthcare facilities based on Epic enablement.
+3. `getE2eGateways`: Retrieves gateways specifically for E2E testing environments.
+
+### __tests__ (directory)
+This directory contains test files for the gateway functionality. It includes tests for the `facilitiesWithEpicFilter` function, ensuring that it correctly filters facilities based on the Epic enablement flag.
+
+## Dependencies
+The code relies on several external libraries and internal modules:
+
+1. `@metriport/core`: Provides core functionality and types, including the `Patient` interface.
+2. `@metriport/ihe-gateway-sdk`: Supplies the `XCPDGateway` interface.
+3. `@metriport/shared`: Offers utility classes like `MetriportError`.
+4. `@metriport/carequality-sdk`: Likely provides Carequality-specific functionality (not directly referenced in the provided code snippets).
+
+Internal dependencies include modules for configuration, AWS app config, and various Carequality-related commands and utilities.
+
+## Configuration
+The code uses configuration settings and feature flags, accessed through:
+
+1. `../../../shared/config`: Provides access to general configuration settings.
+2. `../../aws/app-config`: Offers functions for checking feature flags, such as Epic enablement.
+
+Environment variables or configuration files likely control settings such as E2E testing mode and Epic enablement, though the specific details are not provided in the code snippets.
+
+## Error Handling
+The code uses the `MetriportError` class from `@metriport/shared` to throw errors with specific messages and additional information. For example, an error is thrown if the E2E CQ Directory entry is missing the required XCPD URL.
+
+## Logging
+Logging is implemented using the `out` function from `@metriport/core/util/log`. Key events that are logged include:
+
+1. The start of the `gatherXCPDGateways` function execution.
+2. A message when limiting to E2E gateways.
+3. Error messages, such as when the E2E CQ Directory entry is missing the XCPD URL.
+
+This logging helps in tracking the flow of the gateway gathering process and identifying potential issues during execution.

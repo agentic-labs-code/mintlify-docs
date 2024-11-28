@@ -1,0 +1,131 @@
+---
+title: "consolidated-delete.ts"
+---
+
+## High-level description
+The `deleteConsolidated` function in `consolidated-delete.ts` provides functionality to delete a patient's consolidated medical data from the FHIR server. It supports filtering by resource types and document IDs, and can operate in a dry-run mode for safety.
+
+## Code Structure
+The code defines a main function `deleteConsolidated` that orchestrates the deletion process. It relies on two helper functions: `getResourcesToDelete` to fetch the resources targeted for deletion based on provided filters, and `deleteResources` to perform the actual deletion in batches.
+
+## References
+- `@medplum/core`: Used for FHIR types and error handling.
+- `@metriport/api-sdk`: Provides types and schemas related to consolidated data requests.
+- `@metriport/core`: Offers utilities for logging, notifications, and FHIR API interactions.
+- `@metriport/shared`: Contains shared utilities and constants.
+- `./consolidated-get`: Imports `getConsolidatedPatientData` to retrieve the resources to be deleted.
+
+## Symbols
+
+### `deleteConsolidated`
+#### Description
+This function orchestrates the deletion of a patient's consolidated medical data from the FHIR server. It retrieves the resources to delete, filters out DocumentReference and Patient resources, and then performs the deletion in batches.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | `DeleteConsolidatedParams` | An object containing the parameters for the deletion operation. |
+
+#### Inputs of `DeleteConsolidatedParams`
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `Pick&lt;Patient, "id" \| "cxId" \| "data"&gt;` | An object containing the patient's ID, CX ID, and data. |
+| dryRun | `boolean` | A flag indicating whether to perform a dry run (default: `false`). |
+| resources | `ResourceTypeForConsolidation[]` | An optional array of resource types to filter by. |
+| docIds | `string[]` | An array of document IDs to filter by. |
+
+#### Outputs
+This function does not return any value.
+
+#### Internal Logic
+1. Retrieves the resources to delete using `getResourcesToDelete`.
+2. Filters out DocumentReference and Patient resources from the list.
+3. Deletes the remaining resources in batches using `deleteResources`.
+
+### `getResourcesToDelete`
+#### Description
+This function retrieves the resources to delete from the FHIR server based on the provided filters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `Pick&lt;Patient, "id" \| "cxId"&gt;` | An object containing the patient's ID and CX ID. |
+| documentIds | `string[]` | An array of document IDs to filter by. |
+| resources | `ResourceTypeForConsolidation[] \| undefined` | An optional array of resource types to filter by. |
+| log | `typeof console.log` | A logging function. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resourcesToDelete | `Promise&lt;BundleEntry&lt;Resource&gt;[]&gt;` | A promise that resolves to an array of bundle entries representing the resources to delete. |
+
+#### Internal Logic
+1. Retrieves the consolidated patient data using `getConsolidatedPatientData`.
+2. Filters the resources based on the provided `documentIds` and `resources` filters.
+3. Excludes DocumentReference and Patient resources from the list.
+
+### `deleteResources`
+#### Description
+This function deletes the specified resources from the FHIR server in batches.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resourcesToDelete | `BundleEntry&lt;Resource&gt;[]` | An array of bundle entries representing the resources to delete. |
+| patient | `Pick&lt;Patient, "id" \| "cxId"&gt;` | An object containing the patient's ID and CX ID. |
+| fhir | `FhirClient` | A FHIR client instance. |
+| dryRun | `boolean` | A flag indicating whether to perform a dry run. |
+| log | `typeof console.log` | A logging function. |
+
+#### Outputs
+This function does not return any value.
+
+#### Internal Logic
+1. Creates an array of FHIR bundle entries for the resources to delete.
+2. If `dryRun` is true, logs a message indicating the number of resources that would be deleted and returns.
+3. Splits the bundle entries into chunks of `MAX_ITEMS_PER_BATCH`.
+4. Iterates over the chunks and calls `deleteChunk` to delete each chunk.
+
+### `deleteChunk`
+#### Description
+This function deletes a chunk of resources from the FHIR server.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| entries | `BundleEntry&lt;Resource&gt;[]` | An array of bundle entries representing the resources to delete. |
+| patientId | `string` | The patient's ID. |
+| fhir | `FhirClient` | A FHIR client instance. |
+| log | `typeof console.log` | A logging function. |
+
+#### Outputs
+This function does not return any value.
+
+#### Internal Logic
+1. Executes a batch request to the FHIR server to delete the resources.
+2. Logs any issues encountered during the deletion process.
+3. Captures any errors using the `capture` utility.
+
+## Side Effects
+- This code modifies the FHIR server by deleting patient data.
+- It logs messages to the console and captures errors using a notification system.
+
+## Error Handling
+- The code uses a try-catch block to handle errors during the deletion process.
+- Errors are logged to the console and captured using the `capture` utility.
+- Graceful handling of failures to delete individual resources is implemented by checking for specific success codes in the FHIR response.
+
+## Logging
+- The code uses a `log` function for logging messages to the console.
+- It logs the progress of the deletion process, including the number of resources deleted and any encountered issues.
+
+## Dependencies
+- `@medplum/core`
+- `@metriport/api-sdk`
+- `@metriport/core`
+- `@metriport/shared`
+- `dayjs`
+- `lodash`
+
+## TODOs
+- The code currently excludes DocumentReference and Patient resources from deletion. This logic should be made more dynamic and configurable.

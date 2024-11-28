@@ -1,0 +1,119 @@
+---
+title: "connect.ts"
+---
+
+## High-level description
+This code defines a router for handling various connect-related operations in an API. It includes endpoints for redirecting users to provider authentication pages, processing OAuth callbacks, connecting RPM devices, and retrieving user provider information.
+
+## Code Structure
+The code is structured as a series of route handlers for different endpoints, utilizing middleware functions for common operations. It imports various utility functions, error classes, and provider-specific implementations to handle different types of authentication flows and device connections.
+
+## Symbols
+
+### `buildRedirectURL`
+#### Description
+Builds a redirect URL for the connect widget based on the success status and session token.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| success | boolean | Indicates if the request was successful |
+| token | string | The connect widget's session token |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| redirectURL | string | The constructed redirect URL |
+
+### Router Endpoints
+
+#### GET /connect/redirect
+##### Description
+Generates the authentication URL for the specified provider.
+
+##### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.query.provider | string | The provider to get the redirect for |
+| req.header.api-token | string | The auth token |
+
+##### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| providerUrl | string | The generated authentication URL |
+
+#### GET /connect/:provider
+##### Description
+Processes the OAuth callback for the specified provider.
+
+##### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.provider | string | The provider for the request |
+| req.query.state | string | The connect token |
+| req.query.code | string | The OAuth v2 authorization code (optional) |
+| req.query.oauth_token | string | The OAuth v1 request token (optional) |
+| req.query.oauth_verifier | string | The OAuth v1 request token verifier (optional) |
+
+##### Outputs
+Redirects to the success or error page of the connect widget.
+
+#### POST /connect/rpm/:provider
+##### Description
+Connects the user to the specified RPM device provider and stores their device IDs.
+
+##### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.provider | string | The provider for the request |
+| req.query.token | string | The connect token |
+| req.query.deviceIds | string | Comma-separated string of device IDs to be connected |
+| req.query.deviceUserId | string | The ID of a device user (patient ID, for some providers) |
+
+##### Outputs
+Returns HTTP status 200 if successful.
+
+#### GET /connect/user/providers
+##### Description
+Fetches a user's connected providers.
+
+##### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.header.api-token | string | The auth token |
+| req.header.cxId | string | Customer ID passed via headers |
+| req.header.userId | string | User ID passed via headers |
+
+##### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| providers | string[] | Array of connected provider names |
+
+#### GET /connect/user/apple
+##### Description
+Adds Apple to the provider map and returns the Metriport user ID.
+
+##### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.header.api-token | string | The auth token |
+| req.header.cxId | string | Customer ID passed via headers |
+| req.header.userId | string | User ID passed via headers |
+
+##### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| metriportUserId | string | The Metriport user ID |
+
+## Dependencies
+The code relies on various external libraries and internal modules, including express, zod, and custom error classes.
+
+## Error Handling
+The code uses custom error classes (BadRequestError, UnauthorizedError) for handling specific error scenarios. It also uses try-catch blocks to handle errors in route handlers and redirects to an error page when necessary.
+
+## Configuration
+The code uses a Config class to access environment-specific configuration values.
+
+---
+
+This documentation provides an overview of the main functionalities and structure of the connect.ts file. It covers the primary route handlers, their inputs and outputs, and key utility functions used throughout the code.

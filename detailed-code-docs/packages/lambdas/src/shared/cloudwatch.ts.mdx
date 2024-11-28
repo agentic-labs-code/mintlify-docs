@@ -1,0 +1,73 @@
+---
+title: "cloudwatch.ts"
+---
+
+## High-level description
+This code defines a `CloudWatchUtils` class that provides utility functions for reporting metrics and memory usage to Amazon CloudWatch. It encapsulates the logic for creating and sending custom metrics, making it easier to monitor and analyze the performance of AWS Lambda functions.
+
+## Code Structure
+The `CloudWatchUtils` class is the main component of this file. It contains methods for reporting metrics and memory usage. The class uses the AWS SDK for JavaScript to interact with CloudWatch.
+
+## Symbols
+
+### CloudWatchUtils
+#### Description
+A utility class for reporting metrics to CloudWatch. It requires either a `metricsNamespace` to be passed to the constructor or to individual functions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| region | string | AWS region |
+| lambdaName | string | Name of the Lambda function |
+| metricsNamespace | string (optional) | Namespace for CloudWatch metrics |
+
+#### Internal Logic
+- Initializes a CloudWatch client with the provided region.
+- Provides methods for reporting metrics and memory usage to CloudWatch.
+
+### CloudWatchUtils.reportMetrics
+#### Description
+Reports custom metrics to CloudWatch.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| metrics | Metrics | Object containing metric data |
+| metricsNamespace | string (optional) | Namespace for CloudWatch metrics |
+
+#### Internal Logic
+- Validates the presence of a metrics namespace.
+- Constructs metric data for duration and count metrics.
+- Sends the metric data to CloudWatch using `putMetricData`.
+- Handles errors and logs them without throwing exceptions.
+
+### CloudWatchUtils.reportMemoryUsage
+#### Description
+Reports memory usage of the current process to CloudWatch.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| metricsNamespace | string (optional) | Namespace for CloudWatch metrics |
+
+#### Internal Logic
+- Retrieves current memory usage using `process.memoryUsage()`.
+- Logs memory usage details.
+- Sends the total memory usage (RSS) as a metric to CloudWatch.
+- Handles errors and logs them without throwing exceptions.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-sdk/clients/cloudwatch | Provides CloudWatch client for interacting with CloudWatch API |
+| ./capture | Provides error capturing functionality |
+| ./units | Provides utility functions for unit conversion |
+
+## Error Handling
+The code implements error handling in both `reportMetrics` and `reportMemoryUsage` methods. Errors are logged and captured using the `capture.error` function, but they are not rethrown to prevent Lambda function failure.
+
+## Logging
+The code uses `console.log` for logging memory usage details and error messages.
+
+## Performance Considerations
+The class is designed to minimize the impact on Lambda function performance by handling errors gracefully and not throwing exceptions that could terminate the function execution.

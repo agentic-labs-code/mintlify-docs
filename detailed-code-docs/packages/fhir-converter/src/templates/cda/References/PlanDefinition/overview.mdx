@@ -1,0 +1,80 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for generating partial FHIR (Fast Healthcare Interoperability Resources) PlanDefinition resources. These templates are part of a larger system designed to convert Clinical Document Architecture (CDA) data to FHIR format. The templates focus on specific aspects of the PlanDefinition resource, particularly the action and subject reference fields.
+
+## What does it do?
+The templates in this directory are used to create JSON structures that represent parts of a FHIR PlanDefinition resource. A PlanDefinition is a FHIR resource that describes a plan for a proposed or intended action in healthcare. 
+
+The templates specifically handle:
+1. Creating an action within a PlanDefinition that includes a subject reference.
+2. Defining a subject reference for a PlanDefinition.
+
+These templates are likely used as building blocks in a larger conversion process, where different parts of a CDA document are transformed into corresponding FHIR resources. By using these templates, the conversion system can ensure consistency and adherence to the FHIR standard when generating PlanDefinition resources.
+
+## Key Files
+
+1. `action.subjectReference.hbs`:
+   This template generates a JSON structure for a PlanDefinition resource with a single action containing a subject reference. It takes two inputs: an ID for the PlanDefinition resource and a reference value for the subject of the action.
+
+   Example usage:
+   ```handlebars
+   {{&gt; References/PlanDefinition/action.subjectReference ID="example-id" REF="Patient/123"}}
+   ```
+
+   This would generate a JSON structure like:
+   ```json
+   {
+     "resourceType": "PlanDefinition",
+     "id": "example-id",
+     "action": [
+       {
+         "subjectReference": {
+           "reference": "Patient/123"
+         }
+       }
+     ]
+   }
+   ```
+
+2. `subjectReference.hbs`:
+   This template creates a partial JSON structure for a PlanDefinition resource, focusing on the `subjectReference` field. It also takes two inputs: an ID for the PlanDefinition resource and a reference value for the subject.
+
+   Example usage:
+   ```handlebars
+   {{&gt; References/PlanDefinition/subjectReference ID="example-id" REF="Patient/456"}}
+   ```
+
+   This would generate a JSON structure like:
+   ```json
+   {
+     "resource": {
+       "resourceType": "PlanDefinition",
+       "id": "example-id",
+       "subjectReference": {
+         "reference": "Patient/456"
+       }
+     }
+   }
+   ```
+
+Both templates are designed to be flexible and reusable, allowing for easy integration into a larger FHIR resource compilation process.
+
+## Dependencies
+These templates rely on the Handlebars templating engine for processing and rendering. Handlebars is used to substitute the placeholder variables ({{ID}} and {{REF}}) with actual values during the conversion process.
+
+## Configuration
+Both templates use similar configuration options:
+
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| ID | String | The identifier for the PlanDefinition resource |
+| REF | String | The reference value for the subject |
+
+These options are passed to the templates when they are rendered, allowing for dynamic generation of PlanDefinition resources with different identifiers and subject references.
+
+It's important to note that these templates do not include explicit error handling or logging mechanisms. The system using these templates should ensure that valid values are provided for the ID and REF variables to prevent errors during rendering.
+
+Both files include a comprehensive copyright and license notice, indicating that they are part of a larger project with contributions from both Metriport Inc. and Microsoft Corporation. This notice should be reviewed and updated as necessary to ensure it remains current and accurate.

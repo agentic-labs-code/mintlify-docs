@@ -1,0 +1,150 @@
+---
+title: "internal-patient.ts"
+---
+
+## High-level description
+This file contains the implementation of various API routes and functions related to patient management in a medical data system. It includes operations such as creating, updating, deleting, and retrieving patient information, as well as handling patient discovery across different Health Information Exchanges (HIEs) like CommonWell and CareQuality.
+
+## Code Structure
+The code is organized into several main functions and route handlers, each responsible for different aspects of patient management. These functions interact with various services and models, including database operations, external API calls to HIEs, and data transformation between different formats.
+
+## Symbols
+
+### `router`
+#### Description
+An Express router instance that defines the routes for patient-related operations.
+
+### `createCoverageAssessments`
+#### Description
+Creates coverage assessments for a list of patients.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| facilityId | string | Facility ID |
+| patientCreates | PatientCreateCmd[] | Array of patient creation commands |
+
+#### Internal Logic
+- Creates or updates patients based on the provided data
+- Triggers document queries for each patient
+- Handles errors and reports them
+
+### `deletePatient`
+#### Description
+Deletes a patient from all storages.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientDelete | PatientDeleteCmd | Patient deletion command |
+
+#### Internal Logic
+- Validates the patient and facility
+- Deletes the patient from CommonWell, FHIR server, CareQuality, and local database
+
+### `getConsolidated`
+#### Description
+Retrieves consolidated patient data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | GetConsolidatedParams | Parameters for retrieving consolidated data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | SearchSetBundle&lt;Resource&gt; | Consolidated FHIR bundle |
+| filters | Record&lt;string, string \| boolean \| undefined&gt; | Applied filters |
+
+#### Internal Logic
+- Retrieves consolidated patient data from FHIR server
+- Applies filters and conversions as specified
+- Handles document references and AI brief generation
+
+### `startConsolidatedQuery`
+#### Description
+Initiates a consolidated query for patient data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | ConsolidatedQueryParams | Parameters for the consolidated query |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| progress | ConsolidatedQuery | Query progress information |
+
+#### Internal Logic
+- Checks for existing queries in progress
+- Initiates a new query if none is in progress
+- Stores query metadata and triggers asynchronous data retrieval
+
+### `updatePatient`
+#### Description
+Updates patient information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientUpdate | PatientUpdateCmd | Patient update command |
+| rerunPdOnNewDemographics | boolean | Flag to rerun patient discovery on new demographics |
+| forceCommonwell | boolean | Flag to force CommonWell update |
+| forceCarequality | boolean | Flag to force CareQuality update |
+| emit | boolean | Flag to emit update event |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | Updated patient information |
+
+#### Internal Logic
+- Validates facility access
+- Updates patient information in local database and FHIR server
+- Triggers patient discovery across HIEs if specified
+
+## Dependencies
+- @metriport/api-sdk
+- @metriport/core
+- @metriport/shared
+- express
+- http-status
+- zod
+
+## Error Handling
+The code uses try-catch blocks and error capturing mechanisms to handle and log errors. It also uses custom error classes like `BadRequestError` and `MetriportError` for specific error scenarios.
+
+## Logging
+The code uses a custom logging utility (`out`) for consistent logging across different functions.
+
+## API/Interface Reference
+The file defines several API routes for patient management:
+- GET /internal/patient/ids
+- GET /internal/patient/states
+- POST /internal/patient/update-all/commonwell
+- POST /internal/patient/update-all/carequality
+- DELETE /internal/patient/:id
+- POST /internal/patient/:patientId/link/:source
+- DELETE /internal/patient/:patientId/link/:source
+- GET /internal/patient/:patientId/link
+- GET /internal/patient/duplicates
+- PATCH /internal/patient/duplicates
+- POST /internal/patient/recreate-at-hies
+- POST /internal/patient/enhance-coverage
+- POST /internal/patient/enhance-coverage/set-cq-link-statuses
+- POST /internal/patient/enhance-coverage/after-include-list
+- POST /internal/patient/enhance-coverage/after-doc-query
+- GET /internal/patient/consolidated
+- POST /internal/patient/trigger-update
+- GET /internal/patient/
+- GET /internal/patient/:id
+- POST /internal/patient/:id/patient-discovery
+- POST /internal/patient/bulk/coverage-assessment
+- GET /internal/patient/bulk/coverage-assessment
+- POST /internal/patient/:id/consolidated
+
+Each route handles specific operations related to patient management and data retrieval.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

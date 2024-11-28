@@ -1,0 +1,42 @@
+---
+title: "delete-cq-data.ts"
+---
+
+## High-level description
+The `deleteCQPatientData` function deletes Carequality (CQ) patient data from the database. It retrieves the CQ data based on patient and customer IDs, and if found, deletes the corresponding record.
+
+## References
+- `getCQPatientData`: Used to retrieve the CQ patient data from the database.
+
+## Symbols
+
+### `deleteCQPatientData`
+#### Description
+This function deletes the Carequality patient data associated with a given patient ID and customer ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientDelete | `CQPatientDataDelete` | An object containing the patient ID (`id`) and customer ID (`cxId`) of the patient whose CQ data needs to be deleted. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (none) | `Promise&lt;void&gt;` | This function does not return any value, it resolves the promise upon successful deletion or if no CQ data is found. |
+
+#### Internal Logic
+1. Extracts the `id` and `cxId` from the `patientDelete` input object.
+2. Calls the `getCQPatientData` function to retrieve the CQ patient data based on the provided `id` and `cxId`.
+3. Checks if the `cqData` exists. If not, it returns early, indicating no data to delete.
+4. If `cqData` exists, it calls the `.destroy()` method on the retrieved data object to delete it from the database.
+
+## Side Effects
+- Deletes data from the database table associated with the `CQPatientDataModel`.
+
+## Dependencies
+- This code depends on the following external libraries or modules:
+    - `BaseUpdateCmdWithCustomer`: Defines the structure of the input object containing patient and customer IDs.
+    - `getCQPatientData`: Retrieves CQ patient data from the database.
+
+## Error Handling
+- The function does not explicitly handle errors. Any errors during data retrieval or deletion will be propagated to the caller.

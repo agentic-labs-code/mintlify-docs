@@ -1,0 +1,142 @@
+---
+title: "cda-to-visualization.ts"
+---
+
+## High-level description
+This code implements an AWS Lambda function that converts Clinical Document Architecture (CDA) documents to HTML or PDF format. It uses various libraries and AWS services to perform the conversion, store the results in S3, and generate signed URLs for accessing the converted documents.
+
+## Code Structure
+The main handler function processes the input, calls the appropriate conversion function based on the conversion type, and returns a signed URL for the converted document. The code uses helper functions for downloading documents from S3, converting to HTML, converting to PDF, and generating signed URLs.
+
+## Symbols
+
+### `handler`
+#### Description
+The main Lambda function handler that processes the input and returns the output.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The name of the file to be converted |
+| conversionType | string | The type of conversion to perform ("html" or "pdf") |
+| bucketName | string | The S3 bucket name where the file is stored |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | The signed URL for accessing the converted document |
+
+#### Internal Logic
+1. Downloads the document from S3
+2. Calls the appropriate conversion function based on the `conversionType`
+3. Returns the signed URL for the converted document
+
+### `downloadDocumentFromS3`
+#### Description
+Downloads a document from an S3 bucket.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The name of the file to download |
+| bucketName | string | The S3 bucket name |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | string | undefined | The contents of the downloaded file |
+
+### `convertStoreAndReturnHtmlDocUrl`
+#### Description
+Converts a document to HTML, stores it in S3, and returns a signed URL.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The name of the file to convert |
+| document | string | The document content |
+| bucketName | string | The S3 bucket name |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| urlHtml | string | The signed URL for the converted HTML document |
+
+### `convertStoreAndReturnPdfDocUrl`
+#### Description
+Converts a document to PDF, stores it in S3, and returns a signed URL.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The name of the file to convert |
+| document | string | The document content |
+| bucketName | string | The S3 bucket name |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| urlPdf | string | The signed URL for the converted PDF document |
+
+#### Internal Logic
+1. Converts the document to HTML
+2. Uses Puppeteer to generate a PDF from the HTML
+3. Stores the PDF in S3
+4. Returns a signed URL for the PDF
+
+### `convertToHtml`
+#### Description
+Converts a CDA document to HTML using SaxonJS.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| document | string | The CDA document content |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string | The converted HTML content |
+
+### `getCda10`
+#### Description
+Retrieves the CDA 1.0 resource from a GitHub repository.
+
+### `getNarrative`
+#### Description
+Retrieves the CDA narrative block resource from a GitHub repository.
+
+### `getSignedUrl`
+#### Description
+Generates a signed URL for accessing a file in S3.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The name of the file |
+| bucketName | string | The S3 bucket name |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | The generated signed URL |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core | Provides core functionality and types |
+| @sentry/serverless | Error tracking and monitoring |
+| @sparticuz/chromium | Chromium browser for PDF generation |
+| aws-sdk | AWS SDK for interacting with S3 |
+| puppeteer-core | Browser automation for PDF generation |
+| saxon-js | XSLT processor for HTML conversion |
+| uuid | Generating unique identifiers |
+
+## Error Handling
+The code uses Sentry for error tracking and monitoring. Errors are captured and logged using the `capture.error` function.
+
+## Performance Considerations
+The PDF conversion process has a timeout mechanism to prevent long-running executions. The timeout is calculated based on the `CDA_TO_VIS_TIMEOUT_MS` environment variable.
+
+## TODOs
+- Consider using `require` for loading the CDA 1.0 and narrative resources, similar to how the stylesheet is loaded.

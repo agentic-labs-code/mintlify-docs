@@ -1,0 +1,65 @@
+---
+title: "release-python-sdk.yml"
+---
+
+## High-level description
+This GitHub Actions workflow, named "Release Python SDK," is designed to automate the process of releasing a Python SDK. It can be manually triggered and requires a version input. The workflow uses Fern to generate and release the SDK to PyPI.
+
+## Symbols
+
+### `Release Python SDK` (Workflow)
+#### Description
+This workflow automates the process of releasing a Python SDK. It is triggered manually and requires a version input.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| version | string | The version of the SDKs to be released |
+
+#### Internal Logic
+1. Checks out the repository
+2. Sets up Node.js environment
+3. Installs Fern CLI globally
+4. Generates and releases the SDK using Fern
+
+### `release` (Job)
+#### Description
+This job contains the steps necessary to release the Python SDK.
+
+#### Internal Logic
+1. Runs on the latest Ubuntu environment
+2. Executes a series of steps to prepare the environment and release the SDK
+
+### Steps
+1. **Checkout repo**
+   - Uses `actions/checkout@v3` to clone the repository
+
+2. **Setup node**
+   - Uses `actions/setup-node@v3` to set up a Node.js environment
+
+3. **Download Fern**
+   - Installs the Fern CLI globally using npm
+
+4. **Release SDKs**
+   - Runs the Fern generate command to create and release the SDK
+   - Uses environment variables for authentication
+   - Specifies the Python SDK group, version, and debug logging
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| actions/checkout@v3 | To clone the repository |
+| actions/setup-node@v3 | To set up Node.js environment |
+| fern-api (npm package) | CLI tool for generating and releasing SDKs |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| FERN_TOKEN | secret | N/A | Authentication token for Fern |
+| PYPI_TOKEN | secret | N/A | Authentication token for PyPI |
+
+## Error Handling
+The workflow does not implement explicit error handling. It relies on GitHub Actions' default behavior of stopping the workflow if any step fails.
+
+## Logging
+The Fern generate command includes the `--log-level debug` flag, which enables detailed logging for troubleshooting purposes.

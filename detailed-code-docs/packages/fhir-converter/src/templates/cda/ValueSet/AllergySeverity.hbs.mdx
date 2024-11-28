@@ -1,0 +1,43 @@
+---
+title: "AllergySeverity.hbs"
+---
+
+## High-level description
+This Handlebars template file defines a mapping for allergy severity levels from CDA (Clinical Document Architecture) to FHIR (Fast Healthcare Interoperability Resources) format. It translates various severity descriptions into standardized FHIR severity levels.
+
+## Symbols
+
+### Conditional Statements
+#### Description
+The template uses a series of conditional statements to map different severity descriptions to FHIR-compliant severity levels.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sev | string | The severity description from the CDA document |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| severity | string | The FHIR-compliant severity level |
+
+#### Internal Logic
+1. The input severity (`sev`) is converted to lowercase for case-insensitive comparison.
+2. The template checks for specific severity descriptions and maps them to FHIR severity levels:
+   - "fatal" is mapped to "severe"
+   - "moderate to severe" or "severe" are mapped to "severe"
+   - "mild to moderate" or "moderate" are mapped to "moderate"
+   - "mild" is mapped to "mild"
+3. If the input severity doesn't match any of these conditions, no output is generated (treated as unknown).
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Handlebars | Template engine used for conditional logic and output generation |
+
+## Notes
+1. The template includes a reference to the FHIR R4 ValueSet for reaction event severity: https://www.hl7.org/fhir/R4/valueset-reaction-event-severity.html
+2. There's a note indicating that if a severity cannot be mapped, it should be treated as unknown and omitted from the output.
+3. The template uses helper functions like `eq`, `toLower`, and `or`, which are likely defined elsewhere in the Handlebars configuration.
+
+This template is part of a larger system for converting CDA documents to FHIR format, focusing specifically on translating allergy severity information.

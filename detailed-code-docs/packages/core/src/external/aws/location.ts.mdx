@@ -1,0 +1,98 @@
+---
+title: "location.ts"
+---
+
+## High-level description
+This code defines functions and types for interacting with AWS Location Services, specifically for geocoding and handling location-related data. It provides utilities to create an AWS Location client, parse location results, and handle coordinate data.
+
+## Code Structure
+The code defines several types and functions that work together to handle location data:
+- `Coordinates` and `GeocodingResult` types define the structure of location data.
+- `makeLocationClient` creates an AWS Location client.
+- `getLocationResultPayload` extracts the payload from an AWS Location response.
+- `parseSuggestedAddress` converts AWS Location data into a `GeocodingResult`.
+
+## Symbols
+
+### `Coordinates`
+#### Description
+A type representing geographic coordinates with latitude and longitude.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lat | number | Latitude coordinate |
+| lon | number | Longitude coordinate |
+
+### `GeocodingResult`
+#### Description
+A type representing the result of a geocoding operation, including coordinates, relevance, and a suggested label.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| coordinates | Coordinates | Geographic coordinates |
+| relevance | number | Relevance score of the result |
+| suggestedLabel | string | Suggested label for the location |
+
+### `makeLocationClient`
+#### Description
+Creates and returns an AWS Location client for a specified region.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| region | string | AWS region for the Location client |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| client | AWS.Location | AWS Location client instance |
+
+### `getLocationResultPayload`
+#### Description
+Extracts the payload from an AWS Location response, with an option to fail gracefully.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | PromiseResult&lt;AWS.Location.SearchPlaceIndexForTextResponse, AWS.AWSError&gt; | AWS Location response |
+| failGracefully | boolean | Optional flag to return undefined instead of throwing an error |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payload | AWS.Location.SearchForTextResultList \| undefined | Extracted payload or undefined |
+
+### `parseSuggestedAddress`
+#### Description
+Parses an AWS Location search result into a `GeocodingResult` object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| suggestedAddress | AWS.Location.SearchForTextResult | AWS Location search result |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | GeocodingResult | Parsed geocoding result |
+
+#### Internal Logic
+1. Extracts point, relevance, and label from the input.
+2. Throws an error if no point is found.
+3. Constructs and returns a `GeocodingResult` object if all required data is present.
+4. Throws an error if any required data is missing.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-sdk | Provides AWS SDK for interacting with AWS services |
+| dayjs | Date and time manipulation library |
+
+## Error Handling
+The code includes basic error handling:
+- In `getLocationResultPayload`, it can throw an error or return `undefined` based on the `failGracefully` flag.
+- In `parseSuggestedAddress`, it throws errors if required data is missing or invalid.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

@@ -1,0 +1,68 @@
+---
+title: "2022-12-23_00_create-webhook-request.ts"
+---
+
+## High-level description
+This migration script adds a new table `webhook_request` to the database and introduces changes to the existing `settings` table to support webhook functionality. It adds columns for webhook configuration and status tracking.
+
+## References
+- `Settings` model: `packages/api/src/models/settings.ts`
+- `WebhookRequest` model: `packages/api/src/models/webhook-request.ts`
+- Shared migration utilities: `packages/api/src/sequelize/migrations-shared.ts`
+
+## Symbols
+
+### `up`
+#### Description
+This asynchronous function defines the database migration steps to be executed when upgrading the database schema. It leverages transactions to ensure atomicity.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | Object | An object containing the Sequelize QueryInterface instance for interacting with the database. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. **Begin Transaction:** Starts a database transaction to ensure all changes are applied atomically.
+2. **Add `webhook_enabled` Column:** Adds a new boolean column `webhook_enabled` to the `settings` table with a default value of `false`.
+3. **Rename `webhook_status` Column:** Renames the existing column `webhook_status` in the `settings` table to `webhook_status_detail`.
+4. **Create `webhook_request` Table:** Creates a new table named `webhook_request` with columns for storing webhook request details:
+    - `id`: UUID primary key
+    - `cxId`: String, representing the context ID, non-nullable
+    - `payload`: JSONB, storing the webhook payload, non-nullable
+    - `status`: String, representing the webhook request status, non-nullable
+5. **Commit Transaction:** Commits the database transaction, making all changes persistent.
+
+### `down`
+#### Description
+This asynchronous function defines the database migration steps to be executed when reverting the changes introduced by the `up` migration.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | Object | An object containing the Sequelize QueryInterface instance. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise | A promise that resolves when the migration rollback is complete. |
+
+#### Internal Logic
+1. **Begin Transaction:** Starts a database transaction.
+2. **Rename `webhook_status_detail` Column:** Renames the `webhook_status_detail` column in the `settings` table back to `webhook_status`.
+3. **Remove `webhook_enabled` Column:** Drops the `webhook_enabled` column from the `settings` table.
+4. **Drop `webhook_request` Table:** Drops the `webhook_request` table.
+5. **Commit Transaction:** Commits the database transaction.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | ORM for interacting with the database |
+| DataTypes | Used for defining data types for database columns |
+
+## Error Handling
+The code uses database transactions to ensure atomicity. If any of the operations within the `up` or `down` functions fail, the transaction will be rolled back, preventing partial database changes.

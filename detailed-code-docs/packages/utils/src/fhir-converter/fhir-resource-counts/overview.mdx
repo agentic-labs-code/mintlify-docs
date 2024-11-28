@@ -1,0 +1,74 @@
+---
+title: "Overview"
+---
+
+## High-level description
+
+This directory contains JSON files that provide resource counts for various FHIR (Fast Healthcare Interoperability Resources) resource types. These files serve as summaries or inventories of FHIR resources available in a particular system or dataset. The counts are broken down by resource type and include a total count across all types.
+
+## What does it do?
+
+The files in this directory provide a quantitative overview of FHIR resources in a healthcare system. They offer a snapshot of the distribution of different types of medical data records, such as allergies, conditions, medications, and more. This information can be used for various purposes:
+
+1. Data analysis: Understanding the composition of the dataset.
+2. System monitoring: Tracking the growth or changes in different resource types over time.
+3. Resource planning: Identifying which types of medical data are most prevalent in the system.
+4. Performance optimization: Helping developers optimize database queries or storage based on the volume of different resource types.
+
+For example, if the system shows a high number of AllergyIntolerance records, developers might focus on optimizing the handling and display of allergy information in the user interface.
+
+## Key Files
+
+1. develop-fhir-resource-count.json
+   This file contains a JSON object with two main properties:
+   - "total": The total number of FHIR resources across all types.
+   - "countPerType": An object with key-value pairs, where each key is a FHIR resource type and the value is the count of resources for that type.
+
+   Example structure:
+   ```json
+   {
+     "total": 50000,
+     "countPerType": {
+       "AllergyIntolerance": 819,
+       "Composition": 9445,
+       "Condition": 5678
+       // ... other resource types
+     }
+   }
+   ```
+
+2. develop-post-fhir-insert-resource-count.json
+   This file has a similar structure but uses slightly different property names:
+   - "total": The total number of all FHIR resources combined.
+   - "resources": An object containing key-value pairs for resource counts.
+
+   Example structure:
+   ```json
+   {
+     "total": 50000,
+     "resources": {
+       "AllergyIntolerance": 819,
+       "Communication": 1234,
+       "Condition": 5678
+       // ... other resource types
+     }
+   }
+   ```
+
+3. develop-fhir-resource-count-per-file.json
+   This file is currently empty, but based on its name, it might be intended to store resource counts on a per-file basis, possibly for scenarios where FHIR resources are stored or processed in multiple files.
+
+## Dependencies
+
+These files are directly related to the FHIR (Fast Healthcare Interoperability Resources) standard. Understanding and effectively using the data in these files requires familiarity with the FHIR specification and the specific resource types listed.
+
+## Performance Considerations
+
+Generating these resource counts could be a resource-intensive operation, especially for large healthcare systems with millions of records. It's advisable to implement a strategy for efficiently updating and accessing this data:
+
+1. Caching: Store these counts in a cache and update them periodically rather than calculating them in real-time for each request.
+2. Incremental updates: Instead of recounting all resources each time, implement a system to incrementally update counts as new resources are added or existing ones are modified.
+3. Asynchronous processing: Generate these counts in background jobs to avoid impacting the performance of user-facing operations.
+4. Database optimization: If these counts are frequently accessed, consider maintaining them in database tables with appropriate indexes for quick retrieval.
+
+By implementing these files and using them effectively, developers can gain valuable insights into the composition of their FHIR dataset, which can inform various aspects of system design, optimization, and maintenance.

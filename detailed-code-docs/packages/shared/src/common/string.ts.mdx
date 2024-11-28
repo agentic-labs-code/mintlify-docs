@@ -1,0 +1,56 @@
+---
+title: "string.ts"
+---
+
+## High-level description
+This code provides utility functions for string manipulation in TypeScript. It includes functions to limit string length and strip non-numeric characters from a string.
+
+## Symbols
+
+### `limitStringLength`
+#### Description
+This function limits the length of a given string to a specified maximum length, appending a suffix if the string is truncated.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| value | T extends string \| undefined | The input string to be limited |
+| max | number | The maximum length allowed (default: 255) |
+| suffix | string | The suffix to append if the string is truncated (default: "...") |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | T | The limited string or the original value if it's undefined |
+
+#### Internal Logic
+1. If the input value is falsy (undefined or empty string), return it as is.
+2. Check if the input string's length exceeds the maximum length and is longer than the suffix.
+3. If true, truncate the string to (max - suffix.length) and append the suffix.
+4. If false, return the original string.
+5. Cast the result back to the input type T to maintain type consistency.
+
+### `stripNonNumericChars`
+#### Description
+This function removes all non-numeric characters from a given string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| str | string | The input string to be processed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string | The input string with all non-numeric characters removed |
+
+#### Internal Logic
+1. Trim the input string to remove leading and trailing whitespace.
+2. Use a regular expression `/\D/g` to replace all non-digit characters with an empty string.
+
+## References
+The `limitStringLength` function is used in the `normalizeString` function in the `packages/api/src/models/_default.ts` file. It's used to ensure that string values don't exceed a maximum length, which is likely related to database column constraints.
+
+The `stripNonNumericChars` function is used in the `packages/api/src/routes/medical/schemas/shared.ts` file, specifically in the `defaultZipString` schema definition. It's used to process zip code strings, ensuring they only contain numeric characters.
+
+These utility functions play a crucial role in data normalization and validation across the application, ensuring consistency in string handling and formatting.

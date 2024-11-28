@@ -1,0 +1,88 @@
+---
+title: "bedrock.ts"
+---
+
+## High-level description
+This code defines a `BedrockUtils` class that interacts with Amazon Bedrock, an AWS service for generative AI. It provides functionality to create a Bedrock client and send requests to the Bedrock API, specifically for generating AI-powered responses based on given prompts and input data.
+
+## Code Structure
+The main components of this code are:
+1. The `makeBedrockClient` function, which creates a `BedrockRuntimeClient`.
+2. The `BedrockUtils` class, which encapsulates the Bedrock client and provides methods to interact with it.
+
+## Symbols
+
+### `makeBedrockClient`
+#### Description
+Creates and returns a new `BedrockRuntimeClient` instance.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| client | BedrockRuntimeClient | A new Bedrock client instance |
+
+#### Internal Logic
+- Retrieves the AWS region from the configuration.
+- Throws an error if no region is set.
+- Creates and returns a new `BedrockRuntimeClient` with the specified region.
+
+### `BedrockUtils`
+#### Description
+A class that provides utilities for interacting with Amazon Bedrock.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| modelId | string (optional) | The ID of the Bedrock model to use |
+| modelVersion | string (optional) | The version of the Bedrock model to use |
+
+#### Internal Logic
+- Initializes a Bedrock client using `makeBedrockClient`.
+- Sets the model ID and version, using default values if not provided.
+- Provides a getter for the Bedrock client.
+- Implements a method `getBedrockResponse` to send requests to Bedrock and retrieve responses.
+
+### `BedrockUtils.getBedrockResponse`
+#### Description
+Sends a request to the Bedrock API and retrieves the generated response.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| prompt | string | The prompt to send to the AI model |
+| body | string | Additional input data for the AI model |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | string \| undefined | The generated response from the AI model, or undefined if an error occurs |
+
+#### Internal Logic
+- Constructs the input for the Bedrock API, including the model ID, content type, and request body.
+- Sends the request using the `InvokeModelCommand`.
+- Decodes and parses the response.
+- Returns the generated text from the response.
+- Handles errors and logs them using the `capture` utility.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @aws-sdk/client-bedrock-runtime | Provides the Bedrock client and related commands |
+| @metriport/shared | Provides utility functions like `errorToString` |
+| ../../util/config | Provides configuration values |
+| ../../util | Provides logging and error capturing utilities |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| BEDROCK_REGION | string | undefined | The AWS region for Bedrock |
+| AI_BRIEF_MODEL_ID | string | undefined | The default model ID for AI brief generation |
+| BEDROCK_VERSION | string | undefined | The default Bedrock version to use |
+
+## Error Handling
+The code implements error handling in the `getBedrockResponse` method. If an error occurs during the API call, it logs the error, captures the error message for monitoring, and returns `undefined`.
+
+## TODOs
+- Define the return type for the `getBedrockResponse` method.
+
+This code provides a reusable utility for interacting with Amazon Bedrock, allowing other parts of the application to easily generate AI-powered responses based on prompts and input data.

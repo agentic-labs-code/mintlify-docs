@@ -1,0 +1,80 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for generating various components of FHIR EpisodeOfCare resources. These templates are part of a larger FHIR converter system, specifically designed to transform Clinical Document Architecture (CDA) data into FHIR format. Each template focuses on a specific attribute or reference within the EpisodeOfCare resource, allowing for modular and flexible resource construction.
+
+## What does it do?
+The templates in this directory work together to create different parts of an EpisodeOfCare resource in FHIR format. An EpisodeOfCare represents a period of care for a patient, typically involving multiple encounters. These templates allow the conversion system to generate various aspects of an EpisodeOfCare, such as:
+
+1. Linking to an associated account
+2. Specifying a care manager
+3. Referencing a diagnosis condition
+4. Identifying the managing organization
+5. Linking to a patient
+6. Including a referral request
+7. Specifying a care team
+
+By using these templates, the conversion system can flexibly construct EpisodeOfCare resources based on the available data in the CDA documents being processed.
+
+## Key Files
+1. `account.hbs`: Creates an EpisodeOfCare resource with an associated account reference.
+2. `careManager.hbs`: Defines the careManager field in an EpisodeOfCare resource.
+3. `diagnosis.condition.hbs`: Generates the diagnosis section of an EpisodeOfCare, linking to a Condition resource.
+4. `managingOrganization.hbs`: Specifies the managing organization for an EpisodeOfCare.
+5. `patient.hbs`: Links an EpisodeOfCare to a patient resource.
+6. `referralRequest.hbs`: Includes a referral request reference in an EpisodeOfCare.
+7. `team.hbs`: Defines the care team associated with an EpisodeOfCare.
+
+Each of these templates focuses on a specific aspect of the EpisodeOfCare resource, allowing for modular construction of the complete resource.
+
+## Dependencies
+These templates are part of a larger FHIR conversion system and depend on:
+
+| Dependency | Purpose | Version |
+|:-----------|:--------|:--------|
+| Handlebars | Template engine for generating JSON structures | Not specified |
+
+The Handlebars templating engine is crucial for processing the placeholders and generating the final JSON structures that represent FHIR resources.
+
+## Configuration
+While the individual templates don't have specific configuration options, they are designed to be flexible through the use of placeholders. Common placeholders include:
+
+- `{{ID}}`: Used for setting the unique identifier of the EpisodeOfCare resource.
+- `{{REF}}`: Used for various references, such as account, care manager, condition, organization, patient, referral request, or team.
+
+These placeholders would be populated by the surrounding conversion system based on the data available in the CDA documents being processed.
+
+## Example Usage
+Here's an example of how the `patient.hbs` template might be used to generate part of an EpisodeOfCare resource:
+
+```handlebars
+{
+  "resource": {
+    "resourceType": "EpisodeOfCare",
+    "id": "{{ID}}",
+    "patient": {
+      "reference": "{{REF}}"
+    }
+  }
+}
+```
+
+When rendered with appropriate values, it might produce:
+
+```json
+{
+  "resource": {
+    "resourceType": "EpisodeOfCare",
+    "id": "episode123",
+    "patient": {
+      "reference": "Patient/pat123"
+    }
+  }
+}
+```
+
+This modular approach allows the conversion system to build up complete EpisodeOfCare resources by combining the outputs of multiple templates based on the available data and the desired structure of the final FHIR resource.
+
+In conclusion, this directory provides a set of flexible, modular templates for generating various components of FHIR EpisodeOfCare resources. These templates are designed to work within a larger CDA to FHIR conversion system, allowing for the creation of comprehensive and standards-compliant FHIR resources from CDA data.

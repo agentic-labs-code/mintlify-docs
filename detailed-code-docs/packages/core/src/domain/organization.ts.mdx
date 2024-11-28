@@ -1,0 +1,139 @@
+---
+title: "organization.ts"
+---
+
+## High-level description
+This code defines the structure and behavior of organizations within a healthcare system. It includes enums for organization types, interfaces for creating and updating organizations, and functions for managing organization data across different health information exchanges (HIEs) like Carequality and CommonWell.
+
+## Code Structure
+The main `Organization` interface extends `BaseDomain` and includes properties like `oid`, `organizationNumber`, and `data`. The code also defines enums for organization types and business types. There are functions for creating, updating, and retrieving organizations, as well as for converting organization data between different formats used by various HIEs.
+
+## Symbols
+
+### `OrganizationBizType`
+#### Description
+An enum representing the business type of an organization.
+
+#### Inputs
+N/A
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| healthcareProvider | string | Represents a healthcare provider organization |
+| healthcareITVendor | string | Represents a healthcare IT vendor organization |
+
+### `OrgType`
+#### Description
+An enum representing the type of organization. This enum is deprecated and should be replaced with `TreatmentType`.
+
+#### Inputs
+N/A
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| acuteCare | string | Represents an acute care organization |
+| ambulatory | string | Represents an ambulatory organization |
+| hospital | string | Represents a hospital |
+| labSystems | string | Represents lab systems |
+| pharmacy | string | Represents a pharmacy |
+| postAcuteCare | string | Represents a post-acute care organization |
+
+### `TreatmentType`
+#### Description
+An enum representing the type of treatment an organization provides. This is intended to replace `OrgType`.
+
+#### Inputs
+N/A
+
+#### Outputs
+(Same as `OrgType`)
+
+### `OrganizationData`
+#### Description
+A type representing the core data of an organization.
+
+#### Inputs
+N/A
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | string | The name of the organization |
+| type | OrgType | The type of the organization |
+| location | AddressStrict | The address of the organization |
+
+### `OrganizationCreate`
+#### Description
+An interface for creating a new organization.
+
+#### Inputs
+N/A
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer ID |
+| type | OrganizationBizType (optional) | The business type of the organization |
+| data | OrganizationData | The core data of the organization |
+| cqActive | boolean (optional) | Whether the organization is active in Carequality |
+| cwActive | boolean (optional) | Whether the organization is active in CommonWell |
+| cqApproved | boolean (optional) | Whether the organization is approved for Carequality |
+| cwApproved | boolean (optional) | Whether the organization is approved for CommonWell |
+
+### `OrganizationRegister`
+#### Description
+An interface for registering an organization, extending `OrganizationCreate`.
+
+#### Inputs
+N/A
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string (optional) | The ID of the organization |
+
+### `Organization`
+#### Description
+The main interface representing an organization, extending `BaseDomain` and `Required&lt;OrganizationCreate&gt;`.
+
+#### Inputs
+N/A
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| oid | string | The organization's OID |
+| organizationNumber | number | The organization's number |
+
+### `isHealthcareItVendor`
+#### Description
+A function to check if an organization is a healthcare IT vendor.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| type | OrganizationBizType | The business type of the organization |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | boolean | True if the organization is a healthcare IT vendor, false otherwise |
+
+### `isProvider`
+#### Description
+A function to check if an organization is a healthcare provider.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| type | OrganizationBizType | The business type of the organization |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | boolean | True if the organization is a healthcare provider, false otherwise |
+
+## TODOs
+- Update all instances of OrgType to TreatmentType

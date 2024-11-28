@@ -1,0 +1,69 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `packages/fhir-test` directory contains a comprehensive suite of tests and configurations for validating and load testing two FHIR (Fast Healthcare Interoperability Resources) server implementations: HAPI FHIR JPA Server and Medplum. The project utilizes Artillery.io as the primary testing framework and integrates with AWS CloudWatch for metrics publishing.
+
+## What does it do?
+This test suite performs several key functions:
+
+1. Load Testing: It executes hundreds or thousands of requests to the chosen FHIR server to assess performance under various levels of concurrent load.
+
+2. Batch Testing: It performs tests on batch operations, which involve inserting large amounts of data in a single request.
+
+3. CRUD Operations: It tests Create, Read, Update, and Delete operations on various FHIR resources.
+
+4. Health Checks: It includes specific tests for the health check endpoints of both HAPI FHIR and Medplum servers.
+
+5. Authentication: For Medplum tests, it handles user authentication to obtain access tokens for API requests.
+
+6. Payload Generation: It creates random or specific test payloads for different FHIR resources like Patient, Organization, and DocumentReference.
+
+7. Response Verification: It checks responses to ensure operations were successful and expected resources were created or modified.
+
+8. Metrics Collection: It publishes test metrics to AWS CloudWatch for monitoring and analysis.
+
+## Entry points
+The main entry points for running tests are the YAML configuration files in the `src` directory:
+
+1. `src/healthcheck-hapi.yml` and `src/healthcheck-medplum.yml`: For testing health check endpoints.
+2. `src/fhir/crud-hapi.yml` and `src/fhir/crud-medplum.yml`: For CRUD operation tests.
+3. `src/fhir/batch/functional-hapi.yml` and `src/fhir/batch/functional-medplum.yml`: For functional batch operation tests.
+4. `src/fhir/batch/load-hapi.yml` and `src/fhir/batch/load-medplum.yml`: For load testing batch operations.
+
+These YAML files define the test scenarios, including the endpoints to hit, the number of virtual users, and the duration of the tests. They also reference custom JavaScript functions for payload generation and response processing.
+
+## Key Files
+1. `src/base-processor.js`: Generates random data using Faker library.
+2. `src/example.js`: Contains hook functions for Artillery.io to process requests and responses.
+3. `src/fhir/batch/batch.js`: Utility functions for batch operation tests.
+
+## Dependencies
+The project relies on the following key dependencies:
+
+1. Artillery.io: The core testing framework used for both functional and load testing.
+2. @faker-js/faker (version ^8.0.2): Used for generating random test data.
+3. AWS CloudWatch: Used for publishing and storing test metrics.
+
+## Configuration
+The tests use several environment variables that can be set in a `.env` file:
+
+- HAPI_URL / MEDPLUM_URL: Base URLs for the FHIR servers.
+- REGION: AWS region for CloudWatch metrics.
+- HAPI_TENANT_ID: Tenant ID for HAPI FHIR requests.
+- MEDPLUM_USER / MEDPLUM_PASSWORD: Credentials for Medplum authentication.
+
+Test configurations typically include warm-up phases, ramp-up phases, and main load phases. HTTP timeouts and other Artillery-specific settings are defined in the YAML files.
+
+To run tests, use the Artillery CLI. For example:
+
+```shell
+artillery run --dotenv .env src/healthcheck-medplum.yml
+```
+
+For batch tests, FHIR Bundles in JSON format should be stored under `src/fhir/batch/load/`.
+
+Debug information and detailed test reports can be generated using additional CLI options.
+
+This test suite provides a robust framework for thoroughly testing FHIR server implementations, covering both functional correctness and performance under various load conditions.

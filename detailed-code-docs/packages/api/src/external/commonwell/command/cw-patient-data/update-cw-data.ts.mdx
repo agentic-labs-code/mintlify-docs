@@ -1,0 +1,74 @@
+---
+title: "update-cw-data.ts"
+---
+
+## High-level description
+This code defines functions for updating CommonWell (CW) patient data in a database. It provides functionality to update CW links and link demographics history for a given patient, ensuring data integrity and uniqueness.
+
+## Code Structure
+The main function `updateCwPatientData` orchestrates the update process, while `updateCwPatientDataWithinDBTx` performs the actual update within a database transaction. These functions work with the `CwPatientDataModel` and use helper functions for database operations and data retrieval.
+
+## References
+- `getCwPatientDataOrFail` from "./get-cw-data"
+- `CwPatientDataModel` from "../../models/cw-patient-data"
+- `executeOnDBTx` from "../../../../models/transaction-wrapper"
+
+## Symbols
+
+### `updateCwPatientData`
+#### Description
+This function updates CommonWell patient data by creating a new `CwPatientDataUpdate` object and executing the update within a database transaction.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The ID of the patient data to update |
+| cxId | string | The customer ID |
+| cwLinks | CwLink[] | Optional. Array of CommonWell links to update |
+| requestLinksDemographics | object | Optional. Contains request ID and link demographics |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| updatedPatientData | CwPatientData | The updated CommonWell patient data |
+
+#### Internal Logic
+1. Constructs a `CwPatientDataUpdate` object with the provided data.
+2. Uses `executeOnDBTx` to perform the update within a database transaction.
+3. Retrieves the existing patient data using `getCwPatientDataOrFail`.
+4. Calls `updateCwPatientDataWithinDBTx` to perform the actual update.
+5. Returns the updated patient data.
+
+### `updateCwPatientDataWithinDBTx`
+#### Description
+This function performs the actual update of CommonWell patient data within a database transaction.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| update | CwPatientDataUpdate | The update data |
+| existing | CwPatientDataModel | The existing patient data model |
+| transaction | Transaction | The database transaction object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| updatedModel | CwPatientDataModel | The updated CommonWell patient data model |
+
+#### Internal Logic
+1. Merges the new links with existing links and removes duplicates using `uniqBy`.
+2. Updates the link demographics history by merging existing and new data.
+3. Updates the existing model with the new data, including unique links and updated link demographics history.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| lodash | Used for the `uniqBy` function to remove duplicate links |
+| sequelize | Provides the `Transaction` type for database transactions |
+| @metriport/core | Imports `LinkDemographics` type |
+
+## Error Handling
+The code relies on the error handling mechanism provided by `executeOnDBTx`, which rolls back the transaction in case of an error.
+
+## Performance Considerations
+The use of database transactions and locking (`lock: true`) in `getCwPatientDataOrFail` ensures data consistency but may impact performance for concurrent operations on the same patient data. The `uniqBy` operation on links helps maintain data integrity and reduce redundancy.

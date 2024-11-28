@@ -1,0 +1,85 @@
+---
+title: "consolidated.ts"
+---
+
+## High-level description
+This code provides functionality to retrieve consolidated patient data from a FHIR server. It allows filtering by document IDs, resource types, and date range. The main function, `getConsolidatedFhirBundle`, fetches the requested resources, filters them, and returns a FHIR bundle containing the consolidated data.
+
+## Code Structure
+The main function `getConsolidatedFhirBundle` orchestrates the process of fetching and consolidating patient data. It uses helper functions like `getPatientFilter`, `searchResources`, and `filterByDocumentIds` to perform specific tasks. The code also includes error handling and logging mechanisms.
+
+## Symbols
+
+### `getConsolidatedFhirBundle`
+#### Description
+This function retrieves consolidated patient data from a FHIR server based on the provided filters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId"&gt; | Patient information |
+| documentIds | string[] | Optional list of document reference IDs to filter by |
+| resources | ResourceTypeForConsolidation[] | Optional list of resource types to retrieve |
+| dateFrom | string | Optional start date for filtering |
+| dateTo | string | Optional end date for filtering |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | SearchSetBundle&lt;Resource&gt; | FHIR bundle containing the consolidated patient data |
+
+#### Internal Logic
+1. Determine the resources to fetch based on the input filters.
+2. Create a FHIR API client.
+3. Fetch resources using `searchResources` function.
+4. Filter resources by document IDs if provided.
+5. Hydrate missing references up to 3 rounds.
+6. Build and return the final FHIR bundle.
+
+### `filterByDocumentIds`
+#### Description
+Filters resources based on the provided document IDs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resources | Resource[] | List of resources to filter |
+| documentIds | string[] | List of document IDs to filter by |
+| log | function | Optional logging function |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filteredResources | Resource[] | Filtered list of resources |
+
+### `searchResources`
+#### Description
+Searches for resources of a specific type using the provided search function.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resource | ResourceType | Type of resource to search for |
+| searchFunction | function | Function to perform the search |
+| errorsToReport | Record&lt;string, string&gt; | Object to store error messages |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resources | Resource[] | Array of found resources |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/core | Provides FHIR-related types and utilities |
+| @medplum/fhirtypes | Provides FHIR resource type definitions |
+| @metriport/shared/medical | Provides shared medical-related types and constants |
+
+## Error Handling
+The code implements error handling for resource searches. Errors are caught, logged, and stored in the `errorsToReport` object. The number of failures is reported, and error messages are captured using the `capture.message` function.
+
+## Logging
+The code uses a custom logging mechanism (`out` function) to log information about the consolidation process, including the resources being fetched and any errors encountered.
+
+## Performance Considerations
+The code implements a hydration mechanism to fetch missing references, limited to 3 rounds to prevent excessive API calls. It also uses `Promise.allSettled` to fetch resources in parallel, potentially improving performance when dealing with multiple resource types.

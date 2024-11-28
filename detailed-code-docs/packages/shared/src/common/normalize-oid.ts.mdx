@@ -1,0 +1,85 @@
+---
+title: "normalize-oid.ts"
+---
+
+## High-level description
+This code defines a function `normalizeOid` that validates and normalizes Object Identifiers (OIDs). It ensures that the input string conforms to the expected OID format and structure, including checking for valid root codes.
+
+## Symbols
+
+### `OID_REGEX`
+#### Description
+A regular expression used to match and extract the OID part from an input string.
+
+#### Internal Logic
+The regex pattern matches:
+1. Any non-digit or non-dot characters at the start (optional)
+2. Captures the main OID part, which consists of:
+   - Groups of digits (optional)
+   - Followed by dots (optional)
+   - This pattern can repeat
+3. Any non-digit or non-dot characters at the end (optional)
+
+### `normalizeOid`
+#### Description
+Validates and normalizes an input string to extract a valid OID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| input | string | The input string containing a potential OID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | string | The normalized OID if valid |
+
+#### Internal Logic
+1. Matches the input against the `OID_REGEX`
+2. Checks if the match exists and contains a captured group
+3. Extracts the OID candidate from the match
+4. Validates that the OID candidate doesn't contain ".." and starts with a valid root code
+5. Returns the valid OID or throws an error if invalid
+
+### `startsWithRootCode`
+#### Description
+Checks if the given OID starts with a valid root code (0, 1, or 2).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| oid | string | The OID to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | boolean | True if the OID starts with a valid root code, false otherwise |
+
+#### Internal Logic
+1. Checks if the OID contains a dot
+2. If it does, splits the string and checks the first part
+3. If it doesn't, checks the entire string
+4. Parses the root as an integer and checks if it's within valid bounds
+
+### `isWithinRootBounds`
+#### Description
+Checks if a given number is within the valid range for OID root codes (0 to 2).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| root | number | The number to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | boolean | True if the number is between 0 and 2 (inclusive), false otherwise |
+
+## Error Handling
+The `normalizeOid` function throws an error with the message "OID is not valid" if the input string doesn't contain a valid OID.
+
+## References
+The `normalizeOid` function is exported and used in other parts of the codebase, as seen in the `packages/api/src/external/carequality/command/cq-directory/parse-cq-directory-entry.ts` file.
+
+## Dependencies
+This code doesn't have any external dependencies. It uses only built-in JavaScript/TypeScript features.

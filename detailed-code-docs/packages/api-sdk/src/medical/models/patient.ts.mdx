@@ -1,0 +1,99 @@
+---
+title: "patient.ts"
+---
+
+## High-level description
+This code defines the data structures and schemas for patient-related operations in a medical API. It includes schemas for creating, updating, and querying patient data, as well as handling consolidated patient information and document references.
+
+## Code Structure
+The code defines several interconnected schemas and types using the Zod library for runtime type checking. The main symbols are `patientCreateSchema`, `patientUpdateSchema`, and `patientSchema`, which build upon each other to define the structure of patient data at different stages of operations.
+
+## Symbols
+
+### `patientCreateSchema`
+#### Description
+Defines the schema for creating a new patient, combining demographics data with an optional external ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| demographicsSchema | z.ZodObject | Schema for patient demographics |
+| externalId | z.ZodString (optional) | External identifier for the patient |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| PatientCreate | z.infer&lt;typeof patientCreateSchema&gt; | Type representing the data needed to create a patient |
+
+### `patientUpdateSchema`
+#### Description
+Extends the patient creation schema to include base update information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientCreateSchema | z.ZodObject | Schema for creating a patient |
+| baseUpdateSchema | z.ZodObject | Schema for base update information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| PatientUpdate | z.infer&lt;typeof patientUpdateSchema&gt; | Type representing the data needed to update a patient |
+
+### `patientSchema`
+#### Description
+Extends the patient update schema to include an array of facility IDs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientUpdateSchema | z.ZodObject | Schema for updating a patient |
+| facilityIds | z.ZodArray&lt;z.ZodString&gt; | Array of facility IDs associated with the patient |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Patient | z.infer&lt;typeof patientSchema&gt; | Type representing a complete patient record |
+
+### `patientListSchema`
+#### Description
+Defines a schema for a list of patients.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patients | z.ZodArray&lt;patientSchema&gt; | Array of patient objects |
+
+### `queryStatusSchema`
+#### Description
+Defines an enumeration of possible query statuses.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| QueryStatus | z.infer&lt;typeof queryStatusSchema&gt; | Enum of "processing", "completed", or "failed" |
+
+### `GetConsolidatedQueryProgressResponse`
+#### Description
+Defines the structure of the response for a consolidated query progress request.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | QueryStatus | Current status of the query (deprecated) |
+| queries | ConsolidatedQuery[] \| null | Array of consolidated queries or null |
+| message | string (optional) | Additional message about the query |
+
+### `StartConsolidatedQueryProgressResponse`
+#### Description
+Alias for the ConsolidatedQuery type, representing the response when starting a consolidated query.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| z (from "zod") | Used for defining and validating schemas |
+| baseUpdateSchema | Imported from "./common/base-update" for base update functionality |
+| demographicsSchema | Imported from "./demographics" for patient demographic data |
+| ConsolidatedQuery | Imported from "./fhir" for consolidated query information |
+
+This code provides a robust structure for handling patient data in a medical API context, ensuring type safety and consistency across different operations involving patient information.

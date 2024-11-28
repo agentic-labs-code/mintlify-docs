@@ -1,0 +1,142 @@
+---
+title: "cw-enhanced-coverage-connector.ts"
+---
+
+## High-level description
+This code defines the infrastructure for the CommonWell Enhanced Coverage Connector, which is responsible for managing and enhancing patient coverage information. It sets up various AWS resources, including Lambda functions, S3 buckets, and Secrets Manager secrets, to facilitate the enhanced coverage functionality.
+
+## Code Structure
+The main function `setupRequiredInfra` initializes the necessary infrastructure components, while `setupLambdas` creates the required Lambda functions. These functions use various utility functions and configurations from other parts of the codebase to set up the infrastructure according to the environment type and configuration.
+
+## Symbols
+
+### `settings`
+#### Description
+This function returns configuration settings for the Enhanced Coverage Connector based on the provided properties and environment.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| props | EnhancedCoverageConnectorProps | Configuration properties for the connector |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| settings | Object | Configuration settings for the connector |
+
+#### Internal Logic
+- Determines the schedule expression based on the environment (production or non-production)
+- Sets up Lambda configurations for triggering enhanced coverage
+
+### `getCoverageConfig`
+#### Description
+Retrieves the coverage enhancement configuration from the global config.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| coverageConfig | CWCoverageEnhancementConfig \| undefined | Coverage enhancement configuration if enabled, otherwise undefined |
+
+### `setupRequiredInfra`
+#### Description
+Sets up the required infrastructure for the Enhanced Coverage Connector.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| props | EnhancedCoverageConnectorProps | Configuration properties for the connector |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object \| undefined | Contains the created cookie store secret |
+
+#### Internal Logic
+- Checks if coverage enhancement is enabled
+- Creates cookie store and code challenge store secrets
+- Returns the created cookie store
+
+### `setupLambdas`
+#### Description
+Sets up the Lambda functions for the Enhanced Coverage Connector.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| props | EnhancedCoverageConnectorProps & { cookieStore: secret.Secret } | Configuration properties and cookie store for the connector |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object \| undefined | Contains the created Lambda functions |
+
+#### Internal Logic
+- Checks if coverage enhancement is enabled
+- Creates a scheduled Lambda function to trigger enhanced coverage
+
+### `createCookiesStore`
+#### Description
+Creates a Secrets Manager secret to store cookies for the Enhanced Coverage Connector.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| stack | Construct | The CDK construct stack |
+| theSettings | ReturnType&lt;typeof settings&gt; | Settings for the connector |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cookieStore | secret.Secret | The created Secrets Manager secret for storing cookies |
+
+### `createCodeChallengeStore`
+#### Description
+Creates a Secrets Manager secret to store code challenges for the Enhanced Coverage Connector.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| stack | Construct | The CDK construct stack |
+| theSettings | ReturnType&lt;typeof settings&gt; | Settings for the connector |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| codeChallengeStore | secret.Secret | The created Secrets Manager secret for storing code challenges |
+
+### `createScheduledTriggerECLambda`
+#### Description
+Creates a scheduled Lambda function to trigger the Enhanced Coverage process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| props | EnhancedCoverageConnectorProps | Configuration properties for the connector |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lambda | IFunction | The created Lambda function |
+
+#### Internal Logic
+- Sets up the Lambda function with the specified schedule, memory, and timeout
+- Configures environment variables and alarms
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-cdk-lib | Provides CDK constructs for creating AWS resources |
+| constructs | Provides the base Construct class |
+| ../../config/env-config | Imports configuration types |
+| ../env-type | Imports environment type definitions |
+| ../shared/config | Imports utility functions for configuration management |
+| ../shared/lambda-scheduled | Imports function to create scheduled Lambda functions |
+
+## Configuration
+The code uses various configuration options defined in the `EnhancedCoverageConnectorProps` interface and the global configuration obtained from `getConfig()`. These include settings for Lambda functions, S3 buckets, and environment-specific variables.
+
+## Error Handling
+The code includes basic error handling, such as checking if the coverage enhancement configuration is enabled before proceeding with setup. However, most error handling is likely delegated to the AWS CDK and the runtime environments of the created resources.
+
+## Logging
+There is minimal explicit logging in this code. The `console.log` statement in `getCoverageConfig` provides information about the coverage enhancement being skipped if not enabled.

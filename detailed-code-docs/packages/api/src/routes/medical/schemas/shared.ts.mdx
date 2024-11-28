@@ -1,0 +1,94 @@
+---
+title: "shared.ts"
+---
+
+## High-level description
+This code defines a set of shared schemas and utility functions for handling and validating string inputs, particularly for medical-related data. It utilizes the Zod library for schema validation and includes custom transformations and refinements for various data types such as dates, zip codes, and names.
+
+## Code Structure
+The code defines several constants and functions that are used to create and customize Zod schemas. These schemas are likely used across different parts of the medical routes in the API to ensure consistent data validation.
+
+## References
+This code references the following external modules and internal files:
+- `@metriport/shared`: For the `stripNonNumericChars` function
+- `dayjs`: For date manipulation and validation
+- `zod`: For schema definition and validation
+- `../../../shared/date`: For the `ISO_DATE` constant
+
+## Symbols
+
+### `emptyStringToUndefined`
+#### Description
+A utility function that converts empty strings to undefined.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| v | string \| undefined \| null | The input value to be processed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string \| undefined | The processed value |
+
+#### Internal Logic
+If the input is null, undefined, or an empty string, it returns undefined. Otherwise, it returns the original string.
+
+### `optionalString`
+#### Description
+A function that creates a Zod schema for an optional string with custom transformation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| zodSchema | ZodString | A Zod string schema to be extended |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| schema | Zod.ZodEffects | A Zod schema for an optional string with transformation |
+
+#### Internal Logic
+It creates a schema that accepts either the input ZodString or an optional string, then applies the `emptyStringToUndefined` transformation.
+
+### `defaultString`
+#### Description
+A Zod schema for a default string that trims whitespace.
+
+### `defaultOptionalString`
+#### Description
+A Zod schema for an optional string that uses the `defaultString` schema and applies the `optionalString` function.
+
+### `defaultDateString`
+#### Description
+A Zod schema for a date string that must be in ISO 8601 format.
+
+#### Internal Logic
+It refines the `defaultString` schema by validating the date using dayjs and the `ISO_DATE` format.
+
+### `defaultZipString`
+#### Description
+A Zod schema for a US zip code string.
+
+#### Internal Logic
+It coerces the input to a string, strips non-numeric characters, and ensures the result is exactly 5 digits long.
+
+### `defaultNameString`
+#### Description
+A Zod schema for a non-empty string, typically used for names.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/shared | Provides utility functions like `stripNonNumericChars` |
+| dayjs | Date manipulation and validation |
+| zod | Schema definition and validation |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| ISO_DATE | string | "YYYY-MM-DD" | The format string for ISO 8601 dates |
+| zipLength | number | 5 | The expected length of a US zip code |
+
+## Error Handling
+The schemas defined in this file use Zod's built-in error handling. Custom error messages are provided for date and zip code validation.

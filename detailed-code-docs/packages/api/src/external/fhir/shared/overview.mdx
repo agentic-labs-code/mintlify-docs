@@ -1,0 +1,61 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains shared utilities and functions for working with FHIR (Fast Healthcare Interoperability Resources) in the API. It includes functionality for error handling, JSON validation, bundle processing, and pagination of FHIR resources.
+
+## What does it do?
+The code in this directory provides several key functionalities for FHIR operations:
+
+1. Error Mapping: It defines functions to determine, group, and report FHIR-related errors. This helps in categorizing and handling different types of errors that may occur during FHIR operations.
+
+2. JSON Validation: It implements a JSON validator for FHIR resources using the Ajv library. This ensures that FHIR resources within a Bundle conform to the predefined FHIR schema.
+
+3. Bundle Hydration: It processes FHIR Bundles by removing the Patient resource, adding Metriport and Document extensions to all resources, and ensuring all resources have valid UUIDs for IDs. This prepares FHIR Bundles for further processing or storage.
+
+4. Pagination Handling: It provides a utility function to retrieve all pages of a specific FHIR resource type from a FHIR server, handling pagination automatically.
+
+5. Date Utilities: It includes functions for creating FHIR Period objects with random or specified start and end dates, which is useful for generating mock data in FHIR-related tests.
+
+These functionalities work together to provide a robust set of tools for handling FHIR data, ensuring its validity, and managing common operations like error handling and pagination.
+
+## Key Files
+
+### error-mapping.ts
+This file contains functions for mapping and categorizing FHIR errors. Key functions include:
+
+- `tryDetermineFhirError`: Determines the type of FHIR error from a given error object.
+- `groupFHIRErrors`: Groups FHIR errors by their resource type and element.
+- `reportFHIRError`: Reports FHIR errors by logging them and capturing them for further analysis.
+
+### json-validator.ts
+This file implements a JSON validator for FHIR resources. The main function is:
+
+- `validateFhirEntries`: Validates FHIR resources within a Bundle against a predefined schema.
+
+### hydrate-bundle.ts
+This file defines functions for processing FHIR Bundles. The main function is:
+
+- `hydrateBundle`: Processes a FHIR Bundle by removing the Patient resource, adding extensions, and validating UUIDs.
+
+### paginated.ts
+This file provides a utility for handling pagination in FHIR resource retrieval. The key function is:
+
+- `getAllPages`: Retrieves all pages of a specific FHIR resource type using an async generator function.
+
+## Dependencies
+- @medplum/core: Provides FHIR-related error types and utilities.
+- @medplum/fhirtypes: Provides TypeScript types for FHIR resources.
+- Ajv: Used for JSON schema validation.
+- lodash: Utility library used for various operations.
+- @sentry/types: Provides types for error reporting.
+- @faker-js/faker: Used for generating random dates in test utilities.
+- uuid: Used for generating and validating UUIDs.
+
+## Configuration
+The code relies on a FHIR JSON schema (fhir.schema.json) for validation purposes. This schema defines the structure and constraints for various FHIR resources.
+
+The error mapping and reporting functions use logging utilities and error capture mechanisms from the broader project structure, indicating integration with a larger logging and error tracking system.
+
+In summary, this directory provides a comprehensive set of utilities for working with FHIR data in the API, covering aspects from data validation and processing to error handling and pagination. These tools are essential for maintaining the integrity and efficiency of FHIR-based operations within the larger application.

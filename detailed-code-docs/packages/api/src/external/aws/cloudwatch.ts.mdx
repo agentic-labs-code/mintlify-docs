@@ -1,0 +1,68 @@
+---
+title: "cloudwatch.ts"
+---
+
+Here's the documentation for the provided code:
+
+## High-level description
+This code defines a module for interacting with Amazon CloudWatch, specifically for reporting custom metrics. It provides functionality to send metric data to CloudWatch, which can be used for monitoring and alerting purposes.
+
+## Code Structure
+The main symbols in this code are `METRICS_NAMESPACE`, `Metric`, and `reportMetric`. The `reportMetric` function uses the `METRICS_NAMESPACE` constant and the `Metric` type to send metric data to CloudWatch.
+
+## Symbols
+
+### `METRICS_NAMESPACE`
+#### Description
+A constant string representing the namespace for Metriport metrics in CloudWatch.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| METRICS_NAMESPACE | string | The namespace for Metriport metrics |
+
+### `Metric`
+#### Description
+A type definition for a metric to be reported to CloudWatch.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | string | The name of the metric |
+| unit | "Milliseconds" | The unit of measurement for the metric |
+| value | number \| string | The value of the metric |
+| timestamp | Date (optional) | The timestamp for the metric data point |
+| additionalDimension | string (optional) | An additional dimension for the metric |
+
+### `reportMetric`
+#### Description
+A function that reports a metric to CloudWatch.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| metric | Metric | The metric to be reported |
+
+#### Internal Logic
+1. Creates a base metric object with the provided data.
+2. Constructs the CloudWatch `putMetricData` parameters, including two data points:
+   - One with an additional dimension if provided.
+   - One with a fixed "Service" dimension set to "OSS API".
+3. Calls the CloudWatch `putMetricData` method to send the metric data.
+4. Handles any errors that occur during the process.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-sdk | To interact with AWS CloudWatch |
+| ../../shared/config | To get AWS region configuration |
+| ../../shared/notifications | For error capturing and reporting |
+
+## Error Handling
+The function catches any errors that occur during the metric reporting process. It logs the error to the console and captures it using the `capture.error` method from the notifications module.
+
+## Logging
+The code uses `console.error` to log any errors that occur during the metric reporting process.
+
+## TODOs
+- Move this functionality to @metriport/core as indicated by the @deprecated comments.

@@ -1,0 +1,129 @@
+---
+title: "create-or-update-cq-organization.ts"
+---
+
+## High-level description
+The `createOrUpdateCQOrganization.ts` file provides functionality to create or update an organization's representation within the Carequality (CQ) directory. It leverages the `@metriport/carequality-sdk` to interact with the CQ API.
+
+## References
+- `@metriport/carequality-sdk`: Used to interact with the Carequality API.
+- `CQOrganization`: Represents an organization in the Carequality system.
+- `CQOrgDetails`: Defines the structure of organization details.
+- `getCqAddress`: Retrieves the address information in a format suitable for Carequality.
+- `getParsedCqOrgOrFail`: Fetches and parses organization details from the Carequality directory.
+- `metriportIntermediaryOid`, `metriportOid`: OIDs used for identifying Metriport within the Carequality system.
+- `metriportEmailForCq`: Metriport's designated email address for Carequality interactions.
+- `metriportCompanyDetails`: Contains Metriport's company information.
+
+## Symbols
+
+### `createOrUpdateCQOrganization`
+#### Description
+Creates or updates an organization in the Carequality directory based on the provided details and active status.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| orgDetails | `CQOrgDetails` | Details of the organization to be created or updated. |
+| active | `boolean` | Indicates whether the organization should be marked as active in the CQ directory. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| oid | `string` | The OID of the created or updated organization in the CQ directory. |
+
+#### Internal Logic
+1. Checks if the Carequality API is initialized.
+2. Creates a `CQOrganization` instance from the provided `orgDetails`.
+3. Checks if the organization already exists in the CQ directory using `doesOrganizationExistInCQ`.
+4. If the organization exists, updates it using `updateCQOrganization`.
+5. If the organization doesn't exist, registers it using `registerOrganization`.
+
+### `doesOrganizationExistInCQ`
+#### Description
+Checks if an organization with the given OID exists in the Carequality directory.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cq | `CarequalityManagementAPI` | An instance of the Carequality Management API client. |
+| oid | `string` | The OID of the organization to check for. |
+| active | `boolean` | Indicates whether to filter for active organizations. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| exists | `boolean` | True if an organization with the given OID exists, otherwise false. |
+
+#### Internal Logic
+1. Calls the `listOrganizations` method of the `CarequalityManagementAPI` with the provided `oid` and `active` filters.
+2. Returns true if the API response contains any organizations (indicating existence), otherwise false.
+
+### `updateCQOrganization`
+#### Description
+Updates an existing organization in the Carequality directory.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cq | `CarequalityManagementAPI` | An instance of the Carequality Management API client. |
+| cqOrg | `CQOrganization` | The `CQOrganization` object representing the updated organization data. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| oid | `string` | The OID of the updated organization in the CQ directory. |
+
+#### Internal Logic
+1. Calls the `updateOrganization` method of the `CarequalityManagementAPI` with the XML representation of the `cqOrg` and its OID.
+
+### `registerOrganization`
+#### Description
+Registers a new organization in the Carequality directory.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cq | `CarequalityManagementAPI` | An instance of the Carequality Management API client. |
+| cqOrg | `CQOrganization` | The `CQOrganization` object representing the organization to be registered. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| oid | `string` | The OID assigned to the newly registered organization in the CQ directory. |
+
+#### Internal Logic
+1. Calls the `registerOrganization` method of the `CarequalityManagementAPI` with the XML representation of the `cqOrg`.
+
+### `getAndUpdateCQOrgAndMetriportOrg`
+#### Description
+Retrieves organization details from both the Carequality directory and the Metriport database, updates the CQ organization with the latest information, and synchronizes the active status between both systems.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cq | `CarequalityManagementAPI` | An instance of the Carequality Management API client. |
+| cxId | `string` | The ID of the customer. |
+| oid | `string` | The OID of the organization. |
+| active | `boolean` | The desired active status for the organization. |
+| org | `OrganizationModel` | The organization data from the Metriport database. |
+| facility | `FacilityModel` | Optional. The facility data from the Metriport database, if applicable. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| None | | This function updates data in the CQ directory and the Metriport database as a side effect. |
+
+#### Internal Logic
+1. Retrieves the current active status of the organization or facility.
+2. Fetches the organization details from the CQ directory using `getParsedCqOrgOrFail`.
+3. Retrieves the address information from either the organization or facility data.
+4. Formats the address for CQ using `getCqAddress`.
+5. Updates the CQ organization using `createOrUpdateCQOrganization` with the fetched and formatted data.
+6. Updates the active status of the organization or facility in the Metriport database.
+
+## Error Handling
+The code utilizes try-catch blocks to handle potential errors during interactions with the Carequality API. Errors are logged and reported using the `capture.error` function.
+
+## Logging
+The code uses the `out` function for logging, providing context and details about the operations being performed.

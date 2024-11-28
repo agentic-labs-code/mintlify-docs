@@ -1,0 +1,53 @@
+---
+title: "2024-06-07_00_remove_cq_cw_patient_data_indexes.ts"
+---
+
+## High-level description
+This migration script removes indexes from the `cq_patient_data` and `cw_patient_data` tables in a database. It provides both `up` and `down` functions to apply and revert the migration, respectively.
+
+## Symbols
+
+### `up`
+#### Description
+This asynchronous function removes indexes named `cq_patient_data_id_index` and `cw_patient_data_id_index` from the `cq_patient_data` and `cw_patient_data` tables, respectively. It performs these operations within a database transaction to ensure atomicity.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | object | An object containing the `queryInterface` object, which is assumed to be a Sequelize QueryInterface instance used to interact with the database. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise | A promise that resolves when the indexes have been successfully removed. |
+
+#### Internal Logic
+1. Starts a database transaction using `queryInterface.sequelize.transaction`.
+2. Removes the index `cq_patient_data_id_index` from the `cq_patient_data` table using `queryInterface.removeIndex`.
+3. Removes the index `cw_patient_data_id_index` from the `cw_patient_data` table using `queryInterface.removeIndex`.
+4. Commits the transaction if all operations are successful. If any operation fails, the transaction is rolled back.
+
+### `down`
+#### Description
+This asynchronous function reverts the changes made by the `up` function. It adds back the indexes `cq_patient_data_id_index` and `cw_patient_data_id_index` to the `cq_patient_data` and `cw_patient_data` tables, respectively, within a database transaction.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | object | An object containing the `queryInterface` object, which is assumed to be a Sequelize QueryInterface instance used to interact with the database. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise | A promise that resolves when the indexes have been successfully added back. |
+
+#### Internal Logic
+1. Starts a database transaction using `queryInterface.sequelize.transaction`.
+2. Adds the index `cw_patient_data_id_index` to the `cw_patient_data` table using `queryInterface.addIndex`. The index is created on the `id` field.
+3. Adds the index `cq_patient_data_id_index` to the `cq_patient_data` table using `queryInterface.addIndex`. The index is created on the `id` field.
+4. Commits the transaction if all operations are successful. If any operation fails, the transaction is rolled back.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Sequelize | Provides the database abstraction layer and migration utilities. |

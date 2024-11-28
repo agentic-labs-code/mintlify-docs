@@ -1,0 +1,177 @@
+---
+title: "util.ts"
+---
+
+## High-level description
+This file, `util.ts`, contains utility functions for the connect-widget application. It provides functionality for environment detection, URL parameter handling, redirection, and environment variable management. These utilities are used across the application to manage navigation, environment-specific behavior, and configuration.
+
+## Code Structure
+The file consists of several standalone functions that handle different aspects of the application's utility needs. These functions are exported for use in other parts of the application, particularly for navigation, environment checks, and configuration management.
+
+## References
+This code references and interacts with:
+- `react-router-dom` for navigation
+- `./api` for token management
+- `./constants` for constant values
+- Browser's `window.location` for redirection
+- Node.js `process.env` for environment variables
+
+## Symbols
+
+### `buildEnvParam`
+#### Description
+Constructs an environment parameter string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| envParam | string | The environment parameter name |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | string | The constructed environment parameter string |
+
+### `redirectToMain`
+#### Description
+Redirects to the main connect page while preserving the token state.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| navigate | NavigateFunction | React Router's navigation function |
+| searchParams | URLSearchParams | Current URL search parameters |
+
+#### Internal Logic
+1. Checks if the environment is sandbox
+2. Constructs the redirect URL with the token and environment parameters
+3. Uses React Router's `navigate` function to perform the redirection
+4. Silently catches and ignores any errors
+
+### `redirectToCustomUrl`
+#### Description
+Redirects to a custom URL.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | The URL to redirect to |
+
+#### Internal Logic
+1. Attempts to set `window.location.href` to the provided URL
+2. Silently catches and ignores any errors
+
+### `isLocalEnv`
+#### Description
+Checks if the application is running in a local development environment.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | boolean | True if running in local/dev environment, false otherwise |
+
+### `isEnvParamSet`
+#### Description
+Checks if a specific environment parameter is set in the URL search params.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| searchParams | URLSearchParams | URL search parameters |
+| envParam | string | The environment parameter to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | boolean | True if the parameter is set to 'true', false otherwise |
+
+### `isSandbox`
+#### Description
+Checks if the application is running in sandbox mode.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| searchParams | URLSearchParams | URL search parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | boolean | True if in sandbox mode, false otherwise |
+
+### `getEnvType`
+#### Description
+Retrieves the environment type from environment variables.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | string | The environment type |
+
+### `getEnvVar`
+#### Description
+Retrieves the value of an environment variable.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| varName | string | The name of the environment variable |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | string \| undefined | The value of the environment variable, or undefined if not set |
+
+### `getEnvVarOrFail`
+#### Description
+Retrieves the value of an environment variable, throwing an error if it's not set.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| varName | string | The name of the environment variable |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | string | The value of the environment variable |
+
+#### Internal Logic
+1. Attempts to get the environment variable value
+2. Throws an error if the value is not set or is an empty string
+
+### `isDemoToken`
+#### Description
+Checks if the provided token is a demo token.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| token | string \| null | The token to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | boolean | True if it's a demo token, false otherwise |
+
+### `sleep`
+#### Description
+Creates a promise that resolves after a specified time, useful for introducing delays.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| timeInMs | number | The time to sleep in milliseconds |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | Promise&lt;void&gt; | A promise that resolves after the specified time |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| react-router-dom | For navigation functionality |
+
+## Error Handling
+Most functions in this file do not implement explicit error handling. The `redirectToMain` and `redirectToCustomUrl` functions catch and silently ignore any errors that occur during redirection. The `getEnvVarOrFail` function throws an error if the requested environment variable is not set or is empty.

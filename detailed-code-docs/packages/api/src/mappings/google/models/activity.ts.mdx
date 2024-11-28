@@ -1,0 +1,126 @@
+---
+title: "activity.ts"
+---
+
+## High-level description
+This code defines types and constants related to Google Fit activity data, including data source IDs, activity types, and response models. It provides a mapping between Google Fit's activity data structure and the standardized format used within the application.
+
+## Code Structure
+The code defines several constants for Google Fit data source IDs and a mapping of activity type codes to human-readable names. It utilizes Zod schemas to define the expected structure of Google Fit API responses. These schemas are used to validate and type-check the data received from the Google Fit API.
+
+## Symbols
+
+### `sourceIdActivity`
+#### Description
+A constant string representing the data source ID for activity segments in Google Fit.
+
+#### Internal Logic
+```typescript
+"derived:com.google.activity.segment:com.google.android.gms:merge_activity_segments"
+```
+
+### `sourceIdActiveMinutes`
+#### Description
+A constant string representing the data source ID for active minutes in Google Fit.
+
+#### Internal Logic
+```typescript
+"derived:com.google.active_minutes:com.google.android.gms:merge_active_minutes"
+```
+
+### `sourceIdDistance`
+#### Description
+A constant string representing the data source ID for distance data in Google Fit.
+
+#### Internal Logic
+```typescript
+"derived:com.google.distance.delta:com.google.android.gms:merge_distance_delta"
+```
+
+### `sourceIdCalories`
+#### Description
+A constant string representing the data source ID for calories expended in Google Fit.
+
+#### Internal Logic
+```typescript
+"derived:com.google.calories.expended:com.google.android.gms:merge_calories_expended"
+```
+
+### `sourceIdSteps`
+#### Description
+A constant string representing the data source ID for step count data in Google Fit.
+
+#### Internal Logic
+```typescript
+"derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
+```
+
+### `sourceIdSpeed`
+#### Description
+A constant string representing the data source ID for speed data in Google Fit.
+
+#### Internal Logic
+```typescript
+"derived:com.google.speed:com.google.android.gms:merge_speed"
+```
+
+### `googleActivityDataSourceId`
+#### Description
+A Zod schema defining an enum of possible data source IDs for Google Fit activity data.
+
+#### Internal Logic
+```typescript
+z.enum([
+  sourceIdActivity,
+  sourceIdActiveMinutes,
+  sourceIdCalories,
+  sourceIdDistance,
+  sourceIdSteps,
+  sourceIdSpeed,
+]);
+```
+
+### `googleActivityResp`
+#### Description
+A Zod schema defining the expected structure of a Google Fit API response for activity data. It uses the `googleResp` function (defined elsewhere) with the `googleActivityDataSourceId` schema to validate the response.
+
+#### Internal Logic
+```typescript
+googleResp(googleActivityDataSourceId)
+```
+
+### `GoogleActivity`
+#### Description
+A type alias for the inferred type of the `googleActivityResp` schema. This represents the TypeScript type of a validated Google Fit activity data response.
+
+#### Internal Logic
+```typescript
+z.infer&lt;typeof googleActivityResp&gt;
+```
+
+### `GoogleActivityDataSourceId`
+#### Description
+A type alias for the inferred type of the `googleActivityDataSourceId` schema. This represents the TypeScript type of a valid Google Fit activity data source ID.
+
+#### Internal Logic
+```typescript
+z.infer&lt;typeof googleActivityDataSourceId&gt;
+```
+
+### `GoogleActivityTypes`
+#### Description
+A constant object mapping numerical activity type codes from Google Fit to their corresponding human-readable names.
+
+#### Internal Logic
+```typescript
+{
+  9: "Aerobics",
+  119: "Archery",
+  // ... other activity types
+};
+```
+
+
+## Dependencies
+- `zod`: Used for schema validation and type checking.
+

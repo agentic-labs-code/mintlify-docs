@@ -1,0 +1,86 @@
+---
+title: "analytics.ts"
+---
+
+## High-level description
+This code defines an Analytics class that initializes and uses the PostHog analytics library for tracking events in a React application. It provides methods for emitting events and identifying users, specifically tailored for a connect-widget platform.
+
+## Code Structure
+The code initializes the PostHog library and defines an Analytics class with static methods for emitting events and identifying users. The class also contains a static object defining common event names.
+
+## Symbols
+
+### `posthog.init()`
+#### Description
+Initializes the PostHog analytics library with configuration options.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| key | string | PostHog API key from environment variable |
+| options | object | Configuration options for PostHog |
+
+#### Internal Logic
+- Uses the PostHog API key from the environment variable `REACT_APP_PUBLIC_POST_HOG_KEY`
+- Sets the API host from the environment variable `REACT_APP_PUBLIC_POST_HOG_HOST`
+- Disables autocapture
+- Enables session recording with all inputs masked
+
+### `Analytics`
+#### Description
+A static class that provides methods for emitting events and identifying users using PostHog.
+
+#### Internal Logic
+- Defines static event names for common actions
+- Provides static methods for emitting events and identifying users
+
+### `Analytics.emit()`
+#### Description
+Emits an event to PostHog with optional properties.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| eventName | string | Name of the event to emit |
+| properties | object (optional) | Additional properties for the event |
+
+#### Internal Logic
+- Calls `posthog.capture()` with the event name and properties
+- Adds a "platform" property set to "connect-widget" for all events
+
+### `Analytics.identify()`
+#### Description
+Identifies a user in PostHog.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | Unique identifier for the user |
+
+#### Internal Logic
+- Calls `posthog.identify()` with the provided user ID
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| posthog-js | PostHog analytics library for event tracking and user identification |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REACT_APP_PUBLIC_POST_HOG_KEY | string | "" | PostHog API key |
+| REACT_APP_PUBLIC_POST_HOG_HOST | string | undefined | PostHog API host URL |
+
+## References
+The `Analytics` class is used in other parts of the application:
+
+1. In `packages/connect-widget/src/pages/connect/components/providers.tsx`:
+   - `Analytics.emit()` is called when a user attempts to connect a provider.
+
+2. In `packages/connect-widget/src/shared/localStorage/agreement.ts`:
+   - `Analytics.emit()` is called when a user accepts an agreement.
+
+3. In `packages/connect-widget/src/pages/success/index.tsx`:
+   - `Analytics.emit()` is called when a connection is successful.
+
+These references show that the Analytics class is used throughout the application to track important user actions and events.

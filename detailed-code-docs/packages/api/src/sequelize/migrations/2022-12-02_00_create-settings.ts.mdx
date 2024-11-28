@@ -1,0 +1,60 @@
+---
+title: "2022-12-02_00_create-settings.ts"
+---
+
+## High-level description
+This code defines database migration scripts for creating and dropping the `settings` table. The `settings` table stores application-wide configuration settings.
+
+## References
+- `Settings` model: `packages/api/src/models/settings.ts`
+- Shared migration utilities: `packages/api/src/sequelize/migrations-shared.ts`
+
+## Symbols
+### `up`
+#### Description
+This asynchronous function defines the "up" migration, which creates the `settings` table in the database. It uses a transaction to ensure atomicity.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | { context: QueryInterface } | An object containing the Sequelize query interface. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise&lt;void&gt; | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. Starts a database transaction.
+2. Calls the `createTable` function from `migrations-shared` to create the `settings` table with the following columns:
+    - `id`: UUID, primary key
+    - `webhookUrl`: String, stores the webhook URL
+3. Commits the transaction.
+
+### `down`
+#### Description
+This asynchronous function defines the "down" migration, which drops the `settings` table from the database. It uses a transaction to ensure atomicity.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | { context: QueryInterface } | An object containing the Sequelize query interface. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise&lt;void&gt; | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. Starts a database transaction.
+2. Calls `queryInterface.dropTable` to drop the `settings` table.
+3. Commits the transaction.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | ORM for interacting with the database |
+| umzug | Migration runner |
+
+## Error Handling
+The code uses database transactions to ensure that either all operations within the `up` and `down` migrations succeed or none of them do. This prevents the database from ending up in an inconsistent state if an error occurs during the migration process.

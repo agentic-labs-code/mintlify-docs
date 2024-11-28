@@ -1,0 +1,48 @@
+---
+title: "canvas-event-listener.ts"
+---
+
+## High-level description
+The code defines an event listener that listens for `CANVAS_INTEGRATION` events. When triggered, it retrieves patient data, interacts with the Canvas SDK to create a note, and adds medical data (allergies, conditions, medications) to the patient's record in Canvas.
+
+## Code Structure
+The `canvas-event-listener.ts` file defines a default function that sets up an event listener using `patientEvents().on`. This listener waits for `PatientEvents.CANVAS_INTEGRATION` events. Upon receiving an event, it validates the event, retrieves patient information, initializes the Canvas SDK, and then calls `createFullNote` to populate the patient's Canvas record.
+
+## References
+- `CanvasSDK` from `@metriport/core/external/canvas/index`
+- `createFullNote` from `@metriport/core/external/canvas/note`
+- `PatientEvents`, `patientEvents`, `CanvasIntegrationEvent` from `../../event/medical/patient-event`
+- `getPatientOrFail` from `../../command/medical/patient/get-patient`
+- `CONVERSION_WEBHOOK_TYPE` from `../../command/medical/document/process-doc-query-webhook`
+- `Config` from `../../shared/config`
+
+## Symbols
+
+### `default`
+#### Description
+This is the default exported function that sets up the Canvas event listener. It listens for `CANVAS_INTEGRATION` events and processes them to create notes and add medical data to a patient's record in Canvas.
+
+#### Inputs
+This function does not take any direct inputs. It is called when the `patientEvents` EventEmitter emits a `CANVAS_INTEGRATION` event.
+
+#### Outputs
+This function does not return any value.
+
+#### Internal Logic
+1. **Event Listener Setup:**
+   - Uses `patientEvents().on` to listen for `PatientEvents.CANVAS_INTEGRATION` events.
+2. **Event Validation (`isCanvasIntegrationEvent`):**
+   - Checks if the event is a valid Canvas integration event based on environment and metadata.
+3. **Patient Data Retrieval:**
+   - Fetches patient details using `getPatientOrFail` based on the event's `id` and `cxId`.
+4. **Canvas SDK Initialization:**
+   - Retrieves Canvas API credentials from environment variables.
+   - Creates a new instance of the `CanvasSDK` using these credentials.
+5. **Note Creation and Data Population (`createFullNote`):**
+   - Calls the `createFullNote` function to create a note in Canvas and populate it with the patient's medical data.
+
+## Side Effects
+- Creates a note and adds medical data (allergies, conditions, medications) to a patient's record in Canvas.
+
+## TODOs
+- Remove the demo patient check (patientA, patientB) as per the mentioned GitHub issue. 

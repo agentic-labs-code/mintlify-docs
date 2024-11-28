@@ -1,0 +1,73 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This file contains end-to-end tests for the FHIR API client, specifically focusing on tenant management operations. The tests are currently skipped due to VPN connectivity issues, but they are designed to test the creation, listing, and deletion of tenants using the FHIR admin API.
+
+## Code Structure
+The code imports necessary dependencies, sets up the test environment, and defines a test suite for the FHIR API client. The main test suite is skipped using `describe.skip` due to VPN connectivity issues.
+
+## References
+- `makeOrgNumber` from "../../../../domain/__tests__/organization"
+- `getEnvVarOrFail` from "../../../../util/env-var"
+- `makeFhirAdminApi` from "../api-factory"
+
+## Symbols
+
+### `fhirApi`
+#### Description
+An instance of the FHIR admin API client created using the `makeFhirAdminApi` function and the FHIR server URL from environment variables.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| FHIR_SERVER_URL | string | The URL of the FHIR server, obtained from environment variables |
+
+### `describe.skip("Integration FHIR Client", ...)`
+#### Description
+A skipped test suite for the FHIR API client integration tests.
+
+#### Internal Logic
+The test suite contains a nested `describe` block for tenant-related tests, including creation, listing, and deletion of tenants.
+
+### `test("create tenant", ...)`
+#### Description
+A test case for creating a tenant using the FHIR admin API.
+
+#### Internal Logic
+- Arranges: Uses `organizationNumber` and `cxId` defined in the outer scope.
+- Acts: Calls `fhirApi.createTenant` with the arranged data.
+- Asserts: Expects the promise to resolve without throwing an error.
+
+### `test("list tenants", ...)`
+#### Description
+A test case for listing tenants using the FHIR admin API.
+
+#### Internal Logic
+- Acts: Calls `fhirApi.listTenants()`.
+- Asserts: Expects the returned array to contain the `cxId` created in the previous test.
+
+### `test("delete tenant", ...)`
+#### Description
+A test case for deleting a tenant using the FHIR admin API.
+
+#### Internal Logic
+- Arranges: Uses `organizationNumber` defined in the outer scope.
+- Acts: Calls `fhirApi.deleteTenant` with the arranged data.
+- Asserts: Expects the promise to resolve without throwing an error.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | For loading environment variables from a .env.test file |
+| uuid | For generating unique identifiers |
+| jest | Testing framework (implied by the use of `describe`, `test`, etc.) |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| FHIR_SERVER_URL | string | N/A | The URL of the FHIR server, obtained from environment variables |
+
+## TODOs
+The test suite is currently skipped due to VPN connectivity issues. A comment suggests that these are end-to-end tests that require the FHIR API, and the VPN is not currently connected. This implies that the tests should be re-enabled once the VPN connectivity issue is resolved.

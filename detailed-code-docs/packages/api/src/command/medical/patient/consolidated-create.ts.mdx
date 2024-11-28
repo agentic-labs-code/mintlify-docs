@@ -1,0 +1,121 @@
+---
+title: "consolidated-create.ts"
+---
+
+## High-level description
+This code defines a function `createOrUpdateConsolidatedPatientData` that processes and stores patient data in FHIR format. It converts a collection bundle to a transaction bundle, uploads it to S3, and sends it to a FHIR server. The function also handles errors and removes unwanted data from the response.
+
+## Code Structure
+The code defines a main function `createOrUpdateConsolidatedPatientData` and two helper functions: `convertCollectionBundleToTransactionBundle` and `removeUnwantedFhirData`. The main function orchestrates the data processing flow, while the helper functions perform specific tasks: converting the bundle type and cleaning up the response.
+
+## References
+- `createUploadFilePath` from `@metriport/core/domain/document/upload`
+- `OPERATION_OUTCOME_EXTENSION_URL` from `@metriport/core/external/fhir/shared/extensions/extension`
+- `uploadFhirBundleToS3` from `@metriport/core/fhir-to-cda/upload`
+- `MetriportError` from `@metriport/core/util/error/metriport-error`
+- `makeFhirApi` from `../../../external/fhir/api/api-factory`
+
+## Symbols
+
+### `createOrUpdateConsolidatedPatientData`
+#### Description
+This function takes patient data in a FHIR bundle, converts it to a transaction bundle, uploads it to S3, and sends it to a FHIR server. It also handles errors during the process and removes unwanted data from the response.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The ID of the context or organization. |
+| patientId | string | The ID of the patient. |
+| requestId | string | The ID of the request. |
+| fhirBundle | Bundle | The FHIR bundle containing patient data. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Promise&lt;Bundle \| undefined&gt; | A Promise that resolves to the processed FHIR bundle or undefined if an error occurs. |
+
+#### Internal Logic
+1. **Create S3 upload path:** Generates a unique key for storing the FHIR bundle in S3.
+2. **Fetch patient data:** Retrieves the patient resource from the FHIR server using the provided `patientId`.
+3. **Convert bundle type:** Transforms the input `fhirBundle` from a collection type to a transaction type, preparing it for the FHIR server.
+4. **Execute FHIR batch and upload to S3:** Performs two actions concurrently:
+    - Sends the transaction bundle to the FHIR server using a batch operation.
+    - Uploads the transaction bundle to S3 using the generated key.
+5. **Process response:** 
+    - If both operations are successful, removes unwanted data from the FHIR server response and returns the cleaned bundle.
+    - If an error occurs during either operation, logs the error and throws a `MetriportError` with relevant information.
+
+### `convertCollectionBundleToTransactionBundle`
+#### Description
+This function converts a FHIR bundle of type "collection" to a FHIR bundle of type "transaction". It iterates through the entries of the input bundle, adds a PUT request for each resource, and includes the patient resource in the contained field for non-patient resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The FHIR Patient resource. |
+| fhirBundle | Bundle | The input FHIR bundle of type "collection". |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| transactionBundle | Bundle | The converted FHIR bundle of type "transaction". |
+
+#### Internal Logic
+1. **Create an empty transaction bundle:** Initializes a new FHIR bundle with type "transaction".
+2. **Iterate through input bundle entries:** Loops through each entry in the input `fhirBundle`.
+3. **Skip unwanted resources:** Skips resources that are not meant to be included in the transaction bundle.
+4. **Create a transaction entry:** For each valid resource, creates a new bundle entry with a PUT request and the resource itself.
+5. **Add patient to contained resources:** For non-patient resources, includes the `patient` resource in the `contained` field of the resource.
+6. **Add entry to transaction bundle:** Pushes the created transaction entry to the `entry` array of the `transactionBundle`.
+7. **Return the transaction bundle:** Returns the fully constructed `transactionBundle`.
+
+### `removeUnwantedFhirData`
+#### Description
+This function removes unwanted data from a FHIR Bundle by filtering out specific fields and replacing the coding system in the response outcome.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | Bundle | The FHIR Bundle to be cleaned. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cleanedBundle | Bundle | The cleaned FHIR Bundle with unwanted data removed. |
+
+#### Internal Logic
+1. **Create a new Bundle object:** Initializes a new Bundle object with selected fields from the input `data` Bundle.
+2. **Map the entry array:** Maps over the `entry` array of the input Bundle and applies the `replaceCodingSystem` function to each entry.
+3. **Return the cleaned Bundle:** Returns the newly created Bundle object with the cleaned data.
+
+### `replaceCodingSystem`
+#### Description
+This function replaces the coding system in the `outcome` field of a BundleEntry's response with `OPERATION_OUTCOME_EXTENSION_URL`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resourceEntry | BundleEntry | The BundleEntry object to modify. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| modifiedEntry | BundleEntry | The modified BundleEntry with the replaced coding system. |
+
+#### Internal Logic
+1. **Create a new object based on resourceEntry.response:** Creates a new object by spreading the properties of `resourceEntry.response`.
+2. **Conditionally update the outcome:** If `resourceEntry.response.outcome` exists, it updates the `outcome` field by mapping over the `issue` array and replacing the coding system in the `details` field with `OPERATION_OUTCOME_EXTENSION_URL`.
+3. **Return the modified entry:** Returns a new BundleEntry object with the updated `response` field.
+
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides FHIR resource types and interfaces. |
+| @metriport/core/domain/document/upload | Provides utility functions for document upload, including `createUploadFilePath`. |
+| @metriport/core/external/fhir/shared/extensions/extension | Provides FHIR extension URLs, including `OPERATION_OUTCOME_EXTENSION_URL`. |
+| @metriport/core/fhir-to-cda/upload | Provides functions for uploading FHIR bundles to S3, including `uploadFhirBundleToS3`. |
+| @metriport/core/util/error/metriport-error | Provides custom error class `MetriportError`. |
+| @metriport/core/util/log | Provides logging utilities. |
+| @metriport/shared | Provides shared utility functions, including `errorToString`. |
+| ../../../external/fhir/api/api-factory | Provides a factory function `makeFhirApi` for creating FHIR API clients. |

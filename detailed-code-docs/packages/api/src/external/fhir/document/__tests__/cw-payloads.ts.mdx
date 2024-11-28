@@ -1,0 +1,53 @@
+---
+title: "cw-payloads.ts"
+---
+
+## High-level description
+This file contains test data and payloads for CommonWell Health Alliance (CW) document references. It defines sample document references with various author configurations and a contained patient with an organization reference, which are used for testing purposes in the FHIR document conversion and processing functions.
+
+## Symbols
+
+### `docRefsWithOneAuthorPointingToMultipleContained`
+#### Description
+An array of two `Document` objects representing document references with different author configurations. These are used to test scenarios where a single author reference points to multiple contained resources.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docRefsWithOneAuthorPointingToMultipleContained | Document[] | An array of two document references with specific author configurations |
+
+#### Internal Logic
+1. Creates two `Document` objects, each with a unique UUID and specific content:
+   - The first document has two `Practitioner` resources with the same reference ID.
+   - The second document has one `Organization` and one `Practitioner` resource with the same reference ID.
+2. Both documents include various fields such as identifiers, subject, type, author, status, and context.
+3. Uses `faker` to generate random data for names, dates, and URLs.
+
+### `docRefContainedPatientWithOrg`
+#### Description
+A `Contained` object representing a practitioner with an organization reference. This is used to test scenarios involving practitioners associated with organizations.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docRefContainedPatientWithOrg | Contained | A practitioner object with an organization reference |
+
+#### Internal Logic
+Creates a `Practitioner` resource with:
+- A specific ID (`authRef16`)
+- A name using a randomly generated company name
+- An organization reference (`#orgRef16`)
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @faker-js/faker | Generating random test data |
+| @metriport/commonwell-sdk | Importing CommonWell SDK types |
+| uuid | Generating unique identifiers |
+
+## References
+This file is referenced and used in:
+- `packages/api/src/external/fhir/document/__tests__/index-get-authors.test.ts`
+- `packages/api/src/external/fhir/document/__tests__/index-convert-to-fhir-resource.test.ts`
+
+These test files use the sample data provided in this file to test the functionality of author retrieval and FHIR resource conversion.

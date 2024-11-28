@@ -1,0 +1,101 @@
+---
+title: "internal-cw.ts"
+---
+
+## High-level description
+This code defines a router for internal CommonWell operations, including retrieving and updating organizations and facilities. It provides endpoints for getting organization details, updating organization status, and updating facility status within the CommonWell network.
+
+## Code Structure
+The code exports a router with three main endpoints:
+1. GET /ops/organization/:oid - Retrieves organization details
+2. PUT /ops/organization/:oid - Updates organization status
+3. PUT /ops/facility/:oid - Updates facility status
+
+Each endpoint uses middleware for request logging and error handling.
+
+## Symbols
+
+### router
+#### Description
+An Express router instance for handling internal CommonWell operations.
+
+### GET /ops/organization/:oid
+#### Description
+Retrieves the organization with the specified OID from CommonWell.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.oid | string | The OID of the organization to retrieve |
+| req.query.cxId | string | Customer ID |
+| req.query.facilityId | string (optional) | Facility ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res | Response | HTTP response with organization details |
+
+#### Internal Logic
+1. Extracts cxId, facilityId, and oid from the request
+2. Verifies the existence of the organization or facility
+3. Retrieves the parsed organization from CommonWell
+4. Returns the organization details in the response
+
+### PUT /ops/organization/:oid
+#### Description
+Updates the organization status in CommonWell.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.oid | string | The OID of the organization to update |
+| req.query.cxId | string | Customer ID |
+| req.body | object | Organization status update data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res | Response | HTTP response indicating success |
+
+#### Internal Logic
+1. Extracts cxId and oid from the request
+2. Verifies customer provider access
+3. Retrieves the organization and checks if it's approved for CommonWell
+4. Parses the request body for organization active status
+5. Updates the organization status in CommonWell and Metriport
+6. Returns a success response
+
+### PUT /ops/facility/:oid
+#### Description
+Updates the facility status in CommonWell.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.oid | string | The OID of the facility to update |
+| req.query.cxId | string | Customer ID |
+| req.query.facilityId | string | Facility ID |
+| req.body | object | Facility status update data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res | Response | HTTP response indicating success |
+
+#### Internal Logic
+1. Extracts cxId, facilityId, and oid from the request
+2. Verifies customer IT vendor access
+3. Retrieves the organization and facility, checking if the facility is approved for CommonWell
+4. Parses the request body for facility active status
+5. Updates the facility status in CommonWell and Metriport
+6. Returns a success response
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| express-promise-router | Provides router functionality with promise support |
+| http-status | HTTP status codes |
+| zod | Schema validation |
+
+## Error Handling
+The code uses custom error types (NotFoundError, ForbiddenError) and the asyncHandler middleware for consistent error handling across endpoints.

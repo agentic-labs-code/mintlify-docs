@@ -1,0 +1,64 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains test utility functions and mocks for various models used in the API. It includes utilities for creating mock Settings objects, mocking database transactions, and generating WebhookRequest objects for testing purposes. These utilities are designed to facilitate unit testing of the API's model-related functionality.
+
+## What does it do?
+The code in this directory provides helper functions that developers can use in their test suites to:
+
+1. Create mock Settings objects with specified IDs, which can be used to test settings-related functionality without interacting with a real database.
+2. Mock database transactions, allowing tests to simulate transaction behavior without actually performing database operations. This is particularly useful for testing code that involves transaction management.
+3. Generate WebhookRequest objects with customizable properties, enabling thorough testing of webhook-related features without the need for real webhook data.
+
+These utilities help ensure that tests are isolated, consistent, and don't rely on external services or databases, making the test suite more reliable and easier to maintain.
+
+## Key Files
+
+### settings.ts
+This file defines the `makeSettingModel` function, which creates mock `Settings` objects for use in unit tests. It wraps a `makeSetting` function from a test helper and ensures the return type is `Settings`. This utility promotes consistency in creating mock settings across different test files.
+
+Example usage:
+```typescript
+const mockSetting = makeSettingModel({ id: 'test-setting-id' });
+```
+
+### transaction.ts
+This file provides the `mockStartTransaction` function, which mocks database transactions for Jest tests. It creates a mock transaction object with `commit`, `rollback`, and `afterCommit` methods, and replaces the `startTransaction` function from the `transaction-starter` module with this mock.
+
+Example usage:
+```typescript
+const mockTransaction = mockStartTransaction();
+// Use mockTransaction in your tests
+expect(mockTransaction).toHaveBeenCalled();
+```
+
+### webhook.ts
+This file defines the `makeWebhookModel` function, which creates a `WebhookRequest` object for testing purposes. It uses a factory function `makeWebhook` from another test file and casts the result to `WebhookRequest`.
+
+Example usage:
+```typescript
+const mockWebhook = makeWebhookModel({
+  id: 'test-webhook-id',
+  webhookType: WebhookType.SOME_TYPE,
+  status: WebhookRequestStatus.PENDING
+});
+```
+
+## Dependencies
+The test utilities in this directory rely on several external libraries and internal modules:
+
+1. Jest: Used for mocking and spying on functions in the transaction mock utility.
+2. Sequelize: Provides the Transaction type used in the transaction mock utility.
+3. Internal modules:
+   - `../../domain/__tests__/settings`: Provides the `makeSetting` function for creating mock settings.
+   - `../../domain/__tests__/webhook`: Provides the `makeWebhook` function for creating mock webhooks.
+   - `../../domain/webhook`: Provides `WebhookRequestStatus` and `WebhookType` enums.
+   - `../settings`: Provides the `Settings` type definition.
+   - `../webhook-request`: Provides the `WebhookRequest` type definition.
+
+## Configuration
+This directory does not contain any specific configuration files or environment variables. The test utilities are designed to be flexible and configurable through their function parameters, allowing developers to create mock objects with custom properties as needed for their tests.
+
+In summary, this `__tests__` directory provides essential utilities for mocking and creating test objects related to settings, database transactions, and webhooks. These utilities play a crucial role in facilitating effective unit testing of the API's model-related functionality, ensuring that tests can be run in isolation without depending on external services or databases.

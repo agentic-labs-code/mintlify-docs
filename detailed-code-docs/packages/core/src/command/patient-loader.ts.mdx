@@ -1,0 +1,91 @@
+---
+title: "patient-loader.ts"
+---
+
+## High-level description
+This code defines an interface `PatientLoader` and related types for loading patient data. It provides methods for retrieving patient information, finding patients by similarity, and getting states from patient IDs. The interface is designed to be implemented by different classes that can fetch patient data from various sources.
+
+## Code Structure
+The main symbol in this code is the `PatientLoader` interface. It defines four methods that any implementing class must provide. The types `GetOne` and `FindBySimilarity` are used as parameters for these methods.
+
+## Symbols
+
+### `PatientLoader`
+#### Description
+An interface that defines methods for loading patient data.
+
+#### Methods
+
+1. `getStatesFromPatientIds`
+   #### Description
+   Retrieves states associated with given patient IDs for a specific customer.
+   
+   #### Inputs
+   | Name | Type | Description |
+   |:-----|:-----|:------------|
+   | cxId | string | Customer ID |
+   | patientIds | string[] | Array of patient IDs |
+   
+   #### Outputs
+   | Name | Type | Description |
+   |:-----|:-----|:------------|
+   | - | Promise&lt;string[]&gt; | Promise resolving to an array of state strings |
+
+2. `getOneOrFail`
+   #### Description
+   Retrieves a single patient by ID or throws an error if not found.
+   
+   #### Inputs
+   | Name | Type | Description |
+   |:-----|:-----|:------------|
+   | params | GetOne | Object containing patient ID and customer ID |
+   
+   #### Outputs
+   | Name | Type | Description |
+   |:-----|:-----|:------------|
+   | - | Promise&lt;Patient&gt; | Promise resolving to a Patient object |
+
+3. `findBySimilarityAcrossAllCxs`
+   #### Description
+   Finds patients across all customers that match given criteria.
+   
+   #### Inputs
+   | Name | Type | Description |
+   |:-----|:-----|:------------|
+   | params | Omit&lt;FindBySimilarity, "cxId"&gt; | Object containing search criteria |
+   
+   #### Outputs
+   | Name | Type | Description |
+   |:-----|:-----|:------------|
+   | - | Promise&lt;Patient[]&gt; | Promise resolving to an array of matching Patient objects |
+
+4. `findBySimilarity`
+   #### Description
+   Finds patients within a specific customer that match given criteria.
+   
+   #### Inputs
+   | Name | Type | Description |
+   |:-----|:-----|:------------|
+   | params | FindBySimilarity | Object containing customer ID and search criteria |
+   
+   #### Outputs
+   | Name | Type | Description |
+   |:-----|:-----|:------------|
+   | - | Promise&lt;Patient[]&gt; | Promise resolving to an array of matching Patient objects |
+
+### `GetOne`
+#### Description
+A type representing the parameters for retrieving a single patient.
+
+### `FindBySimilarity`
+#### Description
+A type representing the parameters for finding patients by similarity.
+
+## Dependencies
+The code imports types from other modules:
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/shared/common/types | Imports the `AtLeastOne` type |
+| ../domain/patient | Imports `Patient` and `PatientData` types |
+
+This interface is designed to be flexible and can be implemented by different classes to fetch patient data from various sources, such as APIs or databases. The implementation details are left to the classes that will implement this interface.

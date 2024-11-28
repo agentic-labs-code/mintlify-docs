@@ -1,0 +1,47 @@
+---
+title: "run-or-schedule-patient-discovery.ts"
+---
+
+## High-level description
+The `runOrScheduleCqPatientDiscovery` function orchestrates the patient discovery process for Carequality. It determines whether to immediately run patient discovery or schedule it for later execution based on the current discovery status and the presence of any scheduled requests.
+
+## References
+- `getCQData` (from `../patient`)
+- `discover` (from `../patient`)
+- `schedulePatientDiscovery` (from `../../hie/schedule-patient-discovery`)
+- `getPatientOrFail` (from `../../../command/medical/patient/get-patient`)
+- `processAsyncError` (from `@metriport/core/util/error/shared`)
+
+## Symbols
+
+### `runOrScheduleCqPatientDiscovery`
+#### Description
+This function manages the execution flow of Carequality patient discovery. It checks the patient's existing discovery status and the presence of any scheduled requests to decide whether to initiate discovery immediately or schedule it for later.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `Patient` | The patient object for whom to run or schedule discovery. |
+| facilityId | `string` | The ID of the facility associated with the discovery request. |
+| requestId | `string` | A unique identifier for the discovery request. |
+| rerunPdOnNewDemographics | `boolean` | (Optional) Flag indicating whether to rerun patient discovery when new demographics are available. |
+| forceCarequality | `boolean` | (Optional) **TODO #1572 - remove** Flag to force Carequality discovery. |
+
+#### Outputs
+This function does not return any value (returns `Promise&lt;void&gt;`).
+
+#### Internal Logic
+1. **Retrieve Existing Patient:** Fetches the patient's data from the database using `getPatientOrFail`.
+2. **Extract Carequality Data:** Extracts Carequality-specific data from the patient's `externalData` using `getCQData`.
+3. **Check Discovery Status:**
+   - If the discovery status is "processing" and there's no scheduled request, it schedules a new patient discovery using `schedulePatientDiscovery`.
+   - If the discovery status is not "processing", it initiates patient discovery immediately using `discover` and handles any errors using `processAsyncError`.
+
+#### Side Effects
+- Updates the patient's discovery status in the database.
+- May schedule a new patient discovery request.
+- Initiates Carequality patient discovery, which involves external API calls.
+
+#### Performance Considerations
+- The function's performance depends on the underlying database operations and external API calls.
+- Consider optimizing database queries and API interactions for better performance.

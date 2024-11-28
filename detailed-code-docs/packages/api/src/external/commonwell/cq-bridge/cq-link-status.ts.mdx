@@ -1,0 +1,101 @@
+---
+title: "cq-link-status.ts"
+---
+
+## High-level description
+This code implements functionality for managing patient link statuses in the CommonWell Health Alliance (CW) and CareQuality (CQ) networks. It provides methods to set CQ link statuses for multiple patients, update patient data in CommonWell, and complete the enhanced coverage process for patients.
+
+## Code Structure
+The main functions in this file are `setCQLinkStatuses`, `setCQLinkStatus`, and `completeEnhancedCoverage`. These functions work together to manage patient link statuses and trigger document queries when necessary. The code also uses helper functions and external modules for database operations, error handling, and logging.
+
+## Symbols
+
+### `setCQLinkStatuses`
+#### Description
+This function sets the CQ link status for multiple patients in parallel.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| patientIds | string[] | Array of patient IDs |
+| cqLinkStatus | CQLinkStatus | The CQ link status to set |
+
+#### Internal Logic
+1. Defines an async function `setCQLinkStatusBulk` to update a single patient's CQ link status.
+2. Uses `executeAsynchronously` to process the patient IDs in parallel, with a maximum of 10 parallel executions.
+
+### `setCQLinkStatus`
+#### Description
+Sets the CQ link status for a single patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+| cqLinkStatus | CQLinkStatus \| undefined | The CQ link status to set |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | Updated patient object |
+| updated | boolean | Indicates if the patient was updated |
+
+#### Internal Logic
+1. Retrieves the patient from the database.
+2. Checks if the current CQ link status is different from the new status.
+3. If different, updates the patient's external data with the new CQ link status.
+4. Returns the updated patient and a boolean indicating if an update occurred.
+
+### `completeEnhancedCoverage`
+#### Description
+Completes the enhanced coverage process for multiple patients.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ecId | string \| undefined | Enhanced coverage ID |
+| cxId | string | Customer ID |
+| patientIds | string[] | Array of patient IDs |
+| cqLinkStatus | CQLinkStatus | The CQ link status to set |
+
+#### Internal Logic
+1. Defines an async function `completeECForPatient` to process a single patient.
+2. Uses `executeAsynchronously` to process the patient IDs in parallel, with a maximum of 25 parallel executions.
+3. For each patient, sets the CQ link status and, if the status is "linked", finishes the enhanced coverage process.
+
+### `finishEnhancedCoverage`
+#### Description
+Finishes the enhanced coverage process for a single patient by triggering document queries.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ecId | string \| undefined | Enhanced coverage ID |
+| patient | Patient | Patient object |
+| log | function | Logging function |
+
+#### Internal Logic
+1. Retrieves the facility ID for the patient.
+2. Triggers document queries for the patient.
+3. If an `ecId` is provided, stores the EC results after the document query.
+
+## Dependencies
+- @metriport/core/util/concurrency
+- @metriport/core/util/log
+- dayjs
+- ../../../command/medical/patient/get-patient
+- ../../../models/medical/patient
+- ../../../models/transaction-wrapper
+- ../patient
+- ../patient-shared
+
+## Error Handling
+The code uses try-catch blocks to handle errors in asynchronous operations. Errors are logged and, in some cases, thrown as MetriportErrors.
+
+## Logging
+The code uses the `out` function from "@metriport/core/util/log" for logging operations and errors.
+
+## Performance Considerations
+The code uses parallel processing with `executeAsynchronously` to improve performance when handling multiple patients. The number of parallel executions is limited to avoid overloading the system.

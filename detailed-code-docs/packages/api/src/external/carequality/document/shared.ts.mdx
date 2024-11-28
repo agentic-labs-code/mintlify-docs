@@ -1,0 +1,173 @@
+---
+title: "shared.ts"
+---
+
+## High-level description
+This code defines functions and types for interacting with Carequality (CQ) document references. It includes functions for converting CQ document references to FHIR format, checking for duplicates, and extracting relevant information.
+
+## Code Structure
+The code defines several functions related to handling Carequality document references. `cqToFHIR` converts a CQ document reference to FHIR format. `containsMetriportId` and `containsDuplicateMetriportId` check for the presence and duplicates of Metriport IDs in document references. Other functions like `mapToContainedOrganization`, `generateOrganization`, `splitNameAndOid`, `dedupeContainedResources`, and `getContentTypeOrUnknown` are utility functions used in the conversion process.
+
+## Symbols
+
+### `containsMetriportId`
+#### Description
+This function checks if a given IHE Gateway DocumentReference object contains a Metriport ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docRef | `IHEGWDocumentReference` | The IHE Gateway DocumentReference object to check. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `boolean` | Returns `true` if the `docRef` object has a `metriportId` property that is not undefined, otherwise returns `false`. |
+
+#### Internal Logic
+The function directly checks if the `metriportId` property of the input `docRef` is not undefined. If it's not undefined, it means the document reference contains a Metriport ID.
+
+### `containsDuplicateMetriportId`
+#### Description
+This function checks if a given document reference with a Metriport ID has a duplicate Metriport ID within a set of seen Metriport IDs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docRef | `DocumentReferenceWithMetriportId` | The document reference object to check for duplicates. |
+| seenMetriportIds | `Set&lt;string&gt;` | A set containing Metriport IDs that have already been encountered. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `boolean` | Returns `true` if the `docRef`'s Metriport ID is already present in the `seenMetriportIds` set, indicating a duplicate. Otherwise, it adds the `docRef`'s Metriport ID to the set and returns `false`. |
+
+#### Internal Logic
+The function first checks if the Metriport ID of the input `docRef` is present in the `seenMetriportIds` set. If it is, it means the ID is a duplicate, and the function returns `true`. If the ID is not found in the set, it is added to the set, and the function returns `false`.
+
+### `cqToFHIR`
+#### Description
+Converts a Carequality (CQ) document reference to a FHIR DocumentReference object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docId | `string` | The ID of the document. |
+| docRef | `IHEGWDocumentReference` | The CQ document reference object. |
+| docStatus | `"preliminary" \| "final"` | The status of the document. |
+| patientId | `string` | The ID of the patient. |
+| contentExtension | `MetriportDataSourceExtension` | The Metriport data source extension. |
+| orgName | `string` | Optional. The name of the organization. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `DocumentReferenceWithId` | The converted FHIR DocumentReference object. |
+
+#### Internal Logic
+The function first extracts relevant information from the input CQ document reference, such as file name, content type, size, and creation date. It then creates a list of contained resources, including the author institution and organization (if provided). The function then constructs a FHIR DocumentReference object with the extracted information, including master identifier, status, subject, content, extension, date, and description. Finally, it returns the created FHIR DocumentReference object.
+
+### `generateCQFHIRContent`
+#### Description
+Generates FHIR DocumentReferenceContent for a CQ document reference.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| baseAttachment | `{ contentType?: string; size?: number; creation?: string; fileName?: string; }` | The base attachment information. |
+| contentExtension | `MetriportDataSourceExtension` | The Metriport data source extension. |
+| location | `string` | The location of the document. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `DocumentReferenceContent[]` | An array containing the generated FHIR DocumentReferenceContent. |
+
+#### Internal Logic
+The function checks if the location is provided. If not, it returns an empty array. Otherwise, it creates a FHIR DocumentReferenceContent object with the provided base attachment information, location, and content extension. The function then returns an array containing the created FHIR DocumentReferenceContent object.
+
+### `mapToContainedOrganization`
+#### Description
+Maps an author institution string to a FHIR Organization object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| authorInstitution | `string` | The author institution string. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `Organization \| undefined` | The mapped FHIR Organization object or undefined if the input is falsy. |
+
+#### Internal Logic
+The function first checks if the input `authorInstitution` string is truthy. If not, it returns undefined. Otherwise, it tries to split the input string into name and OID using the `splitNameAndOid` function. If the splitting is successful and a name is extracted, it generates a FHIR Organization object with the extracted name and OID. If the splitting is unsuccessful, it generates a FHIR Organization object with the input string as the name. Finally, it returns the generated FHIR Organization object.
+
+### `generateOrganization`
+#### Description
+Generates a FHIR Organization object with the given name and optional OID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | `string` | The name of the organization. |
+| oid | `string` | Optional. The OID of the organization. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `Organization` | The generated FHIR Organization object. |
+
+#### Internal Logic
+The function creates a FHIR Organization object with the provided `name`. If an `oid` is provided, it adds an identifier to the organization with the given `oid`. Finally, it returns the generated FHIR Organization object.
+
+### `splitNameAndOid`
+#### Description
+Splits a string into name and OID components based on a regular expression.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| input | `string` | The input string to split. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `{ name: string \| undefined; oid: string \| undefined; } \| undefined` | An object containing the extracted name and OID, or undefined if the input string doesn't match the regular expression. |
+
+#### Internal Logic
+The function uses a regular expression `/^(.+?)\^+(.+)$/` to match the input string. If the string matches the pattern, it extracts the name and OID from the captured groups and returns them as an object. If the string doesn't match the pattern, it returns undefined.
+
+### `dedupeContainedResources`
+#### Description
+Deduplicates an array of FHIR resources based on their JSON string representation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| combined | `Resource[]` | The array of FHIR resources to deduplicate. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `Resource[] \| undefined` | The deduplicated array of FHIR resources, or undefined if the input array is falsy. |
+
+#### Internal Logic
+The function first checks if the input `combined` array is truthy. If not, it returns undefined. Otherwise, it creates a new Set to keep track of seen resources. It then iterates through the input array and converts each resource to its JSON string representation. If the JSON string is not already in the seen set, it adds the string to the set and includes the resource in the deduplicated array. Finally, it returns the deduplicated array.
+
+### `getContentTypeOrUnknown`
+#### Description
+Returns the content type of a document reference or "unknown" if the content type is not defined.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docRef | `DocumentReference` | The document reference object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `string` | The content type of the document reference or "unknown" if not defined. |
+
+#### Internal Logic
+The function uses the nullish coalescing operator (`??`) to return the value of `docRef.contentType` if it is defined. Otherwise, it returns the string "unknown".

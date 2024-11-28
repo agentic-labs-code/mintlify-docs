@@ -1,0 +1,62 @@
+---
+title: "patient-updater-metriport-api.ts"
+---
+
+## High-level description
+This code defines a `PatientUpdaterMetriportAPI` class that extends the `PatientUpdater` abstract class. It implements a method to update patient information by making an API call to the Metriport API. The class is designed to handle batch updates for multiple patients associated with a specific customer.
+
+## Code Structure
+The `PatientUpdaterMetriportAPI` class extends the `PatientUpdater` abstract class and implements its `updateAll` method. It uses axios to make HTTP requests to the Metriport API.
+
+## References
+This code references the `PatientUpdater` abstract class, which is likely defined in another file.
+
+## Symbols
+
+### PatientUpdaterMetriportAPI
+#### Description
+A class that implements the `PatientUpdater` interface, specifically designed to update patient information through the Metriport API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| apiUrl | string | The base URL for the Metriport API |
+
+#### Internal Logic
+The class constructor initializes the `apiUrl` property. The `updateAll` method makes a POST request to the Metriport API to update multiple patients at once.
+
+### updateAll
+#### Description
+A method that sends a request to update multiple patients associated with a specific customer.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer ID |
+| patientIds | string[] | An array of patient IDs to update |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| failedUpdateCount | number | The number of patient updates that failed |
+
+#### Internal Logic
+1. Logs the API call initiation.
+2. Makes a POST request to the Metriport API's `/internal/patient/update-all` endpoint.
+3. Includes the customer ID as a query parameter and patient IDs in the request body.
+4. Sets a timeout for the request using the `UPDATE_TIMEOUT` constant.
+5. Returns the response data, which includes the `failedUpdateCount`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| axios | Used for making HTTP requests to the Metriport API |
+| dayjs | Used for handling durations and timeouts |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| UPDATE_TIMEOUT | Duration | 2 minutes | The timeout duration for the update API call |
+
+## Performance Considerations
+The `UPDATE_TIMEOUT` is set to 2 minutes, which may need to be adjusted based on the expected response time of the Metriport API, especially when dealing with large numbers of patient updates.

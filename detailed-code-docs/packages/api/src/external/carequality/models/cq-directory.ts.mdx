@@ -1,0 +1,61 @@
+---
+title: "cq-directory.ts"
+---
+
+## High-level description
+The `CQDirectoryEntryModel` class represents a Carequality Directory Entry in the system. It defines the data model for storing and retrieving information about organizations listed in the Carequality Directory. This includes details like organization name, location, contact information, and URLs for various services.
+
+## Code Structure
+The `CQDirectoryEntryModel` class extends the `BaseModel` class and implements the `CQDirectoryEntry` interface. It defines static properties like `NAME` and `setup`, and instance properties corresponding to the attributes of a directory entry. The `setup` method initializes the model with its attributes and options.
+
+## References
+- `@metriport/carequality-sdk/models/organization`: Used to type the `data` property, which holds detailed organization information.
+- `BaseModel`: Parent class providing basic model functionality.
+- `ModelSetup`: Type defining the structure of the model setup function.
+- `CQDirectoryEntry`: Interface defining the structure of a directory entry.
+
+## Symbols
+
+### `CQDirectoryEntryModel`
+#### Description
+This class defines the data model for a Carequality Directory Entry, extending the base model and implementing the `CQDirectoryEntry` interface.
+
+#### Inputs
+This class does not have explicit input parameters.
+
+#### Outputs
+This class does not have explicit output values.
+
+#### Internal Logic
+- **`NAME`**: Static property storing the name of the model ("cq_directory_entry").
+- **`setup`**: Static method to set up the model within Sequelize.
+    - Defines attributes like `id`, `name`, `urlXCPD`, `urlDQ`, `urlDR`, location data (`lat`, `lon`, `point`, `addressLine`, `city`, `state`, `zip`), `data` (detailed organization info), `managingOrganization`, `managingOrganizationId`, `active`, and `lastUpdatedAtCQ`.
+    - Specifies data types, database field names, and other options for each attribute.
+    - Configures the model's table name and other options inherited from `BaseModel`.
+
+## Side Effects
+- Modifies the database schema by defining the `cq_directory_entry` table and its columns.
+
+## Dependencies
+- `@metriport/carequality-sdk/models/organization`
+- `sequelize`
+
+```typescript
+import { Organization } from "@metriport/carequality-sdk/models/organization";
+import { DataTypes, Sequelize } from "sequelize";
+import { BaseModel, ModelSetup } from "../../../models/_default";
+import { CQDirectoryEntry } from "../cq-directory";
+
+export class CQDirectoryEntryModel
+  extends BaseModel&lt;CQDirectoryEntryModel&gt;
+  implements CQDirectoryEntry
+{
+  static NAME = "cq_directory_entry";
+  declare id: string; // Organization's OID
+  // ... other properties declarations
+  
+  static setup: ModelSetup = (sequelize: Sequelize) =&gt; {
+    // ... model setup logic
+  };
+}
+```

@@ -1,0 +1,68 @@
+---
+title: "location.ts"
+---
+
+## High-level description
+This code implements a deduplication mechanism for FHIR Location resources. It groups and combines similar locations based on their names and normalized addresses, creating a single representative location for each unique combination.
+
+## Code Structure
+The main functions `deduplicateLocations` and `groupSameLocations` work together to process an array of Location resources. `groupSameLocations` creates a map of unique locations, while `deduplicateLocations` uses this map to produce a final array of combined locations and a reference replacement map.
+
+## Symbols
+
+### `deduplicateLocations`
+#### Description
+This function takes an array of Location resources and returns deduplicated locations along with a reference replacement map.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| locations | Location[] | An array of FHIR Location resources to be deduplicated |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| combinedLocations | Location[] | An array of deduplicated Location resources |
+| refReplacementMap | Map&lt;string, string[]&gt; | A map for replacing references to deduplicated locations |
+
+#### Internal Logic
+1. Calls `groupSameLocations` to get a map of unique locations and a reference replacement map.
+2. Uses `combineResources` to convert the map of unique locations into an array.
+3. Returns the combined locations and the reference replacement map.
+
+### `groupSameLocations`
+#### Description
+This function groups Location resources based on their names and normalized addresses.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| locations | Location[] | An array of FHIR Location resources to be grouped |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| locationsMap | Map&lt;string, Location&gt; | A map of unique locations keyed by a JSON string of name and normalized address |
+| refReplacementMap | Map&lt;string, string[]&gt; | A map for replacing references to grouped locations |
+
+#### Internal Logic
+1. Initializes empty maps for unique locations and reference replacements.
+2. Iterates through each location in the input array.
+3. For each location with a name and address:
+   a. Normalizes the address using `normalizeAddress`.
+   b. Creates a key by stringifying the name and normalized address.
+   c. Uses `fillMaps` to add the location to the maps, combining duplicates.
+4. Returns the maps of unique locations and reference replacements.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides TypeScript types for FHIR resources |
+| ../../mpi/normalize-address | Provides the `normalizeAddress` function for standardizing addresses |
+| ../shared | Provides utility functions like `combineResources` and `fillMaps` for resource deduplication |
+
+## Error Handling
+The code does not implement explicit error handling. It assumes that the input data is valid and that the imported functions work correctly.
+
+## Performance Considerations
+The performance of this code depends on the number of input locations. The use of maps for grouping and deduplication provides efficient lookup and combination of similar locations.

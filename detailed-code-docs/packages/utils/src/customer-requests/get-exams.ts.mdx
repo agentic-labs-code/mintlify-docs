@@ -1,0 +1,73 @@
+---
+title: "get-exams.ts"
+---
+
+## High-level description
+This code implements a utility for executing asynchronous operations on a collection of items in parallel, with configurable concurrency, delay, and error handling. It's designed to process large datasets efficiently by distributing the workload across multiple concurrent executions.
+
+## Code Structure
+The main function `executeAsynchronously` orchestrates the parallel execution of tasks. It uses helper functions and types to manage the execution flow, handle errors, and provide logging capabilities.
+
+## Symbols
+
+### `executeAsynchronously&lt;T&gt;`
+#### Description
+This function processes an array of items asynchronously, allowing for parallel execution with configurable options.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| collection | T[] | Array of elements to be processed |
+| fn | FunctionType&lt;T&gt; | Function to be executed asynchronously for each item |
+| options | ExecuteInChunksOptions | Optional settings for execution |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Promise&lt;PromiseSettledResult&lt;void&gt;[]&gt; | Array of promise results |
+
+#### Internal Logic
+1. Validates input parameters
+2. Copies the input collection
+3. Calculates the number of parallel promises to run
+4. Creates an array of promises, each processing a subset of items
+5. Executes the promises in parallel
+6. Returns the results of all promises
+
+### `executeSynchronously&lt;T&gt;`
+#### Description
+A helper function that processes items sequentially within each parallel execution.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| itemsToProcess | T[] | Array of items to process |
+| fn | FunctionType&lt;T&gt; | Function to execute for each item |
+| promiseIndex | number | Index of the current promise |
+| amountOfPromises | number | Total number of parallel promises |
+| indexControl | { currentIndex: number } | Shared object to track overall progress |
+| keepExecutingOnError | boolean | Whether to continue execution on error |
+| log | function (optional) | Logging function |
+
+#### Internal Logic
+1. Iterates through the items
+2. Executes the provided function for each item
+3. Handles errors based on the `keepExecutingOnError` flag
+4. Updates the shared index control
+5. Logs progress if a logging function is provided
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| errorToString | Converts errors to string format |
+| sleep | Introduces delays between executions |
+
+## Error Handling
+The code implements error handling through the `keepExecutingOnError` option. If set to `true`, errors in individual item processing won't stop the overall execution. Otherwise, an error will halt the entire process.
+
+## Performance Considerations
+- The function allows for parallel execution, which can significantly improve performance for I/O-bound tasks.
+- The `numberOfParallelExecutions` option allows fine-tuning of concurrency based on system capabilities and task nature.
+- Jitter and delay options can help prevent overwhelming external systems when making API calls.
+
+This utility is particularly useful for scenarios where you need to process a large number of items efficiently, such as batch API calls, data processing, or any task that can benefit from parallel execution with controlled concurrency.

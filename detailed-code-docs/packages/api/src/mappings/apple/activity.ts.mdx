@@ -1,0 +1,65 @@
+---
+title: "activity.ts"
+---
+
+## High-level description
+The `mapDataToActivity` function transforms raw Apple Health data into a structured array of `Activity` objects, adhering to the Metriport API specification. It processes various data points like energy expenditure, steps, floors climbed, and workout details, grouping them by date.
+
+## Code Structure
+The function iterates over different data types from the input `AppleHealth` object. For each data type, it iterates over individual data points, extracts relevant information, and populates the `activity` array. A `dateToIndex` map is used to efficiently group data points by date.
+
+## References
+- `Activity`: Represents a day's worth of activity data in the Metriport API.
+- `ActivityLog`: Represents a single logged activity within an `Activity`.
+- `AppleHealth`: Represents the raw data structure received from Apple Health.
+- `createMetadata`: A helper function (defined in `./index.ts`) to generate metadata for activity data.
+- `activityTypeMapping`: A mapping (defined in `./activity-types.ts`) from Apple workout type codes to human-readable activity names.
+
+## Symbols
+
+### `mapDataToActivity`
+#### Description
+This function processes raw Apple Health data and maps it to the `Activity` type defined in the Metriport API. It handles various data points like active energy burned, basal metabolic rate, steps, floors climbed, and workout details.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | `AppleHealth` | Raw data fetched from Apple Health. |
+| hourly | `boolean` | Flag indicating whether to group data hourly or daily. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| activity | `Activity[]` | An array of `Activity` objects representing the processed data. |
+
+#### Internal Logic
+1. **Initialization:**
+   - Creates an empty `activity` array to store the processed data.
+   - Creates an empty `dateToIndex` map to track the index of each date in the `activity` array.
+2. **Data Processing:**
+   - Iterates over various data types from the `data` object (e.g., `HKQuantityTypeIdentifierActiveEnergyBurned`, `HKQuantityTypeIdentifierStepCount`, `HKWorkout`).
+   - For each data type:
+     - Iterates over individual data points.
+     - Extracts relevant information like date, value, workout type, etc.
+     - Uses `dayjs` to format the date.
+     - Checks if an entry for the current date already exists in the `activity` array using the `dateToIndex` map.
+     - If an entry exists, updates the existing entry with the new data.
+     - Otherwise, creates a new `Activity` object, populates it with the extracted data, and adds it to the `activity` array.
+     - Uses the `createMetadata` helper function to generate metadata for each `Activity` or `ActivityLog`.
+     - Utilizes the `activityTypeMapping` to map Apple workout type codes to human-readable names.
+3. **Return:**
+   - Returns the populated `activity` array.
+
+## Side Effects
+None.
+
+## Dependencies
+- `@metriport/api-sdk`: Provides the `Activity` and `ActivityLog` types.
+- `@metriport/api-sdk/devices/models/common/activity-log`: Provides the `ActivityLog` type.
+- `dayjs`: Used for date manipulation and formatting.
+
+## Error Handling
+The code does not implement specific error handling beyond basic exception raising.
+
+## Logging
+The code does not implement logging.

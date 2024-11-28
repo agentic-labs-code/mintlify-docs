@@ -1,0 +1,55 @@
+---
+title: "transaction-wrapper.ts"
+---
+
+## High-level description
+This code defines a function `executeOnDBTx` that executes a callback within a database transaction. It's designed to handle database operations safely, ensuring that they are either completed entirely or rolled back in case of an error.
+
+## Code Structure
+The `executeOnDBTx` function is the main component of this file. It takes a model prototype and a callback function as parameters. The function starts a transaction, executes the callback, and handles the commit or rollback of the transaction based on the success or failure of the operation.
+
+## Symbols
+
+### `executeOnDBTx`
+#### Description
+This function executes a callback within a database transaction, ensuring atomicity of the operations performed in the callback.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| model | BaseModelNoId&lt;T&gt; | The model prototype to start the transaction on |
+| callback | (tx: Transaction) =&gt; Promise&lt;X&gt; | The function to execute within the transaction |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Promise&lt;X&gt; | The result of the callback function |
+
+#### Internal Logic
+1. Start a transaction using the `startTransaction` function.
+2. Execute the provided callback function with the transaction as an argument.
+3. If the callback succeeds, commit the transaction.
+4. If an error occurs, rollback the transaction and rethrow the error.
+5. Ensure the transaction is committed in the finally block if it hasn't been already.
+
+#### Performance Considerations
+The function uses a try-catch-finally block to ensure proper handling of the transaction, which is crucial for maintaining data integrity but may have a slight performance overhead.
+
+## Side Effects
+- Starts, commits, or rolls back a database transaction.
+- May modify database state based on the operations performed in the callback.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | For database operations and transaction handling |
+| ./transaction-starter | Provides the `startTransaction` function |
+| ./_default | Imports the `BaseModelNoId` type |
+
+## Error Handling
+The function catches any errors thrown during the execution of the callback. If an error occurs, it rolls back the transaction and re-throws the error.
+
+## TODOs
+- Add unit tests for this function.
+
+This implementation provides a robust way to handle database transactions, ensuring that operations are atomic and maintaining data consistency in case of failures.

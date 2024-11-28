@@ -1,0 +1,114 @@
+---
+title: "cronometer.ts"
+---
+
+## High-level description
+This code defines the `Cronometer` class, which implements the `Provider` and `OAuth2` interfaces for integrating with the Cronometer API. It handles authentication, token management, and retrieval of nutrition data from Cronometer.
+
+## Code Structure
+The `Cronometer` class extends the `Provider` class and implements the `OAuth2` interface. It uses the `OAuth2DefaultImpl` for handling OAuth2 authentication flow. The class provides methods for authentication, token management, and fetching nutrition data from Cronometer.
+
+## Symbols
+
+### Cronometer
+#### Description
+The `Cronometer` class represents the integration with the Cronometer API, handling authentication and data retrieval.
+
+#### Inputs
+- `oauth`: An instance of `OAuth2DefaultImpl` for handling OAuth2 authentication (optional, default provided)
+
+#### Internal Logic
+- Initializes the supported data types for Cronometer (only Nutrition is supported)
+- Implements OAuth2 authentication methods
+- Provides a method to fetch nutrition data from Cronometer
+
+### getAuthUri
+#### Description
+Generates the authorization URI for Cronometer OAuth2 flow.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| state | string | State parameter for OAuth2 flow |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| authUri | string | The generated authorization URI |
+
+### getTokenFromAuthCode
+#### Description
+Exchanges an authorization code for an access token.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | string | The authorization code received from Cronometer |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| accessToken | string | The access token obtained from Cronometer |
+
+### getAccessToken
+#### Description
+Retrieves the access token for a connected user.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| accessToken | string | The access token for the connected user |
+
+### revokeProviderAccess
+#### Description
+Revokes the Cronometer access for a connected user.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object |
+
+### getNutritionData
+#### Description
+Fetches nutrition data from Cronometer for a specific date.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object |
+| date | string | The date for which to fetch nutrition data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| nutritionData | Nutrition | The nutrition data retrieved from Cronometer |
+
+#### Internal Logic
+1. Retrieves the access token for the connected user
+2. Makes a POST request to Cronometer's API to fetch the diary summary
+3. Parses the response and maps it to the Nutrition type using the `mapToNutrition` function
+
+## Dependencies
+- @metriport/api-sdk
+- ../command/connected-user/get-connected-user
+- ../command/connected-user/save-connected-user
+- ../mappings/cronometer/models/diary-summary
+- ../mappings/cronometer/nutrition
+- ../models/connected-user
+- ../shared/config
+- ../shared/constants
+- ./shared/oauth2
+- ./provider
+- ./shared/http
+
+## Configuration
+The Cronometer integration relies on the following configuration options:
+- `CRONOMETER_CLIENT_ID`: The client ID for Cronometer API access
+- `CRONOMETER_CLIENT_SECRET`: The client secret for Cronometer API access
+
+These are retrieved from the environment variables using the `Config` class.

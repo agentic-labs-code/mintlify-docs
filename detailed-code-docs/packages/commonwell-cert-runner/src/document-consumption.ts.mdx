@@ -1,0 +1,77 @@
+---
+title: "document-consumption.ts"
+---
+
+## High-level description
+This code implements document consumption functionality for the CommonWell Health Alliance API. It provides functions to query and retrieve documents associated with a patient, using the CommonWell SDK.
+
+## Code Structure
+The main functions `documentConsumption`, `queryDocuments`, and `retrieveDocument` work together to query and retrieve documents. They utilize helper functions from other modules for creating payloads, finding or creating persons, and utility operations.
+
+## Symbols
+
+### `documentConsumption`
+#### Description
+This function orchestrates the document consumption process by querying for documents and then retrieving each document found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| commonWell | CommonWell | CommonWell SDK instance |
+| queryMeta | RequestMetadata | Metadata for the request |
+
+#### Internal Logic
+1. Calls `queryDocuments` to get a list of documents
+2. Iterates through each document and calls `retrieveDocument`
+
+### `queryDocuments`
+#### Description
+This function queries for documents associated with a patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| commonWell | CommonWell | CommonWell SDK instance |
+| queryMeta | RequestMetadata | Metadata for the request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documents | Document[] | Array of document objects |
+
+#### Internal Logic
+1. Finds or creates a person using `findOrCreatePerson`
+2. Retrieves network links for the patient
+3. Upgrades LOLA 1 links
+4. Queries for documents using `queryDocuments` from the CommonWell SDK
+
+### `retrieveDocument`
+#### Description
+This function retrieves a specific document and saves it to a file.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| commonWell | CommonWell | CommonWell SDK instance |
+| queryMeta | RequestMetadata | Metadata for the request |
+| doc | Document | Document object to retrieve |
+
+#### Internal Logic
+1. Saves the document query result to a file
+2. Creates a write stream for the document contents
+3. Retrieves the document using `retrieveDocument` from the CommonWell SDK
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/commonwell-sdk | Provides CommonWell API functionality |
+| fs | File system operations |
+
+## Error Handling
+The code includes basic error handling, throwing errors when required data is missing (e.g., `personId` or `content.location`).
+
+## Logging
+The code uses `console.log` for logging various steps and results throughout the process.
+
+## TODOs
+There are no explicit TODOs in the code.

@@ -1,0 +1,126 @@
+---
+title: "document-downloader-local.ts"
+---
+
+Here's a comprehensive documentation for the `DocumentDownloaderLocal` class:
+
+## High-level description
+The `DocumentDownloaderLocal` class is responsible for downloading documents from CommonWell and storing them in Amazon S3. It handles various file types, performs content type detection, and manages XML parsing for embedded documents.
+
+## Code Structure
+The `DocumentDownloaderLocal` class extends the `DocumentDownloader` abstract class. It uses the CommonWell API for document retrieval and AWS S3 for storage. The class contains methods for downloading, parsing, and uploading documents, as well as utility functions for file type detection and error handling.
+
+## Symbols
+
+### DocumentDownloaderLocal
+#### Description
+This class handles the downloading of documents from CommonWell and uploading them to S3. It includes functionality for content type detection, XML parsing, and error handling.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | DocumentDownloaderLocalConfig | Configuration object containing AWS region, S3 bucket name, CommonWell API instance, and query metadata |
+
+#### Internal Logic
+1. Initializes AWS S3 client and CommonWell API client
+2. Implements the `download` method to retrieve documents from CommonWell and store them in S3
+3. Handles content type detection and updates file extensions if necessary
+4. Parses XML files to extract embedded documents (e.g., PDFs inside XML)
+
+### download
+#### Description
+Downloads a document from CommonWell and stores it in S3, handling content type detection and XML parsing if necessary.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| document | Document | Document metadata including ID, MIME type, and location |
+| fileInfo | FileInfo | File information including name and location |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | DownloadResult | Object containing information about the downloaded file in S3 |
+
+#### Internal Logic
+1. Downloads the document from CommonWell into S3
+2. Checks and updates the MIME type if necessary
+3. Parses XML files to extract embedded documents if applicable
+4. Returns the download result with updated file information
+
+### checkAndUpdateMimeType
+#### Description
+Checks if the content type of a downloaded document is accepted. If not accepted, updates the content type and extension in S3.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| document | Document | Document metadata |
+| fileInfo | FileInfo | File information |
+| downloadedDocument | string | Downloaded document content |
+| downloadResult | DownloadResult | Initial download result |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | DownloadResult | Updated download result with potentially new content type and key |
+
+### parseXmlFile
+#### Description
+Parses an XML file, checking for embedded PDFs or other file types. If found, uploads the embedded file to S3.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| contents | string | XML file contents |
+| requestedFileInfo | FileInfo | Original file information |
+| downloadedFile | DownloadResult | Information about the downloaded XML file |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | DownloadResult | Download result for either the original XML or the extracted embedded file |
+
+### downloadFromCommonwellIntoS3
+#### Description
+Downloads a document from CommonWell and uploads it to S3.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| document | Document | Document metadata |
+| fileInfo | FileInfo | File information |
+| onDataFn | function | Optional callback for data chunks |
+| onEndFn | function | Optional callback for download completion |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | Object containing S3 upload details (key, bucket, location, size, contentType) |
+
+### downloadDocumentFromCW
+#### Description
+Downloads a document from CommonWell into a provided writable stream.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| location | string | Document location in CommonWell |
+| stream | stream.Writable | Writable stream to receive the document |
+
+## Error Handling
+The class implements error handling for network issues, CommonWell API errors, and S3 upload failures. It uses the `executeWithNetworkRetries` function for resilient network operations and captures errors using a provided capture mechanism.
+
+## Dependencies
+- @metriport/commonwell-sdk
+- @metriport/shared
+- AWS SDK (aws-sdk)
+- xmldom
+- Various utility functions from the project's codebase
+
+## Performance Considerations
+- The class uses streaming for efficient memory usage when handling large files
+- It implements retries for network operations to improve reliability
+- Content type detection and XML parsing may impact performance for large documents
+
+This documentation provides a comprehensive overview of the `DocumentDownloaderLocal` class, its methods, and its functionality within the larger system for downloading and processing documents from CommonWell and storing them in S3.

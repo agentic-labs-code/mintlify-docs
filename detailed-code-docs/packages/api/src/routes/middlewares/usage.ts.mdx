@@ -1,0 +1,87 @@
+---
+title: "usage.ts"
+---
+
+## High-level description
+This code defines middleware functions for reporting usage in an Express.js application. It focuses on tracking and reporting usage for different products, particularly for devices, by intercepting HTTP requests and responses.
+
+## Code Structure
+The main function `reportUsage` creates a middleware that listens for response events. It uses `reportIt` to send usage data. The `reportDeviceUsage` function is a specific implementation for device usage reporting. The code also includes utility functions for extracting entity IDs from requests.
+
+## References
+- `reportUsageCmd` from "../../command/usage/report-usage"
+- `Product` enum from "../../domain/product"
+- `isHttpOK` from "../../shared/http"
+- `Util` from "../../shared/util"
+- `getUserIdFrom` from "../schemas/user-id"
+- `getCxId` from "../util"
+
+## Symbols
+
+### `reportUsage`
+#### Description
+Creates a middleware function that reports usage for a given product and entity ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| product | Product | The product for which usage is being reported |
+| getEntityIdFn | (req: Request) =&gt; string \| undefined | Function to extract entity ID from the request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| middleware | (req: Request, res: any, next: NextFunction) =&gt; Promise&lt;void&gt; | Express middleware function |
+
+#### Internal Logic
+1. Creates an `afterResponse` function that removes listeners and calls `reportIt` if the response is successful.
+2. Attaches `afterResponse` to 'finish' and 'close' events of the response.
+3. Calls `next()` to pass control to the next middleware.
+
+### `reportDeviceUsage`
+#### Description
+A specific implementation of `reportUsage` for device usage reporting.
+
+### `reportIt`
+#### Description
+Asynchronous function that actually reports the usage data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req | Request | Express request object |
+| product | Product | The product for which usage is being reported |
+| entityId | string \| undefined | The entity ID for which usage is being reported |
+
+#### Internal Logic
+1. Extracts customer ID (cxId) from the request.
+2. Checks if both cxId and entityId are present.
+3. Calls `reportUsageCmd` with the collected data.
+
+### `getDevicesEntityId`
+#### Description
+Extracts the user ID from either the request parameters or query string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req | Request | Express request object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| userId | string \| undefined | The extracted user ID |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| express | Web application framework |
+| @metriport/core | Logging utilities |
+
+## Error Handling
+The code uses basic error logging through the `log` function from `Util`. It doesn't implement specific error handling mechanisms beyond this.
+
+## Logging
+Logging is done using the `log` function from `Util`, which is likely a wrapper around a logging library.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

@@ -1,0 +1,62 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the implementation of a proxy for handling CommonWell (CW) Document Query (DQ) requests. It sets up a router to process these requests, specifically for the `/DocumentReference` path, and includes functionality to query a FHIR server, process the results, and return them in the appropriate format.
+
+## What does it do?
+The code in this directory acts as an intermediary between CommonWell requests and a FHIR server. When a Document Query request comes in, the proxy:
+
+1. Extracts patient and customer information from the request
+2. Converts the HTTP request parameters to FHIR query parameters
+3. Queries the FHIR server for the requested resources
+4. Prepares a bundle of FHIR resources in response to the CommonWell request
+5. Handles error cases, such as when the FHIR server is disabled or when resources are not found
+
+This proxy allows for seamless integration between CommonWell's Document Query system and a FHIR-compliant server, ensuring that data can be efficiently retrieved and formatted according to the required standards.
+
+## Entry points
+The main entry point for this proxy is the `cw-fhir-proxy.ts` file, which sets up the router for handling requests. The core logic for processing requests is implemented in `cw-process-request.ts`. These files work together to handle incoming requests, process them, and return the appropriate responses.
+
+The data flow typically follows this path:
+1. A request is received by the router in `cw-fhir-proxy.ts`
+2. The request is passed to the `processRequest` function in `cw-process-request.ts`
+3. Patient and organization information is extracted and validated
+4. The FHIR server is queried for the requested resources
+5. The response is formatted and returned to the client
+
+## Key Files
+
+### cw-fhir-proxy.ts
+This file sets up the main router for handling CommonWell Document Query requests. It defines a GET route for `/DocumentReference` and uses the `processRequest` function to handle these requests. It also includes error handling for undefined routes and provides a dummy router when the FHIR server for CW is disabled.
+
+### cw-process-request.ts
+This file contains the core logic for processing CommonWell Document Query requests. It includes functions for extracting patient and customer information, converting HTTP requests to FHIR query parameters, querying the FHIR server, and preparing the response bundle.
+
+### get-org-or-fail.ts
+This file defines a utility function `getOrgOrFail` that retrieves an organization from the database based on its OID (Organization Identifier). It's designed for use in contexts where the customer ID is not available.
+
+### shared.ts
+This file defines constants and configurations for the CommonWell FHIR proxy, including the proxy prefix, FHIR server URL, and default error responses.
+
+## Dependencies
+The code relies on several external libraries and frameworks:
+
+- @medplum/fhirtypes: Provides FHIR type definitions
+- @metriport/core: Offers various utility functions and configurations
+- express: Web framework for handling HTTP requests
+- express-promise-router: Creates an Express router that allows the use of async route handlers
+- lodash: Utility functions for data manipulation
+
+## Configuration
+The proxy uses the following configuration:
+
+- FHIR server URL: Retrieved from the configuration using `Config.getFHIRServerUrl()`
+- Proxy prefix: Defined in `shared.ts` as `proxyPrefix`
+- Path separator: Defined in `shared.ts` as `pathSeparator`
+- Resource names: `binaryResourceName` and `docReferenceResourceName` defined in `shared.ts`
+
+The behavior of the proxy can be adjusted by modifying these configuration values.
+
+In summary, this directory implements a crucial component for integrating CommonWell Document Query functionality with a FHIR-compliant server, providing a robust and flexible proxy solution for handling these specialized healthcare data requests.

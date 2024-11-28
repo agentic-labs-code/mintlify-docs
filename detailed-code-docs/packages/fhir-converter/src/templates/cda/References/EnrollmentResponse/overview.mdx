@@ -1,0 +1,51 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for generating EnrollmentResponse resources in FHIR format. These templates are part of a larger FHIR converter system, likely used for transforming Clinical Document Architecture (CDA) data to FHIR format. The templates focus on different aspects of the EnrollmentResponse resource, including organization references, request references, and request provider references.
+
+## What does it do?
+These templates work together to create JSON structures representing different parts of an EnrollmentResponse resource in FHIR format. They allow for the dynamic generation of FHIR-compliant data based on input variables. This process is crucial in healthcare data interoperability, enabling the conversion of data from one format (likely CDA) to FHIR, which is a widely adopted standard for exchanging healthcare information electronically.
+
+## Key Files
+1. `organization.hbs`: This template generates the structure for an EnrollmentResponse resource with a focus on the organization reference. It creates a JSON object with the resource type, ID, and an organization reference.
+
+2. `request.hbs`: This template creates the structure for an EnrollmentResponse resource with a reference to a request. It generates a JSON object with the resource type, ID, and a request reference.
+
+3. `requestProvider.hbs`: This template produces the structure for an EnrollmentResponse resource, specifically populating the requestProvider field. It outputs a JSON object with the resource type, ID, and a requestProvider reference.
+
+Each of these templates contributes to different aspects of the EnrollmentResponse resource, allowing for flexible and modular construction of the FHIR resource based on the available data and conversion requirements.
+
+## Dependencies
+These templates rely on the Handlebars templating engine for processing and variable substitution. Handlebars is a popular choice for generating dynamic content in various formats, including JSON.
+
+## Configuration
+While there are no explicit configuration options defined in these templates, they expect certain input variables to be provided when rendered:
+
+- `ID`: A string representing the unique identifier for the EnrollmentResponse resource.
+- `REF`: A string containing the reference to the relevant entity (organization, request, or requestProvider) associated with the enrollment response.
+
+These variables should be supplied by the FHIR converter system when processing the templates.
+
+Here's an example of how these templates might be used together to create a more complete EnrollmentResponse resource:
+
+```handlebars
+{
+  "resourceType": "EnrollmentResponse",
+  "id": "{{ID}}",
+  "organization": {
+    "reference": "{{ORGANIZATION_REF}}"
+  },
+  "request": {
+    "reference": "{{REQUEST_REF}}"
+  },
+  "requestProvider": {
+    "reference": "{{PROVIDER_REF}}"
+  }
+}
+```
+
+In this combined example, the converter system would need to provide values for `ID`, `ORGANIZATION_REF`, `REQUEST_REF`, and `PROVIDER_REF` to generate a complete EnrollmentResponse resource.
+
+It's important to note that these templates are designed to be flexible and modular, allowing the FHIR converter to include or exclude certain elements based on the available data in the source CDA document. This modular approach enables the creation of valid FHIR resources even when some data elements are missing or not applicable to a particular conversion scenario.

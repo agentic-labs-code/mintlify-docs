@@ -1,0 +1,54 @@
+---
+title: "db-maintenance.ts"
+---
+
+## High-level description
+The code defines a database maintenance function `dbMaintenance` that currently only cleans up old webhook requests from the `WebhookRequest` table. It removes requests older than 30 days and returns the number of removed and remaining requests.
+
+## Code Structure
+The `dbMaintenance` function calls the `cleanupWHRequests` function to perform the cleanup. The `cleanupWHRequests` function interacts with the `WebhookRequest` model to delete old records and count the remaining ones.
+
+## References
+- `WebhookRequest` model: Used to interact with the webhook requests table in the database.
+
+## Symbols
+
+### `dbMaintenance`
+#### Description
+This function performs database maintenance tasks. Currently, it only cleans up old webhook requests.
+
+#### Inputs
+None
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhookRequests | `WHRequestsCleanupResult` | An object containing the number of webhook requests removed and remaining. |
+
+#### Internal Logic
+1. Calls the `cleanupWHRequests` function to remove old webhook requests.
+2. Returns the result of the cleanup operation.
+
+### `cleanupWHRequests`
+#### Description
+This function removes webhook requests older than 30 days from the database.
+
+#### Inputs
+None
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `WHRequestsCleanupResult` | An object containing the number of webhook requests removed and remaining. |
+
+#### Internal Logic
+1. Calculates the cutoff date for deleting webhook requests (30 days ago).
+2. Deletes webhook requests older than the cutoff date from the `WebhookRequest` table.
+3. Counts the remaining webhook requests in the table.
+4. Returns the number of removed and remaining webhook requests.
+
+## Side Effects
+- Modifies the `WebhookRequest` table in the database by deleting old records.
+
+## TODOs
+None

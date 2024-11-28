@@ -1,0 +1,76 @@
+---
+title: "dr-request.ts"
+---
+
+## High-level description
+This code processes inbound Document Retrieval (DR) requests in an IHE (Integrating the Healthcare Enterprise) Gateway context. It parses XML requests, extracts relevant information, and structures it into a standardized format for further processing.
+
+## Code Structure
+The main function `processInboundDrRequest` uses helper functions like `extractDocumentReferences`, `convertSamlHeaderToAttributes`, and `extractTimestamp` to parse and structure the incoming XML request. The parsed data is then stored using `storeDrRequest` for monitoring purposes.
+
+## Symbols
+
+### `extractDocumentReferences`
+#### Description
+Extracts document references from an array of document requests.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documentRequest | DocumentRequest[] | Array of document requests |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documentReferences | DocumentReference[] | Array of extracted document references |
+
+#### Internal Logic
+- Maps each document request to a DocumentReference object
+- Strips URN prefixes from HomeCommunityId, DocumentUniqueId, and RepositoryUniqueId
+
+### `processInboundDrRequest`
+#### Description
+Processes an inbound Document Retrieval request by parsing the XML, extracting relevant information, and structuring it into a standardized format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| request | string | XML string containing the inbound DR request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| inboundRequest | InboundDocumentRetrievalReq | Structured object containing parsed request data |
+
+#### Internal Logic
+1. Initializes an XML parser with specific options
+2. Parses the XML request into a JSON object
+3. Validates the parsed object against the `iti39RequestSchema`
+4. Extracts SAML attributes from the request header
+5. Extracts document references using `extractDocumentReferences`
+6. Constructs an `inboundRequest` object with extracted data
+7. Stores the request and inbound request using `storeDrRequest`
+8. Returns the structured inbound request
+
+#### Error Handling
+- Catches any errors during processing
+- Logs the error with a custom message
+- Throws a new error with additional context
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/ihe-gateway-sdk | Provides types and interfaces for IHE Gateway operations |
+| @metriport/shared | Provides utility functions like `errorToString` and `toArray` |
+| fast-xml-parser | Used for parsing XML to JSON |
+| ../../../../../../util/log | Provides logging functionality |
+| ../../../../../../util/urn | Provides `stripUrnPrefix` utility |
+| ../../../utils | Provides `extractText` utility |
+| ../../../monitor/store | Provides `storeDrRequest` function for request monitoring |
+| ../../shared | Provides utility functions for SAML and timestamp extraction |
+| ./schema | Provides request schema and types |
+
+## Logging
+The code uses a custom logging mechanism (`out("Inbound DR Request").log`) to log the incoming request and any errors encountered during processing.
+
+This code is part of a larger system for handling healthcare-related document retrieval requests, specifically within the context of IHE protocols. It focuses on parsing and structuring incoming requests to facilitate further processing and integration with other parts of the system.

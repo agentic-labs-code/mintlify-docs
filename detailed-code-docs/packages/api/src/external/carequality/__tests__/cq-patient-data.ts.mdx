@@ -1,0 +1,88 @@
+---
+title: "cq-patient-data.ts"
+---
+
+## High-level description
+The `packages/api/src/external/carequality/__tests__/cq-patient-data.ts` file contains helper functions for creating test data related to Carequality (CQ) patient data. These functions are used in unit tests to simulate various scenarios and ensure the correct behavior of components interacting with CQ data.
+
+## Code Structure
+This file defines several functions that are used to create test data. The functions are independent of each other but share a common theme of generating data related to Carequality patient information.
+
+## Symbols
+
+### `makeCqDataLink`
+#### Description
+Creates a mock `CQLink` object, which represents a link to patient data in Carequality.
+
+#### Inputs
+None
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | `CQLink` | A mock `CQLink` object with randomly generated data. |
+
+#### Internal Logic
+The function uses the `faker` library to generate random data for various fields of the `CQLink` object, such as `patientId`, `systemId`, `patientResource`, `oid`, and `url`. It also utilizes the `makeAddressStrict` function to generate a random address.
+
+### `makeLinksHistory`
+#### Description
+Creates a mock `LinkDemographicsHistory` object, which represents a history of patient demographics from different sources.
+
+#### Inputs
+None
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | `LinkDemographicsHistory` | A mock `LinkDemographicsHistory` object with randomly generated data. |
+
+#### Internal Logic
+The function uses the `faker` library to generate random data for various fields of the `LinkDemographicsHistory` object, such as `dob`, `gender`, `names`, `addresses`, `telephoneNumbers`, `emails`, `driversLicenses`, and `ssns`. It also utilizes several normalization functions like `normalizeAndStringifyNames`, `normalizeAddress`, `stringifyAddress`, `normalizeTelephone`, `normalizeEmail`, and `normalizeSsn` to ensure data consistency.
+
+### `makeCqData`
+#### Description
+Creates a mock `CQData` object, which represents data received from Carequality.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `params` | `Partial&lt;CQData&gt;` | (Optional) An object containing partial data to override the default generated data. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | `CQData` | A mock `CQData` object with randomly generated data, optionally overridden by the provided `params`. |
+
+#### Internal Logic
+The function uses the `makeCqDataLink` and `makeLinksHistory` functions to generate the `links` and `linkDemographicsHistory` properties of the `CQData` object. It allows overriding these properties with the provided `params`.
+
+### `makeCqPatientData`
+#### Description
+Creates a mock `CQPatientData` object, which represents Carequality patient data stored in the system.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `params` | `Partial&lt;Omit&lt;CQPatientData, "data"&gt; & { data: Partial&lt;CQData&gt; }&gt;` | (Optional) An object containing partial data to override the default generated data. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | `CQPatientData` | A mock `CQPatientData` object with randomly generated data, optionally overridden by the provided `params`. |
+
+#### Internal Logic
+The function uses the `makeBaseDomain` and `makeCqData` functions to generate the base properties and the `data` property of the `CQPatientData` object. It allows overriding these properties with the provided `params`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| `@faker-js/faker` | Used for generating realistic fake data for testing purposes. |
+| `@metriport/core/domain/patient-demographics` | Provides types for patient demographics data. |
+| `dayjs` | Used for date and time manipulation. |
+| `../../../shared/date` | Provides date formatting utilities. |
+| `../../../domain/__tests__/base-domain` | Provides a helper function for creating base domain objects. |
+| `../cq-patient-data` | Provides types for Carequality patient data. |
+| `../../../domain/medical/__tests__/location-address` | Provides a helper function for creating address objects. |
+| `../../../domain/medical/patient-demographics` | Provides functions for normalizing patient demographics data. |
+

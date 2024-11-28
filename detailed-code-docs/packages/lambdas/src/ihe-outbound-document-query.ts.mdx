@@ -1,0 +1,61 @@
+---
+title: "ihe-outbound-document-query.ts"
+---
+
+## High-level description
+This code defines an AWS Lambda function handler for polling outbound document query results in a healthcare interoperability context. It uses the OutboundResultPollerDirect class to poll for results and send them to an API endpoint, while also handling error logging and Sentry integration for monitoring.
+
+## Code Structure
+The main handler function is wrapped with Sentry for error tracking. It uses environment variables for configuration and instantiates an OutboundResultPollerDirect to perform the polling operation. The code also includes error handling and logging.
+
+## References
+- `@metriport/core/external/carequality/ihe-gateway/outbound-result-poller`
+- `@metriport/core/external/carequality/ihe-gateway/outbound-result-poller-direct`
+- `@metriport/core/util/env-var`
+- `@metriport/core/util/error/shared`
+- `@metriport/core/external/aws/secret-manager`
+- `./shared/capture`
+
+## Symbols
+
+### `handler`
+#### Description
+This is the main Lambda function handler, wrapped with Sentry for error tracking. It polls for outbound document query results using the OutboundResultPollerDirect class.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| requestId | string | The ID of the request |
+| numOfGateways | number | The number of gateways to poll |
+| patientId | string | The ID of the patient |
+| cxId | string | The context ID |
+
+#### Internal Logic
+1. Logs the environment type and input parameters
+2. Retrieves database credentials from AWS Secrets Manager
+3. Instantiates an OutboundResultPollerDirect
+4. Calls pollOutboundDocQueryResults with the provided parameters
+5. Catches and logs any errors, sending them to Sentry
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @sentry/serverless | Error tracking and monitoring |
+| @metriport/core | Various utility functions and classes |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| DB_CREDS | string | N/A | ARN of the database credentials secret |
+| API_URL | string | N/A | URL of the API endpoint |
+| AWS_REGION | string | N/A | AWS region |
+| MAX_POLLING_DURATION | string | N/A | Maximum duration for polling (in milliseconds) |
+
+## Error Handling
+Errors are caught, logged to the console, and sent to Sentry with additional context information.
+
+## Logging
+The code uses console.log for basic logging of the Lambda execution and any errors encountered.
+
+## API/Interface Reference
+This Lambda function doesn't expose an API directly, but it interacts with an API defined by the OutboundResultPollerDirect class.

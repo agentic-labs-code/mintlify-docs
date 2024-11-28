@@ -1,0 +1,53 @@
+---
+title: "cq-link-patients.ts"
+---
+
+## High-level description
+This code defines types for linking patients in a CommonWell Health Alliance integration. It provides an `Input` type that represents either an ongoing or completed patient linking process, utilizing the `LinkPatientsCommand` from a related module.
+
+## References
+- `LinkPatientsCommand` from "../management/link-patients"
+
+## Symbols
+
+### `Input`
+#### Description
+`Input` is a union type that represents two possible states of a patient linking process: in progress or completed.
+
+#### Inputs
+This is a type definition, so it doesn't have traditional inputs. However, it uses the following types:
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| LinkPatientsCommand | type | Imported type representing a command to link patients |
+
+#### Outputs
+This is a type definition, so it doesn't have traditional outputs. It defines two possible shapes:
+
+1. In-progress state:
+   - Includes all properties from `LinkPatientsCommand`
+   - Adds a `done` property set to `false`
+
+2. Completed state:
+   - Includes `cxId` and `patientIds` from `LinkPatientsCommand`
+   - Adds a `done` property set to `true`
+
+#### Internal Logic
+The `Input` type uses a union type to represent two possible states:
+
+1. When `done` is `false`, it includes all properties from `LinkPatientsCommand`.
+2. When `done` is `true`, it only includes `cxId` and `patientIds` from `LinkPatientsCommand`.
+
+This structure allows for different handling of the linking process based on its completion status.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| LinkPatientsCommand | Imported type used as a base for the `Input` type |
+
+## Additional Context
+Based on the related code snippet provided, we can infer that this `Input` type is likely used in conjunction with the `LinkPatients` class defined in the `link-patients.ts` file. The `LinkPatientsCommand` type, which is used as a base for the `Input` type, contains properties such as `ecId`, `cxId`, `cxOrgOID`, `patientIds`, `cqOrgIds`, and an optional `log` function.
+
+The `Input` type seems to be designed to track the progress of a patient linking operation, where the initial state includes all the command properties, and the completed state retains only the essential information (`cxId` and `patientIds`) along with a `done` flag set to `true`.
+
+This type definition allows for flexible handling of patient linking operations, potentially enabling progress tracking or different processing based on the operation's status.

@@ -1,0 +1,72 @@
+---
+title: "forbidden.ts"
+---
+
+## High-level description
+This code defines a custom error class `ForbiddenError` that extends the `MetriportError` class. It is used to represent forbidden access errors in the Metriport API, with a default HTTP status code of 403 (Forbidden).
+
+## Code Structure
+The `ForbiddenError` class extends `MetriportError` and sets specific properties for forbidden access scenarios.
+
+## References
+- `MetriportError`: The base error class that `ForbiddenError` extends.
+- `httpStatus`: A library used to get the numeric value for the HTTP FORBIDDEN status.
+
+## Symbols
+
+### ForbiddenError
+#### Description
+A custom error class representing forbidden access errors in the Metriport API. It extends the `MetriportError` class and sets the HTTP status code to 403 (Forbidden).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| message | string | Optional error message (default: "Access is forbidden") |
+
+#### Internal Logic
+1. Calls the superclass constructor with the provided message.
+2. Sets the `status` property to the numeric value of HTTP 403 (Forbidden).
+3. Sets the `name` property to the name of the constructor ("ForbiddenError").
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| httpStatus | Used to get the numeric value for the HTTP FORBIDDEN status |
+| MetriportError | Base error class that ForbiddenError extends |
+
+## Error Handling
+This class is part of the error handling mechanism in the Metriport API. It is used to represent forbidden access errors with a specific HTTP status code and error message.
+
+## Usage Examples
+Based on the related code snippets provided, the `ForbiddenError` class is used in various parts of the application to handle forbidden access scenarios. For example:
+
+1. In the `verifyCxItVendorAccess` function:
+```typescript
+if (org.type === OrganizationBizType.healthcareProvider) {
+  if (throwOnNoAccess) {
+    throw new ForbiddenError("Facilities cannot be created or updated, contact support.");
+  }
+  return false;
+}
+```
+
+2. In the `verifyCxProviderAccess` function:
+```typescript
+if (org.type === OrganizationBizType.healthcareITVendor) {
+  if (throwOnNoAccess) {
+    throw new ForbiddenError("Facilities cannot be created or updated, contact support.");
+  }
+  return false;
+}
+```
+
+3. In the document download URL generation logic:
+```typescript
+if (!fileHasCxId && !Config.isSandbox()) {
+  const message = "File name is invalid or does not contain the CX ID";
+  console.log(`${message}: ${fileName}, ${cxId}`);
+  throw new ForbiddenError(message);
+}
+```
+
+These examples show that the `ForbiddenError` is used to handle cases where access to certain operations or resources is restricted based on the user's role or other conditions.

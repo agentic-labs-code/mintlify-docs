@@ -1,0 +1,147 @@
+---
+title: "index.ts"
+---
+
+Here's a high-level description and documentation of the target file:
+
+## High-level description
+This file contains functions for converting CommonWell (CW) document references to FHIR format, handling authors, and processing document queries. It provides utilities for mapping CW data to FHIR structures, managing document references, and interacting with external systems like AWS S3 and OpenSearch.
+
+## Code Structure
+The main symbols in this code are interconnected functions that work together to process and convert document references. The `cwToFHIR` function is the central piece that converts CW documents to FHIR format. Other functions like `getAuthors`, `convertToFHIRResource`, and `getBestDateFromCWDocRef` support this conversion process.
+
+## Symbols
+
+### `cwToFHIR`
+#### Description
+Converts a CommonWell document to FHIR DocumentReference format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docId | string | The document ID |
+| doc | CWDocumentWithMetriportData | The CommonWell document with Metriport data |
+| patient | Pick&lt;Patient, "id"&gt; | The patient object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| DocumentReferenceWithId | object | The FHIR DocumentReference |
+
+#### Internal Logic
+1. Creates base attachment information
+2. Creates Metriport FHIR content
+3. Creates CommonWell FHIR content if location exists
+4. Converts contained resources
+5. Gets authors
+6. Gets the best date from the CW document reference
+7. Converts CW status to FHIR status
+8. Constructs and returns the FHIR DocumentReference
+
+### `getBestDateFromCWDocRef`
+#### Description
+Determines the best date to use from a CommonWell document reference.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| content | DocumentContent | The document content |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string | string | The best date as an ISO string |
+
+### `cwStatusToFHIR`
+#### Description
+Converts CommonWell document status to FHIR document status.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | DocumentContent["status"] | The CommonWell document status |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| DocumentReference["status"] | string | The FHIR document status |
+
+### `createDocReferenceContent`
+#### Description
+Creates a FHIR DocumentReferenceContent object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | object | Parameters including contentType, size, fileName, location, creation, extension, format |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| DocumentReferenceContent | object | The FHIR DocumentReferenceContent |
+
+### `idToFHIR`
+#### Description
+Converts a CommonWell DocumentIdentifier to a FHIR Identifier.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | DocumentIdentifier | The CommonWell DocumentIdentifier |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Identifier | object | The FHIR Identifier |
+
+### `convertToFHIRResource`
+#### Description
+Converts a CommonWell Contained resource to a FHIR Resource.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resource | Contained | The CommonWell Contained resource |
+| patientId | string | The patient ID |
+| subjectRef | string | The subject reference |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Resource[] | undefined | An array of FHIR Resources or undefined |
+
+### `getAuthors`
+#### Description
+Gets the authors from content that match the contained resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| content | DocumentContent | The document content |
+| contained | Resource[] | The contained resources |
+| docId | string | The document ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Reference&lt;AuthorTypes&gt;[] | array | An array of FHIR References to be used as authors |
+
+## Dependencies
+- @medplum/fhirtypes
+- @metriport/commonwell-sdk
+- @metriport/core/external/fhir/shared/extensions/metriport
+- @metriport/core/external/commonwell/extension
+- dayjs
+- lodash
+
+## Error Handling
+The code uses try-catch blocks and error logging in various functions. It also uses the `capture.message` function to report errors to an external error tracking system.
+
+## Logging
+The code uses a custom logging utility (`Util.out`) for logging messages and errors.
+
+## TODOs
+- Move `getBestDateFromCWDocRef` to external/commonwell/document
+- Move `idToFHIR` to an identifier-specific file once DocumentIdentifier is merged with Identifier on CW SDK
+
+This code is part of a larger system for handling medical document references and converting them between different formats (CommonWell and FHIR). It's designed to be used in a healthcare data integration context.

@@ -1,0 +1,71 @@
+---
+title: "dq-response.ts"
+---
+
+## High-level description
+This code defines a function `createInboundDqResponse` that generates an XML response for an inbound Document Query (DQ) in the context of Carequality's IHE Gateway. It processes the input response data and constructs a SOAP envelope containing the query results or error information.
+
+## Code Structure
+The main function `createInboundDqResponse` uses helper functions `createIti38SoapBody` and `createSecurityHeader` to construct different parts of the SOAP envelope. The code also utilizes external libraries for XML parsing and UUID generation.
+
+## Symbols
+
+### `createIti38SoapBody`
+#### Description
+This function creates the SOAP body for an ITI-38 (Cross Gateway Query) response.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | InboundDocumentQueryResp | The response object containing query results or error information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| soapBody | object | An object representing the structured SOAP body |
+
+#### Internal Logic
+1. Initializes an XML parser with specific options
+2. Determines if the response was successful based on the presence of `extrinsicObjectXmls`
+3. Parses and structures `extrinsicObjectXmls` if present
+4. Structures `registryErrors` if the response was not successful
+5. Constructs and returns the SOAP body object with appropriate namespaces and content
+
+### `createInboundDqResponse`
+#### Description
+This function generates the complete XML response for an inbound Document Query.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | InboundDocumentQueryResp | The response object containing query results or error information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| xmlContent | string | The complete XML response as a string |
+
+#### Internal Logic
+1. Creates a security header using `createSecurityHeader`
+2. Generates the SOAP body using `createIti38SoapBody`
+3. Constructs a SOAP envelope object with appropriate namespaces and content
+4. Uses `XMLBuilder` to convert the SOAP envelope object into an XML string
+5. Returns the resulting XML string
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| fast-xml-parser | For parsing and building XML |
+| uuid | For generating UUIDs |
+| @metriport/ihe-gateway-sdk | For type definitions |
+
+## References
+- `createSecurityHeader` from "../../shared"
+- `xmlBuilderAttributes`, `attributeNamePrefix` from "../../../shared"
+- `namespaces` from "../../../constants"
+- `wrapIdInUrnUuid` from "../../../../../../util/urn"
+
+## TODOs
+- TODO #1776: track the generated MessageID in monitoring
+
+This code is a crucial part of handling inbound Document Queries in the Carequality IHE Gateway, providing a standardized way to format and return query results or errors in the expected SOAP XML format.

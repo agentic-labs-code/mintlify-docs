@@ -1,0 +1,39 @@
+---
+title: "get-address-fields.test.ts"
+---
+
+## High-level description
+The `getAddressFields` function is responsible for extracting the most complete address information from an array of `Address` objects. It prioritizes addresses with all attributes (address line, city, state, and zip code) and falls back to the address with the most attributes if none have all four.
+
+## Symbols
+
+### `getAddressFields`
+#### Description
+This function takes an array of `Address` objects as input and returns a `LenientAddress` object containing the most complete address information found. It iterates through the input addresses, prioritizing those with all required attributes and falling back to the address with the most attributes if none have all.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| addresses | `Address[] \| undefined` | An array of `Address` objects, potentially containing address information. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `LenientAddress` | An object containing the most complete address information extracted from the input addresses. |
+
+#### Internal Logic
+1. **Initialization:**
+   - If the input `addresses` array is undefined, the function returns an empty object.
+   - It initializes an empty `LenientAddress` object called `bestAddress` to store the most complete address found so far.
+2. **Iterating through Addresses:**
+   - The function iterates through each `address` in the `addresses` array.
+   - For each `address`, it creates a `LenientAddress` object called `parsedAddress` to store the parsed address information.
+   - It attempts to extract the `addressLine`, `city`, `state`, and `zip` code from the `address` object.
+   - If the `postalCode` is present, it attempts to normalize it using the `normalizeZipCode` function.
+   - If all four address attributes are present in the `parsedAddress`, the function immediately returns the `parsedAddress`.
+   - If the current `parsedAddress` has more attributes than the current `bestAddress`, it updates `bestAddress` with the `parsedAddress`.
+3. **Returning the Best Address:**
+   - After iterating through all addresses, the function returns the `bestAddress`, which contains the most complete address information found.
+
+#### Performance Considerations
+The function iterates through the input array of addresses, which could potentially be large. However, the logic inside the loop is relatively simple and should not cause significant performance issues for reasonably sized address arrays.

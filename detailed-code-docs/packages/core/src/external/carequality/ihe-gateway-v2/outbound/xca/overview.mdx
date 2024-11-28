@@ -1,0 +1,66 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for implementing outbound Cross-Community Access (XCA) functionality in an Integrating the Healthcare Enterprise (IHE) Gateway v2 system, specifically for Carequality. It handles Document Query (DQ) and Document Retrieval (DR) operations, including creating and signing SOAP envelopes, sending requests, processing responses, and managing MTOM (Message Transmission Optimization Mechanism) for efficient data transfer.
+
+## What does it do?
+The code in this directory enables secure and standardized healthcare information exchange across different communities. It performs several key functions:
+
+1. Creates and signs SOAP envelopes for ITI-38 (Cross-Gateway Query) and ITI-39 (Cross-Gateway Retrieve) requests, ensuring they comply with IHE standards.
+
+2. Sends signed requests to Carequality gateways using SAML authentication for secure communication.
+
+3. Processes responses from document queries and retrievals, including parsing XML, handling MTOM data, and extracting relevant information.
+
+4. Manages error scenarios, providing detailed error handling and logging for troubleshooting.
+
+5. Stores retrieved documents in S3 and creates structured responses for further processing.
+
+6. Implements MTOM encoding and decoding for efficient transmission of large binary data.
+
+In simpler terms, this code acts as a secure messenger for healthcare systems. When a healthcare provider needs to request patient information from another provider or community, it prepares the request in a standardized, secure format, sends it to the appropriate gateway, and then processes the response, extracting and storing the relevant patient data.
+
+## Key Files
+
+1. `create/iti38-envelope.ts` and `create/iti39-envelope.ts`:
+   These files handle the creation and signing of SOAP envelopes for document queries and retrievals, respectively.
+
+2. `send/dq-requests.ts` and `send/dr-requests.ts`:
+   These files contain functions for sending signed Document Query and Document Retrieval requests to Carequality gateways.
+
+3. `process/dq-response.ts` and `process/dr-response.ts`:
+   These files process the responses from document queries and retrievals, parsing XML and constructing structured responses.
+
+4. `mtom/builder.ts` and `mtom/parser.ts`:
+   These files provide functionality for creating and parsing MTOM messages, which are used for efficient binary data transmission.
+
+5. `process/error.ts`:
+   This file contains error handling functions for various response types and error scenarios.
+
+6. `process/schema.ts`:
+   Defines Zod schemas for validating XML responses from XCA gateways.
+
+## Dependencies
+The code relies on several external libraries and internal modules:
+
+1. dayjs: Used for date and time manipulation.
+2. fast-xml-parser: Employed for XML parsing and building.
+3. @metriport/ihe-gateway-sdk: Provides type definitions, schemas, and constants specific to the IHE Gateway.
+4. whatwg-mimetype: Used for parsing MIME types in MTOM response handling.
+5. formidable: Specifically, the MultipartParser is used for parsing multipart MIME messages in MTOM responses.
+6. zod: Used for schema definition and validation.
+
+Internal dependencies include various utility functions for security operations, logging, file type detection, and error handling.
+
+## Configuration
+While there are no explicit configuration files, the code uses several environment-specific values and constants:
+
+1. SAML certificates and keys: Used for signing SOAP envelopes and SAML assertions.
+2. Gateway-specific information: Different gateways may require specific configurations.
+3. AWS S3 configuration: Used for storing retrieved documents.
+
+These configurations are typically passed into the functions as parameters or accessed through environment variables, allowing for flexibility and security in managing sensitive information.
+
+In conclusion, this directory contains critical code for enabling secure, standardized healthcare information exchange across different communities. It implements complex protocols and security measures to ensure that patient data can be requested, retrieved, and processed safely and efficiently in compliance with IHE standards.

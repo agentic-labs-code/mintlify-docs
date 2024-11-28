@@ -1,0 +1,75 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the implementation of CommonWell Health Alliance integration within the core package of the application. It provides functionality for enhancing patient data coverage across different healthcare organizations, managing CommonWell integrations, handling document operations, and interacting with the CommonWell Management API.
+
+## What does it do?
+The code in this directory performs several key tasks:
+
+1. Coverage Enhancement: It implements processes to enhance the coverage of patient data across different healthcare organizations. This involves linking patients to various Carequality organizations and updating their information in the system.
+
+2. Document Handling: The code provides mechanisms for downloading medical documents from CommonWell, detecting content types, parsing XML files, and storing documents in AWS S3.
+
+3. CommonWell Management API Integration: It includes classes and interfaces for interacting with the CommonWell Management API, allowing operations such as session management, patient linking, and data retrieval/updates.
+
+4. FHIR Extensions: The code defines extensions and utility functions for handling CommonWell-related data in the context of FHIR DocumentReference resources.
+
+5. Organization Management: It provides utilities for retrieving, filtering, and prioritizing healthcare organizations within the CommonWell network.
+
+These functionalities work together to improve the breadth and depth of patient data available to the system by leveraging the CommonWell Health Alliance network and Carequality framework.
+
+## Entry points
+The main entry points for this functionality are distributed across several subdirectories:
+
+1. In the `cq-bridge` directory:
+   - `coverage-enhancer.ts`: Defines the abstract `CoverageEnhancer` class.
+   - `coverage-enhancer-local.ts`: Implements local processing of coverage enhancement.
+   - `coverage-enhancer-cloud.ts`: Implements cloud-based processing using AWS services.
+
+2. In the `document` directory:
+   - `DocumentDownloaderLocal` in `document-downloader-local.ts`: Handles local implementation of document downloading and processing.
+   - `DocumentDownloaderLambda` in `document-downloader-lambda.ts`: Provides Lambda-based implementation for document downloading.
+
+3. In the `management` directory:
+   - `api-factory.ts`: Contains a factory function `makeApi` for creating instances of `CommonWellManagementAPI`.
+   - `link-patients.ts`: Defines the `LinkPatients` class for updating include lists and triggering database updates.
+
+The flow of control typically starts with one of these entry points, depending on the specific operation being performed (e.g., coverage enhancement, document downloading, or patient linking).
+
+## Key Files
+1. `cq-bridge/coverage-enhancer.ts`: Defines the abstract `CoverageEnhancer` class with core functionality for enhancing coverage.
+
+2. `document/document-downloader.ts`: Defines the abstract `DocumentDownloader` class, providing the foundation for document downloading implementations.
+
+3. `extension.ts`: Defines extensions and utility functions for handling CommonWell-related data in FHIR DocumentReference resources.
+
+4. `management/api.ts`: Defines the `CommonWellManagementAPI` interface and related types for interacting with the CommonWell Management API.
+
+5. `management/session.ts`: Implements the `SessionManagement` class for managing sessions with the CommonWell management portal.
+
+## Dependencies
+The code in this directory relies on several external libraries and internal modules:
+
+1. AWS SDK: Used for interacting with AWS services like S3, Lambda, and SQS.
+2. axios: Used for making HTTP requests to various APIs.
+3. dayjs: Used for date and time manipulation.
+4. lodash: Used for various utility functions.
+5. xmldom: Used for parsing XML documents.
+6. playwright: Used for browser automation in the login process for the CommonWell Management API.
+7. @metriport/shared and @metriport/commonwell-sdk: Provide shared types and utilities.
+8. Various internal utilities from the Metriport core package.
+
+## Configuration
+The code uses several configuration settings and constants:
+
+1. AWS-related configurations: region, S3 bucket names, Lambda function names, and SQS URLs.
+2. API endpoints for CommonWell and other services.
+3. Organization-specific details (name, OID, NPI) for CommonWell interactions.
+4. Various timeout and retry settings for API operations.
+5. Environment-specific configurations (e.g., `Config.isDev()` for determining API implementation).
+
+These configurations are typically provided when instantiating the various classes or are accessed through a centralized configuration utility.
+
+In conclusion, this directory provides a comprehensive set of tools and implementations for integrating with the CommonWell Health Alliance, handling document operations, and enhancing patient data coverage across healthcare organizations. It offers both local and cloud-based implementations for various operations, making it flexible for different deployment scenarios.

@@ -1,0 +1,79 @@
+---
+title: "procedure.ts"
+---
+
+## High-level description
+This code implements a deduplication process for FHIR Procedure resources. It groups similar procedures based on their codes and dates, combines duplicate entries, and manages references to ensure consistency across the dataset.
+
+## Code Structure
+The main function `deduplicateProcedures` uses `groupSameProcedures` to identify and combine duplicate procedures. The `extractCodes` function is used to parse coding information from the procedures. These functions work together to create a deduplicated set of procedures and maintain a map of reference replacements.
+
+## Symbols
+
+### `deduplicateProcedures`
+#### Description
+This function takes an array of Procedure resources and returns deduplicated procedures along with a map for reference replacements.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| procedures | Procedure[] | An array of FHIR Procedure resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| combinedProcedures | Procedure[] | Deduplicated array of Procedure resources |
+| refReplacementMap | Map&lt;string, string[]&gt; | Map of original references to replacement references |
+
+#### Internal Logic
+1. Calls `groupSameProcedures` to identify and combine duplicate procedures
+2. Returns the combined procedures and reference replacement map
+
+### `groupSameProcedures`
+#### Description
+This function groups similar procedures based on their codes (CPT, LOINC, or SNOMED) and dates.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| procedures | Procedure[] | An array of FHIR Procedure resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| proceduresMap | Map&lt;string, Procedure&gt; | Map of deduplicated procedures |
+| refReplacementMap | Map&lt;string, string[]&gt; | Map of original references to replacement references |
+
+#### Internal Logic
+1. Iterates through the procedures
+2. Extracts the date and relevant codes (CPT, LOINC, or SNOMED)
+3. Creates a key based on the date and code
+4. Uses `fillMaps` function to combine duplicate procedures and update the reference replacement map
+5. Applies special modifications to remove non-standard codes and assign the most descriptive status
+
+### `extractCodes`
+#### Description
+This function extracts CPT, LOINC, and SNOMED codes from a CodeableConcept.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| concept | CodeableConcept \| undefined | The CodeableConcept to extract codes from |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cptCode | string \| undefined | Extracted CPT code |
+| loincCode | string \| undefined | Extracted LOINC code |
+| snomedCode | string \| undefined | Extracted SNOMED code |
+
+#### Internal Logic
+1. Iterates through the coding array in the CodeableConcept
+2. Identifies the system for each coding (CPT, LOINC, or SNOMED)
+3. Extracts and returns the corresponding codes
+
+## Dependencies
+The code relies on several imported functions and constants from other modules, including `combineResources`, `fillMaps`, `getPerformedDateFromResource`, and `pickMostDescriptiveStatus` from the shared deduplication utilities.
+
+## Performance Considerations
+The deduplication process involves iterating through all procedures and comparing them based on dates and codes. For large datasets, this could potentially be a performance-intensive operation.

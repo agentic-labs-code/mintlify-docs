@@ -1,0 +1,44 @@
+---
+title: "GeneratePractitionerId.hbs"
+---
+
+## High-level description
+This Handlebars template generates a unique identifier for a practitioner in a FHIR (Fast Healthcare Interoperability Resources) context. It uses either a combination of root and extension values from the practitioner's ID, or a combination of the practitioner's name, address, and telecom information to create a UUID.
+
+## Symbols
+
+### GeneratePractitionerId
+#### Description
+This template generates a unique identifier for a practitioner based on available information in the input object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| obj | Object | An object containing practitioner information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Id | String | A generated UUID for the practitioner |
+
+#### Internal Logic
+1. The template first checks if there's an `id` array in the input object and focuses on the first element of this array.
+2. If both `root` and `extension` properties exist in the first ID element, it concatenates them with a '|' separator and generates a UUID from this string.
+3. If `root` and `extension` are not both present, it checks for the existence of `assignedPerson.name` in the input object.
+4. If `assignedPerson.name` exists, it concatenates this with `addr` and `telecom` properties and generates a UUID from the resulting string.
+5. The generated UUID is returned as the value of the "Id" key in a JSON object.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| generateUUID | A custom Handlebars helper function that generates a UUID from a given string |
+| toArray | A custom Handlebars helper function that converts an object or value to an array |
+| elementAt | A custom Handlebars helper function that retrieves an element at a specific index in an array |
+
+Note: The actual implementations of these helper functions are not provided in this template file.
+
+## Error Handling
+This template does not include explicit error handling. If the required properties are not present in the input object, the template will simply not generate an ID.
+
+## Performance Considerations
+The performance of this template depends on the efficiency of the custom helper functions, particularly `generateUUID`. For large datasets, the UUID generation could potentially become a bottleneck if not optimized.

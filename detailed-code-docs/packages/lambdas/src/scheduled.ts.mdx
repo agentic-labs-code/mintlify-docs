@@ -1,0 +1,81 @@
+---
+title: "scheduled.ts"
+---
+
+## High-level description
+This code defines an AWS Lambda function that sends a POST request to a specified URL without waiting for the response. It's designed for scheduled jobs triggered by CloudWatch events, calling an endpoint without authentication. The code includes error handling, logging, and integration with Sentry for error tracking.
+
+## Code Structure
+The main handler function is wrapped with Sentry for error tracking. It uses a helper function `sendRequest` to make the HTTP request. The code also imports utility functions from shared packages and initializes error capturing.
+
+## References
+- `@metriport/shared`: For utility functions like `executeWithNetworkRetries`, `getEnvVar`, and `getEnvVarOrFail`.
+- `@sentry/serverless`: For error tracking and wrapping the Lambda handler.
+- `./shared/capture`: For initializing error capturing.
+
+## Symbols
+
+### `handler`
+#### Description
+The main Lambda function handler, wrapped with Sentry for error tracking. It sends a POST request to a specified URL and logs the outcome.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | unknown | The Lambda event object |
+
+#### Internal Logic
+1. Logs the URL being called.
+2. Executes the `sendRequest` function with network retries.
+3. Logs the completion of the request.
+4. Catches and logs any errors, capturing them with Sentry.
+
+### `sendRequest`
+#### Description
+Sends an HTTP request without waiting for the response, only confirming that the request was received.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | The URL to send the request to |
+| method | string | The HTTP method to use |
+| data | Record&lt;string, unknown&gt; | Optional data to send with the request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| request | Promise&lt;http.ClientRequest&gt; | A promise that resolves to the request object |
+
+#### Internal Logic
+1. Parses the URL to determine the protocol (http or https).
+2. Creates an HTTP/HTTPS request with specified options.
+3. Writes data to the request if provided.
+4. Ends the request and resolves the promise when the request is fully sent.
+
+## Side Effects
+- Sends an HTTP/HTTPS request to the specified URL.
+- Logs information and errors to the console.
+- Captures errors and sends them to Sentry.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/shared | Provides utility functions for environment variables and network retries |
+| @sentry/serverless | Error tracking and Lambda handler wrapping |
+| http/https | For making HTTP/HTTPS requests |
+| url | For parsing URLs |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| URL | string | N/A | The URL to send the request to (required) |
+| TIMEOUT_MILLIS | number | undefined | Optional timeout for the request in milliseconds |
+
+## Error Handling
+Errors are caught in the main handler function, logged to the console, and captured using Sentry. The error is then re-thrown, which will cause the Lambda function to fail.
+
+## Logging
+The code uses `console.log` for logging information about the request being sent and any errors that occur.
+
+## TODOs
+There is a commented-out TODO for writing a function to convert object keys into an array. This function is not implemented in the current code.

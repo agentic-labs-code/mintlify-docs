@@ -1,0 +1,108 @@
+---
+title: "get-orgs.ts"
+---
+
+## High-level description
+This code provides functionality to manage and retrieve Care Quality (CQ) organizations within the CommonWell Health Alliance network. It defines data structures for organizations, offers methods to fetch and group organizations by priority, and provides utilities to chunk the organization data for efficient processing.
+
+## Code Structure
+The main symbols in this code are interconnected as follows:
+- `getOrgs()` retrieves all CQ organizations.
+- `getOrgsByPrio()` groups organizations by priority, using `getOrgs()`.
+- `getOrgsInChunks()` and `getOrgChunksFromPos()` both use `getOrgs()` to retrieve and chunk the organization data.
+- The priority-checking functions (`isHighPrio`, `isMediumPrio`, `isLowPrio`) are used to categorize organizations.
+
+## Symbols
+
+### `OrgPrio`
+#### Description
+A type alias representing the priority levels for organizations: "high", "medium", or "low".
+
+### `CQOrg`
+#### Description
+An interface representing the basic structure of a CQ organization, containing an id and name.
+
+### `CQOrgHydrated`
+#### Description
+An interface extending `CQOrg` with additional properties: states, gateway, and optional priority.
+
+### `Gateway`
+#### Description
+An interface extending `CQOrg` with an additional property `Organizations` which is an array of `CQOrg`.
+
+### `getOrgs()`
+#### Description
+A function that retrieves all CQ organizations.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | CQOrgHydrated[] | An array of hydrated CQ organizations |
+
+### `getOrgsByPrio()`
+#### Description
+A function that groups CQ organizations by their priority.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | Record&lt;OrgPrio, CQOrgHydrated[]&gt; | An object with priority keys mapping to arrays of organizations |
+
+#### Internal Logic
+1. Initialize result object with empty arrays for each priority.
+2. Group organizations by priority using `groupBy` from lodash.
+3. Iterate through grouped organizations and assign them to the appropriate priority in the result.
+4. Assign organizations with undefined priority to "low" priority.
+
+### `isHighPrio()`, `isMediumPrio()`, `isLowPrio()`
+#### Description
+Helper functions to check the priority of a given organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| org | CQOrgHydrated | The organization to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | boolean | Whether the organization matches the priority |
+
+### `getOrgsInChunks()`
+#### Description
+A function that retrieves CQ organizations in chunks.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| chunkSize | number | (Optional) The size of each chunk, defaults to CQ_ORG_CHUNK_SIZE |
+| orgs | CQOrgHydrated[] | (Optional) The organizations to chunk, defaults to result of getOrgs() |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | { total: number; chunks: CQOrgHydrated[][] } | Object containing total count and chunked organizations |
+
+### `getOrgChunksFromPos()`
+#### Description
+A function that retrieves CQ organization chunks starting from a given position.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| chunkSize | number | (Optional) The size of each chunk |
+| fromPos | number | (Optional) The starting position, defaults to 0 |
+| orgs | CQOrgHydrated[] | (Optional) The organizations to chunk |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | { total: number; chunks: CQOrgHydrated[][] } | Object containing total count and chunked organizations |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| lodash | Used for utility functions like `chunk` and `groupBy` |
+| ./cq-org-list.json | Imported as `orgs`, likely contains the list of CQ organizations |
+
+This code provides a robust set of utilities for managing and retrieving CQ organizations, with options for prioritization and chunking to handle large datasets efficiently.

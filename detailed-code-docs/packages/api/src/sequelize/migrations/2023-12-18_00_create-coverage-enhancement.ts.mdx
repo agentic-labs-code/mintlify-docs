@@ -1,0 +1,62 @@
+---
+title: "2023-12-18_00_create-coverage-enhancement.ts"
+---
+
+## High-level description
+This code defines a database migration script using Sequelize.js. It creates a new table named "coverage-enhancement" to store patient coverage enhancement data, including patient ID, EC ID, CX ID, JSON data, and timestamps. The script also includes a rollback function to drop the table if needed.
+
+## Symbols
+
+### `up`
+#### Description
+This asynchronous function defines the steps to apply the migration, creating the "coverage-enhancement" table.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | object | An object containing the Sequelize QueryInterface instance for interacting with the database. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. Starts a database transaction to ensure atomicity.
+2. Uses `queryInterface.createTable` to create the "coverage-enhancement" table with the following columns:
+    - `patientId` (UUID, primary key)
+    - `ecId` (UUID, primary key)
+    - `cxId` (UUID)
+    - `data` (JSONB)
+    - `createdAt` (DATE(6), not null, default: current timestamp)
+    - `updatedAt` (DATE(6), not null, default: current timestamp)
+3. Commits the transaction if all operations are successful.
+
+### `down`
+#### Description
+This asynchronous function defines the steps to roll back the migration, dropping the "coverage-enhancement" table.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | object | An object containing the Sequelize QueryInterface instance for interacting with the database. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise | A promise that resolves when the rollback is complete. |
+
+#### Internal Logic
+1. Starts a database transaction to ensure atomicity.
+2. Uses `queryInterface.dropTable` to drop the "coverage-enhancement" table.
+3. Commits the transaction if the drop operation is successful.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Provides the ORM and migration framework. |
+| DataTypes | Used to define column data types in the migration. |
+| literal | Used to create SQL literals for default values. |
+
+## Error Handling
+The code uses database transactions to ensure that either all migration steps are applied or none are. If any operation within the transaction fails, the entire transaction will be rolled back, preventing an inconsistent database state.

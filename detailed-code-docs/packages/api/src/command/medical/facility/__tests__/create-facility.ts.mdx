@@ -1,0 +1,61 @@
+---
+title: "create-facility.ts"
+---
+
+## High-level description
+The code defines two factory functions, `makeFacilityCreateCmd` and `makeFacilityCreate`, used in tests to create instances of `FacilityCreate` objects with pre-populated data. These objects represent data required to create a new medical facility in the system.
+
+## Code Structure
+Both functions utilize helper functions like `makeBaseDomain` and `makeFacilityData` to generate parts of the `FacilityCreate` object. They also rely on the `isOboFacility` function to determine if certain fields should be populated based on the facility type.
+
+## References
+- `FacilityCreate`, `FacilityType`, `isOboFacility` from `../../../../domain/medical/facility`
+- `makeFacilityData` from `../../../../domain/medical/__tests__/facility`
+- `makeBaseDomain` from `../../../../domain/__tests__/base-domain`
+
+## Symbols
+
+### `makeFacilityCreateCmd`
+#### Description
+Creates a `FacilityCreate` object tailored for command usage, omitting specific fields like `id`, `eTag`, `createdAt`, and `updatedAt`. It determines the active status for Carequality (CQ) and Commonwell (CW) based on the provided or default facility types.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | Partial&lt;DeepNullable&lt;FacilityCreate&gt;&gt; & Partial&lt;Pick&lt;FacilityCreate, "data"&gt;&gt; | Optional parameters to customize the generated `FacilityCreate` object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resp | FacilityCreate | A `FacilityCreate` object with pre-populated data, excluding `id`, `eTag`, `createdAt`, and `updatedAt`. |
+
+#### Internal Logic
+1. Determines CQ and CW facility types, defaulting to `FacilityType.initiatorAndResponder` if not provided.
+2. Calculates CQ and CW active status based on the facility type and `isOboFacility` check.
+3. Constructs a `preResponse` object with base domain data, generated UUIDs for `cxId`, optional `cqOboOid` and `cwOboOid`, and facility data.
+4. Removes `id`, `eTag`, `createdAt`, and `updatedAt` from `preResponse` to create the final `resp` object.
+
+### `makeFacilityCreate`
+#### Description
+Creates a `FacilityCreate` object with pre-populated data, including randomly generated boolean values for `cqActive` and `cwActive` if not explicitly provided.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | Partial&lt;DeepNullable&lt;FacilityCreate&gt;&gt; & Partial&lt;Pick&lt;FacilityCreate, "data"&gt;&gt; | Optional parameters to customize the generated `FacilityCreate` object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | FacilityCreate | A `FacilityCreate` object with pre-populated data. |
+
+#### Internal Logic
+1. Determines CQ and CW facility types, defaulting to `FacilityType.initiatorAndResponder`.
+2. Generates random boolean values for `cqActive` and `cwActive` if not explicitly provided, considering the facility type and `isOboFacility` check.
+3. Constructs a `FacilityCreate` object with base domain data, generated UUIDs for `cxId`, optional `cqOboOid` and `cwOboOid`, and facility data.
+
+
+## Dependencies
+- `@faker-js/faker`: Used for generating realistic fake data.
+- `ts-essentials`: Provides the `DeepNullable` type.
+

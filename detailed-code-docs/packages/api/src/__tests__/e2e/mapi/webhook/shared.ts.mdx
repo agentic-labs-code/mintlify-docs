@@ -1,0 +1,50 @@
+---
+title: "shared.ts"
+---
+
+## High-level description
+The `checkWebhookRequestMeta` function is a test helper function that verifies the structure and content of the metadata included in a webhook request. It specifically checks for the presence and validity of the `type`, `messageId`, and `when` fields within the metadata object.
+
+## Symbols
+
+### `checkWebhookRequestMeta`
+#### Description
+This function checks the metadata of a webhook request to ensure it conforms to the expected structure and contains valid data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| whRequest | `WebhookRequest` \| `undefined` | The webhook request object to be checked. |
+| type | `WebhookRequest["meta"]["type"]` | The expected type of the webhook request. |
+
+#### Outputs
+This function does not return any value.
+
+#### Internal Logic
+1. **Assert Request Existence:** Checks if `whRequest` is truthy (not null or undefined). If not, throws an error.
+2. **Assert Metadata Existence:** Checks if the `meta` property exists on the `whRequest`. If not, throws an error.
+3. **Assert Metadata Structure:** Expects the `meta` object to contain the following properties with specific types:
+    - `type`: Matches the `type` argument passed to the function.
+    - `messageId`: Any value is accepted, but it's further validated in the next step.
+    - `when`: Any value is accepted, but it's further validated in a later step.
+4. **Validate Message ID:** Uses the `validateUuid` function to ensure the `messageId` is a valid UUID.
+5. **Validate Timestamp:** 
+    - Calculates an expected date range for the `when` property. The range is one minute before and one minute after the current time.
+    - Converts the `when` property to a Date object.
+    - Asserts that the received date falls within the expected date range.
+6. **Assert Absence of `data`:** Expects the `meta` object to NOT contain a `data` property, or if it does, it should be falsy.
+
+#### Side Effects
+- Throws an error if any of the assertions fail.
+
+## References
+- `WebhookRequest`: This type likely represents the structure of a webhook request and is defined externally.
+- `validateUuid`: This function is used to validate UUIDs and is likely imported from a utility library.
+
+## Dependencies
+- `@metriport/shared/medical`: This package likely contains the definition of the `WebhookRequest` type.
+- `dayjs`: This library is used for date and time manipulation.
+- `uuid`: This library is used for UUID validation.
+
+## Error Handling
+- The function throws errors with descriptive messages if any of the assertions fail, aiding in debugging test failures.

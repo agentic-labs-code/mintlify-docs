@@ -1,0 +1,97 @@
+---
+title: "get-facility.ts"
+---
+
+## High-level description
+The code defines several functions for retrieving facilities from the database based on different criteria, such as cxId, id, oid, and npi. It also includes functions for retrieving facilities and throwing an error if not found.
+
+## Code Structure
+The code consists of several asynchronous functions that interact with the `FacilityModel` to query and retrieve facility data. The functions take different query parameters and return either a single `FacilityModel` object or an array of `FacilityModel` objects.
+
+## References
+- `FacilityModel`: Represents the facility data model.
+- `NotFoundError`: Custom error class for handling not found scenarios.
+
+## Symbols
+
+### `getFacilities`
+#### Description
+Retrieves an array of facilities from the database based on the provided query parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The ID of the customer. |
+| ids | string[] | Optional array of facility IDs to filter by. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;FacilityModel[]\&gt; | Promise\&lt;FacilityModel[]\&gt; | A promise that resolves to an array of `FacilityModel` objects. |
+
+#### Internal Logic
+- Queries the `FacilityModel` to find all facilities matching the provided `cxId` and optional `ids`.
+- Orders the results by `id` in ascending order.
+
+### `getFacilityOrFail`
+#### Description
+Retrieves a single facility from the database based on the provided `cxId` and `id`. Throws a `NotFoundError` if no facility is found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The ID of the customer. |
+| id | string | The ID of the facility. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;FacilityModel\&gt; | Promise\&lt;FacilityModel\&gt; | A promise that resolves to a `FacilityModel` object. |
+
+#### Internal Logic
+- Queries the `FacilityModel` to find a facility matching the provided `cxId` and `id`.
+- Throws a `NotFoundError` if no facility is found.
+
+### `getFaciltiyByOidOrFail`
+#### Description
+Retrieves a single facility from the database based on the provided `cxId`, `id`, and `oid`. Throws a `NotFoundError` if no facility is found or if the `oid` does not match.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filter | GetFacilityQuery & { oid: string } | An object containing the `cxId`, `id`, and `oid` of the facility. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;FacilityModel\&gt; | Promise\&lt;FacilityModel\&gt; | A promise that resolves to a `FacilityModel` object. |
+
+#### Internal Logic
+- Calls `getFacilityOrFail` to retrieve the facility based on `cxId` and `id`.
+- Throws a `NotFoundError` if the retrieved facility's `oid` does not match the provided `oid`.
+
+### `getFacilityByNpi`
+#### Description
+Retrieves a single facility from the database based on the provided `cxId` and `npi`. Returns `null` if no facility is found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The ID of the customer. |
+| npi | string | The NPI of the facility. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;FacilityModel \| null\&gt; | Promise\&lt;FacilityModel \| null\&gt; | A promise that resolves to a `FacilityModel` object or `null`. |
+
+#### Internal Logic
+- Queries the `FacilityModel` to find a facility matching the provided `cxId` and `npi` within the `data` field.
+
+## Error Handling
+- Throws `NotFoundError` if a facility is not found or if the provided `oid` does not match.
+
+## Dependencies
+- `FacilityModel`
+- `NotFoundError`
+

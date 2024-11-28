@@ -1,0 +1,99 @@
+---
+title: "api.ts"
+---
+
+Here's a high-level description and documentation of the target file:
+
+## High-level description
+
+The file `packages/api/src/external/commonwell/api.ts` provides functionality for interacting with the CommonWell Health Alliance API. It defines functions to create instances of the CommonWell API client and management API client, as well as utility functions for handling certificates and query metadata.
+
+## Code Structure
+
+The main symbols in this file are:
+
+1. `makeCommonWellManagementAPI()`: Creates an instance of the CommonWell Management API client.
+2. `makeCommonWellAPI()`: Creates an instance of the CommonWell API client.
+3. `metriportQueryMeta`: Defines default query metadata for Metriport.
+4. `getCertData()`: Retrieves certificate data.
+5. `getCertificate()`: Retrieves certificate information.
+
+These functions are interconnected, with `makeCommonWellAPI()` and `makeCommonWellManagementAPI()` being the primary entry points for interacting with the CommonWell API.
+
+## Symbols
+
+### `makeCommonWellManagementAPI()`
+
+#### Description
+Creates and returns an instance of the CommonWellManagementAPI, which is used exclusively for operations performed through the management portal.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | CommonWellManagementAPI \| undefined | An instance of CommonWellManagementAPI or undefined if required configuration is missing |
+
+#### Internal Logic
+1. Retrieves the cookie ARN and management base URL from the configuration.
+2. If either is missing, returns undefined.
+3. Creates a CookieManagerOnSecrets instance.
+4. Calls `makeApi()` with the cookie manager and base URL to create and return the API instance.
+
+### `makeCommonWellAPI()`
+
+#### Description
+Creates and returns an instance of the CommonWell API client for a specific organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| orgName | string | Organization Name |
+| orgOID | string | Organization OID without 'urn:oid:' namespace |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | CommonWellAPI | An instance of CommonWellAPI |
+
+#### Internal Logic
+1. Checks if the environment is sandbox, returns a mock if true.
+2. Determines if it's a member API based on the OID.
+3. Creates and returns a CommonWell instance with appropriate credentials and settings.
+
+### `metriportQueryMeta`
+
+#### Description
+Defines default query metadata for Metriport.
+
+### `getCertData()`
+
+#### Description
+Retrieves certificate data from the CommonWell organization certificate.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | Object | An object containing validFrom, validTo, and thumbprint of the certificate |
+
+### `getCertificate()`
+
+#### Description
+Retrieves certificate information formatted for CommonWell API use.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | Object | An object containing certificate information for authentication and signing purposes |
+
+## Dependencies
+The file depends on various external libraries and internal modules, including:
+- @metriport/commonwell-sdk
+- @metriport/core
+- crypto
+- dayjs
+- Configuration settings from '../../shared/config'
+
+## Configuration
+The file relies on several configuration options from the Config object, including API modes, certificate information, and CommonWell-specific settings.
+
+## Error Handling
+The code includes basic error handling, such as checking for the existence of required configuration values. However, most error handling is left to the calling functions.

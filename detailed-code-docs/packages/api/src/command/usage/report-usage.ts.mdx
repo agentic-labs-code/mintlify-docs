@@ -1,0 +1,52 @@
+---
+title: "report-usage.ts"
+---
+
+## High-level description
+The `reportUsage` function in `report-usage.ts` is responsible for asynchronously sending usage data to a configured endpoint. This data includes customer ID, entity ID, product type, and whether a document query was involved.
+
+## References
+- `Config.getUsageUrl()`: Retrieves the URL of the usage reporting endpoint from the application configuration.
+- `capture.error()`: Reports an error to an error tracking service (likely Sentry).
+
+## Symbols
+
+### `reportUsage`
+#### Description
+This function sends usage data to a predefined endpoint. It's designed to be asynchronous, meaning it doesn't block the execution flow and handles potential errors internally.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The ID of the customer. |
+| entityId | string | The ID of the entity associated with the usage (e.g., user ID). |
+| product | Product | An enum value representing the product being used. |
+| docQuery | boolean | (Optional) Indicates whether the usage involved a document query. |
+
+#### Outputs
+This function does not return any value (void).
+
+#### Internal Logic
+1. Retrieves the usage reporting URL from the configuration.
+2. If the URL is not configured, the function exits early.
+3. Constructs a payload object containing the usage data.
+4. Sends a POST request to the configured URL with the payload.
+5. If the request fails, logs an error message to the console and reports the error to an error tracking service.
+
+## Side Effects
+- Sends a POST request to the configured usage reporting endpoint.
+- Logs an error message to the console if the request fails.
+- Reports errors to an error tracking service.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Axios | Used for making HTTP requests to the usage reporting endpoint. |
+| json-stringify-safe | Used for safely stringifying the payload object, handling circular references. |
+| Config | Provides access to application configuration, including the usage reporting URL. |
+| capture | Provides error reporting functionality. |
+
+## Error Handling
+- Errors during the HTTP request are caught and handled within the function.
+- Error messages are logged to the console.
+- Errors are reported to an error tracking service.

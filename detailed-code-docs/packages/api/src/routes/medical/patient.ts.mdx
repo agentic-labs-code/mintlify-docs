@@ -1,0 +1,263 @@
+---
+title: "patient.ts"
+---
+
+## High-level description
+This file defines the routes and handlers for patient-related operations in a medical API. It includes endpoints for creating, updating, retrieving, and deleting patients, as well as managing consolidated patient data, medical records, and facility matches.
+
+## Code Structure
+The code is structured as a series of route definitions using Express.js. Each route corresponds to a specific patient-related operation and is associated with one or more handler functions. These handlers interact with various commands and services to perform the requested operations.
+
+## Symbols
+
+### `router`
+#### Description
+An Express router instance that defines the routes for patient-related operations.
+
+### `POST /`
+#### Description
+Creates a new patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.query.facilityId | string | The ID of the facility to associate with the patient |
+| req.body | PatientCreate | Patient data to create |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res.body | PatientDTO | The created patient data |
+
+#### Internal Logic
+1. Validates input and checks sandbox patient limit if applicable
+2. Creates the patient using the `createPatient` function
+3. Returns the created patient data
+
+### `PUT /:id`
+#### Description
+Updates an existing patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.id | string | The ID of the patient to update |
+| req.query.facilityId | string | The ID of the facility associated with the patient |
+| req.body | PatientUpdate | Updated patient data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res.body | PatientDTO | The updated patient data |
+
+#### Internal Logic
+1. Retrieves the existing patient
+2. Validates input and checks if documents are processing
+3. Updates the patient using the `updatePatient` function
+4. Returns the updated patient data
+
+### `GET /:id`
+#### Description
+Retrieves a specific patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.id | string | The ID of the patient to retrieve |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res.body | PatientDTO | The retrieved patient data |
+
+### `DELETE /:id`
+#### Description
+Deletes a specific patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.id | string | The ID of the patient to delete |
+| req.query.facilityId | string | The ID of the facility associated with the patient |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res.status | number | 204 No Content |
+
+### `GET /`
+#### Description
+Retrieves all patients for a customer.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.query.facilityId | string | (Optional) The ID of the facility to filter patients |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res.body | { patients: PatientDTO[] } | Array of patient data |
+
+### `GET /:id/consolidated`
+#### Description
+Retrieves consolidated data for a specific patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.id | string | The ID of the patient |
+| req.query.resources | string | (Optional) Comma-separated list of resources to retrieve |
+| req.query.dateFrom | string | (Optional) Start date for filtering resources |
+| req.query.dateTo | string | (Optional) End date for filtering resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res.body | ConsolidatedData | Consolidated patient data |
+
+### `GET /:id/consolidated/query`
+#### Description
+Retrieves the status of a patient's consolidated data query.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.id | string | The ID of the patient |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res.body | GetConsolidatedQueryProgressResponse | Query status information |
+
+### `POST /:id/consolidated/query`
+#### Description
+Triggers a consolidated data query for a patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.id | string | The ID of the patient |
+| req.query.resources | string | (Optional) Comma-separated list of resources to retrieve |
+| req.query.dateFrom | string | (Optional) Start date for filtering resources |
+| req.query.dateTo | string | (Optional) End date for filtering resources |
+| req.query.conversionType | string | (Optional) File format for the document |
+| req.body | unknown | (Optional) Metadata to be sent through Webhook |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res.body | StartConsolidatedQueryProgressResponse | Query initiation status |
+
+### `GET /:id/medical-record`
+#### Description
+Retrieves the URL to download a patient's medical record summary.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.id | string | The ID of the patient |
+| req.query.conversionType | string | Format of the medical record summary (pdf or html) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res.body | { url: string } | URL to download the medical record summary |
+
+### `GET /:id/medical-record-status`
+#### Description
+Checks the status of a patient's medical record summary.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.id | string | The ID of the patient |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res.body | object | Status of the medical record summary |
+
+### `PUT /:id/consolidated`
+#### Description
+Adds or updates resources from a FHIR bundle for a patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.id | string | The ID of the patient |
+| req.body | Bundle | FHIR Bundle to create or update resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res.body | Bundle | FHIR Bundle with operation outcome |
+
+### `GET /:id/consolidated/count`
+#### Description
+Returns the count of resources a patient has on the FHIR server.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.id | string | The ID of the patient |
+| req.query.resources | string | (Optional) Comma-separated list of resources to count |
+| req.query.dateFrom | string | (Optional) Start date for filtering resources |
+| req.query.dateTo | string | (Optional) End date for filtering resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res.body | ResourceCount | Count of resources for the patient |
+
+### `POST /match`
+#### Description
+Searches for a patient based on demographic data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.body | Demographics | Demographic data for patient matching |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res.body | PatientDTO | Matched patient data |
+
+### `GET /:id/facility-matches`
+#### Description
+Retrieves all facilities the patient is matched to.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.id | string | The ID of the patient |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res.body | PatientFacilityMatch[] | Array of facility matches for the patient |
+
+### `GET /:id/consolidated/webhook`
+#### Description
+Retrieves the webhook for a patient's consolidated query.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.params.id | string | The ID of the patient |
+| req.query.requestId | string | The ID of the request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res.body | ConsolidatedWebhookQuery | Webhook information for the consolidated query |
+
+## Dependencies
+The code relies on various imported functions and types from other modules, including API SDK, core domain models, and utility functions. It also uses external libraries such as Express, Zod for schema validation, and Lodash for utility functions.
+
+## Error Handling
+The code uses try-catch blocks and the `asyncHandler` wrapper to handle errors. It throws specific error types (e.g., `BadRequestError`, `NotFoundError`) for different scenarios and uses the `capture.error` function to log errors.
+
+## Configuration
+The code uses the `Config` object to access environment-specific configuration values, such as sandbox mode settings and feature flags.

@@ -1,0 +1,83 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains configuration files related to Amazon Web Services (AWS) services, specifically focusing on Amazon Elastic Container Service (ECS) and Amazon Relational Database Service (RDS). These configurations are likely used to set up and manage infrastructure components in an AWS environment.
+
+## What does it do?
+The code in this directory provides type definitions and configurations for two main AWS services:
+
+1. Amazon ECS: It defines memory and CPU configurations for ECS tasks, which are used to run containerized applications. These configurations help in specifying the resources allocated to each task, ensuring optimal performance and cost-efficiency.
+
+2. Amazon RDS: It defines alarm thresholds for various metrics of RDS instances, particularly for Aurora Serverless v2 clusters. These thresholds are used to set up monitoring and alerting for database performance and health.
+
+These configurations allow developers and infrastructure managers to:
+- Properly allocate resources for containerized applications running on ECS
+- Set up monitoring and alerting for RDS database instances
+- Ensure that the infrastructure is running efficiently and that any issues are promptly detected
+
+## Key Files
+
+1. `ecs.ts`:
+   This file defines two important types: `ECS_MEMORY` and `ECS_CPU`. These types represent the valid memory and CPU configurations for ECS tasks. The file includes detailed comments explaining the valid combinations of memory and CPU values, which is crucial for setting up ECS task definitions correctly.
+
+2. `rds.ts`:
+   This file defines the `RDSAlarmThresholds` type, which is used to configure alarm thresholds for various RDS metrics. This type is particularly useful for setting up monitoring and alerting for Aurora Serverless v2 clusters.
+
+## Configuration
+
+### ECS Configuration (`ecs.ts`)
+The `ECS_MEMORY` and `ECS_CPU` types in `ecs.ts` serve as configuration guides for ECS task definitions. They provide the following information:
+
+- Valid memory allocations range from 512 MB to 122880 MB (120 GB)
+- Valid CPU allocations range from 256 (.25 vCPU) to 16384 (16 vCPU)
+- Detailed mapping of memory to CPU options, for example:
+  - 512 MB to 2048 MB can be paired with 256 (.25 vCPU)
+  - 1024 MB to 4096 MB can be paired with 512 (.5 vCPU)
+  - Larger memory allocations allow for more CPU options
+
+Example usage:
+```typescript
+const taskMemory: ECS_MEMORY = 1024; // 1 GB
+const taskCPU: ECS_CPU = 256; // .25 vCPU
+```
+
+### RDS Configuration (`rds.ts`)
+The `RDSAlarmThresholds` type in `rds.ts` defines the structure for configuring RDS alarm thresholds:
+
+```typescript
+type RDSAlarmThresholds = {
+  acuUtilizationPct: number;
+  cpuUtilizationPct: number;
+  freeableMemoryMb: number;
+  volumeReadIops: number;
+  volumeWriteIops: number;
+  freeLocalStorageMb?: number; // Defaults to 10GB if not specified
+};
+```
+
+This type allows users to set specific threshold values for different metrics when creating or managing RDS instances. For example:
+
+```typescript
+const alarmThresholds: RDSAlarmThresholds = {
+  acuUtilizationPct: 80,
+  cpuUtilizationPct: 70,
+  freeableMemoryMb: 1024,
+  volumeReadIops: 1000,
+  volumeWriteIops: 500,
+  freeLocalStorageMb: 5120 // 5 GB
+};
+```
+
+These configurations are likely used in conjunction with other parts of the infrastructure setup, such as in the `packages/infra/config/env-config.ts` file, where the `RDSAlarmThresholds` type is referenced in the `EnvConfigBase` type.
+
+## Dependencies
+The code in this directory doesn't explicitly import any external libraries or modules. However, it relies on AWS services and documentation:
+
+1. Amazon ECS: The ECS configurations are based on the AWS ECS documentation for task definition parameters. The specific reference is:
+   https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#task_size
+
+2. Amazon RDS: The RDS alarm thresholds are designed for use with Aurora Serverless v2 clusters, indicating a dependency on this specific AWS RDS offering.
+
+These configurations are crucial for setting up and managing AWS infrastructure, ensuring that containerized applications and databases are properly resourced and monitored. The detailed comments and type definitions provide valuable guidance for developers working with these AWS services, helping to prevent misconfigurations and optimize resource allocation.

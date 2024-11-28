@@ -1,0 +1,143 @@
+---
+title: "organization.ts"
+---
+
+## High-level description
+This code defines functions and types for interacting with CommonWell Health Alliance's API, managing organizations, and handling CommonWell-related operations within the Metriport system. It includes functionality for creating, updating, and retrieving organization information, as well as managing certificates and API connections.
+
+## Code Structure
+The main symbols in this code are functions that interact with the CommonWell API, manage organizations, and handle configuration settings. These functions are used to create, update, and retrieve organization information, as well as to manage certificates and API connections. The code also includes type definitions and utility functions to support these operations.
+
+## Symbols
+
+### `organizationToCommonwell`
+#### Description
+Converts a Metriport organization object to a CommonWell organization object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| org | CWOrganization | The Metriport organization object |
+| isObo | boolean | Indicates if this is an "on behalf of" operation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cwOrg | CWSdkOrganizationWithOrgId | The CommonWell organization object |
+
+#### Internal Logic
+1. Creates a CommonWell ID by concatenating the OID_PREFIX with the organization's OID.
+2. Constructs the CommonWell organization object with the required fields.
+3. Adds authorization information and gateway settings if not an "on behalf of" operation.
+
+### `get`
+#### Description
+Retrieves a CommonWell organization by its OID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| orgOid | string | The organization's OID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | CWSdkOrganization \| undefined | The retrieved CommonWell organization or undefined if not found |
+
+### `create`
+#### Description
+Creates a new organization in CommonWell.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer ID |
+| org | CWOrganization | The organization to create |
+| isObo | boolean | Indicates if this is an "on behalf of" operation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| void | void | No return value |
+
+### `update`
+#### Description
+Updates an existing organization in CommonWell.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer ID |
+| org | CWOrganization | The organization to update |
+| isObo | boolean | Indicates if this is an "on behalf of" operation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| void | void | No return value |
+
+### `initCQOrgIncludeList`
+#### Description
+Initializes the CareQuality organization include list for a given organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| orgOid | string | The organization's OID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| void | void | No return value |
+
+### `parseCWEntry`
+#### Description
+Parses a CommonWell organization entry into a Metriport CWOrganization object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| org | CWSdkOrganization | The CommonWell organization object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cwOrg | CWOrganization | The parsed Metriport CWOrganization object |
+
+### `getParsedOrgOrFail`
+#### Description
+Retrieves and parses a CommonWell organization, throwing an error if not found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| oid | string | The organization's OID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cwOrg | CWOrganization | The parsed Metriport CWOrganization object |
+
+## Dependencies
+- @metriport/shared
+- @metriport/core/util/error/not-found
+- @metriport/commonwell-sdk
+- @metriport/core/domain/oid
+- @metriport/core/domain/organization
+- @metriport/core/external/commonwell/cq-bridge/get-orgs
+- @metriport/core/util/log
+- @metriport/core/util/notifications
+- ../../shared/config
+- ../aws/app-config
+- ./api
+
+## Configuration
+The code uses various configuration options from the `Config` object, including CommonWell-related settings, API endpoints, and certificate information.
+
+## Error Handling
+The code includes error handling for API calls and operations, capturing errors and logging them using the `capture.error` function.
+
+## Logging
+Logging is performed using the `out` function from `@metriport/core/util/log`.
+
+This code is part of a larger system for managing healthcare organization data and integrating with CommonWell Health Alliance's services. It provides essential functionality for creating, updating, and retrieving organization information in both the Metriport system and CommonWell's network.

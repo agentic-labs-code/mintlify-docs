@@ -1,0 +1,83 @@
+---
+title: "jest.config.ts"
+---
+
+## High-level description
+This file defines the Jest configuration for a TypeScript project. It sets up the testing environment, specifies test file patterns, and configures other Jest-related settings. The configuration adapts based on whether end-to-end (E2E) tests are being run or not.
+
+## Symbols
+
+### `config`
+#### Description
+This constant defines the Jest configuration object of type `JestConfigWithTsJest`. It sets up various testing parameters and behaviors for the Jest test runner.
+
+#### Inputs
+N/A (This is a configuration object, not a function)
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | JestConfigWithTsJest | Jest configuration object |
+
+#### Internal Logic
+1. Sets the preset to "ts-jest" for TypeScript support.
+2. Configures the test environment as "node".
+3. Enables verbose output.
+4. Ignores test files in "/node_modules/" and "/dist/" directories.
+5. Defines test file patterns based on whether E2E tests are being run.
+6. Specifies a setup file to be executed after the test environment is set up.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ts-jest | Provides TypeScript support for Jest |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| preset | string | "ts-jest" | Specifies the Jest preset to use |
+| testEnvironment | string | "node" | Sets the test environment |
+| verbose | boolean | true | Enables verbose output |
+| testPathIgnorePatterns | string[] | ["/node_modules/", "/dist/"] | Patterns for directories to ignore |
+| testMatch | string[] | Conditional | Patterns to match test files |
+| setupFilesAfterEnv | string[] | ["./src/__tests__/env-setup.ts"] | Files to run after Jest is initialized |
+
+## Side Effects
+The script sets the `ENV_TYPE` environment variable to "development".
+
+```typescript
+process.env["ENV_TYPE"] = "development";
+```
+
+This may affect the behavior of tests or the application being tested, as it explicitly sets the environment type.
+
+## Performance Considerations
+The configuration uses `testPathIgnorePatterns` to exclude `/node_modules/` and `/dist/` directories from test discovery, which can improve performance by reducing the number of files Jest needs to process.
+
+## Notes
+1. The configuration uses a type import from "ts-jest":
+   ```typescript
+   import type { JestConfigWithTsJest } from "ts-jest";
+   ```
+   This ensures type safety for the Jest configuration object.
+
+2. The script checks for an environment variable to determine if E2E tests should be run:
+   ```typescript
+   const isE2E = process.env["E2E"] === "true";
+   ```
+   This allows for different test file patterns to be used based on whether E2E tests are being executed.
+
+3. The `testMatch` configuration is dynamically set based on the `isE2E` variable:
+   ```typescript
+   testMatch: isE2E
+     ? ["**/__tests__/**/(*.)+(spec|test).e2e.[jt]s?(x)"]
+     : ["**/__tests__/**/(*.)+(spec|test).[jt]s?(x)"],
+   ```
+   This allows for separate patterns for E2E tests and regular tests.
+
+4. The configuration is exported as the default export, making it easy to import in other files:
+   ```typescript
+   export default config;
+   ```
+
+This Jest configuration file provides a flexible setup for running TypeScript-based tests, with special consideration for E2E testing scenarios.

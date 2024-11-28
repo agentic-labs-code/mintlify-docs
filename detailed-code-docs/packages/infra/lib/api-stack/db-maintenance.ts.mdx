@@ -1,0 +1,74 @@
+---
+title: "db-maintenance.ts"
+---
+
+## High-level description
+This code defines a stack for setting up a scheduled database maintenance task in an AWS infrastructure. It creates a Lambda function that runs on a schedule to perform maintenance operations on a database through an API endpoint.
+
+## Code Structure
+The main function `createScheduledDBMaintenance` uses helper functions and imported modules to set up the scheduled Lambda. The `getSettings` function prepares the configuration for the Lambda, while `createScheduledLambda` (imported from a shared module) creates the actual Lambda function.
+
+## Symbols
+
+### `getSettings`
+#### Description
+This function prepares the configuration settings for the scheduled Lambda function.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| props | EnhancedCoverageConnectorProps | Contains stack, lambdaLayers, vpc, and apiAddress |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| settings | Object | Configuration settings for the Lambda function |
+
+#### Internal Logic
+- Sets the name of the Lambda function
+- Defines the schedule expression for when the Lambda should run
+- Constructs the URL for the API endpoint
+- Sets the Lambda timeout duration
+
+### `createScheduledDBMaintenance`
+#### Description
+This function creates a scheduled Lambda function for database maintenance.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| props | EnhancedCoverageConnectorProps | Contains stack, lambdaLayers, vpc, and apiAddress |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lambda | IFunction | The created Lambda function |
+
+#### Internal Logic
+1. Retrieves configuration using `getConfig()`
+2. Calls `getSettings()` to prepare Lambda settings
+3. Uses `createScheduledLambda()` to create the Lambda function
+4. Sets up environment variables, including Sentry DSN if available
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-cdk-lib | Provides AWS CDK constructs and utilities |
+| constructs | Provides the Construct base class |
+| ../shared/config | Provides configuration utilities |
+| ../shared/lambda-layers | Provides Lambda layer utilities |
+| ../shared/lambda-scheduled | Provides utility for creating scheduled Lambdas |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| scheduleExpression | string[] | ["23 9 * * ? *"] | Cron expression for Lambda schedule (UTC) |
+| lambdaTimeout | Duration | 5 minutes | Maximum runtime for the Lambda function |
+
+## Error Handling
+The code doesn't implement specific error handling mechanisms. Error handling is likely managed by the `createScheduledLambda` function and the Lambda runtime environment.
+
+## Logging
+There's no explicit logging implemented in this code. Logging is likely handled by the Lambda function itself and AWS CloudWatch.
+
+This code sets up a crucial maintenance task for the database, ensuring it runs regularly without manual intervention. The use of a scheduled Lambda allows for efficient and automated database maintenance, which is essential for maintaining the health and performance of the database in a production environment.

@@ -1,0 +1,60 @@
+---
+title: "session-manager.ts"
+---
+
+## High-level description
+This code implements a session manager for CommonWell, a health data exchange platform. It maintains an active session by handling authentication, managing cookies, and dealing with code challenges. The script can be run in both local and cloud environments, using different implementations for cookie management and code challenge handling based on the environment.
+
+## Code Structure
+The main functionality is encapsulated in the `main()` function, which sets up the necessary components (cookie manager, code challenge handler, and CommonWell API) and then uses the `SessionManagement` class to keep the session active. The code allows for different implementations of cookie management and code challenge handling based on whether it's running locally or in a cloud environment.
+
+## Symbols
+
+### `main()`
+#### Description
+The main function that orchestrates the session management process for CommonWell.
+
+#### Internal Logic
+1. Logs the start time of the execution.
+2. If cookies are provided, it updates the cookie manager with these cookies.
+3. Sets up the configuration for `SessionManagement`, including credentials, API, cookie manager, code challenge handler, and browser settings.
+4. Instantiates a `SessionManagement` object and calls `keepSessionActive()` to maintain the session.
+5. Logs the completion time.
+
+### `buildStores()`
+#### Description
+A function that creates and returns the appropriate implementations of `CodeChallenge` and `CookieManager` based on the environment (local or cloud).
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| codeChallenge | CodeChallenge | An implementation of the CodeChallenge interface |
+| cookieManager | CookieManager | An implementation of the CookieManager interface |
+
+#### Internal Logic
+- If `isLocal` is true, it returns `CodeChallengeFromTerminal` and `CookieManagerInMemory`.
+- Otherwise, it returns `CodeChallengeFromSecretManager` and `CookieManagerOnSecrets` with appropriate configurations.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | For loading environment variables |
+| @metriport/core | Various utility classes and interfaces |
+| playwright | For browser automation (using Firefox) |
+| readline-sync | For reading input from the terminal in local mode |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| isLocal | boolean | false | Determines whether to use local or cloud-based implementations |
+| headless | boolean | true | Controls whether the browser runs in headless mode |
+
+## Error Handling
+The code doesn't implement specific error handling mechanisms beyond what's provided by the `SessionManagement` class. Errors are likely to be propagated up the call stack.
+
+## Logging
+The code uses `console.log` for basic logging of start and end times, as well as when overwriting cookies.
+
+## TODOs
+- There's a commented-out import for Chromium, suggesting that there might be plans to switch browsers if Firefox fails to get the cookie.
+- The `debug` option in the `SessionManagementConfig` is commented out, indicating that more detailed logging could be enabled if needed.

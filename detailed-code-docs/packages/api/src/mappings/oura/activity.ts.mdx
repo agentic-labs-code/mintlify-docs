@@ -1,0 +1,106 @@
+---
+title: "activity.ts"
+---
+
+## High-level description
+The `mapToActivity` function in `packages/api/src/mappings/oura/activity.ts` is responsible for transforming raw activity data retrieved from the Oura API into a standardized `MetriportActivity` object. This involves extracting relevant fields from the Oura data, mapping them to the corresponding fields in the `MetriportActivity` schema, and structuring the data according to the Metriport API specifications.
+
+## Code Structure
+The code defines a main function `mapToActivity` and several helper functions (`getActivityLogs`, `transformSessionsToActivityLogs`, `transformWorkoutsToActivityLogs`). The `mapToActivity` function orchestrates the transformation process by calling the helper functions to extract and format data from different Oura data sources. The helper functions handle the specific logic for extracting and transforming data from each Oura data type (daily activity, sessions, workouts).
+
+## References
+- `MetriportActivity` and `MetriportBiometrics` types from the `@metriport/api-sdk` package.
+- `PROVIDER_OURA` constant from the `../../shared/constants` module.
+- `Util` class from the `../../shared/util` module.
+- `streamingDataSchema` from the local module.
+- Several Oura data types (`OuraDailyActivity`, `OuraSessions`, `OuraWorkouts`) defined in the same file.
+
+## Symbols
+
+### `mapToActivity`
+#### Description
+This function maps Oura API data to a `MetriportActivity` object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| date | string | The date for which the activity data is being mapped. |
+| ouraDailyActivity | `OuraDailyActivity` | (Optional) Daily activity data from the Oura API. |
+| biometrics | `MetriportBiometrics` | (Optional) Biometrics data from the Oura API. |
+| sessions | `OuraSessions` | (Optional) Activity session data from the Oura API. |
+| workouts | `OuraWorkouts` | (Optional) Workout session data from the Oura API. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `MetriportActivity` | `MetriportActivity` | A `MetriportActivity` object containing the transformed activity data. |
+
+#### Internal Logic
+1. Calls `getActivityLogs` to combine session and workout data into an array of activity logs.
+2. Constructs a `MetriportActivity` object, populating its fields with data from the input parameters and the generated activity logs.
+3. Returns the constructed `MetriportActivity` object.
+
+### `getActivityLogs`
+#### Description
+This function combines session and workout data into a single array of activity logs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sessions | `OuraSessions` | (Optional) Activity session data from the Oura API. |
+| workouts | `OuraWorkouts` | (Optional) Workout session data from the Oura API. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| activityLogs | `Array&lt;ActivityLog&gt;` | An array of activity logs combining data from sessions and workouts. |
+
+#### Internal Logic
+1. Calls `transformSessionsToActivityLogs` and `transformWorkoutsToActivityLogs` to transform the respective data types into activity logs.
+2. Concatenates the resulting arrays of activity logs and returns the combined array.
+
+### `transformSessionsToActivityLogs`
+#### Description
+This function transforms an array of Oura activity sessions into an array of `ActivityLog` objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sessions | `OuraSessions` | (Optional) Activity session data from the Oura API. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| activityLogs | `Array&lt;ActivityLog&gt;` | An array of `ActivityLog` objects representing the transformed activity sessions. |
+
+#### Internal Logic
+1. Checks if the `sessions` array is defined and not empty.
+2. If so, it iterates over each session and constructs an `ActivityLog` object, extracting relevant data from the session object.
+3. If heart rate data is available for the session, it calculates and includes the minimum, maximum, and average heart rate in the `ActivityLog` object.
+4. Returns an empty array if the `sessions` array is undefined or empty.
+
+### `transformWorkoutsToActivityLogs`
+#### Description
+This function transforms an array of Oura workouts into an array of `ActivityLog` objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| workouts | `OuraWorkouts` | (Optional) Workout session data from the Oura API. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| activityLogs | `Array&lt;ActivityLog&gt;` | An array of `ActivityLog` objects representing the transformed workout sessions. |
+
+#### Internal Logic
+1. Checks if the `workouts` array is defined and not empty.
+2. If so, it iterates over each workout and constructs an `ActivityLog` object, extracting relevant data from the workout object.
+3. Returns an empty array if the `workouts` array is undefined or empty.
+
+## Dependencies
+- `@metriport/api-sdk`
+- `zod`
+
+## Error Handling
+The code includes basic error handling by checking for the existence of data before accessing it. For example, it checks if the `sessions` and `workouts` arrays are defined and not empty before iterating over them. However, it does not implement specific error handling beyond that.

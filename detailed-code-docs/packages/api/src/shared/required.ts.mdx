@@ -1,0 +1,69 @@
+---
+title: "required.ts"
+---
+
+## High-level description
+This code defines a utility function `required` that creates a conditional validation rule for object properties. It checks if a dependent property is required based on the presence of another property (dependency) in the same object.
+
+## Symbols
+
+### `required&lt;T&gt;`
+#### Description
+The `required` function is a higher-order function that generates a conditional validation rule. It takes a dependent property key and returns an object with a `when` method, which in turn creates a validation function based on a dependency property key.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dependent | keyof T | The key of the property that may be required |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object | { when: Function } | An object containing the `when` method |
+
+#### Internal Logic
+1. The function returns an object with a `when` method.
+2. The `when` method takes a `dependency` parameter and returns a validation function.
+3. The validation function checks if the `dependency` property exists in the input object.
+4. If the `dependency` exists, it validates the `dependent` property:
+   - Checks if the `dependent` property is not undefined.
+   - If the `dependent` property is a string, it also checks if it's not an empty string after trimming.
+5. If the `dependency` doesn't exist, the validation always returns true.
+
+### `when`
+#### Description
+The `when` method is a closure that captures the `dependent` property and creates a validation function based on a given `dependency` property.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dependency | keyof T | The key of the property that determines if the dependent property is required |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| function | (val: T) =&gt; boolean | A validation function that checks if the dependent property is required |
+
+### Validation Function (returned by `when`)
+#### Description
+This anonymous function performs the actual validation logic, checking if the dependent property is required based on the presence of the dependency property.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| val | T | The object to be validated |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| boolean | boolean | True if the validation passes, false otherwise |
+
+#### Internal Logic
+1. Check if the `dependency` property exists in the input object `val`.
+2. If it exists:
+   - Verify that the `dependent` property is not undefined.
+   - If the `dependent` property is a string, also check that it's not an empty string after trimming.
+3. If the `dependency` property doesn't exist, return true (no validation required).
+
+## Performance Considerations
+The function uses type parameters and keyof operator, which allows for type-safe property access and helps catch errors at compile-time. The validation is performed at runtime and involves simple property checks and string operations, which should be relatively efficient for most use cases.

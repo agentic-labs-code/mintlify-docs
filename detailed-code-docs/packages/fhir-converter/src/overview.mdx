@@ -1,0 +1,78 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `packages/fhir-converter/src` directory contains the core implementation of the FHIR Converter project. This project is designed to convert healthcare data from various formats, particularly Clinical Document Architecture (CDA), into Fast Healthcare Interoperability Resources (FHIR) format. The codebase includes modules for data handling, template management, conversion processes, and API endpoints.
+
+## What does it do?
+The FHIR Converter performs the following key functions:
+
+1. Converts CDA documents to FHIR resources using Handlebars templates.
+2. Provides an API for updating base templates and performing data conversions.
+3. Implements parallel processing for efficient handling of large datasets.
+4. Manages caching of templates and intermediate data for improved performance.
+5. Handles various data formats and types, with a focus on CDA to FHIR R4 conversion.
+6. Processes input data, applies conversion templates, and post-processes the resulting FHIR resources.
+7. Serves API documentation using Swagger UI.
+
+## Entry points
+The main entry points for the FHIR Converter are:
+
+1. `index.js`: Sets up the Express server and configures basic server settings.
+2. `routes.js`: Defines the API endpoints and routes for the application.
+3. `lib/dataHandler/dataHandlerFactory.js`: Creates data handlers for different input formats.
+4. `lib/handlebars-converter/handlebars-converter.js`: Implements the core conversion logic using Handlebars templates.
+5. `lib/workers/workerPool.js`: Manages parallel processing of conversion tasks.
+
+The typical workflow involves:
+1. Receiving a conversion request through the API.
+2. Parsing and preprocessing the input data.
+3. Applying the appropriate conversion templates.
+4. Post-processing the converted FHIR resources.
+5. Returning the final FHIR Bundle to the client.
+
+## Key Files
+1. `index.js`: Initializes the Express server and configures server settings.
+2. `routes.js`: Defines API endpoints and handles routing for the application.
+3. `init-service.js`: Ensures the existence of template directories and performs initial setup.
+4. `ccda-to-fhir-lambda.js`: Implements a Lambda function for CCDA to FHIR conversion.
+5. `lib/`: Contains the core library modules for data handling, conversion, and processing.
+6. `templates/`: Houses the Handlebars templates used for CDA to FHIR conversion.
+
+## Dependencies
+The FHIR Converter relies on several external libraries:
+
+1. Express: Web application framework
+2. Handlebars: Template processing engine
+3. xml2js, minify-xml, fast-xml-parser: XML processing libraries
+4. ANTLR4: Used for JSON parsing in output processing
+5. uuid: Generates unique identifiers
+6. deepmerge: Merges FHIR resources
+7. memory-cache: Implements in-memory caching
+8. swagger-ui-express and swagger-jsdoc: Generates and serves API documentation
+9. fs-extra: Enhanced file system operations
+
+## Configuration
+The application uses a combination of in-code constants and runtime configurations:
+
+1. Constants are defined in the `lib/constants/` directory.
+2. Server configuration (port, timeouts) is set in `index.js`.
+3. API routes and worker pool configuration are defined in `routes.js`.
+4. Template locations and cache settings are configurable at runtime.
+
+Example of initializing the converter with custom configuration:
+
+```javascript
+const { dataHandlerFactory } = require('./lib/dataHandler');
+const { instance: handlebarsConverter } = require('./lib/handlebars-converter');
+const WorkerPool = require('./lib/workers/workerPool');
+
+const dataHandler = dataHandlerFactory.createDataHandler('CDA');
+const handlebars = handlebarsConverter('CDA', templateLocation, dataHandler);
+const workerPool = new WorkerPool('./lib/workers/worker.js', 4);
+
+// Use these components to perform conversions
+```
+
+This codebase provides a comprehensive solution for converting healthcare data to FHIR format, with a focus on extensibility, performance, and data integrity. It offers both a web API and Lambda function implementation for flexible deployment options.

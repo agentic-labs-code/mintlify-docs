@@ -1,0 +1,100 @@
+---
+title: "s3.ts"
+---
+
+Here's a high-level description of the S3Utils class and its main functionality:
+
+The S3Utils class is a utility class for interacting with Amazon S3 (Simple Storage Service). It provides methods for common S3 operations such as uploading files, downloading files, checking if files exist, getting file information, and generating signed URLs for temporary access to S3 objects. The class encapsulates the AWS SDK for S3 and provides a simplified interface for working with S3 buckets and objects.
+
+## Code Structure
+
+The S3Utils class is defined in the file `packages/core/src/external/aws/s3.ts`. It contains various methods for S3 operations, and it uses the AWS SDK for JavaScript to interact with S3. The class is designed to be instantiated with an AWS region, and it creates an S3 client using this region.
+
+## Symbols
+
+### S3Utils
+#### Description
+The main class that provides utility methods for S3 operations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| region | string | The AWS region to use for S3 operations |
+
+#### Internal Logic
+- Creates an S3 client using the provided region
+- Provides methods for various S3 operations
+
+### uploadFile
+#### Description
+Uploads a file to an S3 bucket.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bucket | string | The name of the S3 bucket |
+| key | string | The key (path) of the file in the bucket |
+| file | Buffer | The file content as a Buffer |
+| contentType | string | (Optional) The content type of the file |
+| metadata | Record&lt;string, string&gt; | (Optional) Metadata to attach to the file |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | AWS.S3.ManagedUpload.SendData | The result of the upload operation |
+
+### getFileContentsAsString
+#### Description
+Retrieves the contents of a file from S3 as a string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| s3BucketName | string | The name of the S3 bucket |
+| s3FileName | string | The key (path) of the file in the bucket |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| contents | string | The contents of the file as a string |
+
+### getFileInfoFromS3
+#### Description
+Retrieves information about a file in S3.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| key | string | The key (path) of the file in the bucket |
+| bucket | string | The name of the S3 bucket |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileInfo | Object | Information about the file, including existence, size, and content type |
+
+### getSignedUrl
+#### Description
+Generates a signed URL for temporary access to an S3 object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bucketName | string | The name of the S3 bucket |
+| fileName | string | The key (path) of the file in the bucket |
+| durationSeconds | number | (Optional) The duration for which the URL is valid |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | The signed URL for accessing the S3 object |
+
+## Side Effects
+The S3Utils class interacts with Amazon S3, which means it can create, modify, or delete objects in S3 buckets. It also generates temporary access URLs, which could potentially expose S3 objects if not used carefully.
+
+## Dependencies
+- AWS SDK for JavaScript (aws-sdk)
+- @aws-sdk/client-s3
+- @aws-sdk/s3-request-presigner
+
+The S3Utils class is widely used throughout the codebase for various S3-related operations, including file uploads, downloads, and generating signed URLs for temporary access to S3 objects.

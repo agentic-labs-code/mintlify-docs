@@ -1,0 +1,62 @@
+---
+title: "2024-05-20_00_update-facility-organization-type.ts"
+---
+
+## High-level description
+This migration script updates the `facility` table in the database. It refactors the `type` column, which previously represented both CQ and CW organization types, into separate `cq_type` and `cw_type` columns. It also renames `cw_obo_active` to `cw_active` and `cq_obo_active` to `cq_active`.
+
+## Symbols
+
+### `up`
+#### Description
+This function defines the steps to apply the migration to the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | Object | An object containing the Sequelize QueryInterface instance, which provides methods for interacting with the database. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. Starts a database transaction to ensure atomicity.
+2. Adds `cq_type` and `cw_type` columns to the `facility` table with default values.
+3. Retrieves all existing facilities from the database.
+4. Iterates through each facility and updates the new `cq_type` and `cw_type` columns based on the existing `type` and `*_obo_oid` columns.
+5. Renames `cw_obo_active` to `cw_active` and `cq_obo_active` to `cq_active`.
+6. Removes the original `type` column.
+7. Commits the transaction if all steps are successful.
+
+### `down`
+#### Description
+This function defines the steps to revert the migration and restore the database to its previous state.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { context: queryInterface } | Object | An object containing the Sequelize QueryInterface instance, which provides methods for interacting with the database. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise | A promise that resolves when the rollback is complete. |
+
+#### Internal Logic
+1. Starts a database transaction.
+2. Renames `cw_active` back to `cw_obo_active` and `cq_active` back to `cq_obo_active`.
+3. Adds back the `type` column with its original definition.
+4. Retrieves all facilities from the database.
+5. Iterates through each facility and reconstructs the original `type` value based on the values in `cw_type`, `cq_type`, `cw_obo_oid`, and `cq_obo_oid` columns.
+6. Removes the `cq_type` and `cw_type` columns.
+7. Commits the transaction if all steps are successful.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Provides database interaction methods and data types. |
+
+## Error Handling
+The code uses database transactions to ensure that all migration steps are executed atomically. If any step fails, the entire transaction is rolled back, preventing the database from ending up in an inconsistent state.

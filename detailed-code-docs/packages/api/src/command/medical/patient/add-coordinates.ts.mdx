@@ -1,0 +1,109 @@
+---
+title: "add-coordinates.ts"
+---
+
+## High-level description
+The `addCoordinatesToAddresses` function enriches a list of patient addresses with geographic coordinates by utilizing a geocoding service. It also optionally reports addresses with low geocoding relevance scores to improve data quality and notify the customer experience (CX) team.
+
+## Code Structure
+The code defines two functions: `addCoordinatesToAddresses` and `addGeographicCoordinates`. The former serves as an entry point, preparing data and calling the latter to perform the actual geocoding. `addGeographicCoordinates` iterates through addresses, calls an external geocoding service, and optionally reports low relevance addresses.
+
+## References
+- `Address` type from `@metriport/core/domain/address`
+- `geocodeAddress` function from `../../../external/aws/address`
+- `Config` class from `../../../shared/config`
+- `analytics` function and `EventTypes` enum from `@metriport/core/external/analytics/posthog`
+- `capture` object from `@metriport/core/util/notifications`
+- `combineAddresses` function from `@metriport/core/domain/address`
+
+## Symbols
+
+### `addCoordinatesToAddresses`
+#### Description
+This function enriches a list of patient addresses with geographic coordinates and optionally reports low relevance score addresses to the CX team. It first checks if the application is running in a sandbox environment and returns without modification if it is. Otherwise, it calls the `addGeographicCoordinates` function to obtain updated addresses with coordinates. Finally, it combines the updated addresses with the original list, prioritizing those with coordinates.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| addresses | `Address[]` | A list of Address objects to be enriched with coordinates. |
+| cxId | `string` | The customer's ID. |
+| reportRelevance | `boolean` | (Optional) A flag indicating whether to report addresses with low geocoding relevance scores to the CX team. Defaults to `false`. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `Promise&lt;Address[] \| undefined&gt;` |  | A promise that resolves to a list of Address objects with updated coordinates, or `undefined` if the application is running in a sandbox environment. |
+
+#### Internal Logic
+1. Check if the application is running in a sandbox environment (`Config.isSandbox()`). If true, return `undefined`.
+2. Call the `addGeographicCoordinates` function with the provided addresses, customer ID, and `reportRelevance` flag.
+3. Combine the returned updated addresses with the original list of addresses using the `combineAddresses` function, prioritizing addresses with coordinates.
+4. Return the combined list of addresses.
+
+### `addGeographicCoordinates`
+#### Description
+This asynchronous function iterates through a list of addresses and attempts to obtain geographic coordinates for those missing them. It utilizes the `geocodeAddress` function for geocoding and optionally reports addresses with low relevance scores to the CX team.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| addressList | `Address[]` | A list of Address objects. |
+| cxId | `string` | The customer's ID. |
+| reportRelevance | `boolean` | (Optional) A flag indicating whether to report addresses with low geocoding relevance scores to the CX team. Defaults to `false`. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `Promise&lt;Address[]&gt;` |  | A promise that resolves to a list of Address objects that were updated with coordinates. |
+
+#### Internal Logic
+1. Initialize an empty array `belowThreshold` to store addresses with low geocoding relevance scores.
+2. Iterate through the `addressList` using `Promise.allSettled` to handle successful and failed geocoding attempts asynchronously.
+3. For each address:
+    - If the address already has coordinates, skip it.
+    - Call the `geocodeAddress` function to obtain geocoding suggestions.
+    - If no suggestions are found, skip the address.
+    - Create a result object containing the address with updated coordinates, relevance score, and suggested label.
+    - Log the relevance score to analytics.
+    - If the relevance score is below the threshold (`ADDRESS_MATCH_RELEVANCE_THRESHOLD`), add the result object to the `belowThreshold` array.
+    - Return the updated address.
+4. If `reportRelevance` is true and the `belowThreshold` array is not empty, call the `reportLowRelevance` function to report the low relevance addresses.
+5. Extract the successfully updated addresses from the `Promise.allSettled` results.
+6. Return the list of updated addresses.
+
+### `reportLowRelevance`
+#### Description
+This function logs and reports low relevance scores to Sentry. It is intended to notify the team about potential address inaccuracies.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| addresses | `AddressGeocodingResult[]` | A list of AddressGeocodingResult objects representing addresses with low relevance scores. |
+| cxId | `string` | The customer's ID. |
+
+#### Outputs
+This function does not return any value.
+
+#### Internal Logic
+1. Log a message indicating low address match coefficients along with the problematic addresses.
+2. Report the issue to Sentry using `capture.message` with a "warning" level. The report includes:
+    - Contextual information (`getCoordinatesFromLocation`).
+    - The list of addresses with low relevance scores.
+    - The customer's ID.
+    - The relevance threshold used for determining low scores.
+
+## Side Effects
+- Logs events to analytics using the `analytics` function.
+- Logs messages and reports errors to Sentry using the `capture` object.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/address | Provides the `Address` type and `combineAddresses` function. |
+| ../../../external/aws/address | Provides the `geocodeAddress` function. |
+| ../../../shared/config | Provides the `Config` class for configuration settings. |
+| @metriport/core/external/analytics/posthog | Provides the `analytics` function and `EventTypes` enum for analytics tracking. |
+| @metriport/core/util/notifications | Provides the `capture` object for error reporting and logging. |
+
+## TODOs
+- Automatically email the CX about a bad address (see `reportLowRelevance` function). 

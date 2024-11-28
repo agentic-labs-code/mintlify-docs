@@ -1,0 +1,43 @@
+---
+title: "user.ts"
+---
+
+## High-level description
+The code defines a function `mapToUser` that transforms a `FitbitUser` object, retrieved from the Fitbit API, into a `User` object as defined in the Metriport API SDK. This mapping is essential for standardizing user data from different sources within the Metriport platform.
+
+## References
+- `User`: This symbol is imported from "@metriport/api-sdk" and represents the standardized user object in the Metriport system.
+- `FitbitUser`: This symbol is imported from "./models/user" and represents the user object as returned by the Fitbit API.
+- `Util`: This symbol is imported from "../../shared/util" and provides utility functions used in the mapping process.
+- `PROVIDER_FITBIT`: This symbol is imported from "../../shared/constants" and represents a string constant used to identify Fitbit as the data source.
+
+## Symbols
+
+### `mapToUser`
+#### Description
+This function maps relevant fields from a `FitbitUser` object to a `User` object, adding metadata to indicate the data source and date.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fitbitUser | `FitbitUser` | The user object retrieved from the Fitbit API. |
+| date | `string` | The date associated with the user data. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| user | `User` | The mapped user object conforming to the Metriport API SDK. |
+
+#### Internal Logic
+1. **Metadata Creation:** Constructs a `metadata` object containing the data source (`PROVIDER_FITBIT`) and the provided `date`.
+2. **User Object Initialization:** Creates a `User` object with the `metadata` property set to the created metadata.
+3. **Selective Field Mapping:** Uses the `Util.addDataToObject` utility function to conditionally add fields from the `fitbitUser` object to the `User` object. Only fields with values are added.
+4. **Return Mapped User:** Returns the fully mapped `User` object.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides the `User` interface for standardized user data. |
+
+## Error Handling
+The code does not implement specific error handling beyond basic exception raising. If any of the accessed properties on the `fitbitUser` object are missing or invalid, it might lead to runtime errors.

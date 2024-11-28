@@ -1,0 +1,62 @@
+---
+title: "delete-patient.ts"
+---
+
+## High-level description
+The `deletePatient` function in `delete-patient.ts` is responsible for deleting a patient from the system. This includes removing the patient from external systems (like Commonwell and Carequality), deleting the patient's FHIR resources, and finally, deleting the patient record from the database.
+
+## Code Structure
+The `deletePatient` function orchestrates the deletion process. It first retrieves the patient record and validates its version. Then, it performs the following actions concurrently:
+- Removes the patient from Commonwell.
+- Deletes the patient's FHIR resources.
+- Removes the patient from Carequality.
+Finally, it deletes the patient record from the database.
+
+## References
+- `getFacilityIdOrFail` (from `../../../domain/medical/patient-facility`)
+- `processAsyncError` (from `../../../errors`)
+- `cqCommands` (from `../../../external/carequality`)
+- `cwCommands` (from `../../../external/commonwell`)
+- `makeFhirApi` (from `../../../external/fhir/api/api-factory`)
+- `validateVersionForUpdate` (from `../../../models/_default`)
+- `capture` (from `../../../shared/notifications`)
+- `BaseUpdateCmdWithCustomer` (from `../base-update-command`)
+- `getPatientOrFail` (from `./get-patient`)
+
+## Symbols
+### `deletePatient`
+#### Description
+Deletes a patient from the system, including external systems and the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientDelete | `PatientDeleteCmd` | An object containing the patient's ID, customer ID, optional facility ID, and optional eTag for optimistic locking. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `Promise&lt;void&gt;` | A promise that resolves when the patient has been deleted. |
+
+#### Internal Logic
+1. Retrieves the patient record using `getPatientOrFail`.
+2. Validates the patient's version using `validateVersionForUpdate` to prevent concurrent modifications.
+3. Concurrently performs the following actions:
+    - Removes the patient from Commonwell using `cwCommands.patient.remove`. If the patient is not found in Commonwell, logs a message and continues.
+    - Deletes the patient's FHIR resources using `fhirApi.deleteResource`.
+    - Removes the patient from Carequality using `cqCommands.patient.remove`.
+4. Deletes the patient record from the database using `patient.destroy`.
+5. If any errors occur during the process, captures the error using `capture.error` and re-throws it.
+
+## Side Effects
+- Modifies the database by deleting the patient record.
+- Makes API calls to external systems (Commonwell, Carequality, FHIR server) to remove the patient's data.
+
+## Error Handling
+- Uses `processAsyncError` to handle errors during asynchronous operations.
+- Captures and re-throws errors to propagate them to the caller.
+- Logs errors using `capture.error` for debugging and monitoring.
+
+## Logging
+- Logs a message if the patient is not found in Commonwell during deletion.
+- Logs errors using `capture.error`.

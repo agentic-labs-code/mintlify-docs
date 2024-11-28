@@ -1,0 +1,75 @@
+---
+title: "record-target.ts"
+---
+
+## High-level description
+This code is part of a system that converts FHIR (Fast Healthcare Interoperability Resources) data to CDA (Clinical Document Architecture) format. Specifically, it focuses on building the "Record Target" section of a CDA document, which contains patient information, from a FHIR Patient resource.
+
+## Code Structure
+The main function `buildRecordTargetFromFhirPatient` takes a FHIR Patient resource and transforms it into a CDA RecordTarget structure. It uses several helper functions from the `commons.ts` file to build various parts of the CDA structure, such as addresses, telecom information, and coded values.
+
+## Symbols
+
+### `buildRecordTargetFromFhirPatient`
+#### Description
+This function constructs a CDA RecordTarget object from a FHIR Patient resource.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | FHIR Patient resource |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| recordTarget | CdaRecordTarget | CDA RecordTarget object |
+
+#### Internal Logic
+1. Builds patient role information including identifiers, addresses, and telecom data.
+2. Calls `buildPatient` to construct detailed patient information.
+
+### `buildPatient`
+#### Description
+This function builds the detailed patient information for the CDA RecordTarget.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | FHIR Patient resource |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientRole | CdaPatientRole | CDA PatientRole object |
+
+#### Internal Logic
+1. Constructs patient name information, including mapping name use.
+2. Sets administrative gender, birth time, and deceased indicator.
+3. Sets marital status, race, and ethnic group codes.
+4. Sets language communication information.
+
+### `mapNameUse`
+#### Description
+Maps FHIR name use to CDA name use codes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| use | string \| undefined | FHIR name use |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cdaNameUse | string \| undefined | CDA name use code |
+
+## Dependencies
+The code relies on several utility functions from `commons.ts`, such as `buildInstanceIdentifiersFromIdentifier`, `buildAddress`, `buildTelecom`, `buildCdaGender`, `buildCodeCe`, `withoutNullFlavorObject`, `withoutNullFlavorString`, `withNullFlavor`, and `formatDateToCdaTimestamp`.
+
+## Configuration
+The code uses constants from `constants.ts`, such as `placeholderOrgOid`.
+
+## Error Handling
+The code uses null checks and optional chaining to handle potential undefined values in the FHIR data.
+
+## Performance Considerations
+The code performs multiple transformations and mappings, which could impact performance for large datasets. However, for individual patient records, the performance impact should be minimal.

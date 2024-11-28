@@ -1,0 +1,83 @@
+---
+title: "append-doc-query-progress.ts"
+---
+
+## High-level description
+The `appendDocQueryProgress` function updates the document query progress for a patient in the database. It allows for appending progress information for both download and conversion processes, handling scenarios like resetting progress, removing progress entries, and adjusting conversion totals based on errors.
+
+## Code Structure
+The code defines a main function `appendDocQueryProgress` and a helper function `aggregateDocQueryProgress`. `appendDocQueryProgress` handles database interactions, while `aggregateDocQueryProgress` focuses on calculating the updated progress object.
+
+## Symbols
+
+### `appendDocQueryProgress`
+#### Description
+This asynchronous function updates the document query progress of a patient in the database. It retrieves the existing patient data, aggregates the new progress information, and updates the patient record in the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { patient, downloadProgress, convertProgress, convertibleDownloadErrors, increaseCountConvertible, reset, requestId } | `SetDocQueryProgress` | An object containing the patient information, optional progress updates, error counts, reset flag, and request ID. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `Promise&lt;Patient&gt;` | `Promise&lt;Patient&gt;` | A promise that resolves to the updated patient object. |
+
+#### Internal Logic
+1. **Retrieves existing patient data:** Fetches the patient record from the database based on patient ID and customer ID, acquiring a lock for transactional safety.
+2. **Aggregates progress:** Calls the `aggregateDocQueryProgress` helper function to calculate the updated `documentQueryProgress` object based on the provided inputs.
+3. **Updates patient record:** Updates the patient record in the database with the new `documentQueryProgress` object.
+4. **Returns updated patient:** Returns the updated patient object.
+
+### `aggregateDocQueryProgress`
+#### Description
+This function calculates the updated document query progress based on the existing progress and provided updates. It handles merging new progress information, removing entries when specified, and adjusting conversion totals based on errors.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `documentQueryProgress` | `DocumentQueryProgress` | The existing document query progress object. |
+| `downloadProgress` | `Progress \| undefined \| null` | Optional update for the download progress. |
+| `convertProgress` | `Progress \| undefined \| null` | Optional update for the convert progress. |
+| `convertibleDownloadErrors` | `number` | Number of errors encountered during download that affect the conversion total. |
+| `increaseCountConvertible` | `number` | Number to increase the convertible count by. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `DocumentQueryProgress` | `DocumentQueryProgress` | The updated document query progress object. |
+
+#### Internal Logic
+1. **Merges download progress:** If `downloadProgress` is provided, it merges it with the existing `download` property of `documentQueryProgress`. If `downloadProgress` is null, it removes the `download` property.
+2. **Merges convert progress:**  If `convertProgress` is provided, it merges it with the existing `convert` property of `documentQueryProgress`. If `convertProgress` is null, it removes the `convert` property.
+3. **Adjusts conversion total for errors:** If `convertibleDownloadErrors` is provided, it decreases the `total` of the `convert` progress accordingly, ensuring it doesn't go below zero. It also updates the `status` of the `convert` progress based on the new total.
+4. **Increases convertible count:** If `increaseCountConvertible` is provided, it increases the `total` of the `convert` progress accordingly. It also updates the `status` of the `convert` progress based on the new total.
+5. **Returns updated progress:** Returns the updated `documentQueryProgress` object.
+
+### `updateProgressWebhookSent`
+#### Description
+This asynchronous function updates the `webhookSent` flag for a specific progress type (download or convert) in the patient's document query progress.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `patient` | `Pick&lt;Patient, "id" \| "cxId"&gt;` | An object containing the patient's ID and customer ID. |
+| `type` | `ProgressType` | The type of progress to update the webhook flag for (either "download" or "convert"). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `Promise&lt;void&gt;` | `Promise&lt;void&gt;` | A promise that resolves when the update is complete. |
+
+#### Internal Logic
+1. **Retrieves existing patient data:** Fetches the patient record from the database based on patient ID and customer ID, acquiring a lock for transactional safety.
+2. **Updates webhookSent flag:** Updates the `webhookSent` flag to `true` for the specified progress type within the patient's `documentQueryProgress`.
+3. **Updates patient record:** Updates the patient record in the database with the modified `documentQueryProgress`.
+
+## Side Effects
+- Modifies the patient record in the database by updating the `documentQueryProgress` field.
+
+## Error Handling
+- Utilizes the `getPatientOrFail` function, which throws a `NotFoundError` if the patient is not found.
+- Does not explicitly handle other potential errors, relying on the calling code or higher-level error handling mechanisms.

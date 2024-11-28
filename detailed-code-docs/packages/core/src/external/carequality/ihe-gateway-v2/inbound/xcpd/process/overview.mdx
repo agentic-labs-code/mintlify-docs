@@ -1,0 +1,73 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for processing inbound Cross-Community Patient Discovery (XCPD) requests in an Integrating the Healthcare Enterprise (IHE) gateway. It focuses on handling ITI-55 requests, which are used for patient discovery across different healthcare communities. The code defines schemas for request validation and provides functionality to transform XML-based requests into standardized patient resource formats.
+
+## What does it do?
+The code in this directory performs several key functions:
+
+1. It defines a set of schemas using Zod to validate the structure of incoming XCPD requests. These schemas ensure that the requests contain the correct patient demographics, identifiers, and other required information.
+
+2. It processes inbound XCPD requests by parsing the XML content, validating it against the defined schemas, and transforming it into a standardized format.
+
+3. It extracts patient information from the request, including names, addresses, contact information, gender, birth date, and identifiers.
+
+4. It converts the extracted information into a standardized patient resource format, which can be used more easily by other parts of the system.
+
+5. It handles authentication by processing SAML (Security Assertion Markup Language) headers in the requests.
+
+6. It stores the processed requests for monitoring purposes.
+
+In simpler terms, this code acts as a translator and validator for patient discovery requests coming from other healthcare systems. It ensures that the incoming information is correct and complete, then converts it into a format that the rest of the system can understand and use.
+
+## Key Files
+
+### schema.ts
+This file defines the Zod schemas used for validating XCPD requests. It includes schemas for:
+- Patient names
+- Identification numbers
+- Query parameters
+- The overall ITI-55 request structure
+
+These schemas are crucial for ensuring that incoming requests are well-formed and contain all necessary information.
+
+### xcpd-request.ts
+This file contains the main logic for processing XCPD requests. It includes two primary functions:
+
+1. `transformIti55RequestToPatientResource`: This function takes a parsed ITI-55 request and converts it into a standardized patient resource format. It extracts and maps various patient details such as names, addresses, contact information, gender, and birth date.
+
+2. `processInboundXcpdRequest`: This function handles the entire process of receiving and processing an XCPD request. It parses the XML, validates the structure using the schemas defined in `schema.ts`, extracts SAML attributes, transforms the request into a patient resource, and stores the request for monitoring.
+
+## Dependencies
+The code relies on several external libraries and internal modules:
+
+1. Zod: Used for schema declaration and validation. It provides a type-safe way to define and validate complex data structures.
+
+2. fast-xml-parser: Employed for efficient parsing of XML to JSON. This is crucial for handling the XML-based ITI-55 requests.
+
+3. dayjs: Used for date manipulation, particularly in formatting birth dates.
+
+4. @metriport/ihe-gateway-sdk: Provides types and schemas specific to the IHE gateway.
+
+5. @metriport/shared: Contains utility functions used throughout the code.
+
+These dependencies were likely chosen for their performance, ease of use, and specific functionality required for processing healthcare-related data and protocols.
+
+## Configuration
+While there are no explicit configuration files mentioned, the code does use several imported schemas and utility functions from other parts of the project, such as:
+
+- `schemaOrArray`
+- `textSchema`
+- `addressSchema`
+- `samlHeaderSchema`
+- `genderCodeSchema`
+- `schemaOrArrayOrEmpty`
+- `schemaOrEmpty`
+
+These imported schemas and utilities are used to build the more complex schemas and processing logic in this directory.
+
+The code also uses a custom logging function `out` for consistent log formatting across the application.
+
+In conclusion, this directory plays a crucial role in the IHE gateway by handling the ingress of patient discovery requests. It ensures data integrity, standardizes the format of patient information, and prepares the data for further processing within the system. The use of strong typing and schema validation helps maintain data quality and reduces the likelihood of errors in downstream processes.

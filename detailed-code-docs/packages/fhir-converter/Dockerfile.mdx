@@ -1,0 +1,47 @@
+---
+title: "Dockerfile"
+---
+
+## High-level description
+This Dockerfile defines a multi-stage build process for a Node.js application, specifically for the FHIR Converter. It creates a production-ready Docker image with minimal dependencies, optimized for size and security.
+
+## Code Structure
+The Dockerfile consists of two main stages: the build stage and the production stage. The build stage prepares the application, while the production stage creates the final, lightweight image.
+
+## Symbols
+
+### Base Image (Build Stage)
+#### Description
+This stage sets up the build environment using Node.js 18 and prepares the application for production.
+
+#### Internal Logic
+1. Uses `node:18` as the base image
+2. Sets the working directory to `/app`
+3. Copies the entire application to the container
+4. Installs production dependencies using npm
+
+### Prod Image (Production Stage)
+#### Description
+This stage creates the final production image using a slim version of Node.js 18.
+
+#### Internal Logic
+1. Uses `node:18-slim` as the base image
+2. Copies the built application from the build stage
+3. Sets the working directory to `/app`
+4. Exposes port 8080
+5. Sets the entrypoint to `/app/docker-entrypoint.sh`
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| node:18 | Base image for the build stage |
+| node:18-slim | Base image for the production stage |
+
+## TODOs
+1. TODO: #1810 remove comment about `libcurl4-gnutls-dev` installation if not needed after cleaning up unused FHIR converter code
+2. TODO: #1810 remove comment about `chmod` command if not needed after cleaning up unused FHIR converter code
+
+## Notes
+1. The commented-out `RUN` command for installing `libcurl4-gnutls-dev` suggests that this dependency might have been needed in the past but is currently not required.
+2. The commented-out `RUN` command for changing permissions of `/app/deploy/webapp.sh` indicates that this file might have been important in previous versions but is not currently used.
+3. The use of `--only=production`, `--no-fund`, `--no-optional`, and `--no-audit` flags in the npm install command optimizes the installation process for production use and minimizes the image size.

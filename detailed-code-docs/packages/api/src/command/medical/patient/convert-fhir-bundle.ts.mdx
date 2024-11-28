@@ -1,0 +1,137 @@
+---
+title: "convert-fhir-bundle.ts"
+---
+
+## High-level description
+The `convert-fhir-bundle.ts` file provides functionality to convert a FHIR bundle into a consolidated medical record format (HTML or PDF) and store it in an S3 bucket. It leverages an AWS Lambda function for the conversion process and returns a FHIR DocumentReference pointing to the generated file.
+
+## Code Structure
+The code defines two main functions: `handleBundleToMedicalRecord` and `convertFHIRBundleToMedicalRecord`. `handleBundleToMedicalRecord` acts as an entry point, handling both sandbox and production environments. It calls `convertFHIRBundleToMedicalRecord` to perform the actual conversion and then constructs a FHIR bundle containing a DocumentReference resource pointing to the generated file.
+
+## References
+- `@medplum/fhirtypes`: Provides FHIR data types.
+- `@metriport/core/domain/conversion/fhir-to-medical-record`: Defines types related to FHIR to medical record conversion.
+- `@metriport/core/domain/medical-record-summary`: Provides utilities for generating medical record summary file names.
+- `@metriport/core/domain/patient`: Defines the `Patient` type.
+- `@metriport/core/external/aws/lambda`: Provides utilities for interacting with AWS Lambda.
+- `@metriport/core/external/aws/s3`: Provides utilities for interacting with AWS S3.
+- `@metriport/shared/medical`: Defines the `SearchSetBundle` type.
+- `@metriport/api-sdk`: Defines the `ResourceTypeForConsolidation` type.
+- `../../../shared/config`: Provides access to configuration settings.
+- `../../../shared/sandbox/sandbox-seed-data`: Provides sandbox seed data.
+- `./shared`: Provides shared utilities.
+
+## Symbols
+
+### `handleBundleToMedicalRecord`
+#### Description
+This function handles the conversion of a FHIR bundle to a medical record format (HTML or PDF). It first checks if the environment is a sandbox. If so, it retrieves a pre-generated medical record summary file from S3. Otherwise, it calls the `convertFHIRBundleToMedicalRecord` function to perform the conversion. Finally, it constructs a FHIR bundle containing a DocumentReference resource pointing to the generated file.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | `Bundle&lt;Resource&gt;` | The FHIR bundle to convert. |
+| patient | `Pick&lt;Patient, "id" | "cxId" | "data"&gt;` | The patient associated with the FHIR bundle. |
+| resources | `ResourceTypeForConsolidation[]` | Optional. An array of resource types to include in the consolidation. |
+| dateFrom | `string` | Optional. The start date for filtering resources. |
+| dateTo | `string` | Optional. The end date for filtering resources. |
+| conversionType | `MedicalRecordFormat` | The desired output format for the medical record (HTML or PDF). |
+| generateAiBrief | `boolean` | Optional. Whether to generate an AI brief. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `Promise&lt;SearchSetBundle&lt;Resource&gt;&gt;` | A promise that resolves to a FHIR bundle containing a DocumentReference resource pointing to the generated file. |
+
+#### Internal Logic
+1. Check if the environment is a sandbox and a bucket name is configured.
+2. If in sandbox, retrieve the pre-generated medical record summary file from S3 based on the patient's first name and conversion type.
+3. If not in sandbox, call the `convertFHIRBundleToMedicalRecord` function to perform the conversion.
+4. Construct a FHIR bundle containing a DocumentReference resource pointing to the generated file.
+5. Return the FHIR bundle.
+
+### `buildDocRefBundleWithAttachment`
+#### Description
+This function builds a FHIR bundle containing a DocumentReference resource with an attachment pointing to the provided URL.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | `string` | The ID of the patient associated with the DocumentReference. |
+| attachmentUrl | `string` | The URL of the attachment. |
+| mimeType | `ConsolidationConversionType` | The MIME type of the attachment. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | `SearchSetBundle&lt;Resource&gt;` | A FHIR bundle containing a DocumentReference resource with an attachment. |
+
+#### Internal Logic
+1. Create a new FHIR bundle with type "searchset".
+2. Create a DocumentReference resource with the provided patient ID and an attachment containing the provided URL and MIME type.
+3. Add the DocumentReference resource to the bundle's entry array.
+4. Return the bundle.
+
+### `convertFHIRBundleToMedicalRecord`
+#### Description
+This function converts a FHIR bundle to a medical record format (HTML or PDF) using an AWS Lambda function.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | `Bundle&lt;Resource&gt;` | The FHIR bundle to convert. |
+| patient | `Pick&lt;Patient, "id" | "cxId" | "data"&gt;` | The patient associated with the FHIR bundle. |
+| resources | `ResourceTypeForConsolidation[]` | Optional. An array of resource types to include in the consolidation. |
+| dateFrom | `string` | Optional. The start date for filtering resources. |
+| dateTo | `string` | Optional. The end date for filtering resources. |
+| conversionType | `MedicalRecordFormat` | The desired output format for the medical record (HTML or PDF). |
+| generateAiBrief | `boolean` | Optional. Whether to generate an AI brief. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `Promise&lt;ConversionOutput&gt;` | A promise that resolves to an object containing the URL of the generated file and a flag indicating whether the file has contents. |
+
+#### Internal Logic
+1. Retrieve the name of the FHIR to Medical Record Lambda function from configuration.
+2. Generate a file name for the FHIR bundle.
+3. Upload the FHIR bundle to S3.
+4. Invoke the FHIR to Medical Record Lambda function with the file name and other relevant parameters.
+5. Parse the Lambda function's response and return the URL of the generated file and the flag indicating whether the file has contents.
+
+### `uploadJsonBundleToS3`
+#### Description
+This function uploads a FHIR bundle to S3 as a JSON file.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | `Bundle&lt;Resource&gt;` | The FHIR bundle to upload. |
+| fileName | `string` | The name of the file to create in S3. |
+| metadata | `Record&lt;string, string&gt;` | Metadata to associate with the file in S3. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `Promise&lt;void&gt;` | A promise that resolves when the upload is complete. |
+
+#### Internal Logic
+1. Upload the FHIR bundle to S3 as a JSON file with the provided file name and metadata.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides FHIR data types. |
+| @metriport/core | Provides core domain logic and utilities for interacting with external services. |
+| @metriport/shared | Provides shared types and utilities. |
+| @metriport/api-sdk | Provides types for the API SDK. |
+| dayjs | Provides date and time utilities. |
+
+## Configuration
+The code relies on several configuration settings accessed via the `Config` class. These settings include AWS region, S3 bucket names, and Lambda function names.
+
+## Error Handling
+The code uses basic exception handling with `throw new Error()` for error conditions.
+
+## Logging
+The code logs messages to the console using `console.log()`.

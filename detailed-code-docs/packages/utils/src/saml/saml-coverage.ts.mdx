@@ -1,0 +1,113 @@
+---
+title: "saml-coverage.ts"
+---
+
+## High-level description
+This code provides functionality for analyzing SAML (Security Assertion Markup Language) responses from various healthcare vendors. It processes a JSON file containing SAML responses, calculates statistics on patient matches and errors, and provides detailed analysis by vendor, including the ability to exclude specific vendors from the analysis.
+
+## Code Structure
+The code defines several functions that work together to analyze SAML responses:
+- `analyzeResponses`: Provides a general analysis of all responses.
+- `analyzeResponsesByVendor`: Analyzes responses grouped by vendor.
+- `analyzeResponsesWithExclusions`: Analyzes responses while excluding specified vendors.
+- `recordError`: Helper function to record error details.
+- `getGatewayOidsWithNullPatientMatch`: Retrieves gateway OIDs with null patient matches.
+
+These functions use the `Response` interface to define the structure of SAML response data.
+
+## Symbols
+
+### `analyzeResponses`
+#### Description
+This function reads a JSON file containing SAML responses and analyzes them, providing counts of null and false patient matches, error counts, and gateway URL statistics.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filePath | string | Path to the JSON file containing SAML responses |
+
+#### Internal Logic
+1. Reads and parses the JSON file.
+2. Iterates through each response, counting null and false patient matches.
+3. Records error counts and gateway URLs for null and false matches.
+4. Logs the results to the console.
+
+### `analyzeResponsesByVendor`
+#### Description
+This function analyzes SAML responses grouped by vendor, providing success rates and detailed error information for each vendor.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filePath | string | Path to the JSON file containing SAML responses |
+
+#### Internal Logic
+1. Reads and parses the JSON file.
+2. Initializes statistics for predefined vendors.
+3. Iterates through each response, categorizing it by vendor based on the gateway URL.
+4. Calculates success rates and records detailed error information for each vendor.
+5. Logs the results to the console.
+
+### `analyzeResponsesWithExclusions`
+#### Description
+This function analyzes SAML responses while excluding specified vendors, providing a catch-all category for unmatched responses.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filePath | string | Path to the JSON file containing SAML responses |
+| excludeList | string[] | List of vendor names to exclude from the analysis |
+
+#### Internal Logic
+1. Reads and parses the JSON file.
+2. Initializes statistics including a catch-all category.
+3. Iterates through each response, skipping those from excluded vendors.
+4. Categorizes responses by vendor or catch-all, calculating success rates and recording errors.
+5. Logs the results to the console.
+
+### `recordError`
+#### Description
+Helper function to record error details for a specific vendor or catch-all category.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| stats | any | Object containing statistics for vendors |
+| key | string | Vendor key or "CatchAll" |
+| operationOutcome | any | Object containing error details |
+| item | any | SAML response item |
+
+#### Internal Logic
+1. Extracts error text from the operation outcome.
+2. Creates an error detail object with gateway and timestamp information.
+3. Updates the error count and details for the specified vendor or catch-all category.
+
+### `getGatewayOidsWithNullPatientMatch`
+#### Description
+This function retrieves a list of gateway OIDs (Object Identifiers) for responses with null patient matches.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filePath | string | Path to the JSON file containing SAML responses |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| oids | string[] | Array of gateway OIDs with null patient matches |
+
+#### Internal Logic
+1. Reads and parses the JSON file.
+2. Filters responses with null patient matches.
+3. Extracts and returns the gateway OIDs from the filtered responses.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| fs | File system module for reading JSON files |
+
+## Error Handling
+The code includes basic error handling, primarily in the form of null checks and conditional logic to handle missing or unexpected data in the SAML responses.
+
+## TODOs
+- The `filePath` variable is empty in the usage example at the end of the file. This should be set to a valid file path before running the analysis functions.

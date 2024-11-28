@@ -1,0 +1,70 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for generating FHIR ResearchSubject resources. These templates are part of a larger FHIR converter project, specifically focusing on the References subdirectory for ResearchSubject resources. The templates are designed to create JSON structures that represent different aspects of a ResearchSubject in FHIR format, including consent, individual, and study references.
+
+## What does it do?
+These templates work together to create standardized representations of research subjects in healthcare studies. They generate JSON structures that can be used in FHIR-compliant systems to describe:
+
+1. A research subject's consent to participate in a study
+2. The individual who is the subject of the research
+3. The study with which the research subject is associated
+
+Each template focuses on a specific aspect of the ResearchSubject resource, allowing for modular and flexible creation of these resources. When processed with the appropriate data, these templates produce JSON objects that can be integrated into larger FHIR documents or used in healthcare information systems that work with research data.
+
+## Key Files
+1. `consent.hbs`: This template generates a ResearchSubject resource with a reference to the subject's consent. It's used to link a research subject to their documented consent for participation in a study.
+
+2. `individual.hbs`: This template creates a ResearchSubject resource with a reference to the individual who is the subject of the research. It establishes the connection between the research subject and their personal record in the system.
+
+3. `study.hbs`: This template produces a ResearchSubject resource with a reference to the study in which the subject is participating. It links the research subject to the specific research study they are involved in.
+
+Each of these templates follows a similar structure, creating a JSON object with the "ResearchSubject" resourceType and including specific references based on their purpose.
+
+## Dependencies
+These templates rely on the Handlebars templating engine to process and render the final output. Handlebars is used to insert dynamic values into the predefined JSON structures.
+
+## Configuration
+While these templates don't include specific configuration options, they are designed to be flexible through the use of input parameters. Each template expects certain inputs:
+
+- `ID`: A unique identifier for the ResearchSubject resource
+- `REF`: A reference to the relevant associated resource (consent, individual, or study)
+
+These inputs allow the templates to be configured at runtime to produce specific ResearchSubject resources as needed.
+
+Here's an example of how the `consent.hbs` template might be used:
+
+```handlebars
+{{#with resource as |resource|}}
+{
+  "resourceType": "ResearchSubject",
+  "id": "{{ID}}",
+  "consent": {
+    "reference": "{{REF}}"
+  }
+}
+{{/with}}
+```
+
+To use this template, you would provide values for `ID` and `REF` when rendering the template. For example:
+
+```javascript
+const template = Handlebars.compile(consentTemplate);
+const result = template({
+  ID: "research-subject-001",
+  REF: "Consent/consent-001"
+});
+```
+
+This would produce a JSON object representing a ResearchSubject with an ID of "research-subject-001" and a consent reference to "Consent/consent-001".
+
+It's important to note that these templates are designed to be parts of a larger system. They generate partial FHIR resources that would typically be combined or nested within larger FHIR documents or bundles.
+
+The templates all include a detailed copyright and licensing notice, indicating that they are:
+1. Copyright (c) 2022-present Metriport Inc.
+2. Licensed under AGPLv3
+3. Incorporate work covered by a copyright and permission notice from Microsoft Corporation
+
+This licensing information suggests that these templates are part of an open-source project that has built upon previous work by Microsoft, but is now maintained and extended by Metriport Inc.

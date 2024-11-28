@@ -1,0 +1,63 @@
+---
+title: "verify-access.test.ts"
+---
+
+## High-level description
+The code defines two functions, `verifyCxProviderAccess` and `verifyCxItVendorAccess`, that check if an organization associated with a given `cxId` has the correct business type (healthcare provider or healthcare IT vendor) to perform certain actions, presumably related to medical facilities. 
+
+These functions are used to enforce authorization rules, ensuring that only organizations with the appropriate permissions can create or update facilities.
+
+## Code Structure
+Both `verifyCxProviderAccess` and `verifyCxItVendorAccess` rely on the `getOrganizationOrFail` function to retrieve organization details based on the provided `cxId`. They then check the organization's `type` property to determine if it matches the required business type.
+
+## References
+- `getOrganizationOrFail`: A function that retrieves an organization by its `cxId` or throws an error if not found.
+- `OrganizationBizType`: An enum defining the possible business types for an organization (healthcare provider or healthcare IT vendor).
+
+## Symbols
+
+### `verifyCxProviderAccess`
+#### Description
+This function checks if an organization associated with the given `cxId` is a healthcare provider. It throws an error if the organization is a healthcare IT vendor and `throwOnNoAccess` is true or not set.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The `cxId` of the organization. |
+| throwOnNoAccess | boolean | (Optional) If true, throws an error if the organization is not a healthcare provider. Defaults to true. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | boolean | True if the organization is a healthcare provider, false otherwise. |
+
+#### Internal Logic
+1. Retrieves the organization using `getOrganizationOrFail`.
+2. Checks if the organization type is `OrganizationBizType.healthcareITVendor`.
+3. If the organization is a healthcare IT vendor and `throwOnNoAccess` is true or not set, throws a `ForbiddenError`.
+4. Returns true if the organization is a healthcare provider, false otherwise.
+
+### `verifyCxItVendorAccess`
+#### Description
+This function checks if an organization associated with the given `cxId` is a healthcare IT vendor. It throws an error if the organization is a healthcare provider and `throwOnNoAccess` is true or not set.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The `cxId` of the organization. |
+| throwOnNoAccess | boolean | (Optional) If true, throws an error if the organization is not a healthcare IT vendor. Defaults to true. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | boolean | True if the organization is a healthcare IT vendor, false otherwise. |
+
+#### Internal Logic
+1. Retrieves the organization using `getOrganizationOrFail`.
+2. Checks if the organization type is `OrganizationBizType.healthcareProvider`.
+3. If the organization is a healthcare provider and `throwOnNoAccess` is true or not set, throws a `ForbiddenError`.
+4. Returns true if the organization is a healthcare IT vendor, false otherwise.
+
+## Error Handling
+- Both functions throw a `ForbiddenError` if the organization does not have the required business type and `throwOnNoAccess` is true or not set.
+- The `getOrganizationOrFail` function throws a `NotFoundError` if the organization is not found.

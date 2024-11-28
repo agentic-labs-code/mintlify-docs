@@ -1,0 +1,98 @@
+---
+title: "activity.ts"
+---
+
+## High-level description
+This code defines two functions, `mapToActivity` and `formatWorkoutLogs`, that transform Withings activity and workout data into the standard `Activity` and `ActivityLog` formats used by the application. 
+
+The `mapToActivity` function serves as the main entry point, orchestrating the transformation of raw Withings data into a consolidated `Activity` object containing both activity and workout logs.
+
+## Code Structure
+The `mapToActivity` function depends on `formatActivityLogs` and `formatWorkoutLogs` to transform Withings activity and workout data respectively. Both of these functions use the `Util.addDataToObject` function.
+
+## References
+- `Activity`: Represents the standardized activity data structure.
+- `ActivityLog`: Represents the standardized activity log data structure.
+- `Metadata`: Represents the standardized metadata structure.
+- `PROVIDER_WITHINGS`: A constant likely representing the Withings data provider.
+- `WithingsActivityLogs`: Represents the raw activity data structure from Withings.
+- `WithingsWorkoutLogs`: Represents the raw workout data structure from Withings.
+- `Util.addDataToObject`: A utility function that conditionally adds data to an object.
+
+## Symbols
+
+### `mapToActivity`
+#### Description
+This function maps Withings activity and workout data to a standardized `Activity` object. It extracts relevant data points from the Withings data structures and populates the corresponding fields in the `Activity` and `ActivityLog` objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| date | string | The date of the activity data. |
+| withingsActivityLogs | `WithingsActivityLogs` | Raw activity data from Withings. |
+| withingsWorkoutLogs | `WithingsWorkoutLogs` | Raw workout data from Withings. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| activity | `Activity` | A standardized `Activity` object containing the transformed activity and workout data. |
+
+#### Internal Logic
+1. Creates a `metadata` object with the date and data source (Withings).
+2. Calls `formatActivityLogs` to transform the Withings activity data.
+3. Calls `formatWorkoutLogs` to transform the Withings workout data.
+4. Combines the transformed activity and workout logs into a single array.
+5. Returns a new `Activity` object populated with the metadata and the combined activity logs.
+
+### `formatActivityLogs`
+#### Description
+This function transforms an array of `WithingsActivityLogs` into an array of standardized `ActivityLog` objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| metadata | `Metadata` | Metadata associated with the activity logs. |
+| withingsActivityLogs | `WithingsActivityLogs` | An array of raw activity logs from Withings. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| activityLogs | `ActivityLog[]` | An array of standardized `ActivityLog` objects. |
+
+#### Internal Logic
+1. Iterates through each `withingsActivityLog` in the input array.
+2. For each log, extracts relevant data points like active duration, intensity levels, energy expenditure, steps, elevation, distance, and heart rate.
+3. Populates a new `ActivityLog` object with the extracted data and the provided metadata.
+4. Appends the newly created `ActivityLog` to the `activityLogs` array.
+5. Returns the `activityLogs` array.
+
+### `formatWorkoutLogs`
+#### Description
+This function transforms an array of `WithingsWorkoutLogs` into an array of standardized `ActivityLog` objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| metadata | `Metadata` | Metadata associated with the workout logs. |
+| withingsWorkoutLogs | `WithingsWorkoutLogs` | An array of raw workout logs from Withings. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| workoutLogs | `ActivityLog[]` | An array of standardized `ActivityLog` objects. |
+
+#### Internal Logic
+1. Iterates through each `withingsWorkoutLog` in the input array.
+2. For each log, extracts relevant data points like start and end times, workout category, manual calories burned, steps, elevation, distance, heart rate data, and SpO2 data.
+3. Populates a new `ActivityLog` object with the extracted data and the provided metadata.
+4. Appends the newly created `ActivityLog` to the `workoutLogs` array.
+5. Returns the `workoutLogs` array.
+
+## Dependencies
+- `dayjs`: Used for date and time manipulation.
+
+## Error Handling
+The code does not implement specific error handling beyond basic exception raising.
+
+## Logging
+The code does not implement logging.

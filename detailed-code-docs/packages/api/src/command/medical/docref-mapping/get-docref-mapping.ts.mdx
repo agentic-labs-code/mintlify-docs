@@ -1,0 +1,114 @@
+---
+title: "get-docref-mapping.ts"
+---
+
+## High-level description
+The `get-docref-mapping.ts` file provides functions for interacting with `DocRefMapping` entities, which map external document references to internal Metriport IDs. It includes functions for retrieving, creating, and querying these mappings.
+
+## Code Structure
+The code defines several exported asynchronous functions for managing `DocRefMapping` entities. These functions primarily interact with the `DocRefMappingModel` Sequelize model to perform database operations. The `getOrCreateDocRefMapping` function utilizes a raw SQL query for upsert functionality.
+
+## References
+- `DocRefMapping`: Interface defining the structure of a document reference mapping.
+- `DocRefMappingModel`: Sequelize model representing the `docref_mapping` database table.
+- `MedicalDataSource`: Enum defining the source of medical data (e.g., COMMONWELL).
+
+## Symbols
+
+### `getDocRefMapping`
+#### Description
+Retrieves a single `DocRefMapping` by its ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The ID of the `DocRefMapping` to retrieve. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;DocRefMapping \| undefined\&gt; | Promise | A promise that resolves to the `DocRefMapping` if found, or `undefined` if not. |
+
+#### Internal Logic
+- Uses `DocRefMappingModel.findByPk(id)` to fetch the `DocRefMapping` from the database.
+- Returns the found `DocRefMapping` or `undefined` if not found.
+
+### `getAllDocRefMapping`
+#### Description
+Retrieves all `DocRefMapping` entities matching the provided criteria.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  { requestId, patientId, cxId } | object | An object containing the search criteria. |
+| requestId | string | The ID of the request associated with the mappings. |
+| patientId | string \| undefined | Optional. The ID of the patient associated with the mappings. |
+| cxId | string \| undefined | Optional. The ID of the context associated with the mappings. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;DocRefMapping[]\&gt; | Promise | A promise that resolves to an array of matching `DocRefMapping` entities. |
+
+#### Internal Logic
+- Uses `DocRefMappingModel.findAll()` to query the database for matching mappings based on the provided `requestId`, `patientId`, and `cxId`.
+- Returns the found `DocRefMapping` entities.
+
+### `getOrCreateDocRefMapping`
+#### Description
+Retrieves an existing `DocRefMapping` or creates a new one if it doesn't exist.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { cxId, patientId, requestId, externalId, source } | object | An object containing the details for the `DocRefMapping`. |
+| cxId | string | The ID of the context associated with the mapping. |
+| patientId | string | The ID of the patient associated with the mapping. |
+| requestId | string | The ID of the request associated with the mapping. |
+| externalId | string | The external ID of the document being mapped. |
+| source | MedicalDataSource | The source of the medical data (e.g., COMMONWELL). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;DocRefMapping\&gt; | Promise | A promise that resolves to the retrieved or created `DocRefMapping`. |
+
+#### Internal Logic
+- Executes a raw SQL query using `DocRefMappingModel.sequelize?.query()` to perform an upsert operation.
+  - The query attempts to insert a new `DocRefMapping` with a generated UUID.
+  - If a conflict occurs (duplicate `externalId`, `patientId`, `cxId`, and `source`), it updates the `updatedAt` timestamp of the existing record.
+- Retrieves the inserted or updated `DocRefMapping` from the query result.
+- Throws an error if the `DocRefMapping` is not found.
+
+### `getDocRefMappings`
+#### Description
+Retrieves multiple `DocRefMapping` entities based on various criteria, including IDs, patient IDs, external ID, source, and creation date range.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { cxId, ids, patientId, externalId, source, createdAtRange } | object | An object containing the search criteria. |
+| cxId | string | The ID of the context associated with the mappings. |
+| ids | string[] \| undefined | Optional. An array of `DocRefMapping` IDs to retrieve. |
+| patientId | string[] \| string \| undefined | Optional. An array of patient IDs or a single patient ID associated with the mappings. |
+| externalId | string \| undefined | Optional. The external ID of the document associated with the mappings. |
+| source | MedicalDataSource \| undefined | Optional. The source of the medical data associated with the mappings. |
+| createdAtRange | { from?: Date; to?: Date } \| undefined | Optional. An object specifying the creation date range for filtering the mappings. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;DocRefMapping[]\&gt; | Promise | A promise that resolves to an array of matching `DocRefMapping` entities. |
+
+#### Internal Logic
+- Normalizes the `patientId` input to an array.
+- Uses `DocRefMappingModel.findAll()` to query the database for matching mappings based on the provided criteria.
+- Returns the found `DocRefMapping` entities.
+
+## Dependencies
+- `@metriport/core/external/index`: Provides the `MedicalDataSource` enum.
+- `@metriport/core/util/uuid-v7`: Provides the `uuidv7` function for generating UUIDs.
+- `sequelize`: ORM for database interaction.
+
+## Error Handling
+- The `getOrCreateDocRefMapping` function throws an error if the `DocRefMapping` is not found after the upsert operation.

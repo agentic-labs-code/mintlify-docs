@@ -1,0 +1,79 @@
+---
+title: "patient-facility.ts"
+---
+
+## High-level description
+This file contains utility functions for managing the association between patients and facilities in a medical system. It provides functions to check patient-facility associations, retrieve facility IDs, and validate optional facility IDs.
+
+## Symbols
+
+### `isPatientAssociatedWithFacility`
+#### Description
+Checks if a patient is associated with a given facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient to check |
+| facilityId | string | The ID of the facility to check against |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | boolean | True if the patient is associated with the facility, false otherwise |
+
+#### Internal Logic
+The function uses the `some` method to check if the `facilityId` exists in the patient's `facilityIds` array.
+
+### `getFacilityIdOrFail`
+#### Description
+Retrieves a facility ID for a given patient, considering an optionally passed facility ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient to get the facility ID for |
+| facilityId | string | Optional facility ID to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facilityId | string | The facility ID associated with the patient |
+
+#### Internal Logic
+1. If a `facilityId` is provided, it checks if the patient is associated with it.
+2. If no `facilityId` is provided, it checks if the patient is associated with only one facility.
+3. If the patient is associated with multiple facilities and no `facilityId` is provided, it throws an error.
+4. If the patient has no associated facilities, it throws an error.
+
+### `validateOptionalFacilityId`
+#### Description
+Validates that a facility ID is associated with a patient or that the patient only has one facility if none is provided.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient to validate |
+| facilityId | string | Optional facility ID to validate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | true | Always returns true if validation passes |
+
+#### Internal Logic
+This function calls `getFacilityIdOrFail` and returns true if no error is thrown.
+
+## Error Handling
+The code uses custom error classes:
+- `BadRequestError`: Thrown when there's an issue with the patient-facility association.
+- `MetriportError`: Thrown when there's a programming error (e.g., patient doesn't have a facility).
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/util/error/metriport-error | Importing MetriportError class |
+| ../../errors/bad-request | Importing BadRequestError class |
+| @metriport/core/domain/patient | Importing Patient type |
+
+The code relies on the Patient type having a `facilityIds` property, which is an array of facility IDs associated with the patient.

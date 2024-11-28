@@ -1,0 +1,82 @@
+---
+title: "log.ts"
+---
+
+Here's a high-level description and documentation of the `log.ts` file:
+
+## High-level description
+
+The `log.ts` file provides a flexible logging utility for the Metriport core package. It exports functions to create customized logging functions with optional prefixes and suffixes. The main purpose is to standardize logging across the application, making it easier to identify the source of log messages and include additional context when needed.
+
+## Code Structure
+
+The file exports three main functions: `log`, `debug`, and `out`. These functions are interconnected, with `out` being the primary function that returns an object containing both `log` and `debug` functions.
+
+## Symbols
+
+### `log`
+
+#### Description
+Creates a logging function with an optional prefix and suffix.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| prefix | string (optional) | A string to prepend to log messages |
+| suffix | string (optional) | A string to append to log messages |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| logFunction | Function | A function that logs messages with the specified prefix and suffix |
+
+#### Internal Logic
+- Creates a function that prepends the prefix (if provided) to the message.
+- Appends the suffix (if provided) to the additional parameters.
+- Calls `console.log` with the formatted message and parameters.
+
+### `debug`
+
+#### Description
+Creates a debug logging function that only logs in non-cloud environments.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| prefix | string (optional) | A string to prepend to debug messages |
+| suffix | string (optional) | A string to append to debug messages |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| debugFunction | Function | A function that logs debug messages in non-cloud environments |
+
+#### Internal Logic
+- Uses the `Config.isCloudEnv()` function to determine if it's running in a cloud environment.
+- If not in a cloud environment, it returns the `log` function with the provided prefix and suffix.
+- If in a cloud environment, it returns an empty function that does nothing.
+
+### `out`
+
+#### Description
+Creates an object containing both `log` and `debug` functions with the specified prefix and suffix.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| prefix | string (optional) | A string to prepend to log and debug messages |
+| suffix | string (optional) | A string to append to log and debug messages |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| logObject | Object | An object containing `log` and `debug` functions |
+
+#### Internal Logic
+- Creates and returns an object with `log` and `debug` properties, each calling their respective functions with the provided prefix and suffix.
+
+## Dependencies
+The file imports `emptyFunction` from "@metriport/shared" and `Config` from "./config".
+
+## Performance Considerations
+The `debug` function checks the environment on each call, which could have a minor performance impact if called frequently in a tight loop.

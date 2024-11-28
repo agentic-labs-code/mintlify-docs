@@ -1,0 +1,69 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for handling FHIR (Fast Healthcare Interoperability Resources) document references, specifically focusing on converting CommonWell (CW) documents to FHIR format, managing document references, and interacting with FHIR servers. It includes functionality for creating, updating, and retrieving document references, as well as utilities for handling authors, dates, and other document metadata.
+
+## What does it do?
+The code in this directory performs several key functions:
+
+1. Converts CommonWell document references to FHIR-compliant DocumentReference resources.
+2. Creates temporary DocumentReference resources during the document upload process.
+3. Retrieves FHIR DocumentReference resources based on specified parameters.
+4. Upserts (inserts or updates) document references to a FHIR server, both individually and in batches.
+5. Processes FHIR search responses and handles errors.
+6. Provides utility functions for extracting author information, converting statuses, and handling dates in the context of document references.
+
+These functionalities are crucial for maintaining interoperability in healthcare data exchange, especially when dealing with different data formats and systems like CommonWell and FHIR.
+
+## Entry points
+The main entry points for this directory are:
+
+1. `index.ts`: Contains the core functionality for converting CommonWell documents to FHIR format and handling document references.
+2. `save-document-reference.ts`: Provides functions for upserting document references to a FHIR server.
+3. `get-documents.ts`: Offers a (deprecated) function for retrieving FHIR DocumentReference resources.
+4. `draft-update-document-reference.ts`: Handles the creation of temporary document references during the upload process.
+
+The data flow typically starts with incoming CommonWell documents, which are then converted to FHIR format using the functions in `index.ts`. These FHIR documents can then be saved to a FHIR server using the functions in `save-document-reference.ts`. The `get-documents.ts` file provides a way to retrieve these documents, while `draft-update-document-reference.ts` handles temporary document states during uploads.
+
+## Key Files
+
+1. `index.ts`:
+   - Contains the `cwToFHIR` function, which is the core conversion function from CommonWell to FHIR format.
+   - Includes utility functions like `getAuthors`, `convertToFHIRResource`, and `getBestDateFromCWDocRef`.
+   - Handles the mapping of CommonWell data structures to FHIR resources.
+
+2. `save-document-reference.ts`:
+   - Defines `upsertDocumentToFHIRServer` for single document reference updates.
+   - Provides `upsertDocumentsToFHIRServer` for batch operations using transaction bundles.
+   - Implements network retry logic for improved reliability.
+
+3. `draft-update-document-reference.ts`:
+   - Contains `composeDocumentReference` for creating temporary document references.
+   - Includes utility functions for handling identifiers, extensions, and content in DocumentReference resources.
+
+4. `process-fhir-search-response.ts`:
+   - Defines `processFhirResponse` for handling FHIR operation results and error reporting.
+
+5. `get-documents.ts`:
+   - Provides a deprecated wrapper function `getDocumentsFromFHIR` for backward compatibility.
+
+## Dependencies
+The code relies on several external libraries and internal modules:
+
+1. @medplum/fhirtypes: Provides FHIR type definitions.
+2. @metriport/commonwell-sdk: Offers types and utilities for working with CommonWell data.
+3. @metriport/core: Contains various utilities and functions used across the codebase.
+4. dayjs: Used for date manipulation and comparison.
+5. lodash: Provides utility functions for object manipulation.
+6. @metriport/shared: Contains shared utilities like network retry logic.
+
+Internal dependencies include various utility functions and types from other parts of the codebase, such as error handling, logging, and configuration management.
+
+## Configuration
+The code uses configuration values for AWS region and S3 bucket names, which are retrieved from a Config object. While there are no explicit configuration files in this directory, the code likely relies on configuration set at the project level.
+
+Error handling is implemented throughout the code, with custom error classes like `MetriportError` and `BadRequestError` being used to provide detailed error information. The code also uses logging utilities for error reporting and debugging purposes.
+
+In summary, this directory plays a crucial role in managing FHIR document references within the larger healthcare data integration system, providing essential functionality for data conversion, storage, and retrieval in compliance with FHIR standards.
