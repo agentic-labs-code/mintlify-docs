@@ -1,0 +1,76 @@
+---
+title: "message_builder.py"
+---
+
+## High-level description
+The `SlackAlertMessageBuilder` class is responsible for constructing Slack messages specifically tailored for data quality alerts. It extends the base `SlackMessageBuilder` and provides methods for adding structured sections like title, preview, and details to the alert message.
+
+## Code Structure
+The code defines a custom exception `PreviewIsTooLongError` and a schema `SlackAlertMessageSchema`. The main component is the `SlackAlertMessageBuilder` class which utilizes these components and inherits from `SlackMessageBuilder` to structure and build the Slack alert message.
+
+## References
+- `SlackMessageBuilder`: This class inherits from `elementary.clients.slack.slack_message_builder.SlackMessageBuilder` to leverage its functionality for building Slack messages.
+- `SlackAlertMessageSchema`: This schema defines the structure of the alert message with optional title, preview, and details sections.
+- `SlackBlocksType`: This type alias represents a list of Slack blocks used for composing message content.
+
+## Symbols
+
+### `PreviewIsTooLongError`
+#### Description
+This exception is raised when the preview section of a Slack alert message exceeds the maximum allowed number of blocks.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| preview_blocks | `SlackBlocksType` | The preview blocks that exceed the limit. |
+| message | `str` | Optional. A custom error message. |
+
+#### Outputs
+This class inherits from `Exception` and doesn't define any custom output.
+
+### `SlackAlertMessageSchema`
+#### Description
+A Pydantic model defining the schema for a Slack alert message. It allows for optional title, preview, and details sections, each represented as a list of Slack blocks.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| title | `Optional[SlackBlocksType]` | Optional. List of Slack blocks for the alert title. |
+| preview | `Optional[SlackBlocksType]` | Optional. List of Slack blocks for the alert preview. |
+| details | `Optional[SlackBlocksType]` | Optional. List of Slack blocks for the alert details. |
+
+#### Outputs
+This class inherits from `BaseModel` and doesn't define any custom output. It validates the input data against the defined schema.
+
+### `SlackAlertMessageBuilder`
+#### Description
+This class is responsible for building Slack alert messages with a specific structure. It extends the base `SlackMessageBuilder` and provides methods for adding title, preview, and details sections to the message.
+
+#### Inputs
+This class doesn't define any custom input parameters.
+
+#### Outputs
+- `get_slack_message`: Returns a `SlackMessageSchema` object representing the constructed Slack alert message.
+
+#### Internal Logic
+- `__init__`: Initializes the Slack message structure using the parent class's initialization.
+- `get_slack_message`: Orchestrates the building of the Slack message by adding title, preview, and details sections based on the provided `alert_schema`.
+- `add_title_to_slack_alert`: Adds the title section to the Slack message, appending a divider block afterward.
+- `add_preview_to_slack_alert`: Adds the preview section to the Slack message after validating the number of blocks.
+- `add_details_to_slack_alert`: Adds the details section to the Slack message.
+- `_validate_preview_blocks` (classmethod): Validates the preview section to ensure it doesn't exceed the maximum allowed blocks. It also pads the preview with empty blocks to maintain a consistent length.
+
+## Side Effects
+This class modifies the internal state of the `slack_message` attribute while constructing the Slack alert message.
+
+## Dependencies
+- `typing`: Used for type hinting.
+- `pydantic`: Used for data validation and schema definition.
+- `elementary.clients.slack.schema`: Imports `SlackBlocksType` and `SlackMessageSchema`.
+- `elementary.clients.slack.slack_message_builder`: Imports `SlackMessageBuilder`.
+
+## Error Handling
+- `PreviewIsTooLongError`: This custom exception is raised if the preview section of the alert message exceeds the defined limit.
+
+## Logging
+This code doesn't implement any specific logging mechanisms.

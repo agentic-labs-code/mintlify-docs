@@ -1,0 +1,87 @@
+---
+title: "test_selector_filter.py"
+---
+
+## High-level description
+This file contains unit tests for the `SelectorFilter` class, which is responsible for parsing and validating selectors used in data monitoring. The tests cover various scenarios, including different types of selectors and their interactions with dbt runners.
+
+## Code Structure
+The file consists of several test functions and fixtures. The main test functions are:
+1. `test_parse_selector_with_user_dbt_runner_no_models`
+2. `test_parse_selector_with_user_dbt_runner_with_models`
+3. `test_parse_selector_without_user_dbt_runner`
+4. `test_validate_report_selector`
+
+These tests use fixtures to mock dependencies and set up test environments.
+
+## Symbols
+
+### `test_parse_selector_with_user_dbt_runner_no_models`
+#### Description
+This test checks the behavior of `SelectorFilter` when using a dbt runner with no models.
+
+#### Inputs
+- `dbt_runner_no_models_mock`: A mocked dbt runner that returns no models
+- `anonymous_tracking_mock`: A mocked anonymous tracking object
+
+#### Internal Logic
+1. Creates a `MockConfig` object
+2. Initializes a `SelectorFilter` with the mocked objects and a selector
+3. Asserts that the resulting filter has no node names and the correct selector
+
+### `test_parse_selector_with_user_dbt_runner_with_models`
+#### Description
+This test checks the behavior of `SelectorFilter` when using a dbt runner with models.
+
+#### Inputs
+- `dbt_runner_with_models_mock`: A mocked dbt runner that returns two models
+- `anonymous_tracking_mock`: A mocked anonymous tracking object
+
+#### Internal Logic
+1. Creates a `MockConfig` object
+2. Initializes a `SelectorFilter` with the mocked objects and a selector
+3. Asserts that the resulting filter has the correct node names and selector
+
+### `test_parse_selector_without_user_dbt_runner`
+#### Description
+This test checks the behavior of `SelectorFilter` for various selector types without using a dbt runner.
+
+#### Inputs
+- `anonymous_tracking_mock`: A mocked anonymous tracking object
+
+#### Internal Logic
+Tests different selector types (tag, owner, model, status, resource type, invocation_id, invocation_time, last_invocation) and asserts that the resulting filter has the correct properties for each type.
+
+### `test_validate_report_selector`
+#### Description
+This parametrized test checks the validation of report selectors.
+
+#### Inputs
+- `selector_filter`: A `FiltersSchema` object with different selector configurations
+- `should_raise`: A boolean indicating whether an exception should be raised
+
+#### Internal Logic
+1. If `should_raise` is True, asserts that `InvalidSelectorError` is raised when validating the report selector
+2. If `should_raise` is False, asserts that no exception is raised when validating the report selector
+
+## Fixtures
+
+### `anonymous_tracking_mock`
+Returns a `MockAnonymousTracking` object.
+
+### `dbt_runner_no_models_mock`
+Mocks the `ls` method of `CommandLineDbtRunner` to return an empty list.
+
+### `dbt_runner_with_models_mock`
+Mocks the `ls` method of `CommandLineDbtRunner` to return a list with two model names.
+
+## Dependencies
+- `pytest`: Used for test runner and assertions
+- `parametrization`: Used for parametrized tests
+- `unittest.mock`: Used for mocking objects and methods
+- `elementary.monitor.data_monitoring.schema`: Provides schema classes and enums
+- `elementary.monitor.data_monitoring.selector_filter`: Provides the `SelectorFilter` class
+- `tests.mocks.anonymous_tracking_mock`: Provides `MockAnonymousTracking`
+- `tests.mocks.config_mock`: Provides `MockConfig`
+
+This test file ensures that the `SelectorFilter` class correctly handles various selector types and configurations, both with and without a dbt runner, and validates report selectors as expected.

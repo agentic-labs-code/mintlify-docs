@@ -1,0 +1,71 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the implementation of the lineage API for the Elementary monitor. It provides functionality to fetch, structure, and represent lineage data for models, sources, and exposures within a dbt project. The main components are the `LineageAPI` class, which interacts with the dbt project to retrieve lineage information, and a set of Pydantic schemas that define the structure of lineage data.
+
+## What does it do?
+The lineage API allows users to:
+1. Fetch dependency information for specified nodes in a dbt project.
+2. Construct a directed graph representing the relationships between different components (models, sources, exposures) in the project.
+3. Represent the lineage data in a structured format, including nodes and their dependencies.
+4. Convert the lineage data into NetworkX graph objects for further analysis or visualization.
+
+This functionality is crucial for understanding the data flow and dependencies within a dbt project, which can be helpful for impact analysis, debugging, and optimizing data pipelines.
+
+## Key Files
+1. `lineage.py`: Contains the `LineageAPI` class, which is responsible for fetching and structuring lineage data. It uses the `LineageFetcher` to retrieve raw dependency information and constructs a directed graph representing the lineage.
+
+2. `schema.py`: Defines Pydantic schemas for representing lineage data. The main schemas are:
+   - `LineageNodeSchema`: Represents a single node in the lineage graph.
+   - `LineageSchema`: Represents the overall lineage graph, containing nodes and edges.
+   - `NodeDependsOnNodesSchema`: Represents the dependencies of a single node.
+
+These schemas are used for data validation, serialization, and deserialization of lineage information.
+
+## Dependencies
+The lineage API relies on the following external libraries:
+1. `networkx`: Used for creating and manipulating graph structures. This library is chosen for its robust graph algorithms and data structures, which are essential for representing and analyzing lineage relationships.
+
+2. `pydantic`: Used for data validation and serialization of the lineage schemas. Pydantic is chosen for its ease of use in defining data models and its integration with FastAPI, which is likely used in other parts of the Elementary monitor.
+
+## Configuration
+The lineage API does not have specific configuration files or environment variables. However, it interacts with the dbt project configuration through the `BaseDbtRunner` instance provided to the `LineageAPI` constructor.
+
+Key configurable aspects include:
+1. The ability to exclude Elementary-specific models from the lineage data (controlled by the `exclude_elementary_models` parameter in the `get_lineage` method).
+2. The list of node IDs to include in the lineage (specified by the `lineage_node_ids` parameter in the `get_lineage` method).
+
+## Code Examples
+
+Here's an example of how to use the `LineageAPI` to fetch lineage data:
+
+```python
+from elementary.clients.dbt.base_dbt_runner import BaseDbtRunner
+from elementary.monitor.api.lineage.lineage import LineageAPI
+
+# Assume we have a BaseDbtRunner instance
+dbt_runner = BaseDbtRunner(...)
+
+# Create a LineageAPI instance
+lineage_api = LineageAPI(dbt_runner)
+
+# Fetch lineage data for specific nodes
+lineage_node_ids = ["model.my_project.model1", "model.my_project.model2"]
+lineage_data = lineage_api.get_lineage(lineage_node_ids, exclude_elementary_models=True)
+
+# Access lineage information
+for node in lineage_data.nodes:
+    print(f"Node: {node.unique_id}, Type: {node.type}, Sub-type: {node.sub_type}")
+
+for edge in lineage_data.edges:
+    print(f"Edge: {edge[0]} -&gt; {edge[1]}")
+
+# Convert to a NetworkX graph for further analysis
+graph = lineage_data.to_directed_graph()
+```
+
+This example demonstrates how to create a `LineageAPI` instance, fetch lineage data for specific nodes, and access the resulting lineage information. It also shows how to convert the lineage data into a NetworkX graph for additional analysis or visualization.
+
+The lineage API provides a powerful tool for understanding and analyzing the structure of dbt projects, enabling users to trace data lineage, identify dependencies, and optimize their data workflows.

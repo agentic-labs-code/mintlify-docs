@@ -1,0 +1,63 @@
+---
+title: "schema.py"
+---
+
+## High-level description
+This code defines a schema for Slack messages in the Elementary data monitoring system. It provides a structure for creating and validating Slack messages, including text, attachments, and blocks. The schema also includes a validator to ensure that the number of attachments doesn't exceed Slack's limit.
+
+## Code Structure
+The main class `SlackMessageSchema` inherits from `BaseModel` and defines the structure of a Slack message. It uses a validator to check the number of attachments. The code also defines some type aliases for Slack blocks.
+
+## Symbols
+
+### SlackMessageSchema
+#### Description
+This class defines the structure of a Slack message, including optional text, attachments, and blocks.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| text | Optional[str] | The main text of the Slack message |
+| attachments | Optional[list] | A list of attachments for the Slack message |
+| blocks | Optional[list] | A list of blocks for the Slack message |
+
+#### Internal Logic
+The class uses a validator to check if the number of attachments exceeds the Slack limit (50). If it does, it logs an error and removes the attachments from the message.
+
+### validate_attachments
+#### Description
+This is a validator method for the `attachments` field in `SlackMessageSchema`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cls | Type[SlackMessageSchema] | The class itself |
+| attachments | Any | The attachments to validate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Optional[list] | The validated attachments or None if invalid |
+
+#### Internal Logic
+1. Checks if `attachments` is a list and if its length exceeds `SLACK_MESSAGE_ATTACHMENTS_LIMIT`.
+2. If the limit is exceeded, it logs an error and returns None.
+3. Otherwise, it returns the original attachments.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| typing | Provides type hinting support |
+| elementary.utils.log | Provides logging functionality |
+| elementary.utils.pydantic_shim | Provides BaseModel and validator |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| SLACK_MESSAGE_ATTACHMENTS_LIMIT | int | 50 | Maximum number of attachments allowed in a Slack message |
+
+## Error Handling
+The code logs an error when the number of attachments exceeds the limit. It uses the `logger.error()` method to log the error message.
+
+## Logging
+The code uses a logger obtained from `elementary.utils.log.get_logger()` to log error messages.

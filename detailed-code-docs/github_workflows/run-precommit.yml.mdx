@@ -1,0 +1,47 @@
+---
+title: "run-precommit.yml"
+---
+
+## High-level description
+This GitHub Actions workflow file defines a job to run pre-commit hooks on the Elementary project. It is triggered on pull requests and can also be manually dispatched. The workflow ensures code quality by running various checks and tests defined in the project's pre-commit configuration.
+
+## Symbols
+
+### `name`
+#### Description
+Defines the name of the GitHub Actions workflow as "Run pre-commit hooks".
+
+### `on`
+#### Description
+Specifies the events that trigger this workflow. It runs on pull requests and can be manually triggered using the `workflow_dispatch` event.
+
+### `jobs`
+#### Description
+Defines the jobs to be executed in this workflow. There is one job named `code-quality`.
+
+### `code-quality`
+#### Description
+This job runs the pre-commit hooks on an Ubuntu environment.
+
+#### Internal Logic
+1. Checks out the Elementary repository
+2. Sets up Python 3.8
+3. Installs the Elementary package in editable mode
+4. Installs development requirements
+5. Runs pre-commit hooks on all files, showing diff on failure
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| actions/checkout@v3 | To check out the repository code |
+| actions/setup-python@v4.3.0 | To set up Python 3.8 environment |
+| pip | To install Python packages |
+| pre-commit | To run pre-commit hooks |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| python-version | string | "3.8" | Specifies the Python version to use |
+
+## Error Handling
+The workflow will fail if any of the steps fail, including the pre-commit hooks. The `--show-diff-on-failure` option in the pre-commit run command ensures that differences are displayed when a hook fails, aiding in debugging.

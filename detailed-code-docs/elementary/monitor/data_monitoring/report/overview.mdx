@@ -1,0 +1,75 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the implementation of the data monitoring report functionality in the Elementary project. It includes classes and utilities for generating, formatting, and sending data monitoring reports to various platforms such as Slack, AWS S3, Google Cloud Storage, and Azure Blob Storage.
+
+## What does it do?
+The code in this directory performs the following main tasks:
+
+1. Generates comprehensive data monitoring reports by retrieving test results, model runs, and lineage information from the Elementary API.
+2. Formats the report data into an HTML file for easy viewing and sharing.
+3. Sends the generated report to various platforms:
+   - Uploads the report to cloud storage services (AWS S3, Google Cloud Storage, or Azure Blob Storage) if configured.
+   - Sends a summary of test results to Slack, including statistics on passed, failed, and warning tests.
+   - Attaches the full HTML report to Slack messages when appropriate.
+4. Provides flexibility in report generation, allowing users to specify parameters such as the number of days to include, the number of test runs to consider, and whether to include or exclude certain types of data.
+5. Constructs formatted Slack messages that summarize the data monitoring results, including a title, preview of test result totals, and detailed information about failed, warning, error, and skipped tests.
+
+## Key Files
+
+### data_monitoring_report.py
+This file contains the `DataMonitoringReport` class, which is the core component for generating and sending data monitoring reports. It handles the following tasks:
+- Retrieving report data from the Elementary API
+- Generating the HTML report
+- Uploading the report to cloud storage platforms
+- Sending test result summaries and report attachments to Slack
+
+The class provides methods for each step of the report generation and distribution process, allowing for flexible usage in different scenarios.
+
+### slack_report_summary_message_builder.py
+This file contains the `SlackReportSummaryMessageBuilder` class, which is responsible for constructing formatted Slack messages that summarize the data monitoring test results. It creates a structured message with:
+- A title section with the monitoring summary and environment context
+- A preview section showing filter information and test result totals
+- A details section with information about failed, warning, error, and skipped tests
+
+This class helps in presenting the monitoring results in a clear and organized manner within Slack messages.
+
+## Dependencies
+The code in this directory relies on several external libraries and internal modules:
+
+1. External libraries:
+   - `base64`: For encoding report data
+   - `json`: For serializing and deserializing data
+   - `os`: For file system operations
+   - `webbrowser`: For opening the report in a web browser
+   - `typing`: For type hinting
+
+2. Internal modules:
+   - `elementary.config.config.Config`: For configuration settings
+   - `elementary.monitor.api.report.report.ReportAPI`: For retrieving report data
+   - `elementary.monitor.api.tests.tests.TestsAPI`: For retrieving test results summaries
+   - `elementary.clients.s3.client.S3Client`: For uploading reports to AWS S3
+   - `elementary.clients.gcs.client.GCSClient`: For uploading reports to Google Cloud Storage
+   - `elementary.clients.azure.client.AzureClient`: For uploading reports to Azure Blob Storage
+   - `elementary.clients.slack.client.SlackClient`: For sending reports and summaries to Slack
+
+## Configuration
+The report generation and sending process can be configured using various parameters:
+
+1. Report generation:
+   - `days_back`: Number of days to include in the report
+   - `test_runs_amount`: Number of test runs to consider
+   - `disable_passed_test_metrics`: Whether to exclude metrics for passed tests
+   - `exclude_elementary_models`: Whether to exclude Elementary's internal models
+   - `project_name`: Name of the project to display in the report
+
+2. Report distribution:
+   - Cloud storage configuration (AWS S3, Google Cloud Storage, or Azure Blob Storage)
+   - Slack webhook URL and channel settings
+   - Options for including/excluding certain information in Slack messages (e.g., test descriptions)
+
+These configuration options allow users to customize the report generation and distribution process according to their specific needs and preferences.
+
+In summary, this directory provides a comprehensive solution for generating, formatting, and distributing data monitoring reports, with a focus on flexibility and integration with popular platforms for easy sharing and analysis of monitoring results.

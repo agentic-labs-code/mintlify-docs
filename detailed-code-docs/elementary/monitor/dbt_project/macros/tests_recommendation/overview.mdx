@@ -1,0 +1,43 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This macro, `get_recommended_tests`, is designed to retrieve recommended tests from a specific table based on a given condition. It's part of a dbt project and uses Elementary's custom functions to execute the query and format the results.
+
+## Symbols
+
+### `get_recommended_tests`
+#### Description
+This macro retrieves recommended tests from the `test_recommendations` table based on a provided where clause. It ensures that a where expression is provided, executes the query, and returns the results as a list of dictionaries.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| where_expression | string | A SQL where clause to filter the test recommendations |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | list of dicts | A list of dictionaries containing the recommended tests |
+
+#### Internal Logic
+1. Check if a `where_expression` is provided, raising an error if it's missing.
+2. Construct a SQL query to select specific columns from the `test_recommendations` table, applying the provided `where_expression`.
+3. Execute the query using Elementary's `run_query` function.
+4. Convert the query result to a list of dictionaries using Elementary's `agate_to_dicts` function.
+5. Return the formatted result.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary | Used for `run_query` and `agate_to_dicts` functions |
+| dbt | Used for the `ref` function to reference the `test_recommendations` table |
+
+## Error Handling
+The macro implements basic error handling by checking if the `where_expression` argument is provided. If it's missing, a compiler error is raised using dbt's `exceptions.raise_compiler_error` function.
+
+## Notes
+- This macro is part of a larger dbt project structure, as indicated by the use of the `ref` function to reference the `test_recommendations` table.
+- The macro relies on Elementary's custom functions for query execution and result formatting, suggesting it's part of an Elementary-specific implementation within the dbt project.
+- The `test_recommendations` table is expected to have columns: `resource_name`, `source_name`, `test_namespace`, `test_name`, `test_args`, and `table_args`.

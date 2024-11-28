@@ -1,0 +1,54 @@
+---
+title: "update_skipped_alerts.sql"
+---
+
+## High-level description
+This SQL file is part of a dbt project and is responsible for updating skipped alerts in the Elementary monitoring system. It uses custom macros to perform the update operation without materializing any results.
+
+## Code Structure
+The code consists of a dbt configuration block and two main operations: updating skipped alerts and returning no results.
+
+## Symbols
+
+### dbt Configuration
+#### Description
+This configuration block sets the materialization strategy for the dbt model.
+
+#### Internal Logic
+The `materialized = 'nothing'` setting indicates that this model should not produce any output tables or views in the data warehouse.
+
+### Update Skipped Alerts Operation
+#### Description
+This operation uses a custom macro to update skipped alerts based on provided alert IDs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| alert_ids | list | A list of alert IDs to be marked as skipped |
+
+#### Internal Logic
+The `elementary_cli.update_skipped_alerts()` macro is called with the `alert_ids` variable passed as an argument. This macro likely updates the status of the specified alerts to "skipped" in the alerts tracking system.
+
+### No Results Query
+#### Description
+This operation ensures that no results are returned from the model execution.
+
+#### Internal Logic
+The `elementary.no_results_query()` macro is called, which likely returns an empty result set or a query that produces no output.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| alerts_v2 | Referenced model that this file depends on |
+| elementary_cli | Custom package providing the `update_skipped_alerts` macro |
+| elementary | Custom package providing the `no_results_query` macro |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| alert_ids | list | N/A | List of alert IDs to be marked as skipped |
+
+Note: The `alert_ids` variable is expected to be provided when running this model.
+
+## TODOs
+The comment `-- depends_on: {{ ref('alerts_v2') }}` suggests that this model depends on the 'alerts_v2' model. This dependency is currently commented out and may need to be reviewed or uncommented if the dependency is required for proper functioning.

@@ -1,0 +1,67 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `alerts` directory within the Elementary data observability system contains macros for managing the lifecycle of alerts, including fetching, populating, and updating alert statuses. These macros interact with the Elementary alerts database to handle various types of alerts such as model alerts, source freshness alerts, and test alerts.
+
+## What does it do?
+This directory provides functionality to:
+
+1. Fetch pending alerts and last sent times for alerts from the database.
+2. Populate a centralized alerts table with different types of alerts (model, source freshness, and test alerts) while avoiding duplicates and managing data size limitations.
+3. Update the status of alerts, marking them as sent or skipped based on specific conditions.
+4. Generate standardized alert objects and handle potential data size limitations.
+5. Provide utility functions for creating empty alert tables and filtering for new alerts.
+
+These macros form the core of the alerting system within the Elementary monitoring framework, enabling users to track and respond to various data quality and pipeline issues effectively.
+
+## Entry points
+The main entry points for this directory are:
+
+1. `fetchers/`: Contains macros for retrieving alert-related information from the database.
+2. `manage/`: Houses macros for updating alert statuses (sent or skipped).
+3. `population/`: Includes macros for populating the alerts table with various types of alerts.
+
+## Key Files
+1. `fetchers/fetchers.sql`:
+   - Contains `get_pending_alerts` and `get_last_alert_sent_times` macros for retrieving alert information.
+
+2. `manage/update_sent_alerts.sql`:
+   - Updates the status of specified alerts to 'sent' in the Elementary alerts table.
+
+3. `manage/update_skipped_alerts.sql`:
+   - Transitions the state of specified alerts from 'pending' to 'skipped'.
+
+4. `population/populate_alerts_table.sql`:
+   - Main entry point for populating the centralized alerts table with various types of alerts.
+
+5. `population/model_alerts.sql`:
+   - Generates and populates model alerts based on dbt model and snapshot execution results.
+
+6. `population/source_freshness_alerts.sql`:
+   - Handles the generation and population of alerts related to data source freshness.
+
+7. `population/test_alerts.sql`:
+   - Manages the creation and population of alerts based on failed data quality tests.
+
+8. `population/utils/`:
+   - Contains utility macros for creating empty alert tables, generating standardized alert objects, and filtering for new alerts.
+
+## Dependencies
+The macros in this directory rely on the following dependencies:
+
+1. `elementary`: A custom package that provides utility functions for various operations such as table creation, data type casting, time manipulation, and query execution.
+2. `elementary_cli`: Used for generating alert objects, normalizing alert statuses, and getting alert time limits.
+3. dbt (data build tool): The underlying framework on which these macros are built and executed.
+
+## Configuration
+The macros use several configuration options, including:
+
+1. `days_back`: Number of days to look back for alerts (default: 1)
+2. `disable_samples`: Flag to disable sample collection for test alerts (default: false)
+3. `type`: Optional parameter to filter alerts by type in fetcher macros
+
+Additionally, there are configuration options for managing data size limitations, such as maximum row and column sizes for alert data.
+
+In conclusion, the `alerts` directory contains a comprehensive set of macros for managing the entire lifecycle of alerts within the Elementary data monitoring system. These macros work together to efficiently fetch, populate, and update various types of alerts, providing a robust foundation for data quality monitoring and issue detection in dbt projects.

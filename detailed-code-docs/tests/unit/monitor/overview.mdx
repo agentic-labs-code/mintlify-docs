@@ -1,0 +1,44 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains unit tests for Elementary's monitoring system, focusing on various components such as the API, data monitoring, and alert fetching. The tests cover a wide range of functionalities including alert filtering, test metadata extraction, alert generation and formatting, integration with external platforms (particularly Slack), report summarization, and selector functionality.
+
+## What does it do?
+The tests in this directory ensure that Elementary's monitoring system can:
+
+1. Correctly fetch, process, and format alerts from various sources (tests, models, and source freshness checks).
+2. Filter alerts based on various criteria such as tags, owners, models, statuses, and resource types.
+3. Extract and format test metadata from different sources, including Elementary and dbt test result databases.
+4. Integrate seamlessly with Slack for sending alert notifications and reports, adhering to platform-specific limitations.
+5. Summarize and format test results for delivery via Slack.
+6. Create and validate filter schemas based on command-line interface (CLI) parameters.
+7. Parse and validate selectors used in data monitoring, with and without dbt runners.
+8. Validate and structure incoming alert information, including metadata, tags, and timestamps.
+9. Manage operations such as splitting large lists of alerts into manageable chunks and updating the status of sent alerts.
+
+These tests act as a safeguard to ensure that users receive accurate, timely, and well-formatted alerts and reports through their configured channels, maintaining the reliability and effectiveness of Elementary's monitoring capabilities.
+
+## Key Files
+
+1. `tests/unit/monitor/api/alerts/test_alert_filters.py`: Contains tests for alert filtering functionality.
+2. `tests/unit/monitor/api/tests/test_tests_api.py`: Houses unit tests for the `TestsAPI` class, particularly the test metadata extraction method.
+3. `tests/unit/monitor/data_monitoring/alerts/test_data_monitoring_alerts.py`: Tests the `DataMonitoringAlerts` class, covering methods for fetching, sorting, and formatting alerts.
+4. `tests/unit/monitor/data_monitoring/alerts/integrations/slack/test_slack_alert_message_builder.py`: Focuses on the construction of Slack-specific alert messages.
+5. `tests/unit/monitor/data_monitoring/report/test_slack_report_summary_message_builder.py`: Tests the `SlackReportSummaryMessageBuilder` class for constructing Slack messages that summarize test results.
+6. `tests/unit/monitor/data_monitoring/test_filters_schema.py`: Contains unit tests for the `FiltersSchema` class, specifically testing the `from_cli_params` method.
+7. `tests/unit/monitor/data_monitoring/test_selector_filter.py`: Contains unit tests for the `SelectorFilter` class, responsible for parsing and validating selectors.
+8. `tests/unit/monitor/fetchers/schemas/test_alert_data_schema.py`: Tests the `BaseAlertDataSchema` and `TestAlertDataSchema` classes for alert data validation and structuring.
+9. `tests/unit/monitor/fetchers/schemas/test_pending_alerts_schema.py`: Tests the `PendingAlertSchema` for pending alert structure and timestamp handling.
+10. `tests/unit/monitor/fetchers/test_alerts_fetcher.py`: Contains unit tests for the AlertsFetcher class, covering functionalities like splitting lists into chunks and updating sent alerts.
+
+## Dependencies
+The tests rely on several external libraries and internal modules:
+
+- pytest: Used as the primary testing framework.
+- unittest.mock: Utilized for mocking subprocess calls in some tests.
+- Various internal Elementary modules such as `elementary.monitor.alerts`, `elementary.monitor.data_monitoring`, and `elementary.monitor.fetchers`.
+
+## Configuration
+The tests use pytest fixtures to set up test environments and mock objects. These fixtures allow for controlled testing of the monitoring system's behavior under various conditions without affecting real data or external services. While there are no specific configuration files or environment variables mentioned, the tests are designed to be run as part of a larger test suite, likely triggered by a CI/CD pipeline or during local development.

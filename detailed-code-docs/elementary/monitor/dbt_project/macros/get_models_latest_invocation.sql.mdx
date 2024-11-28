@@ -1,0 +1,42 @@
+---
+title: "get_models_latest_invocation.sql"
+---
+
+## High-level description
+This macro retrieves the latest invocation ID for each unique model ID in the dbt project. It leverages the `dbt_run_results` and `dbt_models` tables to identify the most recent run for each model and extracts the corresponding invocation ID.
+
+## Code Structure
+The macro first defines a CTE called `ordered_run_results` that joins `dbt_run_results` and `dbt_models` tables and orders the results by `generated_at` timestamp in descending order. It then defines another CTE called `latest_run_results` that filters the `ordered_run_results` to only include the latest run for each model. Finally, it selects the `unique_id` and `invocation_id` from the `latest_run_results` CTE.
+
+## References
+- `elementary.dbt_run_results`: This table stores information about each dbt run, including the invocation ID and timestamp.
+- `elementary.dbt_models`: This table contains metadata about the models in the dbt project, including the unique model ID.
+- `elementary.agate_to_dicts`: This function converts an agate table to a list of dictionaries.
+
+## Symbols
+### `get_models_latest_invocation`
+#### Description
+This macro retrieves the latest invocation ID for each unique model ID.
+
+#### Inputs
+This macro does not take any inputs.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | list of dictionaries | A list of dictionaries, where each dictionary represents a model and contains its `unique_id` and `invocation_id`. |
+
+#### Internal Logic
+1. **Create `ordered_run_results` CTE:**
+    - Joins `dbt_run_results` and `dbt_models` tables using the `unique_id` column.
+    - Uses a window function to assign a row number to each run result for a given model, ordered by the `generated_at` timestamp in descending order.
+2. **Create `latest_run_results` CTE:**
+    - Filters the `ordered_run_results` CTE to only include rows where `row_number` is 1, effectively selecting the latest run for each model.
+3. **Select `unique_id` and `invocation_id`:**
+    - Selects the `unique_id` and `invocation_id` columns from the `latest_run_results` CTE.
+4. **Execute the query:**
+    - Uses the `run_query` function to execute the constructed SQL query.
+5. **Convert to dictionaries:**
+    - Uses the `elementary.agate_to_dicts` function to convert the result of the query (an agate table) into a list of dictionaries.
+6. **Return the result:**
+    - Returns the list of dictionaries.

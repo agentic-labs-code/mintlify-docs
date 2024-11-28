@@ -1,0 +1,53 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains unit tests for Elementary's data monitoring system, focusing on alerts, reporting, filtering, and selector functionality. The tests cover various aspects of the system, including alert generation, formatting, integration with external platforms (particularly Slack), report summarization, and filter schema creation.
+
+## What does it do?
+The tests in this directory ensure that Elementary's data monitoring system can:
+
+1. Correctly fetch, process, and format alerts from various sources (tests, models, and source freshness checks).
+2. Integrate seamlessly with Slack for sending alert notifications and reports.
+3. Summarize and format test results for delivery via Slack, adhering to platform-specific limitations.
+4. Create and validate filter schemas based on command-line interface (CLI) parameters.
+5. Parse and validate selectors used in data monitoring, with and without dbt runners.
+
+These tests act as a safeguard to ensure that users receive accurate, timely, and well-formatted alerts and reports through their configured channels, maintaining the reliability and effectiveness of Elementary's monitoring capabilities.
+
+## Key Files
+
+### `alerts/test_data_monitoring_alerts.py`
+This file contains unit tests for the `DataMonitoringAlerts` class, covering methods for fetching, sorting, and formatting alerts. It ensures that alerts are correctly handled, suppressed when necessary, and formatted appropriately for delivery.
+
+### `alerts/integrations/slack/test_slack_alert_message_builder.py`
+This file focuses on the construction of Slack-specific alert messages, ensuring they meet Slack's formatting requirements and API limitations.
+
+### `alerts/integrations/slack/test_slack_integration.py`
+This file examines the overall integration with Slack, including channel selection, client handling, and template selection based on workflow integration status.
+
+### `report/test_slack_report_summary_message_builder.py`
+This file tests the `SlackReportSummaryMessageBuilder` class, responsible for constructing Slack messages that summarize test results. It verifies the accuracy of result aggregation, handling of Slack attachment limits, and the exclusion of passed tests from detailed report sections.
+
+### `test_filters_schema.py`
+This file contains unit tests for the `FiltersSchema` class, specifically testing the `from_cli_params` method. It covers various scenarios of creating filter schemas from CLI parameters, including empty filters, and filters for tags, owners, models, statuses, and resource types.
+
+### `test_selector_filter.py`
+This file contains unit tests for the `SelectorFilter` class, which is responsible for parsing and validating selectors used in data monitoring. The tests cover various scenarios, including different types of selectors and their interactions with dbt runners.
+
+## Dependencies
+The tests rely on several external libraries and internal modules:
+
+- pytest: Used as the testing framework.
+- elementary.monitor.alerts: Provides alert models for different types.
+- elementary.monitor.data_monitoring.alerts.integrations.slack: Contains the Slack integration implementation.
+- elementary.monitor.fetchers.alerts: Provides schemas for alert data and pending alerts.
+- elementary.monitor.data_monitoring.schema: Provides schema classes and enums.
+- elementary.monitor.data_monitoring.selector_filter: Provides the `SelectorFilter` class.
+- tests.mocks: Contains mock implementations for testing purposes.
+
+## Configuration
+The tests use pytest fixtures to set up test environments and mock objects. These fixtures allow for controlled testing of the monitoring system's behavior under various conditions without affecting real data or external services.
+
+The tests are designed to be run as part of a larger test suite, likely triggered by a CI/CD pipeline or during local development to ensure the integrity of the monitoring system before deploying changes.

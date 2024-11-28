@@ -1,0 +1,32 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `tests/unit/monitor/data_monitoring/alerts/integrations` directory houses unit tests designed to validate the integration of Elementary's data monitoring system with external alerting platforms. Currently, it focuses solely on Slack integration. The tests within this directory ensure that alerts are correctly built, formatted, and sent to the appropriate Slack channels.
+
+## What does it do?
+This directory primarily ensures that Elementary's data monitoring system can effectively communicate with Slack to deliver alert notifications. It validates the following:
+
+1. **Alert Message Formatting:** Tests verify that alert messages sent to Slack are correctly structured and adhere to Slack's API limitations. This includes validating the title, preview, and detailed content of the message.
+2. **Channel Selection:** Tests confirm that alerts are routed to the correct Slack channel based on the alert configuration and any user-defined overrides.
+3. **Client Handling:** The system supports different Slack client types, such as webhooks and web clients. Tests ensure compatibility and proper handling of each client type.
+
+In essence, this directory functions as a quality assurance measure, guaranteeing that users receive accurate and well-formatted alert notifications within their designated Slack channels.
+
+## Entry points
+While the directory contains multiple files, the primary entry points for understanding the testing logic are:
+
+1. **`test_base_integration.py`:** This file focuses on the fundamental `BaseIntegration` class, which provides a foundation for all alert integrations. It specifically tests the `_get_alert_template` method, ensuring the correct template is selected based on the alert type.
+2. **`slack/test_slack_alert_message_builder.py`:** This file delves into the construction of Slack-specific alert messages. It tests the `SlackAlertMessageBuilder` class, responsible for assembling message components like title, preview, and details into a valid Slack message payload.
+3. **`slack/test_slack_integration.py`:** This file examines the overall integration with Slack. It covers template selection based on workflow/non-workflow integration, deriving integration parameters from alert configurations, and handling different Slack client types.
+
+## Key Files
+### `tests/unit/monitor/data_monitoring/alerts/integrations/test_base_integration.py`
+This file lays the groundwork for testing alert integrations by focusing on the `BaseIntegration` class. It ensures that the correct alert template is selected based on the type of alert being triggered. For instance, a `dbt test` alert would utilize a different template compared to a `model` alert.
+
+### `tests/unit/monitor/data_monitoring/alerts/integrations/slack`
+This subdirectory focuses specifically on the Slack integration. It contains tests for:
+
+- **`test_slack_alert_message_builder.py`:** Validates the construction of Slack alert messages, ensuring they adhere to formatting requirements and include the necessary information.
+- **`test_slack_integration.py`:** Tests the overall integration with Slack, including channel selection, client handling, and template selection based on workflow integration.

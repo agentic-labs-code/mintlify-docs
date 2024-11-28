@@ -1,0 +1,86 @@
+---
+title: "dbt_log_to_elementary_alerts.py"
+---
+
+## High-level description
+This script processes dbt log files to extract Elementary alerts. It reads a dbt log file, filters out Elementary-specific log lines, parses them into JSON format, and extracts the alert information. The extracted alerts are then saved to a new JSON file.
+
+## Code Structure
+The script is organized into four main functions: `get_elementary_log_lines`, `get_json_logs`, `get_elementary_alerts`, and `main`. These functions work together to process the log file and extract the alerts.
+
+## Symbols
+
+### `get_elementary_log_lines`
+#### Description
+This function filters the input dbt log to extract only the lines containing Elementary alerts.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dbt_log | str | The contents of the dbt log file |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | List[str] | A list of log lines containing Elementary alerts |
+
+#### Internal Logic
+The function uses a list comprehension to filter the log lines, keeping only those that contain the `ALERT_PREFIX`.
+
+### `get_json_logs`
+#### Description
+This function attempts to parse each log line as JSON and returns a list of successfully parsed JSON objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| log_lines | List[str] | A list of log lines to be parsed as JSON |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| json_logs | List[dict] | A list of parsed JSON objects |
+
+#### Internal Logic
+The function iterates through each log line, attempts to parse it as JSON, and appends successful parses to the `json_logs` list. It silently ignores any lines that fail to parse.
+
+### `get_elementary_alerts`
+#### Description
+This function extracts Elementary alerts from the parsed JSON logs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| elementary_json_logs | List[dict] | A list of parsed JSON log objects |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| elementary_alerts | List[dict] | A list of extracted Elementary alerts |
+
+#### Internal Logic
+The function iterates through each JSON log, extracts the alert message by splitting on the `ALERT_PREFIX`, parses the resulting string as JSON, and extends the `elementary_alerts` list with the parsed alerts.
+
+### `main`
+#### Description
+This is the main function that orchestrates the entire process of reading the log file, extracting alerts, and saving them to a new file.
+
+#### Internal Logic
+1. Reads the dbt log file specified as a command-line argument.
+2. Calls `get_elementary_log_lines` to filter Elementary-specific log lines.
+3. Calls `get_json_logs` to parse the filtered log lines as JSON.
+4. Calls `get_elementary_alerts` to extract the alerts from the parsed JSON logs.
+5. Writes the extracted alerts to a new JSON file named "elementary_alerts.json".
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| json | Used for parsing and writing JSON data |
+| sys | Used to access command-line arguments |
+| typing | Used for type hinting |
+
+## Error Handling
+The script includes basic error handling in the `get_json_logs` function, where it silently ignores any lines that fail to parse as JSON. However, it does not include explicit error handling for file operations or command-line argument parsing.
+
+## Performance Considerations
+The script processes the entire log file in memory, which could be a concern for very large log files. For improved performance with large files, consider implementing a streaming approach or processing the file in chunks.

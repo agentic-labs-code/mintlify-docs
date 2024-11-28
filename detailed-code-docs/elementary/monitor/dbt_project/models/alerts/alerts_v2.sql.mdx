@@ -1,0 +1,51 @@
+---
+title: "alerts_v2.sql"
+---
+
+## High-level description
+This SQL file defines a dbt model for creating and managing alerts (version 2) in the Elementary monitoring system. It sets up an incremental table with specific configurations and dependencies on various other models and test results.
+
+## Code Structure
+The file consists of a single dbt model configuration block using the `config` macro, followed by several `depends_on` statements to establish dependencies, and finally a call to the `elementary_cli.empty_alerts_v2()` macro.
+
+## Symbols
+
+### dbt Model Configuration
+#### Description
+This configuration block sets up the materialization strategy and other properties for the `alerts_v2` model.
+
+#### Internal Logic
+- Sets the materialization strategy to 'incremental'
+- Defines 'alert_id' as the unique key
+- Specifies merge update columns
+- Configures schema change behavior
+- Sets table type and incremental strategy using Elementary functions
+- Adds a post-hook to populate the alerts table
+
+### Dependencies
+The model declares dependencies on various other models and test results using the `depends_on` statements. These include:
+- dbt tests and test results
+- dbt models, snapshots, and their run results
+- dbt sources and source freshness results
+- Backwards compatibility with previous alert models
+
+### `elementary_cli.empty_alerts_v2()`
+#### Description
+This macro call likely generates the structure for the alerts table without populating it with data.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary | Provides functions for table type and incremental strategy |
+| elementary_cli | Provides macros for populating alerts and creating empty alert structure |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| days_back | integer | 1 | Number of days to look back when populating alerts |
+
+## Notes
+- The model is set up as an incremental table, allowing for efficient updates of alert data.
+- It relies on various other models and test results, suggesting a comprehensive alert system that considers multiple aspects of the data pipeline.
+- The use of Elementary-specific functions and macros indicates integration with the Elementary monitoring system.
+- The backwards compatibility dependencies suggest that this is an updated version of a previous alert system.

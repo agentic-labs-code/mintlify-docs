@@ -1,0 +1,41 @@
+---
+title: "env_vars_context.py"
+---
+
+## High-level description
+This code defines a context manager called `env_vars_context` that allows temporary modification of environment variables within a specific context. It provides a way to set, modify, and delete environment variables for the duration of the context and then restore the original environment afterwards.
+
+## Symbols
+### `env_vars_context`
+#### Description
+This context manager function temporarily modifies environment variables within its context. It takes a dictionary of environment variables to set and ensures that the original environment is restored when the context is exited.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| env_vars | Optional[Dict[str, str]] | A dictionary containing environment variable key-value pairs to set within the context. If None, no environment modification is performed. |
+
+#### Outputs
+This function does not explicitly return any values. It yields control to the code within the context.
+
+#### Internal Logic
+1. **Check for Empty Input:** If `env_vars` is None, it yields control immediately without modifying the environment.
+2. **Store Original Environment:** If `env_vars` is not None, it creates a copy of the current environment variables using `os.environ.copy()`.
+3. **Update Environment:** It updates the current environment variables with the provided `env_vars` using `os.environ.update()`.
+4. **Yield Control:** It yields control to the code within the context, allowing it to execute with the modified environment.
+5. **Restore Original Environment:** After the context exits, it iterates through the provided `env_vars` and either deletes newly added variables or restores the original values of modified variables.
+
+## Side Effects
+- **Modifies Environment Variables:** This function directly modifies the process's environment variables within its context.
+- **Restores Original Environment:** It ensures that the original environment variables are restored after the context exits, even if exceptions occur within the context.
+
+## Error Handling
+The context manager (`@contextmanager`) ensures that the original environment is restored even if exceptions occur within the context.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| os | Used for accessing and manipulating environment variables. |
+| contextlib | Used for creating the context manager using `contextmanager`. |
+| typing | Used for type hinting (Optional, Dict, Generator). |
+```

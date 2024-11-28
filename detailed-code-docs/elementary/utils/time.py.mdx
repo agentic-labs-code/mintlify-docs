@@ -1,0 +1,300 @@
+---
+title: "time.py"
+---
+
+## High-level description
+The `elementary/utils/time.py` file provides a set of utility functions for handling time and date operations. These functions include converting between different timezones, formatting timestamps, and calculating time differences.
+
+## References
+This code file references the following symbols from other files:
+- `get_logger` from `elementary/utils/log`
+- `pluralize_string` from `elementary/utils/strings`
+- `DATETIME_FORMAT` from `tests/mocks/fetchers/alerts_fetcher_mock.py`
+
+## Symbols
+
+### `MILLISECONDS_IN_SEC`
+#### Description
+A constant representing the number of milliseconds in one second.
+
+#### Inputs
+_This symbol has no inputs._
+
+#### Outputs
+_This symbol has no outputs._
+
+#### Internal Logic
+The value is set to `1000`.
+
+### `MILLISECONDS_IN_MIN`
+#### Description
+A constant representing the number of milliseconds in one minute.
+
+#### Inputs
+_This symbol has no inputs._
+
+#### Outputs
+_This symbol has no outputs._
+
+#### Internal Logic
+The value is calculated as `1000 * 60`.
+
+### `MILLISECONDS_IN_HOUR`
+#### Description
+A constant representing the number of milliseconds in one hour.
+
+#### Inputs
+_This symbol has no inputs._
+
+#### Outputs
+_This symbol has no outputs._
+
+#### Internal Logic
+The value is calculated as `1000 * 60 * 60`.
+
+### `DATETIME_FORMAT`
+#### Description
+A constant representing the default date and time format string.
+
+#### Inputs
+_This symbol has no inputs._
+
+#### Outputs
+_This symbol has no outputs._
+
+#### Internal Logic
+The value is set to `"%Y-%m-%d %H:%M:%S"`.
+
+### `DATETIME_WITH_TIMEZONE_FORMAT`
+#### Description
+A constant representing the date and time format string that includes the timezone.
+
+#### Inputs
+_This symbol has no inputs._
+
+#### Outputs
+_This symbol has no outputs._
+
+#### Internal Logic
+The value is set to `"%Y-%m-%d %H:%M:%S %Z"`.
+
+### `convert_utc_iso_format_to_datetime`
+#### Description
+This function converts a UTC ISO format string to a datetime object with UTC timezone.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| utc_iso_format | str | A string representing the date and time in UTC ISO format. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| datetime | datetime | A datetime object representing the input date and time in UTC timezone. |
+
+#### Internal Logic
+1. Parses the input string using `datetime.fromisoformat()`.
+2. Replaces the timezone information with UTC using `tz.tzutc()`.
+
+### `convert_utc_time_to_timezone`
+#### Description
+This function converts a datetime object representing UTC time to a specified timezone. If no timezone is provided, it defaults to the local timezone.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| utc_time | datetime | A datetime object representing the UTC time. |
+| timezone | Optional[str] | The target timezone to convert to. Defaults to None. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| datetime | datetime | A datetime object representing the input time converted to the specified timezone. |
+
+#### Internal Logic
+1. Sets the timezone of the input datetime object to UTC.
+2. Gets the target timezone using `tz.gettz()` or defaults to the local timezone using `tz.tzlocal()`.
+3. Converts the datetime object to the target timezone using `astimezone()`.
+
+### `convert_local_time_to_timezone`
+#### Description
+This function converts a datetime object representing local time to a specified timezone. If no timezone is provided, it defaults to UTC.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| local_time | datetime | A datetime object representing the local time. |
+| timezone | Optional[str] | The target timezone to convert to. Defaults to None. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| datetime | datetime | A datetime object representing the input time converted to the specified timezone. |
+
+#### Internal Logic
+1. Sets the timezone of the input datetime object to the local timezone.
+2. Gets the target timezone using `tz.gettz()` or defaults to UTC using `tz.tzutc()`.
+3. Converts the datetime object to the target timezone using `astimezone()`.
+
+### `convert_time_to_timezone`
+#### Description
+This function converts a datetime object to a specified timezone. If the input datetime object has no timezone information, it defaults to UTC. If no target timezone is provided, it defaults to UTC.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| time | datetime | A datetime object representing the time to convert. |
+| timezone | Optional[str] | The target timezone to convert to. Defaults to None. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| datetime | datetime | A datetime object representing the input time converted to the specified timezone. |
+
+#### Internal Logic
+1. Gets the timezone of the input datetime object using `tz.gettz()` or defaults to UTC.
+2. Gets the target timezone using `tz.gettz()` or defaults to UTC.
+3. Converts the datetime object to the target timezone using `astimezone()`.
+
+### `get_now_utc_str`
+#### Description
+This function returns the current UTC time as a formatted string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| format | str | The desired format string for the output. Defaults to `DATETIME_FORMAT`. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| str | str | The current UTC time formatted according to the input format string. |
+
+#### Internal Logic
+1. Gets the current UTC time using `datetime.utcnow()`.
+2. Formats the datetime object using the input format string using `strftime()`.
+
+### `get_now_utc_iso_format`
+#### Description
+This function returns the current UTC time in ISO format.
+
+#### Inputs
+_This symbol has no inputs._
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| str | str | The current UTC time in ISO format. |
+
+#### Internal Logic
+1. Gets the current UTC time using `datetime.now(timezone.utc)`.
+2. Removes the microseconds and formats the datetime object in ISO format using `isoformat()`.
+
+### `format_milliseconds`
+#### Description
+This function formats a duration in milliseconds into a human-readable string representation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| duration | int | The duration in milliseconds. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| str | str | A formatted string representing the duration in the format "hours:minutes:seconds:milliseconds". |
+
+#### Internal Logic
+1. Calculates the number of hours, minutes, seconds, and remaining milliseconds from the input duration.
+2. Constructs a formatted string using f-string formatting.
+
+### `convert_datetime_utc_str_to_timezone_str`
+#### Description
+This function converts a datetime string in UTC ISO format to a formatted string in a specified timezone.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| isoformat_datetime | str | The datetime string in UTC ISO format. |
+| timezone | Optional[str] | The target timezone to convert to. Defaults to None. |
+| include_timezone | bool | Whether to include the timezone in the output string. Defaults to False. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| str | str | The formatted datetime string in the specified timezone, or the original input string if an error occurs during conversion. |
+
+#### Internal Logic
+1. Parses the input datetime string using `datetime.fromisoformat()`.
+2. Converts the datetime object to the specified timezone using `convert_utc_time_to_timezone()`.
+3. Formats the datetime object using `datetime_strftime()`.
+4. Returns the original input string if any error occurs during the process.
+
+### `datetime_strftime`
+#### Description
+This function formats a datetime object into a string representation based on the `include_timezone` flag.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| datetime | datetime | The datetime object to format. |
+| include_timezone | bool | Whether to include the timezone in the output string. Defaults to False. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| str | str | The formatted datetime string. |
+
+#### Internal Logic
+1. Uses the `DATETIME_FORMAT` if `include_timezone` is False, otherwise uses `DATETIME_WITH_TIMEZONE_FORMAT`.
+2. Formats the datetime object using the selected format string using `strftime()`.
+
+### `convert_partial_iso_format_to_full_iso_format`
+#### Description
+This function converts a partially formatted ISO format time string to a full ISO format string with microseconds set to 0.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| partial_iso_format_time | str | The partially formatted ISO format time string. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| str | str | The full ISO format string with microseconds set to 0, or the original input string if an error occurs during conversion. |
+
+#### Internal Logic
+1. Parses the input time string using `datetime.fromisoformat()`.
+2. Extracts the timezone information from the parsed datetime object.
+3. Creates a new datetime object with the extracted timezone and microseconds set to 0.
+4. Returns the ISO format string of the new datetime object using `isoformat()`.
+5. If a `ValueError` occurs during parsing, logs the exception and returns the original input string.
+
+### `get_formatted_timedelta`
+#### Description
+This function calculates the time difference between now and a given time in seconds, and returns a formatted string representation of the duration.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| time_ago_in_s | float | The time difference in seconds. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| str | str | A formatted string representing the duration in days, hours, minutes, and seconds. |
+
+#### Internal Logic
+1. Creates a `timedelta` object from the input seconds.
+2. Extracts the number of days, hours, minutes, and seconds from the `timedelta` object.
+3. Constructs a formatted string based on the duration components, using `pluralize_string` to handle singular/plural forms.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| datetime | Provides classes for working with dates and times. |
+| timedelta |  Represents a duration of time. |
+| timezone | Represents a timezone. |
+| typing | Used for type hinting. |
+| dateutil.tz | Provides timezone utilities. |
+

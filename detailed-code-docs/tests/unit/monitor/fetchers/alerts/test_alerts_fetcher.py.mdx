@@ -1,0 +1,82 @@
+---
+title: "test_alerts_fetcher.py"
+---
+
+## High-level description
+This file contains unit tests for the AlertsFetcher class, focusing on testing the functionality of splitting lists into chunks, updating sent alerts, and skipping alerts. The tests use mocking to simulate subprocess calls and verify the correct behavior of the AlertsFetcher methods.
+
+## Code Structure
+The file consists of three main test functions and a fixture:
+1. `test_split_list_to_chunks`: Tests the internal method for splitting lists into chunks.
+2. `test_update_sent_alerts`: Tests the method for updating sent alerts.
+3. `test_skip_alerts`: Tests the method for skipping alerts.
+4. `alerts_fetcher_mock`: A fixture that provides a MockAlertsFetcher instance for testing.
+
+## Symbols
+
+### `test_split_list_to_chunks`
+#### Description
+This function tests the `_split_list_to_chunks` method of the AlertsFetcher class.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| alerts_fetcher_mock | MockAlertsFetcher | An instance of the mocked AlertsFetcher |
+
+#### Internal Logic
+1. Creates a mock list of 150 None elements.
+2. Tests splitting the list with a chunk size of 10.
+3. Tests splitting the list with the default chunk size (50).
+4. Asserts that the resulting chunks have the expected lengths.
+
+### `test_update_sent_alerts`
+#### Description
+This function tests the `update_sent_alerts` method of the AlertsFetcher class.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| mock_subprocess_run | MagicMock | A mocked version of subprocess.run |
+| alerts_fetcher_mock | MockAlertsFetcher | An instance of the mocked AlertsFetcher |
+
+#### Internal Logic
+1. Creates a list of 60 mock alert IDs.
+2. Calls `update_sent_alerts` with the mock alert IDs.
+3. Asserts that `subprocess.run` was called twice (due to chunking).
+4. Verifies the correct arguments were passed to `subprocess.run`.
+
+### `test_skip_alerts`
+#### Description
+This function tests the `skip_alerts` method of the AlertsFetcher class.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| mock_subprocess_run | MagicMock | A mocked version of subprocess.run |
+| alerts_fetcher_mock | MockAlertsFetcher | An instance of the mocked AlertsFetcher |
+
+#### Internal Logic
+1. Creates a list of 2000 mock alerts to skip.
+2. Calls `skip_alerts` with the mock alerts.
+3. Asserts that `subprocess.run` was called 6 times (due to chunking).
+4. Verifies the correct arguments were passed to `subprocess.run`.
+
+### `alerts_fetcher_mock`
+#### Description
+This is a pytest fixture that provides a MockAlertsFetcher instance for testing.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| alerts_fetcher_mock | MockAlertsFetcher | An instance of the mocked AlertsFetcher |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| json | Used for parsing JSON strings in test assertions |
+| unittest.mock | Used for mocking subprocess.run |
+| pytest | Testing framework |
+| tests.mocks.fetchers.alerts_fetcher_mock | Provides MockAlertsFetcher for testing |
+
+## Error Handling
+The tests do not explicitly handle errors but rely on pytest's assertion mechanism to catch and report any unexpected behavior or failed assertions.

@@ -1,0 +1,65 @@
+---
+title: "enriched_exposures.sql"
+---
+
+## High-level description
+This SQL code defines a dbt model named 'enriched_exposures' that combines and enriches data from two sources: 'dbt_exposures' and 'elementary_exposures'. It creates a view that coalesces corresponding fields from both sources, prioritizing data from 'elementary_exposures' when available.
+
+## Code Structure
+The code consists of a single SQL query that performs a full join between two relations and selects coalesced fields from both. It also includes some Jinja templating to handle conditional logic for the 'depends_on_columns' field.
+
+## Symbols
+
+### enriched_exposures
+#### Description
+This dbt model creates a view that combines and enriches exposure data from two sources: 'dbt_exposures' and 'elementary_exposures'.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dbt_exposures | relation | Reference to the 'dbt_exposures' model |
+| elementary_exposures | relation | Reference to the 'elementary_exposures' model from the 'elementary_cli' package |
+
+#### Outputs
+A view containing enriched exposure data with the following columns:
+- unique_id
+- name
+- maturity
+- type
+- owner_email
+- owner_name
+- url
+- depends_on_macros
+- depends_on_nodes
+- description
+- tags
+- meta
+- package_name
+- original_path
+- path
+- generated_at
+- metadata_hash
+- label
+- raw_queries
+- depends_on_columns (conditionally included)
+
+#### Internal Logic
+1. The model uses Jinja templating to check if the 'depends_on_columns' column exists in both input relations.
+2. It performs a full join between 'dbt_exposures' and 'elementary_exposures' based on the 'name' column.
+3. For each column, it uses the COALESCE function to prioritize data from 'elementary_exposures' over 'dbt_exposures'.
+4. The 'depends_on_columns' field is included conditionally based on its existence in the input relations.
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| materialized | string | 'view' | Specifies that this model should be materialized as a view |
+| bind | boolean | False | Disables query binding |
+| unique_key | string | 'unique_id' | Defines the unique key for the model |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dbt | Used for model referencing and configuration |
+| elementary | Used for checking column existence in relations |
+
+This model combines data from two sources to provide a comprehensive view of exposures, prioritizing data from the 'elementary_exposures' source when available. The conditional logic for the 'depends_on_columns' field ensures compatibility with different versions of the input relations.

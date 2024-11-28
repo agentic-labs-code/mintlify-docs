@@ -1,0 +1,76 @@
+---
+title: "get_adapter_type_and_unique_id.sql"
+---
+
+## High-level description
+This code defines a set of macros in dbt (data build tool) that retrieve the adapter type and a unique identifier for different database adapters. The main macro `get_adapter_type_and_unique_id()` returns a list containing the target type and a unique identifier specific to the adapter being used.
+
+## Code Structure
+The code consists of one main macro `get_adapter_type_and_unique_id()` and several adapter-specific macros for retrieving unique identifiers. The main macro uses dbt's dispatch functionality to call the appropriate adapter-specific macro based on the current adapter type.
+
+## Symbols
+
+### `get_adapter_type_and_unique_id()`
+#### Description
+This is the main macro that returns a list containing the adapter type and a unique identifier for the current adapter.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | list | A list containing two elements: the adapter type and the unique identifier |
+
+#### Internal Logic
+1. Uses `target.type` to get the adapter type.
+2. Uses `adapter.dispatch()` to call the appropriate `get_adapter_unique_id` macro based on the current adapter.
+3. Returns a list containing these two pieces of information.
+
+### `default__get_adapter_unique_id()`
+#### Description
+This is the default macro for retrieving a unique identifier when no specific adapter macro is defined.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string | The host of the target database |
+
+### `snowflake__get_adapter_unique_id()`
+#### Description
+This macro retrieves a unique identifier for Snowflake adapters.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string | The account of the Snowflake target |
+
+### `bigquery__get_adapter_unique_id()`
+#### Description
+This macro retrieves a unique identifier for BigQuery adapters.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string | The project of the BigQuery target |
+
+### `athena__get_adapter_unique_id()`
+#### Description
+This macro retrieves a unique identifier for Athena adapters.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string | The S3 staging directory of the Athena target |
+
+## Dependencies
+This code relies on dbt's core functionality, particularly the `adapter` and `target` variables, which are provided by dbt's context during compilation and execution.
+
+## Configuration
+The behavior of these macros depends on the dbt project's configuration, specifically the `target` settings in the `profiles.yml` file. The macros access different properties of the `target` object based on the adapter type.
+
+## API/Interface Reference
+While not an API in the traditional sense, this set of macros provides a consistent interface for retrieving adapter-specific information:
+
+| Macro | Usage | Return Value |
+|:------|:------|:-------------|
+| `get_adapter_type_and_unique_id()` | `{% do get_adapter_type_and_unique_id() %}` | List containing adapter type and unique identifier |
+
+The adapter-specific macros (`snowflake__get_adapter_unique_id()`, `bigquery__get_adapter_unique_id()`, etc.) are not intended to be called directly but are dispatched by the main macro based on the current adapter type.

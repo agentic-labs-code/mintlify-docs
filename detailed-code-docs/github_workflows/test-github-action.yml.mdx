@@ -1,0 +1,82 @@
+---
+title: "test-github-action.yml"
+---
+
+## High-level description
+This GitHub Actions workflow, named "Test elementary GitHub action", is designed to test the Elementary data reliability tool and its associated dbt package. It runs on a daily schedule and can also be manually triggered. The workflow checks out the necessary repositories, sets up the environment, runs integration tests, and executes Elementary commands.
+
+## Code Structure
+The workflow consists of two jobs: `test` and `notify_failures`. The `test` job performs the main testing and execution of Elementary, while `notify_failures` is conditionally triggered to send Slack notifications in case of failures during scheduled runs.
+
+## Symbols
+
+### Workflow
+#### Description
+This GitHub Actions workflow is triggered either by a daily schedule or manually. It sets up the environment, runs tests, and executes Elementary commands.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| elementary-ref | string | Branch or tag to checkout for 'elementary' repository |
+| dbt-data-reliability-ref | string | Branch or tag to checkout for 'dbt-data-reliability' repository |
+| dbt-version | string | dbt's version to test with |
+
+#### Internal Logic
+1. Checkout Elementary and dbt package repositories
+2. Set up dbt profiles
+3. Set up Python environment
+4. Install dbt and Elementary
+5. Install dbt package
+6. Run dbt package integration tests
+7. Run Elementary commands
+8. Upload report and log artifacts
+
+### Job: test
+#### Description
+This job performs the main testing and execution of Elementary.
+
+#### Steps
+1. Checkout repositories
+2. Write dbt profiles
+3. Setup Python
+4. Install dbt
+5. Install Elementary
+6. Install dbt package
+7. Run dbt package integration tests
+8. Run Elementary
+9. Upload report and log
+
+### Job: notify_failures
+#### Description
+This job is conditionally triggered to send Slack notifications in case of failures during scheduled runs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string | The result of the test job |
+| run_id | string | The GitHub run ID |
+| workflow_name | string | The name of the workflow |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| actions/checkout@v3 | Checking out repositories |
+| actions/setup-python@v4 | Setting up Python environment |
+| elementary-data/run-elementary-action@v1.8 | Running Elementary commands |
+| actions/upload-artifact@v3 | Uploading artifacts |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| DBT_PKG_INTEG_TESTS_DIR | string | ${{ github.workspace }}/dbt-data-reliability/integration_tests/deprecated_tests | Directory for dbt package integration tests |
+
+## Error Handling
+The workflow includes a separate job (`notify_failures`) to handle failures and send notifications to Slack when the main `test` job fails during scheduled runs.
+
+## Logging
+The workflow uploads the `edr.log` file as an artifact, which contains logs from the Elementary execution.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /actions/runs/${{ github.run_id }} | GET | N/A | Workflow run details | GitHub API endpoint for accessing the workflow run details |

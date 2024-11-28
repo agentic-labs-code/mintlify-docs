@@ -1,0 +1,78 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains unit tests for the Elementary monitoring system's API, focusing on two main areas: alert filtering and test metadata extraction. The tests ensure the correct functionality of alert categorization and the accurate processing of test result data from various sources.
+
+## What does it do?
+The code in this directory simulates and verifies two key aspects of the Elementary monitoring system:
+
+1. Alert Filtering: It tests the system's ability to filter alerts based on various criteria such as tags, owners, models, statuses, and resource types. This is crucial for users who need to quickly find and address specific issues in their data pipelines.
+
+2. Test Metadata Extraction: It validates the system's capability to extract and format test metadata from different sources, including Elementary and dbt test result databases. This ensures that users can access accurate and comprehensive information about test executions.
+
+These tests help maintain the reliability and effectiveness of the monitoring system, allowing users to confidently manage their data pipeline alerts and test results.
+
+## Entry points
+The main entry points for understanding the tests are:
+
+1. `tests/unit/monitor/api/alerts/test_alert_filters.py`: This file contains all the test functions for alert filtering. Each test function focuses on a specific aspect of the filtering logic.
+
+2. `tests/unit/monitor/api/tests/test_tests_api.py`: This file houses the unit tests for the `TestsAPI` class, particularly the `_get_test_metadata_from_test_result_db_row` method.
+
+The tests in both files follow a similar pattern:
+1. Setup: Define sample data (alerts or test results).
+2. Execution: Call the relevant function or method being tested.
+3. Assertion: Verify that the returned results match the expected outcome.
+
+## Dependencies
+The tests rely on the following internal modules:
+
+- `elementary.monitor.api.alerts.alert_filters`: Provides the alert filtering functions being tested.
+- `elementary.monitor.data_monitoring.schema`: Defines the data structures and schemas for alerts.
+- `elementary.monitor.fetchers.alerts.schema.pending_alerts`: Deals with the schema of pending alerts.
+- `elementary.monitor.api.tests`: Contains the `TestsAPI` class being tested.
+
+External dependencies are not explicitly mentioned, but the tests likely use a Python testing framework such as pytest.
+
+## Configuration
+No specific configuration files or environment variables are mentioned for these tests. However, the tests may rely on certain fixtures or setup functions to create the necessary test data and environment.
+
+The tests use mock data to simulate database interactions and test results, allowing for isolated testing of the API functionality without requiring actual database connections or real test executions.
+
+Code Snippet Example:
+Here's an example of how a test function in `test_alert_filters.py` might look:
+
+```python
+def test_filter_alerts_by_tag(initial_alerts):
+    alerts = initial_alerts()
+    filtered_alerts = filter_alerts_by_tag(alerts, ["critical"])
+    assert len(filtered_alerts) == 2
+    assert all("critical" in alert.tags for alert in filtered_alerts)
+```
+
+This test function checks if the `filter_alerts_by_tag` function correctly filters alerts based on a given tag.
+
+Similarly, a test in `test_tests_api.py` might look like this:
+
+```python
+def test_get_test_metadata_from_elementary_test_result():
+    mock_row = {
+        "test_name": "example_test",
+        "test_execution_id": "123",
+        "test_execution_time": "2023-01-01T00:00:00",
+        "test_params": '{"param1": "value1"}',
+        "test_results_description": "Test passed",
+    }
+    test_api = TestsAPI()
+    metadata = test_api._get_test_metadata_from_test_result_db_row(mock_row)
+    
+    assert metadata["test_name"] == "example_test"
+    assert metadata["execution_time"] == "2023-01-01T00:00:00"
+    assert metadata["test_params"] == {"param1": "value1"}
+```
+
+This test verifies that the `_get_test_metadata_from_test_result_db_row` method correctly extracts and formats test metadata from a simulated Elementary test result row.
+
+These unit tests play a crucial role in ensuring the reliability and accuracy of the Elementary monitoring system's API, particularly in handling alerts and test results.

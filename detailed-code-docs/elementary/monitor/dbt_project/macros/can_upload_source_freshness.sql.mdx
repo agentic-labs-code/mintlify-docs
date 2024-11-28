@@ -1,0 +1,43 @@
+---
+title: "can_upload_source_freshness.sql"
+---
+
+## High-level description
+The `can_upload_source_freshness` macro checks if it's allowed to upload source freshness results for a given invocation ID. It determines this by checking if there are any existing source freshness results for the same invocation ID within a specified number of days.
+
+## Code Structure
+The macro first defines a SQL query (`counter_query`) that counts the number of existing source freshness results for the given invocation ID within the specified timeframe. Then, it executes this query and retrieves the count. Finally, it returns `true` if the count is 0 (meaning no previous results exist), otherwise it returns `none`.
+
+## Symbols
+### `can_upload_source_freshness`
+#### Description
+This macro checks if it's allowed to upload source freshness results for a given invocation ID, based on whether previous results exist within a specified timeframe.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invocation_id | string | The invocation ID to check for. |
+| days_back | integer | The number of days to look back for previous results. Defaults to 14. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | boolean or none | Returns `true` if it's allowed to upload results (no previous results found), `none` otherwise. |
+
+#### Internal Logic
+1. **Define `counter_query`:**
+    - Constructs a SQL query that counts the number of rows in the `dbt_source_freshness_results` table matching the given `invocation_id` and generated within the last `days_back` days.
+    - Uses the `elementary.edr_datediff` and `elementary.edr_current_timestamp` macros for date calculations.
+2. **Execute `counter_query`:**
+    - Executes the `counter_query` using `elementary.result_value` and stores the result in `records_count`.
+3. **Return based on `records_count`:**
+    - If `records_count` is 0 (no previous results found), returns `true`.
+    - Otherwise, returns `none`.
+
+## References
+- `elementary.dbt_source_freshness_results`: This macro references the `dbt_source_freshness_results` table, which presumably stores the results of source freshness runs.
+- `elementary.edr_datediff`: This macro is used for calculating the difference between two dates in days.
+- `elementary.edr_cast_as_timestamp`: This macro is used for casting a value to a timestamp.
+- `elementary.edr_current_timestamp`: This macro is used for getting the current timestamp.
+- `elementary.edr_quote`: This macro is used for quoting a string literal in SQL.
+- `elementary.result_value`: This macro is used for extracting a single value from a query result.

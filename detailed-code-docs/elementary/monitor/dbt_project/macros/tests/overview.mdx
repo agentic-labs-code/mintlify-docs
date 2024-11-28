@@ -1,0 +1,42 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines a custom dbt test macro named `unique_if_exists`. It checks for the uniqueness of a specified column in a given model, but only if the model exists. If the model doesn't exist, it issues a warning and returns an empty result set.
+
+## Symbols
+
+### `unique_if_exists`
+#### Description
+This is a custom dbt test macro that checks for the uniqueness of a specified column in a given model, but only if the model exists. It handles cases where the model might not be present in the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| model | dbt.model | The dbt model to be tested |
+| column_name | string | The name of the column to check for uniqueness |
+
+#### Outputs
+The macro returns either:
+1. `None` if not in execution mode
+2. An empty result set if the model doesn't exist
+3. The result of the `test_unique` test if the model exists
+
+#### Internal Logic
+1. First, it checks if the macro is in execution mode. If not, it returns `None`.
+2. It then checks if the specified model exists using the `elementary.relation_exists` function.
+3. If the model doesn't exist, it issues a warning and returns an empty result set using `elementary.no_results_query()`.
+4. If the model exists, it dispatches and returns the result of the `test_unique` test for the specified model and column.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dbt | The data build tool framework this macro is built for |
+| elementary | A custom package providing utility functions like `relation_exists` and `no_results_query` |
+
+## Error Handling
+The macro uses dbt's `exceptions.warn` to issue a warning if the specified model doesn't exist, rather than raising an error. This allows the test to gracefully handle missing models without failing the entire test suite.
+
+## Performance Considerations
+By checking for the existence of the model before running the uniqueness test, this macro avoids potential errors or unnecessary processing when dealing with models that may not always be present in the database. This can be particularly useful in environments where certain models are conditionally built or in development scenarios where not all models are always available.

@@ -1,0 +1,80 @@
+---
+title: "freshness-anomalies.mdx"
+---
+
+---
+title: "freshness_anomalies"
+sidebarTitle: "Freshness anomalies"
+---
+
+`elementary.freshness_anomalies`
+
+Monitors the freshness of your table over time, as the expected time between data updates.
+
+Upon running the test, your data is split into time buckets (daily by default, configurable with the `time bucket` field),
+and then we compute the maximum freshness value per bucket for the last `training_period` (by default 14 days).
+
+The test then compares the freshness of each bucket within the detection period (last 2 days by default, controlled by the
+`detection_period` var), and compares it to the freshness of the previous time buckets.
+If there were any anomalies during the detection period, the test will fail.
+
+### Test configuration
+
+_Required configuration: `timestamp_column`_
+_Default configuration: `anomaly_direction: spike` to alert only on delays._
+
+{/* prettier-ignore */}
+&lt;pre&gt;
+ &lt;code&gt;
+  tests:
+    &nbsp;&nbsp;-- elementary.freshness_anomalies:
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/timestamp-column"&gt;&lt;font color="#CD7D55"&gt;timestamp_column: column name&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/where-expression"&gt;&lt;font color="#CD7D55"&gt;where_expression: sql expression&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/anomaly-sensitivity"&gt;&lt;font color="#CD7D55"&gt;anomaly_sensitivity: int&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/detection-period"&gt;&lt;font color="#CD7D55"&gt;detection_period:&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/detection-period"&gt;&lt;font color="#CD7D55"&gt;period: [hour | day | week | month]&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/detection-period"&gt;&lt;font color="#CD7D55"&gt;count: int&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/training-period"&gt;&lt;font color="#CD7D55"&gt;training_period:&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/training-period"&gt;&lt;font color="#CD7D55"&gt;period: [hour | day | week | month]&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/training-period"&gt;&lt;font color="#CD7D55"&gt;count: int&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/time-bucket"&gt;&lt;font color="#CD7D55"&gt;time_bucket:&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/time-bucket"&gt;&lt;font color="#CD7D55"&gt;period: [hour | day | week | month]&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/time-bucket"&gt;&lt;font color="#CD7D55"&gt;count: int&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/detection-delay"&gt;&lt;font color="#CD7D55"&gt;detection_delay:&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/detection-delay"&gt;&lt;font color="#CD7D55"&gt;period: [hour | day | week | month]&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/detection-delay"&gt;&lt;font color="#CD7D55"&gt;count: int&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/ignore_small_changes"&gt;&lt;font color="#CD7D55"&gt;ignore_small_changes:&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/ignore_small_changes"&gt;&lt;font color="#CD7D55"&gt;spike_failure_percent_threshold: int&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/ignore_small_changes"&gt;&lt;font color="#CD7D55"&gt;drop_failure_percent_threshold: int&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/anomaly-exclude-metrics"&gt;&lt;font color="#CD7D55"&gt;anomaly_exclude_metrics: [SQL expression]&lt;/font&gt;&lt;/a&gt;
+ &lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;RequestExample&gt;
+
+```yml Models
+models:
+  - name: &lt; model name &gt;
+    tests:
+      - elementary.freshness_anomalies:
+          timestamp_column: &lt; timestamp column &gt; # Mandatory
+          where_expression: &lt; sql expression &gt;
+          time_bucket: # Daily by default
+            period: &lt; time period &gt;
+            count: &lt; number of periods &gt;
+```
+
+```yml Models example
+models:
+  - name: login_events
+    tests:
+      - elementary.freshness_anomalies:
+          timestamp_column: "updated_at"
+          # optional - use tags to run elementary tests on a dedicated run
+          tags: ["elementary"]
+          config:
+            # optional - change severity
+            severity: warn
+```
+
+&lt;/RequestExample&gt;

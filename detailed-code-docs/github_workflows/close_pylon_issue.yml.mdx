@@ -1,0 +1,74 @@
+---
+title: "close_pylon_issue.yml"
+---
+
+## High-level description
+This GitHub Actions workflow is designed to automatically close a corresponding Pylon ticket when an issue or pull request in the repository is closed. It extracts the Pylon ticket ID from the issue or pull request body and uses the Pylon API to close the ticket.
+
+## Code Structure
+The workflow consists of a single job with three main steps: checking out the repository, extracting the Pylon ticket ID, and closing the Pylon ticket.
+
+## Symbols
+
+### `close_pylon_ticket` (job)
+#### Description
+This job runs on Ubuntu and executes the steps to close a Pylon ticket when an issue or pull request is closed.
+
+#### Internal Logic
+1. Checks out the repository
+2. Extracts the Pylon ticket ID from the issue or pull request body
+3. Closes the Pylon ticket if a valid ID is found
+
+### `Extract Pylon Ticket ID` (step)
+#### Description
+This step extracts the Pylon ticket ID from the body of the closed issue or pull request.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| pylon_ticket_id | string | The extracted Pylon ticket ID |
+
+#### Internal Logic
+1. Determines if the event is for an issue or pull request
+2. Fetches the body of the issue or pull request using the GitHub API
+3. Uses a regular expression to extract the Pylon ticket ID from the body
+4. Sets the extracted ID as an output variable
+
+### `Close Pylon Ticket` (step)
+#### Description
+This step closes the Pylon ticket using the extracted ticket ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| pylon_ticket_id | string | The Pylon ticket ID to close |
+
+#### Internal Logic
+1. Checks if a valid Pylon ticket ID was extracted
+2. If valid, sends a PATCH request to the Pylon API to close the ticket
+3. Uses the `PYLON_API_KEY` secret for authentication
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| actions/checkout@v2 | To check out the repository |
+| curl | To make HTTP requests to GitHub and Pylon APIs |
+| jq | To parse JSON responses from the GitHub API |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| GITHUB_TOKEN | secret | N/A | Used for authenticating GitHub API requests |
+| PYLON_API_KEY | secret | N/A | Used for authenticating Pylon API requests |
+
+## Error Handling
+The workflow does not explicitly handle errors, but it will fail if any of the steps encounter an error. The `if` condition in the "Close Pylon Ticket" step ensures that it only runs if a valid Pylon ticket ID is extracted.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| https://api.github.com/repos/{owner}/{repo}/issues/{issue_number} | GET | N/A | Issue details | Fetches issue details |
+| https://api.github.com/repos/{owner}/{repo}/pulls/{pull_number} | GET | N/A | Pull request details | Fetches pull request details |
+| https://api.usepylon.com/issues/{ticket_id} | PATCH | JSON with "state": "closed" | N/A | Closes the Pylon ticket |
+
+This workflow demonstrates integration between GitHub and Pylon, automating the process of closing related tickets when issues or pull requests are closed in the repository.

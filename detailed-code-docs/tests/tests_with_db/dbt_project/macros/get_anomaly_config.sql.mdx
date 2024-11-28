@@ -1,0 +1,46 @@
+---
+title: "get_anomaly_config.sql"
+---
+
+## High-level description
+This macro, `get_anomaly_config`, is a utility function used in dbt (data build tool) projects. It simulates a model configuration and context to retrieve anomaly test configurations from Elementary, a dbt package for data observability and testing.
+
+## Symbols
+
+### `get_anomaly_config`
+#### Description
+This macro creates a mock model configuration and updates the context to simulate a running model. It then calls Elementary's `get_anomalies_test_configuration` function to retrieve the anomaly test configuration.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| model_config | dict | Configuration for the Elementary package in the model |
+| config | dict | Additional configuration parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| anomaly_config | dict | The first item of the anomaly test configuration returned by Elementary |
+
+#### Internal Logic
+1. Create a mock model dictionary with the provided `model_config`.
+2. Update the context with a simulated model and graph structure.
+3. Call Elementary's `get_anomalies_test_configuration` function with a mock relation and the provided config.
+4. Return the first item of the resulting configuration.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary | Used to call the `get_anomalies_test_configuration` function |
+| dbt | Implicit dependency for the context and api modules |
+
+## Side Effects
+This macro modifies the global context by updating it with mock model and graph information. This is done to simulate the environment that Elementary expects when calculating anomaly configurations.
+
+## Performance Considerations
+This macro is primarily used for testing or configuration retrieval and is not expected to be performance-critical. However, it does involve context manipulation and calling an external function, which may have some overhead.
+
+## Notes
+- This macro is likely used in a testing environment to retrieve and verify anomaly configurations without running a full dbt model.
+- The use of Jinja2 templating ({% %} and {{ }}) indicates that this code is executed during dbt's compilation phase, not during runtime.
+- The macro relies on Elementary's internal functions and expects a specific context structure, which may make it sensitive to changes in Elementary's implementation.

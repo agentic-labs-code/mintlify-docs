@@ -1,0 +1,57 @@
+---
+title: "schema.py"
+---
+
+## High-level description
+This code defines the schema for grouping data in the Elementary monitoring system. It provides structures for organizing and categorizing different types of artifacts (models, sources, exposures, tests) based on various criteria such as dbt structure, data warehouse structure, tags, and owners.
+
+## Code Structure
+The code defines several Pydantic models and type aliases to represent different grouping structures. The main `GroupsSchema` class combines all these grouping structures into a single schema.
+
+## Symbols
+
+### `GroupItemSchema`
+#### Description
+A Pydantic model representing an individual item in a group.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| node_id | Optional[str] | Unique identifier for the item |
+| resource_type | Optional[str] | Type of the resource (e.g., model, source, exposure) |
+
+### `TreeGroupSchema`
+#### Description
+A type alias for a dictionary representing a tree-like structure of groups.
+
+### `TagsGroupSchema`
+#### Description
+A type alias for a dictionary mapping tags to lists of `GroupItemSchema` objects.
+
+### `OwnersGroupSchema`
+#### Description
+A type alias for a dictionary mapping owners to lists of `GroupItemSchema` objects.
+
+### `GroupsSchema`
+#### Description
+A Pydantic model representing the overall grouping structure for the monitoring system.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dbt | TreeGroupSchema | Groups based on dbt structure |
+| tags | TagsGroupSchema | Groups based on tags |
+| owners | OwnersGroupSchema | Groups based on owners |
+| dwh | TreeGroupSchema | Groups based on data warehouse structure |
+| bi | Optional[TreeGroupSchema] | Optional groups for BI tools |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| typing | Provides type hinting support |
+| elementary.utils.pydantic_shim | Imports the BaseModel class for Pydantic models |
+
+## References
+This schema is used in other parts of the Elementary monitoring system, particularly in the `GroupsAPI` class (from `elementary/monitor/api/groups/groups.py`) and the `ReportAPI` class (from `elementary/monitor/api/report/report.py`). These classes use the schema to organize and structure data for reporting and analysis purposes.
+
+The `GroupsAPI` class implements methods to populate the `GroupsSchema` with actual data, while the `ReportAPI` class uses the `GroupsSchema` as part of generating comprehensive reports on the monitored data and tests.

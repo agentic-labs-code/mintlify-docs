@@ -1,0 +1,81 @@
+---
+title: "test_alerts.sql"
+---
+
+## High-level description
+This SQL file contains two macros that are used to populate and query test alerts in the Elementary data observability tool. The macros handle the generation of test alerts based on failed tests and their associated metadata, providing a comprehensive view of test results for data quality monitoring.
+
+## Code Structure
+The file contains two main macros:
+1. `populate_test_alerts`: Generates test alert objects based on raw test alert data.
+2. `populate_test_alerts_query`: Constructs a SQL query to fetch failed test results and associated metadata.
+
+These macros work together to create a complete test alerting system, with the query macro providing the data that the populate macro then processes into alert objects.
+
+## Symbols
+
+### `populate_test_alerts`
+#### Description
+This macro generates test alert objects based on raw test alert data. It processes the results of the `populate_test_alerts_query` and creates structured alert objects for each failed test.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | integer | Number of days to look back for test results (default: 1) |
+| disable_samples | boolean | Flag to disable sample result rows (default: false) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| test_alerts | list | A list of test alert objects |
+
+#### Internal Logic
+1. Fetches raw test alert data using `populate_test_alerts_query`.
+2. Iterates through each raw test alert.
+3. Determines the test type and status.
+4. Fetches test row samples if applicable.
+5. Constructs a test alert data dictionary.
+6. Generates an alert object using `elementary_cli.generate_alert_object`.
+7. Appends the alert object to the `test_alerts` list.
+8. Returns the list of test alerts.
+
+### `populate_test_alerts_query`
+#### Description
+This macro constructs a SQL query to fetch failed test results and associated metadata from various Elementary tables.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | integer | Number of days to look back for test results (default: 1) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| query | string | A SQL query string to fetch failed test results |
+
+#### Internal Logic
+1. Defines CTEs for elementary_test_results, models, sources, tests, and artifacts_meta.
+2. Creates a failed_tests CTE to select relevant columns from elementary_test_results.
+3. Constructs the main query by joining failed_tests with tests and artifacts_meta.
+4. Generates an alert_class_id and elementary_unique_id for each test.
+5. Excludes alerts that already exist in the alerts_v2 table.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary_cli | Provides utility functions for alert generation and result processing |
+| elementary | Provides utility functions for timestamp operations |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| days_back | integer | 1 | Number of days to look back for test results |
+| disable_samples | boolean | false | Flag to disable sample result rows |
+
+## Error Handling
+The code does not implement explicit error handling mechanisms. It relies on the underlying dbt and Elementary framework for error management.
+
+## Logging
+The code does not implement explicit logging. Logging is likely handled by the broader Elementary framework.
+
+This documentation provides a comprehensive overview of the test_alerts.sql file, explaining its purpose, structure, and key components. The file is crucial for generating and managing test alerts within the Elementary data observability tool, allowing users to track and respond to data quality issues effectively.

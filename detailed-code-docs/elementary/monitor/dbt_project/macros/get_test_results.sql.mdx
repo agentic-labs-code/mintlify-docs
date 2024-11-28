@@ -1,0 +1,53 @@
+---
+title: "get_test_results.sql"
+---
+
+## High-level description
+This SQL macro, `get_test_results`, is designed to retrieve and process test results from a data testing framework, likely dbt (data build tool). It fetches test results for a specified time range, processes them, and returns a structured output with detailed information about each test, including test metadata and sample data for failed or warned tests.
+
+## Code Structure
+The macro is composed of several CTE (Common Table Expressions) and SQL operations to fetch, filter, and format test results. It also includes logic to handle different types of tests, particularly dimension anomaly tests, and to prepare sample data for visualization or further analysis.
+
+## Symbols
+
+### get_test_results
+#### Description
+This is the main macro that orchestrates the retrieval and processing of test results.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | integer | Number of days to look back for test results (default: 7) |
+| invocations_per_test | integer | Maximum number of test invocations to return per test (default: 720) |
+| disable_passed_test_metrics | boolean | If true, excludes passed tests from the results (default: false) |
+
+#### Internal Logic
+1. Sets up the allowed test statuses based on the `disable_passed_test_metrics` parameter.
+2. Constructs a CTE to fetch test results using the `elementary_cli.current_tests_run_results_query` macro.
+3. Orders and ranks the test results, calculating the days difference from the current date.
+4. Creates a temporary table with the ordered test results.
+5. Fetches the test results and result rows from the temporary table.
+6. Filters the tests based on the `elementary.include` metadata.
+7. Processes each test result, adding sample data for failed or warned tests.
+8. Handles dimension anomaly tests separately, restructuring their sample data.
+9. Returns the processed test results.
+
+## Side Effects
+- Creates a temporary table in the database to store ordered test results.
+- Executes database queries to fetch and process test results.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary_cli | Used for querying current test run results |
+| elementary | Used for various utility functions and date operations |
+
+## Error Handling
+The macro doesn't implement explicit error handling. It relies on the underlying dbt framework to handle any SQL errors that might occur during execution.
+
+## Performance Considerations
+- The macro uses a temporary table to store intermediate results, which can help with performance for large result sets.
+- The `invocations_per_test` parameter limits the number of test invocations returned, preventing excessive data retrieval for frequently run tests.
+- The macro uses window functions (rank()) for efficient ordering and limiting of results.
+
+This macro is a crucial part of a data testing and monitoring system, likely used to generate reports or dashboards on test results. It provides a comprehensive view of test outcomes, including detailed information and sample data for failed or warned tests, which is valuable for data quality assessment and issue investigation.

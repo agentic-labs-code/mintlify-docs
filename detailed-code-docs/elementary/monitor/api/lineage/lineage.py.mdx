@@ -1,0 +1,90 @@
+---
+title: "lineage.py"
+---
+
+## High-level description
+The `LineageAPI` class is responsible for fetching and structuring lineage data for models, sources, and exposures within a dbt project. It utilizes the `LineageFetcher` to retrieve dependency information and constructs a graph representation of the lineage.
+
+## Code Structure
+The `LineageAPI` class uses `LineageFetcher` to get lineage data from the dbt project. It then uses the `networkx` library to construct a directed graph representing the lineage relationships. The `LineageSchema` is used to represent the lineage data with nodes and edges.
+
+## References
+- `elementary.clients.api.api_client.APIClient`: Base class for interacting with the dbt project.
+- `elementary.clients.dbt.base_dbt_runner.BaseDbtRunner`: For running dbt commands.
+- `elementary.monitor.api.lineage.schema`: Provides schemas for lineage data structures.
+- `elementary.monitor.fetchers.lineage.lineage.LineageFetcher`: Fetches raw lineage data from the dbt project.
+
+## Symbols
+
+### `LineageAPI`
+#### Description
+This class is responsible for fetching and structuring lineage data for a dbt project.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dbt_runner | `BaseDbtRunner` | An instance of `BaseDbtRunner` to interact with the dbt project. |
+
+#### Outputs
+This class doesn't return any output directly. It provides methods to retrieve lineage data.
+
+#### Internal Logic
+- Initializes an `APIClient` and a `LineageFetcher`.
+- Provides the `get_lineage` method to retrieve and structure lineage data.
+
+### `LineageAPI.get_lineage`
+#### Description
+This method retrieves lineage information for specified nodes, constructs a directed graph representing the lineage, and returns the lineage data as a `LineageSchema` object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lineage_node_ids | `List[str]` | A list of unique identifiers for the nodes to include in the lineage. |
+| exclude_elementary_models | `bool` | A flag indicating whether to exclude Elementary-specific models from the lineage. Defaults to `False`. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lineage | `LineageSchema` | A `LineageSchema` object representing the lineage data, including nodes and edges. |
+
+#### Internal Logic
+1. **Fetch Dependency Data:**
+   - Utilizes the `LineageFetcher` to retrieve dependency information for nodes, optionally excluding Elementary models.
+   - Filters the fetched data to include only nodes specified in `lineage_node_ids`.
+2. **Construct Lineage Graph:**
+   - Creates a directed graph using the `networkx` library.
+   - Iterates through the filtered dependency data and adds edges to the graph based on the `depends_on_nodes` relationships.
+3. **Prepare and Return Lineage Data:**
+   - Converts the dependency data into `LineageNodeSchema` objects, representing individual nodes in the lineage.
+   - Constructs a `LineageSchema` object, populating it with the converted nodes and the edges from the constructed graph.
+   - Returns the `LineageSchema` object.
+
+### `LineageAPI._convert_depends_on_node_to_lineage_node`
+#### Description
+This static method converts a list of `NodeDependsOnNodesSchema` objects to a list of `LineageNodeSchema` objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| nodes_depends_on_nodes | `List[NodeDependsOnNodesSchema]` | A list of `NodeDependsOnNodesSchema` objects representing nodes and their dependencies. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lineage_nodes | `List[LineageNodeSchema]` | A list of `LineageNodeSchema` objects representing nodes in the lineage. |
+
+#### Internal Logic
+- Iterates through the input list of `NodeDependsOnNodesSchema` objects.
+- For each `NodeDependsOnNodesSchema` object, it extracts the `unique_id`, `type`, and `sub_type` and creates a new `LineageNodeSchema` object.
+- Appends the created `LineageNodeSchema` object to a new list.
+- Returns the list of `LineageNodeSchema` objects.
+
+## Dependencies
+- networkx
+
+```python
+import networkx as nx
+```
+
+## Error Handling
+This code does not implement specific error handling beyond basic exception raising.

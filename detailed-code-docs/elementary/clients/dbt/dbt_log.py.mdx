@@ -1,0 +1,68 @@
+---
+title: "dbt_log.py"
+---
+
+## High-level description
+This code defines a `DbtLog` class and a `parse_dbt_output` function to handle and parse dbt (data build tool) log output. It provides a structured way to represent and process dbt log messages, supporting both JSON and text formats.
+
+## Code Structure
+The main components of this code are:
+1. `DbtLog` dataclass: Represents a single dbt log entry.
+2. `parse_dbt_output` function: Parses dbt output and yields `DbtLog` objects.
+
+These components work together to process dbt log output and provide a structured representation of the logs.
+
+## Symbols
+
+### `DbtLog`
+#### Description
+A dataclass that represents a single dbt log entry, containing the message, log level, and exception information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| msg | Optional[str] | The log message |
+| level | Optional[str] | The log level |
+| exception | Optional[str] | The exception information, if any |
+
+#### Outputs
+N/A (This is a dataclass)
+
+#### Internal Logic
+- The `from_log_line` class method parses a JSON log line and creates a `DbtLog` instance.
+- The `__str__` method provides a string representation of the log entry.
+
+### `parse_dbt_output`
+#### Description
+A function that parses dbt output and yields `DbtLog` objects for each log line.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| output | str | The dbt output string to parse |
+| log_format | str | The format of the logs ('json' or 'text') |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Iterator[DbtLog] | An iterator of DbtLog objects |
+
+#### Internal Logic
+- Iterates through each line of the input `output` string.
+- For JSON format, it uses `DbtLog.from_log_line` to parse each line.
+- For text format, it creates a `DbtLog` with the entire line as the message and 'info' as the level.
+- Catches and logs any `JSONDecodeError` that occurs during parsing.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| json | Used for parsing JSON log lines |
+| dataclasses | Used to define the DbtLog dataclass |
+| typing | Used for type hinting |
+| elementary.utils.log | Used to get a logger instance |
+
+## Error Handling
+The code implements basic error handling for JSON parsing errors in the `parse_dbt_output` function. When a `JSONDecodeError` occurs, it logs a debug message with the problematic log line and the exception information.
+
+## Logging
+The code uses a logger obtained from `elementary.utils.log.get_logger()` to log debug messages when parsing errors occur.

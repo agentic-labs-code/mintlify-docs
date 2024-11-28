@@ -1,0 +1,42 @@
+---
+title: "get_sources.sql"
+---
+
+## High-level description
+This macro, `get_sources()`, retrieves information about dbt sources from the `dbt_sources` table in the Elementary schema. It returns a list of dictionaries containing detailed information about each source, including its name, database, schema, table name, and other metadata.
+
+## Symbols
+
+### `get_sources()`
+#### Description
+This macro queries the `dbt_sources` table to fetch information about all dbt sources. It constructs a SQL query to select relevant columns from the table and returns the result as a list of dictionaries.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sources | List[Dict] | A list of dictionaries, each containing metadata about a dbt source |
+
+#### Internal Logic
+1. The macro first checks if the `dbt_sources` relation exists using the `elementary.relation_exists()` function.
+2. If the relation exists, it constructs a SQL query using a CTE (Common Table Expression) named `dbt_artifacts_sources`.
+3. The query selects various columns from the `dbt_sources` table, including name, source_name, unique_id, database_name, schema_name, table_name (aliased from identifier), owners (aliased from owner), tags, package_name, description, and full_path (aliased from original_path).
+4. The constructed query is executed using the `run_query()` function, which returns an Agate table.
+5. Finally, the Agate table is converted to a list of dictionaries using the `elementary.agate_to_dicts()` function and returned.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary | Used for `relation_exists()` and `agate_to_dicts()` functions |
+| dbt | Implicit dependency for `ref()` function |
+
+## TODOs
+There is a commented TODO in the code:
+```sql
+--{# TODO: should we group by #}
+```
+This suggests that there might be a consideration to group the results, but it's currently not implemented.
+
+## Notes
+- The macro uses Jinja templating syntax, which is common in dbt projects.
+- The macro is designed to be flexible, returning an empty result if the `dbt_sources` relation doesn't exist.
+- The use of a CTE (`dbt_artifacts_sources`) allows for potential future expansion or modification of the query without changing the main select statement.

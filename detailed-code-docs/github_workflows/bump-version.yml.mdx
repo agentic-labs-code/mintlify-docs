@@ -1,0 +1,62 @@
+---
+title: "bump-version.yml"
+---
+
+## High-level description
+This GitHub Actions workflow, named "Bump version", is designed to automate the process of updating version numbers in various files of a project. It can be triggered manually or called from another workflow, allowing for flexible version bumping of both a CLI tool and an associated dbt package.
+
+## Code Structure
+The workflow consists of three main jobs: `validate-version`, `bump-version`, and `create-pr`. These jobs work sequentially to validate input versions, update version numbers in specific files, and create a pull request for the changes.
+
+## Jobs
+
+### `validate-version`
+#### Description
+This job validates the input versions for both the CLI and dbt package.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| validated-cli-version | string | Validated CLI version |
+| default-dbt-package-version | string | Default dbt package version (same as CLI version) |
+| validated-dbt-package-version | string | Validated dbt package version (if provided) |
+
+#### Internal Logic
+1. Validates the CLI version input using a regex pattern.
+2. If provided, validates the dbt package version input.
+3. Outputs the validated versions.
+4. Fails the workflow if the CLI version is invalid.
+
+### `bump-version`
+#### Description
+This job updates version numbers in various files of the project.
+
+#### Internal Logic
+1. Checks out the code and creates a new release branch.
+2. Updates the version in `pyproject.toml`.
+3. Updates the version in `packages.yml` and `quickstart-package-install.mdx` files.
+4. Commits and pushes the changes to the new branch.
+
+### `create-pr`
+#### Description
+This job creates a pull request with the version bump changes.
+
+#### Internal Logic
+1. Creates a pull request from the new release branch to the master branch.
+2. Sets the PR title and body.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| actions/checkout@v3 | Checking out the repository |
+| actions/github-script@v6 | Running custom GitHub Actions scripts |
+| repo-sync/pull-request@v2 | Creating pull requests |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| cli-version | string | N/A | New CLI version (required) |
+| dbt-package-version | string | Same as cli-version | Elementary package version (optional) |
+
+## Error Handling
+The workflow includes basic error handling by validating input versions and failing the workflow if the CLI version is invalid.

@@ -1,0 +1,52 @@
+---
+title: "generate_alert_object.sql"
+---
+
+## High-level description
+This SQL macro, `generate_alert_object`, creates a standardized alert object structure in dbt (data build tool). It encapsulates the process of creating an alert with predefined fields and default values, ensuring consistency in alert generation across the project.
+
+## Symbols
+
+### `generate_alert_object`
+#### Description
+This macro generates a structured alert object with predefined fields. It takes input parameters to populate the alert object and sets default values for some fields.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| alert_id | string | Unique identifier for the alert |
+| alert_class_id | string | Identifier for the class of alert |
+| type | string | Type of the alert |
+| detected_at | timestamp | Time when the alert was detected |
+| created_at | timestamp | Time when the alert was created |
+| data | object | Additional data associated with the alert |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| alert_object | dictionary | A structured alert object containing all the input data and default values |
+
+#### Internal Logic
+1. Creates a dictionary `alert_object` with the following key-value pairs:
+   - `alert_id`: Passed in as an argument
+   - `alert_class_id`: Passed in as an argument
+   - `type`: Passed in as an argument
+   - `detected_at`: Passed in as an argument
+   - `created_at`: Passed in as an argument
+   - `updated_at`: Set to the same value as `created_at`
+   - `status`: Set to 'pending' by default
+   - `data`: Converts the input `data` to JSON format using `tojson` function
+   - `sent_at`: Set to `none` (null) by default
+2. Returns the `alert_object` dictionary
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dbt | This macro is written for use within dbt projects |
+| tojson | Used to convert the `data` input to JSON format |
+
+## Notes
+- This macro is likely part of a larger alerting system within a dbt project.
+- The use of `tojson` for the `data` field suggests that this field can contain complex nested structures.
+- The `status` field is initialized as 'pending', indicating that newly created alerts start in this state.
+- The `sent_at` field is initially set to `none`, presumably to be updated when the alert is sent or processed.

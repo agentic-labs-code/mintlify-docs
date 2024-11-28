@@ -1,0 +1,36 @@
+---
+title: "tags.sql"
+---
+
+## High-level description
+This SQL macro, `get_project_tags()`, retrieves and combines tags from dbt models, sources, and tests. It executes a query to fetch tags from three different tables and returns the result as a list of dictionaries.
+
+## Symbols
+
+### `get_project_tags()`
+#### Description
+This macro constructs and executes a SQL query to fetch tags from dbt models, sources, and tests. It then processes the query results and returns them in a format suitable for further use in dbt.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tags | List[Dict] | A list of dictionaries containing tags from dbt models, sources, and tests |
+
+#### Internal Logic
+1. Defines a SQL query using Jinja templating:
+   - Creates three CTEs (Common Table Expressions) for dbt models, sources, and tests using the `ref` function to reference the appropriate tables.
+   - Combines the tags from all three sources using UNION.
+2. Executes the query using the `run_query` function.
+3. Processes the query results using the `elementary.agate_to_dicts` function to convert the Agate table to a list of dictionaries.
+4. Returns the processed results.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary | Used for the `agate_to_dicts` function to process query results |
+| dbt | Implied usage of dbt's `ref` function for table references |
+
+## Notes
+- This macro relies on the existence of three tables in the 'elementary' schema: `dbt_models`, `dbt_sources`, and `dbt_tests`.
+- The macro uses dbt's `ref` function, indicating it's designed to be used within a dbt project.
+- The `elementary.agate_to_dicts` function is used, suggesting that this macro is part of or compatible with the Elementary data observability tool.

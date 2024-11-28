@@ -1,0 +1,60 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains SQL models for generating and managing alerts in the Elementary monitoring system. It includes both current and deprecated models, focusing on aggregating and storing alerts from various sources such as dbt tests, schema changes, data monitoring (including anomaly detection), and source freshness checks.
+
+## What does it do?
+The code in this directory implements a comprehensive alert system for data pipelines. It processes and stores different types of alerts:
+
+1. dbt test failures: Alerts generated when dbt tests within the project fail.
+2. Schema changes: Alerts triggered by detected changes in database table or view structures.
+3. Anomaly detection: Alerts raised when statistical anomalies are found in data, potentially indicating data quality issues.
+4. Source freshness: Alerts generated when data sources are not updated as expected, possibly indicating data pipeline issues.
+
+The system is designed to work incrementally, processing only new or changed data in subsequent runs for efficiency. It also includes configurations for handling schema changes and merging updates to ensure data consistency.
+
+## Key Files
+
+### alerts_v2.sql
+This is the current version of the main alerts model. It sets up an incremental table for managing alerts with specific configurations:
+
+- Materialization strategy: incremental
+- Unique key: alert_id
+- Merge update columns specified
+- Schema change behavior configured
+- Table type and incremental strategy using Elementary functions
+- Post-hook to populate the alerts table
+
+The model depends on various other models and test results, including dbt tests, models, snapshots, sources, and their respective run results. It also maintains backwards compatibility with previous alert models.
+
+The core of this model is a call to the `elementary_cli.empty_alerts_v2()` macro, which likely generates the structure for the alerts table without populating it with data.
+
+### Deprecated models (in the 'deprecated' subdirectory)
+
+#### alerts.sql (deprecated)
+This model serves as the main aggregation point for all alert types. It combines data from other alert-specific models (`alerts_dbt_tests`, `alerts_schema_changes`, `alerts_anomaly_detection`, `alerts_data_monitoring`) into a single table, providing a comprehensive overview of all active alerts within the data monitoring system.
+
+#### alerts_models.sql (deprecated)
+This model focuses specifically on alerts related to dbt models. It retrieves data from the `alerts_dbt_models` relation, which likely contains detailed information about failing dbt models and the tests that triggered the alerts.
+
+#### alerts_source_freshness.sql (deprecated)
+This model handles alerts related to data source freshness. It retrieves data from the `alerts_dbt_source_freshness` relation, which likely contains information about data sources that are not being updated as expected and the severity of the delay.
+
+## Dependencies
+The main dependencies for this directory are:
+
+1. elementary: Provides functions for table type and incremental strategy
+2. elementary_cli: Provides macros for populating alerts and creating empty alert structures
+
+## Configuration
+The main configuration option for the alerts_v2 model is:
+
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| days_back | integer | 1 | Number of days to look back when populating alerts |
+
+This configuration allows users to adjust the time range for alert generation, balancing between comprehensive coverage and performance.
+
+The models in this directory are designed to be flexible and efficient, using incremental materialization and configurable options to adapt to different data pipeline needs and sizes. The system's comprehensive approach to alert generation and management provides data teams with a powerful tool for monitoring and maintaining data quality and pipeline health.

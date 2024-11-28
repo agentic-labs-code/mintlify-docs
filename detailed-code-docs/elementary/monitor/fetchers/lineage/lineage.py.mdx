@@ -1,0 +1,96 @@
+---
+title: "lineage.py"
+---
+
+## High-level description
+This code defines a `LineageFetcher` class that fetches and processes lineage information for dbt nodes. It retrieves data about node dependencies, normalizes the results, and provides methods to resolve node dependencies, including handling ephemeral models.
+
+## Code Structure
+The main class `LineageFetcher` inherits from `FetcherClient`. It contains methods to fetch node dependencies, normalize results, and resolve node dependencies. The class uses a constant dictionary `_MATERIALIZATION_TO_SUB_TYPE` to map materialization types to sub-types.
+
+## Symbols
+
+### LineageFetcher
+#### Description
+A class that fetches and processes lineage information for dbt nodes.
+
+#### Methods
+
+### get_nodes_depends_on_nodes
+#### Description
+Fetches node dependency information and returns a list of `NodeDependsOnNodesSchema` objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| exclude_elementary_models | bool | Flag to exclude Elementary models from the results |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | List[NodeDependsOnNodesSchema] | List of node dependency information |
+
+#### Internal Logic
+1. Runs a dbt operation to get node dependency data.
+2. Normalizes the results and creates a mapping of node IDs to node data.
+3. Processes each node to create `NodeDependsOnNodesSchema` objects, resolving dependencies for ephemeral models.
+
+### get_node_sub_type
+#### Description
+Static method to determine the sub-type of a node based on its materialization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| node_depends_on_nodes_result | dict | Node information dictionary |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Optional[str] | Sub-type of the node |
+
+### _normalize_result_dict
+#### Description
+Static method to normalize the result dictionary, parsing the `depends_on_nodes` field.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result_dict | dict | Raw result dictionary |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | dict | Normalized result dictionary |
+
+### _resolve_node_deps
+#### Description
+Class method to recursively resolve node dependencies, handling ephemeral models.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| node | dict | Node information dictionary |
+| id_to_node_map | Dict[str, Dict] | Mapping of node IDs to node data |
+| agg_deps | Optional[set] | Accumulated dependencies set |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Set[str] | Set of resolved node dependencies |
+
+#### Internal Logic
+Recursively resolves dependencies for ephemeral models, aggregating all non-ephemeral dependencies.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| json | Used for parsing JSON data |
+| typing | Provides type hinting |
+| elementary.clients.fetcher.fetcher | Base class for the fetcher |
+| elementary.monitor.api.lineage.schema | Provides the `NodeDependsOnNodesSchema` |
+
+## Error Handling
+The code doesn't implement specific error handling mechanisms beyond basic exception raising.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

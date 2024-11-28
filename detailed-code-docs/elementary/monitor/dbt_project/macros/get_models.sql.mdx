@@ -1,0 +1,46 @@
+---
+title: "get_models.sql"
+---
+
+## High-level description
+This SQL macro, `get_models`, retrieves information about dbt models from the 'dbt_models' table in the Elementary schema. It provides a flexible way to fetch model metadata, with an option to exclude Elementary package models.
+
+## Symbols
+
+### `get_models`
+#### Description
+This macro retrieves metadata about dbt models from the 'dbt_models' table. It constructs and executes a SQL query to fetch relevant information about each model, including its name, unique ID, database, schema, table name, owners, tags, package name, description, materialization type, and file path.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| exclude_elementary | boolean | If true, excludes models from the 'elementary' package |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| models | list of dicts | A list of dictionaries, each containing metadata for a dbt model |
+
+#### Internal Logic
+1. Checks if the 'dbt_models' relation exists using `elementary.relation_exists()`.
+2. Checks if the 'patch_path' column exists in the relation using `elementary.column_exists_in_relation()`.
+3. Constructs a SQL query to select relevant columns from the 'dbt_models' table.
+4. If `exclude_elementary` is true, adds a WHERE clause to exclude models from the 'elementary' package.
+5. Executes the query using `run_query()`.
+6. Converts the query result to a list of dictionaries using `elementary.agate_to_dicts()`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary | Used for utility functions like `relation_exists`, `column_exists_in_relation`, and `agate_to_dicts` |
+
+## TODOs
+There is a TODO comment suggesting consideration of whether to group the results:
+```sql
+--{# TODO: should we group by #}
+```
+
+## Notes
+- The macro includes backwards compatibility handling for the 'patch_path' column.
+- The 'table_name' is set to either the 'alias' if it exists, or the 'name' if not.
+- The macro uses Jinja templating to dynamically construct the SQL query based on the existence of certain columns and the `exclude_elementary` parameter.

@@ -1,0 +1,83 @@
+---
+title: "cli.py"
+---
+
+## High-level description
+This code defines the command-line interface (CLI) for Elementary, an open-source data reliability solution. It uses the `click` library to handle commands and arguments, and provides access to various subcommands like `monitor`, `report`, `send-report`, and `run-operation`.
+
+## Code Structure
+The `ElementaryCLI` class extends `click.MultiCommand` to handle multiple subcommands. It defines a command map (`_CMD_MAP`) that maps subcommand names to their respective functions. The `list_commands`, `get_command`, and `invoke` methods are overridden to provide custom behavior for listing, retrieving, and invoking subcommands. The `cli` function is the main entry point, decorated with `click.command` to define it as a CLI command.
+
+## References
+- `elementary.cli.upgrade.recommend_version_upgrade`: Checks for a newer version of Elementary and recommends an upgrade.
+- `elementary.config.config.Config`: Provides access to configuration settings.
+- `elementary.monitor.cli`: Contains subcommands related to data monitoring.
+- `elementary.operations.cli`: Contains subcommands related to running Elementary operations.
+- `elementary.tracking.anonymous_tracking.AnonymousCommandLineTracking`: Tracks anonymous CLI usage data.
+- `elementary.utils`: Provides utility functions.
+- `elementary.utils.log`: Provides logging functionality.
+
+## Symbols
+
+### `get_log_path`
+#### Description
+This function determines the path for the EDR log file based on the context and default target path.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ctx | click.Context | The current click context |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| log_path | str | The absolute path to the EDR log file |
+
+#### Internal Logic
+1. Retrieves the default target path from `Config.DEFAULT_TARGET_PATH`.
+2. Attempts to extract the target path from the command-line arguments if the `--target-path` flag is present.
+3. Creates the target directory if it doesn't exist.
+4. Returns the joined path of the target directory and the log file name (`edr.log`).
+
+### `ElementaryCLI`
+#### Description
+This class defines the main CLI for Elementary, handling multiple subcommands.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+- `_CMD_MAP`: A dictionary mapping subcommand names to their respective functions.
+- `list_commands`: Returns a list of available subcommand names.
+- `get_command`: Retrieves the function associated with a given subcommand name.
+- `format_help`: Formats the help message for the CLI, including anonymous tracking.
+- `invoke`: Invokes the appropriate subcommand function, setting up logging and printing a welcome message.
+
+### `cli`
+#### Description
+This function defines the main entry point for the Elementary CLI.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+- Decorated with `click.command` to define it as a CLI command.
+- Uses `ElementaryCLI` as the command class to handle subcommands.
+- Sets the help message to point to the Elementary documentation.
+- Uses `click.version_option` to display the Elementary version.
+
+## Dependencies
+- `click`: Used for building the command-line interface.
+- `pyfiglet`: Used for rendering the ASCII art title.
+
+## Error Handling
+The `invoke` method includes a try-except block to catch and log any exceptions that occur during the execution of subcommands.
+
+## Logging
+The `invoke` method sets up logging to a file (`edr.log`) in the target directory. It uses a rotating file handler to limit the log file size.

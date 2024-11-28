@@ -1,0 +1,60 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the command-line interface (CLI) implementation for Elementary, an open-source data reliability solution. The CLI is built using the `click` library and provides access to various subcommands for monitoring, reporting, and running operations related to data reliability.
+
+## What does it do?
+The Elementary CLI serves as the main entry point for users to interact with the Elementary data reliability tool. It allows users to:
+
+1. Monitor data quality and reliability
+2. Generate and send reports
+3. Run various operations related to data management and reliability
+4. Check for and recommend upgrades to the latest version of Elementary
+
+The CLI is designed to be user-friendly, with a hierarchical command structure that groups related functionality. It also includes features like logging, error handling, and anonymous usage tracking to improve the user experience and help the developers understand how the tool is being used.
+
+## Entry points
+The main entry point for the CLI is defined in the `cli.py` file. The `cli()` function, decorated with `@click.command()`, serves as the root command for the Elementary CLI. This function uses the `ElementaryCLI` class to handle subcommands, which are defined in separate modules and imported as needed.
+
+The CLI is organized conceptually as follows:
+
+1. Root command (`cli()`)
+2. Subcommands (e.g., `monitor`, `report`, `send-report`, `run-operation`)
+3. Command-specific options and arguments
+
+The control flow starts with the `cli()` function, which then delegates to the appropriate subcommand based on user input. Each subcommand may have its own set of options and arguments, which are processed using the `click` library.
+
+## Key Files
+1. `cli.py`: This is the main file that defines the CLI structure and handles the execution of subcommands. It contains the `ElementaryCLI` class, which extends `click.MultiCommand` to provide custom behavior for listing, retrieving, and invoking subcommands.
+
+2. `upgrade.py`: This file contains the `recommend_version_upgrade()` function, which checks for newer versions of the Elementary package and recommends upgrades to users.
+
+## Dependencies
+The CLI implementation relies on several external libraries and internal modules:
+
+1. `click` (version not specified): Used for building the command-line interface, handling commands, arguments, and options.
+2. `pyfiglet` (version not specified): Used for rendering ASCII art titles in the CLI.
+3. `packaging` (version not specified): Used for parsing and comparing version strings in the upgrade recommendation feature.
+
+Internal dependencies include various modules from the `elementary` package, such as `elementary.config`, `elementary.monitor.cli`, `elementary.operations.cli`, and `elementary.tracking.anonymous_tracking`.
+
+These dependencies were likely chosen for their specific functionalities:
+- `click` provides a powerful and user-friendly way to create CLIs in Python.
+- `pyfiglet` adds a visual element to the CLI with ASCII art titles.
+- `packaging` offers robust version comparison capabilities for the upgrade feature.
+
+## Configuration
+The CLI uses configuration settings from the `elementary.config.config.Config` class. While the specific configuration fields are not detailed in the provided code, it's evident that the CLI accesses configuration settings, particularly for determining the default target path for logs.
+
+The CLI also uses environment variables and command-line arguments for configuration:
+
+1. The `--target-path` flag can be used to specify a custom target path for logs and other output.
+2. The log file is named `edr.log` and is stored in the specified target directory.
+
+The CLI implements logging using a rotating file handler, which helps manage log file sizes. The log level and other logging configurations are likely set within the `elementary.utils.log` module.
+
+Additionally, the CLI includes anonymous usage tracking, which can likely be configured or disabled, although the specific mechanism for this is not shown in the provided code.
+
+In summary, this directory contains a well-structured CLI implementation for Elementary, providing a user-friendly interface for accessing various data reliability features while incorporating logging, error handling, and version management capabilities.

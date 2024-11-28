@@ -1,0 +1,40 @@
+---
+title: "cli_utils.py"
+---
+
+## High-level description
+The code defines a custom Click option called `RequiredIf` that enforces the presence of another option when this option is used. This is useful for command-line interfaces where certain options only make sense when used together.
+
+## Code Structure
+The `RequiredIf` class inherits from `click.Option` and overrides the `__init__` and `handle_parse_result` methods to implement its custom logic.
+
+## Symbols
+### `RequiredIf`
+#### Description
+This class defines a custom Click option that is required only if another specified option is present. It raises a user-friendly error message if the required option is missing.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| *args | tuple | Positional arguments passed to the parent `click.Option` constructor. |
+| **kwargs | dict | Keyword arguments passed to the parent `click.Option` constructor. This should include `required_if` (str), the name of the option that, if present, makes this option required. |
+
+#### Outputs
+This class doesn't directly return any values. It modifies the behavior of the Click option parsing.
+
+#### Internal Logic
+1. **Initialization (`__init__`)**:
+   - It extracts the `required_if` parameter from the keyword arguments.
+   - It raises a `ClickException` if `required_if` is not provided.
+   - It appends a note to the help text indicating the required dependency.
+   - It calls the parent class constructor (`click.Option`) to initialize the option.
+
+2. **Parse Result Handling (`handle_parse_result`)**:
+   - It checks if both the current option and the `required_if` option are present in the parsed options.
+   - If the current option is present but the `required_if` option is not, it raises a `click.UsageError` with a clear message.
+   - Otherwise, it proceeds with the default handling from the parent class.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| click | Used for creating command-line interfaces and managing options. |

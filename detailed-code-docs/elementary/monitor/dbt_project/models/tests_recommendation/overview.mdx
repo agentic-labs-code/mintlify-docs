@@ -1,0 +1,25 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains SQL models that power a system for recommending data quality tests within a dbt project. It leverages metadata from dbt and Elementary, a data observability tool, to identify tables, understand their criticality, and suggest relevant tests based on predefined best practices.
+
+## What does it do?
+This code analyzes the database schema, dbt project structure, and existing data quality tests to identify gaps in test coverage. It then recommends specific tests tailored to each table based on factors like table type, dependencies, and the presence of timestamp columns. This helps data teams proactively maintain data quality by ensuring comprehensive test coverage.
+
+## Key Files
+### tables_criticality.sql
+This model aggregates information about tables from various sources, including dbt models, dbt sources, and Elementary's exposure tracking. It provides a unified view of each table's dependencies, exposures, and other metadata, which is crucial for determining the criticality of a table and the potential impact of data quality issues.
+
+### table_timestamp_columns.sql
+This model identifies and ranks potential timestamp columns for each table. It considers predefined common timestamp column names, user-provided timestamp columns defined in dbt sources and models, and assigns confidence scores based on their likelihood of being the true timestamp column. This information is essential for recommending tests that rely on temporal data, such as freshness checks.
+
+### test_recommendations.sql
+This model is the core of the test recommendation engine. It combines the information from `tables_criticality.sql` and `table_timestamp_columns.sql` to generate a list of recommended tests for each table. It considers the table's metadata, existing tests, and predefined best practices to suggest relevant tests. The recommendations include specific arguments for certain test types, such as volume and freshness anomaly detection, based on the table's characteristics.
+
+## Dependencies
+- **dbt:** The code heavily relies on dbt's framework and functions, including `ref` for referencing other models and Jinja templating for dynamic SQL generation.
+- **Elementary:** The code integrates with Elementary, a data observability tool, to access metadata about dbt artifacts, exposures, and potentially enriched exposures.
+
+This directory showcases a practical application of data observability principles by using metadata to automate and improve data quality testing within a dbt project. 

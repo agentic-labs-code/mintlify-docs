@@ -1,0 +1,95 @@
+---
+title: "Dockerfile"
+---
+
+## High-level description
+This Dockerfile sets up a Python environment for running an application called "edr". It installs necessary dependencies, copies the application code, and configures the environment for running the application.
+
+## Code Structure
+The Dockerfile follows a typical structure for building a Docker image, starting with a base image, setting up the environment, installing dependencies, copying application code, and defining the entry point.
+
+## Symbols
+
+### FROM
+#### Description
+Specifies the base image for the Docker container.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| python:3.10.7 | string | The specific Python version to use as the base image |
+
+### ARG
+#### Description
+Defines a build-time variable that can be used in subsequent instructions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| USR_APP_PATH | string | The path where the application will be installed |
+
+### ENV
+#### Description
+Sets environment variables in the container.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| DBT_LOG_PATH | string | The path for DBT logs |
+| DBT_TARGET_PATH | string | The path for DBT target files |
+
+### WORKDIR
+#### Description
+Sets the working directory for subsequent instructions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| $USR_APP_PATH | string | The path set by the ARG instruction |
+
+### RUN
+#### Description
+Executes commands in the container during the build process.
+
+#### Internal Logic
+1. Updates package lists
+2. Upgrades installed packages
+3. Installs specific development libraries
+4. Cleans up unnecessary files to reduce image size
+5. Changes permissions of the working directory
+6. Upgrades pip
+7. Installs the application and its dependencies
+
+### COPY
+#### Description
+Copies files from the host machine to the container.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| . | string | The source directory (current directory on host) |
+| /app | string | The destination directory in the container |
+
+### ENTRYPOINT
+#### Description
+Specifies the command to run when the container starts.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ["edr"] | array | The command to run (in this case, "edr") |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| python-dev | Python development files |
+| libsasl2-dev | SASL authentication library |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| USR_APP_PATH | string | /usr/app | The path where the application will be installed |
+| DBT_LOG_PATH | string | $USR_APP_PATH/logs | The path for DBT logs |
+| DBT_TARGET_PATH | string | $USR_APP_PATH/target | The path for DBT target files |
+
+This Dockerfile sets up a Python 3.10.7 environment, installs necessary system libraries, and prepares the container for running an application called "edr". It uses build arguments and environment variables to configure paths, copies the application code into the container, and installs the application along with its dependencies using pip. The entrypoint is set to run the "edr" command when the container starts.

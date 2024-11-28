@@ -1,0 +1,87 @@
+---
+title: "test_config.py"
+---
+
+## High-level description
+This file contains unit tests for the `Config` class in the Elementary project. It tests various aspects of the configuration loading and retrieval, particularly focusing on Slack-related settings and workflows.
+
+## Code Structure
+The code defines test configurations, utility functions, and pytest fixtures to set up temporary environments for testing. It then uses parametrized tests to verify different aspects of the `Config` class functionality.
+
+## Symbols
+
+### `create_config_files`
+#### Description
+Creates a temporary configuration file with the given configuration dictionary.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| directory | str | The directory where the config file will be created |
+| config | dict | The configuration data to be written to the file |
+
+#### Internal Logic
+1. Uses `OrderedYaml` to dump the configuration into a YAML file named "config.yml" in the specified directory.
+
+### `config` (pytest fixture)
+#### Description
+A pytest fixture that creates a temporary directory, writes a configuration file, and yields a `Config` object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| request | pytest.FixtureRequest | The pytest request object containing the parametrized configuration |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | Config | A Config object initialized with the temporary configuration |
+
+#### Internal Logic
+1. Creates a temporary directory
+2. Calls `create_config_files` to write the configuration
+3. Yields a `Config` object initialized with the temporary directory paths
+4. Cleans up the temporary directory after the test
+
+### `test_config_get_slack_notification_webhook`
+#### Description
+Tests if the `slack_webhook` property of the `Config` object matches the expected value from the configuration.
+
+#### Internal Logic
+Asserts that `config.slack_webhook` equals `CONFIG["slack"]["notification_webhook"]`.
+
+### `test_config_get_slack_token`
+#### Description
+Tests if the `slack_token` property of the `Config` object matches the expected value from the configuration.
+
+#### Internal Logic
+Asserts that `config.slack_token` equals `CONFIG["slack"]["token"]`.
+
+### `test_config_get_slack_notification_channel_name`
+#### Description
+Tests if the `slack_channel_name` property of the `Config` object matches the expected value from the configuration.
+
+#### Internal Logic
+Asserts that `config.slack_channel_name` equals `CONFIG["slack"]["channel_name"]`.
+
+### `test_slack_workflows_config_get_workflows`
+#### Description
+Tests if the `is_slack_workflow` property of the `Config` object matches the expected value from the workflow configuration.
+
+#### Internal Logic
+Asserts that `config.is_slack_workflow` equals `WORKFLOWS_CONFIG["slack"]["workflows"]`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| pytest | Testing framework used for writing and running the tests |
+| tempfile | Used to create temporary directories for testing |
+| elementary.config.config | Contains the `Config` class being tested |
+| elementary.utils.ordered_yaml | Provides `OrderedYaml` for YAML file handling |
+
+## Configuration
+The tests use two main configuration dictionaries:
+1. `CONFIG`: A basic Slack configuration with workflows set to `False`.
+2. `WORKFLOWS_CONFIG`: Similar to `CONFIG`, but with workflows set to `True`.
+
+These configurations are used to test different scenarios and ensure the `Config` class correctly handles various settings.

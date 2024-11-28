@@ -1,0 +1,66 @@
+---
+title: "test_slack_alert_message_builder.py"
+---
+
+## High-level description
+This file contains unit tests for the `SlackAlertMessageBuilder` class, which is responsible for constructing Slack alert messages. The tests cover various aspects of message building, including adding titles, previews, and details to the Slack alert message.
+
+## Symbols
+
+### `test_add_title_to_slack_alert`
+#### Description
+This test function verifies the correct addition of a title to a Slack alert message.
+
+#### Internal Logic
+1. Creates a `SlackAlertMessageBuilder` instance.
+2. Creates a header block and a context block.
+3. Adds the title blocks to the Slack alert.
+4. Asserts that the resulting JSON structure matches the expected format.
+
+### `test_validate_preview_blocks`
+#### Description
+This test function checks the `_validate_preview_blocks` method of `SlackAlertMessageBuilder` for different scenarios.
+
+#### Internal Logic
+1. Tests with no blocks (empty list).
+2. Tests with fewer than 5 blocks, expecting padding with empty blocks.
+3. Tests with exactly 5 blocks.
+4. Tests with more than 5 blocks, expecting a `PreviewIsTooLongError`.
+
+### `test_add_preview_to_slack_alert`
+#### Description
+This test function verifies the correct addition of a preview to a Slack alert message.
+
+#### Internal Logic
+1. Creates a `SlackAlertMessageBuilder` instance.
+2. Creates a header block and a context block.
+3. Adds the preview blocks to the Slack alert.
+4. Asserts that the resulting JSON structure matches the expected format, including padding with empty blocks.
+
+### `test_add_details_to_slack_alert`
+#### Description
+This test function checks the `add_details_to_slack_alert` method of `SlackAlertMessageBuilder` for different scenarios.
+
+#### Internal Logic
+1. Tests with no details.
+2. Tests with empty details (empty list).
+3. Tests with actual detail blocks.
+4. Asserts that the resulting JSON structure matches the expected format for each case.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| json | Used for JSON serialization and comparison |
+| pytest | Testing framework |
+| elementary.monitor.data_monitoring.alerts.integrations.slack.message_builder | Contains the `SlackAlertMessageBuilder` and `PreviewIsTooLongError` classes |
+
+## Error Handling
+The tests check for the `PreviewIsTooLongError` exception when trying to add more than the maximum allowed preview blocks.
+
+## Notes
+- The tests make extensive use of JSON comparisons to verify the structure of the generated Slack messages.
+- The `SlackAlertMessageBuilder` class is designed to construct Slack messages with specific sections: title, preview, and details.
+- The preview section has a maximum limit of 5 blocks, which is enforced and tested.
+- Empty blocks are used for padding when the preview section has fewer than 5 blocks.
+
+This test file ensures that the `SlackAlertMessageBuilder` class correctly constructs Slack alert messages according to the specified format and constraints.

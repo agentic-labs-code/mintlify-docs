@@ -1,0 +1,44 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `elementary/clients/api` directory provides a base class `APIClient` for interacting with different components of the Elementary project through their respective APIs. This directory acts as a central hub for communication between various parts of the Elementary system.
+
+## What does it do?
+The `elementary/clients/api` directory enables communication between different parts of the Elementary project by providing a standardized way to interact with their APIs. It defines a base class `APIClient` that handles common functionalities like caching run-related data. This base class is then extended by other API client classes, each specializing in a specific aspect of the Elementary system, such as alerts, models, or lineage.
+
+## Entry points
+The main entry point for this directory is `api_client.py`, which defines the `APIClient` base class. Developers creating new API clients should inherit from this class and extend its functionality.
+
+## Key Files
+### elementary/clients/api/api_client.py
+This file defines the `APIClient` class, which serves as the base class for all API clients in the Elementary project. It provides a simple caching mechanism using `collections.defaultdict` to store and retrieve run-related data. The `APIClient` class is initialized with a `BaseDbtRunner` instance, allowing it to execute dbt commands.
+
+Here's a code snippet showcasing the `APIClient` class:
+
+```python
+from collections import defaultdict
+from typing import Any
+
+from elementary.clients.dbt.base_dbt_runner import BaseDbtRunner
+
+
+class APIClient:
+    def __init__(self, dbt_runner: BaseDbtRunner) -&gt; None:
+        self.dbt_runner = dbt_runner
+        self._run_cache = defaultdict(lambda: None)
+
+    def set_run_cache(self, key: str, value: Any) -&gt; None:
+        self._run_cache[key] = value
+
+    def get_run_cache(self, key: str) -&gt; Any:
+        return self._run_cache[key]
+```
+
+This class is then subclassed by other API clients like `AlertsAPI`, `ModelsAPI`, etc., each implementing specific API interactions for their respective functionalities.
+
+## Dependencies
+- **collections.defaultdict:** Used for creating dictionaries with default values, simplifying data storage in the cache.
+- **typing:** Used for type hinting, improving code readability and maintainability.
+- **elementary.clients.dbt.base_dbt_runner.BaseDbtRunner:** Provides an interface for executing dbt commands, essential for interacting with dbt projects. 

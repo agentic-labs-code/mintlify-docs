@@ -1,0 +1,46 @@
+---
+title: "fail_model.sql"
+---
+
+## High-level description
+This file contains a dbt (data build tool) model that intentionally creates a failing SQL query. The model is configured as a table materialization with customizable tags and metadata, and it attempts to perform a division by zero operation, which will result in an error when executed.
+
+## Symbols
+
+### dbt Model: fail_model
+#### Description
+This dbt model is designed to fail by attempting to divide 1 by 0. It's likely used for testing error handling or demonstrating failure scenarios in a dbt project.
+
+#### Configuration
+The model uses the `config` block to set up its materialization strategy and metadata:
+
+| Option | Type | Value | Description |
+|:-------|:-----|:------|:------------|
+| materialized | string | 'table' | Specifies that this model should be materialized as a table |
+| tags | list | var('one_tags', []) | Sets tags for the model, using a variable with a default empty list |
+| meta | dict | {'owner': var('one_owner', 'egk')} | Sets metadata for the model, specifically an owner, using a variable with a default value of 'egk' |
+
+#### Internal Logic
+The model consists of a single SQL statement:
+```sql
+SELECT 1/0 AS fail_value
+```
+This statement attempts to divide 1 by 0, which is an invalid mathematical operation in SQL and will cause an error when executed.
+
+## Error Handling
+This model is specifically designed to produce an error. When run as part of a dbt project, it will cause a division by zero error, which can be used to test error handling mechanisms or demonstrate failure scenarios.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dbt | This file is part of a dbt project and uses dbt-specific syntax for configuration |
+
+## Configuration
+The model uses dbt variables for configuration, allowing for customization of tags and owner metadata:
+
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| one_tags | list | [] | A list of tags to be applied to the model |
+| one_owner | string | 'egk' | The owner of the model, set in the metadata |
+
+These variables can be set in the dbt project's `dbt_project.yml` file or passed at runtime to customize the model's configuration.

@@ -1,0 +1,78 @@
+---
+title: "client.py"
+---
+
+## High-level description
+This code defines an `AzureClient` class for interacting with Azure Blob Storage. It provides functionality to initialize the client, create instances, and upload HTML reports to Azure containers.
+
+## Code Structure
+The `AzureClient` class is the main component of this file. It contains methods for initializing the client, creating instances, and sending reports to Azure Blob Storage. The class uses the `BlobServiceClient` from the `azure.storage.blob` module to interact with Azure Blob Storage.
+
+## Symbols
+
+### `AzureClient`
+#### Description
+A class that provides methods to interact with Azure Blob Storage for uploading HTML reports.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | Config | Configuration object containing Azure-related settings |
+| tracking | Optional[Tracking] | Optional tracking object for monitoring and analytics |
+
+#### Internal Logic
+- Initializes the `BlobServiceClient` using the Azure connection string from the config.
+- Provides a class method `create_client` to create an instance of `AzureClient` if Azure Blob Storage is configured.
+- Implements a `send_report` method to upload HTML files to Azure Blob Storage.
+
+### `AzureClient.create_client`
+#### Description
+A class method that creates and returns an instance of `AzureClient` if Azure Blob Storage is configured.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | Config | Configuration object containing Azure-related settings |
+| tracking | Optional[Tracking] | Optional tracking object for monitoring and analytics |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| client | Optional[AzureClient] | An instance of AzureClient if Azure Blob Storage is configured, otherwise None |
+
+### `AzureClient.send_report`
+#### Description
+Uploads an HTML file to Azure Blob Storage and optionally updates the container's website.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| local_html_file_path | str | Path to the local HTML file to be uploaded |
+| remote_bucket_file_path | Optional[str] | Optional remote path for the file in the Azure container |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| success | bool | True if the upload was successful, False otherwise |
+| bucket_website_url | Optional[str] | URL of the uploaded file if the container's website was updated |
+
+#### Internal Logic
+1. Determines the remote file name based on the input or the local file name.
+2. Creates a blob client for the specified container and file.
+3. Uploads the HTML file to Azure Blob Storage.
+4. If configured, updates the container's website by copying the uploaded file to 'index.html'.
+5. Returns the success status and the website URL (if applicable).
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| azure.storage.blob | Provides the BlobServiceClient for interacting with Azure Blob Storage |
+| elementary.config.config | Contains the Config class for accessing configuration settings |
+| elementary.tracking.tracking_interface | Provides the Tracking interface for optional analytics |
+| elementary.utils.log | Provides logging functionality |
+
+## Error Handling
+The code uses logging to report errors and successful operations. It doesn't implement specific error handling mechanisms beyond basic exception raising.
+
+## Logging
+The code uses a logger obtained from `elementary.utils.log.get_logger` to log information about the upload process and any errors that occur.

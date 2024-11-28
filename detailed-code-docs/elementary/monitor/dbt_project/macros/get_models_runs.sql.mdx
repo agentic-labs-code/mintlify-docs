@@ -1,0 +1,49 @@
+---
+title: "get_models_runs.sql"
+---
+
+## High-level description
+This SQL macro, `get_models_runs`, retrieves and processes data about model runs from the 'model_run_results' table. It filters the data based on a specified time range, optionally excludes Elementary models, and returns the results as a list of dictionaries.
+
+## Symbols
+
+### `get_models_runs`
+#### Description
+This macro generates a SQL query to fetch model run data, executes the query, and returns the results as a list of dictionaries.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | integer | Number of days to look back for model runs (default: 7) |
+| exclude_elementary | boolean | Flag to exclude Elementary models from the results (default: false) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | list of dictionaries | Processed model run data |
+
+#### Internal Logic
+1. Defines a CTE (Common Table Expression) named `model_runs` that selects data from the 'model_run_results' table and adds a rank column based on the generation time.
+2. Selects and processes specific columns from the CTE, including:
+   - Calculating execution time (rounded to 1 decimal place for successful runs, 0 for failed runs)
+   - Including compiled code only for the most recent invocation of each model
+3. Filters the results based on the `days_back` parameter
+4. Optionally excludes Elementary models based on the `exclude_elementary` parameter
+5. Orders the results by generation time
+6. Executes the query using `run_query`
+7. Converts the query results to a list of dictionaries using `elementary.agate_to_dicts`
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary | Used for various utility functions (edr_cast_as_numeric, edr_datediff, edr_cast_as_timestamp, edr_current_timestamp, agate_to_dicts) |
+
+## References
+- `{{ ref('elementary', 'model_run_results') }}`: References the 'model_run_results' table from the 'elementary' schema
+
+## Performance Considerations
+- The macro uses a window function (`rank()`) which may impact performance on large datasets
+- Filtering is done using `generated_at`, which should be indexed for optimal performance
+
+## Side Effects
+This macro does not have any side effects as it only reads data and does not modify any external state.

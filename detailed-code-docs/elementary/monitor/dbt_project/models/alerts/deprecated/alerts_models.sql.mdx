@@ -1,0 +1,58 @@
+---
+title: "alerts_models.sql"
+---
+
+## High-level description
+This SQL code defines a dbt model for alerts related to dbt models. It is configured as an incremental model that merges updates based on the `alert_id` column. The model either selects data from an existing `alerts_dbt_models` relation or returns an empty result set if the relation doesn't exist.
+
+## Code Structure
+The code consists of a single SQL query with dbt-specific configurations and Jinja templating. It references other dbt packages and custom macros for functionality.
+
+## Symbols
+
+### dbt model configuration
+#### Description
+This section configures the dbt model using the `config` block.
+
+#### Internal Logic
+- Sets the materialization strategy to 'incremental'
+- Defines `alert_id` as the unique key
+- Specifies columns to update during merges
+- Configures behavior on schema changes
+- Sets table type and incremental strategy using custom macros
+
+### Main SQL query
+#### Description
+The main query either selects data from an existing `alerts_dbt_models` relation or returns an empty result set.
+
+#### Internal Logic
+1. Checks if the `alerts_dbt_models` relation exists
+2. If it exists:
+   - Selects all columns from the relation except `detected_at`
+   - Adds a custom `detected_at` expression
+   - Adds `alert_sent` and `suppression_status` columns
+   - Adds a `sent_at` column cast as string
+3. If the model is incremental, applies a filter for new alerts
+4. If the relation doesn't exist, calls a macro to return an empty result set
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dbt_utils | Provides the `star` macro for selecting all columns except specified ones |
+| elementary_cli | Provides custom macros for alert-related functionality |
+| elementary | Provides macros for table type and incremental strategy |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| materialized | string | 'incremental' | Sets the materialization strategy |
+| unique_key | string | 'alert_id' | Defines the unique key for the model |
+| merge_update_columns | list | ['alert_id'] | Specifies columns to update during merges |
+| on_schema_change | string | 'sync_all_columns' | Configures behavior on schema changes |
+| table_type | macro | elementary.get_default_table_type() | Sets the table type |
+| incremental_strategy | macro | elementary.get_default_incremental_strategy() | Sets the incremental strategy |
+
+## Error Handling
+The code includes basic error handling by checking if the `alerts_dbt_models` relation exists before attempting to query it. If the relation doesn't exist, it returns an empty result set using a custom macro.
+
+This documentation provides a comprehensive overview of the SQL code, its structure, and its functionality within the context of a dbt project focused on alert management for dbt models.

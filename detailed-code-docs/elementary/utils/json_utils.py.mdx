@@ -1,0 +1,137 @@
+---
+title: "json_utils.py"
+---
+
+## High-level description
+The `json_utils.py` file provides utility functions for working with JSON data and lists of strings. It includes functions for safely loading JSON, unpacking and flattening lists, and manipulating lists of strings.
+
+## Code Structure
+The code consists of several independent utility functions that operate on strings, lists, and JSON data. Some functions call other functions within the file to achieve their functionality. For example, `unpack_and_flatten_and_dedup_list_of_strings` uses `unpack_and_flatten_str_to_list` and `sum_lists`.
+
+## References
+This code references the `json` module for JSON encoding and decoding.
+
+## Symbols
+
+### `try_load_json`
+#### Description
+This function attempts to load JSON data from a given value. If the value is already a dictionary or list, it is returned directly. If the value is a string, it attempts to parse it as JSON. If loading fails, it returns None.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| value | Optional[Union[str, dict, list]] | The value to load as JSON. Can be a string, dictionary, list, or None. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | Union[dict, list, None] | The loaded JSON data as a dictionary or list, or None if loading failed. |
+
+#### Internal Logic
+1. Checks if the value is None or already a dictionary/list.
+2. If not, attempts to parse the value as JSON using `json.loads()`.
+3. Returns the loaded JSON data or None if an exception occurs during parsing.
+
+### `unpack_and_flatten_str_to_list`
+#### Description
+This function converts a string representation of a list into an actual list of strings. It handles three cases: a single string, a comma-delimited string, and a JSON string representing a list.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| list_as_str | str | The string to convert to a list. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | List[str] | A list of strings extracted from the input string. |
+
+#### Internal Logic
+1. Attempts to load the input string as JSON using `try_load_json`.
+2. If successful and the result is a list, returns the list.
+3. If not JSON or not a list, splits the string by comma and strips whitespace from each element.
+4. Returns the resulting list of strings.
+
+### `sum_lists`
+#### Description
+This function takes a list of lists and returns a single flattened list containing all the elements from the input lists.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| list_of_lists | List[List] | A list of lists to flatten. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | List | A single flattened list containing all elements from the input lists. |
+
+#### Internal Logic
+1. Iterates through each sublist in the input list.
+2. Extends the `ret` list with all elements from the current sublist.
+3. Returns the flattened `ret` list.
+
+### `unpack_and_flatten_and_dedup_list_of_strings`
+#### Description
+This function processes a list of strings, which can be a string, a list, or None. It unpacks any JSON strings, flattens the list, and removes duplicate strings.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| list_maybe_jsoned | Optional[Union[List[str], str]] | The input list of strings, which can be a string, a list, or None. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | List[str] | A de-duplicated list of strings extracted from the input. |
+
+#### Internal Logic
+1. Checks if the input is None or empty. If so, returns an empty list.
+2. If the input is a string, calls `unpack_and_flatten_str_to_list` to convert it to a list.
+3. If the input is a list, iterates through each element, calls `unpack_and_flatten_str_to_list` for string elements, and combines the results using `sum_lists`.
+4. Converts the final list to a set to remove duplicates and returns it as a list.
+
+### `list_of_lists_of_strings_to_comma_delimited_unique_strings`
+#### Description
+This function takes a list of lists of strings, flattens it, removes duplicates, optionally adds a prefix to each string, and returns a comma-delimited string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| list_of_strings | List[List[str]] | The input list of lists of strings. |
+| prefix | Optional[str] | An optional prefix to add to each string. Defaults to None. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | str | A comma-delimited string containing unique strings from the input list, with an optional prefix. |
+
+#### Internal Logic
+1. Filters out None and empty lists from the input list.
+2. Flattens the remaining lists using `sum_lists`.
+3. Optionally adds the prefix to each string using `append_prefix_if_missing`.
+4. Converts the list to a set to remove duplicates.
+5. Joins the unique strings with a comma and space separator.
+
+### `append_prefix_if_missing`
+#### Description
+This function appends a prefix to a string if it's not already present.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string | str | The string to append the prefix to. |
+| prefix | str | The prefix to append. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | str | The string with the prefix appended if it wasn't already present. |
+
+#### Internal Logic
+1. Checks if the string already starts with the prefix.
+2. If so, returns the string unchanged.
+3. If not, returns a new string with the prefix prepended.
+
+## Dependencies
+This code depends on the built-in `json` module.

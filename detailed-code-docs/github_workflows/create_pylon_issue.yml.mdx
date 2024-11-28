@@ -1,0 +1,105 @@
+---
+title: "create_pylon_issue.yml"
+---
+
+## High-level description
+This GitHub Actions workflow creates a Pylon issue when a new GitHub issue or pull request is opened. It then adds the Pylon ticket ID to the body of the GitHub issue or pull request for reference.
+
+## Code Structure
+The workflow consists of a single job (`create_pylon_issue`) with multiple steps that handle both issues and pull requests. The main steps involve checking out the repository, installing dependencies, creating a Pylon issue, and updating the GitHub issue or pull request with the Pylon ticket ID.
+
+## Symbols
+
+### `create_pylon_issue` (job)
+#### Description
+This job runs on Ubuntu and executes a series of steps to create a Pylon issue and update the GitHub issue or pull request.
+
+#### Internal Logic
+1. Check out the repository
+2. Install jq (JSON processor)
+3. Create a Pylon issue for GitHub issues or pull requests
+4. Add the Pylon ticket ID to the GitHub issue or pull request body
+
+### Create Pylon Issue for GitHub Issue (step)
+#### Description
+This step creates a Pylon issue when a new GitHub issue is opened.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `github.event.issue.title` | string | The title of the GitHub issue |
+| `github.repository` | string | The repository name |
+| `github.event.issue.html_url` | string | The URL of the GitHub issue |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `ticket_id` | string | The ID of the created Pylon issue |
+
+#### Internal Logic
+1. Send a POST request to the Pylon API to create an issue
+2. Extract the ticket ID from the response
+3. Set the ticket ID as an environment variable
+
+### Add Pylon ticket ID to issue body (step)
+#### Description
+This step adds the Pylon ticket ID to the body of the GitHub issue.
+
+#### Internal Logic
+1. Fetch the current issue body
+2. Append the Pylon ticket ID to the body
+3. Update the issue with the new body
+
+### Create Pylon Issue for Pull Request (step)
+#### Description
+This step creates a Pylon issue when a new pull request is opened.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `github.event.pull_request.title` | string | The title of the pull request |
+| `github.repository` | string | The repository name |
+| `github.event.pull_request.html_url` | string | The URL of the pull request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `ticket_id` | string | The ID of the created Pylon issue |
+
+#### Internal Logic
+1. Send a POST request to the Pylon API to create an issue
+2. Extract the ticket ID from the response
+3. Set the ticket ID as an environment variable
+
+### Add Pylon ticket ID to PR body (step)
+#### Description
+This step adds the Pylon ticket ID to the body of the pull request.
+
+#### Internal Logic
+1. Fetch the current pull request body
+2. Append the Pylon ticket ID to the body
+3. Update the pull request with the new body
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| actions/checkout@v2 | To check out the repository |
+| jq | JSON processor for parsing API responses |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| PYLON_API_KEY | string | N/A | API key for authenticating with the Pylon API |
+| PYLON_ACCOUNT_ID | string | N/A | Account ID for the Pylon account |
+| PYLON_REQUESTER_ID | string | N/A | Requester ID for creating Pylon issues |
+| GITHUB_TOKEN | string | N/A | GitHub token for authenticating API requests |
+
+## Error Handling
+The workflow uses the `if: success()` condition to ensure that the steps for adding the Pylon ticket ID to the issue or pull request body only run if the previous steps were successful.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| https://api.usepylon.com/issues | POST | JSON payload with issue details | JSON with created issue data | Creates a new Pylon issue |
+| https://api.github.com/repos/{owner}/{repo}/issues/{issue_number} | PATCH | JSON payload with updated body | Updated issue data | Updates a GitHub issue |
+| https://api.github.com/repos/{owner}/{repo}/pulls/{pull_number} | PATCH | JSON payload with updated body | Updated pull request data | Updates a GitHub pull request |

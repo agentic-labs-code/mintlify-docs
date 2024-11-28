@@ -1,0 +1,53 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the implementation of Microsoft Teams integration for the Elementary data monitoring system. It provides functionality to send alerts and test messages to Microsoft Teams channels using webhooks. The integration formats alert information into card messages with sections for relevant details and links to Elementary reports.
+
+## What does it do?
+The Teams integration allows the Elementary data monitoring system to send notifications about various types of alerts to Microsoft Teams channels. These alerts can include:
+
+1. dbt test alerts
+2. Elementary test alerts
+3. Model alerts
+4. Snapshot alerts
+5. Source freshness alerts
+6. Grouped alerts by table
+
+The integration formats these alerts into rich card messages that include:
+- Alert title and subtitle
+- Alert status and detection time
+- Relevant details such as table name, column name, tags, owners, and subscribers
+- Test descriptions and result messages
+- Test queries and parameters
+- Sample test results
+- Links to Elementary reports for more detailed information
+
+The integration also provides a way to send test messages to verify the connection and configuration.
+
+## Key Files
+
+1. `message_builder.py`: Contains the `TeamsAlertMessageBuilder` class, which provides a high-level interface for constructing Teams messages using the `pymsteams` library.
+
+2. `teams.py`: Implements the `TeamsIntegration` class, which is responsible for formatting different types of alerts into Teams messages and sending them to the configured webhook.
+
+## Dependencies
+- `pymsteams`: Used for constructing and sending Teams messages via webhooks.
+- `pandas`: Used for formatting test result samples into markdown tables.
+
+The integration relies on the following internal dependencies:
+- `elementary.clients.teams.client.TeamsClient`: For interacting with the Teams API.
+- `elementary.monitor.data_monitoring.alerts.integrations.utils.report_link.ReportLinkData`: For handling report link data.
+
+## Configuration
+The Teams integration requires a webhook URL to be configured for sending messages. This URL should be provided when initializing the `TeamsIntegration` class.
+
+Key configurable aspects include:
+- Alert fields to include in the message (e.g., table name, column name, tags, owners, subscribers)
+- Customization of message templates for different alert types
+- Fallback message format for cases where the main message fails to send
+
+The integration supports various alert models, including `TestAlertModel`, `ModelAlertModel`, `SourceFreshnessAlertModel`, and `GroupedByTableAlerts`, allowing for flexible handling of different alert types.
+
+In summary, this Teams integration provides a robust and flexible way to notify data teams about important events and issues detected by the Elementary data monitoring system, leveraging the collaboration features of Microsoft Teams.

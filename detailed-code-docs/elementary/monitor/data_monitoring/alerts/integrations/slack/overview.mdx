@@ -1,0 +1,44 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the implementation of Slack integration for sending data monitoring alerts. It provides functionality to construct and send structured Slack messages for various types of alerts, including tests, models, and source freshness alerts. The main components are the `SlackAlertMessageBuilder` for constructing alert messages and the `SlackIntegration` class for handling the communication with Slack.
+
+## What does it do?
+The code in this directory enables the sending of data quality alerts to Slack channels or webhooks. It takes alert data from various sources (such as test results, model performance, or data freshness checks) and formats them into structured Slack messages. These messages are then sent to the configured Slack destination, allowing teams to be notified of data quality issues or important events in their data pipeline.
+
+The system is designed to handle different types of alerts, format them appropriately for Slack, and manage the communication process, including error handling and fallback mechanisms. This ensures that important data quality information is reliably communicated to the relevant team members through Slack.
+
+## Key Files
+
+1. `message_builder.py`:
+   This file contains the `SlackAlertMessageBuilder` class, which is responsible for constructing the structure of Slack alert messages. It defines how different parts of an alert (title, preview, and details) are formatted and assembled into a complete Slack message. The class includes methods for adding these components to the message and ensures that the message structure adheres to Slack's formatting requirements.
+
+2. `slack.py`:
+   This file implements the `SlackIntegration` class, which serves as the main interface for sending alerts to Slack. It handles the process of formatting different types of alerts (tests, models, source freshness) into Slack messages using the `SlackAlertMessageBuilder`. The class also manages the connection to Slack, whether through a Slack API token or a webhook, and handles sending messages, including error handling and fallback mechanisms.
+
+## Dependencies
+The main external dependencies for this integration are:
+
+1. `slack_sdk` (version not specified): Used for interacting with the Slack API. This library provides the necessary functionality to send messages to Slack channels and handle API responses.
+
+2. `ratelimit` (version not specified): Used for implementing rate limiting when making API calls to Slack. This helps ensure that the integration doesn't exceed Slack's API rate limits.
+
+3. `pydantic` (version not specified): Used for data validation and schema definition, particularly in defining the structure of Slack alert messages.
+
+These dependencies were likely chosen for their robustness, ease of use, and compatibility with Slack's API requirements. The `slack_sdk` provides a reliable way to interact with Slack, while `ratelimit` helps manage API call frequency. `pydantic` is used for its strong data validation capabilities, ensuring that alert messages are correctly structured before being sent to Slack.
+
+## Configuration
+The Slack integration uses several configuration options:
+
+1. `slack_token`: The Slack API token used for authentication when sending messages through the Slack API.
+2. `slack_channel_name`: The name of the Slack channel where alerts should be sent.
+3. `slack_webhook`: A Slack webhook URL, used as an alternative method for sending messages to Slack.
+4. `is_slack_workflow`: A boolean flag indicating whether Slack workflow functionality is enabled.
+
+These configuration options allow users to customize the Slack integration according to their specific setup, whether they're using a Slack app with an API token or a webhook for sending messages.
+
+The `SlackIntegration` class also accepts a `config` object and an `override_config_defaults` flag, allowing for further customization of the integration's behavior.
+
+In summary, this directory provides a comprehensive solution for integrating data quality alerts with Slack, offering flexibility in configuration and robust handling of message construction and delivery.

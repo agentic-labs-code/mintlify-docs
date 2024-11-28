@@ -1,0 +1,86 @@
+---
+title: ".pre-commit-config.yaml"
+---
+
+## High-level description
+This YAML file configures pre-commit hooks for a project. It defines a set of tools and checks to be run automatically before each commit, ensuring code quality, formatting consistency, and preventing common issues.
+
+## Code Structure
+The file is structured as a list of repositories (`repos`), each containing one or more hooks. Some hooks are from external repositories, while others are defined locally.
+
+## Symbols
+
+### repos
+#### Description
+A list of repositories containing pre-commit hooks to be executed.
+
+#### Internal Logic
+Each repository is defined with a `repo` URL, a `rev` (revision or version), and one or more `hooks`. Some repositories have additional configuration options for their hooks.
+
+### External Hooks
+
+#### black
+- **Description**: A Python code formatter that enforces a consistent style.
+- **Repo**: https://github.com/psf/black
+- **Version**: 22.12.0
+
+#### isort
+- **Description**: A Python utility to sort imports alphabetically and automatically separate them into sections.
+- **Repo**: https://github.com/pycqa/isort
+- **Version**: 5.12.0
+- **Args**: ["--profile", "black"] (configures isort to be compatible with black)
+
+#### flake8
+- **Description**: A Python linter that checks Python code for style and quality issues.
+- **Repo**: https://github.com/pycqa/flake8
+- **Version**: 6.0.0
+
+#### prettier
+- **Description**: An opinionated code formatter that supports multiple languages.
+- **Repo**: https://github.com/pre-commit/mirrors-prettier
+- **Version**: v3.0.0
+- **Exclude**: \.html$|^docs/ (excludes HTML files and the docs directory)
+
+#### typos
+- **Description**: A tool to check for spelling mistakes in source code.
+- **Repo**: https://github.com/crate-ci/typos
+- **Version**: v1.16.6
+- **Exclude**: index\.html$|elementary_output\.json$ (excludes specific files)
+
+### Local Hooks
+
+#### no_commit
+- **Description**: Checks for the presence of a "NO_COMMIT" marker in the staged changes.
+- **Entry**: bash -c "git diff --cached -U0 | (! grep NO_COMMIT)"
+- **Language**: system
+- **Require Serial**: true
+- **Pass Filenames**: false
+
+#### mypy
+- **Description**: A static type checker for Python code.
+- **Entry**: mypy --no-error-summary
+- **Language**: system
+- **Files**: ^elementary/.*\.py$ (only checks Python files in the elementary directory)
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| black | Python code formatting |
+| isort | Python import sorting |
+| flake8 | Python linting |
+| prettier | Multi-language code formatting |
+| typos | Spelling mistake detection |
+| mypy | Python static type checking |
+
+Note: These dependencies are not directly installed by this file but are required to be available in the system for the hooks to function.
+
+## Configuration
+Some hooks have specific configuration options:
+
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| args | list | ["--profile", "black"] | For isort, configures it to be compatible with black |
+| exclude | string | Various patterns | For prettier and typos, specifies files to exclude from checks |
+| files | string | ^elementary/.*\.py$ | For mypy, specifies which files to check |
+
+This configuration ensures that the code quality tools work together harmoniously and are applied to the appropriate files in the project.

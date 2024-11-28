@@ -1,0 +1,63 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the API implementation for handling source freshness data in the Elementary monitoring system. It defines Pydantic models for structuring and validating source freshness data, as well as an API class for fetching and processing this data.
+
+## What does it do?
+The code in this directory enables the Elementary monitoring system to track and report on the freshness of data sources. It does this by:
+
+1. Defining structured data models (schemas) for source freshness results, metadata, invocations, and runs.
+2. Providing an API to fetch source freshness data from a dbt runner.
+3. Processing raw source freshness data into structured formats for easy consumption by other parts of the system.
+4. Calculating statistics such as fail rates and totals for source freshness tests.
+
+This functionality allows users of the Elementary monitoring system to easily track how up-to-date their data sources are, identify any freshness issues, and monitor the performance of their data pipelines over time.
+
+## Key Files
+
+### schema.py
+This file defines the Pydantic models used to structure and validate source freshness data. Key models include:
+
+- `DbtSourceFreshnessResultSchema`: Represents the result of a single dbt source freshness test.
+- `SourceFreshnessMetadataSchema`: Contains metadata about a source freshness test.
+- `SourceFreshnessResultSchema`: Combines metadata and test results.
+- `SourceFreshnessInvocationSchema`: Represents a single invocation of a source freshness test.
+- `SourceFreshnessInvocationsSchema`: Represents a collection of test invocations.
+- `SourceFreshnessRunSchema`: Combines metadata, test runs, and test results for a complete source freshness run.
+
+These models ensure that data is consistently structured throughout the system and provide built-in validation.
+
+### source_freshnesses.py
+This file contains the `SourceFreshnessesAPI` class, which is responsible for fetching and processing source freshness data. Key features include:
+
+- Initialization with a dbt runner and configuration options.
+- Methods to retrieve processed source freshness results and runs.
+- Helper methods for processing raw data into structured formats.
+- Calculation of statistics such as fail rates and totals.
+
+The `SourceFreshnessesAPI` class serves as the main interface for other parts of the system to access source freshness data.
+
+## Dependencies
+The code in this directory relies on several external libraries and internal modules:
+
+- Pydantic: Used for data validation and settings management.
+- typing: Provides support for type hints.
+- elementary.clients.api.api_client: Base class for API clients.
+- elementary.clients.dbt.base_dbt_runner: Interface for running dbt operations.
+- elementary.monitor.fetchers.source_freshnesses: Fetches raw source freshness data.
+- elementary.utils.time: Utilities for time conversion and manipulation.
+
+These dependencies allow the source freshness API to integrate with the broader Elementary monitoring system and leverage existing functionality for data fetching and processing.
+
+## Configuration
+The `SourceFreshnessesAPI` class accepts configuration parameters during initialization:
+
+- `dbt_runner`: An instance of `BaseDbtRunner` for executing dbt operations.
+- `days_back`: Number of days to look back for source freshness data (default: 7).
+- `invocations_per_test`: Number of invocations to fetch per test (default: 720).
+
+These configuration options allow users to customize the behavior of the source freshness API to suit their specific needs and data volumes.
+
+In summary, this directory provides a crucial component of the Elementary monitoring system, enabling detailed tracking and analysis of data source freshness. By structuring the data and providing a clean API, it facilitates easy integration with other parts of the system and enables users to maintain high data quality and reliability in their data pipelines.

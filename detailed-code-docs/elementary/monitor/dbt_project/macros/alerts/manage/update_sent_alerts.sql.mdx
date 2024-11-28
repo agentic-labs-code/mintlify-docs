@@ -1,0 +1,42 @@
+---
+title: "update_sent_alerts.sql"
+---
+
+## High-level description
+This macro, `update_sent_alerts`, is designed to update the status of specified alerts in the Elementary data observability system. It marks selected alerts as 'sent' and updates their sent and updated timestamps in the alerts database table.
+
+## Symbols
+
+### `update_sent_alerts`
+#### Description
+This macro updates the status of specified alerts to 'sent' in the Elementary alerts table. It also updates the `sent_at` and `updated_at` timestamps for these alerts.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| alert_ids | list | A list of alert IDs to be updated |
+| sent_at | timestamp | The timestamp when the alerts were sent |
+
+#### Internal Logic
+1. The macro first checks if it's in execute mode using the `{% if execute %}` condition.
+2. It then verifies if `alert_ids` is not empty.
+3. If conditions are met, it constructs an SQL update query:
+   - The query targets the 'alerts_v2' table in the 'elementary_cli' schema.
+   - It updates the status to 'sent', sets the `sent_at` timestamp, and updates the `updated_at` timestamp.
+   - The update is applied only to alerts with matching `alert_id`, current status 'pending', and `detected_at` timestamp within a specified time limit.
+4. Finally, it executes the constructed query using the `elementary.run_query()` function.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary | Provides utility functions for timestamp casting, quoting, and current timestamp |
+| elementary_cli | Provides the `get_alerts_time_limit()` function |
+
+## Error Handling
+This macro does not implement explicit error handling. It relies on the underlying dbt and database error handling mechanisms.
+
+## Performance Considerations
+The macro uses a single UPDATE statement to modify multiple alerts at once, which is generally more efficient than updating alerts individually. However, performance may be affected if a large number of alert IDs are provided.
+
+## TODOs
+There are no explicit TODOs in this code.

@@ -1,0 +1,76 @@
+---
+title: "schema.py"
+---
+
+## High-level description
+This code defines a Pydantic model `DbtInvocationSchema` that represents the schema for a dbt (data build tool) invocation. It includes fields for various invocation details and provides custom validators for formatting the `detected_at` timestamp and the `selected` field.
+
+## Symbols
+
+### `DbtInvocationSchema`
+#### Description
+A Pydantic model that defines the structure and validation rules for a dbt invocation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invocation_id | Optional[str] | Unique identifier for the invocation |
+| detected_at | Optional[str] | Timestamp when the invocation was detected |
+| command | Optional[str] | The dbt command that was executed |
+| selected | Optional[str] | Selected models or tests for the invocation |
+| full_refresh | Optional[bool] | Whether a full refresh was performed |
+| job_url | Optional[str] | URL of the job, if applicable |
+| job_name | Optional[str] | Name of the job, if applicable |
+| job_id | Optional[str] | Identifier of the job, if applicable |
+| orchestrator | Optional[str] | Name of the orchestrator, if used |
+
+#### Internal Logic
+The class uses Pydantic's `BaseModel` as its base class and defines optional fields for various invocation details. It also includes two custom validators:
+
+1. `format_detected_at`: Converts the `detected_at` timestamp to a full ISO format.
+2. `format_selected`: Converts the `selected` field from a JSON string to a space-separated string of selected items.
+
+### `format_detected_at`
+#### Description
+A validator method that formats the `detected_at` timestamp.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| detected_at | str | The timestamp to be formatted |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| formatted_timestamp | str | The timestamp in full ISO format |
+
+#### Internal Logic
+This method uses the `convert_partial_iso_format_to_full_iso_format` function from the `elementary.utils.time` module to ensure the timestamp is in full ISO format.
+
+### `format_selected`
+#### Description
+A validator method that formats the `selected` field.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| selected | str | JSON string of selected items |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| formatted_selected | str | Space-separated string of selected items |
+
+#### Internal Logic
+This method uses the `try_load_json` function from `elementary.utils.json_utils` to attempt to parse the `selected` field as JSON. If successful, it joins the resulting list into a space-separated string. If parsing fails, it returns an empty string.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| typing | Provides type hinting support |
+| elementary.utils.json_utils | Provides the `try_load_json` function for JSON parsing |
+| elementary.utils.pydantic_shim | Provides Pydantic model and validator functionality |
+| elementary.utils.time | Provides the `convert_partial_iso_format_to_full_iso_format` function |
+
+## References
+This schema is used in other parts of the codebase, particularly in the `InvocationsAPI` and `InvocationsFetcher` classes, which handle fetching and processing dbt invocation data.

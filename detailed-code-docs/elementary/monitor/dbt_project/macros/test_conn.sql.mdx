@@ -1,0 +1,67 @@
+---
+title: "test_conn.sql"
+---
+
+## High-level description
+The code defines several Jinja macros within a dbt project to test the connection to a data warehouse. It provides a generic `test_conn` macro that dispatches to adapter-specific implementations, with a default implementation for testing connections by querying a sample table.
+
+## Code Structure
+The `test_conn` macro serves as an entry point that dynamically calls the appropriate `test_conn` implementation based on the target adapter. The `default__test_conn` macro provides a generic implementation, while the `snowflake__test_conn` macro offers a Snowflake-specific implementation that includes additional checks.
+
+## Symbols
+
+### `test_conn`
+#### Description
+This macro serves as the main entry point for testing the connection to the data warehouse. It dynamically dispatches the `test_conn` call to the appropriate adapter-specific implementation using `adapter.dispatch`.
+
+#### Inputs
+None
+
+#### Outputs
+- `List`: A list containing the target type and the result of the adapter-specific `test_conn` macro.
+
+#### Internal Logic
+1. Retrieves the target type.
+2. Uses `adapter.dispatch` to call the appropriate `test_conn` implementation based on the target type.
+3. Returns a list containing the target type and the result of the adapter-specific `test_conn` call.
+
+### `default__test_conn`
+#### Description
+This macro provides a default implementation for testing the connection to the data warehouse. It attempts to query a sample table (`dbt_models`) in the Elementary schema and returns the result.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+1. Retrieves the database and schema for the Elementary package.
+2. Constructs a relation object for the `dbt_models` table.
+3. Executes a query to select the first 10 rows from the `dbt_models` table.
+
+### `snowflake__test_conn`
+#### Description
+This macro provides a Snowflake-specific implementation for testing the connection to the data warehouse. It first checks if the current user has access to the current warehouse and then calls the default `test_conn` macro.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+1. Retrieves the current warehouse name.
+2. Raises a compiler error if the current warehouse is not accessible.
+3. Calls the `default__test_conn` macro to perform the default connection test.
+
+## Error Handling
+The `snowflake__test_conn` macro raises a compiler error if the current user does not have access to the current warehouse. This error is raised using the `exceptions.raise_compiler_error` function.
+
+## References
+- `elementary.get_package_database_and_schema()`: This function retrieves the database and schema for the Elementary package.
+- `api.Relation.create()`: This function creates a relation object for a given database, schema, and table.
+- `elementary.run_query()`: This function executes a query and returns the result.
+- `elementary.agate_to_dicts()`: This function converts an Agate table to a list of dictionaries.
+- `exceptions.raise_compiler_error()`: This function raises a compiler error with a given message.
+- `elementary_cli.default__test_conn()`: This calls the default connection test macro.

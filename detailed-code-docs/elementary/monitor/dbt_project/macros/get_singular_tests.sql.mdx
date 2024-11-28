@@ -1,0 +1,40 @@
+---
+title: "get_singular_tests.sql"
+---
+
+## High-level description
+This code defines a Jinja macro named `get_singular_tests()` that retrieves information about singular tests from a dbt project. It queries a specific table in the Elementary package to fetch details about tests of type 'singular' and returns the results as a list of dictionaries.
+
+## Symbols
+
+### `get_singular_tests()`
+#### Description
+This macro fetches information about singular tests from the 'dbt_tests' table in the Elementary package. It constructs a SQL query, executes it, and returns the results in a format suitable for further processing in dbt.
+
+#### Inputs
+This macro doesn't take any explicit inputs.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | List[Dict] | A list of dictionaries, where each dictionary represents a singular test with its properties |
+
+#### Internal Logic
+1. Defines a SQL query using Jinja templating to select specific columns from the 'dbt_tests' table, filtering for tests of type 'singular'.
+2. Executes the query using the `elementary.run_query()` function and stores the result in an Agate table.
+3. Converts the Agate table to a list of dictionaries using the `elementary.agate_to_dicts()` function.
+4. Returns the resulting list of dictionaries.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary | Used for running queries and converting Agate tables to dictionaries |
+| dbt | Implied dependency for the use of `ref()` function and overall macro structure |
+
+## References
+- `{{ ref('elementary', 'dbt_tests') }}`: References the 'dbt_tests' table in the Elementary package.
+
+## Notes
+- This macro is likely part of a larger dbt project that uses the Elementary package for test management and reporting.
+- The macro assumes the existence of a 'dbt_tests' table with specific columns (unique_id, name, original_path, package_name, tags) and a 'type' column for filtering.
+- The use of `elementary.run_query()` and `elementary.agate_to_dicts()` suggests that these are custom functions provided by the Elementary package to interact with dbt's query execution and result handling mechanisms.

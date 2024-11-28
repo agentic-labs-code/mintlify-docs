@@ -1,0 +1,159 @@
+---
+title: "schema.py"
+---
+
+## High-level description
+The `schema.py` file defines the data schemas and filters used for data monitoring in Elementary. It includes schemas for filters, statuses, resource types, warehouse information, and selector filters. These schemas are used to structure and validate data related to data monitoring, such as alerts and reports.
+
+## Code Structure
+The code defines several Pydantic models (using the `BaseModel` class) to represent different data structures. These models include `FilterSchema`, `StatusFilterSchema`, `ResourceTypeFilterSchema`, `FiltersSchema`, `SelectorFilterSchema`, and `WarehouseInfo`. The `FiltersSchema` model is used to define filters for data monitoring, while the `SelectorFilterSchema` is a simplified version used for specific selections. The `WarehouseInfo` model stores information about the data warehouse.
+
+## References
+This code references the `elementary.utils.log` module for logging, `elementary.utils.time` module for time conversions, and `elementary.utils.pydantic_shim` for Pydantic model definitions.
+
+## Symbols
+
+### `InvalidSelectorError`
+#### Description
+This class represents an exception raised when an invalid selector is used for filtering data monitoring reports.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+This class inherits from the built-in `Exception` class and doesn't define any specific logic.
+
+### `Status`
+#### Description
+This enum defines the possible statuses for data monitoring results, including WARN, FAIL, SKIPPED, ERROR, and RUNTIME_ERROR.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+This enum uses the `Enum` class to define a set of named constants representing different statuses.
+
+### `ResourceType`
+#### Description
+This enum defines the types of resources monitored, including TEST, MODEL, and SOURCE_FRESHNESS.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+This enum uses the `Enum` class to define a set of named constants representing different resource types.
+
+### `SupportedFilterTypes`
+#### Description
+This enum defines the supported filter types, currently only including IS.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+This enum uses the `Enum` class to define a set of named constants representing different filter types.
+
+### `FilterSchema`
+#### Description
+This Pydantic model defines the schema for a basic filter, including a list of values and the filter type.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+This model uses the `BaseModel` class from Pydantic to define the schema. It includes a `values` field for the filter values and a `type` field for the filter type, defaulting to `SupportedFilterTypes.IS`.
+
+### `StatusFilterSchema`
+#### Description
+This Pydantic model defines the schema for a status filter, inheriting from `FilterSchema` and specifying the `values` field as a list of `Status` enums.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+This model inherits from `FilterSchema` and overrides the `values` field type to be a list of `Status` enums.
+
+### `ResourceTypeFilterSchema`
+#### Description
+This Pydantic model defines the schema for a resource type filter, inheriting from `FilterSchema` and specifying the `values` field as a list of `ResourceType` enums.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+This model inherits from `FilterSchema` and overrides the `values` field type to be a list of `ResourceType` enums.
+
+### `_get_default_statuses_filter`
+#### Description
+This function returns a list of `StatusFilterSchema` objects representing the default status filter, which includes FAIL, ERROR, RUNTIME_ERROR, and WARN statuses.
+
+#### Inputs
+None
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| default_statuses_filter | List[StatusFilterSchema] | A list of `StatusFilterSchema` objects representing the default status filter. |
+
+#### Internal Logic
+The function creates a list containing a single `StatusFilterSchema` object with the type set to `SupportedFilterTypes.IS` and the values set to a list of `Status` enums representing the default statuses.
+
+### `FiltersSchema`
+#### Description
+This Pydantic model defines the schema for data monitoring filters, including fields for selector, invocation ID, invocation time, last invocation flag, node names, tags, owners, models, statuses, and resource types.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+This model uses the `BaseModel` class from Pydantic to define the schema. It includes various fields for different filter options. The `invocation_time` field has a validator to ensure it's in the correct format. The `validate_report_selector` method checks if the selector is valid for reports. The `from_cli_params` method creates a `FiltersSchema` object from command-line parameters. The `to_selector_filter_schema` method converts the `FiltersSchema` object to a `SelectorFilterSchema` object.
+
+### `SelectorFilterSchema`
+#### Description
+This Pydantic model defines a simplified schema for selector filters, including fields for selector, invocation ID, invocation time, last invocation flag, tag, owner, model, statuses, resource types, and node names.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+This model uses the `BaseModel` class from Pydantic to define the schema. It includes various fields for different filter options, but with simplified types compared to `FiltersSchema`.
+
+### `WarehouseInfo`
+#### Description
+This Pydantic model defines the schema for warehouse information, including fields for ID and type.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+This model uses the `BaseModel` class from Pydantic to define the schema. It includes fields for the warehouse ID and type.

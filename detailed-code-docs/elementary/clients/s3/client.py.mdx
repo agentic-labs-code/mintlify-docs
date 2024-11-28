@@ -1,0 +1,117 @@
+---
+title: "client.py"
+---
+
+## High-level description
+This code defines an S3Client class that handles interactions with Amazon S3 for uploading and managing reports. It provides functionality to send reports to S3 buckets, update bucket website configurations, and retrieve bucket website URLs.
+
+## Code Structure
+The S3Client class is the main component of this code. It initializes an AWS session and S3 client, and provides methods for sending reports, updating bucket websites, and retrieving bucket information. The class uses configuration settings from a Config object and optionally integrates with a Tracking system.
+
+## Symbols
+
+### S3Client
+#### Description
+A class that handles interactions with Amazon S3 for report management.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | Config | Configuration object containing AWS and S3 settings |
+| tracking | Optional[Tracking] | Optional tracking object for monitoring operations |
+
+#### Internal Logic
+- Initializes an AWS session using provided configuration
+- Creates an S3 client using the AWS session
+- Provides methods for sending reports, updating bucket websites, and retrieving bucket information
+
+### S3Client.create_client
+#### Description
+A class method that creates and returns an S3Client instance if S3 is configured.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | Config | Configuration object containing AWS and S3 settings |
+| tracking | Optional[Tracking] | Optional tracking object for monitoring operations |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| client | Optional[S3Client] | An S3Client instance if S3 is configured, otherwise None |
+
+### S3Client.send_report
+#### Description
+Uploads a report file to the configured S3 bucket and optionally updates the bucket website configuration.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| local_html_file_path | str | Path to the local HTML report file |
+| remote_bucket_file_path | Optional[str] | Optional remote path for the file in the S3 bucket |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| success | bool | True if the upload was successful, False otherwise |
+| bucket_website_url | Optional[str] | URL of the bucket website if updated, None otherwise |
+
+#### Internal Logic
+1. Determines the report filename and bucket path
+2. Uploads the file to the S3 bucket
+3. Optionally updates the bucket website configuration
+4. Retrieves and returns the bucket website URL if updated
+
+### S3Client.get_bucket_website_url
+#### Description
+Retrieves the website URL for the configured S3 bucket.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bucket_website_url | Optional[str] | URL of the bucket website if available, None otherwise |
+
+#### Internal Logic
+1. Checks if bucket website updating is enabled
+2. Uses the configured report URL if available
+3. Otherwise, constructs the URL using the bucket name and region
+
+### S3Client._get_bucket_region
+#### Description
+Retrieves the region of the specified S3 bucket.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bucket_name | str | Name of the S3 bucket |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| region | str | Region of the specified bucket |
+
+### S3Client._get_aws_s3_website_url_from_location
+#### Description
+A static method that returns the S3 website URL for a given AWS region.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| location | str | AWS region code |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| website_url | str | S3 website URL for the given region |
+
+## Dependencies
+- boto3: Used for AWS S3 interactions
+- elementary.config.config: Provides the Config class for configuration settings
+- elementary.tracking.tracking_interface: Provides the optional Tracking interface
+- elementary.utils: Utility functions for bucket path operations and logging
+
+## Error Handling
+The code uses logging to report errors and warnings during operations. It doesn't implement extensive error handling but relies on boto3's error handling mechanisms.
+
+## Logging
+The code uses a logger obtained from `elementary.utils.log.get_logger()` to log information, warnings, and errors throughout the operations.

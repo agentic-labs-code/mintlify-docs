@@ -1,0 +1,40 @@
+---
+title: "get_alerts_model_detected_at_expr.sql"
+---
+
+## High-level description
+This macro, `get_alerts_model_detected_at_expr`, is designed to handle the data type of the 'detected_at' column in an alerts model. It ensures backward compatibility by maintaining the column's data type as a string if it already exists as such, or casting it to a timestamp otherwise.
+
+## Symbols
+
+### get_alerts_model_detected_at_expr
+#### Description
+This macro determines the appropriate expression for the 'detected_at' column in an alerts model, based on the existing relation's column type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| existing_relation | dbt Relation object | The existing relation (table or view) containing the 'detected_at' column |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| expression | string | SQL expression to cast 'detected_at' as either string or timestamp |
+
+#### Internal Logic
+1. Attempt to get the column information for 'detected_at' or 'DETECTED_AT' from the existing relation.
+2. Normalize the data type of the column.
+3. If the column exists and is currently a string:
+   - Return an expression to cast 'detected_at' as a string.
+4. Otherwise:
+   - Return an expression to cast 'detected_at' as a timestamp.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary | Used for utility functions like `get_column_in_relation`, `normalize_data_type`, `edr_cast_as_string`, and `edr_cast_as_timestamp` |
+
+## Notes
+- The macro uses Jinja2 templating syntax, which is common in dbt projects.
+- It handles case-insensitivity by checking for both 'detected_at' and 'DETECTED_AT' column names.
+- The macro prioritizes backward compatibility by maintaining the string data type if it's already used in the existing relation.

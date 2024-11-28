@@ -1,0 +1,98 @@
+---
+title: "filters.py"
+---
+
+## High-level description
+This code defines a `FiltersAPI` class that generates filters for test results, test runs, and model runs based on the provided data. It's part of a monitoring system for data pipelines, likely used in a data analytics or business intelligence context.
+
+## Code Structure
+The `FiltersAPI` class inherits from `APIClient` and contains methods to generate different types of filters. The main method `get_filters` orchestrates the creation of filters for test results, test runs, and model runs. It uses two private static methods `_get_test_filters` and `_get_model_runs_filters` to generate specific types of filters.
+
+## Symbols
+
+### FiltersAPI
+#### Description
+A class that provides methods to generate filters for test results, test runs, and model runs.
+
+#### Methods
+
+### get_filters
+#### Description
+The main method that generates all types of filters based on the provided data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| test_results_totals | Dict[str, TotalsSchema] | Totals for test results |
+| test_runs_totals | Dict[str, TotalsSchema] | Totals for test runs |
+| models | Dict[str, NormalizedModelSchema] | Normalized model data |
+| sources | Dict[str, NormalizedSourceSchema] | Normalized source data |
+| models_runs | List[ModelRunsSchema] | Data about model runs |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | FiltersSchema | A schema containing all generated filters |
+
+#### Internal Logic
+1. Calls `_get_test_filters` for both test results and test runs
+2. Calls `_get_model_runs_filters` for model runs
+3. Combines all filters into a `FiltersSchema` object
+
+### _get_test_filters (static method)
+#### Description
+Generates filters for test results or test runs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| totals | Dict[str, TotalsSchema] | Totals for tests |
+| models | Dict[str, NormalizedModelSchema] | Normalized model data |
+| sources | Dict[str, NormalizedSourceSchema] | Normalized source data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | List[FilterSchema] | List of generated filters |
+
+#### Internal Logic
+1. Creates filter objects for different test statuses (failures, warnings, errors, passed, no tests)
+2. Iterates through artifacts (models and sources) and totals to populate the filters
+3. Returns only filters that have associated model IDs
+
+### _get_model_runs_filters (static method)
+#### Description
+Generates filters for model runs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| models_runs | List[ModelRunsSchema] | Data about model runs |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | List[FilterSchema] | List of generated filters for model runs |
+
+#### Internal Logic
+1. Creates filter objects for different run statuses (successful, failed, no runs)
+2. Iterates through model runs data to populate the filters
+3. Returns only filters that have associated model IDs
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary.clients.api.api_client | Provides the base APIClient class |
+| elementary.monitor.api.filters.schema | Defines the schema for filters |
+| elementary.monitor.api.models.schema | Defines schemas for models and model runs |
+| elementary.monitor.api.totals_schema | Defines the schema for totals |
+| elementary.monitor.fetchers.models.schema | Defines the schema for artifacts |
+| elementary.utils.log | Provides logging functionality |
+
+## Error Handling
+The code doesn't implement specific error handling mechanisms. It relies on the caller to handle any exceptions that might occur during the execution of these methods.
+
+## Logging
+The code imports a logger using `get_logger(__name__)`, but it's not used within the provided code snippet. It's likely used in other parts of the class or in potential future extensions.
+
+This code is part of a larger system for monitoring and analyzing data pipeline operations, focusing on generating filters for various aspects of the pipeline execution and test results.

@@ -1,0 +1,114 @@
+---
+title: "models.py"
+---
+
+## High-level description
+This code defines a `ModelsFetcher` class that interacts with a dbt runner to fetch various types of data related to dbt models, sources, exposures, and test coverages. It provides methods to retrieve and parse this data into structured formats using Pydantic models.
+
+## Code Structure
+The `ModelsFetcher` class inherits from `FetcherClient` and contains methods to fetch different types of dbt-related data. Each method uses the `dbt_runner` to execute specific dbt operations and then parses the results into corresponding Pydantic models.
+
+## Symbols
+
+### ModelsFetcher
+#### Description
+A class that fetches various types of dbt-related data using a dbt runner.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dbt_runner | BaseDbtRunner | A dbt runner instance used to execute dbt operations |
+
+#### Methods
+
+### get_models_runs
+#### Description
+Fetches model run data for a specified time period.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | Optional[int] | Number of days to look back for model runs (default: 7) |
+| exclude_elementary_models | bool | Whether to exclude Elementary models (default: False) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| model_runs | List[ModelRunSchema] | A list of model run data |
+
+#### Internal Logic
+1. Executes the "elementary_cli.get_models_runs" dbt operation.
+2. Parses the JSON response into `ModelRunSchema` objects.
+
+### get_models
+#### Description
+Fetches model data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| exclude_elementary_models | bool | Whether to exclude Elementary models (default: False) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| models | List[ModelSchema] | A list of model data |
+
+#### Internal Logic
+1. Executes the "elementary_cli.get_models" dbt operation.
+2. Parses the JSON response into `ModelSchema` objects.
+
+### get_sources
+#### Description
+Fetches source data.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sources | List[SourceSchema] | A list of source data |
+
+#### Internal Logic
+1. Executes the "elementary_cli.get_sources" dbt operation.
+2. Parses the JSON response into `SourceSchema` objects.
+
+### get_exposures
+#### Description
+Fetches exposure data.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| exposures | List[ExposureSchema] | A list of exposure data |
+
+#### Internal Logic
+1. Executes the "elementary_cli.get_exposures" dbt operation.
+2. Parses the JSON response into `ExposureSchema` objects.
+3. Handles the parsing of raw_queries JSON field.
+
+### get_test_coverages
+#### Description
+Fetches test coverage data for models.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| coverages | List[ModelTestCoverage] | A list of test coverage data for models |
+
+#### Internal Logic
+1. Executes the "elementary_cli.get_dbt_models_test_coverage" dbt operation.
+2. Parses the JSON response into `ModelTestCoverage` objects.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary.clients.fetcher.fetcher | Provides the base FetcherClient class |
+| elementary.monitor.fetchers.models.schema | Provides schema classes for parsing fetched data |
+| elementary.utils.log | Provides logging functionality |
+
+## Error Handling
+The code doesn't implement specific error handling beyond what's provided by the base classes and libraries used. Errors from dbt operations or JSON parsing would propagate up to the caller.
+
+## Logging
+The code uses a logger initialized with `get_logger(__name__)`, but no specific log messages are included in this file.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

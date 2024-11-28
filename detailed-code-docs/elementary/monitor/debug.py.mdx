@@ -1,0 +1,55 @@
+---
+title: "debug.py"
+---
+
+## High-level description
+This code defines a `Debug` class that provides functionality to test the connection to the Elementary database and schema. It uses dbt to run a test operation and reports the success or failure of the connection.
+
+## Code Structure
+The `Debug` class is initialized with a `Config` object and contains a `run` method that performs the connection test. It uses the `create_dbt_runner` function to create a dbt runner, which is then used to execute a test operation.
+
+## Symbols
+
+### Debug
+#### Description
+A class that encapsulates the functionality to test the connection to the Elementary database and schema.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | Config | Configuration object containing necessary settings |
+
+#### Internal Logic
+1. Creates a dbt runner using the `create_dbt_runner` function.
+2. Attempts to run the `elementary_cli.test_conn` operation using the dbt runner.
+3. If successful, prints a success message.
+4. If unsuccessful, catches the `DbtCommandError` and prints an error message with logs.
+
+### run
+#### Description
+A method of the `Debug` class that performs the actual connection test.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| success | bool | True if the connection test was successful, False otherwise |
+
+#### Internal Logic
+1. Creates a dbt runner.
+2. Tries to run the `elementary_cli.test_conn` operation.
+3. If successful, prints a success message and returns True.
+4. If an error occurs, prints an error message with logs and returns False.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| click | Used for command-line interface functionality |
+| elementary.clients.dbt.factory | Provides the `create_dbt_runner` function |
+| elementary.config.config | Provides the `Config` class |
+| elementary.exceptions.exceptions | Provides the `DbtCommandError` exception |
+| elementary.monitor.dbt_project_utils | Provides the `CLI_DBT_PROJECT_PATH` constant |
+
+## Error Handling
+The code catches `DbtCommandError` exceptions that may occur during the execution of the dbt operation. When caught, it formats and prints the error logs.
+
+This code is part of a larger CLI tool for monitoring and debugging dbt projects using Elementary. It specifically handles the 'debug' command, which tests the connection to the Elementary database and schema.

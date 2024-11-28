@@ -1,0 +1,36 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory houses the implementation for interacting with dbt, the data build tool. It provides various classes and functions to execute dbt commands, parse their results, and handle errors. The core functionality revolves around running dbt commands either through the dbt Python API (for versions 1.5.0 and above) or through subprocess calls (for older versions or specific configurations).
+
+## What does it do?
+This code allows Elementary to execute dbt commands and interpret their results. It acts as a bridge between Elementary and the dbt CLI, enabling users to trigger dbt operations like running models, testing, and generating documentation directly from Elementary. This integration facilitates seamless data testing and validation within the Elementary ecosystem.
+
+## Entry points
+The main entry point for interacting with this code is the `elementary/clients/dbt/factory.py` file. It provides a factory function `create_dbt_runner` that abstracts the creation of different dbt runner classes based on the dbt version and environment settings. Developers should use this factory function to obtain an instance of the appropriate dbt runner for their needs.
+
+Data flow starts from the factory function, which instantiates a specific runner class. This runner then handles the execution of dbt commands, either through the dbt API or subprocess calls. The results are then parsed and returned to the calling code.
+
+## Key Files
+
+### elementary/clients/dbt/api_dbt_runner.py
+This file defines the `APIDbtRunner` class, which leverages the dbt Python API to execute dbt commands. It's used for dbt versions 1.5.0 and above, providing a more direct and potentially performant way to interact with dbt.
+
+### elementary/clients/dbt/command_line_dbt_runner.py
+This file defines the `CommandLineDbtRunner` class, which serves as a base class for running dbt commands through the command line. It provides a common interface for executing various dbt operations and handling their results.
+
+### elementary/clients/dbt/subprocess_dbt_runner.py
+This file defines the `SubprocessDbtRunner` class, which extends `CommandLineDbtRunner` to execute dbt commands using subprocess calls. It's used for older dbt versions or when explicitly configured.
+
+## Dependencies
+- `dbt`: The core dbt library for interacting with the dbt API (version 1.5.0 or higher for `APIDbtRunner`).
+- `subprocess`: Used by `SubprocessDbtRunner` to execute dbt commands through the shell.
+- `packaging`: Used for parsing and comparing dbt versions.
+- `google.protobuf.json_format`: Used by `APIDbtRunner` for handling protobuf messages from the dbt API.
+
+## Configuration
+The choice between `APIDbtRunner` and `SubprocessDbtRunner` is determined by:
+- **dbt version:** `APIDbtRunner` is used for dbt 1.5.0 and above.
+- **`DBT_RUNNER_METHOD` environment variable:** Setting this variable to "subprocess" forces the use of `SubprocessDbtRunner`, regardless of the dbt version. 

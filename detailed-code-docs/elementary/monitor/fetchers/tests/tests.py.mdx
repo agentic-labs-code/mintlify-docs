@@ -1,0 +1,77 @@
+---
+title: "tests.py"
+---
+
+## High-level description
+This code defines a `TestsFetcher` class that is responsible for fetching test results from a dbt project. It uses a dbt runner to execute dbt operations and retrieve test data. The class provides methods to get all test results and singular tests from the dbt project.
+
+## Code Structure
+The `TestsFetcher` class inherits from `FetcherClient` and uses a `BaseDbtRunner` to interact with dbt. It defines two main methods: `get_all_test_results_db_rows` and `get_singular_tests`, which fetch and process test data from the dbt project.
+
+## References
+- `BaseDbtRunner`: Used to run dbt operations
+- `FetcherClient`: Base class for fetcher clients
+- `TestResultDBRowSchema`: Schema for test result database rows
+- `NormalizedTestSchema`: Schema for normalized test data
+
+## Symbols
+
+### TestsFetcher
+#### Description
+A class that fetches test results from a dbt project using a dbt runner.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dbt_runner | BaseDbtRunner | An instance of a dbt runner to execute dbt operations |
+
+#### Internal Logic
+- Initializes the class with a dbt runner
+- Provides methods to fetch test results and singular tests
+
+### get_all_test_results_db_rows
+#### Description
+Fetches all test results from the dbt project and returns them as a list of `TestResultDBRowSchema` objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | Optional[int] | Number of days to look back for test results (default: 7) |
+| invocations_per_test | int | Number of invocations per test to fetch (default: 720) |
+| disable_passed_test_metrics | bool | Whether to disable passed test metrics (default: False) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| test_results | List[TestResultDBRowSchema] | A list of test result objects |
+
+#### Internal Logic
+1. Runs a dbt operation to get test results using the provided parameters
+2. Parses the JSON response into `TestResultDBRowSchema` objects
+3. Returns the list of test result objects
+
+### get_singular_tests
+#### Description
+Fetches singular tests from the dbt project and returns them as a list of `NormalizedTestSchema` objects.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| test_results | List[NormalizedTestSchema] | A list of normalized singular test objects |
+
+#### Internal Logic
+1. Runs a dbt operation to get singular tests
+2. Parses the JSON response into `NormalizedTestSchema` objects
+3. Returns the list of normalized singular test objects
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| json | Used for parsing JSON responses from dbt operations |
+| typing | Provides type hints for better code readability and type checking |
+| elementary.clients.dbt.base_dbt_runner | Provides the BaseDbtRunner class for running dbt operations |
+| elementary.clients.fetcher.fetcher | Provides the FetcherClient base class |
+| elementary.monitor.fetchers.tests.schema | Provides schema classes for test results and normalized tests |
+| elementary.utils.log | Provides logging functionality |
+
+This code is part of a larger system for monitoring and analyzing dbt test results. It serves as a crucial component for fetching and processing test data, which can then be used for further analysis or reporting.

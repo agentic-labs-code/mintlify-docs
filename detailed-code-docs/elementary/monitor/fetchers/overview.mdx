@@ -1,0 +1,59 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `elementary/monitor/fetchers` directory contains various fetcher modules responsible for retrieving and processing different types of data from a dbt project within the Elementary monitoring system. These fetchers interact with dbt to extract information about models, tests, invocations, lineage, alerts, and more.
+
+## What does it do?
+This directory provides a set of specialized tools that interact with dbt to fetch various types of metadata and results. Here's a breakdown of the main functionalities:
+
+1. Alerts: Fetches and manages alerts, including pending alerts and alert statuses.
+2. Invocations: Retrieves data about dbt invocations, such as the last test invocation and latest invocations for specific models.
+3. Lineage: Constructs a dependency graph of dbt nodes, helping to understand data flow and relationships between models.
+4. Models: Fetches metadata about dbt models, sources, exposures, and their test coverages.
+5. Selector: Retrieves results of dbt selectors, allowing for targeted selection of dbt resources.
+6. Source Freshnesses: Checks and retrieves information about the freshness of data sources.
+7. Tests: Fetches test results from dbt projects, including detailed and simplified representations.
+
+These fetchers work together to provide a comprehensive view of a dbt project's state, performance, and structure, which can be used for monitoring, analysis, and optimization within the Elementary system.
+
+## Entry points
+The main entry points for each functionality are typically classes named after their specific purpose, such as `AlertsFetcher`, `InvocationsFetcher`, `LineageFetcher`, `ModelsFetcher`, `SelectorFetcher`, `SourceFreshnessesFetcher`, and `TestsFetcher`. These classes are usually found in files named after their functionality (e.g., `alerts.py`, `invocations.py`, etc.).
+
+Each fetcher class typically extends a base `FetcherClient` class and uses a `dbt_runner` to interact with dbt and retrieve data. The fetched data is then parsed and structured using Pydantic models defined in corresponding `schema.py` files.
+
+## Key Files
+While each subdirectory contains its own important files, some key files across the fetchers include:
+
+1. `base_fetcher.py`: Defines the `BaseFetcher` class, which serves as a foundation for other fetcher classes.
+
+2. `alerts/alerts.py`: Contains the `AlertsFetcher` class for managing and retrieving alerts.
+
+3. `invocations/invocations.py`: Houses the `InvocationsFetcher` class for fetching dbt invocation data.
+
+4. `lineage/lineage.py`: Implements the `LineageFetcher` class for constructing dependency graphs of dbt nodes.
+
+5. `models/models.py`: Defines the `ModelsFetcher` class for retrieving metadata about dbt models, sources, and exposures.
+
+6. `selector/selector.py`: Contains the `SelectorFetcher` class for interacting with dbt selectors.
+
+7. `source_freshnesses/source_freshnesses.py`: Implements functionality to fetch source freshness results.
+
+8. `tests/tests.py`: Houses the `TestsFetcher` class for retrieving test results from dbt projects.
+
+Each of these files typically has an accompanying `schema.py` file that defines the data structures used for parsing and validating the fetched data.
+
+## Dependencies
+The fetchers rely on several key dependencies:
+
+1. `elementary.clients.dbt`: Provides the `BaseDbtRunner` class for interacting with dbt.
+2. `elementary.clients.fetcher.fetcher`: Offers the base `FetcherClient` class.
+3. `pydantic`: Used for data validation and serialization in the schema definitions.
+4. `typing`: Utilized for type hinting throughout the codebase.
+5. `elementary.utils`: Various utility modules for logging, time operations, and configuration management.
+
+## Configuration
+While there's no explicit configuration file for the fetchers, they often rely on configuration passed through the `dbt_runner` or other initialization parameters. The specific configuration needs may vary depending on the fetcher and its purpose.
+
+In summary, the `elementary/monitor/fetchers` directory provides a comprehensive set of tools for interacting with dbt and retrieving various types of project metadata and results. These fetchers form a crucial part of the Elementary monitoring system, enabling detailed analysis and monitoring of dbt projects.

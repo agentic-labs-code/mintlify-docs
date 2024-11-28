@@ -1,0 +1,119 @@
+---
+title: "schema.py"
+---
+
+## High-level description
+This code defines data models and schemas for representing various aspects of dbt (data build tool) artifacts, including models, sources, exposures, and model runs. It uses Pydantic for data validation and serialization, providing a structured way to handle dbt-related data in the Elementary monitoring system.
+
+## Code Structure
+The code defines several Pydantic models that inherit from `ExtendedBaseModel`, which in turn inherits from Pydantic's `BaseModel`. These models represent different dbt artifacts and their properties. The code also includes validators for specific fields to ensure proper data formatting and handling.
+
+## Symbols
+
+### ModelRunSchema
+#### Description
+Represents a single run of a dbt model.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| unique_id | str | Unique identifier for the model |
+| invocation_id | str | Identifier for the dbt invocation |
+| name | str | Name of the model |
+| schema_name | Optional[str] | Schema name (aliased as "schema") |
+| status | str | Status of the model run |
+| execution_time | float | Execution time of the model run |
+| compiled_code | Optional[str] | Compiled SQL code |
+| full_refresh | Optional[bool] | Whether it was a full refresh run |
+| materialization | Optional[str] | Materialization strategy |
+| generated_at | str | Timestamp of when the run was generated |
+
+#### Internal Logic
+Includes a validator for the `generated_at` field to ensure it's in the correct ISO format.
+
+### ArtifactSchema
+#### Description
+Base schema for dbt artifacts (models, sources, exposures).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | Optional[str] | Name of the artifact |
+| unique_id | Optional[str] | Unique identifier |
+| owners | Optional[List[str]] | List of owners |
+| tags | Optional[List[str]] | List of tags |
+| package_name | Optional[str] | Package name |
+| description | Optional[str] | Description of the artifact |
+| full_path | Optional[str] | Full path of the artifact |
+| meta | Optional[Dict[str, Any]] | Metadata |
+| materialization | Optional[str] | Materialization strategy |
+
+#### Internal Logic
+Includes validators for tags, owners, full_path, and meta fields to ensure proper formatting and handling.
+
+### ModelSchema
+#### Description
+Represents a dbt model, inheriting from ArtifactSchema.
+
+#### Inputs
+(Inherits from ArtifactSchema, plus:)
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| database_name | Optional[str] | Database name |
+| schema_name | str | Schema name |
+| table_name | str | Table name |
+| patch_path | Optional[str] | Patch path |
+
+#### Internal Logic
+Includes a `ref()` method to generate a dbt ref statement for the model.
+
+### SourceSchema
+#### Description
+Represents a dbt source, inheriting from ArtifactSchema.
+
+#### Inputs
+(Inherits from ArtifactSchema, plus:)
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| source_name | Optional[str] | Source name |
+| database_name | Optional[str] | Database name |
+| schema_name | str | Schema name |
+| table_name | str | Table name |
+
+#### Internal Logic
+Includes a `ref()` method to generate a dbt source statement.
+
+### ExposureSchema
+#### Description
+Represents a dbt exposure, inheriting from ArtifactSchema.
+
+#### Inputs
+(Inherits from ArtifactSchema, plus:)
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| label | Optional[str] | Label for the exposure |
+| url | Optional[str] | URL associated with the exposure |
+| type | Optional[str] | Type of exposure |
+| maturity | Optional[str] | Maturity level |
+| depends_on_nodes | Optional[List[str]] | List of dependent nodes |
+| owner | Optional[OwnerSchema] | Owner information |
+| raw_queries | Optional[List[str]] | List of raw queries |
+
+### ModelTestCoverage
+#### Description
+Represents test coverage information for a model.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| model_unique_id | Optional[str] | Unique identifier for the model |
+| column_tests | int | Number of column tests |
+| table_tests | int | Number of table tests |
+
+## Dependencies
+- `elementary.utils.pydantic_shim`: Provides compatibility layer for Pydantic v1 and v2
+- `elementary.utils.schema`: Defines `ExtendedBaseModel`
+- `elementary.utils.time`: Provides `convert_partial_iso_format_to_full_iso_format` function
+
+## Error Handling
+The code relies on Pydantic's built-in validation for error handling. It doesn't implement any custom error handling mechanisms.

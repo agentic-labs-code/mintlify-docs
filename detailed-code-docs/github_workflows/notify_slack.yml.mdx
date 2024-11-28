@@ -1,0 +1,78 @@
+---
+title: "notify_slack.yml"
+---
+
+## High-level description
+This GitHub Actions workflow, named "Notify Slack," is designed to send a notification to Slack when a specified workflow fails. It is set up as a reusable workflow that can be called from other workflows, taking inputs such as the result status, run ID, and workflow name.
+
+## Code Structure
+The workflow consists of two jobs: `print_inputs` and `notify`. The `print_inputs` job is for debugging purposes, while the `notify` job is responsible for sending the Slack notification when a failure occurs.
+
+## Symbols
+
+### Workflow: Notify Slack
+#### Description
+This workflow is triggered by a `workflow_call` event, allowing it to be reused across different workflows. It takes three inputs: `result`, `run_id`, and `workflow_name`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string | The result status of the calling workflow (required) |
+| run_id | string | The run ID of the calling workflow (optional) |
+| workflow_name | string | The name of the calling workflow (required) |
+
+### Job: print_inputs
+#### Description
+This job is used for debugging purposes. It prints out the input values received by the workflow.
+
+#### Internal Logic
+1. Runs on the latest Ubuntu runner
+2. Has a timeout of 2 minutes
+3. Executes a single step that prints the values of `run_id`, `workflow_name`, and `result`
+
+### Job: notify
+#### Description
+This job is responsible for sending a Slack notification when a workflow failure occurs.
+
+#### Internal Logic
+1. Runs on the latest Ubuntu runner
+2. Has a timeout of 3 minutes
+3. Only executes if the `result` input is 'failure'
+4. Uses the `tokorom/action-slack-incoming-webhook@main` action to send a Slack notification
+5. Constructs a message with the workflow name and a link to the failed run
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| INCOMING_WEBHOOK_URL | secret | The Slack webhook URL for sending notifications |
+
+#### Side Effects
+Sends a notification to a Slack channel when executed.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| tokorom/action-slack-incoming-webhook@main | Used to send Slack notifications |
+
+## Configuration
+The workflow uses a secret `SLACK_WEBHOOK_URL` which should be configured in the repository's secrets.
+
+## Error Handling
+The workflow does not implement explicit error handling. If the Slack notification fails to send, the job will fail, but this failure will not be specially handled.
+
+## API/Interface Reference
+This workflow is designed to be called by other workflows. Here's how it can be used:
+
+```yaml
+jobs:
+  call-notify-slack:
+    uses: ./.github/workflows/notify_slack.yml
+    with:
+      result: ${{ job.status }}
+      run_id: ${{ github.run_id }}
+      workflow_name: ${{ github.workflow }}
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+```
+
+Note that the calling workflow needs to pass the `SLACK_WEBHOOK_URL` secret.

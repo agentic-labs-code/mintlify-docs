@@ -1,0 +1,246 @@
+---
+title: "data_monitoring_report.py"
+---
+
+## High-level description
+The `DataMonitoringReport` class is responsible for generating and sending data monitoring reports. It retrieves data from various sources, compiles it into a report, and then sends it to a specified platform, such as Slack, AWS S3, Google Cloud Storage, or Azure Blob Storage. It also provides functionality for sending test results summaries and managing report attachments.
+
+## Code Structure
+The `DataMonitoringReport` class inherits from the `DataMonitoring` class and utilizes several API clients, including `ReportAPI`, `S3Client`, `GCSClient`, `AzureClient`, and `SlackClient`, to perform its tasks. It also uses the `SlackReportSummaryMessageBuilder` to construct Slack messages.
+
+## References
+- `elementary.config.config.Config`: Provides configuration settings for the report generation and sending process.
+- `elementary.monitor.api.report.report.ReportAPI`: Used to retrieve report data from the Elementary API.
+- `elementary.monitor.api.tests.tests.TestsAPI`: Used to retrieve test results summaries.
+- `elementary.clients.s3.client.S3Client`: Used to upload reports to AWS S3.
+- `elementary.clients.gcs.client.GCSClient`: Used to upload reports to Google Cloud Storage.
+- `elementary.clients.azure.client.AzureClient`: Used to upload reports to Azure Blob Storage.
+- `elementary.clients.slack.client.SlackClient`: Used to send reports and test results summaries to Slack.
+
+## Symbols
+
+### `DataMonitoringReport`
+#### Description
+This class is responsible for generating and sending data monitoring reports. It retrieves data from various sources, compiles it into a report, and then sends it to a specified platform.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | `Config` | Configuration settings for the report generation and sending process. |
+| tracking | `Tracking` | Tracking object for recording events and exceptions. |
+| selector_filter | `FiltersSchema` | Filters to apply when retrieving data for the report. |
+| force_update_dbt_package | `bool` | Whether to force updating the Elementary dbt package. |
+| disable_samples | `bool` | Whether to disable sampling of data in the report. |
+
+#### Outputs
+None
+
+#### Internal Logic
+The class initializes various API clients based on the provided configuration. It then retrieves data from the Elementary API, including test results, model runs, and lineage information. This data is compiled into a report, which is then sent to the specified platform.
+
+### `generate_report`
+#### Description
+Generates a data monitoring report and saves it as an HTML file.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | `int` | Number of days back to retrieve data for. |
+| test_runs_amount | `int` | Number of test runs to retrieve data for. |
+| file_path | `Optional[str]` | Path to save the report HTML file. |
+| disable_passed_test_metrics | `bool` | Whether to disable data metrics for passed tests in the report. |
+| should_open_browser | `bool` | Whether to open the report in a web browser after generation. |
+| exclude_elementary_models | `bool` | Whether to exclude Elementary's internal models from the report. |
+| project_name | `Optional[str]` | The project name to display in the report. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| success | `bool` | Whether the report generation was successful. |
+| html_path | `str` | Path to the generated report HTML file. |
+
+#### Internal Logic
+1. Retrieves report data using the `get_report_data` method.
+2. Reads the report template HTML file.
+3. Encodes the report data as base64 and embeds it in the template HTML.
+4. Writes the compiled HTML to the specified file path.
+5. Opens the report in a web browser if `should_open_browser` is True.
+
+### `get_report_data`
+#### Description
+Retrieves data for the data monitoring report from the Elementary API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | `int` | Number of days back to retrieve data for. |
+| test_runs_amount | `int` | Number of test runs to retrieve data for. |
+| disable_passed_test_metrics | `bool` | Whether to disable data metrics for passed tests in the report. |
+| exclude_elementary_models | `bool` | Whether to exclude Elementary's internal models from the report. |
+| project_name | `Optional[str]` | The project name to display in the report. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| report_data_dict | `dict` | Dictionary containing the retrieved report data. |
+
+#### Internal Logic
+1. Uses the `ReportAPI` to retrieve report data from the Elementary API.
+2. Adds tracking information to the report data.
+3. Logs an error message if the data retrieval fails.
+
+### `validate_report_selector`
+#### Description
+Validates the report selector filter.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+Calls the `validate_report_selector` method of the `selector_filter` object.
+
+### `_add_report_tracking`
+#### Description
+Adds tracking information to the report data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| report_data | `ReportDataSchema` | Report data object. |
+| error | `Optional[Exception]` | Exception object if an error occurred during data retrieval. |
+
+#### Outputs
+None
+
+#### Internal Logic
+1. Records an internal exception if an error occurred.
+2. Counts the number of Elementary tests and total test results.
+3. Adds tracking information to the report data if anonymous tracking is enabled.
+
+### `send_report`
+#### Description
+Generates and sends the data monitoring report to the specified platform.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | `int` | Number of days back to retrieve data for. |
+| test_runs_amount | `int` | Number of test runs to retrieve data for. |
+| file_path | `Optional[str]` | Path to save the report HTML file. |
+| disable_passed_test_metrics | `bool` | Whether to disable data metrics for passed tests in the report. |
+| should_open_browser | `bool` | Whether to open the report in a web browser after generation. |
+| exclude_elementary_models | `bool` | Whether to exclude Elementary's internal models from the report. |
+| project_name | `Optional[str]` | The project name to display in the report. |
+| remote_file_path | `Optional[str]` | Path to save the report in the remote storage. |
+| disable_html_attachment | `bool` | Whether to disable sending the report as an HTML attachment to Slack. |
+| include_description | `bool` | Whether to include test descriptions in the Slack summary message. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| success | `bool` | Whether the report sending was successful. |
+
+#### Internal Logic
+1. Generates the report using the `generate_report` method.
+2. Uploads the report to the specified cloud storage platform if configured.
+3. Sends a test results summary to Slack if configured.
+4. Sends the report as an attachment to Slack if configured and not uploaded to cloud storage.
+
+### `send_report_attachment`
+#### Description
+Sends the data monitoring report as an attachment to Slack.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| local_html_path | `str` | Path to the local HTML report file. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| success | `bool` | Whether the report attachment was sent successfully. |
+
+#### Internal Logic
+1. Sends the report file to Slack using the `SlackClient`.
+2. Records the success status in the execution properties.
+
+### `upload_report`
+#### Description
+Uploads the data monitoring report to the specified cloud storage platform.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| local_html_path | `str` | Path to the local HTML report file. |
+| remote_file_path | `Optional[str]` | Path to save the report in the remote storage. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| success | `bool` | Whether the report upload was successful. |
+| bucket_website_url | `Optional[str]` | URL of the uploaded report in the cloud storage bucket. |
+
+#### Internal Logic
+1. Uploads the report to Google Cloud Storage if configured.
+2. Uploads the report to AWS S3 if configured.
+3. Uploads the report to Azure Blob Storage if configured.
+4. Records the success status and bucket website URL in the execution properties.
+
+### `send_test_results_summary`
+#### Description
+Sends a summary of the test results to Slack.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | `int` | Number of days back to retrieve data for. |
+| test_runs_amount | `int` | Number of test runs to retrieve data for. |
+| disable_passed_test_metrics | `bool` | Whether to disable data metrics for passed tests in the report. |
+| bucket_website_url | `Optional[str]` | URL of the uploaded report in the cloud storage bucket. |
+| include_description | `bool` | Whether to include test descriptions in the Slack summary message. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| success | `bool` | Whether the test results summary was sent successfully. |
+
+#### Internal Logic
+1. Retrieves the test results summary using the `TestsAPI`.
+2. Constructs a Slack message using the `SlackReportSummaryMessageBuilder`.
+3. Sends the message to Slack using the `SlackClient`.
+4. Records the success status in the execution properties.
+
+### `_get_report_file_path`
+#### Description
+Returns the path to the report HTML file.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| file_path | `Optional[str]` | User-specified path to save the report HTML file. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| file_path | `str` | Path to the report HTML file. |
+
+#### Internal Logic
+1. If `file_path` is provided and ends with '.html' or '.htm', returns the absolute path of `file_path`.
+2. Otherwise, returns the absolute path of 'elementary_report.html' in the target directory.
+
+## Dependencies
+- `base64`: Used for encoding report data.
+- `json`: Used for serializing and deserializing data.
+- `os`: Used for file system operations.
+- `os.path`: Used for path manipulation.
+- `webbrowser`: Used for opening the report in a web browser.
+- `typing`: Used for type hinting.
+
+## Error Handling
+The code includes basic error handling using try-except blocks. Exceptions are logged using the `logger` object, and the success status is set to False if an error occurs.
+
+## Logging
+The code uses the `get_logger` function to create a logger object, which is used to log messages at various levels of severity.

@@ -1,0 +1,50 @@
+---
+title: "get_dbt_models_test_coverage.sql"
+---
+
+## High-level description
+This SQL macro, `get_dbt_models_test_coverage()`, is designed to calculate and return test coverage information for dbt models. It queries a specific relation containing dbt test data to compute the number of column-level and table-level tests for each model.
+
+## Symbols
+
+### get_dbt_models_test_coverage
+#### Description
+This macro retrieves test coverage information for dbt models by querying the 'dbt_tests' relation and aggregating the results.
+
+#### Inputs
+This macro doesn't have explicit inputs, but it relies on the existence of a 'dbt_tests' relation in the 'elementary' schema.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| coverage_data | List[Dict] | A list of dictionaries containing test coverage information for each model |
+
+#### Internal Logic
+1. References the 'dbt_tests' relation from the 'elementary' schema.
+2. Checks if the relation exists using the `elementary.relation_exists()` function.
+3. If the relation exists:
+   a. Defines a SQL query to aggregate test coverage data.
+   b. Executes the query using `run_query()`.
+   c. Converts the query results to a list of dictionaries using `elementary.agate_to_dicts()`.
+4. Returns the coverage data if the relation exists, otherwise returns nothing.
+
+The SQL query performs the following steps:
+1. Selects relevant columns from the 'dbt_tests' relation.
+2. Groups the data by `parent_model_unique_id`.
+3. Calculates the number of column-level tests and table-level tests for each model.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary | Used for utility functions like `relation_exists()` and `agate_to_dicts()` |
+| dbt | Implied dependency for the `ref()` function and overall macro functionality |
+
+## References
+- `elementary.dbt_tests`: Referenced relation containing dbt test data
+- `elementary.relation_exists()`: Function to check if a relation exists
+- `elementary.agate_to_dicts()`: Function to convert Agate table to list of dictionaries
+
+## Notes
+- The macro uses Jinja templating syntax, which is common in dbt projects.
+- The macro is designed to be flexible, returning no data if the required relation doesn't exist.
+- The coverage calculation distinguishes between column-level tests (where `test_column_name` is not null) and table-level tests (where `test_column_name` is null).

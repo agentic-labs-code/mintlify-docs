@@ -1,0 +1,96 @@
+---
+title: "volume-anomalies.mdx"
+---
+
+---
+title: "volume_anomalies"
+sidebarTitle: "Volume anomalies"
+---
+
+`elementary.volume_anomalies`
+
+Monitors the row count of your table over time per time bucket (if configured without `timestamp_column`, will count table total rows).
+
+Upon running the test, your data is split into time buckets (daily by default, configurable with the `time bucket` field),
+and then we compute the row count per bucket for the last [`training_period`](/data-tests/anomaly-detection-configuration/training-period) days (by default 14).
+
+The test then compares the row count of each bucket within the detection period (last 2 days by default, configured as [`detection_period`](/data-tests/anomaly-detection-configuration/detection-period)),
+and compares it to the row count of the previous time buckets.
+
+**The test will only run on completed time buckets**, so if you run it with daily buckets in the middle of today, the test would only count yesterday as a complete bucket.
+If there were any anomalies during the detection period, the test will fail.
+
+### Test configuration
+
+No mandatory configuration, however it is highly recommended to configure a `timestamp_column`.
+
+{/* prettier-ignore */}
+&lt;pre&gt;
+ &lt;code&gt;
+  tests:
+    &nbsp;&nbsp;- elementary.volume_anomalies:
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/timestamp-column"&gt;&lt;font color="#CD7D55"&gt;timestamp_column: column name&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/where-expression"&gt;&lt;font color="#CD7D55"&gt;where_expression: sql expression&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/anomaly-sensitivity"&gt;&lt;font color="#CD7D55"&gt;anomaly_sensitivity: int&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/anomaly-direction"&gt;&lt;font color="#CD7D55"&gt;anomaly_direction: [both | spike | drop]&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/detection-period"&gt;&lt;font color="#CD7D55"&gt;detection_period:&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/detection-period"&gt;&lt;font color="#CD7D55"&gt;period: [hour | day | week | month]&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/detection-period"&gt;&lt;font color="#CD7D55"&gt;count: int&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/training-period"&gt;&lt;font color="#CD7D55"&gt;training_period:&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/training-period"&gt;&lt;font color="#CD7D55"&gt;period: [hour | day | week | month]&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/training-period"&gt;&lt;font color="#CD7D55"&gt;count: int&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/time-bucket"&gt;&lt;font color="#CD7D55"&gt;time_bucket:&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/time-bucket"&gt;&lt;font color="#CD7D55"&gt;period: [hour | day | week | month]&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/time-bucket"&gt;&lt;font color="#CD7D55"&gt;count: int&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/seasonality"&gt;&lt;font color="#CD7D55"&gt;seasonality: day_of_week&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/fail_on_zero"&gt;&lt;font color="#CD7D55"&gt;fail_on_zero: [true | false]&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/ignore_small_changes"&gt;&lt;font color="#CD7D55"&gt;ignore_small_changes:&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/ignore_small_changes"&gt;&lt;font color="#CD7D55"&gt;spike_failure_percent_threshold: int&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/ignore_small_changes"&gt;&lt;font color="#CD7D55"&gt;drop_failure_percent_threshold: int&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/detection-delay"&gt;&lt;font color="#CD7D55"&gt;detection_delay:&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/detection-delay"&gt;&lt;font color="#CD7D55"&gt;period: [hour | day | week | month]&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/detection-delay"&gt;&lt;font color="#CD7D55"&gt;count: int&lt;/font&gt;&lt;/a&gt;
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="/data-tests/anomaly-detection-configuration/anomaly-exclude-metrics"&gt;&lt;font color="#CD7D55"&gt;anomaly_exclude_metrics: [SQL expression]&lt;/font&gt;&lt;/a&gt;
+ &lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;RequestExample&gt;
+
+```yml Models
+models:
+  - name: &lt; model name &gt;
+    tests:
+      - elementary.volume_anomalies:
+          timestamp_column: &lt; timestamp column &gt;
+          where_expression: &lt; sql expression &gt;
+          time_bucket: # Daily by default
+            period: &lt; time period &gt;
+            count: &lt; number of periods &gt;
+```
+
+```yml Models example
+models:
+  - name: login_events
+    config:
+      elementary:
+        timestamp_column: "loaded_at"
+    tests:
+      - elementary.volume_anomalies:
+          where_expression: "event_type in ('event_1', 'event_2') and country_name != 'unwanted country'"
+          time_bucket:
+            period: day
+            count: 1
+          # optional - use tags to run elementary tests on a dedicated run
+          tags: ["elementary"]
+          config:
+            # optional - change severity
+            severity: warn
+
+  - name: users
+    # if no timestamp is configured, elementary will monitor without time filtering
+    tests:
+      - elementary.volume_anomalies:
+          tags: ["elementary"]
+```
+
+&lt;/RequestExample&gt;

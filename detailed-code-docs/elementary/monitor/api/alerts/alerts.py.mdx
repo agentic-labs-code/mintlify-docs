@@ -1,0 +1,81 @@
+---
+title: "alerts.py"
+---
+
+## High-level description
+This code defines the `AlertsAPI` class, which provides methods to interact with alerts data in the Elementary monitoring system. It handles fetching, updating, and managing alerts using a dbt runner and configuration.
+
+## Code Structure
+The `AlertsAPI` class inherits from `APIClient` and uses `AlertsFetcher` to perform database operations. It provides methods to get new alerts, retrieve last sent times for alerts, skip alerts, and update sent alerts.
+
+## Symbols
+
+### AlertsAPI
+#### Description
+A class that provides an API for interacting with alerts in the Elementary monitoring system.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dbt_runner | BaseDbtRunner | A dbt runner instance for executing dbt operations |
+| config | Config | Configuration object for the Elementary system |
+
+#### Internal Logic
+- Initializes an `AlertsFetcher` instance with the provided dbt runner and config
+- Provides methods to interact with alerts data
+
+### get_new_alerts
+#### Description
+Retrieves new alerts for a specified number of days back.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | int | Number of days to look back for new alerts |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| pending_alerts | List[PendingAlertSchema] | List of new pending alerts |
+
+### get_alerts_last_sent_times
+#### Description
+Retrieves the last sent times for alerts within a specified number of days.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | int | Number of days to look back for alert sent times |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| last_sent_times | Dict[str, datetime] | Dictionary of alert class IDs and their last sent times |
+
+### skip_alerts
+#### Description
+Marks specified alerts as skipped.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| alerts_to_skip | List[PendingAlertSchema] | List of alerts to be skipped |
+
+### update_sent_alerts
+#### Description
+Updates the status of specified alerts as sent.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| alert_ids | List[str] | List of alert IDs to be marked as sent |
+
+## Dependencies
+- elementary.clients.api.api_client.APIClient
+- elementary.clients.dbt.base_dbt_runner.BaseDbtRunner
+- elementary.config.config.Config
+- elementary.monitor.fetchers.alerts.alerts.AlertsFetcher
+- elementary.monitor.fetchers.alerts.schema.pending_alerts.PendingAlertSchema
+- elementary.utils.log.get_logger
+
+The `AlertsAPI` class provides a high-level interface for managing alerts in the Elementary monitoring system, abstracting away the details of database operations and dbt interactions.

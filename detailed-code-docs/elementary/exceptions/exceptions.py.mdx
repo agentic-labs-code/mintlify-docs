@@ -1,0 +1,118 @@
+---
+title: "exceptions.py"
+---
+
+## High-level description
+This module defines custom exception classes for handling errors specific to the Elementary application. These exceptions provide more context and information than generic exceptions, aiding in debugging and error tracking.
+
+## Code Structure
+This code defines several exception classes, all inheriting from the base `Error` class. Some exceptions, like `InvalidArgumentsError`, inherit from more specific exception classes like `ConfigError`. Each exception class may override the `anonymous_tracking_context` property to provide context for error tracking.
+
+## Symbols
+### `Error`
+#### Description
+Base class for all custom exceptions in the Elementary application. It defines a default `anonymous_tracking_context` property that returns an empty dictionary.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+This class serves as a base class and doesn't have any specific internal logic.
+
+### `ConfigError`
+#### Description
+Exception raised for errors related to configuration. Inherits from the `Error` class.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+This class serves as a base class for configuration-related exceptions and doesn't have any specific internal logic.
+
+### `InvalidArgumentsError`
+#### Description
+Exception raised when invalid arguments are provided to a command. Inherits from the `ConfigError` class.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+This class overrides the `anonymous_tracking_context` property to include the exception message, as it's considered generic and doesn't contain sensitive information.
+
+### `DbtCommandError`
+#### Description
+Exception raised when an error occurs while executing a dbt command. It provides details about the command, error message, logs, and return code.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| base_command_args | List[str] | List of base command arguments used for the dbt command. |
+| err_msg | Optional[str] | Optional error message. |
+| logs | Optional[List[DbtLog]] | Optional list of DbtLog objects containing log messages from the dbt command execution. |
+| err | Optional[subprocess.CalledProcessError] | Optional CalledProcessError object if the dbt command execution failed. |
+
+#### Outputs
+None
+
+#### Internal Logic
+The constructor initializes the exception message based on the provided arguments. It extracts error messages from the logs if available. It also stores the command arguments, return code, and logs for later access. The `extract_detailed_dbt_command_args` method attempts to extract more specific information from the command arguments, such as the macro name and arguments for `run-operation` commands.
+
+### `DbtLsCommandError`
+#### Description
+Exception raised when an error occurs while executing a `dbt ls` command. It provides details about the selector used and the reason for the failure.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| selector | Optional[str] | Optional selector string used with the `dbt ls` command. |
+
+#### Outputs
+None
+
+#### Internal Logic
+The constructor initializes the exception message based on the provided selector. It extracts the selector method using the `extract_selector_method` method.
+
+### `UnsupportedSelectorError`
+#### Description
+Exception raised when an unsupported selector method is used with the `edr` command. It provides details about the selector used and the reason for the failure.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| selector | Optional[str] | Optional selector string used with the `edr` command. |
+
+#### Outputs
+None
+
+#### Internal Logic
+The constructor initializes the exception message based on the provided selector. It extracts the selector method using the `extract_selector_method` method.
+
+## References
+This code references the following symbols:
+
+- `elementary.clients.dbt.dbt_log.DbtLog`
+- `elementary.utils.log.get_logger`
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| json | Used for parsing JSON data, particularly in the `DbtCommandError` class to handle macro arguments. |
+| subprocess | Used for executing dbt commands in a subprocess and capturing the output and errors. |
+
+```python
+import json
+import subprocess
+from typing import List, Optional
+
+from elementary.clients.dbt.dbt_log import DbtLog
+from elementary.utils.log import get_logger
+```

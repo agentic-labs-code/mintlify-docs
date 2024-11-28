@@ -1,0 +1,77 @@
+---
+title: "test-warehouse.yml"
+---
+
+## High-level description
+This GitHub Actions workflow, named "Test warehouse platform", is designed to test and validate the Elementary data reliability tool across various data warehouse platforms. It sets up the environment, runs tests, generates reports, and sends the results to various storage and communication platforms.
+
+## Code Structure
+The workflow is structured into a single job named "test" with multiple steps that handle different aspects of the testing process, from setting up the environment to running tests and sending reports.
+
+## Symbols
+
+### Workflow
+#### Description
+This GitHub Actions workflow is triggered either manually (workflow_dispatch) or can be called from another workflow (workflow_call). It sets up the testing environment, runs various tests, and generates and sends reports for the Elementary data reliability tool.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| warehouse-type | choice/string | Type of warehouse platform to test |
+| elementary-ref | string | Branch or tag to checkout for 'elementary' repository |
+| dbt-data-reliability-ref | string | Branch or tag to checkout for 'dbt-data-reliability' repository |
+| dbt-version | string | dbt's version to test with |
+| should-run-tests | boolean | Whether to run E2E tests |
+| clear-tests | boolean | Whether to clean test environment |
+| generate-data | boolean | Whether to generate new data |
+
+#### Internal Logic
+1. Sets up the environment (Python, dbt, Elementary)
+2. Checks out necessary repositories
+3. Configures the data warehouse
+4. Runs various tests (unit, integration, E2E)
+5. Generates and sends reports
+6. Uploads artifacts and logs
+
+### Job: test
+#### Description
+This job runs on Ubuntu 20.04 and executes all the steps necessary for testing the Elementary data reliability tool.
+
+#### Steps
+1. Checkout Elementary and dbt package repositories
+2. Set up Python and install dependencies
+3. Install dbt and Elementary
+4. Configure dbt profiles
+5. Run various tests (unit, integration, E2E)
+6. Generate and send reports
+7. Upload artifacts and logs
+
+## Side Effects
+- Creates and modifies files in the GitHub Actions runner environment
+- Interacts with external services (data warehouses, cloud storage, Slack)
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| actions/checkout@v3 | Checking out code repositories |
+| actions/setup-python@v4 | Setting up Python environment |
+| actions/upload-artifact@v3 | Uploading artifacts |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| BRANCH_NAME | environment variable | - | Name of the current branch |
+| DBT_PKG_INTEG_TESTS_DIR | environment variable | - | Directory for dbt package integration tests |
+| ELMENTARY_INTERNAL_DBT_PKG_DIR | environment variable | - | Directory for Elementary's internal dbt package |
+
+## Error Handling
+The workflow does not implement specific error handling mechanisms beyond the default GitHub Actions behavior.
+
+## Logging
+The workflow generates logs during execution and uploads the `edr.log` file as an artifact at the end of the run.
+
+## API/Interface Reference
+This workflow does not expose an API but can be triggered manually or called from another workflow.
+
+## TODOs
+There are no explicit TODOs in the code.

@@ -1,0 +1,57 @@
+---
+title: "integrations.py"
+---
+
+## High-level description
+The `Integrations` class in `integrations.py` provides a static method `get_integration` to retrieve a concrete implementation of a notification integration (e.g., Slack, Teams) based on the provided configuration. It acts as a factory for creating integration instances.
+
+## Code Structure
+The `Integrations` class uses the `Config` class to determine which integration to return. It instantiates and returns the appropriate integration class based on the configuration settings.
+
+## References
+- `elementary.config.config.Config`: Used to access configuration settings for different integrations.
+- `elementary.monitor.data_monitoring.alerts.integrations.base_integration.BaseIntegration`: Abstract base class for all integration implementations.
+- `elementary.monitor.data_monitoring.alerts.integrations.slack.slack.SlackIntegration`: Concrete integration class for Slack notifications.
+- `elementary.monitor.data_monitoring.alerts.integrations.teams.teams.TeamsIntegration`: Concrete integration class for Microsoft Teams notifications.
+- `elementary.tracking.tracking_interface.Tracking`: Optional dependency for tracking usage data.
+
+## Symbols
+
+### `Integrations`
+#### Description
+This class provides a static method to get a concrete integration instance based on the configuration.
+
+#### Symbols
+##### `get_integration`
+#### Description
+This static method retrieves a concrete integration instance based on the provided configuration.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | `elementary.config.config.Config` | An instance of the `Config` class containing the application's configuration. |
+| tracking | `Optional[elementary.tracking.tracking_interface.Tracking]` | An optional instance of the `Tracking` class for usage tracking. Defaults to `None`. |
+| override_config_defaults | `bool` | A boolean flag indicating whether to override the default configuration values. Defaults to `False`. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | `elementary.monitor.data_monitoring.alerts.integrations.base_integration.BaseIntegration` | An instance of a concrete integration class (e.g., `SlackIntegration`, `TeamsIntegration`) based on the provided configuration. |
+
+#### Internal Logic
+1. Checks if the `config` object has Slack credentials (`config.has_slack`).
+    - If True, returns a new instance of `SlackIntegration`.
+2. Checks if the `config` object has Microsoft Teams credentials (`config.has_teams`).
+    - If True, returns a new instance of `TeamsIntegration`.
+3. If neither Slack nor Teams credentials are provided, raises an `UnsupportedAlertIntegrationError`.
+
+## Error Handling
+- Raises `UnsupportedAlertIntegrationError` if no supported integration is configured.
+
+## Dependencies
+- `elementary.config.config`
+- `elementary.monitor.data_monitoring.alerts.integrations.base_integration`
+- `elementary.monitor.data_monitoring.alerts.integrations.slack.slack`
+- `elementary.monitor.data_monitoring.alerts.integrations.teams.teams`
+- `elementary.tracking.tracking_interface`
+

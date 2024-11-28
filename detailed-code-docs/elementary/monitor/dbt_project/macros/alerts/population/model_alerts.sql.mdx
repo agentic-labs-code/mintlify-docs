@@ -1,0 +1,78 @@
+---
+title: "model_alerts.sql"
+---
+
+## High-level description
+This SQL macro file defines two main macros: `populate_model_alerts` and `populate_model_alerts_query`. These macros are used to generate and populate model alerts based on the execution results of dbt models and snapshots. The macros retrieve data from various sources, process it, and create a structured list of model alerts.
+
+## Code Structure
+The file contains two interconnected macros:
+1. `populate_model_alerts`: This macro processes the raw alert data and generates a list of model alert objects.
+2. `populate_model_alerts_query`: This macro defines the SQL query used to retrieve the raw alert data.
+
+The `populate_model_alerts` macro uses the results from `populate_model_alerts_query` to create the final list of model alerts.
+
+## Symbols
+
+### `populate_model_alerts`
+#### Description
+This macro retrieves raw model alert data, processes it, and generates a list of structured model alert objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | integer | Number of days to look back for alerts (default: 1) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| model_alerts | list | A list of processed model alert objects |
+
+#### Internal Logic
+1. Executes the `populate_model_alerts_query` to retrieve raw alert data.
+2. Iterates through the raw alerts and creates a structured dictionary for each alert.
+3. Generates an alert object for each processed alert using `elementary_cli.generate_alert_object`.
+4. Appends each alert object to the `model_alerts` list.
+5. Returns the final list of model alerts.
+
+### `populate_model_alerts_query`
+#### Description
+This macro defines the SQL query used to retrieve raw model alert data from various sources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | integer | Number of days to look back for alerts (default: 1) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| SQL query | string | A SQL query that retrieves raw model alert data |
+
+#### Internal Logic
+1. Defines CTEs for models, snapshots, artifacts_meta, model_run_results, and snapshot_run_results.
+2. Combines model and snapshot run results where the status is not 'success' and within the specified time range.
+3. Joins the combined results with artifacts_meta to include model metadata.
+4. Excludes alerts that already exist in the target table.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary | Used for various utility functions and references to other tables |
+| elementary_cli | Used for generating alert objects |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| days_back | integer | 1 | Number of days to look back for alerts |
+
+## Error Handling
+The code does not implement specific error handling mechanisms beyond basic dbt macro functionality.
+
+## API/Interface Reference
+| Macro | Inputs | Outputs | Description |
+|:------|:-------|:--------|:------------|
+| populate_model_alerts | days_back (optional) | List of model alerts | Generates and returns a list of model alert objects |
+| populate_model_alerts_query | days_back (optional) | SQL query string | Returns a SQL query for retrieving raw model alert data |
+
+These macros are designed to be used within a dbt project to populate and retrieve model alerts based on the execution results of dbt models and snapshots.

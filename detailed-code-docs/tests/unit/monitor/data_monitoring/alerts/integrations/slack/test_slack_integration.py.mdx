@@ -1,0 +1,69 @@
+---
+title: "test_slack_integration.py"
+---
+
+## High-level description
+This file contains unit tests for the Slack integration functionality in the Elementary data monitoring system. It focuses on testing the behavior of alert template generation, integration parameters, and channel logic for different Slack client configurations.
+
+## Code Structure
+The code consists of three main test functions and a helper function to create mock Slack integrations. Each test function focuses on a specific aspect of the Slack integration's behavior.
+
+## Symbols
+
+### `test_get_alert_template_workflow_param`
+#### Description
+This function tests the behavior of the `_get_alert_template` method for both workflow and non-workflow Slack integrations.
+
+#### Internal Logic
+1. Creates a mock alerts data object.
+2. Tests the workflow integration, asserting that the alert template text is a JSON dump of the alert data.
+3. Tests the non-workflow integration, mocking the `_get_dbt_test_template` method and asserting the expected SlackMessageSchema structure.
+
+### `test_get_integration_params_different_slack_clients_logic`
+#### Description
+This function tests the `_get_integration_params` method for different Slack client configurations (webhook and web client).
+
+#### Internal Logic
+1. Creates a mock alerts data object.
+2. Tests the webhook client integration, asserting that an empty dictionary is returned.
+3. Tests the web client integration, asserting that a dictionary with the channel name is returned.
+
+### `test_get_integration_params_channel_logic`
+#### Description
+This function tests the channel selection logic in the `_get_integration_params` method under different scenarios.
+
+#### Internal Logic
+1. Tests with an alert without a channel defined in meta, asserting the channel from the configuration is used.
+2. Tests with an alert with a channel defined in meta, asserting the channel from the alert is used.
+3. Tests with an alert with a channel defined in meta and override_config_defaults set to True, asserting the channel from the configuration is used.
+
+### `get_slack_integration_mock`
+#### Description
+This is a helper function that creates and returns a SlackIntegrationMock object with the specified parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| override_config_defaults | bool | Flag to override config defaults |
+| is_slack_workflow | bool | Flag to indicate if it's a Slack workflow |
+| slack_token | Optional[str] | Slack token |
+| slack_channel_name | Optional[str] | Slack channel name |
+| slack_webhook | Optional[str] | Slack webhook URL |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | SlackIntegrationMock | A mock Slack integration object |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| json | Used for JSON operations |
+| typing | Used for type hinting |
+| unittest.mock | Used for mocking in tests |
+| elementary.clients.slack.schema | Provides SlackMessageSchema |
+| elementary.monitor.data_monitoring.alerts.integrations.slack.message_builder | Provides SlackAlertMessageSchema |
+| tests.mocks.data_monitoring.alerts.integrations.alerts_data_mock | Provides mock alert data |
+| tests.mocks.data_monitoring.alerts.integrations.slack_integration_mock | Provides SlackIntegrationMock |
+
+This file is crucial for ensuring the correct behavior of the Slack integration in the Elementary data monitoring system, particularly in handling different configurations and scenarios for alert notifications.

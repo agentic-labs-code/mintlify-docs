@@ -1,0 +1,74 @@
+---
+title: "cli.py"
+---
+
+## High-level description
+The `cli.py` file defines the command-line interface for running Elementary operations, specifically the `upload-source-freshness` operation. This operation uploads the results of `dbt source freshness` to Elementary's schema, enabling monitoring and alerting on source freshness failures.
+
+## Code Structure
+The code defines a Click CLI group `run_operation` and a command `upload_source_freshness` within that group. The command utilizes the `Config` class for configuration management and the `UploadSourceFreshnessOperation` class to execute the upload logic. It also incorporates anonymous command-line tracking using the `AnonymousCommandLineTracking` class.
+
+## References
+- `elementary.config.config.Config`: Provides configuration settings.
+- `elementary.operations.upload_source_freshness.UploadSourceFreshnessOperation`: Handles the logic for uploading source freshness results.
+- `elementary.tracking.anonymous_tracking.AnonymousCommandLineTracking`: Tracks command-line usage anonymously.
+
+## Symbols
+
+### `run_operation`
+#### Description
+This Click group serves as a container for commands related to Elementary operations.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+Defines a Click group named `run_operation`.
+
+### `upload_source_freshness`
+#### Description
+This Click command uploads the results of `dbt source freshness` to Elementary's schema.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ctx | click.Context | Click context object. |
+| project_dir | click.Path | Path to the dbt project directory. |
+| profile_target | str | Target to load for the dbt profile. |
+| profiles_dir | click.Path | Path to the dbt profiles directory. |
+| target_path | str | Absolute target path for saving Elementary files. |
+| rows_per_insert | int | Number of rows to insert per SQL statement. |
+
+#### Outputs
+None
+
+#### Internal Logic
+1. Creates a `Config` object with the provided configuration options.
+2. Initializes anonymous command-line tracking.
+3. Creates an `UploadSourceFreshnessOperation` object and calls its `run` method, passing the `rows_per_insert` value.
+4. Tracks the end of the command execution.
+
+## Side Effects
+- Uploads data to Elementary's schema.
+- Creates files in the specified target directory.
+- Sends anonymous usage data if enabled.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| click | Defines the command-line interface. |
+| elementary.config.config | Provides configuration management. |
+| elementary.operations.upload_source_freshness | Handles the upload source freshness operation. |
+| elementary.tracking.anonymous_tracking | Provides anonymous command-line tracking. |
+
+### Configuration
+Uses configuration options defined in the `Config` class.
+
+## Error Handling
+Raises `click.ClickException` for invalid arguments or errors during execution.
+
+## Logging
+Uses the standard Python logging module for logging messages.

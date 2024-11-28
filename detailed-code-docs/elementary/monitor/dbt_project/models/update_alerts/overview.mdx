@@ -1,0 +1,36 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `update_alerts` directory houses SQL models responsible for updating the status of alerts within the Elementary monitoring system. These models leverage custom macros provided by the Elementary CLI to interact with the alert tracking system and do not materialize any data themselves.
+
+## What does it do?
+This directory contains two SQL files that, when executed, update the status of alerts in the Elementary monitoring system. One file updates alerts to "sent" status, indicating they have been successfully dispatched, while the other updates alerts to "skipped" status. These updates are performed based on a list of alert IDs provided as input. The models themselves do not produce any output data, their primary function is to trigger the status update process within the Elementary system.
+
+## Key Files
+
+### update_sent_alerts.sql
+This file updates the status of alerts to "sent". It utilizes the `elementary_cli.update_sent_alerts` macro, providing it with a list of alert IDs and a timestamp indicating when the alerts were sent.
+
+```sql
+{{ elementary_cli.update_sent_alerts(alert_ids=var('alert_ids'), sent_at=var('sent_at')) }}
+{{ elementary.no_results_query() }}
+```
+
+### update_skipped_alerts.sql
+This file updates the status of alerts to "skipped". It utilizes the `elementary_cli.update_skipped_alerts` macro, providing it with a list of alert IDs to be marked as skipped.
+
+```sql
+{{ elementary_cli.update_skipped_alerts(alert_ids=var('alert_ids')) }}
+{{ elementary.no_results_query() }}
+```
+
+## Dependencies
+
+Both files depend on the following:
+
+- **elementary_cli**: Provides custom macros for interacting with the Elementary monitoring system, specifically `update_sent_alerts` and `update_skipped_alerts`.
+- **elementary**: Provides the `no_results_query` macro, ensuring no data is materialized by these models.
+
+Additionally, `update_sent_alerts.sql` might have a dependency on the `alerts_v2` model, though this is currently commented out and requires further investigation.

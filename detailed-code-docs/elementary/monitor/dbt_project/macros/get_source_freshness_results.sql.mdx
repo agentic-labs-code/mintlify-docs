@@ -1,0 +1,51 @@
+---
+title: "get_source_freshness_results.sql"
+---
+
+## High-level description
+This macro, `get_source_freshness_results`, retrieves and processes source freshness test results from dbt. It combines data from two tables, applies filters, and returns a list of dictionaries containing detailed information about source freshness tests.
+
+## Code Structure
+The macro consists of a SQL query to fetch and join data from two tables, followed by Python-like code to process the query results and construct a list of dictionaries with the desired output format.
+
+## Symbols
+
+### get_source_freshness_results
+#### Description
+This macro retrieves source freshness test results, processes them, and returns a formatted list of dictionaries containing detailed information about each test.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | integer | Number of days to look back for test results (default: 7) |
+| invocations_per_test | integer | Maximum number of test invocations to include per unique test (default: 720) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| source_freshness_results | list of dictionaries | Processed and formatted source freshness test results |
+
+#### Internal Logic
+1. Checks for the existence of certain columns in the source tables.
+2. Constructs and executes a SQL query to fetch and join data from `dbt_source_freshness_results` and `dbt_sources` tables.
+3. Processes the query results, applying filters and transformations.
+4. Constructs a list of dictionaries containing the processed test results.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary | Used for various utility functions (e.g., `column_exists_in_relation`, `edr_datediff`, `edr_cast_as_timestamp`, `edr_current_timestamp`, `agate_to_dicts`) |
+| elementary_cli | Used for `normalized_source_freshness_status` function |
+
+## Configuration
+The macro uses the following configuration options:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| days_back | integer | 7 | Number of days to look back for test results |
+| invocations_per_test | integer | 720 | Maximum number of test invocations to include per unique test |
+
+## Error Handling
+The macro includes basic error handling by checking for the existence of certain columns in the source tables and adjusting the query accordingly.
+
+## Performance Considerations
+The macro uses a window function (`rank() over (partition by unique_id order by generated_at desc)`) to limit the number of invocations per test, which may impact performance for large datasets. The `days_back` parameter also helps limit the amount of data processed.

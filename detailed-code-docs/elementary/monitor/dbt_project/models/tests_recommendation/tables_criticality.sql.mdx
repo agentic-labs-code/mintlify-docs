@@ -1,0 +1,84 @@
+---
+title: "tables_criticality.sql"
+---
+
+## High-level description
+This SQL code creates a comprehensive view of tables (both dbt models and sources) with their dependencies, exposures, and other metadata. It combines information from various dbt-related tables to provide a unified view of the data lineage and usage within the project.
+
+## Code Structure
+The code is structured as a series of Common Table Expressions (CTEs) that build upon each other to create the final result. It starts with separate CTEs for dbt models and sources, combines them, and then adds dependency and exposure information.
+
+## Symbols
+
+### CTE: dbt_models_data
+#### Description
+Retrieves information about dbt models from the "elementary.dbt_models" table.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | Unique identifier for the model |
+| database_name | string | Database name |
+| schema_name | string | Schema name |
+| table_name | string | Alias of the model |
+| resource_name | string | Name of the model |
+| source_name | null | Set to null for models |
+| table_type | string | Set to 'model' |
+| tags | jsonb | Tags associated with the model |
+| owner | jsonb | Owner information |
+| depends_on | jsonb | List of nodes this model depends on |
+
+### CTE: dbt_sources_data
+#### Description
+Retrieves information about dbt sources from the "elementary.dbt_sources" table.
+
+#### Outputs
+Similar to dbt_models_data, but with 'source' as table_type and an empty jsonb array for depends_on.
+
+### CTE: tables_information
+#### Description
+Combines the data from dbt_models_data and dbt_sources_data into a single dataset.
+
+### CTE: dependant_on_counts
+#### Description
+Calculates the number of other tables that depend on each table.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | Unique identifier for the table |
+| dependant_on_count | integer | Number of tables that depend on this table |
+
+### CTE: exposure_counts
+#### Description
+Calculates the number of exposures that depend on each table.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | Unique identifier for the table |
+| exposure_count | integer | Number of exposures that depend on this table |
+
+### CTE: tables
+#### Description
+Combines all the information from previous CTEs to create a comprehensive view of tables with their dependencies and exposure counts.
+
+#### Outputs
+Includes all columns from tables_information, plus:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| depends_on_count | integer | Number of tables this table depends on |
+| dependant_on_count | integer | Number of tables that depend on this table |
+| exposure_count | integer | Number of exposures that depend on this table |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary.dbt_models | Source of dbt model information |
+| elementary.dbt_sources | Source of dbt source information |
+| elementary_cli.enriched_exposures or elementary.dbt_exposures | Source of exposure information |
+
+## Notes
+1. The code uses a Jinja2 conditional to determine which exposure relation to use (elementary_cli.enriched_exposures or elementary.dbt_exposures).
+2. The code uses JSON functions (cast as jsonb, jsonb_array_length) to handle JSON data in the tables.
+3. The final select statement returns all columns from the 'tables' CTE, providing a comprehensive view of all tables (models and sources) with their dependencies and exposure information.

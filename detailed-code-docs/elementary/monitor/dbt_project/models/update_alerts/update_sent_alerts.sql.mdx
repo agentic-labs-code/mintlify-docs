@@ -1,0 +1,53 @@
+---
+title: "update_sent_alerts.sql"
+---
+
+## High-level description
+This SQL file is part of a dbt project and is responsible for updating sent alerts in the Elementary monitoring system. It uses custom macros to update the status of specified alerts and doesn't materialize any data.
+
+## Symbols
+
+### `update_sent_alerts`
+#### Description
+This is a custom macro provided by the Elementary CLI that updates the status of sent alerts in the system.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| alert_ids | list | A list of alert IDs to be updated |
+| sent_at | datetime | The timestamp when the alerts were sent |
+
+#### Internal Logic
+The macro likely updates a table or view that tracks the status of alerts, marking the specified alerts as sent at the given timestamp.
+
+### `no_results_query`
+#### Description
+This is a macro provided by Elementary that returns a query that produces no results.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| query | string | An SQL query that returns no results |
+
+## Configuration
+The model is configured using dbt's `config` block:
+
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| materialized | string | 'nothing' | Specifies that this model should not materialize any data |
+
+## Dependencies
+The file includes a commented-out `depends_on` statement, indicating a dependency on the `alerts_v2` model. This suggests that the `update_sent_alerts` macro may interact with or rely on data from the `alerts_v2` model.
+
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary_cli | Provides the `update_sent_alerts` macro |
+| elementary | Provides the `no_results_query` macro |
+
+## Side Effects
+While this model doesn't materialize any data, it does have the side effect of updating the status of sent alerts in the Elementary monitoring system through the `update_sent_alerts` macro.
+
+## Notes
+1. The `depends_on` statement is commented out, which might be intentional or an oversight. If it's needed for proper execution order, it should be uncommented.
+2. The use of `var()` function suggests that `alert_ids` and `sent_at` are expected to be provided as variables when running this model.
+3. The combination of updating sent alerts and returning no results allows this model to perform its update operation without producing any output data, which is consistent with its 'nothing' materialization strategy.

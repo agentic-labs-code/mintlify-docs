@@ -1,0 +1,59 @@
+---
+title: "source_freshnesses.py"
+---
+
+## High-level description
+This code defines a `SourceFreshnessesFetcher` class that fetches source freshness results from a dbt project. It uses a dbt runner to execute a specific macro and retrieve the results, which are then parsed and returned as a list of `SourceFreshnessResultDBRowSchema` objects.
+
+## Code Structure
+The main class `SourceFreshnessesFetcher` inherits from `FetcherClient` and uses a `BaseDbtRunner` to interact with dbt. The class has a single method `get_source_freshness_results_db_rows` that fetches and processes the source freshness results.
+
+## Symbols
+
+### SourceFreshnessesFetcher
+#### Description
+A class that fetches source freshness results from a dbt project using a dbt runner.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dbt_runner | BaseDbtRunner | An instance of a dbt runner used to execute dbt operations |
+
+### get_source_freshness_results_db_rows
+#### Description
+Fetches source freshness results by running a dbt operation and processes the results into a list of `SourceFreshnessResultDBRowSchema` objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | Optional[int] | Number of days to look back for results (default: 7) |
+| invocations_per_test | int | Number of invocations per test to fetch (default: 720) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| source_freshness_results | List[SourceFreshnessResultDBRowSchema] | A list of processed source freshness results |
+
+#### Internal Logic
+1. Runs the dbt operation "elementary_cli.get_source_freshness_results" with the provided arguments.
+2. Parses the JSON response from the operation.
+3. Converts each result into a `SourceFreshnessResultDBRowSchema` object.
+4. Returns the list of processed results.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| json | Used for parsing the JSON response from the dbt operation |
+| typing | Provides type hinting for better code readability and type checking |
+| elementary.clients.dbt.base_dbt_runner | Provides the BaseDbtRunner class for executing dbt operations |
+| elementary.clients.fetcher.fetcher | Provides the FetcherClient base class |
+| elementary.monitor.fetchers.source_freshnesses.schema | Provides the SourceFreshnessResultDBRowSchema for structuring the results |
+| elementary.utils.log | Provides logging functionality |
+
+## Error Handling
+The code doesn't implement explicit error handling. It relies on the underlying `dbt_runner.run_operation` method to handle any errors that might occur during the dbt operation execution.
+
+## Logging
+The code uses a logger obtained from `elementary.utils.log.get_logger`, but no specific logging statements are present in this file.
+
+This code serves as a crucial component in fetching and processing source freshness results from a dbt project, which can be used for monitoring and analysis purposes in the larger Elementary system.

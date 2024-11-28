@@ -1,0 +1,59 @@
+---
+title: "dbt-package.mdx"
+---
+
+---
+title: "Elementary dbt package"
+sidebarTitle: "Introduction"
+---
+
+For data monitoring and dbt artifacts collection, Elementary uses a dbt package.
+The package adds models, macros, and Elementary tests as dbt tests to your project.
+
+The impact of the package on `dbt run` is minimal, and most of the processing happens as part of the data tests that are executed on `dbt test`.
+
+&lt;Accordion title="What are dbt packages and packages.yml?"&gt;
+A dbt package is additional Jinja and SQL code that is added to your project, for additional functionality. In fact, each package is a dbt project. By adding a package to your project, you are adding the package code to be part of your project, you can reference its macros, execute its models, and so on.
+
+Add packages to your project by creating a `packages.yml` file under the main project directory (where your `
+dbt_project.yml` is), and adding the relevant package. After you add a new package, run `dbt deps` to actually pull its
+code to your project. This is also how you update packages.
+Some packages we recommend you check out: [dbt_utils](https://github.com/dbt-labs/dbt-utils/tree/0.8.2/)
+, [dbt_date](https://github.com/calogica/dbt-date/tree/0.5.4/)
+, [codegen](https://github.com/dbt-labs/dbt-codegen/tree/0.5.0/).
+
+&lt;/Accordion&gt;
+
+The repository and source code of the Elementary dbt package can be [found here](https://github.com/elementary-data/dbt-data-reliability).
+
+## Package Features
+
+After you deploy the dbt package, you can use Elementary tests, and your dbt artifacts will be uploaded automatically with on-run-end hooks:
+
+&lt;CardGroup cols={3}&gt;
+  &lt;Card title="Elementary data tests" href="/features/data-tests"&gt;&lt;/Card&gt;
+  &lt;Card title="dbt artifacts" href="/dbt/dbt-artifacts"&gt;&lt;/Card&gt;
+  &lt;Card title="on-run-end hooks" href="/dbt/on-run-end_hooks"&gt;&lt;/Card&gt;
+&lt;/CardGroup&gt;
+
+Although you can use the package only, we recommend using it with Elementary Cloud or OSS.
+
+&lt;Snippet file="products-cards.mdx" /&gt;
+
+## Elementary schema
+
+&lt;Snippet file="faq/question-schema-no-accordion.mdx" /&gt;
+
+## Package full refresh
+
+Elementary incremental models are not full-refreshed by default. This is because these models contain
+information such as historical runs and test results, which typically you'd want to maintain even when full refreshing
+the models of your main dbt project.
+
+However, if you wish to change this behavior and include Elementary models as a part of the full refresh, you can set
+the following var:
+
+```yaml
+vars:
+  elementary_full_refresh: true
+```

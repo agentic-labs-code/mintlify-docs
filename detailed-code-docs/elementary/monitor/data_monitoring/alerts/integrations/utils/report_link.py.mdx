@@ -1,0 +1,179 @@
+---
+title: "report_link.py"
+---
+
+## High-level description
+The `report_link.py` module provides utility functions for generating report links for different types of alerts in the Elementary data monitoring system. These links point to specific sections of the Elementary report, allowing users to view relevant details about test runs, model runs, or model test runs.
+
+## Code Structure
+The code defines an `Enum` called `ReportPath` to represent different report sections and a `BaseModel` called `ReportLinkData` to structure the link data. It then provides several functions: `_get_formatted_report_url`, `_get_run_history_report_link`, `get_test_runs_link`, `get_model_runs_link`, and `get_model_test_runs_link`. These functions work together to construct the appropriate report link based on the provided parameters.
+
+## References
+This module is referenced by the following parts of the codebase:
+- `elementary/monitor/alerts/group_of_alerts.py`: Uses the `get_model_test_runs_link` function to provide a link to the relevant test runs for a group of alerts.
+- `elementary/monitor/alerts/alert.py`: Defines an abstract method `get_report_link` that is implemented by concrete alert types using functions from this module.
+- `elementary/monitor/alerts/model_alert.py`: Uses the `get_model_runs_link` function to provide a link to the relevant model runs for a model alert.
+- `elementary/monitor/alerts/source_freshness_alert.py`: Uses the `get_test_runs_link` function to provide a link to the relevant test runs for a source freshness alert.
+- `elementary/monitor/alerts/test_alert.py`: Uses the `get_test_runs_link` function to provide a link to the relevant test runs for a test alert.
+- `elementary/monitor/data_monitoring/alerts/integrations/teams/teams.py`: Uses the `ReportLinkData` class and the `get_report_link` method of alert objects to include report links in Teams alert messages.
+
+## Symbols
+
+### `TEST_RUNS_LINK_TEXT`
+#### Description
+A constant string representing the display text for links pointing to test runs.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+This is a simple constant definition.
+
+### `MODEL_RUNS_LINK_TEXT`
+#### Description
+A constant string representing the display text for links pointing to model runs.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+This is a simple constant definition.
+
+### `ReportLinkData`
+#### Description
+A Pydantic model defining the structure of a report link, containing a URL and display text.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | str | The URL of the report link. |
+| text | str | The display text for the report link. |
+
+#### Outputs
+None
+
+#### Internal Logic
+This is a Pydantic model definition.
+
+### `ReportPath`
+#### Description
+An enumeration defining the possible paths within the Elementary report.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+This is an enumeration definition.
+
+### `_get_formatted_report_url`
+#### Description
+A private helper function that removes trailing slashes from a given report URL.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| report_url | str | The report URL to format. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| formatted_report_url | str | The formatted report URL with trailing slashes removed. |
+
+#### Internal Logic
+This function uses the `strip()` method to remove trailing slashes from the input URL.
+
+### `_get_run_history_report_link`
+#### Description
+A private helper function that constructs a `ReportLinkData` object for a given report URL, path, and unique ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| report_url | Optional[str] | The base URL of the Elementary report. |
+| path | ReportPath | The section of the report to link to. |
+| unique_id | Optional[str] | The unique ID of the test run or model run. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| report_link | Optional[ReportLinkData] | A `ReportLinkData` object containing the constructed report link, or `None` if either `unique_id` or `report_url` is not provided. |
+
+#### Internal Logic
+This function first checks if both `unique_id` and `report_url` are provided. If so, it formats the report URL, constructs the link URL using the provided path and unique ID, and creates a `ReportLinkData` object with the appropriate display text based on the provided path. Otherwise, it returns `None`.
+
+### `get_test_runs_link`
+#### Description
+A function that constructs a report link for a given report URL and Elementary unique ID, pointing to the test runs section of the report.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| report_url | Optional[str] | The base URL of the Elementary report. |
+| elementary_unique_id | Optional[str] | The unique ID of the test run. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| report_link | Optional[ReportLinkData] | A `ReportLinkData` object containing the constructed report link, or `None` if either `elementary_unique_id` or `report_url` is not provided. |
+
+#### Internal Logic
+This function delegates the link construction to the `_get_run_history_report_link` function, passing `ReportPath.TEST_RUNS` as the path.
+
+### `get_model_runs_link`
+#### Description
+A function that constructs a report link for a given report URL and model unique ID, pointing to the model runs section of the report.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| report_url | Optional[str] | The base URL of the Elementary report. |
+| model_unique_id | Optional[str] | The unique ID of the model run. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| report_link | Optional[ReportLinkData] | A `ReportLinkData` object containing the constructed report link, or `None` if either `model_unique_id` or `report_url` is not provided. |
+
+#### Internal Logic
+This function delegates the link construction to the `_get_run_history_report_link` function, passing `ReportPath.MODEL_RUNS` as the path.
+
+### `get_model_test_runs_link`
+#### Description
+A function that constructs a report link for a given report URL and model unique ID, pointing to the test runs section of the report filtered by the provided model ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| report_url | Optional[str] | The base URL of the Elementary report. |
+| model_unique_id | Optional[str] | The unique ID of the model. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| report_link | Optional[ReportLinkData] | A `ReportLinkData` object containing the constructed report link, or `None` if either `model_unique_id` or `report_url` is not provided. |
+
+#### Internal Logic
+This function checks if both `model_unique_id` and `report_url` are provided. If so, it formats the report URL, constructs the link URL using the provided model ID as a filter parameter, and creates a `ReportLinkData` object with the appropriate display text. Otherwise, it returns `None`.
+
+## Dependencies
+This module depends on the following external libraries:
+| Dependency | Purpose |
+|:-----------|:--------|
+| enum | Used for defining the `ReportPath` enumeration. |
+| typing | Used for type hinting. |
+| elementary.utils.pydantic_shim | Used for defining the `ReportLinkData` model. |
+
+## Error Handling
+This module does not implement specific error handling beyond basic exception raising.
+
+## Logging
+This module does not implement logging.

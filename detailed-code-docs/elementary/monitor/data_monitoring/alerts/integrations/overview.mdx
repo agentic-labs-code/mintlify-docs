@@ -1,0 +1,59 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `elementary/monitor/data_monitoring/alerts/integrations` directory contains the implementation of various alert integrations for the Elementary data monitoring system. It provides a framework for sending alerts to different platforms such as Slack and Microsoft Teams, with the ability to extend to other platforms. The directory includes base classes, utility functions, and specific implementations for supported integrations.
+
+## What does it do?
+This directory enables the Elementary data monitoring system to send alerts about data quality issues, test results, model performance, and other monitoring events to external communication platforms. It handles the formatting of different types of alerts into platform-specific message structures and manages the communication process with these platforms. The system supports various alert types, including dbt tests, Elementary tests, model alerts, snapshot alerts, source freshness alerts, and grouped alerts by table.
+
+The integrations allow data teams to receive timely notifications about important events and issues detected by the Elementary system directly in their preferred communication channels. This facilitates quick response to data quality problems and helps maintain the overall health of the data infrastructure.
+
+## Entry points
+The main entry point for the integrations is the `Integrations` class in `integrations.py`. This class provides a factory method `get_integration` that returns the appropriate integration instance based on the provided configuration.
+
+The flow of data typically follows this pattern:
+1. The monitoring system detects an alert condition.
+2. It calls the `get_integration` method to obtain the appropriate integration instance.
+3. The alert data is passed to the integration's `send_alert` method.
+4. The integration formats the alert data into a platform-specific message structure.
+5. The formatted message is sent to the configured destination (e.g., Slack channel, Teams webhook).
+
+## Key Files
+1. `base_integration.py`: Defines the `BaseIntegration` abstract base class, which provides a blueprint for all integration implementations.
+
+2. `integrations.py`: Contains the `Integrations` class with the `get_integration` factory method for creating integration instances.
+
+3. `slack/`: Directory containing Slack-specific implementation:
+   - `message_builder.py`: Implements `SlackAlertMessageBuilder` for constructing Slack messages.
+   - `slack.py`: Implements `SlackIntegration` for sending alerts to Slack.
+
+4. `teams/`: Directory containing Microsoft Teams-specific implementation:
+   - `message_builder.py`: Implements `TeamsAlertMessageBuilder` for constructing Teams messages.
+   - `teams.py`: Implements `TeamsIntegration` for sending alerts to Teams.
+
+5. `utils/`: Directory containing utility functions:
+   - `report_link.py`: Provides functionality for generating links to specific sections of the Elementary report.
+
+## Dependencies
+The integrations rely on several external libraries:
+- `slack_sdk`: For interacting with the Slack API.
+- `ratelimit`: For implementing rate limiting in API calls.
+- `pydantic`: For data validation and schema definition.
+- `pymsteams`: For constructing and sending Teams messages.
+- `pandas`: For formatting test result samples into markdown tables.
+
+These dependencies were chosen for their reliability, ease of use, and compatibility with the respective platform APIs.
+
+## Configuration
+The integrations use various configuration options, which are typically passed through a `Config` object. Key configuration aspects include:
+
+- Authentication credentials (e.g., Slack token, Teams webhook URL)
+- Destination channels or endpoints
+- Alert fields to include in messages
+- Customization of message templates for different alert types
+
+The `BaseIntegration` class and its implementations are designed to handle cases where certain configuration options are missing, providing fallback behaviors and error handling.
+
+In summary, this directory provides a flexible and extensible system for integrating Elementary's data monitoring alerts with various communication platforms, enhancing the ability of data teams to respond quickly to data quality issues and important events in their data infrastructure.

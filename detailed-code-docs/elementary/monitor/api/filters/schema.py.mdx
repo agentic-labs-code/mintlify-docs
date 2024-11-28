@@ -1,0 +1,60 @@
+---
+title: "schema.py"
+---
+
+## High-level description
+This code defines data structures for filters used in the Elementary monitoring system. It provides schemas for individual filters and a collection of filters, which are likely used to categorize and filter test results, test runs, and model runs in the monitoring interface.
+
+## Code Structure
+The code defines two main classes: `FilterSchema` and `FiltersSchema`. `FilterSchema` represents an individual filter, while `FiltersSchema` is a collection of filters for different categories (test results, test runs, and model runs).
+
+## Symbols
+
+### `FilterSchema`
+#### Description
+Represents an individual filter with a name, display name, and associated model unique IDs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | str | The internal name of the filter |
+| display_name | str | The user-friendly name of the filter |
+| model_unique_ids | List[Optional[str]] | List of model unique IDs associated with this filter |
+
+#### Internal Logic
+The `add_model_unique_id` method adds a new model unique ID to the filter's list, ensuring uniqueness.
+
+### `add_model_unique_id`
+#### Description
+Adds a new model unique ID to the filter's list of associated models.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| model_unique_id | Optional[str] | The unique ID of the model to be added |
+
+#### Internal Logic
+1. Creates a new set from the existing `model_unique_ids` and the new `model_unique_id`.
+2. Converts the set back to a list and assigns it to `model_unique_ids`.
+
+### `FiltersSchema`
+#### Description
+Represents a collection of filters for different categories: test results, test runs, and model runs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| test_results | List[FilterSchema] | List of filters for test results |
+| test_runs | List[FilterSchema] | List of filters for test runs |
+| model_runs | List[FilterSchema] | List of filters for model runs |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| typing | Provides type hinting support |
+| elementary.utils.pydantic_shim | Imports the BaseModel class for data validation |
+
+## References
+This schema is used in the `FiltersAPI` class in the `elementary/monitor/api/filters/filters.py` file. The `FiltersAPI` class uses these schemas to create and populate filters based on test results, test runs, and model runs data.
+
+The `FilterSchema` and `FiltersSchema` classes are used to structure the filter data returned by the `get_filters` method in the `FiltersAPI` class. The `add_model_unique_id` method is used extensively in the `_get_test_filters` and `_get_model_runs_filters` methods to associate model unique IDs with specific filters based on their status (e.g., failures, warnings, errors, passed, no tests).

@@ -1,0 +1,52 @@
+---
+title: "get_test_rows_sample.sql"
+---
+
+## High-level description
+This macro, `get_test_rows_sample`, is designed to extract and process test result rows from either a legacy JSON format or an Agate table. It converts the input data into a list of Python dictionaries, providing a unified format for further processing or analysis of test results.
+
+## Symbols
+
+### `get_test_rows_sample`
+#### Description
+This macro processes test result rows from different sources and returns them as a list of Python dictionaries. It handles two possible input formats: a JSON string (legacy format) or an Agate table.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| legacy_result_rows | string | A JSON string containing test result rows in the legacy format |
+| result_rows_agate | Agate table | An Agate table containing test result rows |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result_rows | list | A list of Python dictionaries, each representing a test result row |
+
+#### Internal Logic
+1. Initialize an empty list `result_rows` to store the processed result rows.
+2. Check if `legacy_result_rows` is defined and not None:
+   - If true, parse the JSON string using `fromjson()` and assign it to `result_rows`.
+3. If `legacy_result_rows` is not available, check if `result_rows_agate` is provided:
+   - If true, iterate through the "result_row" column of the Agate table.
+   - For each row, parse the JSON string using `fromjson()` and append it to `result_rows`.
+4. Return the `result_rows` list containing the processed test result rows.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| fromjson | Jinja2 filter used to parse JSON strings into Python objects |
+
+Note: The `fromjson` filter is likely provided by the dbt framework or a custom implementation within the project.
+
+## Configuration
+This macro uses two configuration parameters that are passed as arguments:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| legacy_result_rows | string | None | JSON string containing test result rows in the legacy format |
+| result_rows_agate | Agate table | None | Agate table containing test result rows |
+
+These parameters are sourced from:
+- `legacy_result_rows`: `elementary_test_results.result_rows`
+- `result_rows_agate`: `test_result_rows`
+
+The macro is designed to work with either of these inputs, providing flexibility in handling different data sources.

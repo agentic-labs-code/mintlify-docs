@@ -1,0 +1,78 @@
+---
+title: "create_all_types_table.sql"
+---
+
+## High-level description
+This code defines macros for creating a table with all supported data types for different data warehouses (BigQuery, Snowflake, Redshift, and PostgreSQL) in a dbt project. It also includes a macro to compare the data types from the relation and the information schema.
+
+## Code Structure
+The main macro `create_all_types_table()` dispatches to specific macros for each supported data warehouse. Each warehouse-specific macro creates a table with columns of all supported data types for that particular warehouse. The `compare_relation_types_and_information_schema_types()` macro is used to compare the data types from the created relation and the information schema.
+
+## Symbols
+
+### `create_all_types_table()`
+#### Description
+This is the main macro that dispatches to the appropriate warehouse-specific macro based on the current adapter.
+
+#### Internal Logic
+It uses the `adapter.dispatch()` function to call the appropriate warehouse-specific macro.
+
+### `bigquery__create_all_types_table()`
+#### Description
+Creates a table with all supported data types for BigQuery.
+
+#### Internal Logic
+1. Gets the database and schema names.
+2. Creates or gets a relation for the 'all_types' table.
+3. Defines a SQL query that selects various BigQuery-specific data types.
+4. Creates the table using the defined SQL query.
+5. Logs and executes the create table query.
+
+### `snowflake__create_all_types_table()`
+#### Description
+Creates a table with all supported data types for Snowflake.
+
+#### Internal Logic
+Similar to the BigQuery macro, but with Snowflake-specific data types.
+
+### `redshift__create_all_types_table()`
+#### Description
+Creates a table with all supported data types for Redshift.
+
+#### Internal Logic
+Similar to the previous macros, but with Redshift-specific data types.
+
+### `postgres__create_all_types_table()`
+#### Description
+Creates a table with all supported data types for PostgreSQL.
+
+#### Internal Logic
+Similar to the previous macros, but with PostgreSQL-specific data types.
+
+### `default__create_all_types_table()`
+#### Description
+A default implementation that raises an error for unsupported warehouses.
+
+### `compare_relation_types_and_information_schema_types()`
+#### Description
+Compares the data types from the created relation and the information schema.
+
+#### Internal Logic
+1. Creates the 'all_types' table.
+2. Retrieves column types from the relation and information schema.
+3. Normalizes and compares the data types.
+4. Returns a list of unmatched types.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dbt | Used for database operations and adapter functions |
+| elementary | Custom package for logging and utility functions |
+
+## Error Handling
+The code uses `exceptions.raise_compiler_error()` in the default macro to handle unsupported warehouses.
+
+## Logging
+The code uses `elementary.edr_log()` for logging various steps and results.
+
+This code is crucial for testing and ensuring compatibility across different data warehouse types in a dbt project, particularly for the Elementary package.

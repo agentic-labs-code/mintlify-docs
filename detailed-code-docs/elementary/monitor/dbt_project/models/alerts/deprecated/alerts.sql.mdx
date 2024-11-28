@@ -1,0 +1,63 @@
+---
+title: "alerts.sql"
+---
+
+## High-level description
+This SQL code defines a dbt model for aggregating and storing alerts from various sources, including dbt tests, schema changes, and anomaly detection. It's designed to be materialized incrementally and includes configuration for handling schema changes and merging updates.
+
+## Code Structure
+The code is structured as a single SQL query that combines data from multiple sources using UNION ALL operations. It references other dbt models and uses Jinja templating for dynamic SQL generation based on the availability of certain relations.
+
+## Symbols
+
+### Main SQL Query
+#### Description
+This query combines alerts from different sources into a single table, adding additional columns for alert management.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| alerts_dbt_tests | dbt model | Contains alerts from dbt tests |
+| alerts_schema_changes | dbt model (optional) | Contains alerts from schema changes |
+| alerts_anomaly_detection | dbt model (optional) | Contains alerts from anomaly detection |
+| alerts_data_monitoring | dbt model (optional) | Fallback for anomaly detection alerts (backwards compatibility) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| alert_id | string | Unique identifier for each alert |
+| detected_at | timestamp | When the alert was detected |
+| alert_sent | boolean | Indicates if the alert has been sent (always false in this query) |
+| suppression_status | string | Status of alert suppression (always 'pending' in this query) |
+| sent_at | string | When the alert was sent (always NULL in this query) |
+| ... | various | Other columns from the source models |
+
+#### Internal Logic
+1. The query starts by selecting all columns from the `alerts_dbt_tests` model.
+2. It then conditionally unions this data with `alerts_schema_changes` if the relation exists.
+3. Next, it unions with either `alerts_anomaly_detection` or `alerts_data_monitoring` (for backwards compatibility), if either relation exists.
+4. The query adds additional columns: `detected_at`, `alert_sent`, `suppression_status`, and `sent_at`.
+5. For incremental runs, it applies a where clause to filter for new alerts.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dbt_utils | Used for the `star()` macro to select all columns except 'detected_at' |
+| elementary | Used for various custom macros and configurations |
+| elementary_cli | Used for custom macros related to alert detection and filtering |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| materialized | string | 'incremental' | Specifies the materialization strategy |
+| unique_key | string | 'alert_id' | Defines the unique key for the model |
+| merge_update_columns | list | ['alert_id'] | Specifies columns to update during merges |
+| on_schema_change | string | 'sync_all_columns' | Defines behavior on schema changes |
+| table_type | string | elementary.get_default_table_type() | Sets the table type |
+| incremental_strategy | string | elementary.get_default_incremental_strategy() | Sets the incremental strategy |
+
+## Error Handling
+The code doesn't implement explicit error handling, relying on dbt's built-in error handling mechanisms.
+
+## Performance Considerations
+The use of incremental materialization and the `unique_key` configuration suggests that this model is optimized for efficient updates, only processing new or changed data in subsequent runs.

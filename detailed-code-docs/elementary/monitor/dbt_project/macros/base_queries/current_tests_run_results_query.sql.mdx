@@ -1,0 +1,48 @@
+---
+title: "current_tests_run_results_query.sql"
+---
+
+## High-level description
+This SQL macro, `current_tests_run_results_query`, is designed to generate a comprehensive query for retrieving and combining test results data from various Elementary and dbt tables. It joins multiple CTEs to create a detailed view of test executions, including test metadata, execution details, and associated model information.
+
+## Code Structure
+The macro defines several Common Table Expressions (CTEs) that are then joined in the final SELECT statement to produce a comprehensive result set. The CTEs include data from Elementary test results, dbt run results, tests, models, and sources.
+
+## Symbols
+
+### current_tests_run_results_query
+#### Description
+This macro generates a SQL query that combines data from various Elementary and dbt tables to provide a comprehensive view of test results and related information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| days_back | integer | Optional. Number of days to look back for test results. |
+| invocation_id | string | Optional. Specific invocation ID to filter results. |
+
+#### Outputs
+The macro returns a SQL query string that, when executed, produces a result set with columns including test details, execution information, and associated model metadata.
+
+#### Internal Logic
+1. Defines CTEs for various data sources (elementary_test_results, dbt_run_results, dbt_tests, dbt_models, dbt_sources).
+2. Creates a unified CTE for dbt artifacts combining models and sources.
+3. Calculates the first occurrence of each test.
+4. Joins all the CTEs in the final SELECT statement to produce a comprehensive result set.
+5. Includes logic to handle inconsistencies in test sub-types and column names.
+6. Applies filtering based on the `days_back` parameter if provided.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary | Used for date difference calculations and timestamp casting |
+| dbt | Used for referencing other models/sources |
+
+## Configuration
+The macro uses the following configuration options:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| days_back | integer | None | Number of days to look back for test results |
+| invocation_id | string | None | Specific invocation ID to filter results |
+
+## Performance Considerations
+The query joins multiple large tables and performs several calculations. Depending on the size of the data and the value of `days_back`, this query could be resource-intensive. Proper indexing on join columns and date fields would be crucial for optimal performance.

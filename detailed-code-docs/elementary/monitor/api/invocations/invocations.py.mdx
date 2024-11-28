@@ -1,0 +1,137 @@
+---
+title: "invocations.py"
+---
+
+## High-level description
+This code defines the `InvocationsAPI` class, which provides methods to fetch and manage dbt invocation data. It interacts with the `InvocationsFetcher` to retrieve invocation information based on various criteria such as type, time, and ID.
+
+## Code Structure
+The `InvocationsAPI` class inherits from `APIClient` and uses an `InvocationsFetcher` instance to fetch invocation data. It provides methods to get invocations by type, time, and ID, as well as methods to retrieve test invocations based on filters and get the latest invocations for models.
+
+## Symbols
+
+### InvocationsAPI
+#### Description
+A class that provides an API for retrieving and managing dbt invocation data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dbt_runner | BaseDbtRunner | An instance of a dbt runner for executing dbt commands |
+
+#### Internal Logic
+- Initializes an `InvocationsFetcher` instance with the provided `dbt_runner`.
+- Provides methods to retrieve invocations based on different criteria.
+- Implements a method to get test invocations based on a `SelectorFilterSchema`.
+- Offers methods to fetch the latest invocations data for models.
+
+### get_last_invocation
+#### Description
+Retrieves the last invocation of a specified type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| type | str | The type of invocation to retrieve |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invocation | DbtInvocationSchema | The last invocation data |
+
+#### Internal Logic
+- Currently only supports the "test" type.
+- Calls the `get_test_last_invocation` method of the `InvocationsFetcher`.
+
+### get_invocation_by_time
+#### Description
+Retrieves an invocation by its maximum time.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| type | str | The type of invocation to retrieve |
+| invocation_max_time | str | The maximum time of the invocation to retrieve |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invocation | DbtInvocationSchema | The invocation data |
+
+#### Internal Logic
+- Currently only supports the "test" type.
+- Calls the `get_test_last_invocation` method of the `InvocationsFetcher` with the specified time.
+
+### get_invocation_by_id
+#### Description
+Retrieves an invocation by its ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| type | str | The type of invocation to retrieve |
+| invocation_id | str | The ID of the invocation to retrieve |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invocation | DbtInvocationSchema | The invocation data |
+
+#### Internal Logic
+- Currently only supports the "test" type.
+- Calls the `get_test_last_invocation` method of the `InvocationsFetcher` with the specified ID.
+
+### get_test_invocation_from_filter
+#### Description
+Retrieves a test invocation based on the provided selector filter.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| selector_filter | SelectorFilterSchema | The filter criteria for selecting the invocation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invocation | DbtInvocationSchema | The invocation data matching the filter |
+
+#### Internal Logic
+- Checks for the presence of `invocation_id`, `invocation_time`, or `last_invocation` in the filter.
+- Calls the appropriate method to retrieve the invocation based on the filter criteria.
+
+### get_models_latest_invocations_data
+#### Description
+Retrieves the latest invocations data for models.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invocations | List[DbtInvocationSchema] | A list of the latest invocations data for models |
+
+#### Internal Logic
+- Calls the `get_models_latest_invocations_data` method of the `InvocationsFetcher`.
+
+### get_models_latest_invocation
+#### Description
+Retrieves the latest invocation for models.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| latest_invocation | Dict[str, str] | A dictionary containing the latest invocation data for models |
+
+#### Internal Logic
+- Calls the `get_models_latest_invocation` method of the `InvocationsFetcher`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| elementary.clients.api.api_client | Provides the base APIClient class |
+| elementary.clients.dbt.base_dbt_runner | Provides the BaseDbtRunner class for executing dbt commands |
+| elementary.monitor.data_monitoring.schema | Provides the SelectorFilterSchema for filtering invocations |
+| elementary.monitor.fetchers.invocations.invocations | Provides the InvocationsFetcher class for fetching invocation data |
+| elementary.monitor.fetchers.invocations.schema | Provides the DbtInvocationSchema for structuring invocation data |
+| elementary.utils.log | Provides logging functionality |
+
+## Error Handling
+The class raises `NotImplementedError` for unsupported invocation types in the `get_last_invocation`, `get_invocation_by_time`, and `get_invocation_by_id` methods.

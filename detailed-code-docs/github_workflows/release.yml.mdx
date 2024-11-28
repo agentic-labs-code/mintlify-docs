@@ -1,0 +1,69 @@
+---
+title: "release.yml"
+---
+
+## High-level description
+This GitHub Actions workflow, named "Release package," is triggered when a version tag is pushed. It automates the process of publishing the package to PyPI, building and pushing a Docker image to GitHub Container Registry (GHCR), and creating a pull request to merge the master branch into the docs branch.
+
+## Code Structure
+The workflow consists of three jobs: `publish-to-pypi`, `build-and-push-docker-image`, and `merge-to-docs`. Each job performs a specific task in the release process.
+
+## Symbols
+
+### `publish-to-pypi` job
+#### Description
+This job builds the Python package and publishes it to PyPI.
+
+#### Internal Logic
+1. Checks out the repository
+2. Sets up Python 3.8
+3. Installs the 'build' package
+4. Builds the package (both sdist and wheel)
+5. Uploads the built artifacts
+6. Publishes the package to PyPI using provided credentials
+
+### `build-and-push-docker-image` job
+#### Description
+This job builds a Docker image and pushes it to GitHub Container Registry.
+
+#### Internal Logic
+1. Checks out the repository
+2. Logs in to the container registry (GHCR)
+3. Extracts metadata for Docker image tagging
+4. Builds and pushes the Docker image with appropriate tags and labels
+
+### `merge-to-docs` job
+#### Description
+This job creates a pull request to merge the master branch into the docs branch.
+
+#### Internal Logic
+1. Checks out the repository
+2. Creates a pull request from the master branch to the docs branch
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| actions/checkout@v3 | Checks out the repository |
+| actions/setup-python@v4 | Sets up Python environment |
+| actions/upload-artifact@v3 | Uploads build artifacts |
+| pypa/gh-action-pypi-publish@release/v1 | Publishes package to PyPI |
+| docker/login-action@v2 | Logs in to container registry |
+| docker/metadata-action@v4 | Extracts metadata for Docker image |
+| docker/build-push-action@v3 | Builds and pushes Docker image |
+| repo-sync/pull-request@v2 | Creates pull request for merging branches |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REGISTRY | string | ghcr.io | The container registry to use |
+| IMAGE_NAME | string | ${{ github.repository }} | The name of the Docker image |
+
+## Error Handling
+The workflow does not implement specific error handling mechanisms. It relies on the default behavior of GitHub Actions, which will stop the workflow if any step fails.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| N/A | N/A | Push with tag v[0-9].[0-9]+.[0-9]+ | Workflow execution | Triggers the release process when a version tag is pushed |
+
+This workflow is triggered by pushing a tag that matches the pattern `v[0-9].[0-9]+.[0-9]+`, representing version numbers (e.g., v1.2.3).

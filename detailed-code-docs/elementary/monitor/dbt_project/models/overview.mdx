@@ -1,0 +1,68 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains SQL models for Elementary's data monitoring system, focusing on alert generation, management, and test recommendations. It includes models for processing various types of alerts, enriching exposure data, and providing intelligent test recommendations based on table criticality and characteristics.
+
+## What does it do?
+The code in this directory implements a comprehensive data monitoring and quality assurance system. It performs several key functions:
+
+1. Alert Generation and Management: Processes and stores alerts from various sources, including dbt test failures, schema changes, anomaly detection, and source freshness checks.
+
+2. Exposure Enrichment: Combines and enriches exposure metadata from different sources to provide a comprehensive view of data exposures.
+
+3. Test Recommendations: Analyzes table metadata, criticality, and existing tests to recommend additional data quality tests, helping to improve overall test coverage.
+
+4. Alert Status Updates: Provides functionality to update the status of alerts (e.g., marking them as sent or skipped) within the monitoring system.
+
+## Entry points
+The main entry points for this directory are:
+
+1. `alerts/alerts_v2.sql`: The current version of the main alerts model, which sets up an incremental table for managing alerts.
+
+2. `elementary_exposures/elementary_exposures.sql`: Defines the structure for storing and managing exposure data.
+
+3. `enriched_exposures/enriched_exposures.sql`: Combines and enriches exposure data from multiple sources.
+
+4. `tests_recommendation/test_recommendations.sql`: The core of the test recommendation engine, which generates tailored test suggestions for each table.
+
+5. `update_alerts/update_sent_alerts.sql` and `update_alerts/update_skipped_alerts.sql`: Entry points for updating alert statuses.
+
+The data flow generally moves from raw data sources through the alert generation and enrichment processes, culminating in the test recommendation system. The alert update models provide a mechanism for maintaining the state of alerts within the system.
+
+## Key Files
+1. `alerts/alerts_v2.sql`: Sets up the main incremental table for alert management, processing various types of alerts and maintaining backwards compatibility.
+
+2. `elementary_exposures/elementary_exposures.sql`: Defines the structure for storing exposure data, configured as an incremental model.
+
+3. `enriched_exposures/enriched_exposures.sql`: Creates a view that combines and enriches exposure data from 'dbt_exposures' and 'elementary_exposures' sources.
+
+4. `tests_recommendation/tables_criticality.sql`: Aggregates information about tables from various sources to determine their criticality.
+
+5. `tests_recommendation/table_timestamp_columns.sql`: Identifies and ranks potential timestamp columns for each table.
+
+6. `tests_recommendation/test_recommendations.sql`: Generates tailored test recommendations for each table based on its characteristics and existing tests.
+
+## Dependencies
+The main dependencies for this directory are:
+
+1. dbt: Used extensively for model referencing, configuration, and Jinja templating.
+2. elementary: Provides functions for table type, incremental strategy, and various utility functions.
+3. elementary_cli: Offers macros for populating alerts, creating empty alert structures, and updating alert statuses.
+
+## Configuration
+Key configuration options include:
+
+1. For `alerts_v2.sql`:
+   - `days_back`: Number of days to look back when populating alerts (default: 1)
+
+2. For `elementary_exposures.sql`:
+   - `elementary_full_refresh`: Determines whether to perform a full refresh of the model
+
+3. For `enriched_exposures.sql`:
+   - `materialized`: Set to 'view'
+   - `bind`: Set to False
+   - `unique_key`: Set to 'unique_id'
+
+The models in this directory are designed to be flexible and efficient, using incremental materialization and configurable options to adapt to different data pipeline needs and sizes. The system's comprehensive approach to alert generation, exposure management, and test recommendations provides data teams with powerful tools for monitoring and maintaining data quality and pipeline health.

@@ -1,0 +1,82 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains documentation snippets related to Elementary Cloud, a cloud-based data pipeline monitoring system. The snippets cover various aspects of the platform, including features, integrations, security, and onboarding processes.
+
+## What does it do?
+The content in this directory provides users with comprehensive information about Elementary Cloud, explaining its functionality, setup process, and integration with various data warehouses. It covers:
+
+1. Introduction to Elementary Cloud and its key features
+2. Step-by-step onboarding instructions
+3. Detailed integration guides for various data platforms
+4. Explanation of the platform's security model
+5. Overview of monitoring capabilities, including anomaly detection and data testing
+
+## Key Files
+
+1. `features.mdx`: Provides a detailed overview of Elementary Cloud's features, organized into three main categories:
+   - Detection & Coverage
+   - Triage & Response
+   - Collaboration & Communication
+
+2. `how-it-works.mdx`: Explains the architecture and workflow of Elementary Cloud, detailing how it interacts with the user's dbt project and data warehouse.
+
+3. `introduction.mdx`: Offers a comprehensive introduction to Elementary Cloud, highlighting its key benefits and integrations.
+
+4. `quickstart-steps.mdx`: Outlines the steps for getting started with Elementary Cloud, from account creation to connecting a data warehouse.
+
+5. `integrations/` (directory): Contains individual MDX files for each supported data warehouse integration, providing specific setup instructions for platforms like BigQuery, Snowflake, Redshift, Databricks, and Postgres.
+
+## Configuration
+The integration files in the `integrations/` directory typically include the following configuration elements:
+
+1. User or service account creation instructions
+2. Permissions setup
+3. Connection form fields, which may include:
+   - Host/Account information
+   - Database and schema names
+   - Authentication credentials (users, passwords, tokens, or key pairs)
+   - Optional fields like roles or catalogs
+
+For example, the Snowflake configuration includes:
+
+```markdown
+- **Account**: e.g. `example.us-east-1`
+- **Database name**: e.g. `analytics`
+- **Warehouse**: e.g. `ELEMENTARY_WAREHOUSE`
+- **Elementary schema**: Usually `[schema name]_elementary`
+- **Role (optional)**: e.g. `ELEMENTARY_ROLE`
+```
+
+Many files also include SQL snippets for creating users or setting up network policies, such as:
+
+```sql
+CREATE NETWORK POLICY ELEMENTARY_CLOUD
+    ALLOWED_IP_LIST=('3.126.156.226')
+    BLOCKED_IP_LIST=()
+COMMENT='IP used by Elementary Cloud to sync the Elementary schema';
+```
+
+These configuration details ensure that users can properly set up and secure their Elementary Cloud integrations with their specific data platforms.
+
+## Dependencies
+Elementary Cloud integrates with various data warehouses and platforms, including:
+
+1. Google BigQuery
+2. Snowflake
+3. Amazon Redshift
+4. Databricks
+5. PostgreSQL
+
+The platform also relies on the Elementary dbt package, which needs to be installed in the user's dbt project to collect and store data in the Elementary schema.
+
+## Security
+Elementary Cloud emphasizes security in its design:
+
+1. The platform only requires read access to the Elementary schema, not to schemas containing sensitive data.
+2. Connections to the Elementary schema are encrypted and use a static IP address that users need to allowlist.
+3. The Elementary dbt package creates a separate schema for logs, results, and metadata, ensuring separation of concerns.
+
+This security model allows users to monitor their data pipelines without granting access to their actual data, addressing potential privacy and security concerns.
