@@ -1,0 +1,65 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines a service class `CreateService` within the `Fees::Commitments::Minimum` module. Its primary purpose is to create a minimum commitment fee for an invoice subscription when necessary, calculating the true-up fee and applying taxes to it.
+
+## Code Structure
+The `CreateService` class inherits from `BaseService` and contains a single public method `call`. It interacts with other services like `CalculateTrueUpFeeService` and `ApplyTaxesService` to perform its operations.
+
+## Symbols
+
+### `Fees::Commitments::Minimum::CreateService`
+#### Description
+This service is responsible for creating a minimum commitment fee for an invoice subscription. It calculates the true-up fee, creates a new fee record, applies taxes, and saves it to the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice_subscription | InvoiceSubscription | The invoice subscription for which the minimum commitment fee is being created |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the created fee and any error information |
+
+#### Internal Logic
+1. Check if the invoice already has a minimum commitment fee or if there's no minimum commitment.
+2. Calculate the true-up fee using `CalculateTrueUpFeeService`.
+3. Create a new `Fee` object with the calculated amount and other details.
+4. Apply taxes to the new fee using `ApplyTaxesService`.
+5. Save the new fee to the database.
+6. Handle any validation errors that occur during the process.
+
+### `call`
+#### Description
+This method executes the main logic of the service, creating the minimum commitment fee when necessary.
+
+#### Internal Logic
+1. Return early if the invoice already has a minimum commitment fee or if there's no minimum commitment.
+2. Calculate the true-up fee amount.
+3. Create a new `Fee` object with the calculated amount and other details.
+4. Apply taxes to the new fee.
+5. Save the new fee to the database.
+6. Add the new fee to the result object.
+7. Handle any `ActiveRecord::RecordInvalid` errors by recording the validation failure.
+
+### `invoice_has_minimum_commitment_fee?`
+#### Description
+A private method that checks if the invoice already has a minimum commitment fee for the given subscription.
+
+#### Internal Logic
+Checks the invoice's fees for any commitment-type fees associated with the subscription that are minimum commitments.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Commitments::Minimum::CalculateTrueUpFeeService | Calculates the true-up fee amount |
+| Fees::ApplyTaxesService | Applies taxes to the newly created fee |
+
+## Error Handling
+The service handles `ActiveRecord::RecordInvalid` errors that may occur during fee creation or saving. These errors are captured and added to the result object using the `record_validation_failure!` method.
+
+## Performance Considerations
+The service performs database operations, including querying for existing fees and saving new records. Care should be taken to ensure these operations are optimized, especially if dealing with a large number of invoices or subscriptions.

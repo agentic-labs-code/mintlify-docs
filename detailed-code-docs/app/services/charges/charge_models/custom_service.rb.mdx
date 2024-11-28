@@ -1,0 +1,56 @@
+---
+title: "custom_service.rb"
+---
+
+## High-level description
+This code defines a `CustomService` class within the `Charges::ChargeModels` module. It is a specialized implementation of a charge model that computes custom charges based on aggregation results. The class extends the `BaseService` class and overrides specific methods to provide custom functionality for calculating charge amounts and unit amounts.
+
+## Code Structure
+The `CustomService` class inherits from `Charges::ChargeModels::BaseService` and implements two protected methods: `compute_amount` and `unit_amount`. These methods are used to calculate the charge amount and the unit amount, respectively, based on the aggregation results.
+
+## References
+This code references the `Charges::ChargeModels::BaseService` class, which it inherits from. It also indirectly references the `aggregation_result` object, which is likely passed to the class during instantiation.
+
+## Symbols
+
+### `Charges::ChargeModels::CustomService`
+#### Description
+This class represents a custom charge model service. It provides specific implementations for computing the charge amount and unit amount based on custom aggregation results.
+
+#### Inputs
+This class doesn't define its own initializer, so it inherits the inputs from its parent class `BaseService`:
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Object | The charge object |
+| aggregation_result | Object | The result of aggregation calculations |
+| properties | Hash | Additional properties for the charge model |
+
+#### Outputs
+The class doesn't explicitly define outputs, but it contributes to the `result` object inherited from `BaseService`.
+
+#### Internal Logic
+
+##### `compute_amount`
+This protected method calculates the charge amount based on the custom aggregation result.
+
+1. It attempts to access the `:amount` key from the `custom_aggregation` hash in the `aggregation_result`.
+2. If the amount is not found or is nil, it returns 0.
+
+##### `unit_amount`
+This protected method calculates the unit amount based on the total units and the computed amount.
+
+1. It first tries to get the `full_units_number` from the `aggregation_result`. If that's not available, it falls back to the `units` value.
+2. If the total units are zero, it returns 0 to avoid division by zero.
+3. Otherwise, it divides the `result.amount` by the total units to get the unit amount.
+
+## Dependencies
+This class depends on the `Charges::ChargeModels::BaseService` class, which it inherits from.
+
+## Error Handling
+There's no explicit error handling in this class. It relies on the error handling mechanisms of its parent class and the Ruby language itself.
+
+## Performance Considerations
+The `compute_amount` method uses the safe navigation operator (`&.`) when accessing the custom aggregation amount. This prevents errors if the `custom_aggregation` is nil, but it might slightly impact performance compared to a direct hash access.
+
+The `unit_amount` method performs a division operation, which could potentially be a performance concern if called frequently with very large numbers. However, for typical use cases, this should not be a significant issue.

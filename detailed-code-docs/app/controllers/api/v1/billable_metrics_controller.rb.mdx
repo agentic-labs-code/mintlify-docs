@@ -1,0 +1,125 @@
+---
+title: "billable_metrics_controller.rb"
+---
+
+## High-level description
+This file defines the `BillableMetricsController` within the `Api::V1` namespace. It handles CRUD operations for billable metrics, including creating, updating, deleting, showing, and listing billable metrics for an organization through a RESTful API.
+
+## Code Structure
+The controller inherits from `Api::BaseController` and defines five main actions: `create`, `update`, `destroy`, `show`, and `index`. Each action interacts with corresponding service objects to perform the required operations on billable metrics.
+
+## Symbols
+
+### `BillableMetricsController`
+#### Description
+This controller manages billable metrics for an organization through API endpoints.
+
+#### Internal Logic
+- Uses service objects for create, update, and destroy operations
+- Renders JSON responses using serializers
+- Handles pagination for the index action
+- Implements error handling for failed operations
+
+### `create`
+#### Description
+Creates a new billable metric for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| input_params | Hash | Parameters for creating a billable metric |
+
+#### Internal Logic
+1. Calls `BillableMetrics::CreateService` to create the metric
+2. Renders the created metric using `V1::BillableMetricSerializer` if successful
+3. Renders an error response if creation fails
+
+### `update`
+#### Description
+Updates an existing billable metric for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | Code of the billable metric to update |
+| input_params | Hash | Parameters for updating the billable metric |
+
+#### Internal Logic
+1. Finds the billable metric by code and organization
+2. Calls `BillableMetrics::UpdateService` to update the metric
+3. Renders the updated metric using `V1::BillableMetricSerializer` if successful
+4. Renders an error response if update fails
+
+### `destroy`
+#### Description
+Deletes a billable metric for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | Code of the billable metric to delete |
+
+#### Internal Logic
+1. Finds the billable metric by code and organization
+2. Calls `BillableMetrics::DestroyService` to delete the metric
+3. Renders the deleted metric using `V1::BillableMetricSerializer` if successful
+4. Renders an error response if deletion fails
+
+### `show`
+#### Description
+Retrieves a single billable metric for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | Code of the billable metric to retrieve |
+
+#### Internal Logic
+1. Finds the billable metric by code and organization
+2. Renders the metric using `V1::BillableMetricSerializer` if found
+3. Returns a not found error if the metric doesn't exist
+
+### `index`
+#### Description
+Lists all billable metrics for the current organization with pagination.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| page | Integer | Page number for pagination |
+| per_page | Integer | Number of items per page |
+
+#### Internal Logic
+1. Retrieves billable metrics for the current organization
+2. Applies pagination and ordering
+3. Renders the metrics using `CollectionSerializer` with `V1::BillableMetricSerializer`
+
+### `input_params` (private)
+#### Description
+Defines the allowed parameters for creating or updating a billable metric.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| permitted_params | ActionController::Parameters | Permitted parameters for billable metric operations |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BillableMetrics::CreateService | Handles the creation of billable metrics |
+| BillableMetrics::UpdateService | Handles the updating of billable metrics |
+| BillableMetrics::DestroyService | Handles the deletion of billable metrics |
+| V1::BillableMetricSerializer | Serializes billable metric data for API responses |
+| CollectionSerializer | Serializes collections of billable metrics for API responses |
+
+## Error Handling
+The controller uses `render_error_response` method (likely defined in a parent controller) to handle and render error responses for failed operations.
+
+## API/Interface Reference
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| /api/v1/billable_metrics | POST | Create a new billable metric |
+| /api/v1/billable_metrics/:code | PUT | Update an existing billable metric |
+| /api/v1/billable_metrics/:code | DELETE | Delete a billable metric |
+| /api/v1/billable_metrics/:code | GET | Retrieve a single billable metric |
+| /api/v1/billable_metrics | GET | List all billable metrics (paginated) |

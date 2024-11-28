@@ -1,0 +1,48 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for serializers related to invoices in the V1 API. The serializers are responsible for converting various invoice-related objects into JSON representations. The tests ensure that these serializers correctly transform the objects and include all necessary information in the output.
+
+## What does it do?
+These tests verify that the serializers for invoice-related objects work correctly. They check if:
+
+1. Applied taxes on invoices are correctly serialized, including all relevant details like amounts and timestamps.
+2. Invoice metadata is properly converted to JSON, with the correct keys and values.
+3. Invoices with lost payment disputes are serialized correctly, both with and without additional provider error information.
+
+These tests help ensure that when the API sends invoice data to clients, it's in the correct format and contains all the necessary information. This is crucial for maintaining consistency in the API and preventing issues with client applications that consume this data.
+
+## Key Files
+1. `applied_tax_serializer_spec.rb`: Tests the serialization of applied taxes on invoices.
+2. `metadata_serializer_spec.rb`: Verifies the correct serialization of invoice metadata.
+3. `payment_dispute_lost_serializer_spec.rb`: Ensures proper serialization of invoices with lost payment disputes.
+
+Each of these files focuses on a specific aspect of invoice-related data serialization, contributing to the overall reliability of the API's data output.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: A library for creating test data, used to generate invoice-related objects for testing.
+3. JSON: Used for parsing the serialized output back into Ruby hashes for verification.
+
+These dependencies are likely managed through the project's Gemfile, with specific versions defined there.
+
+## Configuration
+While not explicitly shown in the provided summaries, these test files likely depend on a `rails_helper.rb` file, which sets up the Rails testing environment and includes necessary configurations. This helper file typically loads RSpec configurations, sets up FactoryBot, and includes any custom helpers or shared examples used across the test suite.
+
+The tests make use of RSpec's `let` statements and `subject` definitions to set up the objects and serializers being tested. They also use `aggregate_failures` to group multiple expectations together, allowing for more comprehensive error reporting.
+
+Here's an example of how these serializers might be used in the actual application:
+
+```ruby
+invoice = Invoice.find(params[:id])
+serializer = V1::Invoices::AppliedTaxSerializer.new(invoice.applied_taxes)
+render json: serializer.as_json
+```
+
+This code snippet demonstrates how an API controller might use one of these serializers to convert invoice data into JSON format before sending it as a response to a client request.
+
+The tests in this directory play a crucial role in ensuring that these serializers function correctly, maintaining the integrity and consistency of the API's data output. By thoroughly testing these serializers, the development team can confidently make changes to the invoice data structure or serialization process, knowing that any issues will be caught by the test suite.

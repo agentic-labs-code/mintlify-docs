@@ -1,0 +1,61 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `app/models/analytics` directory contains a collection of classes that handle various aspects of analytics data processing and caching for an organization. These classes are designed to efficiently query and cache complex analytics data, such as gross revenue, invoiced usage, monthly recurring revenue (MRR), overdue balances, and invoice collections.
+
+## What does it do?
+This directory provides a set of tools for calculating and retrieving various financial metrics for an organization. Here's a breakdown of the main functionalities:
+
+1. **Gross Revenue Calculation**: Computes the gross revenue for an organization over time, considering invoices and instant charges.
+2. **Invoiced Usage Tracking**: Retrieves data on invoiced usage for an organization, allowing for filtering by time period and currency.
+3. **Monthly Recurring Revenue (MRR) Calculation**: Calculates the MRR for an organization, taking into account different billing cycles and payment schedules.
+4. **Overdue Balance Tracking**: Computes and retrieves overdue balance information for an organization's customers.
+5. **Invoice Collection Analysis**: Aggregates data about invoices, including counts and total amounts for different payment statuses.
+
+Each of these functionalities is implemented with performance in mind, utilizing SQL queries with Common Table Expressions (CTEs) and caching mechanisms to optimize data retrieval and processing.
+
+## Entry points
+The main entry point for each analytics type is the `query` class method defined in each specific analytics class. These methods construct and execute complex SQL queries to retrieve the desired data. The classes are:
+
+1. `Analytics::Base`: An abstract base class that provides common functionality for caching and data retrieval.
+2. `Analytics::GrossRevenue`: Handles gross revenue calculations.
+3. `Analytics::InvoicedUsage`: Manages invoiced usage data retrieval.
+4. `Analytics::Mrr`: Calculates Monthly Recurring Revenue.
+5. `Analytics::OverdueBalance`: Computes overdue balance information.
+6. `Analytics::InvoiceCollection`: Aggregates invoice-related data.
+
+Each of these classes inherits from `Analytics::Base` and implements its own specific logic for data retrieval and caching.
+
+## Key Files
+1. `base.rb`: Defines the `Analytics::Base` abstract class, which provides common functionality for all analytics classes.
+2. `gross_revenue.rb`: Implements the `Analytics::GrossRevenue` class for calculating gross revenue.
+3. `invoiced_usage.rb`: Contains the `Analytics::InvoicedUsage` class for retrieving invoiced usage data.
+4. `mrr.rb`: Implements the `Analytics::Mrr` class for calculating Monthly Recurring Revenue.
+5. `overdue_balance.rb`: Defines the `Analytics::OverdueBalance` class for computing overdue balances.
+6. `invoice_collection.rb`: Implements the `Analytics::InvoiceCollection` class for aggregating invoice data.
+
+## Dependencies
+The analytics classes primarily depend on the following:
+
+1. `ActiveRecord`: Used for database interactions and query building.
+2. `Rails.cache`: Utilized for caching query results to improve performance.
+
+These dependencies are part of the Ruby on Rails framework, which is assumed to be the underlying technology stack for this application.
+
+## Configuration
+While there are no explicit configuration files in this directory, the analytics classes use several configuration options:
+
+1. Cache expiration time: Set to 4 hours in the `Analytics::Base` class.
+2. SQL query construction: Each analytics class constructs its SQL queries based on the specific requirements of the data being retrieved.
+
+The classes are designed to be flexible, allowing for optional arguments such as:
+- `organization_id`: The ID of the organization for which to retrieve data.
+- `external_customer_id`: For filtering data by a specific customer.
+- `currency`: For filtering data by a specific currency.
+- `months`: For specifying the number of months to include in the data retrieval.
+
+These configuration options are passed as arguments to the `query` methods of each analytics class.
+
+In summary, the `app/models/analytics` directory provides a robust set of tools for calculating and retrieving various financial metrics for an organization. The classes are designed with performance in mind, utilizing complex SQL queries and caching mechanisms to efficiently process and retrieve large amounts of data. The modular structure allows for easy maintenance and extension of analytics capabilities as needed.

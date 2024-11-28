@@ -1,0 +1,49 @@
+---
+title: "20230918090426_add_index_to_events.rb"
+---
+
+## High-level description
+This migration file adds a new index to the `events` table and removes an existing index. It's designed to improve query performance on the `events` table by creating a more specific index that includes the `timestamp` column and excludes deleted records.
+
+## Symbols
+
+### `AddIndexToEvents`
+#### Description
+This class is a Rails migration that inherits from `ActiveRecord::Migration[7.0]`. It defines changes to be applied to the database schema, specifically adding and removing indexes on the `events` table.
+
+#### Internal Logic
+1. Disables DDL (Data Definition Language) transactions for this migration.
+2. Adds a new index on the `events` table for columns `subscription_id`, `code`, and `timestamp`.
+3. Removes an existing index on the `events` table for columns `subscription_id` and `code`.
+
+### `change`
+#### Description
+This method defines the changes to be applied to the database schema. It adds a new index and removes an existing one.
+
+#### Internal Logic
+1. Adds a new index:
+   - Table: `events`
+   - Columns: `subscription_id`, `code`, `timestamp`
+   - Condition: `deleted_at IS NULL`
+   - Algorithm: Concurrent
+2. Removes an existing index:
+   - Table: `events`
+   - Columns: `subscription_id`, `code`
+
+## Side Effects
+- Improves query performance for the `events` table when searching by `subscription_id`, `code`, and `timestamp` for non-deleted records.
+- May temporarily impact database performance during index creation and removal.
+
+## Performance Considerations
+- The new index is created concurrently (`algorithm: :concurrently`), which allows other operations on the table while the index is being built.
+- The `where` clause in the new index (`deleted_at IS NULL`) makes the index more selective, potentially improving query performance for non-deleted records.
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| `disable_ddl_transaction!` | Method call | N/A | Disables DDL transaction for this migration, allowing concurrent index creation |
+
+## Notes
+1. This migration is designed to run without blocking other database operations, thanks to the `disable_ddl_transaction!` call and the use of `algorithm: :concurrently`.
+2. The new index is more specific than the old one, including the `timestamp` column and filtering out deleted records, which can lead to better query performance in certain scenarios.
+3. Removing the old index suggests that it's no longer needed or has been replaced by the new, more comprehensive index.

@@ -1,0 +1,118 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for the password reset functionality in a Rails application. It includes tests for two main services: `PasswordResets::CreateService` and `PasswordResets::ResetService`. These tests ensure the correct behavior of creating password reset requests and actually resetting passwords.
+
+## What does it do?
+The tests in this directory verify the following workflows:
+
+1. Creating a password reset request:
+   - Ensures that a new `PasswordReset` record is created for a user
+   - Verifies that an email job is enqueued to send reset instructions
+   - Checks error handling when invalid input is provided
+
+2. Resetting a user's password:
+   - Confirms that the user's password is changed successfully
+   - Verifies that the user is logged in after resetting their password
+   - Checks various error scenarios, such as missing arguments or expired reset tokens
+
+These tests help maintain the integrity and reliability of the password reset feature, which is crucial for user account management and security.
+
+## Key Files
+
+1. `create_service_spec.rb`:
+   This file contains tests for the `PasswordResets::CreateService` class. It verifies the process of initiating a password reset, including creating a `PasswordReset` record and enqueuing an email job.
+
+   Key tests include:
+   - Creating a password reset record
+   - Handling cases without valid user arguments
+   - Enqueuing a `SendEmailJob` for password reset instructions
+
+2. `reset_service_spec.rb`:
+   This file tests the `PasswordResets::ResetService` class, which handles the actual password reset process when a user submits a new password.
+
+   Key tests include:
+   - Changing the user's password successfully
+   - Logging in the user after resetting the password
+   - Handling missing arguments (token or new password)
+   - Dealing with expired password reset tokens
+
+Both files use RSpec's `describe` and `context` blocks to organize tests, and utilize `let` statements to set up shared test data.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data, particularly user objects.
+3. Rails: The tests are written for a Rails application, using Rails-specific testing helpers.
+
+## Configuration
+While there are no explicit configuration files in this directory, the tests rely on the broader Rails and RSpec configuration. Some notable configurations include:
+
+1. `rails_helper`: This is required at the beginning of each test file, likely setting up the Rails environment for testing.
+2. FactoryBot: The tests use FactoryBot for creating test data, which would be configured elsewhere in the application.
+
+## Code Snippets and Examples
+
+Here's an example of how the `PasswordResets::CreateService` is tested:
+
+```ruby
+RSpec.describe PasswordResets::CreateService do
+  describe '#call' do
+    let(:user) { create(:user) }
+    let(:create_args) { { user: user } }
+
+    it 'creates a password reset' do
+      expect { subject.call(create_args) }.to change { PasswordReset.count }.by(1)
+    end
+
+    it 'enqueues an SendEmailJob' do
+      expect { subject.call(create_args) }.to have_enqueued_job(SendEmailJob)
+    end
+
+    context 'without arguments' do
+      it 'returns error' do
+        result = subject.call(user: nil)
+        expect(result).not_to be_success
+        expect(result.error_code).to eq('user_not_found')
+      end
+    end
+  end
+end
+```
+
+This snippet shows how the tests verify the creation of a password reset record, the enqueuing of an email job, and error handling for invalid input.
+
+For the `PasswordResets::ResetService`, here's an example of how password changing is tested:
+
+```ruby
+RSpec.describe PasswordResets::ResetService do
+  describe '#call' do
+    let(:user) { create(:user) }
+    let(:password_reset) { create(:password_reset, user: user) }
+    let(:new_password) { 'new_password' }
+    let(:reset_args) do
+      {
+        token: password_reset.token,
+        new_password: new_password
+      }
+    end
+
+    it 'changes the user password' do
+      expect do
+        subject.call(reset_args)
+      end.to change { user.reload.password_digest }
+
+      expect(user.authenticate(new_password)).to be_truthy
+    end
+
+    # ... other tests ...
+  end
+end
+```
+
+This example demonstrates how the tests ensure that the user's password is changed successfully and can be used for authentication after the reset.
+
+These test files provide comprehensive coverage for the password reset functionality, ensuring that both the creation of reset requests and the actual password reset process work as expected, including proper error handling and edge cases.

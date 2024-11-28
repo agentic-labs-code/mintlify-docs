@@ -1,0 +1,65 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains serializer classes for the analytics module of the application's API (version 1). These serializers are responsible for formatting various types of analytical data into JSON-compatible structures for API responses. The serializers handle different aspects of financial and invoice-related data, including gross revenue, invoice collections, invoiced usage, monthly recurring revenue (MRR), and overdue balances.
+
+## What does it do?
+The serializers in this directory transform complex data structures into simplified, consistent formats suitable for API responses. They extract relevant information from the input data and organize it into standardized hash structures. This process ensures that the API can provide uniform and easily consumable data to clients, regardless of the underlying complexity of the data models.
+
+For example:
+1. The Gross Revenue serializer formats revenue data, including the month, amount, currency, and number of invoices.
+2. The Invoice Collection serializer summarizes collections of invoices, providing details like the month, payment status, invoice count, total amount, and currency.
+3. The Invoiced Usage serializer formats data about billed usage, including the month, code, currency, and amount.
+4. The MRR (Monthly Recurring Revenue) serializer provides a simple view of recurring revenue data.
+5. The Overdue Balance serializer formats information about unpaid balances, including associated invoice IDs.
+
+These serializers play a crucial role in presenting complex financial and analytical data in a clear, consistent manner through the API.
+
+## Key Files
+1. `gross_revenue_serializer.rb`: Serializes gross revenue data, including month, amount, currency, and invoice count.
+2. `invoice_collection_serializer.rb`: Formats collections of invoices, summarizing key details like payment status and total amount.
+3. `invoiced_usage_serializer.rb`: Serializes data about billed usage, including the specific code and amount.
+4. `mrr_serializer.rb`: Handles the serialization of Monthly Recurring Revenue data.
+5. `overdue_balance_serializer.rb`: Formats overdue balance information, including associated invoice IDs.
+
+Each of these serializers inherits from a base `ModelSerializer` class, which likely provides common serialization functionality. They all override the `serialize` method to define custom logic for their specific data types.
+
+## Dependencies
+All serializers in this directory depend on:
+
+1. `ModelSerializer`: This is the parent class for all serializers, providing basic serialization functionality. It's likely defined in `app/serializers/model_serializer.rb`.
+
+2. Ruby's built-in `JSON` module: Used for parsing JSON strings, particularly in the `OverdueBalanceSerializer`.
+
+The consistent use of `ModelSerializer` as a base class suggests a standardized approach to serialization across the application, which helps maintain consistency and reduces code duplication.
+
+## Configuration
+While there are no explicit configuration files mentioned for these serializers, they may rely on configuration inherited from the `ModelSerializer` base class. Additionally, the serializers appear to be designed to work with specific data structures, implying that there might be some implicit configuration in terms of expected input formats.
+
+Some serializers, like the `OverdueBalanceSerializer`, handle JSON parsing, which suggests that certain data might be stored in JSON format in the database or passed as JSON strings.
+
+Here's an example of how the `GrossRevenueSerializer` might be used:
+
+```ruby
+revenue_data = {
+  month: '2023-05',
+  amount_cents: 1000000,
+  currency: 'USD',
+  invoices_count: 50
+}
+
+serializer = V1::Analytics::GrossRevenueSerializer.new(revenue_data)
+serialized_data = serializer.serialize
+
+# serialized_data would be:
+# {
+#   month: '2023-05',
+#   amount_cents: 1000000,
+#   currency: 'USD',
+#   invoices_count: 50
+# }
+```
+
+This structure allows for easy extension and modification of the serialization process for each type of analytical data, while maintaining a consistent interface through the common `serialize` method.

@@ -1,0 +1,47 @@
+---
+title: "20230811081854_populate_fees_precise_coupons_amount_cents.rb"
+---
+
+## High-level description
+This migration populates the `precise_coupons_amount_cents` field in the `Fee` model. It calculates and distributes coupon amounts across fees based on different coupon types (limited to specific plans, limited to billable metrics, or unlimited) for version 3 invoices.
+
+## Code Structure
+The migration defines several ActiveRecord models and implements a `change` method that performs the main logic of populating the `precise_coupons_amount_cents` field.
+
+## Symbols
+
+### `PopulateFeesPreciseCouponsAmountCents`
+#### Description
+This is the main migration class that inherits from `ActiveRecord::Migration[7.0]`. It defines temporary versions of several ActiveRecord models to prevent future schema issues and implements the migration logic in the `change` method.
+
+### `change`
+#### Description
+This method contains the main logic for populating the `precise_coupons_amount_cents` field in the `Fee` model. It uses a reversible block to ensure the migration can be rolled back if needed.
+
+#### Internal Logic
+1. Retrieves relevant credits joined with invoices and coupons.
+2. Excludes fees that already have a non-zero `precise_coupons_amount_cents` value.
+3. Iterates through each credit and applies the following logic based on the coupon type:
+   a. For coupons limited to specific plans:
+      - Finds relevant fees based on the subscription's plan.
+      - Calculates and updates `precise_coupons_amount_cents` for each fee.
+   b. For coupons limited to specific billable metrics:
+      - Finds relevant fees based on the charge's billable metric.
+      - Calculates and updates `precise_coupons_amount_cents` for each fee.
+   c. For unlimited coupons:
+      - Applies the coupon amount to all fees of the invoice.
+      - Calculates and updates `precise_coupons_amount_cents` for each fee.
+
+#### Performance Considerations
+The migration uses `find_each` to process fees in batches, which can help with memory usage when dealing with a large number of records.
+
+## Side Effects
+This migration modifies the `precise_coupons_amount_cents` field of the `Fee` model for existing records.
+
+## Error Handling
+The migration uses `safety_assured` to bypass Strong Migrations checks, which may have implications for database safety during the migration process.
+
+## TODOs
+There are two NOTE comments in the code:
+1. A note about redefining models to prevent future schema issues.
+2. A note explaining the base of computation for coupons without limitations.

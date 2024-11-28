@@ -1,0 +1,71 @@
+---
+title: "Overview"
+---
+
+## High-level description
+
+This directory contains RSpec test files for jobs related to Stripe payment provider integration in the application. The tests cover three main jobs: HandleEventJob, RefreshWebhookJob, and RegisterWebhookJob. These tests ensure that the jobs correctly interact with their respective services and perform their intended functions.
+
+## What does it do?
+
+The tests in this directory verify the behavior of three important jobs related to Stripe integration:
+
+1. HandleEventJob: This job is responsible for processing Stripe webhook events. The test ensures that when the job is executed, it correctly calls the StripeService to handle the event for a given organization.
+
+2. RefreshWebhookJob: This job is tasked with refreshing Stripe webhooks. The test verifies that the job properly interacts with the StripeService to refresh a webhook for a given Stripe provider.
+
+3. RegisterWebhookJob: This job is responsible for registering new Stripe webhooks. The test checks that the job correctly calls the RegisterWebhookService when performed.
+
+These tests are crucial for maintaining the integrity of the Stripe integration, ensuring that webhook events are properly handled, and that webhooks are correctly registered and refreshed as needed.
+
+## Key Files
+
+1. `handle_event_job_spec.rb`:
+   This file tests the `PaymentProviders::Stripe::HandleEventJob`. It verifies that the job correctly delegates event handling to the `PaymentProviders::StripeService`. The test ensures that the service is initialized with the correct parameters and that the `handle_event` method is called with the provided Stripe event.
+
+2. `refresh_webhook_job_spec.rb`:
+   This file contains tests for the `PaymentProviders::Stripe::RefreshWebhookJob`. It checks that the job properly interacts with the `PaymentProviders::StripeService` to refresh a Stripe webhook. The test verifies that the service is initialized correctly and that the `refresh_webhook` method is called with the provided Stripe provider.
+
+3. `register_webhook_job_spec.rb`:
+   This file tests the `PaymentProviders::Stripe::RegisterWebhookJob`. It ensures that the job correctly calls the `PaymentProviders::Stripe::RegisterWebhookService` when performed. The test verifies that the service's `call` method is invoked with the provided Stripe provider.
+
+## Dependencies
+
+The tests in this directory rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data, such as organizations and Stripe providers.
+3. Rails: The tests are written in the context of a Rails application, using the `rails_helper` to load the Rails testing environment and configuration.
+
+## Configuration
+
+The tests use RSpec's configuration and mocking capabilities. Some common patterns used across the test files include:
+
+1. Using `let` blocks to define test data and mock objects.
+2. Using `before` blocks to set up test environments and configure mock objects.
+3. Using RSpec's `allow` and `expect` methods for stubbing and verifying method calls.
+
+Here's an example of how the tests are typically structured:
+
+```ruby
+RSpec.describe PaymentProviders::Stripe::SomeJob, type: :job do
+  let(:some_service) { instance_double(PaymentProviders::SomeService) }
+  let(:result) { instance_double(BaseService::Result) }
+  let(:some_model) { create(:some_model) }
+
+  before do
+    allow(PaymentProviders::SomeService).to receive(:new).and_return(some_service)
+    allow(some_service).to receive(:some_method).and_return(result)
+  end
+
+  it 'calls the appropriate service method' do
+    described_class.perform_now(some_model)
+    expect(PaymentProviders::SomeService).to have_received(:new)
+    expect(some_service).to have_received(:some_method)
+  end
+end
+```
+
+This structure allows for isolated testing of the job's behavior, ensuring that it correctly interacts with the associated services without actually executing the service logic.
+
+The tests in this directory play a crucial role in maintaining the reliability of the Stripe integration within the application. They ensure that the jobs responsible for handling Stripe events, refreshing webhooks, and registering new webhooks are functioning correctly, which is essential for proper payment processing and webhook management.

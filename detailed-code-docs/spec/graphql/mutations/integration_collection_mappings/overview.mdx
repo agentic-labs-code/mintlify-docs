@@ -1,0 +1,101 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test suites for GraphQL mutations related to Integration Collection Mappings. The tests cover the creation, updating, and deletion of these mappings, ensuring proper functionality, authorization, and error handling.
+
+## What does it do?
+These test suites verify the behavior of GraphQL mutations that manage Integration Collection Mappings. They ensure that:
+
+1. New mappings can be created with the correct input data.
+2. Existing mappings can be updated with new information.
+3. Mappings can be deleted when no longer needed.
+4. Proper authorization and permissions are enforced for each operation.
+5. Error cases, such as attempting to delete a non-existent mapping, are handled correctly.
+
+The tests simulate various scenarios a developer might encounter when working with these mutations, providing confidence that the mutations behave as expected in different situations.
+
+## Key Files
+1. `create_spec.rb`: Tests the creation of new Integration Collection Mappings.
+2. `update_spec.rb`: Verifies the updating of existing Integration Collection Mappings.
+3. `destroy_spec.rb`: Ensures proper deletion of Integration Collection Mappings.
+
+Each file focuses on a specific mutation and includes tests for successful operations, authorization checks, and error handling where applicable.
+
+## Dependencies
+The test suites rely on the following key dependencies:
+
+1. RSpec: The testing framework used to structure and run the tests.
+2. FactoryBot: Used to create test data and objects.
+3. Faker: Generates random data for testing purposes.
+4. Rails: The underlying framework, with `rails_helper` used to load the Rails testing environment.
+5. GraphQL: The API query language used for defining and executing the mutations.
+
+## Configuration
+While there are no explicit configuration files mentioned, the tests use several setup mechanisms:
+
+1. `let` statements: Used to define test data and variables.
+2. Shared examples: Common authorization checks are defined as shared examples and included in each test suite.
+3. `execute_graphql` method: Likely defined in a support file (e.g., `spec/support/graphql_helper.rb`) to simplify running GraphQL queries in tests.
+
+Here's an example of how the `mutation` is defined in the create_spec.rb file:
+
+```ruby
+let(:mutation) do
+  &lt;&lt;-GQL
+    mutation($input: CreateIntegrationCollectionMappingInput!) {
+      createIntegrationCollectionMapping(input: $input) {
+        integrationCollectionMapping {
+          id
+          externalId
+          externalName
+          externalAccountCode
+          mappingType
+          integration {
+            id
+          }
+        }
+      }
+    }
+  GQL
+end
+```
+
+This mutation definition is used to test the creation of a new Integration Collection Mapping.
+
+The test suites make extensive use of RSpec's `describe`, `context`, and `it` blocks to organize tests logically. They also use `aggregate_failures` to group multiple expectations, allowing all assertions to be checked even if one fails.
+
+For example, in the update_spec.rb file:
+
+```ruby
+it 'updates a netsuite integration' do
+  result = execute_graphql(
+    mutation,
+    input: {
+      id: integration_collection_mapping.id,
+      externalId: external_id,
+      externalName: external_name,
+      externalAccountCode: external_account_code,
+      mappingType: mapping_type
+    },
+    current_user: membership.user,
+    current_organization: organization
+  )
+
+  data = result['data']['updateIntegrationCollectionMapping']['integrationCollectionMapping']
+
+  aggregate_failures do
+    expect(data['id']).to eq(integration_collection_mapping.id)
+    expect(data['externalId']).to eq(external_id)
+    expect(data['externalName']).to eq(external_name)
+    expect(data['externalAccountCode']).to eq(external_account_code)
+    expect(data['mappingType']).to eq(mapping_type)
+    expect(data['integration']['id']).to eq(integration.id)
+  end
+end
+```
+
+This test case verifies that updating a NetSuite integration collection mapping works as expected, checking all relevant fields after the update.
+
+Overall, these test suites provide comprehensive coverage for the Integration Collection Mapping mutations, ensuring they function correctly and handle various scenarios appropriately.

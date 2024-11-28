@@ -1,0 +1,73 @@
+---
+title: "netsuite_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Integrations::Aggregator::Contacts::Payloads::Netsuite` class. It tests the creation and updating of payload bodies for NetSuite customer integration, handling various scenarios such as different address configurations and legacy script settings.
+
+## Symbols
+
+### `Integrations::Aggregator::Contacts::Payloads::Netsuite`
+#### Description
+This class is responsible for generating payload bodies for creating and updating customer records in NetSuite.
+
+### `#create_body`
+#### Description
+This method generates the payload body for creating a new customer record in NetSuite.
+
+#### Internal Logic
+- Constructs a hash with customer details including name, subsidiary, Lago ID, Salesforce ID, customer link, email, and phone.
+- Handles different address configurations (billing and shipping).
+- Considers the `legacy_script` setting of the integration.
+
+### `#update_body`
+#### Description
+This method generates the payload body for updating an existing customer record in NetSuite.
+
+#### Internal Logic
+- Constructs a hash with customer details to be updated, including the external customer ID.
+- Includes fewer fields compared to the create body.
+
+### `#email`
+#### Description
+A private method that extracts the first email address from a comma-separated list of email addresses.
+
+#### Internal Logic
+- Handles nil and empty string cases.
+- Splits the email string by comma and returns the first element.
+
+### `#phone`
+#### Description
+A private method that extracts the first phone number from a comma-separated list of phone numbers.
+
+#### Internal Logic
+- Handles nil and empty string cases.
+- Splits the phone string by comma and returns the first element.
+
+## Tests
+
+The spec file includes several test cases:
+
+1. `#create_body`
+   - Tests different scenarios based on shipping address presence and whether it's the same as the billing address.
+   - Checks the behavior when `legacy_script` is true or false.
+
+2. `#update_body`
+   - Verifies the structure of the update payload.
+
+3. `#email`
+   - Tests various email input scenarios (nil, empty, single email, multiple emails).
+
+4. `#phone`
+   - Tests various phone input scenarios (nil, empty, single phone, multiple phones).
+
+Each test case uses factories to create test data and compares the output of the methods against expected results.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| FactoryBot | Used for creating test data |
+| Faker | Generates fake data for tests |
+
+This spec file is crucial for ensuring the correct functionality of the NetSuite integration payload generation, covering various edge cases and configurations.

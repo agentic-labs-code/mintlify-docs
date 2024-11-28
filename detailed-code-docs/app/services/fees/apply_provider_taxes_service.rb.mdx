@@ -1,0 +1,56 @@
+---
+title: "apply_provider_taxes_service.rb"
+---
+
+## High-level description
+The `ApplyProviderTaxesService` is a service class within the `Fees` module that applies provider-specific taxes to a given fee. It calculates and applies tax amounts based on the provided fee taxes, creating `Fee::AppliedTax` records for each tax and updating the fee's tax-related attributes.
+
+## Code Structure
+The main class `ApplyProviderTaxesService` inherits from `BaseService`. It takes a fee and fee taxes as input and processes them to apply the taxes to the fee. The class uses the `Result` object from `BaseService` to store and return the result of the operation.
+
+## Symbols
+
+### `ApplyProviderTaxesService`
+#### Description
+This service applies provider taxes to a given fee. It calculates the tax amounts, creates `Fee::AppliedTax` records, and updates the fee's tax-related attributes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fee | Fee | The fee object to which taxes will be applied |
+| fee_taxes | Object | An object containing tax information to be applied |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | A Result object containing the applied taxes and any error information |
+
+#### Internal Logic
+1. Check if the fee already has applied taxes. If so, return the result without further processing.
+2. Iterate through each tax in the `fee_taxes.tax_breakdown`:
+   - Create a new `Fee::AppliedTax` record for each tax.
+   - Calculate the tax amount based on the fee's sub-total and tax rate.
+   - Add the applied tax to the fee and save it if the fee is persisted.
+   - Update the total applied taxes amount and rate.
+   - Add the applied tax to the result.
+3. Update the fee's `taxes_amount_cents` and `taxes_rate` attributes.
+4. Handle any `ActiveRecord::RecordInvalid` errors by calling `record_validation_failure!` on the result.
+
+## Side Effects
+- Creates and persists `Fee::AppliedTax` records.
+- Updates the `applied_taxes`, `taxes_amount_cents`, and `taxes_rate` attributes of the input fee.
+
+## Error Handling
+The service handles `ActiveRecord::RecordInvalid` errors by calling `record_validation_failure!` on the result object, which is defined in the `BaseService` class.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Fee::AppliedTax | Model used to create applied tax records |
+| BaseService | Parent class providing common service functionality |
+
+## References
+- `BaseService`: The parent class that provides common functionality for services, including the `Result` object and error handling methods.
+- `Fee::AppliedTax`: The model used to create applied tax records.
+
+This service is likely used in conjunction with other services and models related to fee and tax calculations in the application, such as the `ComputeAmountsFromFees` service in the `Invoices` module.

@@ -1,0 +1,78 @@
+---
+title: "max_query.rb"
+---
+
+## High-level description
+This code defines a `MaxQuery` class within the `Events::Stores::Clickhouse::PreAggregated` module. It is designed to handle pre-aggregated maximum value queries for event data stored in Clickhouse, specifically using the `EventsMaxAgg` model.
+
+## Code Structure
+The `MaxQuery` class inherits from a `Base` class and overrides several protected methods to define specific behavior for maximum value aggregation queries.
+
+## Symbols
+
+### `MaxQuery`
+#### Description
+This class is responsible for handling pre-aggregated maximum value queries in Clickhouse. It sets up the necessary configurations for querying maximum aggregated event data.
+
+#### Internal Logic
+The class overrides four protected methods:
+
+1. `aggregation_type`: Returns the string 'max_agg' to identify the type of aggregation.
+2. `pre_aggregated_model`: Returns the `Clickhouse::EventsMaxAgg` model, which represents the pre-aggregated data table in Clickhouse.
+3. `clickhouse_aggregation`: Returns the string 'max', indicating the Clickhouse aggregation function to be used.
+4. `assign_units`: A method to update the units in a bucket if the new value is greater than the existing one.
+
+### `aggregation_type`
+#### Description
+Defines the aggregation type as 'max_agg'.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @aggregation_type | String | The string 'max_agg' |
+
+### `pre_aggregated_model`
+#### Description
+Specifies the Clickhouse model to be used for pre-aggregated data.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @pre_aggregated_model | Class | The `Clickhouse::EventsMaxAgg` class |
+
+### `clickhouse_aggregation`
+#### Description
+Defines the Clickhouse aggregation function to be used.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @clickhouse_aggregation | String | The string 'max' |
+
+### `assign_units`
+#### Description
+Updates the units in a bucket if the new value is greater than the existing one.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bucket | Hash | The bucket to update |
+| units | Numeric | The new units value to compare |
+
+#### Internal Logic
+This method compares the new `units` value with the existing value in the `bucket[:units]`. If the new value is greater, it updates the bucket's units.
+
+## References
+The code references the `Clickhouse::EventsMaxAgg` model, which is defined in the related file `app/models/clickhouse/events_max_agg.rb`.
+
+## Dependencies
+The code depends on a `Base` class, which is not provided in the given snippets but is likely defined in a parent module or a separate file.
+
+## Notes on Related Code
+The related `Clickhouse::EventsMaxAgg` model provides context for the data structure used in the pre-aggregated queries:
+
+- It inherits from `BaseRecord`
+- The table name is set to 'events_max_agg'
+- The table schema includes fields for code, filters, grouped_by, timestamp, value, charge_id, external_subscription_id, and organization_id
+
+This model represents the structure of the pre-aggregated maximum values stored in Clickhouse, which the `MaxQuery` class is designed to query.

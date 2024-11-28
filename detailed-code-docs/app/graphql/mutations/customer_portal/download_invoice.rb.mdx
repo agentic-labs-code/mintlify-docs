@@ -1,0 +1,57 @@
+---
+title: "download_invoice.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for downloading a customer portal invoice PDF. It's part of a larger GraphQL API and handles the authentication and generation of invoice PDFs for customers in a customer portal.
+
+## Code Structure
+The `DownloadInvoice` class is defined within the `Mutations::CustomerPortal` module. It inherits from `BaseMutation` and includes the `AuthenticableCustomerPortalUser` concern for authentication. The class defines the GraphQL mutation structure, including its name, description, arguments, and return type.
+
+## References
+- `AuthenticableCustomerPortalUser` concern
+- `Types::Invoices::Object` type
+- `::Invoices::GeneratePdfService` service
+
+## Symbols
+
+### `Mutations::CustomerPortal::DownloadInvoice`
+#### Description
+This class defines a GraphQL mutation for downloading a customer portal invoice PDF. It authenticates the user, finds the requested invoice, and generates the PDF using a service.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the invoice to be downloaded |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Types::Invoices::Object | The invoice object with the generated PDF |
+
+#### Internal Logic
+1. Authenticate the customer portal user
+2. Find the visible invoice for the authenticated user using the provided ID
+3. Generate the PDF using the `Invoices::GeneratePdfService`
+4. Return the invoice if successful, or an error if the generation fails
+
+## Side Effects
+- Generates and attaches a PDF file to the invoice object
+- May trigger a webhook event 'invoice.generated'
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableCustomerPortalUser | Provides authentication for customer portal users |
+| Types::Invoices::Object | Defines the structure of the invoice object returned by the mutation |
+| ::Invoices::GeneratePdfService | Service responsible for generating the invoice PDF |
+
+## Error Handling
+The mutation uses the `result_error` method to handle errors returned by the `GeneratePdfService`. Specific error handling details are not visible in the provided code snippet.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| downloadCustomerPortalInvoice | Mutation | `{ id: ID! }` | Invoice object | Downloads a customer portal invoice PDF |
+
+This mutation is part of the larger GraphQL API and can be accessed through the standard GraphQL endpoint.

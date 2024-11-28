@@ -1,0 +1,85 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for a subscription-based billing system, specifically focusing on scenarios involving minimum commitments billed in advance. The tests cover both anniversary and calendar-based billing for various frequencies (weekly, monthly, quarterly, and yearly), ensuring the correct application of minimum commitment fees across different billing periods and their interaction with coupons.
+
+## What does it do?
+The tests in this directory simulate complex subscription billing scenarios to verify the system's behavior in handling minimum commitments. They cover the following key aspects:
+
+1. Setting up organizations, customers, and subscription plans with different billing frequencies.
+2. Creating various types of billable metrics (metered and recurring) and charges.
+3. Defining minimum commitments for plans and testing their application.
+4. Generating events and invoices over multiple billing periods.
+5. Applying coupons to subscriptions and verifying their impact on minimum commitment calculations.
+6. Testing both anniversary billing (based on subscription start date) and calendar-based billing.
+7. Verifying pro-ration and partial billing period handling.
+8. Ensuring correct fee calculation and minimum commitment application in different scenarios.
+
+These tests are crucial for validating the billing system's accuracy and reliability, especially when dealing with complex scenarios involving minimum commitments, various billing frequencies, and the application of coupons.
+
+## Key Files
+The directory is organized into two main subdirectories: `anniversary` and `calendar`, each containing four key test files:
+
+1. `weekly_spec.rb`: Tests weekly billing scenarios
+2. `monthly_spec.rb`: Tests monthly billing scenarios
+3. `quarterly_spec.rb`: Tests quarterly billing scenarios
+4. `yearly_spec.rb`: Tests yearly billing scenarios, including monthly charges within yearly plans
+
+Each file follows a similar structure:
+- Setting up the test environment with necessary objects
+- Creating subscriptions and initial events
+- Testing billing behavior across multiple periods
+- Verifying the correct application of minimum commitment fees
+- Testing scenarios with and without applied coupons
+
+The main difference between the `anniversary` and `calendar` subdirectories is the billing time configuration:
+- `anniversary`: Billing date is based on the subscription start date
+- `calendar`: Billing follows calendar-based intervals
+
+## Dependencies
+The test files rely on the following key dependencies:
+
+| Dependency | Purpose |
+|:-----------|:--------|
+| RSpec | Testing framework |
+| FactoryBot | Used for creating test objects |
+| ActiveSupport::Testing::TimeHelpers | Used for time manipulation in tests |
+| rails_helper | Loads Rails testing environment and configuration |
+
+These dependencies were chosen to provide a robust testing environment for Rails applications, allowing for easy test data creation and time manipulation, which is crucial for testing complex billing scenarios.
+
+## Configuration
+The tests use various configuration settings to simulate different billing scenarios:
+
+- Billing frequencies: weekly, monthly, quarterly, yearly
+- Billing time: 'anniversary' or 'calendar'
+- Timezone: Usually set to 'UTC' for the customer
+- Minimum commitment amounts
+- Coupon amounts and types
+- Billable metric types: metered, recurring
+- Charge models: standard, package
+
+Example configuration for a minimum commitment:
+```ruby
+create(
+  :commitment,
+  plan:,
+  commitment_type: 'minimum',
+  amount_cents: 10_000,
+  invoice_display_name: 'Minimum commitment fee'
+)
+```
+
+Example configuration for a charge:
+```ruby
+create(
+  :standard_charge,
+  plan:,
+  billable_metric: billable_metric_metered,
+  properties: { amount: '0.01' }
+)
+```
+
+These configurations allow the tests to cover a wide range of scenarios and ensure the billing system works correctly under different conditions, providing comprehensive validation of the minimum commitment feature across various billing intervals and types.

@@ -1,0 +1,46 @@
+---
+title: "grouped_usage.rb"
+---
+
+## High-level description
+The `GroupedUsage` class represents a group of charges with aggregated usage data, such as total amount, event count, and units. It provides fields for accessing the aggregated values, filters applied, and grouping criteria.
+
+## Code Structure
+The `GroupedUsage` class inherits from `Types::BaseObject` and defines several fields representing aggregated usage data and metadata. It utilizes the underlying `object` which is assumed to be an array of individual charge usage records.
+
+## References
+- `Types::Customers::Usage::ChargeFilter`: Used for the `filters` field, representing filters applied to the grouped usage.
+
+## Symbols
+
+### `GroupedUsage`
+#### Description
+This class represents a group of charges with aggregated usage data. It provides fields for accessing the aggregated values, filters applied, and grouping criteria.
+
+#### Inputs
+This class does not define any explicit inputs. It operates on the `object` instance variable, which is implicitly passed and assumed to be an array of individual charge usage records.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `amount_cents` | `GraphQL::Types::BigInt` | Total amount in cents for the grouped charges. |
+| `events_count` | `Integer` | Total number of events for the grouped charges. |
+| `units` | `GraphQL::Types::Float` | Total units consumed for the grouped charges. |
+| `filters` | `[Types::Customers::Usage::ChargeFilter]` | List of filters applied to the grouped usage. |
+| `grouped_by` | `GraphQL::Types::JSON` | Criteria used for grouping the charges. |
+
+#### Internal Logic
+The class defines methods for calculating and accessing the aggregated data:
+- `amount_cents`: Calculates the sum of `amount_cents` from individual charge records.
+- `events_count`: Calculates the sum of `events_count` from individual charge records.
+- `units`: Calculates the sum of `units` from individual charge records, converting each unit value to `BigDecimal` before summation.
+- `grouped_by`: Retrieves the `grouped_by` value from the first charge record, assuming it's consistent across the group.
+- `filters`: Returns a sorted list of `ChargeFilter` objects representing the filters applied to the group. If no filters are present, it returns an empty array.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| `graphql` | Provides GraphQL types and utilities. |
+
+### Configuration
+This code does not define any configuration options.

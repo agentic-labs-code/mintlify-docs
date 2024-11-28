@@ -1,0 +1,80 @@
+---
+title: "create_draft_service.rb"
+---
+
+## High-level description
+This code defines a service class `CreateDraftService` within the `Integrations::Aggregator::Taxes::Invoices` module. Its primary purpose is to create a draft invoice by interacting with an external API, specifically for the Anrok integration. The service handles the API request, processes the response, and manages potential errors.
+
+## Code Structure
+The `CreateDraftService` class inherits from `BaseService` and contains methods for defining the API path, making the API call, and processing the response. It also includes a private method for preparing the payload for the API request.
+
+## References
+- `BaseService` (not shown in the provided code)
+- `Integrations::Aggregator::Taxes::Invoices::Payload` (not shown in the provided code)
+- `LagoHttpClient::HttpError` (shown in related code snippets)
+
+## Symbols
+
+### `CreateDraftService`
+#### Description
+This class is responsible for creating a draft invoice by making an API call to an external service (Anrok).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Object | The integration object (expected to be of type 'Integrations::AnrokIntegration') |
+| invoice | Object | The invoice object |
+| customer | Object | The customer object |
+| integration_customer | Object | The integration customer object |
+| fees | Array | An array of fee objects |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the result of the operation |
+
+#### Internal Logic
+1. Checks if the integration exists and is of the correct type.
+2. Prepares the payload using the `Payload` class.
+3. Makes a POST request to the external API using `http_client`.
+4. Parses the response and processes it.
+5. Handles any HTTP errors that may occur during the request.
+
+### `action_path`
+#### Description
+Defines the API endpoint path for creating draft invoices.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| path | String | The API endpoint path |
+
+### `call`
+#### Description
+The main method that orchestrates the creation of a draft invoice.
+
+#### Internal Logic
+1. Checks for the existence of the integration and its type.
+2. Makes the API call using the prepared payload and headers.
+3. Processes the API response.
+4. Handles any `LagoHttpClient::HttpError` that may occur.
+
+### `payload` (private)
+#### Description
+Prepares the payload for the API request using the `Payload` class.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| body | Hash | The prepared payload for the API request |
+
+## Error Handling
+The `call` method uses a `rescue` block to catch `LagoHttpClient::HttpError` exceptions. When an error occurs, it extracts the error code and message, then updates the `result` object with the failure information.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| LagoHttpClient | Used for making HTTP requests and handling HTTP errors |
+| JSON | Used for parsing the API response body |
+
+This service class is designed to work within a larger system for managing integrations, specifically for creating draft invoices with tax information. It relies on other parts of the system, such as the `Payload` class and the `BaseService` class, to function properly.

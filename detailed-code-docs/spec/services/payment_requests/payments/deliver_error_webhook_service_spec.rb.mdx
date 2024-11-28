@@ -1,0 +1,48 @@
+---
+title: "deliver_error_webhook_service_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `PaymentRequests::Payments::DeliverErrorWebhookService` class. It specifically tests the `call_async` method of the service, which is responsible for enqueuing a job to send a payment request payment failure webhook.
+
+## Symbols
+
+### `RSpec.describe PaymentRequests::Payments::DeliverErrorWebhookService`
+#### Description
+This is the main describe block for the test suite, focusing on the `PaymentRequests::Payments::DeliverErrorWebhookService` class.
+
+### `subject(:webhook_service)`
+#### Description
+Defines the subject of the test, which is an instance of the `DeliverErrorWebhookService` class, initialized with a payment request and params.
+
+### `let(:payment_request)`
+#### Description
+Creates a test payment request using FactoryBot.
+
+### `let(:params)`
+#### Description
+Defines a hash of parameters that simulate the error data for the webhook.
+
+### `describe '.call_async'`
+#### Description
+Focuses on testing the `call_async` method of the service.
+
+#### Internal Logic
+The test checks if calling `call_async` on the webhook service enqueues a `SendWebhookJob` with the correct arguments:
+1. The webhook event name: 'payment_request.payment_failure'
+2. The payment request object
+3. The params hash containing error details
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used for creating test objects (payment_request) |
+| RSpec | The testing framework used |
+
+## Notes
+1. The test uses `have_enqueued_job` matcher, which suggests that the actual sending of the webhook is handled asynchronously through a background job system (likely Sidekiq, based on the related `rails_helper.rb` file).
+2. The `with_indifferent_access` method is used on the params hash, allowing both string and symbol keys to be used interchangeably.
+3. The test doesn't actually send the webhook; it only verifies that the job to send the webhook is enqueued with the correct parameters.
+
+This test ensures that when the `call_async` method of the `DeliverErrorWebhookService` is called, it properly enqueues a job to send a webhook notification about a payment failure, including the necessary details about the payment request and the error that occurred.

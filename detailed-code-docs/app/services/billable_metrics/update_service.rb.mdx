@@ -1,0 +1,58 @@
+---
+title: "update_service.rb"
+---
+
+## High-level description
+This code defines the `UpdateService` class within the `BillableMetrics` module. Its primary purpose is to update an existing billable metric with new attributes provided in the `params` hash. The service handles various update scenarios, including updating filters and managing different attributes based on whether the billable metric is attached to a plan or not.
+
+## Code Structure
+The `UpdateService` class inherits from `BaseService` and contains a single public method `call`. It uses a transaction to ensure data consistency when updating filters. The class also delegates the `organization` method to the `billable_metric` object.
+
+## Symbols
+
+### `BillableMetrics::UpdateService`
+#### Description
+This service class is responsible for updating a billable metric with new attributes. It handles various update scenarios and performs necessary validations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| billable_metric | BillableMetric | The billable metric to be updated |
+| params | Hash | A hash containing the new attributes for the billable metric |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the updated billable metric or error information |
+
+#### Internal Logic
+1. Check if the billable metric exists
+2. Validate custom aggregation permission
+3. Update basic attributes (name and description)
+4. Update filters in a transaction if provided
+5. Update additional attributes if the billable metric is not attached to any plans
+6. Save the updated billable metric
+7. Handle errors and return the result
+
+#### Error Handling
+The service handles two types of errors:
+1. `ActiveRecord::RecordInvalid`: For validation errors when saving the billable metric
+2. `BaseService::FailedResult`: For errors raised by other services (e.g., filter creation)
+
+## Side Effects
+- Updates the attributes of the given billable metric
+- Creates or updates filters associated with the billable metric
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BillableMetricFilters::CreateOrUpdateBatchService | Used to create or update filters for the billable metric |
+
+## References
+- `BillableMetricFilters::CreateOrUpdateBatchService`: Used to handle filter updates
+- `BaseService`: The parent class for this service
+- `BillableMetric` model: The main object being updated by this service
+
+This service is used in the following contexts:
+1. API endpoint for updating billable metrics (`Api::V1::BillableMetricsController#update`)
+2. GraphQL mutation for updating billable metrics (`Mutations::BillableMetrics::Update`)

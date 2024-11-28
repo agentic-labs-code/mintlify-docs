@@ -1,0 +1,45 @@
+---
+title: "payments.rb"
+---
+
+## High-level description
+This file defines a factory for creating `Payment` objects using FactoryBot, a popular Ruby gem for generating test data. The factory sets up default attributes and associations for payment instances, which can be used in tests to create sample payment records efficiently.
+
+## Symbols
+
+### `:payment` factory
+#### Description
+This factory defines the structure and default values for creating `Payment` objects. It sets up associations with related models and provides default values for various attributes of a payment.
+
+#### Inputs
+The factory doesn't have explicit inputs, but it can be customized when used in tests.
+
+#### Outputs
+When used, this factory produces a `Payment` object with the specified attributes and associations.
+
+#### Internal Logic
+The factory sets up the following:
+
+1. Associations:
+   - `payable`: Associated with an `Invoice` object
+   - `payment_provider`: Associated with a `StripeProvider` object
+   - `payment_provider_customer`: Associated with a `StripeCustomer` object
+
+2. Attributes:
+   - `amount_cents`: Set to 200 (representing 2.00 in the specified currency)
+   - `amount_currency`: Set to 'EUR'
+   - `provider_payment_id`: Generated using `SecureRandom.uuid`
+   - `status`: Set to 'pending'
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| FactoryBot | Used to define and create factories for test data generation |
+| SecureRandom | Used to generate a random UUID for the `provider_payment_id` |
+
+## Notes
+1. The `frozen_string_literal: true` comment at the top of the file enables frozen string literals, which can improve performance and memory usage in Ruby.
+2. This factory assumes the existence of other factories: `:invoice`, `:stripe_provider`, and `:stripe_customer`.
+3. The `amount_cents` and `amount_currency` suggest that the `Payment` model likely uses the money-rails gem or a similar approach to handle currency amounts.
+4. The `status` is set to 'pending' by default, indicating that newly created payments start in a pending state.
+5. This factory can be easily extended or overridden in tests to create payments with different attributes or associations as needed.

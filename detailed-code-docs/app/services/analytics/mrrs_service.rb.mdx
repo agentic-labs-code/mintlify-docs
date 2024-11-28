@@ -1,0 +1,57 @@
+---
+title: "mrrs_service.rb"
+---
+
+## High-level description
+This code defines the `Analytics::MrrsService` class, which is responsible for retrieving Monthly Recurring Revenue (MRR) records for a given organization. It checks for premium license status before fetching the records and returns the result.
+
+## Code Structure
+The `MrrsService` class inherits from `BaseService` and contains a single `call` method that performs the main functionality.
+
+## References
+- `License`: Used to check premium status
+- `::Analytics::Mrr`: Used to fetch MRR records
+- `BaseService`: Parent class providing common service functionality
+
+## Symbols
+
+### `Analytics::MrrsService`
+#### Description
+This service class handles the retrieval of MRR records for an organization, ensuring that the user has the necessary premium license to access this feature.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization for which to fetch MRR records |
+| filters | Hash | Optional filters for the MRR query |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Contains the fetched records or a failure status |
+
+#### Internal Logic
+1. Check if the user has a premium license using `License.premium?`
+2. If not premium, return a forbidden failure result
+3. Fetch MRR records using `::Analytics::Mrr.find_all_by` with the organization ID and filters
+4. Store the fetched records in the result object
+5. Return the result
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| License | To check if the user has a premium license |
+| ::Analytics::Mrr | To fetch MRR records |
+
+## Error Handling
+The service uses the error handling mechanisms provided by the `BaseService` class. If the user doesn't have a premium license, it returns a forbidden failure result.
+
+## API/Interface Reference
+This service is likely called from the `Api::V1::Analytics::MrrsController`, which handles the API endpoint for retrieving MRR data. The controller passes the current organization and any filters from the request parameters to the service.
+
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /api/v1/analytics/mrrs | GET | Optional query params: currency, months | MRR records | Retrieves MRR data for the organization |
+
+## Performance Considerations
+The performance of this service depends on the efficiency of the `::Analytics::Mrr.find_all_by` method, which likely involves database queries. The `Analytics::Mrr` model uses complex SQL queries to calculate MRR, which may impact performance for large datasets or long time ranges.

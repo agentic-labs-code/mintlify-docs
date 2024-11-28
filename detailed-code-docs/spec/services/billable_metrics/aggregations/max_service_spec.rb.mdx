@@ -1,0 +1,66 @@
+---
+title: "max_service_spec.rb"
+---
+
+## High-level description
+This code defines a RSpec test suite for the `BillableMetrics::Aggregations::MaxService` class. It tests the functionality of aggregating events based on the 'max' aggregation type, including various scenarios such as filtering, grouping, and handling different data types.
+
+## Code Structure
+The test suite is organized into several contexts and examples, each testing different aspects of the `MaxService` class. It uses FactoryBot to create test data and RSpec expectations to verify the behavior of the service.
+
+## Symbols
+
+### `BillableMetrics::Aggregations::MaxService`
+#### Description
+This is the main class being tested. It's responsible for aggregating events using the 'max' aggregation type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event_store_class | Class | The class used for event storage (e.g., Events::Stores::PostgresStore) |
+| charge | Object | The charge associated with the billable metric |
+| subscription | Object | The subscription for which events are being aggregated |
+| boundaries | Hash | Contains from_datetime and to_datetime for the aggregation period |
+| filters | Hash | Contains grouping and filtering options |
+
+#### Outputs
+The service returns an object with the following properties:
+- `aggregation`: The maximum value found
+- `count`: The number of events considered
+- `aggregations`: (When grouped) An array of aggregations for each group
+
+#### Internal Logic
+The service aggregates events by finding the maximum value of a specified field within the given boundaries and filters. It can handle grouping, filtering, and various data types (integers, floats, strings).
+
+### `#aggregate`
+#### Description
+This method performs the main aggregation logic.
+
+#### Internal Logic
+1. Fetches events based on the given parameters
+2. Finds the maximum value of the specified field
+3. Handles grouping if specified
+4. Applies filters if provided
+
+### `#per_event_aggregation`
+#### Description
+This method provides aggregation results for each individual event.
+
+### `#grouped_by_aggregation`
+#### Description
+This method performs aggregation when grouping is specified.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| FactoryBot | Creates test data |
+
+## Error Handling
+The test suite checks for proper handling of various edge cases, such as:
+- Events outside the specified time boundaries
+- Missing or non-numeric property values
+- Empty event sets
+
+## Performance Considerations
+The test suite doesn't explicitly test performance, but it does check the correct counting and aggregation of events, which could impact performance at scale.

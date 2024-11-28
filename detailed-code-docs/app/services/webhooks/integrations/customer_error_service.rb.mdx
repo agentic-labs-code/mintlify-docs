@@ -1,0 +1,87 @@
+---
+title: "customer_error_service.rb"
+---
+
+## High-level description
+This code defines a service class `CustomerErrorService` within the `Webhooks::Integrations` module. It is responsible for handling webhook events related to customer errors in accounting provider integrations. The service prepares and serializes customer error data for webhook delivery.
+
+## Code Structure
+The `CustomerErrorService` class inherits from `Webhooks::BaseService` and defines several private methods that are likely used by the parent class to customize the webhook behavior for customer accounting provider errors.
+
+## References
+This code references:
+- `Webhooks::BaseService` (parent class)
+- `::V1::Integrations::CustomerErrorSerializer` (for serializing the customer error data)
+
+## Symbols
+
+### `Webhooks::Integrations::CustomerErrorService`
+#### Description
+This class is responsible for handling customer error events related to accounting provider integrations. It prepares the necessary data for webhook delivery.
+
+#### Inputs
+This class doesn't explicitly define inputs, but it likely receives an `object` and `options` through its parent class `Webhooks::BaseService`.
+
+#### Internal Logic
+The class defines four private methods that customize the behavior of the webhook service:
+
+1. `current_organization`: Retrieves the organization associated with the object.
+2. `object_serializer`: Creates a serializer for the customer error data.
+3. `webhook_type`: Defines the type of webhook event.
+4. `object_type`: Specifies the type of object being processed.
+
+### `current_organization`
+#### Description
+Retrieves and memoizes the organization associated with the object.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @current_organization | Organization | The organization associated with the object |
+
+### `object_serializer`
+#### Description
+Creates and returns a serializer for the customer error data.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| serializer | ::V1::Integrations::CustomerErrorSerializer | Serializer instance for the customer error data |
+
+#### Internal Logic
+Creates a new instance of `::V1::Integrations::CustomerErrorSerializer` with the following parameters:
+- `object`: The customer object
+- `root_name`: The object type
+- `provider_error`: The error from the provider (from options)
+- `provider`: The provider name (from options)
+- `provider_code`: The provider code (from options)
+
+### `webhook_type`
+#### Description
+Defines the type of webhook event.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_type | String | The type of webhook event |
+
+### `object_type`
+#### Description
+Specifies the type of object being processed.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object_type | String | The type of object being processed |
+
+## Dependencies
+This code depends on the `::V1::Integrations::CustomerErrorSerializer` class for serializing the customer error data.
+
+## API/Interface Reference
+While this class doesn't directly expose an API, it is used as part of the webhook system. The `SendWebhookJob` (from the related snippets) shows that this service is invoked for the `'customer.accounting_provider_error'` webhook type.
+
+| Webhook Type | Service Class |
+|:-------------|:--------------|
+| customer.accounting_provider_error | Webhooks::Integrations::CustomerErrorService |
+
+This service prepares data for a webhook that notifies external systems about errors related to customers in accounting provider integrations.

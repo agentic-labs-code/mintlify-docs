@@ -1,0 +1,61 @@
+---
+title: "create.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for creating a new add-on in a SaaS application. It's part of a larger GraphQL API and handles the creation of add-ons with various attributes, including authentication and organization checks.
+
+## Code Structure
+The `Mutations::AddOns::Create` class inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the input, output, and resolution logic for the add-on creation mutation.
+
+## References
+- `Types::AddOns::CreateInput`: Defines the input structure for the mutation
+- `Types::AddOns::Object`: Defines the output structure for the mutation
+- `::AddOns::CreateService`: Service class that handles the actual creation of the add-on
+
+## Symbols
+
+### `Mutations::AddOns::Create`
+#### Description
+This class represents a GraphQL mutation for creating a new add-on. It includes authentication and organization checks, defines the required permission, and delegates the actual creation to a service class.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | Arguments passed to the mutation, defined by `Types::AddOns::CreateInput` |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| add_on | Types::AddOns::Object | The created add-on object |
+
+#### Internal Logic
+1. Authenticates the user and checks for required organization (via included modules)
+2. Calls the `::AddOns::CreateService` to create the add-on
+3. Merges the current organization ID with the input arguments
+4. Returns the created add-on if successful, or an error if not
+
+## Side Effects
+- Creates a new add-on in the database
+- May create associated tax records (based on the `CreateService` implementation)
+- Tracks the add-on creation event (based on the `CreateService` implementation)
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides user authentication logic |
+| RequiredOrganization | Ensures the user belongs to a valid organization |
+| Types::AddOns::CreateInput | Defines the input structure for the mutation |
+| Types::AddOns::Object | Defines the output structure for the mutation |
+| ::AddOns::CreateService | Handles the actual creation of the add-on |
+
+## Error Handling
+- Uses `result_error` method to handle errors from the `CreateService`
+- Inherits error handling from `AuthenticableApiUser` and `RequiredOrganization` modules
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| createAddOn | POST | CreateAddOnInput | AddOn | Creates a new add-on |
+
+Note: This is a GraphQL mutation, so it's typically accessed through a single GraphQL endpoint, not a REST-style URL.

@@ -1,0 +1,75 @@
+---
+title: "charge_serializer.rb"
+---
+
+## High-level description
+The `V1::ChargeSerializer` class is responsible for serializing a `Charge` model object into a JSON representation for API responses. It includes details like charge ID, invoice display name, creation date, charge model, and associated taxes and filters.
+
+## Code Structure
+The `ChargeSerializer` inherits from `ModelSerializer` and overrides the `serialize` method to define its own serialization logic. It uses helper methods like `taxes` and `charge_filters` to serialize associated objects. It also leverages the `CollectionSerializer` to serialize collections of related objects like taxes and filters.
+
+## References
+- `ModelSerializer`: Parent class providing basic serialization functionality.
+- `CollectionSerializer`: Used to serialize collections of related objects.
+- `TaxSerializer`: Used to serialize associated `Tax` objects.
+- `ChargeFilterSerializer`: Used to serialize associated `ChargeFilter` objects.
+
+## Symbols
+
+### `V1::ChargeSerializer`
+#### Description
+This class serializes a `Charge` object into a hash representation suitable for JSON output. It includes various attributes of the charge and optionally includes associated taxes and filters based on the provided options.
+
+#### Inputs
+The `initialize` method (inherited from `ModelSerializer`) takes:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| model | `Charge` | The `Charge` object to be serialized. |
+| options | `Hash` | Optional parameters controlling the serialization process, such as `:includes` to specify which associations to include. |
+
+#### Outputs
+The `serialize` method returns:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payload | `Hash` | A hash representation of the `Charge` object and its attributes, including optional nested hashes for associated taxes and filters. |
+
+#### Internal Logic
+1. **Base Payload:** Creates a hash containing basic attributes of the `Charge` object like `lago_id`, `invoice_display_name`, `created_at`, etc.
+2. **Conditional Inclusions:**
+    - **Taxes:** If the `:includes` option contains `:taxes`, it calls the `taxes` method to serialize associated `Tax` objects and merges them into the payload.
+    - **Filters:** It calls the `charge_filters` method to serialize associated `ChargeFilter` objects and merges them into the payload.
+3. **Returns Payload:** Returns the constructed payload hash.
+
+### `taxes`
+#### Description
+This private method serializes the associated `Tax` objects of the `Charge` object using the `CollectionSerializer`.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `Hash` | A hash containing a 'taxes' key with an array of serialized `Tax` objects. |
+
+#### Internal Logic
+1. It initializes a `CollectionSerializer` with the `taxes` collection of the `Charge` object, the `V1::TaxSerializer`, and options for the collection name and optional includes.
+2. It calls the `serialize` method of the `CollectionSerializer` to get the serialized representation of the taxes.
+
+### `charge_filters`
+#### Description
+This private method serializes the associated `ChargeFilter` objects of the `Charge` object using the `CollectionSerializer`.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `Hash` | A hash containing a 'filters' key with an array of serialized `ChargeFilter` objects. |
+
+#### Internal Logic
+1. It initializes a `CollectionSerializer` with the `filters` collection of the `Charge` object (including `billable_metric_filters`), the `V1::ChargeFilterSerializer`, and options for the collection name.
+2. It calls the `serialize` method of the `CollectionSerializer` to get the serialized representation of the filters.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ModelSerializer | Provides the base class for serializing model objects. |
+| CollectionSerializer | Used to serialize collections of related objects. |
+| V1::TaxSerializer | Serializes associated `Tax` objects. |
+| V1::ChargeFilterSerializer | Serializes associated `ChargeFilter` objects. | 

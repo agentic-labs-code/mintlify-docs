@@ -1,0 +1,75 @@
+---
+title: "events.rb"
+---
+
+## High-level description
+This file defines factories for creating `Event` objects using FactoryBot, a popular Ruby gem for generating test data. It includes two factories: `event` and `received_event`, both of which create instances of the `Event` class with different attributes and associations.
+
+## Symbols
+
+### `event` factory
+#### Description
+This factory creates a basic `Event` object with associated `subscription` and `customer` objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription | Subscription | A transient attribute to create or reference a subscription |
+| customer | Customer | A transient attribute derived from the subscription's customer |
+
+#### Outputs
+An `Event` object with the following attributes:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | Integer | ID of a newly created organization |
+| transaction_id | String | A unique transaction ID |
+| code | String | A random alphanumeric code |
+| timestamp | Time | The current time |
+| external_subscription_id | String | The external ID of the associated subscription |
+
+#### Internal Logic
+- Creates a new organization and uses its ID
+- Generates a unique transaction ID using `SecureRandom.hex`
+- Uses Faker to generate a random alphanumeric code
+- Sets the timestamp to the current time
+- Associates the event with a subscription using its external ID
+
+### `received_event` factory
+#### Description
+This factory creates an `Event` object representing a received event, with associated `source_organization`, `source_customer`, and `source_subscription` objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| source_organization | Organization | A transient attribute to create or reference a source organization |
+| source_customer | Customer | A transient attribute to create or reference a source customer |
+| source_subscription | Subscription | A transient attribute to create or reference a source subscription |
+
+#### Outputs
+An `Event` object with the following attributes:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | Integer | ID of the source organization |
+| external_subscription_id | String | The external ID of the source subscription |
+| transaction_id | String | A unique transaction ID |
+| code | String | A random alphanumeric code |
+| timestamp | Time | The current time |
+
+#### Internal Logic
+- Uses the source organization's ID
+- Associates the event with a source subscription using its external ID
+- Generates a unique transaction ID using `SecureRandom.hex`
+- Uses Faker to generate a random alphanumeric code
+- Sets the timestamp to the current time
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| FactoryBot | Defines factories for creating test objects |
+| Faker | Generates random data for attributes |
+| SecureRandom | Generates unique transaction IDs |
+
+## Notes
+- The file uses `frozen_string_literal: true` to improve performance and prevent string mutation.
+- Both factories use transient attributes to create associated objects, allowing for more flexible test data generation.
+- The `received_event` factory is specifically designed to create events that represent received events, possibly for testing incoming event processing.

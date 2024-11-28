@@ -1,0 +1,59 @@
+---
+title: "20240111140424_create_billable_metric_filters.rb"
+---
+
+## High-level description
+This migration file creates a new table called `billable_metric_filters` in the database. It defines the structure for storing filters associated with billable metrics, including references to the billable metric, a key, and an array of values.
+
+## Symbols
+
+### `CreateBillableMetricFilters`
+#### Description
+This is a Rails migration class that inherits from `ActiveRecord::Migration[7.0]`. It defines the schema changes for creating the `billable_metric_filters` table.
+
+#### Internal Logic
+The migration uses the `change` method to define the table structure:
+
+1. Creates a new table named `billable_metric_filters` with UUID as the primary key.
+2. Adds a reference to the `billable_metric` table.
+3. Defines `key` and `values` columns for storing filter information.
+4. Adds timestamp columns for record creation and updating.
+5. Includes a `deleted_at` column for soft deletion support.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for defining database schema changes |
+
+## Code Structure
+
+### Table Definition
+```ruby
+create_table :billable_metric_filters, id: :uuid do |t|
+  # ... column definitions ...
+end
+```
+
+#### Columns
+| Column Name | Type | Constraints | Description |
+|:------------|:-----|:------------|:------------|
+| id | uuid | primary key | Unique identifier for each filter |
+| billable_metric_id | uuid | foreign key, not null, indexed | Reference to the associated billable metric |
+| key | string | not null | The key of the filter |
+| values | string array | not null, default: [] | An array of values for the filter |
+| created_at | datetime | automatically managed | Timestamp of record creation |
+| updated_at | datetime | automatically managed | Timestamp of last update |
+| deleted_at | datetime | indexed | Timestamp for soft deletion |
+
+### Notable Features
+1. **UUID Primary Key**: The table uses UUID for its primary key instead of the default integer.
+2. **Foreign Key Reference**: It includes a reference to the `billable_metrics` table, ensuring data integrity.
+3. **Array Column**: The `values` column is defined as an array of strings, allowing multiple values per filter.
+4. **Soft Delete**: The inclusion of a `deleted_at` column suggests the use of soft delete functionality.
+5. **Timestamps**: Automatic timestamp columns for tracking record creation and updates.
+
+## Performance Considerations
+- The `billable_metric_id` column is indexed, which should improve query performance when filtering or joining with the `billable_metrics` table.
+- The `deleted_at` column is also indexed, which will enhance the performance of queries that filter based on the soft delete status.
+
+This migration sets up a flexible structure for storing and querying billable metric filters, with considerations for data integrity, performance, and soft deletion capabilities.

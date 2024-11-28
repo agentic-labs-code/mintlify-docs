@@ -1,0 +1,56 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for the `Integrations::Aggregator::Contacts::Payloads` module, which is responsible for generating payload bodies for creating and updating customer records in various integration systems, particularly NetSuite. The tests cover the Factory class that creates appropriate payload instances and the specific implementation for NetSuite payloads.
+
+## What does it do?
+The code in this directory tests the functionality of creating and managing customer data payloads for different integration systems. It ensures that:
+
+1. The Factory class correctly creates payload instances based on the type of customer (NetSuite, Xero, or Anrok).
+2. The payload generation for NetSuite customers works correctly, handling various scenarios such as different address configurations and legacy script settings.
+3. The creation and updating of customer records in NetSuite are properly formatted and include all necessary information.
+4. Edge cases, such as handling multiple email addresses or phone numbers, are correctly managed.
+
+These tests are crucial for maintaining the integrity of the integration system, ensuring that customer data is correctly formatted and transmitted to external systems like NetSuite.
+
+## Key Files
+
+1. `factory_spec.rb`:
+   - Tests the `Integrations::Aggregator::Contacts::Payloads::Factory` class.
+   - Verifies the correct creation of payload instances for different customer types.
+   - Ensures that create and update body methods return correct data for each customer type.
+
+2. `netsuite_spec.rb`:
+   - Tests the `Integrations::Aggregator::Contacts::Payloads::Netsuite` class.
+   - Verifies the correct generation of payload bodies for creating and updating NetSuite customer records.
+   - Tests various scenarios including different address configurations and legacy script settings.
+   - Checks the handling of email and phone number extraction from comma-separated lists.
+
+## Dependencies
+Both test files rely on the following dependencies:
+
+| Dependency | Purpose | Version |
+|:-----------|:--------|:--------|
+| rails_helper | Loads Rails environment and RSpec configuration | Not specified |
+| FactoryBot | Used for creating test data | Not specified |
+| Faker | Generates fake data for tests (used in netsuite_spec.rb) | Not specified |
+
+These dependencies are crucial for setting up the test environment and generating test data. FactoryBot allows for easy creation of test objects, while Faker provides realistic fake data for testing various scenarios.
+
+## Configuration
+The test files use `let` statements to define shared variables and test data. For example:
+
+```ruby
+let(:customer) { create(:customer) }
+let(:integration) { create(:integration) }
+let(:subsidiary_id) { Faker::Number.number(digits: 10).to_s }
+let(:integration_customer) { create(:integration_customer, :netsuite, customer: customer, integration: integration) }
+```
+
+These configurations allow for flexible and reusable test setups, making it easier to test different scenarios and edge cases.
+
+The tests also use RSpec's `describe` and `context` blocks to organize tests logically, improving readability and maintainability of the test suite.
+
+In summary, this directory contains comprehensive tests for the payload generation system of the integration module, focusing on factory creation and NetSuite-specific implementations. The tests ensure that the system can correctly handle various customer types and scenarios, providing confidence in the reliability of the integration process.

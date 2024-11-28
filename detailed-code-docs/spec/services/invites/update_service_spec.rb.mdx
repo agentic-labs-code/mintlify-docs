@@ -1,0 +1,63 @@
+---
+title: "update_service_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Invites::UpdateService` class. It tests various scenarios for updating an invite, including successful updates for pending invites and error cases for non-existent, revoked, or accepted invites.
+
+## Code Structure
+The test suite is organized into a single `describe` block for the `#call` method of `Invites::UpdateService`, with nested `context` blocks for different scenarios. Each scenario is tested with an individual `it` block.
+
+## Symbols
+
+### `RSpec.describe Invites::UpdateService`
+#### Description
+This is the main describe block for the `Invites::UpdateService` class, specifically testing its `#call` method.
+
+### `describe '#call'`
+#### Description
+This nested describe block focuses on testing the `#call` method of the `Invites::UpdateService`.
+
+### `context 'when invite is pending'`
+#### Description
+Tests the scenario where an invite is in a pending state and can be successfully updated.
+
+#### Internal Logic
+1. Creates a pending invite with an 'admin' role
+2. Attempts to update the role to 'manager'
+3. Expects the update to be successful and the role to be changed
+
+### `context 'when invite is not found'`
+#### Description
+Tests the error case when trying to update a non-existent invite.
+
+#### Internal Logic
+1. Sets the invite to nil
+2. Attempts to update the non-existent invite
+3. Expects the result to be unsuccessful with an 'invite_not_found' error code
+
+### `context 'when invite is revoked'`
+#### Description
+Tests the error case when trying to update a revoked invite.
+
+#### Internal Logic
+1. Creates a revoked invite
+2. Attempts to update the revoked invite
+3. Expects the result to be unsuccessful with a 'cannot_update_revoked_invite' error code
+
+### `context 'when invite is accepted'`
+#### Description
+Tests the error case when trying to update an accepted invite.
+
+#### Internal Logic
+1. Creates an accepted invite
+2. Attempts to update the accepted invite
+3. Expects the result to be unsuccessful with a 'cannot_update_accepted_invite' error code
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Used for creating test data (invites, memberships, organizations) |
+
+Note: The `rails_helper` file is included in the related code snippets and sets up the testing environment, including SimpleCov for code coverage, database cleaner, and various RSpec configurations.

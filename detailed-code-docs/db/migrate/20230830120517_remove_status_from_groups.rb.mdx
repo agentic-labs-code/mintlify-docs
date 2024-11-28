@@ -1,0 +1,32 @@
+---
+title: "20230830120517_remove_status_from_groups.rb"
+---
+
+## High-level description
+This migration removes the `status` column from the `groups` table in a Rails application. Before removing the column, it updates the `deleted_at` field for groups with a specific status, ensuring data consistency during the migration process.
+
+## Symbols
+
+### `RemoveStatusFromGroups`
+#### Description
+This class is an ActiveRecord migration that removes the `status` column from the `groups` table. It also performs a data migration to update the `deleted_at` field for certain groups before removing the column.
+
+#### Internal Logic
+1. The migration is wrapped in a `safety_assured` block, indicating that the developer has manually verified the safety of this migration.
+2. A `reversible` block is used to define the `up` direction of the migration, allowing for potential rollback if needed.
+3. In the `up` direction:
+   - An SQL query is executed to update the `deleted_at` field for groups where `status` is 1 and `deleted_at` is NULL.
+   - The `status` column is then removed from the `groups` table.
+
+## Side Effects
+- Updates the `deleted_at` field for groups with `status = 1` and `deleted_at IS NULL`.
+- Removes the `status` column from the `groups` table.
+
+## Error Handling
+This migration does not implement specific error handling beyond what is provided by ActiveRecord migrations. If an error occurs during the migration, it will be raised and the migration will be rolled back.
+
+## Performance Considerations
+The SQL update is performed as a single operation, which should be efficient for large datasets. However, depending on the number of records in the `groups` table, this migration could potentially take some time to complete.
+
+## TODOs
+There are no explicit TODOs in this migration.

@@ -1,0 +1,68 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for the Okta integration services within the application. It specifically focuses on testing the creation and update operations for Okta integrations, ensuring that these services behave correctly under various scenarios, including different license states and input validations.
+
+## What does it do?
+The tests in this directory verify the functionality of two main services:
+
+1. Okta Integration Creation Service:
+   - Checks if the service correctly handles attempts to create an Okta integration when the organization doesn't have a premium license.
+   - Verifies that the service properly creates an Okta integration when the organization has the necessary premium license and Okta premium integration.
+   - Ensures that the service handles validation errors, such as missing required fields.
+
+2. Okta Integration Update Service:
+   - Tests the behavior of updating an existing Okta integration under different license conditions.
+   - Verifies that the service correctly updates the integration details when provided with valid input.
+   - Ensures that the service properly handles validation errors during the update process.
+
+These tests help ensure that the Okta integration services work as expected, maintaining data integrity and adhering to business rules regarding premium licenses and required fields.
+
+## Key Files
+
+1. `create_service_spec.rb`:
+   This file contains tests for the `Integrations::Okta::CreateService` class. It verifies the behavior of the `call` method under various scenarios, including:
+   - Attempting to create an integration without a premium license
+   - Creating an integration with a premium license and Okta premium integration
+   - Handling validation errors during creation
+
+   Key aspects tested include:
+   - Proper error handling (`BaseService::MethodNotAllowedFailure`, `BaseService::ValidationFailure`)
+   - Correct creation of integrations when all conditions are met
+   - Validation of required fields (e.g., domain)
+
+2. `update_service_spec.rb`:
+   This file tests the `Integrations::Okta::UpdateService` class, focusing on the `call` method's behavior in different scenarios:
+   - Updating an integration without a premium license
+   - Updating with a premium license but without Okta premium integration
+   - Successful updates with valid input
+   - Handling validation errors during updates
+
+   Key aspects tested include:
+   - Proper error handling for unauthorized operations
+   - Correct updating of integration details (domain, organization name)
+   - Validation of required fields during updates
+
+Both files use RSpec's `describe` and `context` blocks to organize tests logically, and utilize `let` statements to set up test data and service instances.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| rspec | Testing framework used for writing and running the tests |
+| FactoryBot | Used for creating test data (e.g., `create(:okta_integration)`) |
+
+## Configuration
+The tests use the following RSpec configuration:
+
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| type: :service | Symbol | Specifies that these are service tests |
+
+No specific environment variables or external configuration files are mentioned in the provided summaries.
+
+Both test files follow similar patterns and conventions, ensuring consistency in testing approach across different Okta integration services. They thoroughly cover various scenarios, including license checks, validation errors, and successful operations, providing comprehensive test coverage for the Okta integration functionality in the application.

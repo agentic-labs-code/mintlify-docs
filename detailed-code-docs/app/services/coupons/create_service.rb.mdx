@@ -1,0 +1,135 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines a `CreateService` class within the `Coupons` module, responsible for creating new coupons in the system. It handles the creation process, including validation, database transactions, and associated records creation.
+
+## Code Structure
+The `CreateService` class inherits from `BaseService` and contains a main `create` method that orchestrates the coupon creation process. It also includes private helper methods for handling specific aspects of the creation process, such as tracking and validating input data.
+
+## Symbols
+
+### Coupons::CreateService
+#### Description
+This class is responsible for creating new coupons in the system. It handles the entire process from input validation to database persistence and associated records creation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | A hash containing the coupon attributes and related data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the created coupon or error information |
+
+#### Internal Logic
+1. Validates the input arguments
+2. Initializes coupon attributes
+3. Checks for plan and billable metric limitations
+4. Creates the coupon and associated records within a transaction
+5. Tracks the coupon creation event
+6. Handles any errors that occur during the process
+
+### create
+#### Description
+The main method that orchestrates the coupon creation process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | A hash containing the coupon attributes and related data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the created coupon or error information |
+
+#### Internal Logic
+1. Validates input arguments
+2. Initializes coupon attributes
+3. Checks for plan and billable metric limitations
+4. Creates the coupon and associated records within a transaction
+5. Tracks the coupon creation event
+6. Handles any errors that occur during the process
+
+### track_coupon_created
+#### Description
+A private method that tracks the coupon creation event using Segment analytics.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| coupon | Coupon | The created coupon object |
+
+#### Internal Logic
+Enqueues a SegmentTrackJob to track the coupon creation event with relevant properties.
+
+### plan_identifiers
+#### Description
+A private method that retrieves plan identifiers based on the current context (API or not).
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| identifiers | Array | An array of plan identifiers (codes or IDs) |
+
+### plans
+#### Description
+A private method that retrieves plans based on the plan identifiers and organization.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| plans | ActiveRecord::Relation | A relation of Plan objects |
+
+### billable_metric_identifiers
+#### Description
+A private method that retrieves billable metric identifiers based on the current context (API or not).
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| identifiers | Array | An array of billable metric identifiers (codes or IDs) |
+
+### billable_metrics
+#### Description
+A private method that retrieves billable metrics based on the billable metric identifiers and organization.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| billable_metrics | ActiveRecord::Relation | A relation of BillableMetric objects |
+
+### valid?
+#### Description
+A private method that validates the input arguments using the Coupons::ValidateService.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | The input arguments to validate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid | Boolean | Whether the input is valid or not |
+
+## Dependencies
+- BaseService
+- Coupon model
+- CouponTarget model
+- Plan model
+- BillableMetric model
+- SegmentTrackJob
+- Coupons::ValidateService
+
+## Error Handling
+The service uses a `result` object to handle and return errors. It catches `ActiveRecord::RecordInvalid` exceptions and adds the validation errors to the result object.
+
+## Logging
+This service does not implement any specific logging mechanism.
+
+## TODOs
+There are no explicit TODOs in the code.

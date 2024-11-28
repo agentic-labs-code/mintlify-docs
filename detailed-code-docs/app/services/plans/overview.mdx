@@ -1,0 +1,92 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains services related to plan management in a subscription-based system. The services handle various operations such as creating, updating, destroying, and overriding plans, as well as applying taxes and preparing plans for deletion.
+
+## What does it do?
+The services in this directory manage the lifecycle of plans within the subscription system. They handle the following key operations:
+
+1. Creating new plans with associated charges, taxes, usage thresholds, and commitments.
+2. Updating existing plans, including modifying their attributes, charges, and related entities.
+3. Destroying plans, including handling active and pending subscriptions, and finalizing draft invoices.
+4. Overriding plans to create new ones based on existing plans with specific modifications.
+5. Applying taxes to plans and their associated charges.
+6. Preparing plans for deletion by marking them and their children as pending deletion.
+
+These services ensure data consistency, handle error cases, and manage related entities such as subscriptions, invoices, and taxes throughout the plan lifecycle.
+
+## Key Files
+
+### 1. `create_service.rb`
+This file contains the `Plans::CreateService` class, responsible for creating new plans. It handles the creation of associated charges, taxes, usage thresholds, and commitments. The service ensures data consistency by using database transactions and applies various validations during the creation process.
+
+### 2. `update_service.rb`
+The `Plans::UpdateService` class in this file manages the updating of existing plans. It handles modifications to plan attributes, charges, usage thresholds, and minimum commitments. The service also manages related subscriptions and updates draft invoices as needed.
+
+### 3. `destroy_service.rb`
+This file contains the `Plans::DestroyService` class, which is responsible for deleting plans. It handles the termination of active subscriptions, cancellation of pending subscriptions, and finalization of draft invoices related to the plan being destroyed.
+
+### 4. `override_service.rb`
+The `Plans::OverrideService` class in this file creates new plans based on existing ones with specific overrides. It handles the duplication of the original plan and applies changes to various aspects such as charges, taxes, usage thresholds, and commitments.
+
+### 5. `apply_taxes_service.rb`
+This file contains the `Plans::ApplyTaxesService` class, which is responsible for applying taxes to plans. It manages the association between a plan and its taxes, creating or removing applied taxes based on the provided tax codes.
+
+### 6. `prepare_destroy_service.rb`
+The `Plans::PrepareDestroyService` class in this file prepares a plan for deletion by marking it and its children as pending deletion. It also schedules a background job to perform the actual deletion process.
+
+## Dependencies
+The services in this directory rely on several external libraries and internal services:
+
+1. ActiveRecord: Used for database operations and transactions.
+2. BaseService: A parent class providing common service functionality.
+3. SegmentTrackJob: Used for tracking events related to plan operations.
+4. Various internal services: Such as `Charges::ApplyTaxesService`, `Commitments::ApplyTaxesService`, and `Invoices::RefreshDraftAndFinalizeService`.
+
+## Configuration
+The services in this directory do not have explicit configuration files. However, they may rely on environment variables or system-wide configurations for features such as premium license checks and event tracking.
+
+## Error Handling
+Error handling is implemented consistently across the services:
+
+1. Services use a `result` object to handle and propagate errors.
+2. Common exceptions like `ActiveRecord::RecordInvalid` and `BaseService::FailedResult` are caught and handled.
+3. Not found errors are returned when plans or related entities are not found.
+4. Validation errors are captured and returned in the result object.
+
+## Code Examples
+
+Here's an example of how the `Plans::CreateService` might be used:
+
+```ruby
+args = {
+  name: "Premium Plan",
+  code: "premium_2023",
+  interval: "yearly",
+  amount_cents: 99900,
+  amount_currency: "USD",
+  charges: [
+    {
+      billable_metric_id: 1,
+      charge_model: "standard",
+      properties: { amount: "10" }
+    }
+  ],
+  tax_codes: ["VAT", "GST"]
+}
+
+result = Plans::CreateService.new.create(args)
+
+if result.success?
+  new_plan = result.plan
+  puts "New plan created: #{new_plan.name}"
+else
+  puts "Error creating plan: #{result.error}"
+end
+```
+
+This example demonstrates creating a new yearly plan with a charge and tax codes. The service handles the creation of the plan, associated charge, and application of taxes.
+
+In conclusion, the services in this directory provide a comprehensive set of operations for managing plans in a subscription-based system, ensuring data consistency and proper handling of related entities throughout the plan lifecycle.

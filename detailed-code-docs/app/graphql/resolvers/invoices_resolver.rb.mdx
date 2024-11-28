@@ -1,0 +1,63 @@
+---
+title: "invoices_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying invoices. It's part of a larger GraphQL API and includes authentication, organization requirements, and various filtering options for invoice queries.
+
+## Code Structure
+The `InvoicesResolver` class inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines arguments for filtering and pagination, and resolves the query by calling the `InvoicesQuery` service.
+
+## References
+- `Resolvers::BaseResolver`
+- `AuthenticableApiUser` module
+- `RequiredOrganization` module
+- `InvoicesQuery` service
+- Various GraphQL types and enums
+
+## Symbols
+
+### `InvoicesResolver`
+#### Description
+This class is a GraphQL resolver for querying invoices. It handles authentication, organization requirements, and provides various filtering options for invoice queries.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| currency | Types::CurrencyEnum | Optional. Filter by currency |
+| customer_external_id | String | Optional. Filter by customer's external ID |
+| invoice_type | [Types::Invoices::InvoiceTypeEnum] | Optional. Filter by invoice type |
+| issuing_date_from | GraphQL::Types::ISO8601Date | Optional. Filter by issuing date (from) |
+| issuing_date_to | GraphQL::Types::ISO8601Date | Optional. Filter by issuing date (to) |
+| limit | Integer | Optional. Limit the number of results |
+| page | Integer | Optional. Specify the page number for pagination |
+| payment_dispute_lost | Boolean | Optional. Filter by payment dispute status |
+| payment_overdue | Boolean | Optional. Filter by payment overdue status |
+| payment_status | [Types::Invoices::PaymentStatusTypeEnum] | Optional. Filter by payment status |
+| search_term | String | Optional. Search term for filtering invoices |
+| status | [Types::Invoices::StatusTypeEnum] | Optional. Filter by invoice status |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoices | Types::Invoices::Object.collection_type | A collection of invoice objects |
+
+#### Internal Logic
+1. The resolver checks for authentication and organization requirements.
+2. It processes the input arguments and passes them to the `InvoicesQuery` service.
+3. The `InvoicesQuery` service filters and paginates the invoices based on the provided arguments.
+4. The resolver returns the filtered and paginated invoices.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication functionality |
+| RequiredOrganization | Ensures the presence of a valid organization |
+| InvoicesQuery | Service for querying and filtering invoices |
+| Various GraphQL types and enums | Define the structure and allowed values for input arguments |
+
+## Error Handling
+The resolver inherits error handling from `AuthenticableApiUser` and `RequiredOrganization` modules, which raise `GraphQL::ExecutionError` for unauthorized access or missing organization.
+
+## Performance Considerations
+The resolver uses pagination (limit and page arguments) to manage the number of results returned, which can help with performance when dealing with large datasets.

@@ -1,0 +1,66 @@
+---
+title: "create_from_progressive_billing_invoice.rb"
+---
+
+## High-level description
+This code defines a service class `CreateFromProgressiveBillingInvoice` within the `CreditNotes` module. Its primary purpose is to create a credit note from a progressive billing invoice, handling the calculation of creditable amounts and applying taxes.
+
+## Code Structure
+The main class `CreateFromProgressiveBillingInvoice` inherits from `BaseService`. It initializes with a progressive billing invoice, an amount, and a reason. The `call` method orchestrates the creation of the credit note, utilizing other services like `CreditNotes::CreateService` and `CreditNotes::ApplyTaxesService`.
+
+## Symbols
+
+### `CreditNotes::CreateFromProgressiveBillingInvoice`
+#### Description
+This service class is responsible for creating a credit note from a progressive billing invoice.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| progressive_billing_invoice | Invoice | The progressive billing invoice to create a credit note from |
+| amount | Numeric | The amount to be credited |
+| reason | Symbol | The reason for creating the credit note (default: :other) |
+
+#### Internal Logic
+1. Validates that the amount is positive and the invoice is a progressive billing invoice.
+2. Calculates the items to be credited using the `calculate_items!` method.
+3. Calls `CreditNotes::CreateService` to create the actual credit note.
+
+### `calculate_items!`
+#### Description
+This private method calculates the items to be credited based on the fees of the progressive billing invoice.
+
+#### Internal Logic
+1. Iterates through the invoice fees in descending order of amount.
+2. Creates credit items for each fee until the total credit amount is reached.
+3. Adjusts the credit amount if there's any remaining after crediting all fees.
+
+### `creditable_amount_cents`
+#### Description
+This private method calculates the final creditable amount in cents, considering taxes and coupons.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| amount | Numeric | The initial credit amount |
+| items | Array | The calculated credit items |
+
+#### Internal Logic
+1. Calls `CreditNotes::ApplyTaxesService` to calculate taxes for the credit items.
+2. Adjusts the credit amount by subtracting coupon adjustments and adding taxes.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| CreditNotes::CreateService | Creates the actual credit note |
+| CreditNotes::ApplyTaxesService | Calculates taxes for the credit items |
+
+## TODOs
+There is a TODO comment in the `calculate_items!` method:
+```ruby
+# TODO(ProgressiveBilling): verify and check in v2
+```
+This suggests that there might be a need to verify and potentially modify the handling of remaining amounts in a future version of the progressive billing feature.
+
+## Performance Considerations
+The service iterates through invoice fees to calculate credit items, which could be a performance concern for invoices with a large number of fees. However, this is likely an infrequent operation and shouldn't cause significant performance issues in most cases.

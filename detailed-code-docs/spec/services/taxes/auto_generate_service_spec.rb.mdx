@@ -1,0 +1,50 @@
+---
+title: "auto_generate_service_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Taxes::AutoGenerateService` class. It verifies that the service correctly creates EU taxes for an organization when called.
+
+## Symbols
+
+### `RSpec.describe Taxes::AutoGenerateService, type: :service`
+#### Description
+This is the main describe block for the `Taxes::AutoGenerateService` test suite. It sets up the context for testing the service and specifies that it's a service-type test.
+
+### `subject(:auto_generate_service)`
+#### Description
+Defines the subject of the test, which is an instance of `Taxes::AutoGenerateService` initialized with an organization.
+
+### `let(:organization)`
+#### Description
+Creates a test organization using FactoryBot's `create` method.
+
+### `describe '.call'`
+#### Description
+Describes the test for the `call` method of the `Taxes::AutoGenerateService`.
+
+### `it 'creates eu taxes for organization'`
+#### Description
+This test case verifies that calling the service creates the expected number of EU taxes for the organization.
+
+#### Internal Logic
+1. Calls the `call` method on the `auto_generate_service` instance.
+2. Uses `aggregate_failures` to group multiple expectations.
+3. Checks that the total count of `Tax` records is 46 (EU taxes + 2 defaults).
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Used for creating test data (organization) |
+
+## References
+- The test references the `Tax` model, suggesting that the `Taxes::AutoGenerateService` interacts with this model to create tax records.
+- The test uses FactoryBot to create an organization, implying the existence of an `Organization` model and a corresponding factory.
+
+## Notes
+- The test expects 46 taxes to be created in total, which includes EU taxes and 2 default taxes. This suggests that the service is responsible for generating a specific set of tax records for EU countries, plus some default taxes.
+- The use of `aggregate_failures` allows the test to continue running and report all failures, even if one expectation fails.
+- The test file follows Ruby style guidelines with the `frozen_string_literal: true` magic comment.
+
+This test provides a high-level verification of the `Taxes::AutoGenerateService`'s functionality, ensuring that it creates the expected number of tax records for an organization. However, it doesn't go into detail about the specific taxes created or their attributes, focusing instead on the total count of taxes generated.

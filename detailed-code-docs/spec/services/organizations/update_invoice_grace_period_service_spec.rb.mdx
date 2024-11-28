@@ -1,0 +1,82 @@
+---
+title: "update_invoice_grace_period_service_spec.rb"
+---
+
+## High-level description
+This RSpec test file is designed to validate the functionality of the `Organizations::UpdateInvoiceGracePeriodService`. It tests the service's ability to update an organization's invoice grace period, finalize draft invoices, and update issuing dates on draft invoices based on the new grace period.
+
+## Symbols
+
+### `RSpec.describe Organizations::UpdateInvoiceGracePeriodService`
+#### Description
+This is the main test suite for the `Organizations::UpdateInvoiceGracePeriodService`. It sets up the necessary test environment and contains various test cases to ensure the service behaves correctly under different scenarios.
+
+### `describe '#call'`
+#### Description
+This nested describe block focuses on testing the `#call` method of the `UpdateInvoiceGracePeriodService`. It contains several test cases that verify different aspects of the service's behavior when called.
+
+#### Internal Logic
+The tests in this block cover the following scenarios:
+1. Updating the invoice grace period on the organization
+2. Finalizing corresponding draft invoices
+3. Updating issuing dates on draft invoices
+4. Handling customers with net payment terms
+5. Behavior when the new grace period is the same as the current one
+
+### Test Cases
+
+#### `it 'updates invoice grace period on organization'`
+#### Description
+This test ensures that the service correctly updates the invoice grace period on the organization.
+
+#### Internal Logic
+- It expects the organization's `invoice_grace_period` to change from 0 to 2 after calling the service.
+
+#### `it 'finalizes corresponding draft invoices'`
+#### Description
+This test verifies that the service finalizes the appropriate draft invoices based on the new grace period.
+
+#### Internal Logic
+- It sets up two invoices: one that should be finalized and one that should not.
+- It uses `travel_to` to set a specific current date for testing.
+- It expects the `Invoices::RefreshDraftAndFinalizeService` to be called only for the invoice that should be finalized.
+
+#### `it 'updates issuing_date on draft invoices'`
+#### Description
+This test checks if the service correctly updates the issuing date and payment due date on draft invoices.
+
+#### Internal Logic
+- It uses `travel_to` to set a specific current date for testing.
+- It expects the `issuing_date` and `payment_due_date` of the draft invoice to be updated to the correct dates after calling the service.
+
+#### Context: `when customer has net_payment_term`
+#### Description
+This context block tests the service's behavior when dealing with customers who have a net payment term.
+
+#### Internal Logic
+- It creates a customer with a net payment term of 3 days.
+- It verifies that the `payment_due_date` is correctly calculated based on the net payment term.
+
+#### Context: `when grace_period is the same as the current one`
+#### Description
+This context block tests the service's behavior when the new grace period is the same as the current one.
+
+#### Internal Logic
+- It verifies that no draft invoices are finalized in this case.
+- It checks that the issuing dates on draft invoices are not updated.
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides the necessary setup for Rails-specific testing |
+| FactoryBot | Used for creating test data (organizations, customers, invoices) |
+| ActiveSupport::Testing::TimeHelpers | Used for time manipulation in tests (travel_to) |
+
+## Error Handling
+This test file does not explicitly test error handling scenarios. It focuses on the happy path and various business logic scenarios.
+
+## Notes
+- The tests make use of RSpec's `let` statements to define reusable test data.
+- The `travel_to` method is used to manipulate time in the tests, allowing for predictable date-based assertions.
+- The tests mock the `Invoices::RefreshDraftAndFinalizeService` to verify that it's called with the correct parameters without actually executing it.

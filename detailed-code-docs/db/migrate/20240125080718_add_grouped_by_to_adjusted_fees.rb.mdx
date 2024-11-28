@@ -1,0 +1,36 @@
+---
+title: "20240125080718_add_grouped_by_to_adjusted_fees.rb"
+---
+
+## High-level description
+This migration adds a new `grouped_by` column to the `adjusted_fees` table in the database. The column is of type `jsonb`, which allows for storing JSON-formatted data, and is set to be non-nullable with a default empty JSON object.
+
+## Symbols
+
+### `AddGroupedByToAdjustedFees`
+#### Description
+This class is an ActiveRecord migration that defines a change to be applied to the database schema. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0 migration framework.
+
+#### Internal Logic
+The migration uses the `change` method to define a reversible database change. It adds a new column named `grouped_by` to the `adjusted_fees` table using the `add_column` method.
+
+The new column has the following characteristics:
+- Name: `grouped_by`
+- Table: `adjusted_fees`
+- Data type: `jsonb` (JSON Binary)
+- Constraints: 
+  - `null: false` (the column cannot contain NULL values)
+  - `default: {}` (default value is an empty JSON object)
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the migration framework for database schema changes |
+
+## Performance Considerations
+Using `jsonb` type for the `grouped_by` column allows for efficient storage and querying of JSON data in PostgreSQL databases. This can be beneficial for storing flexible, schema-less data within the `adjusted_fees` table.
+
+## Notes
+1. This migration is automatically reversible. Rails can infer how to reverse this change (by removing the column) without an explicit `down` method.
+2. The use of `jsonb` suggests that the application might store various grouping criteria or categories for adjusted fees in a flexible format.
+3. The `frozen_string_literal: true` comment at the top of the file is a Ruby directive that makes all string literals in the file frozen, which can provide performance benefits and prevent unintended string mutations.

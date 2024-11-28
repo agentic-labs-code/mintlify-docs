@@ -1,0 +1,67 @@
+---
+title: "authenticable_api_user.rb"
+---
+
+Here's the documentation for the `AuthenticableApiUser` module:
+
+## High-level description
+The `AuthenticableApiUser` module is a concern that provides authentication functionality for API users in a GraphQL context. It ensures that only authenticated users can access certain GraphQL operations.
+
+## Code Structure
+This module is designed to be included in GraphQL resolvers or mutations. It extends `ActiveSupport::Concern` and defines a private method `ready?` that checks for user authentication before allowing the operation to proceed.
+
+## Symbols
+
+### `AuthenticableApiUser`
+#### Description
+This module is designed to be included in GraphQL resolvers or mutations to enforce user authentication.
+
+#### Internal Logic
+The module defines a private `ready?` method that:
+1. Checks if there's a `current_user` in the GraphQL context.
+2. Raises an `unauthorized_error` if no current user is found.
+3. Calls the superclass's `ready?` method if a user is present.
+
+### `ready?`
+#### Description
+A private method that checks for user authentication before allowing the GraphQL operation to proceed.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| **args | Hash | Any arguments passed to the resolver or mutation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Boolean | Returns true if authentication passes, otherwise raises an error |
+
+#### Internal Logic
+1. Checks if `context[:current_user]` exists.
+2. If not, raises an `unauthorized_error`.
+3. If a user is present, calls `super` to proceed with the operation.
+
+### `unauthorized_error`
+#### Description
+A private method that creates a GraphQL execution error for unauthorized access.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| error | GraphQL::ExecutionError | An error object with unauthorized status and code |
+
+## Error Handling
+The module raises a `GraphQL::ExecutionError` with the message "unauthorized" and appropriate status and code when authentication fails.
+
+## Usage
+This module is typically included in GraphQL resolvers or mutations where user authentication is required. For example:
+
+```ruby
+class SomeResolver &lt; Resolvers::BaseResolver
+  include AuthenticableApiUser
+
+  # resolver implementation
+end
+```
+
+By including this module, the resolver will automatically check for user authentication before executing its logic.

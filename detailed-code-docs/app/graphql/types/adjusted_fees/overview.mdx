@@ -1,0 +1,62 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions related to adjusted fees in the application. It includes an enum type for adjusted fee types and an input type for creating adjusted fees. These types are crucial for handling adjusted fee-related operations in the GraphQL API.
+
+## What does it do?
+This directory provides the necessary type definitions for working with adjusted fees in the GraphQL API. It allows the API to:
+
+1. Represent different types of adjusted fees using an enum, ensuring that only valid fee types can be used throughout the system.
+2. Define the structure for creating new adjusted fees, specifying what information is required and optional when adding a new adjusted fee to the system.
+
+These types enable the API to maintain consistency in fee type representation and provide a clear contract for creating new adjusted fees.
+
+## Key Files
+
+1. `adjusted_fee_type_enum.rb`:
+   This file defines the `AdjustedFeeTypeEnum` which represents the various types of adjusted fees in the system. It dynamically generates enum values based on the `ADJUSTED_FEE_TYPES` constant from the `AdjustedFee` model. This approach ensures that the GraphQL API always reflects the current set of adjusted fee types defined in the application's business logic.
+
+   Example usage:
+   ```ruby
+   class AdjustedFeeTypeEnum &lt; Types::BaseEnum
+     AdjustedFee::ADJUSTED_FEE_TYPES.each do |type|
+       value type
+     end
+   end
+   ```
+
+2. `create_input.rb`:
+   This file defines the `CreateInput` type, which specifies the structure for creating new adjusted fees. It inherits from `Types::BaseInputObject` and defines the required and optional fields for creating an adjusted fee.
+
+   Example structure:
+   ```ruby
+   class CreateInput &lt; Types::BaseInputObject
+     argument :fee_id, ID, required: true
+     argument :invoice_display_name, String, required: false
+     argument :unit_amount_cents, GraphQL::Types::BigInt, required: false
+     argument :units, GraphQL::Types::Float, required: false
+   end
+   ```
+
+## Dependencies
+The code in this directory relies on the following dependencies:
+
+1. GraphQL Ruby: This is the main GraphQL implementation for Ruby, used to define the types and structure the API.
+2. `Types::BaseEnum`: A custom base class for enum types in the application's GraphQL schema.
+3. `Types::BaseInputObject`: A custom base class for input object types in the application's GraphQL schema.
+4. `GraphQL::Types::BigInt`: A built-in GraphQL type for handling large integer values.
+5. `GraphQL::Types::Float`: A built-in GraphQL type for handling floating-point numbers.
+
+## Configuration
+While there are no explicit configuration files in this directory, the `AdjustedFeeTypeEnum` relies on the `ADJUSTED_FEE_TYPES` constant from the `AdjustedFee` model. This constant should be maintained to reflect all valid adjusted fee types in the system. Any changes to this constant will automatically be reflected in the GraphQL enum.
+
+The `CreateInput` type defines the structure for creating adjusted fees. If the requirements for creating adjusted fees change, this input type should be updated accordingly. The current structure includes:
+
+- `fee_id` (required): The ID of the fee to adjust.
+- `invoice_display_name` (optional): The display name for the invoice.
+- `unit_amount_cents` (optional): The unit amount in cents.
+- `units` (optional): The number of units.
+
+These definitions provide a flexible structure for creating adjusted fees while ensuring that the necessary information (the fee ID) is always provided.

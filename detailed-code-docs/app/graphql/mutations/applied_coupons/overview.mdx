@@ -1,0 +1,105 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL mutations related to applied coupons in a Ruby on Rails application. It includes two main operations: creating an applied coupon and terminating an existing applied coupon. These mutations are part of a larger system that manages coupons and their application to customers within organizations.
+
+## What does it do?
+The code in this directory enables two main actions:
+
+1. Creating an Applied Coupon: This allows assigning a coupon to a specific customer. When creating an applied coupon, you can specify details such as the coupon ID, customer ID, amount, currency, frequency, and percentage rate. This process links a coupon to a customer, potentially applying discounts or special offers to their account.
+
+2. Terminating an Applied Coupon: This action removes the association between a coupon and a customer. It effectively ends the application of a coupon, which might be necessary when a promotion ends or if there's a need to cancel a discount.
+
+Both operations require user authentication and are designed to work within the context of an organization, ensuring that users can only manipulate coupons and customers they have access to.
+
+## Key Files
+
+### create.rb
+This file defines the `Create` mutation for applied coupons. It handles the process of assigning a coupon to a customer with specific parameters.
+
+Key features:
+- Authenticates the user and ensures the presence of an organization
+- Accepts inputs such as coupon_id, customer_id, amount, currency, frequency, and percentage rate
+- Uses a service object (`::AppliedCoupons::CreateService`) to handle the creation logic
+- Returns the created applied coupon or an error if the creation fails
+
+Example usage:
+```graphql
+mutation {
+  createAppliedCoupon(
+    input: {
+      couponId: "123",
+      customerId: "456",
+      amountCents: 1000,
+      amountCurrency: USD,
+      frequency: MONTHLY,
+      frequencyDuration: 3,
+      percentageRate: 10.5
+    }
+  ) {
+    appliedCoupon {
+      id
+      amount {
+        cents
+        currency
+      }
+      frequency
+      percentageRate
+    }
+  }
+}
+```
+
+### terminate.rb
+This file defines the `Terminate` mutation for applied coupons. It handles the process of ending the application of a coupon to a customer.
+
+Key features:
+- Authenticates the user
+- Accepts the ID of the applied coupon to terminate
+- Uses a service object (`::AppliedCoupons::TerminateService`) to handle the termination logic
+- Returns the terminated applied coupon or an error if the termination fails
+
+Example usage:
+```graphql
+mutation {
+  terminateAppliedCoupon(
+    input: {
+      id: "789"
+    }
+  ) {
+    appliedCoupon {
+      id
+      status
+    }
+  }
+}
+```
+
+## Dependencies
+Both mutations rely on several shared dependencies:
+
+1. GraphQL: The mutations are built using the GraphQL framework, which allows for flexible and efficient API queries.
+
+2. Ruby on Rails: The underlying application structure is based on Ruby on Rails, providing the ORM and other utilities.
+
+3. Custom Types: The mutations use custom GraphQL types (e.g., `Types::AppliedCoupons::Object`, `Types::CurrencyEnum`) for input and output handling.
+
+4. Service Objects: Both mutations delegate the core logic to service objects (`CreateService` and `TerminateService`), following the service object pattern for better separation of concerns.
+
+5. Authentication: The `AuthenticableApiUser` module is used in both mutations to ensure that only authenticated users can perform these operations.
+
+6. Organization Context: The `RequiredOrganization` module (used in the Create mutation) ensures that operations are performed within the context of a specific organization.
+
+## Configuration
+While there are no explicit configuration files in this directory, the mutations rely on the broader application configuration, particularly for:
+
+1. GraphQL schema setup
+2. Authentication mechanisms
+3. Database connections (for interacting with Customer, Coupon, and AppliedCoupon models)
+4. Service object implementations
+
+The mutations are designed to be flexible, allowing for various parameters to be passed when creating an applied coupon. This flexibility is reflected in the numerous optional arguments in the Create mutation, such as `amount_cents`, `amount_currency`, `frequency`, `frequency_duration`, and `percentage_rate`.
+
+In conclusion, this directory contains crucial GraphQL mutations for managing applied coupons, providing a secure and flexible interface for creating and terminating coupon applications within the system. The code is structured to promote reusability, security, and clear separation of concerns, making it easier to maintain and extend the coupon management functionality.

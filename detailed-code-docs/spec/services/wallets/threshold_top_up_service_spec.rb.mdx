@@ -1,0 +1,94 @@
+---
+title: "threshold_top_up_service_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Wallets::ThresholdTopUpService` class. It tests various scenarios for topping up a wallet based on threshold rules, including different configurations of recurring transaction rules and wallet states.
+
+## Code Structure
+The test file is organized into a single `RSpec.describe` block for the `Wallets::ThresholdTopUpService` class. Within this block, there are multiple nested `context` and `it` blocks that test different scenarios and edge cases for the `#call` method of the service.
+
+## Symbols
+
+### `Wallets::ThresholdTopUpService`
+#### Description
+This is the main class being tested. It appears to be a service responsible for topping up wallets based on threshold rules.
+
+### `#call`
+#### Description
+This is the main method being tested in the `ThresholdTopUpService`. It checks if a wallet needs to be topped up based on certain conditions and enqueues a job to create a wallet transaction if necessary.
+
+#### Internal Logic
+1. Checks if the wallet's balance has crossed a threshold defined in the recurring transaction rule.
+2. If the threshold is crossed, it enqueues a `WalletTransactions::CreateJob` with appropriate parameters.
+3. Handles different scenarios such as rules requiring successful payment, including transaction metadata, and using a target method for top-up.
+
+## Test Cases
+
+### Basic Top-Up Scenario
+#### Description
+Tests if the service correctly enqueues a job to create a wallet transaction when the threshold is crossed.
+
+#### Internal Logic
+1. Arranges: Creates a wallet and a recurring transaction rule.
+2. Acts: Calls the `top_up_service.call` method.
+3. Asserts: Expects a `WalletTransactions::CreateJob` to be enqueued with specific parameters.
+
+### Rule Requiring Successful Payment
+#### Description
+Tests if the service correctly handles rules that require successful payment.
+
+#### Internal Logic
+1. Arranges: Creates a wallet and a recurring transaction rule with `invoice_requires_successful_payment: true`.
+2. Acts: Calls the `top_up_service.call` method.
+3. Asserts: Expects a job to be enqueued with `invoice_requires_successful_payment: true`.
+
+### Rule with Transaction Metadata
+#### Description
+Tests if the service correctly includes transaction metadata when enqueuing the job.
+
+#### Internal Logic
+1. Arranges: Creates a wallet and a recurring transaction rule with transaction metadata.
+2. Acts: Calls the `top_up_service.call` method.
+3. Asserts: Expects a job to be enqueued with the correct metadata.
+
+### Threshold Not Crossed
+#### Description
+Tests that the service does not enqueue a job when the threshold has not been crossed.
+
+#### Internal Logic
+1. Arranges: Creates a wallet and a recurring transaction rule with a threshold that hasn't been crossed.
+2. Acts: Calls the `top_up_service.call` method.
+3. Asserts: Expects no job to be enqueued.
+
+### Pending Transactions
+#### Description
+Tests that the service does not enqueue a job when there are pending transactions.
+
+#### Internal Logic
+1. Arranges: Creates a wallet, a recurring transaction rule, and a pending wallet transaction.
+2. Acts: Calls the `top_up_service.call` method.
+3. Asserts: Expects no job to be enqueued.
+
+### Target Method
+#### Description
+Tests the service's behavior when the recurring transaction rule uses the "target" method.
+
+#### Internal Logic
+1. Arranges: Creates a wallet and a recurring transaction rule with the "target" method.
+2. Acts: Calls the `top_up_service.call` method.
+3. Asserts: Expects a job to be enqueued with calculated credits based on the target ongoing balance.
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Used for creating test data (wallets and recurring transaction rules) |
+| RSpec | Testing framework |
+
+## Configuration
+The test file uses the following RSpec configuration:
+| Option | Value | Description |
+|:-------|:------|:------------|
+| type | :service | Specifies that this is a service test |

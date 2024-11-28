@@ -1,0 +1,71 @@
+---
+title: "apply_taxes_service.rb"
+---
+
+## High-level description
+The `ApplyTaxesService` is a Ruby service class within the `Plans` module that applies taxes to a given plan. It manages the association between a plan and its taxes, creating or removing applied taxes based on the provided tax codes.
+
+## Code Structure
+The main class `ApplyTaxesService` inherits from `BaseService` and contains a single public method `call` that performs the core functionality. It also includes a private method `taxes` for retrieving the relevant taxes.
+
+## Symbols
+
+### `ApplyTaxesService`
+#### Description
+This service class is responsible for applying taxes to a plan. It takes a plan and a list of tax codes as input, and updates the plan's applied taxes accordingly.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| plan | Plan | The plan to which taxes will be applied |
+| tax_codes | Array | An array of tax code strings to be applied to the plan |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the result of the operation, including applied taxes or error information |
+
+#### Internal Logic
+1. Validates the existence of the plan and all provided tax codes.
+2. Removes any existing applied taxes that are not in the provided tax codes.
+3. Creates or finds applied taxes for each provided tax code.
+4. Handles any record validation errors that may occur during the process.
+
+### `call`
+#### Description
+The main method that executes the tax application process.
+
+#### Internal Logic
+1. Checks if the plan exists and returns a not found failure if it doesn't.
+2. Verifies that all provided tax codes exist, returning a not found failure if any are missing.
+3. Removes applied taxes that are no longer needed.
+4. Creates or finds applied taxes for each provided tax code.
+5. Returns the result with the list of applied taxes.
+6. Catches and handles any `ActiveRecord::RecordInvalid` errors.
+
+### `taxes`
+#### Description
+A private method that retrieves the taxes associated with the plan's organization and the provided tax codes.
+
+#### Internal Logic
+Uses ActiveRecord to query the taxes based on the plan's organization and the provided tax codes.
+
+## Error Handling
+The service handles potential errors by:
+1. Returning a not found failure if the plan doesn't exist.
+2. Returning a not found failure if any of the provided tax codes don't exist.
+3. Catching `ActiveRecord::RecordInvalid` errors and returning a record validation failure.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseService | Parent class providing common service functionality |
+| ActiveRecord | Used for database operations and error handling |
+
+## References
+This service is used in other parts of the application, such as:
+- `Plans::CreateService`
+- `Plans::OverrideService`
+- `Plans::UpdateService`
+
+These services call `ApplyTaxesService` when creating, overriding, or updating plans that include tax information.

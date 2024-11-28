@@ -1,0 +1,74 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various subscription date calculation services in a Ruby on Rails application. The services tested are for different subscription intervals: weekly, monthly, quarterly, and yearly. These tests ensure that the date calculations for subscriptions are accurate and handle various scenarios such as different billing times, timezones, and pay-in-advance plans.
+
+## What does it do?
+The test files in this directory verify the functionality of subscription date calculation services. These services are responsible for determining important dates in a subscription lifecycle, such as:
+
+1. The start and end dates of billing periods
+2. The dates from which charges should be calculated
+3. The next end of a billing period
+4. The previous beginning of a billing period
+5. The price for a single day of subscription
+6. The duration of a charging period in days
+
+The tests cover various scenarios, including:
+- Calendar and anniversary billing times
+- Different customer timezones
+- Pay-in-advance plans
+- Subscriptions that start or terminate mid-period
+- Leap year calculations (for yearly subscriptions)
+
+By thoroughly testing these services, the codebase ensures that subscription billing and date calculations are accurate and consistent across different subscription types and edge cases.
+
+## Key Files
+1. `weekly_service_spec.rb`: Tests the `Subscriptions::Dates::WeeklyService` class, which handles date calculations for weekly subscriptions.
+
+2. `monthly_service_spec.rb`: Tests the `Subscriptions::Dates::MonthlyService` class, responsible for date calculations in monthly subscriptions.
+
+3. `quarterly_service_spec.rb`: Tests the `Subscriptions::Dates::QuarterlyService` class, which manages date calculations for quarterly subscriptions.
+
+4. `yearly_service_spec.rb`: Tests the `Subscriptions::Dates::YearlyService` class, handling date calculations for yearly subscriptions.
+
+Each of these files follows a similar structure, testing the same set of methods for their respective subscription intervals. The methods tested include:
+
+- `from_datetime`
+- `to_datetime`
+- `charges_from_datetime`
+- `charges_to_datetime`
+- `next_end_of_period`
+- `previous_beginning_of_period` (or `compute_previous_beginning_of_period`)
+- `single_day_price`
+- `charges_duration_in_days`
+
+## Dependencies
+The test files in this directory rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: A library for creating test data, used to set up subscription, customer, and plan objects for testing.
+3. Rails helper modules: Various helper modules are used, including a custom `match_datetime` matcher for comparing datetime objects.
+
+## Configuration
+The test files use the following RSpec configuration:
+
+```ruby
+RSpec.describe Subscriptions::Dates::SomeService, type: :service do
+  # Test code
+end
+```
+
+The `type: :service` option is used to indicate that these are service tests, which may trigger specific configurations or behaviors in the RSpec setup.
+
+Additionally, each test file sets up common variables and objects used across multiple tests, such as:
+
+- `subscription`: A subscription object with various attributes
+- `customer`: A customer object with a timezone
+- `plan`: A plan object with interval and pay_in_advance options
+- Various date variables used in the tests
+
+These setups are typically done using `let` statements or within `before` blocks.
+
+In conclusion, this directory contains a comprehensive set of tests for subscription date calculation services, ensuring that the core functionality of subscription management in the application is robust and handles various scenarios correctly.

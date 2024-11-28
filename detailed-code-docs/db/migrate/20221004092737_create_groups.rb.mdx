@@ -1,0 +1,46 @@
+---
+title: "20221004092737_create_groups.rb"
+---
+
+## High-level description
+This migration file creates a new table called `groups` in the database. It defines the structure of the `groups` table, including its columns, data types, and relationships with other tables.
+
+## Symbols
+
+### `CreateGroups`
+#### Description
+This is a Rails migration class that inherits from `ActiveRecord::Migration[7.0]`. It defines the schema changes for creating the `groups` table.
+
+#### Internal Logic
+The migration uses the `change` method to define the table structure:
+
+1. Creates a new table named `groups` with a UUID as the primary key.
+2. Adds various columns to the table, including references to other tables and basic attributes.
+3. Sets up indexes and foreign key constraints.
+
+Here's a breakdown of the table structure:
+
+| Column Name | Data Type | Constraints | Description |
+|:------------|:----------|:------------|:------------|
+| id | uuid | primary key | Unique identifier for each group |
+| billable_metric_id | uuid | foreign key, not null | Reference to the billable_metrics table |
+| parent_group_id | uuid | foreign key | Reference to the parent group in the same table |
+| key | string | not null | Key of the group |
+| value | string | not null | Value of the group |
+| status | integer | not null, default: 0 | Status of the group |
+| created_at | datetime | | Timestamp of creation |
+| updated_at | datetime | | Timestamp of last update |
+
+## Dependencies
+This migration relies on the Rails framework, specifically the ActiveRecord ORM for database operations.
+
+## Performance Considerations
+- The migration creates indexes on the `billable_metric_id` and `parent_group_id` columns, which can improve query performance when searching or joining on these columns.
+- Using UUIDs as primary keys can have both advantages (e.g., distributed systems) and disadvantages (e.g., potentially slower than integer IDs for joins) depending on the specific use case and database system.
+
+## Notes
+- The `billable_metric` reference has a cascading delete constraint, meaning that if a billable metric is deleted, all associated groups will be deleted as well.
+- The `parent_group` reference allows for a hierarchical structure of groups, where a group can have a parent group.
+- The `status` column is an integer with a default value of 0, suggesting it might be used with an enum in the corresponding model to represent different states of the group.
+
+This migration sets up a flexible structure for managing groups, potentially related to billing or metrics, with the ability to create hierarchies and track their status over time.

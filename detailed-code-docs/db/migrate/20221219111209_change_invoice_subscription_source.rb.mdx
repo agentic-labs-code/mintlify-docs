@@ -1,0 +1,61 @@
+---
+title: "20221219111209_change_invoice_subscription_source.rb"
+---
+
+## High-level description
+This migration modifies the `invoice_subscriptions` table by replacing the `source` column with a new `recurring` boolean column. It also sets all existing records to have `recurring` as true and ensures the column is not nullable.
+
+## Code Structure
+The migration class `ChangeInvoiceSubscriptionSource` contains two methods: `up` for applying the changes and `down` for reverting them.
+
+## Symbols
+
+### ChangeInvoiceSubscriptionSource
+#### Description
+This class is an ActiveRecord migration that alters the structure of the `invoice_subscriptions` table.
+
+#### Internal Logic
+1. In the `up` method:
+   - Removes the `source` column
+   - Adds a new `recurring` boolean column
+   - Sets all existing records to have `recurring` as true
+   - Makes the `recurring` column non-nullable
+2. In the `down` method:
+   - Adds back the `source` column as an integer
+   - Removes the `recurring` column
+
+### up
+#### Description
+This method applies the forward migration, modifying the `invoice_subscriptions` table structure.
+
+#### Internal Logic
+1. Uses `safety_assured` to bypass Strong Migrations checks
+2. Modifies the `invoice_subscriptions` table:
+   - Removes the `source` column
+   - Adds a new `recurring` boolean column, initially allowing null values
+3. Executes raw SQL to update all existing records, setting `recurring` to true
+4. Changes the `recurring` column to disallow null values
+
+### down
+#### Description
+This method defines the rollback procedure for the migration.
+
+#### Internal Logic
+1. Modifies the `invoice_subscriptions` table:
+   - Adds back the `source` column as an integer
+   - Removes the `recurring` column
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations |
+
+## Performance Considerations
+The migration uses `bulk: true` in the `change_table` calls, which can improve performance for multiple column operations.
+
+## Error Handling
+The migration uses `safety_assured` to bypass Strong Migrations checks. This should be used cautiously, ensuring that the migration is safe to run on large tables.
+
+___
+
+This migration makes a significant change to the `invoice_subscriptions` table structure, replacing the `source` column with a `recurring` boolean column. It's important to note that this change is not reversible without potential data loss, as the `down` method doesn't preserve the data from the `recurring` column when rolling back to the `source` column.

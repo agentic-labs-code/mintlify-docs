@@ -1,0 +1,78 @@
+---
+title: "validate_recurring_transaction_rules_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Wallets::ValidateRecurringTransactionRulesService` class. It specifically tests the `valid?` method of the service, focusing on validating recurring transaction rules for wallets.
+
+## Symbols
+
+### `RSpec.describe Wallets::ValidateRecurringTransactionRulesService`
+#### Description
+This is the main describe block for the test suite, focusing on the `Wallets::ValidateRecurringTransactionRulesService` class.
+
+### `subject(:validate_service)`
+#### Description
+Defines the subject of the tests as an instance of `Wallets::ValidateRecurringTransactionRulesService`, initialized with a `result` object and additional arguments.
+
+### `let(:result)`
+#### Description
+Creates a new instance of `BaseService::Result` for each test.
+
+### `let(:membership)`
+#### Description
+Creates a new membership record using FactoryBot for each test.
+
+### `let(:organization)`
+#### Description
+References the organization associated with the created membership.
+
+### `let(:args)`
+#### Description
+Defines the arguments to be passed to the service, including the `recurring_transaction_rules`.
+
+### `describe '.valid?'`
+#### Description
+Groups tests specifically for the `valid?` method of the service.
+
+#### Internal Logic
+The tests are organized into two contexts:
+1. When there are no recurring transaction rules
+2. When there is a wrong number of recurring transaction rules
+
+For each context, it checks the validity of the service and examines the result for errors.
+
+## Test Cases
+
+### Context: "when there is no recurring transaction rules"
+#### Description
+Tests the scenario where no recurring transaction rules are provided.
+
+#### Internal Logic
+- Arranges: Sets `args` to an empty hash.
+- Acts: Calls `be_valid` on the `validate_service`.
+- Asserts: Expects the service to be valid.
+
+### Context: "when there is wrong number of recurring transaction rules"
+#### Description
+Tests the scenario where an incorrect number of recurring transaction rules are provided.
+
+#### Internal Logic
+- Arranges: Sets `rules` to an array containing two rule hashes (interval and threshold).
+- Acts: Implicitly calls `valid?` on the `validate_service`.
+- Asserts:
+  1. Expects the service not to be valid.
+  2. Checks that the result's error messages for `:recurring_transaction_rules` contain the specific error 'invalid_number_of_recurring_rules'.
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| FactoryBot | Used for creating test data (membership) |
+
+## Notes
+- The tests use RSpec's `let` helper for lazy-loading of test data.
+- FactoryBot is used to create test records (`:membership`).
+- The service being tested is expected to validate the number of recurring transaction rules.
+- The test file doesn't cover all possible scenarios for the service, focusing only on the presence/absence and number of rules.

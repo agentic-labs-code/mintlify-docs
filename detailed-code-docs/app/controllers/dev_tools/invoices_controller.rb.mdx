@@ -1,0 +1,55 @@
+---
+title: "invoices_controller.rb"
+---
+
+## High-level description
+This code defines the `InvoicesController` within the `DevTools` module, which is responsible for displaying invoice PDFs in HTML format. It utilizes the `Invoices::GeneratePdfService` to render the invoice HTML and makes a minor modification to the image path before rendering the content.
+
+## Code Structure
+The `InvoicesController` inherits from `ApplicationController` and contains a `show` action and a private `invoice` method. The `show` action uses the `Invoices::GeneratePdfService` to generate the invoice HTML and modifies it before rendering.
+
+## References
+- `::Invoices::GeneratePdfService`
+- `Invoice` model
+- `ApplicationController`
+
+## Symbols
+
+### `DevTools::InvoicesController`
+#### Description
+This controller handles the display of invoice PDFs in HTML format for development tools purposes.
+
+### `show`
+#### Description
+Renders the invoice HTML after generating it and modifying the logo image path.
+
+#### Internal Logic
+1. Creates a new instance of `Invoices::GeneratePdfService` with the current invoice.
+2. Calls `render_html` on the service to generate the HTML content.
+3. Modifies the image path in the HTML to use the correct asset path.
+4. Renders the modified HTML content as a safe HTML string.
+
+#### Side Effects
+- Renders HTML content directly to the response.
+
+#### Performance Considerations
+- The `gsub!` method modifies the string in place, which is more efficient for large strings.
+
+### `invoice`
+#### Description
+A private method that retrieves the invoice based on the `id` parameter.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @invoice | Invoice | The found invoice object |
+
+## Error Handling
+The controller relies on the default error handling provided by `ApplicationController` for handling routing errors and record not found errors.
+
+## Security Considerations
+The controller uses `html_safe` to render the HTML content, which is generally unsafe. However, it's disabled the `Rails/OutputSafety` cop, indicating that this is an intentional decision. Care should be taken to ensure that the rendered HTML does not contain any malicious content.
+
+## TODOs
+- Consider refactoring the image path modification to be handled in the `GeneratePdfService` or a separate concern.
+- Evaluate the security implications of using `html_safe` and consider alternative approaches if necessary.

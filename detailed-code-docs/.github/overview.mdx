@@ -3,128 +3,96 @@ title: "Overview"
 ---
 
 ## High-level description
-The `.github` directory contains essential configuration files and templates for managing the GitHub repository of the Elementary project. It includes two main subdirectories: `ISSUE_TEMPLATE` and `workflows`. These components streamline the process of issue reporting, automate various development tasks, and enhance collaboration within the project.
+
+This `.github` directory contains essential configuration files and workflows for managing the Lago project on GitHub. It includes two main subdirectories: `ISSUE_TEMPLATE` and `workflows`. The `ISSUE_TEMPLATE` directory provides structured templates for bug reports and feature requests, along with configuration for the issue creation process. The `workflows` directory contains GitHub Actions workflows that automate various aspects of the development lifecycle, including continuous integration, testing, and deployment.
 
 ## What does it do?
-This directory serves two primary functions:
 
-1. **Standardized Issue Reporting:** The `ISSUE_TEMPLATE` subdirectory provides structured templates for users to report bugs, request features, or highlight documentation gaps. This ensures that the project maintainers receive consistent and comprehensive information, facilitating efficient issue triage and resolution.
+The contents of this directory serve several crucial functions in the Lago project:
 
-2. **Automated Workflows:** The `workflows` subdirectory contains GitHub Actions configurations that automate crucial aspects of the development process. These workflows handle tasks such as:
-   - Running tests across different data warehouse platforms and dbt versions
-   - Managing releases, including version bumping and package publishing
-   - Tracking and managing issues and pull requests
-   - Sending notifications to team communication channels (e.g., Slack)
+1. Issue Management:
+   - Provides templates for users to submit well-structured bug reports and feature requests.
+   - Configures the issue creation process to guide users towards using templates or seeking support in the Lago Community Slack.
 
-By automating these processes, the project maintains code quality, streamlines development, and keeps the team informed about the project's status.
+2. Continuous Integration and Deployment:
+   - Automates the building and pushing of Docker images to Amazon ECR.
+   - Runs database migrations for PostgreSQL and ClickHouse to ensure schema consistency.
+   - Performs code style checks using Rubocop on pull requests.
+   - Executes the RSpec test suite in a controlled environment with necessary services.
+   - Handles the release process by building and publishing multi-architecture Docker images.
 
-## Entry points
-The main entry points for developers working with this directory are:
-
-1. **Issue Templates:** Located in the `ISSUE_TEMPLATE` subdirectory, these Markdown files (`bug_report.md`, `documentation_gap.md`, and `feature_request.md`) define the structure for different types of issues.
-
-2. **Workflow Files:** In the `workflows` subdirectory, key workflow files include:
-   - `test-all-warehouses.yml`: Orchestrates testing across different warehouse platforms
-   - `release.yml`: Manages the release process
-   - `stale.yml`: Handles stale issues and pull requests
-
-Developers would typically start with these files based on the specific task they're working on or the process they want to understand or modify.
+These components work together to streamline development processes, maintain code quality, and improve the project's overall efficiency and reliability.
 
 ## Key Files
-### ISSUE_TEMPLATE/bug_report.md
-This template guides users in reporting bugs by prompting for:
-- Detailed description of the bug
-- Steps to reproduce the issue
-- Expected behavior
-- Screenshots (if applicable)
-- Environment details
-- Additional context
-- User's willingness to contribute a fix
 
-Example snippet:
-```markdown
-## Describe the bug
-A clear and concise description of what the bug is.
+1. Issue Templates (`ISSUE_TEMPLATE/bug_report.md` and `ISSUE_TEMPLATE/feature_request.md`):
+   These Markdown files provide structured formats for users to report bugs or suggest new features. They prompt users for specific information to help maintainers understand and address issues more effectively.
 
-## To Reproduce
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
-```
+   Example from `bug_report.md`:
+   ```markdown
+   **Describe the bug**
+   A clear and concise description of what the bug is.
 
-### ISSUE_TEMPLATE/feature_request.md
-This template structures feature requests by asking users to provide:
-- Description of the problem or need
-- Proposed solution
-- Alternative solutions considered
-- Additional context
-- User's willingness to contribute to the implementation
+   **To Reproduce**
+   Steps to reproduce the behavior:
+   1. Go to '...'
+   2. Click on '....'
+   3. Scroll down to '....'
+   4. See error
+   ```
 
-### workflows/test-warehouse.yml
-This reusable workflow defines the core testing logic for Elementary. It:
-- Sets up the testing environment
-- Runs various types of tests
-- Generates test reports
-- Sends results to different platforms
+2. Issue Template Configuration (`ISSUE_TEMPLATE/config.yml`):
+   This YAML file customizes the issue creation process by disabling blank issues and providing a link to the Lago Community Slack for questions and feature requests.
 
-Example snippet:
-```yaml
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+   ```yaml
+   blank_issues_enabled: false
+   contact_links:
+     - name: Lago Community
+       url: https://www.getlago.com/slack
+       about: Please ask and answer questions here.
+   ```
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
+3. Workflow Files (in the `workflows` directory):
+   - `internal-build.yml`: Builds and pushes Docker images to Amazon ECR.
+   - `migrations-test.yml`: Runs database migrations for PostgreSQL and ClickHouse.
+   - `pronto.yml`: Performs Rubocop linting on pull requests.
+   - `release.yml`: Handles the release process, including multi-architecture Docker image builds.
+   - `spec.yml`: Executes the RSpec test suite in a controlled environment.
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-```
-
-### workflows/notify_slack.yml
-This workflow sends notifications to a Slack channel about the status of other workflows. It's typically called at the end of a workflow run to report success or failure.
-
-Example usage:
-```yaml
-- name: Notify Slack
-  uses: ./.github/workflows/notify_slack.yml
-  with:
-    status: ${{ job.status }}
-    slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-```
-
-### workflows/bump-version.yml
-This workflow automates the process of bumping version numbers in various project files. It can be triggered manually or by other workflows and allows specifying new version numbers for both the CLI tool and the associated dbt package.
+   These workflows define jobs and steps that automate various aspects of the development process, ensuring code quality and facilitating continuous integration and deployment.
 
 ## Dependencies
-The workflows in this directory rely on several GitHub Actions and external tools:
 
-1. **actions/checkout@v3**: Used to check out the repository code.
-2. **actions/setup-python@v4**: Sets up the Python environment for running tests and scripts.
-3. **actions/cache@v3**: Caches dependencies to speed up workflow execution.
-4. **softprops/action-gh-release@v1**: Used for creating GitHub releases.
-5. **peter-evans/create-pull-request@v5**: Creates pull requests for version bumps and other automated changes.
-6. **slack-notify/action-slack-notify@v2**: Sends notifications to Slack channels.
+The workflows in this directory rely on several external actions and services:
 
-These actions were chosen to leverage community-maintained, well-tested tools for common CI/CD tasks, reducing the need for custom scripts and improving reliability.
+1. GitHub Actions: `actions/checkout@v4`, `actions/upload-artifact@v4`, `actions/download-artifact@v4`, `ruby/setup-ruby@v1`
+2. AWS Actions: `aws-actions/configure-aws-credentials@v4`, `aws-actions/amazon-ecr-login@v2`
+3. Docker Actions: `docker/build-push-action@v6`, `docker/metadata-action@v5`, `docker/setup-buildx-action@v3`, `docker/login-action@v3`
+4. Database Services: PostgreSQL (postgres:14-alpine), ClickHouse (clickhouse/clickhouse-server), Redis
+5. Ruby and related gems: Ruby 3.3.4, Rubocop, RSpec
+
+These dependencies are crucial for setting up the required environments, building and pushing Docker images, running tests, and performing various CI/CD tasks.
 
 ## Configuration
-The workflows use various environment variables and secrets for configuration:
 
-1. **GITHUB_TOKEN**: Automatically provided by GitHub, used for authentication in various actions.
-2. **SLACK_WEBHOOK_URL**: Secret containing the Slack webhook URL for notifications.
-3. **PYPI_API_TOKEN**: Secret for publishing packages to PyPI.
-4. **WAREHOUSE_TYPE**: Environment variable specifying the type of data warehouse for testing (e.g., "snowflake", "bigquery").
-5. **DBT_VERSION**: Environment variable specifying the dbt version to use for testing.
+The workflows use a combination of environment variables and GitHub secrets to configure their behavior. Key configuration elements include:
 
-These configurations allow the workflows to be flexible and secure, adapting to different testing scenarios and keeping sensitive information protected.
+1. AWS credentials and region for ECR access
+2. Docker Hub credentials for image publishing
+3. Database connection strings and credentials
+4. Rails environment variables (e.g., RAILS_ENV, SECRET_KEY_BASE)
+5. Lago-specific configuration variables (e.g., LAGO_API_URL, LAGO_PDF_URL)
 
-In summary, the `.github` directory plays a crucial role in maintaining the Elementary project's development workflow, ensuring consistent issue reporting, automating testing and release processes, and facilitating effective team communication.
+The `ISSUE_TEMPLATE/config.yml` file contains the following configuration:
+
+| Option | Value | Description |
+|--------|-------|-------------|
+| `blank_issues_enabled` | `false` | Disables the creation of blank issues |
+
+It also defines a contact link:
+
+| Name | URL | Description |
+|------|-----|-------------|
+| Lago Community | https://www.getlago.com/slack | Slack community for questions and feature requests |
+
+This configuration encourages users to use predefined templates when creating issues and directs them to the Slack community for general questions and feature requests, helping maintain an organized and efficient issue tracking system.

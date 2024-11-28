@@ -1,0 +1,74 @@
+---
+title: "integration_mappings.rb"
+---
+
+## High-level description
+This code defines factory definitions for creating test data related to integration mappings, specifically for NetSuite and Xero integrations. It uses FactoryBot to create factories that generate instances of `IntegrationMappings::NetsuiteMapping` and `IntegrationMappings::XeroMapping` with predefined attributes and associations.
+
+## Symbols
+
+### `netsuite_mapping` factory
+#### Description
+Defines a factory for creating `IntegrationMappings::NetsuiteMapping` instances with associated integration and mappable objects, as well as predefined settings.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | association | A NetSuite integration instance |
+| mappable | association | An add-on instance |
+| settings | hash | A hash containing external_id, external_account_code, and external_name |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| netsuite_mapping | IntegrationMappings::NetsuiteMapping | An instance of NetsuiteMapping with predefined attributes |
+
+#### Internal Logic
+1. Associates the mapping with a NetSuite integration using the `:netsuite_integration` factory.
+2. Associates the mapping with an add-on using the `:add_on` factory as the mappable object.
+3. Sets predefined settings with NetSuite-specific values.
+
+### `xero_mapping` factory
+#### Description
+Defines a factory for creating `IntegrationMappings::XeroMapping` instances with associated integration and mappable objects, as well as predefined settings.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | association | A Xero integration instance |
+| mappable | association | An add-on instance |
+| settings | hash | A hash containing external_id, external_account_code, and external_name |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| xero_mapping | IntegrationMappings::XeroMapping | An instance of XeroMapping with predefined attributes |
+
+#### Internal Logic
+1. Associates the mapping with a Xero integration using the `:xero_integration` factory.
+2. Associates the mapping with an add-on using the `:add_on` factory as the mappable object.
+3. Sets predefined settings with Xero-specific values.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| FactoryBot | Used to define factories for creating test data |
+
+## References
+The factories reference the following models and factories:
+- `IntegrationMappings::NetsuiteMapping`
+- `IntegrationMappings::XeroMapping`
+- `:netsuite_integration` factory
+- `:xero_integration` factory
+- `:add_on` factory
+
+These references suggest the existence of corresponding model classes and additional factories in the application.
+
+## Notes
+1. The factories use the `association` method to create associated objects, which allows for more flexibility in testing by creating related objects on-demand.
+2. Both factories use a `settings` block to define a hash of predefined settings, which are stored as JSONB in the database according to the schema information in the related files.
+3. The `mappable` association is polymorphic, as indicated by the `mappable_type` and `mappable_id` fields in the schema.
+4. The factories are defined within a `FactoryBot.define` block, which is the standard way to define factories using the FactoryBot gem.
+5. The related files show that both `NetsuiteMapping` and `XeroMapping` inherit from a `BaseMapping` class, which is not directly visible in the provided code but is likely defined elsewhere in the application.
+
+This factory definition file is crucial for setting up test data for integration mappings, allowing developers to easily create instances of these mappings with realistic data for both NetSuite and Xero integrations in their test suites.

@@ -3,33 +3,69 @@ title: "Overview"
 ---
 
 ## High-level description
-This directory contains GitHub Actions workflows that automate various aspects of the Elementary project, including testing, release management, issue tracking, and communication. These workflows define automated processes triggered by specific events within the GitHub repository, such as pushing code, creating pull requests, or adding comments.
+This directory contains GitHub Actions workflows for the Lago project, focusing on continuous integration and deployment tasks. The workflows handle various aspects of the development process, including building and pushing Docker images, running database migrations, performing code linting, releasing new versions, and executing the test suite.
 
 ## What does it do?
-This directory houses the configuration files that dictate how GitHub Actions automate tasks within the Elementary project. These tasks include:
+The workflows in this directory automate several key processes in the software development lifecycle:
 
-- **Testing:** Automatically running tests on different data warehouse platforms and dbt versions whenever code changes are pushed or on a schedule.
-- **Release Management:** Automating the process of creating new releases, including bumping version numbers, publishing packages, and updating documentation.
-- **Issue Tracking:** Managing the lifecycle of issues and pull requests, such as labeling stale issues, closing them after a period of inactivity, and integrating with the Pylon issue tracker.
-- **Communication:** Sending notifications to Slack channels about the status of workflows, test results, and other important events.
+1. Internal Build: Builds and pushes a Docker image of the API to Amazon ECR when changes are pushed to the main branch.
+2. Migrations Test: Runs database migrations for both PostgreSQL and ClickHouse databases to ensure schema changes are applied correctly.
+3. Rubocop Linting: Performs code style checks on modified Ruby files in pull requests using Rubocop.
+4. Release: Builds and publishes multi-architecture Docker images for the Lago API when a new release is created.
+5. Run Spec: Executes the RSpec test suite in a controlled environment with all necessary services (PostgreSQL, Redis, ClickHouse) set up.
 
-These workflows help streamline development, improve code quality, and keep the team informed about the project's status.
+These workflows help maintain code quality, ensure database consistency, facilitate continuous integration, and streamline the release process.
 
 ## Entry points
-While there are many files in this directory, a developer would typically start with the workflow that corresponds to the specific task they want to automate. For example:
+The main entry points for these workflows are:
 
-- To understand how tests are run on different warehouse platforms, one would start with `test-all-warehouses.yml`.
-- To see how new releases are managed, one would look at `release.yml`.
-- To understand how stale issues are handled, one would examine `stale.yml`.
+1. `internal-build.yml`: Triggered on pushes to the main branch or manual dispatch.
+2. `migrations-test.yml`: Runs on pushes to the main branch and pull request events.
+3. `pronto.yml`: Executes on pull request events.
+4. `release.yml`: Activated by release events or manual triggers.
+5. `spec.yml`: Runs on pushes to the main branch and pull request events.
 
-Each workflow file is self-contained and defines its own triggers, jobs, and steps.
+Each workflow file defines a specific set of jobs and steps to accomplish its tasks. The workflows interact with various services and dependencies, such as Docker, AWS ECR, PostgreSQL, ClickHouse, and Redis.
 
-## Key Files
-### .github/workflows/test-warehouse.yml
-This workflow defines the core testing logic for Elementary, designed to be reusable across different warehouse platforms. It sets up the environment, runs various types of tests, generates reports, and sends the results to different platforms. This workflow is called by other workflows that specify the target warehouse type and other configuration parameters.
+## Dependencies
+The workflows rely on several external actions and services:
 
-### .github/workflows/notify_slack.yml
-This reusable workflow sends notifications to a Slack channel about the status of other workflows. It is typically called at the end of a workflow run to report success or failure, providing details about the workflow and a link to the run logs.
+1. GitHub Actions:
+   - `actions/checkout@v4`: Used in all workflows to fetch repository code.
+   - `actions/upload-artifact@v4` and `actions/download-artifact@v4`: Used in the release workflow for handling image digests.
+   - `ruby/setup-ruby@v1`: Sets up the Ruby environment in multiple workflows.
 
-### .github/workflows/bump-version.yml
-This workflow automates the process of bumping version numbers in various files within the project. It is triggered manually or by other workflows and allows for specifying the new version numbers for both the CLI tool and the associated dbt package.
+2. AWS Actions:
+   - `aws-actions/configure-aws-credentials@v4`: Configures AWS credentials for ECR access.
+   - `aws-actions/amazon-ecr-login@v2`: Logs in to Amazon ECR.
+
+3. Docker Actions:
+   - `docker/build-push-action@v6`: Builds and pushes Docker images.
+   - `docker/metadata-action@v5`: Generates Docker metadata.
+   - `docker/setup-buildx-action@v3`: Sets up Docker Buildx for multi-architecture builds.
+   - `docker/login-action@v3`: Logs in to Docker Hub.
+
+4. Database Services:
+   - PostgreSQL (postgres:14-alpine)
+   - ClickHouse (clickhouse/clickhouse-server)
+   - Redis
+
+5. Ruby and related gems:
+   - Ruby 3.3.4
+   - Rubocop for linting
+   - RSpec for testing
+
+These dependencies are crucial for setting up the required environments, building and pushing Docker images, running tests, and performing various CI/CD tasks.
+
+## Configuration
+The workflows use a combination of environment variables and GitHub secrets to configure their behavior. Key configuration elements include:
+
+1. AWS credentials and region for ECR access.
+2. Docker Hub credentials for image publishing.
+3. Database connection strings and credentials.
+4. Rails environment variables (e.g., RAILS_ENV, SECRET_KEY_BASE).
+5. Lago-specific configuration variables (e.g., LAGO_API_URL, LAGO_PDF_URL).
+
+Each workflow file contains specific configuration details relevant to its tasks. For example, the release workflow configures Docker image tags and platforms, while the spec workflow sets up database services and environment variables for testing.
+
+The use of GitHub secrets ensures that sensitive information like API keys and credentials are not exposed in the workflow files.

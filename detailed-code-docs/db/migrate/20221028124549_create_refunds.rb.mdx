@@ -1,0 +1,56 @@
+---
+title: "20221028124549_create_refunds.rb"
+---
+
+## High-level description
+This Ruby code defines an ActiveRecord migration to create a `refunds` table in the database. The migration sets up the structure for storing refund information, including relationships to payments, credit notes, payment providers, and customers, as well as refund amount and status details.
+
+## Symbols
+
+### CreateRefunds
+#### Description
+This class inherits from `ActiveRecord::Migration[7.0]` and defines the schema changes for creating the `refunds` table.
+
+#### Internal Logic
+The `change` method creates a new table named `refunds` with the following attributes:
+
+1. Uses UUID as the primary key.
+2. Sets up foreign key relationships with `payments`, `credit_notes`, `payment_providers`, and `payment_provider_customers` tables.
+3. Defines columns for amount, currency, status, and provider refund ID.
+4. Includes timestamp columns for created_at and updated_at.
+
+## Code Structure
+
+```ruby
+create_table :refunds, id: :uuid do |t|
+  # Foreign key references
+  t.references :payment, type: :uuid, null: false, foreign_key: true, index: true
+  t.references :credit_note, type: :uuid, null: false, foreign_key: true, index: true
+  t.references :payment_provider, type: :uuid, null: false, foreign_key: true, index: true
+  t.references :payment_provider_customer, type: :uuid, null: false, foreign_key: true, index: true
+  
+  # Refund details
+  t.bigint :amount_cents, null: false, default: 0
+  t.string :amount_currency, null: false
+  t.string :status, null: false
+  t.string :provider_refund_id, null: false
+  
+  # Timestamps
+  t.timestamps
+end
+```
+
+## Dependencies
+This migration relies on the ActiveRecord framework, which is part of Ruby on Rails.
+
+## References
+The migration references the following tables:
+- payments
+- credit_notes
+- payment_providers
+- payment_provider_customers
+
+These tables must exist in the database schema for the foreign key constraints to be valid.
+
+## Performance Considerations
+The migration creates indexes on all foreign key columns, which can improve query performance when joining or filtering based on these relationships.

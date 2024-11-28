@@ -1,0 +1,75 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `app/services/subscriptions` directory contains a collection of service classes responsible for managing various aspects of subscription lifecycle, billing, and date calculations within the application. These services handle complex operations such as creating, updating, terminating, and billing subscriptions, as well as managing free trials and performing date-related calculations.
+
+## What does it do?
+This directory provides a set of services that collectively manage the entire subscription process:
+
+1. Subscription Creation and Modification:
+   - `CreateService`: Handles creating new subscriptions or upgrading/downgrading existing ones.
+   - `UpdateService`: Manages updates to existing subscriptions, including plan overrides and date changes.
+
+2. Subscription Termination:
+   - `TerminateService`: Handles the termination of subscriptions, including immediate termination and termination with pending next subscriptions.
+
+3. Billing and Charging:
+   - `BillingService`: Manages the billing process for subscriptions, handling various billing scenarios and intervals.
+   - `FreeTrialBillingService`: Handles billing for subscriptions ending their free trial period.
+   - `ChargeCacheService`: Manages caching and expiration of charge-related data for subscriptions.
+
+4. Date Calculations:
+   - `DatesService`: Provides a factory for creating interval-specific date services and common date calculation methods.
+   - `TerminatedDatesService`: Handles date calculations for terminated subscriptions.
+   - `Dates` subdirectory: Contains services for weekly, monthly, quarterly, and yearly date calculations.
+
+5. Activation:
+   - `ActivateService`: Responsible for activating pending subscriptions based on their start dates.
+
+6. Validation:
+   - `ValidateService`: Ensures the validity of subscription-related data during creation or updates.
+
+These services work together to provide a comprehensive subscription management system, handling complex scenarios such as upgrades, downgrades, pro-rating, and various billing models (e.g., calendar-based, anniversary-based, pay-in-advance, pay-in-arrears).
+
+## Entry points
+The main entry points for this directory are:
+
+1. `CreateService`: For creating new subscriptions or handling upgrades/downgrades.
+2. `UpdateService`: For modifying existing subscriptions.
+3. `TerminateService`: For ending subscriptions.
+4. `BillingService`: For managing the billing process.
+5. `ActivateService`: For activating pending subscriptions.
+
+These services are likely called from controllers or other parts of the application that need to perform subscription-related operations.
+
+## Key Files
+1. `create_service.rb`: Handles subscription creation and modification.
+2. `update_service.rb`: Manages updates to existing subscriptions.
+3. `terminate_service.rb`: Handles subscription termination.
+4. `billing_service.rb`: Manages the billing process for subscriptions.
+5. `dates_service.rb`: Provides date calculation functionality for subscriptions.
+6. `activate_service.rb`: Responsible for activating pending subscriptions.
+7. `validate_service.rb`: Ensures the validity of subscription-related data.
+
+## Dependencies
+These services rely on various external libraries and internal components:
+
+1. Ruby on Rails framework
+2. ActiveRecord for database interactions
+3. Background job processors (e.g., Sidekiq) for asynchronous tasks
+4. Internal models such as Subscription, Customer, Plan, and Charge
+5. Other internal services like Plans::OverrideService and CreditNotes::CreateFromTermination
+
+## Configuration
+While there are no explicit configuration files in this directory, the services are designed to work with subscription and plan objects that likely contain configuration data such as:
+
+- Billing frequency (weekly, monthly, quarterly, yearly)
+- Payment terms (advance or arrears)
+- Anniversary dates
+- Calendar-based vs anniversary-based billing
+
+These configuration details are accessed through the subscription and plan objects referenced in the services.
+
+In summary, the `app/services/subscriptions` directory provides a comprehensive set of services for managing the entire lifecycle of subscriptions, from creation to termination, including complex billing scenarios and date calculations. These services form the core of the subscription management system within the application.

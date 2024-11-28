@@ -1,0 +1,65 @@
+---
+title: "analytics_ruby.rb"
+---
+
+## High-level description
+This code initializes the Segment Analytics client for tracking user interactions and events in a Ruby on Rails application. It sets up error handling, logging configuration, and creates a global `SEGMENT_CLIENT` instance with specific settings, including environment-based stubbing for development and test environments.
+
+## Code Structure
+The code defines a custom error class `SegmentError` and initializes the Segment Analytics client with specific configuration options. The initialization is conditional, based on an environment variable.
+
+## Symbols
+
+### `SegmentError`
+#### Description
+A custom error class that encapsulates Segment-related errors with status and error message information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | Integer | The status code of the error |
+| error_message | String | The error message |
+
+#### Internal Logic
+- Initializes instance variables for status, error_message, and a combined message
+- Calls the superclass initializer
+
+### `SEGMENT_CLIENT`
+#### Description
+A global constant that holds the initialized Segment Analytics client instance.
+
+#### Internal Logic
+- Configures the Segment Analytics client with the following options:
+  - `write_key`: Fetched from environment variables or set to 'changeme'
+  - `on_error`: A proc that captures exceptions using Sentry
+  - `stub`: Set to true in development or test environments
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Segment::Analytics | Provides the analytics tracking functionality |
+| Sentry | Used for error reporting |
+| Logger | Used to configure logging for Segment |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LAGO_DISABLE_SEGMENT | String | N/A | If set to 'true', disables Segment initialization |
+| SEGMENT_WRITE_KEY | String | 'changeme' | The write key for Segment authentication |
+
+## Error Handling
+The code implements custom error handling for Segment-related errors:
+- Defines a custom `SegmentError` class to encapsulate error information
+- Uses Sentry to capture exceptions when Segment encounters an error
+
+## Logging
+Segment's internal logging is disabled by setting the logger to `Logger.new(nil)`.
+
+## Performance Considerations
+The code stubs the Segment client in development and test environments, which can improve performance and prevent unnecessary API calls during development and testing.
+
+## TODOs
+- Consider making the 'changeme' default write key more secure or obvious that it needs to be changed.
+- Evaluate if disabling Segment's internal logging is the best approach for all environments.
+
+This initialization code plays a crucial role in setting up analytics tracking for the application, ensuring proper error handling and environment-specific behavior.

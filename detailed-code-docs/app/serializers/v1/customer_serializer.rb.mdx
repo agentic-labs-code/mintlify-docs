@@ -1,0 +1,47 @@
+---
+title: "customer_serializer.rb"
+---
+
+## High-level description
+The `V1::CustomerSerializer` class is responsible for serializing `Customer` model objects into a JSON representation for API responses. It includes various attributes of the customer, such as their ID, contact information, billing details, and associated data like metadata, taxes, and integration customers.
+
+## Code Structure
+The `V1::CustomerSerializer` class inherits from `ModelSerializer` and overrides the `serialize` method to define the custom serialization logic. It uses several private helper methods (`metadata`, `billing_configuration`, `taxes`, `vies_check`, `integration_customers`) to format specific attributes or associated data.
+
+## References
+This serializer references other serializers like `V1::Customers::MetadataSerializer`, `V1::TaxSerializer`, and `V1::IntegrationCustomerSerializer` to serialize associated data. It also uses the `CollectionSerializer` to serialize collections of objects.
+
+## Symbols
+
+### `V1::CustomerSerializer`
+#### Description
+This class serializes a `Customer` object into a hash representation suitable for JSON output. It includes various customer attributes and associated data based on the provided options.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| model | Customer | The `Customer` object to serialize. |
+| options | Hash | Optional parameters controlling the serialization, such as included associations. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payload | Hash | A hash representation of the serialized `Customer` object. |
+
+#### Internal Logic
+The `serialize` method constructs a hash containing the customer's attributes. It then conditionally merges additional data based on the `options` parameter using the `include?` method. The private helper methods handle the serialization of specific attributes or associated data.
+
+* `metadata`: Serializes the customer's metadata using the `V1::Customers::MetadataSerializer`.
+* `billing_configuration`: Constructs a hash containing the customer's billing configuration, including payment provider details.
+* `taxes`: Serializes the customer's taxes using the `V1::TaxSerializer`.
+* `vies_check`: Includes VIES check information if provided in the `options`.
+* `integration_customers`: Serializes the customer's integration customers using the `V1::IntegrationCustomerSerializer`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ModelSerializer | Provides the base serialization functionality. |
+| CollectionSerializer | Used to serialize collections of associated objects. |
+| V1::Customers::MetadataSerializer | Serializes customer metadata. |
+| V1::TaxSerializer | Serializes customer taxes. |
+| V1::IntegrationCustomerSerializer | Serializes customer integration customers. | 

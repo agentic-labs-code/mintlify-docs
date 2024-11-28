@@ -1,0 +1,57 @@
+---
+title: "20231102154537_change_precision_to_precise_unit_amount.rb"
+---
+
+## High-level description
+This migration file changes the precision of the `precise_unit_amount` column in the `fees` table. It increases the scale from 5 to 15 decimal places while maintaining the overall precision of 30 digits. This change allows for more precise decimal representations in the `precise_unit_amount` field.
+
+## Symbols
+
+### `ChangePrecisionToPreciseUnitAmount`
+#### Description
+This class is an ActiveRecord migration that modifies the `precise_unit_amount` column in the `fees` table. It increases the scale (number of decimal places) from 5 to 15 while keeping the overall precision at 30 digits.
+
+#### Internal Logic
+The migration defines two methods:
+
+1. `up`: This method is called when migrating the database forward. It changes the `precise_unit_amount` column to have a precision of 30 and a scale of 15.
+
+2. `down`: This method is called when rolling back the migration. It reverts the `precise_unit_amount` column to have a precision of 30 and a scale of 5.
+
+Both methods use the `change_table` method with the `bulk: true` option for better performance when making multiple changes to a table.
+
+### `up`
+#### Description
+This method increases the scale of the `precise_unit_amount` column from 5 to 15 decimal places.
+
+#### Internal Logic
+1. Uses `safety_assured` to bypass Strong Migrations checks, indicating that this migration has been manually reviewed for safety.
+2. Calls `change_table` with `bulk: true` for optimized performance.
+3. Uses `t.change` to modify the `precise_unit_amount` column:
+   - Sets precision to 30
+   - Sets scale to 15
+   - Ensures the column is not nullable (`null: false`)
+   - Sets a default value of '0.0'
+
+### `down`
+#### Description
+This method reverts the changes made by the `up` method, reducing the scale of the `precise_unit_amount` column back to 5 decimal places.
+
+#### Internal Logic
+1. Calls `change_table` with `bulk: true` for optimized performance.
+2. Uses `t.change` to modify the `precise_unit_amount` column:
+   - Sets precision to 30
+   - Sets scale to 5
+   - Ensures the column is not nullable (`null: false`)
+   - Sets a default value of '0.0'
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+
+## Performance Considerations
+The migration uses `bulk: true` in the `change_table` method, which can improve performance when making multiple changes to a table by combining them into a single ALTER TABLE statement.
+
+## Error Handling
+This migration does not implement any specific error handling. It relies on the default error handling provided by ActiveRecord migrations.

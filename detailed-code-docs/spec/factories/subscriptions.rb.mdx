@@ -1,0 +1,54 @@
+---
+title: "subscriptions.rb"
+---
+
+## High-level description
+This file defines a factory for creating `Subscription` objects using FactoryBot, a popular Ruby gem for generating test data. The factory provides a default configuration for subscriptions and includes additional traits for different subscription states.
+
+## Symbols
+
+### `FactoryBot.define`
+#### Description
+This method is used to define factories for FactoryBot. It encapsulates all the factory definitions within its block.
+
+### `factory :subscription`
+#### Description
+Defines a factory for creating `Subscription` objects with default attributes and associations.
+
+#### Internal Logic
+- Associates a `customer` and a `plan` with the subscription.
+- Sets the default `status` to `:active`.
+- Generates a random `external_id` using `SecureRandom.uuid`.
+- Sets the `started_at` date to 1 day ago from the current time.
+
+### `trait :pending`
+#### Description
+Defines a trait that can be applied to create a pending subscription.
+
+#### Internal Logic
+- Sets the `status` to `:pending`.
+
+### `trait :terminated`
+#### Description
+Defines a trait that can be applied to create a terminated subscription.
+
+#### Internal Logic
+- Sets the `status` to `:terminated`.
+- Sets the `started_at` date to 1 month ago from the current time.
+- Sets the `terminated_at` date to the current time.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| FactoryBot | Used for defining and creating test data factories |
+| SecureRandom | Used to generate unique UUIDs for `external_id` |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| status | Symbol | :active | The status of the subscription |
+| external_id | String | SecureRandom.uuid | A unique identifier for the subscription |
+| started_at | DateTime | 1.day.ago | The start date of the subscription |
+| terminated_at | DateTime | Time.zone.now (only for terminated trait) | The termination date of the subscription |
+
+This factory configuration allows for flexible creation of `Subscription` objects in different states, which is particularly useful for testing various scenarios in the application. The use of traits enables easy customization of the subscription's status and associated dates.

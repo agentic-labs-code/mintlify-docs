@@ -1,0 +1,48 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files that focus on various scenarios related to recurring fees in a subscription-based billing system. The tests cover subscription upgrades, downgrades, and general recurring fee behaviors for both calendar and anniversary billing cycles. These tests are crucial for ensuring the correct functionality of the billing system, especially in complex scenarios involving subscription changes and different billing models.
+
+## What does it do?
+The test suite in this directory simulates and verifies the behavior of a subscription-based billing system in various scenarios:
+
+1. Subscription Upgrades: It tests how the system handles a customer upgrading their subscription plan, including the creation of new subscriptions, termination of old ones, and correct fee calculations.
+
+2. Subscription Downgrades: Similar to upgrades, it verifies the system's behavior when a customer downgrades their plan, ensuring proper fee adjustments and billing timing.
+
+3. Recurring Non-Invoiceable Fees: These tests cover scenarios for both pay-in-advance and pay-in-arrears charges, with and without invoicing, and with different grouping options. They verify fee creation, billing cycles, and subscription termination effects.
+
+The tests simulate real-world scenarios by manipulating time (using `travel_to`), creating events to represent usage, and verifying the correct creation of fees, invoices, and subscription states at various points in the billing cycle.
+
+## Key Files
+
+1. `recurring_fee_upgrade_spec.rb`:
+   This file focuses on testing the subscription upgrade process. It verifies that when a customer upgrades their plan, the system correctly terminates the old subscription, creates a new one, and calculates fees appropriately. It covers both calendar and anniversary billing cycles.
+
+2. `recurring_fee_downgrade_spec.rb`:
+   Similar to the upgrade spec, this file tests the downgrade scenario. It ensures that when a customer downgrades their plan, the billing system adjusts fees correctly and maintains proper billing timing for both calendar and anniversary billing models.
+
+3. `recurring_fees_spec.rb`:
+   This file contains a comprehensive set of tests for recurring non-invoiceable fees. It covers various combinations of pay-in-advance and pay-in-arrears charges, invoiceable and non-invoiceable fees, and grouped and non-grouped fee creation. It also tests subscription termination effects on fee creation.
+
+## Dependencies
+The test files rely on the following key dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data and objects.
+3. WebMock: Used for stubbing HTTP requests, particularly for webhook calls.
+4. Rails testing environment: The tests are integrated with the Rails framework and use its testing utilities.
+
+## Configuration
+The tests use various configuration techniques:
+
+1. Time manipulation: `travel_to` is used extensively to simulate different dates and times without waiting for actual time to pass.
+2. WebMock stubs: HTTP requests, particularly webhooks, are stubbed to isolate the tests from external dependencies.
+3. FactoryBot: Used to create test data consistently across the test suite.
+4. Custom helper methods: Such as `send_event!` for creating events and simulating usage.
+
+The tests don't rely on external configuration files but instead set up the necessary test data and environment within each spec file.
+
+These tests play a crucial role in ensuring the reliability and correctness of the billing system, especially when handling complex scenarios like subscription changes and different billing models. They provide a safety net for developers to make changes to the core billing logic with confidence that existing functionality remains intact.

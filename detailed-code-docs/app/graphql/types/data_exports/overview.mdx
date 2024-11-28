@@ -1,0 +1,73 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions related to data exports, specifically focusing on invoice data exports. It includes various GraphQL types such as enums, input objects, and object types that work together to provide a flexible and type-safe way of requesting and representing invoice data exports through a GraphQL API.
+
+## What does it do?
+The code in this directory enables users of the GraphQL API to:
+
+1. Request exports of invoice data with specific filters and formats.
+2. Specify the type of invoice data to export (general invoices or invoice fees).
+3. Apply detailed filters to the invoice data, including criteria such as currency, customer ID, invoice type, date ranges, and payment status.
+4. Choose the format for the exported data.
+5. Create data export jobs with specified parameters.
+6. Retrieve information about data export jobs, including their status.
+
+This functionality allows for precise control over what invoice data is exported and how it's formatted, which can be useful for reporting, analysis, or integration with other systems.
+
+## Key Files
+
+1. `format_type_enum.rb`:
+   - Defines a GraphQL enum type `DataExportFormatTypeEnum` representing available formats for data exports.
+   - Dynamically generates enum values based on the `DataExport::EXPORT_FORMATS` constant.
+
+2. `invoices/create_input.rb`:
+   - Defines the `CreateInput` class for creating a data export job.
+   - Includes fields for filters, format, and resource type.
+
+3. `invoices/export_type_enum.rb`:
+   - Defines the `ExportTypeEnum` specifying types of invoice data that can be exported (invoices or invoice fees).
+
+4. `invoices/filters_input.rb`:
+   - Defines the `FiltersInput` class with a comprehensive set of filtering options for invoice data.
+
+5. `object.rb`:
+   - Defines a GraphQL object type `DataExport` representing a data export entity.
+   - Includes fields for `id` and `status`.
+
+6. `status_enum.rb`:
+   - Defines a GraphQL enum type `DataExportStatusEnum` representing possible statuses of a data export.
+   - Dynamically generates enum values based on the `DataExport::STATUSES` constant.
+
+## Dependencies
+The code relies on several GraphQL-related dependencies and custom types:
+
+1. `graphql` gem: The core library for implementing GraphQL in Ruby.
+2. Custom base types:
+   - `Types::BaseInputObject`
+   - `Types::BaseEnum`
+   - `Types::BaseObject`
+3. Custom enum types:
+   - `Types::CurrencyEnum`
+   - `Types::Invoices::InvoiceTypeEnum`
+   - `Types::Invoices::PaymentStatusTypeEnum`
+   - `Types::Invoices::StatusTypeEnum`
+4. `GraphQL::Types::ISO8601Date`: For handling date inputs in ISO 8601 format.
+
+## Configuration
+While there are no explicit configuration files in this directory, the structure and naming of the types suggest some conventions and configurations in the broader application:
+
+1. The use of nested modules (e.g., `Types::DataExports::Invoices`) indicates an organized structure for managing different areas of the GraphQL schema.
+2. The presence of various enum types suggests that there might be configuration or database-backed lists of valid values for currencies, invoice types, payment statuses, etc.
+3. The `FiltersInput` type includes a wide range of filter options, which might be aligned with database indexes or search capabilities in the backend.
+4. The `DataExport::EXPORT_FORMATS` and `DataExport::STATUSES` constants are used to dynamically generate enum values, indicating that these values are defined elsewhere in the application.
+
+To use these types effectively, developers would need to ensure that:
+
+1. The corresponding GraphQL mutations and queries are implemented to use these input types.
+2. The backend logic can handle the specified filters and export types.
+3. Any changes to the available currencies, invoice types, statuses, or export formats are reflected in the respective enum types or constants.
+
+In summary, this directory provides a well-structured set of GraphQL types for handling invoice data exports, offering flexibility in filtering and export options while maintaining type safety and clear API design.

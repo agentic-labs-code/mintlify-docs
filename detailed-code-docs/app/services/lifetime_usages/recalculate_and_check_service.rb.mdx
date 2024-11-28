@@ -1,0 +1,56 @@
+---
+title: "recalculate_and_check_service.rb"
+---
+
+## High-level description
+This code defines a service class `RecalculateAndCheckService` within the `LifetimeUsages` module. Its primary purpose is to recalculate lifetime usage for a subscription, check if any usage thresholds have been reached, and trigger appropriate actions such as sending webhooks and generating invoices for progressive billing.
+
+## Code Structure
+The main class `RecalculateAndCheckService` inherits from `BaseService` and contains a single public method `call`. It interacts with other services like `CalculateService`, `UsageThresholds::CheckService`, and `Invoices::ProgressiveBillingService` to perform its operations.
+
+## Symbols
+
+### `RecalculateAndCheckService`
+#### Description
+This service recalculates lifetime usage, checks for passed usage thresholds, and handles progressive billing if necessary.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lifetime_usage | LifetimeUsage | The lifetime usage object to be recalculated and checked |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the operation result, including passed thresholds and generated invoice |
+
+#### Internal Logic
+1. Recalculate the lifetime usage using `CalculateService`.
+2. Check for passed usage thresholds using `UsageThresholds::CheckService`.
+3. If any thresholds are passed:
+   a. Send webhooks for each passed threshold.
+   b. Generate an invoice using `Invoices::ProgressiveBillingService`.
+4. Return the result containing passed thresholds and the generated invoice (if any).
+
+### `progressive_billed_amount`
+#### Description
+A private method that calculates the total amount of progressive billing invoices for the subscription.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| amount | Integer | The total amount of progressive billing invoices in cents |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| LifetimeUsages::CalculateService | Recalculates the lifetime usage |
+| LifetimeUsages::UsageThresholds::CheckService | Checks for passed usage thresholds |
+| Invoices::ProgressiveBillingService | Generates progressive billing invoices |
+| SendWebhookJob | Sends webhooks for passed thresholds |
+
+## Error Handling
+The service uses the `raise_if_error!` method to handle errors from the called services. This likely raises an exception if any of the underlying services encounter an error.
+
+## Performance Considerations
+The service performs multiple database queries and potentially creates new records. It may become a performance bottleneck for subscriptions with frequent usage updates or many passed thresholds. Consider optimizing the underlying services or implementing caching mechanisms if performance issues arise.

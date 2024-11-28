@@ -1,0 +1,86 @@
+---
+title: "estimate_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `CreditNotes::EstimateService` class. It tests the functionality of estimating credit notes and refund amounts for invoices, including various scenarios such as valid inputs, invalid items, and different invoice types.
+
+## Code Structure
+The test suite is organized around different contexts and scenarios for the `CreditNotes::EstimateService`. It uses RSpec's `describe` and `context` blocks to group related tests and set up different test conditions.
+
+## Symbols
+
+### RSpec.describe CreditNotes::EstimateService
+#### Description
+This is the main describe block for the `CreditNotes::EstimateService` test suite. It sets up the basic structure for all the tests related to this service.
+
+### subject(:estimate_service)
+#### Description
+Defines the subject of the test, which is an instance of `CreditNotes::EstimateService` initialized with an invoice and items.
+
+### let blocks
+#### Description
+These blocks define various test data used throughout the specs, including:
+- `organization`
+- `customer`
+- `invoice`
+- `fee1` and `fee2`
+- `tax`
+- `items`
+
+### around { |test| lago_premium!(&test) }
+#### Description
+This block ensures that all tests are run in the context of a premium Lago account.
+
+### it 'estimates the credit and refund amount'
+#### Description
+This test checks if the service correctly estimates the credit and refund amount for a given invoice and items.
+
+#### Internal Logic
+1. Calls the `estimate_service.call` method
+2. Checks if the result is successful
+3. Verifies various attributes of the resulting credit note, including amounts, taxes, and items
+
+### context 'with invalid items'
+#### Description
+This context tests the behavior of the service when provided with invalid items (e.g., amount higher than the remaining fee amount).
+
+#### Internal Logic
+1. Sets up items with an invalid amount
+2. Calls the `estimate_service.call` method
+3. Checks if the result is a failure with the expected error messages
+
+### context 'when invoice is not found'
+#### Description
+This context tests the behavior of the service when the invoice is nil.
+
+#### Internal Logic
+1. Sets the invoice to nil
+2. Calls the `estimate_service.call` method
+3. Checks if the result is a failure with the expected error message
+
+### context 'when invoice is a prepaid credit invoice'
+#### Description
+This context tests the behavior of the service when the invoice is a prepaid credit invoice.
+
+#### Internal Logic
+1. Creates a credit invoice
+2. Calls the `estimate_service.call` method
+3. Checks if the result is a failure with the expected error code
+
+### context 'when invoice is legacy'
+#### Description
+This context tests the behavior of the service when the invoice is a legacy invoice (version_number: 1).
+
+#### Internal Logic
+1. Creates a legacy invoice
+2. Calls the `estimate_service.call` method
+3. Checks if the result is a failure with the expected error code
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| FactoryBot | Used for creating test data (implied by the use of `create` method) |
+
+Note: The `lago_premium!` method is likely a custom helper method defined elsewhere in the test suite to set up a premium account context.

@@ -1,0 +1,31 @@
+---
+title: "20240729152352_add_index_on_payments_payable_id_and_payable_type.rb"
+---
+
+## High-level description
+This migration adds a composite index on the `payable_type` and `payable_id` columns of the `payments` table in a Rails application. The index is created concurrently and only if it doesn't already exist, ensuring minimal impact on database performance during deployment.
+
+## Symbols
+
+### `AddIndexOnPaymentsPayableIdAndPayableType`
+#### Description
+This class is an ActiveRecord migration that adds a composite index to the `payments` table. It inherits from `ActiveRecord::Migration[7.1]`, indicating it's compatible with Rails 7.1 migration framework.
+
+#### Internal Logic
+1. The migration disables DDL (Data Definition Language) transactions using `disable_ddl_transaction!`. This allows for the concurrent creation of the index.
+2. The `change` method defines the migration operation:
+   - It adds a composite index on the `payable_type` and `payable_id` columns of the `payments` table.
+   - The index is created with the following options:
+     - `algorithm: :concurrently`: This allows the index to be built without locking the table for writes.
+     - `if_not_exists: true`: This prevents errors if the index already exists.
+
+## Performance Considerations
+1. The use of `disable_ddl_transaction!` and `algorithm: :concurrently` allows the index to be created without locking the table. This is crucial for maintaining database availability, especially in production environments with active write operations.
+2. The `if_not_exists: true` option prevents errors and unnecessary operations if the index has already been created, making the migration idempotent and safe to run multiple times.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the migration framework and database abstraction |
+
+Note: This migration assumes the existence of a `payments` table with `payable_type` and `payable_id` columns, likely part of a polymorphic association in the application's data model.

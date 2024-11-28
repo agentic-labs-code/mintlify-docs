@@ -1,0 +1,38 @@
+---
+title: "20220919133338_run_customer_currency_task.rb"
+---
+
+## High-level description
+This migration file defines a task to populate currency information for customers. It uses a background job to execute the task after a short delay, ensuring that the workers are properly loaded with the necessary tasks before execution.
+
+## Symbols
+
+### `RunCustomerCurrencyTask`
+#### Description
+This class is an ActiveRecord migration that schedules a background job to populate currency information for customers.
+
+#### Internal Logic
+1. The migration uses `MigrationTaskJob` to schedule a background job.
+2. The job is set to run after a 20-second delay using `set(wait: 20.seconds)`.
+3. The job will execute the task named 'customers:populate_currency'.
+
+## Side Effects
+This migration schedules a background job that will modify customer data by populating currency information. The actual data modification occurs outside of this migration file.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Base class for database migrations |
+| MigrationTaskJob | Custom job class for executing migration tasks |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| wait | ActiveSupport::Duration | 20.seconds | Delay before executing the background job |
+
+## TODOs
+The code includes a NOTE comment explaining the reason for the delay:
+```ruby
+# NOTE: Wait to ensure workers are loaded with the added tasks
+```
+This suggests that the 20-second delay is implemented to ensure that the worker processes have enough time to load and recognize the newly added tasks before attempting to execute them.

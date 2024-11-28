@@ -1,0 +1,86 @@
+---
+title: "adyen_service.rb"
+---
+
+## High-level description
+This code defines the `AdyenService` class within the `Invoices::Payments` module. It handles Adyen payment processing for invoices, including creating payments, updating payment statuses, and generating payment URLs. The service interacts with the Adyen API to perform these operations and manages the associated invoice and payment records.
+
+## Code Structure
+The `AdyenService` class inherits from `BaseService` and includes two modules: `Lago::Adyen::ErrorHandlable` and `Customers::PaymentProviderFinder`. It contains methods for creating payments, updating payment statuses, and generating payment URLs. The class also includes several private helper methods to support these main operations.
+
+## Symbols
+
+### `AdyenService`
+#### Description
+This class handles Adyen payment processing for invoices. It provides methods to create payments, update payment statuses, and generate payment URLs.
+
+#### Inputs
+- `invoice`: An optional `Invoice` object passed to the initializer.
+
+#### Methods
+
+### `create`
+#### Description
+Creates an Adyen payment for the associated invoice.
+
+#### Outputs
+- `result`: A `BaseService::Result` object containing the created payment and updated invoice.
+
+#### Internal Logic
+1. Checks if payment should be processed.
+2. Increments payment attempts.
+3. Creates an Adyen payment.
+4. Creates a `Payment` record.
+5. Updates the invoice payment status.
+6. Enqueues a job to sync the payment if necessary.
+
+### `update_payment_status`
+#### Description
+Updates the status of an existing payment and the associated invoice.
+
+#### Inputs
+- `provider_payment_id`: The Adyen payment ID.
+- `status`: The new payment status.
+- `metadata`: Additional metadata for the payment.
+
+#### Outputs
+- `result`: A `BaseService::Result` object containing the updated payment and invoice.
+
+#### Internal Logic
+1. Finds or creates the payment based on the provider payment ID and metadata.
+2. Updates the payment status.
+3. Updates the invoice payment status.
+
+### `generate_payment_url`
+#### Description
+Generates a payment URL for the invoice using Adyen's payment links API.
+
+#### Outputs
+- `result`: A `BaseService::Result` object containing the generated payment URL.
+
+#### Internal Logic
+1. Checks if payment should be processed.
+2. Calls Adyen's payment links API to generate a URL.
+3. Handles any errors from the API call.
+
+## Side Effects
+- Creates and updates `Payment` records in the database.
+- Updates `Invoice` records in the database.
+- Enqueues background jobs for payment synchronization and error handling.
+- Interacts with the Adyen API to process payments and generate payment links.
+
+## Dependencies
+- `Adyen`: The Adyen Ruby SDK for API interactions.
+- `Lago::Adyen::ErrorHandlable`: A module for handling Adyen API errors.
+- `Customers::PaymentProviderFinder`: A module for finding payment providers.
+- `Invoices::UpdateService`: A service for updating invoices.
+- `Integrations::Aggregator::Payments::CreateJob`: A background job for syncing payments.
+- `DeliverErrorWebhookService`: A service for delivering error webhooks.
+
+## Error Handling
+The service includes error handling for various scenarios, such as API errors, validation errors, and authentication errors. It uses the `Lago::Adyen::ErrorHandlable` module to handle Adyen-specific errors and delivers error webhooks when necessary.
+
+## Logging
+The service does not implement explicit logging, but it uses background jobs and webhooks to communicate important events and errors.
+
+This documentation provides a comprehensive overview of the `AdyenService` class and its functionality within the invoice payment processing system.

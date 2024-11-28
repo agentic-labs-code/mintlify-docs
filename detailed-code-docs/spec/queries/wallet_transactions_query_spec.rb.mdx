@@ -1,0 +1,89 @@
+---
+title: "wallet_transactions_query_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `WalletTransactionsQuery` class. It tests the functionality of querying wallet transactions, including pagination and filtering by status and transaction type. The tests ensure that the query returns the correct transactions for a given wallet and applies filters and pagination correctly.
+
+## Code Structure
+The test suite is organized into several contexts, each testing different aspects of the `WalletTransactionsQuery`:
+1. Basic functionality (returning all transactions for a wallet)
+2. Pagination
+3. Filtering by status
+4. Filtering by transaction type
+5. Error handling for non-existent wallets
+
+## Symbols
+
+### `RSpec.describe WalletTransactionsQuery`
+#### Description
+This is the main test suite for the `WalletTransactionsQuery` class. It sets up the necessary test data and defines various test cases.
+
+#### Internal Logic
+The test suite uses `let` statements to define test data, including an organization, customer, wallet, and several wallet transactions. It then runs multiple test cases to verify the query's behavior under different conditions.
+
+### `subject(:result)`
+#### Description
+This defines the subject of the test, which is the result of calling the `WalletTransactionsQuery.call` method with specified parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization associated with the wallet |
+| wallet_id | Integer | The ID of the wallet to query transactions for |
+| pagination | Hash | Optional pagination parameters |
+| filters | Hash | Optional filters to apply to the query |
+
+### Test: "returns all wallet transactions for a certain wallet"
+#### Description
+This test verifies that the query returns all transactions associated with a specific wallet.
+
+#### Internal Logic
+1. Calls the query method
+2. Checks that the returned transactions count is correct (3)
+3. Verifies that the correct transaction IDs are included in the result
+4. Ensures that a transaction from a different wallet is not included
+
+### Test: "with pagination"
+#### Description
+This test checks if the pagination functionality works correctly.
+
+#### Internal Logic
+1. Sets pagination parameters (page 2, limit 2)
+2. Verifies various pagination-related attributes of the result
+
+### Test: "when filtering by status"
+#### Description
+This test ensures that filtering transactions by status works as expected.
+
+#### Internal Logic
+1. Creates a transaction with a specific status ('pending')
+2. Applies a status filter
+3. Verifies that only the transaction with the matching status is returned
+
+### Test: "when filtering by transaction type"
+#### Description
+This test checks if filtering transactions by transaction type functions correctly.
+
+#### Internal Logic
+1. Creates a transaction with a specific type ('outbound')
+2. Applies a transaction type filter
+3. Verifies that only the transaction with the matching type is returned
+
+### Test: "when wallet is not found"
+#### Description
+This test verifies the error handling when an invalid wallet ID is provided.
+
+#### Internal Logic
+1. Sets an invalid wallet ID
+2. Checks that the result is not successful
+3. Verifies that the correct error type and message are returned
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| rspec | Testing framework used for writing and running tests |
+
+## Error Handling
+The test suite includes a specific test case for error handling when an invalid wallet ID is provided. It checks for a `BaseService::NotFoundFailure` error with the message 'wallet_not_found'.

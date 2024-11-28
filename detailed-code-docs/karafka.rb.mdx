@@ -1,0 +1,60 @@
+---
+title: "karafka.rb"
+---
+
+## High-level description
+This code configures a Karafka application for handling Kafka-related operations in a Ruby on Rails environment. It sets up Kafka connection parameters, configures logging and monitoring, and establishes settings for the Karafka web interface and process tagging.
+
+## Code Structure
+The main class `KarafkaApp` inherits from `Karafka::App` and contains the primary configuration. It sets up Kafka connection details, configures monitoring and logging for both consumers and producers, and establishes settings for the Karafka web interface.
+
+## Symbols
+
+### `KarafkaApp`
+#### Description
+This class is responsible for setting up the Karafka application, including Kafka connection details and monitoring configurations.
+
+#### Internal Logic
+1. Sets up Kafka connection parameters using environment variables.
+2. Configures additional security settings if specified in environment variables.
+3. Sets the client ID to 'Lago'.
+4. Configures consumer persistence based on the Rails environment.
+5. Sets up logging and monitoring for both consumers and producers.
+
+### `Karafka::Web.setup`
+#### Description
+Configures the Karafka web interface.
+
+#### Internal Logic
+Disables processing for the web interface.
+
+### `Karafka::Process.tags.add`
+#### Description
+Adds a tag to the Karafka process for identification purposes.
+
+#### Internal Logic
+Adds an 'application_name' tag with the value 'lago-api'.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Karafka | Main framework for Kafka operations |
+| WaterDrop | Used for producer monitoring |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LAGO_KAFKA_BOOTSTRAP_SERVERS | String | N/A | Kafka bootstrap servers |
+| LAGO_KAFKA_SECURITY_PROTOCOL | String | N/A | Kafka security protocol |
+| LAGO_KAFKA_SASL_MECHANISMS | String | N/A | Kafka SASL mechanisms |
+| LAGO_KAFKA_USERNAME | String | N/A | Kafka username |
+| LAGO_KAFKA_PASSWORD | String | N/A | Kafka password |
+
+## Logging
+The code sets up logging for both consumers and producers using Karafka's built-in instrumentation. It subscribes to `Karafka::Instrumentation::LoggerListener` for general Karafka logging and `WaterDrop::Instrumentation::LoggerListener` for producer-specific logging.
+
+## Performance Considerations
+In development mode, consumer persistence is disabled to allow for Rails code reloading. This may impact performance but improves developer experience.
+
+## TODOs
+There is a commented-out line for subscribing to `Karafka::Instrumentation::ProctitleListener`, which could be uncommented if process title instrumentation is needed.

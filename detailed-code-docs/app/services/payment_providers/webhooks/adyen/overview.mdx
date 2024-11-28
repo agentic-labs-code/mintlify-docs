@@ -1,0 +1,65 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines the `ChargebackService` class within the `PaymentProviders::Webhooks::Adyen` module. It handles Adyen chargeback events, processing the event data and updating the corresponding payment and invoice status when a chargeback is lost.
+
+## Code Structure
+The `ChargebackService` class inherits from `BaseService` and contains a main `call` method that processes the chargeback event. It also includes private methods for parsing the event data and extracting the payment dispute lost date.
+
+## References
+- `BaseService`: The parent class that provides common functionality for service objects.
+- `Payment`: A model representing a payment record.
+- `Invoices::LoseDisputeService`: A service used to mark an invoice as lost due to a dispute.
+
+## Symbols
+
+### `ChargebackService`
+#### Description
+This service processes Adyen chargeback events, updating the payment and invoice status when a chargeback is lost.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event_json | String | JSON string containing the Adyen chargeback event data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the result of the operation |
+
+#### Internal Logic
+1. Parse the event data from the JSON input.
+2. Extract the dispute status, reason, and provider payment ID from the event.
+3. Find the corresponding payment using the provider payment ID.
+4. If the payment is not found, return a not found failure result.
+5. If the dispute status is 'Lost' and the event was successful, call the `Invoices::LoseDisputeService` to mark the invoice as lost.
+6. Return the result object.
+
+### `event`
+#### Description
+A private method that parses the JSON event data and extracts the relevant information.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | Hash | Parsed event data |
+
+### `payment_dispute_lost_at`
+#### Description
+A private method that extracts the payment dispute lost date from the event data.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payment_dispute_lost_at | Time | The date and time when the payment dispute was lost |
+
+## Error Handling
+The service uses the `result` object from `BaseService` to handle errors. If the payment is not found, it returns a not found failure result.
+
+## Performance Considerations
+The service performs a database query to find the payment by provider_payment_id. This could potentially be optimized if it becomes a performance bottleneck.
+
+## TODOs
+There are no explicit TODOs in the code.

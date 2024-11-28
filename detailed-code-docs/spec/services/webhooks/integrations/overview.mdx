@@ -1,0 +1,67 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for the `Webhooks::Integrations` namespace, focusing on services that handle webhook creation for various customer-related events and errors. The tests cover services related to customer creation, general customer errors, and tax-specific errors.
+
+## What does it do?
+The code in this directory tests the functionality of services responsible for creating webhooks in response to different customer-related events and errors. These services ensure that the system properly notifies external integrations or internal components about important customer events. Specifically, the tests verify that:
+
+1. When a customer is created, a webhook with the event 'customer.accounting_provider_created' is generated.
+2. When a general customer error occurs, a webhook with the event 'customer.accounting_provider_error' is created.
+3. For tax-related errors, appropriate webhooks are created with specific event names and types, such as 'tax_provider_error' for general tax errors and 'fee.tax_provider_error' for fee-specific tax errors.
+
+These tests help maintain the reliability and accuracy of the webhook system, ensuring that integrations and other parts of the application receive the correct notifications for various customer-related events and errors.
+
+## Key Files
+1. `customer_created_service_spec.rb`: Tests the `Webhooks::Integrations::CustomerCreatedService` class, verifying that it creates the correct webhook when a new customer is added to the system.
+
+2. `customer_error_service_spec.rb`: Tests the `Webhooks::Integrations::CustomerErrorService` class, ensuring it generates the appropriate webhook when a customer-related error occurs.
+
+3. `taxes/error_service_spec.rb`: Tests the `Webhooks::Integrations::Taxes::ErrorService` class, which handles webhook creation for general tax provider errors.
+
+4. `taxes/fee_error_service_spec.rb`: Tests the `Webhooks::Integrations::Taxes::FeeErrorService` class, responsible for creating webhooks specific to tax provider fee errors.
+
+## Dependencies
+The test files rely on the following key dependencies:
+
+1. RSpec: The testing framework used throughout the test suite.
+2. FactoryBot: A library for creating test data, used to generate instances of `customer`, `organization`, and other necessary objects.
+3. Rails: The tests are part of a Rails application, as evidenced by the use of `rails_helper`.
+
+## Configuration
+While there are no explicit configuration files in this directory, the tests follow several important conventions and configurations:
+
+1. `frozen_string_literal: true`: This Ruby magic comment is used at the top of the files to freeze string literals.
+
+2. RSpec configuration: The tests use RSpec's `describe`, `context`, and `it` blocks to structure the test cases. They also use `let` statements for defining memoized helper methods.
+
+3. Shared examples: Many of the test files reference a shared example `'creates webhook'`, which encapsulates common webhook creation testing logic.
+
+Here's an example of how the `CustomerCreatedService` is tested:
+
+```ruby
+RSpec.describe Webhooks::Integrations::CustomerCreatedService do
+  subject(:webhook_service) { described_class.new(customer: customer) }
+
+  let(:customer) { create(:customer, organization: organization) }
+  let(:organization) { create(:organization) }
+
+  describe '.call' do
+    it_behaves_like 'creates webhook' do
+      let(:webhook_name) { 'customer.accounting_provider_created' }
+      let(:webhook_type) { 'customer' }
+      let(:webhook_payload) do
+        {
+          integration_customers: []
+        }
+      end
+    end
+  end
+end
+```
+
+This test structure ensures that the `CustomerCreatedService` creates the correct webhook when called with a customer object. The use of shared examples (`it_behaves_like 'creates webhook'`) indicates that webhook creation is a common behavior tested across multiple services.
+
+Overall, these tests play a crucial role in maintaining the reliability and correctness of the webhook system within the application, particularly for customer-related events and error handling.

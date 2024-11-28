@@ -1,0 +1,91 @@
+---
+title: "validate_service.rb"
+---
+
+## High-level description
+This code defines a `ValidateService` class within the `WalletTransactions` module. Its primary purpose is to validate various aspects of a wallet transaction, including the wallet itself, credit amounts (paid, granted, and voided), and metadata. It ensures that all transaction parameters are valid before proceeding with the actual transaction.
+
+## Code Structure
+The `ValidateService` class inherits from `BaseValidator` and contains a main `valid?` method that orchestrates the validation process. It calls several private methods to perform specific validations and aggregates any errors encountered.
+
+## References
+This code references the following external symbols:
+- `Organization` model
+- `Wallet` model (through association with Organization)
+- `::Validators::DecimalAmountService`
+- `::Validators::MetadataValidator`
+
+## Symbols
+
+### `ValidateService`
+#### Description
+This class is responsible for validating wallet transactions. It checks various aspects of the transaction to ensure all parameters are valid and consistent.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object to store validation results |
+| args | Hash | A hash containing transaction parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid? | Boolean | Returns true if all validations pass, false otherwise |
+
+#### Internal Logic
+1. Validates the wallet
+2. Validates paid credits amount (if present)
+3. Validates granted credits amount (if present)
+4. Validates voided credits amount (if present and current wallet exists)
+5. Validates metadata (if present)
+6. If any errors are found, sets validation failure and returns false
+7. Returns true if all validations pass
+
+### `valid_wallet?`
+#### Description
+Validates the existence and status of the wallet associated with the transaction.
+
+#### Internal Logic
+1. Finds the organization by ID
+2. Finds the wallet within the organization
+3. Adds an error if the wallet is not found
+4. Adds an error if the wallet is terminated
+5. Returns true if the wallet is valid
+
+### `valid_paid_credits_amount?`
+#### Description
+Validates the amount of paid credits.
+
+#### Internal Logic
+Uses `::Validators::DecimalAmountService` to check if the paid credits amount is valid.
+
+### `valid_granted_credits_amount?`
+#### Description
+Validates the amount of granted credits.
+
+#### Internal Logic
+Uses `::Validators::DecimalAmountService` to check if the granted credits amount is valid.
+
+### `valid_voided_credits_amount?`
+#### Description
+Validates the amount of voided credits and checks if there are sufficient credits in the wallet.
+
+#### Internal Logic
+1. Uses `::Validators::DecimalAmountService` to check if the voided credits amount is valid
+2. Checks if the voided credits amount is less than or equal to the current wallet's credit balance
+
+### `valid_metadata?`
+#### Description
+Validates the metadata associated with the transaction.
+
+#### Internal Logic
+Uses `::Validators::MetadataValidator` to check if the metadata is valid and adds any errors found to the error list.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ::Validators::DecimalAmountService | Validates decimal amounts for credits |
+| ::Validators::MetadataValidator | Validates metadata structure and content |
+
+## Error Handling
+The class uses the `add_error` method inherited from `BaseValidator` to collect errors during validation. If any errors are found, it sets a validation failure on the result object.

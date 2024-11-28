@@ -1,0 +1,61 @@
+---
+title: "destroy_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Mutations::AdjustedFees::Destroy` GraphQL mutation. It verifies that the mutation correctly destroys an adjusted fee, while also ensuring proper authentication and authorization.
+
+## Code Structure
+The test file defines a set of let statements to set up the necessary objects and data for the tests. It then defines the GraphQL mutation and includes shared examples for common authentication and authorization checks. Finally, it includes a specific test case to verify the destruction of an adjusted fee.
+
+## Symbols
+
+### RSpec.describe Mutations::AdjustedFees::Destroy
+#### Description
+This is the main describe block for the test suite, focusing on the `Mutations::AdjustedFees::Destroy` GraphQL mutation.
+
+### let statements
+#### Description
+These statements set up the necessary objects and data for the tests, including:
+- `required_permission`: The permission required to perform the mutation
+- `membership`: A factory-created membership object
+- `organization`: The organization associated with the membership
+- `invoice`: A factory-created invoice in draft status
+- `fee`: A factory-created charge fee associated with the invoice
+- `adjusted_fee`: A factory-created adjusted fee associated with the invoice and fee
+
+### mutation
+#### Description
+This let statement defines the GraphQL mutation string used in the test.
+
+### it_behaves_like shared examples
+#### Description
+These shared examples test common authentication and authorization scenarios:
+- 'requires current user'
+- 'requires current organization'
+- 'requires permission'
+
+### 'destroys an adjusted fee' test
+#### Description
+This test verifies that executing the GraphQL mutation results in the destruction of an adjusted fee.
+
+#### Internal Logic
+1. Set up expectations for the change in `AdjustedFee` count
+2. Execute the GraphQL mutation with the necessary parameters
+3. Verify that the `AdjustedFee` count decreases by 1
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used for creating test objects (implied by the use of `create` method) |
+| GraphQL | The mutation being tested is a GraphQL mutation |
+
+## Error Handling
+This test file does not explicitly test error handling scenarios. It focuses on the happy path where the adjusted fee is successfully destroyed.
+
+## Notes
+- The test uses factory methods (`create`) to set up test data, which suggests the use of FactoryBot or a similar factory library.
+- The test file includes shared examples for common authentication and authorization checks, which helps in keeping the tests DRY (Don't Repeat Yourself).
+- The test verifies the destruction of an adjusted fee by checking the change in the count of `AdjustedFee` records.
+- The test assumes the existence of a `execute_graphql` helper method, which is likely defined in a support file or helper module.

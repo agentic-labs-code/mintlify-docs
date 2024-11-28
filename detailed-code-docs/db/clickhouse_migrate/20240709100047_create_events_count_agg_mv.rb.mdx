@@ -1,0 +1,58 @@
+---
+title: "20240709100047_create_events_count_agg_mv.rb"
+---
+
+## High-level description
+This code defines a Ruby on Rails migration that creates a materialized view named `events_count_agg_mv` in a ClickHouse database. The view aggregates data from the `events_enriched` table, focusing on count aggregation events, and groups them by various dimensions including time (hourly), organization, subscription, and other attributes.
+
+## Symbols
+
+### `CreateEventsCountAggMv`
+#### Description
+This class is a Rails migration that defines the creation of a materialized view in ClickHouse. It inherits from `ActiveRecord::Migration[7.1]`, indicating it's using Rails 7.1 migration features.
+
+#### Internal Logic
+The migration uses the `change` method to define the changes to be applied to the database. It constructs a SQL query that:
+
+1. Selects and groups data from the `events_enriched` table.
+2. Filters for events where `aggregation_type` is 'count_agg'.
+3. Aggregates the `value` field using `sum()`.
+4. Groups the data by several fields, including a hourly timestamp.
+
+The SQL query is then used to create a materialized view named `events_count_agg_mv` using the `create_view` method.
+
+## SQL Query Details
+
+The SQL query used to create the materialized view has the following characteristics:
+
+1. **Selected Fields**:
+   - `organization_id`
+   - `external_subscription_id`
+   - `code`
+   - `charge_id`
+   - `sum(toDecimal128(value, 26))` as `value`
+   - `toStartOfHour(timestamp)` as `timestamp`
+   - `filters`
+   - `grouped_by`
+
+2. **Source Table**: `events_enriched`
+
+3. **Filter Condition**: `WHERE aggregation_type = 'count_agg'`
+
+4. **Grouping**: The data is grouped by all selected fields except the aggregated `value`.
+
+5. **Time Aggregation**: The `timestamp` is aggregated to the start of each hour using `toStartOfHour(timestamp)`.
+
+6. **Value Aggregation**: The `value` field is summed up using `sum(toDecimal128(value, 26))`, which suggests it's treating the value as a high-precision decimal number.
+
+## Dependencies
+This migration relies on the ClickHouse database adapter for Rails, as it uses ClickHouse-specific SQL syntax and the `create_view` method with materialized view support.
+
+## Performance Considerations
+Materialized views in ClickHouse are designed for performance optimization. This view pre-aggregates data from the `events_enriched` table, which can significantly speed up queries that frequently need this aggregated data, especially for large datasets.
+
+## Notes
+- The use of `frozen_string_literal: false` at the top of the file suggests that string literals in this file are mutable, which is not the default behavior in modern Ruby.
+- The `to: 'events_count_agg'` parameter in the `create_view` method specifies the name of the underlying table that ClickHouse will create to store the materialized view data.
+
+This migration is likely part of a larger system that deals with event tracking and aggregation, possibly for billing or analytics purposes in a multi-tenant application (given the presence of `organization_id` and `external_subscription_id`).

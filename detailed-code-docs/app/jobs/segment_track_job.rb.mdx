@@ -1,0 +1,63 @@
+---
+title: "segment_track_job.rb"
+---
+
+## High-level description
+This code defines a background job class `SegmentTrackJob` that is responsible for tracking events using Segment analytics. It inherits from `ApplicationJob` and is designed to send event data to Segment asynchronously.
+
+## Code Structure
+The `SegmentTrackJob` class is defined with a single public method `perform` that takes three parameters: `membership_id`, `event`, and `properties`. This method is called when the job is executed.
+
+## Symbols
+### SegmentTrackJob
+#### Description
+A background job class for tracking events using Segment analytics.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| membership_id | String | The ID of the membership associated with the event |
+| event | String | The name of the event to be tracked |
+| properties | Hash | Additional properties/data associated with the event |
+
+#### Internal Logic
+1. The job checks if Segment tracking is disabled via an environment variable.
+2. If not disabled, it uses the `SEGMENT_CLIENT` to track the event with the provided parameters.
+3. The `membership_id` is used as the `user_id` for Segment.
+4. The `properties` hash is merged with additional data from `hosting_type` and `version` methods.
+
+#### Side Effects
+- Sends event data to Segment analytics platform.
+
+### `hosting_type`
+#### Description
+A private method that determines the hosting type of the application.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| hosting_type | Hash | A hash containing the hosting type ('cloud' or 'self') |
+
+### `version`
+#### Description
+A private method that retrieves the current version of the application.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| version | Hash | A hash containing the version number of the application |
+
+## Dependencies
+- The job relies on the `SEGMENT_CLIENT` constant, which is presumably defined elsewhere in the application.
+- It uses the `LAGO_VERSION` constant to get the application version.
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LAGO_DISABLE_SEGMENT | String | 'false' | Environment variable to disable Segment tracking |
+| LAGO_CLOUD | String | - | Environment variable to determine if the application is running in cloud mode |
+
+## Error Handling
+The job does not implement specific error handling. It relies on the default error handling provided by ActiveJob.
+
+This job is used extensively throughout the application to track various events such as customer creation, subscription changes, invoice generation, and more. It plays a crucial role in collecting analytics data for the application.

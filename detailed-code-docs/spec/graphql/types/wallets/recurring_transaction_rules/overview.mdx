@@ -1,0 +1,82 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL types related to recurring transaction rules in a wallet system. The tests focus on ensuring the correct structure and field types of input and object types used in the GraphQL schema for creating, updating, and representing recurring transaction rules.
+
+## What does it do?
+These test files verify the structure and behavior of GraphQL types used in a wallet system's recurring transaction rules feature. They ensure that:
+
+1. The input type for creating recurring transaction rules (`CreateInput`) has the correct fields and types.
+2. The object type representing recurring transaction rules (`Object`) has all the necessary fields with the correct types.
+3. The input type for updating recurring transaction rules (`UpdateInput`) accepts the appropriate arguments with their respective types.
+
+By running these tests, developers can ensure that the GraphQL schema for recurring transaction rules remains consistent and correctly defined, preventing potential issues in the API's contract with its consumers.
+
+## Key Files
+
+1. `create_input_spec.rb`: Tests the structure of the input type used for creating recurring transaction rules.
+2. `object_spec.rb`: Verifies the fields and types of the object representing recurring transaction rules.
+3. `update_input_spec.rb`: Checks the input type used for updating existing recurring transaction rules.
+
+Each file focuses on a specific aspect of the recurring transaction rules feature in the GraphQL schema:
+
+- `create_input_spec.rb` ensures that the creation process accepts the correct parameters.
+- `object_spec.rb` verifies that the representation of a recurring transaction rule includes all necessary information.
+- `update_input_spec.rb` confirms that the update process allows modification of the appropriate fields.
+
+## Dependencies
+
+The test files rely on the following dependencies:
+
+| Dependency | Purpose | Version |
+|:-----------|:--------|:--------|
+| RSpec | Testing framework | Not specified |
+| Rails | Web application framework | Not specified |
+| GraphQL | GraphQL implementation for Ruby | Not specified |
+
+These dependencies are likely managed through the project's Gemfile, with specific versions defined there.
+
+## Configuration
+
+The test files use RSpec's configuration, which is loaded through the `rails_helper`. This helper file typically sets up the testing environment, including loading the Rails application, configuring RSpec, and potentially setting up any test-specific configurations or helper methods.
+
+Key configuration aspects include:
+
+1. Use of custom matchers: The tests use `accept_argument` and `have_field` matchers, which are likely defined in a custom RSpec configuration for GraphQL type testing.
+
+2. GraphQL type definitions: The tests reference custom GraphQL types and enums, such as:
+   - `RecurringTransactionIntervalEnum`
+   - `RecurringTransactionMethodEnum`
+   - `RecurringTransactionTriggerEnum`
+   - `ISO8601DateTime`
+
+   These types are presumably defined in the application's GraphQL schema.
+
+3. Field types: The tests verify various field types, including:
+   - `ID` for unique identifiers
+   - `String` for text fields and potentially for representing decimal values
+   - Custom enum types for fields with predefined sets of values
+   - `ISO8601DateTime` for date and time fields
+
+Here's an example of how the tests are structured, taken from `object_spec.rb`:
+
+```ruby
+RSpec.describe Types::Wallets::RecurringTransactionRules::Object do
+  it { is_expected.to have_field(:lago_id).of_type("ID!") }
+  it { is_expected.to have_field(:method).of_type("RecurringTransactionMethodEnum!") }
+  it { is_expected.to have_field(:trigger).of_type("RecurringTransactionTriggerEnum!") }
+  it { is_expected.to have_field(:interval).of_type("RecurringTransactionIntervalEnum") }
+  it { is_expected.to have_field(:started_at).of_type("ISO8601DateTime") }
+  it { is_expected.to have_field(:target_ongoing_balance).of_type("String") }
+  it { is_expected.to have_field(:threshold_credits).of_type("String") }
+  it { is_expected.to have_field(:paid_credits).of_type("String!") }
+  it { is_expected.to have_field(:granted_credits).of_type("String!") }
+  it { is_expected.to have_field(:created_at).of_type("ISO8601DateTime!") }
+end
+```
+
+This structure ensures that the GraphQL type has all the expected fields with the correct types, including nullable and non-nullable fields.
+
+In summary, these test files play a crucial role in maintaining the integrity of the GraphQL schema for recurring transaction rules in the wallet system. They provide a safety net for developers, ensuring that any changes to the schema are intentional and do not break the API contract.

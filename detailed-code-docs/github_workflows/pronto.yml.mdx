@@ -1,0 +1,86 @@
+---
+title: "pronto.yml"
+---
+
+## High-level description
+This GitHub Actions workflow, named "Rubocop", is designed to run Rubocop linting on Ruby files in pull requests. It checks for code style and potential issues in modified Ruby files, excluding the database schema file, and only runs for non-Dependabot pull requests.
+
+## Code Structure
+The workflow consists of a single job named "Linters" with several steps that set up the environment, install dependencies, and run Rubocop on the relevant files.
+
+## Symbols
+
+### Workflow: Rubocop
+#### Description
+This GitHub Actions workflow is triggered on pull requests and runs Rubocop linting on modified Ruby files.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| github.actor | string | The username of the account that triggered the workflow |
+| github.base_ref | string | The base branch of the pull request |
+
+#### Internal Logic
+1. Checks if the actor is not Dependabot
+2. Checks out the code
+3. Sets up Ruby
+4. Installs Rubocop and dependencies
+5. Determines which Ruby files have been modified
+6. Runs Rubocop on the modified files, excluding db/schema.rb
+
+### Job: Linters
+#### Description
+This job sets up the environment and runs Rubocop on the modified Ruby files.
+
+#### Steps
+1. Checkout code
+2. Setup Ruby
+3. Setup Rubocop
+4. Run Rubocop
+
+### Step: Checkout code
+#### Description
+Checks out the repository code using the `actions/checkout@v4` action.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fetch-depth | number | The number of commits to fetch (0 for all history) |
+
+### Step: Setup Ruby
+#### Description
+Sets up the Ruby environment using the `ruby/setup-ruby@v1` action.
+
+### Step: Setup Rubocop
+#### Description
+Installs Rubocop and its dependencies using `bundle install`.
+
+#### Internal Logic
+Uses `bundle install` due to a bug requiring this method to use `rubocop-rails`.
+
+### Step: Run Rubocop
+#### Description
+Determines which Ruby files have been modified and runs Rubocop on those files.
+
+#### Internal Logic
+1. Uses `git diff` to find modified Ruby files, excluding db/schema.rb
+2. If no files are found, exits with a message
+3. If files are found, runs Rubocop on those files using `bundle exec rubocop`
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| actions/checkout@v4 | To check out the repository code |
+| ruby/setup-ruby@v1 | To set up the Ruby environment |
+| bundler | To install Rubocop and its dependencies |
+| rubocop | To perform linting on Ruby files |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| runs-on | string | ubuntu-latest | Specifies the runner environment |
+| if | boolean expression | ${{ github.actor != 'dependabot[bot]' }} | Condition to run the job |
+
+## TODOs
+- The comment mentions a bug in Rubocop that requires the use of `bundle install`. This should be revisited when the fix is implemented in Rubocop.
+- The workflow currently lints only modified files due to too many errors in the entire project. Consider expanding the scope of linting as the codebase improves.

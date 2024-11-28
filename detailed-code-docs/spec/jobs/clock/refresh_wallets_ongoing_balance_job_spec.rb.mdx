@@ -1,0 +1,68 @@
+---
+title: "refresh_wallets_ongoing_balance_job_spec.rb"
+---
+
+## High-level description
+This code defines a RSpec test suite for the `Clock::RefreshWalletsOngoingBalanceJob` class. It tests the behavior of the job's `perform` method under different conditions, specifically for freemium and premium scenarios, and for active and inactive wallets.
+
+## Code Structure
+The test suite is organized into a single `describe` block for the `Clock::RefreshWalletsOngoingBalanceJob` class, with a nested `describe` block for the `.perform` method. Within this, there are two main contexts: "when freemium" and "when premium", each containing specific test cases.
+
+## Symbols
+
+### `Clock::RefreshWalletsOngoingBalanceJob`
+#### Description
+This is the main class being tested. It appears to be a job responsible for refreshing the ongoing balance of wallets.
+
+### `.perform`
+#### Description
+This is the method being tested within the job class. It's responsible for performing the wallet balance refresh operation.
+
+#### Internal Logic
+The method's behavior differs based on whether the system is in freemium or premium mode:
+- In freemium mode, it should not enqueue the `Wallets::RefreshOngoingBalanceJob`.
+- In premium mode, it should enqueue the `Wallets::RefreshOngoingBalanceJob` for active wallets, but not for inactive (terminated) wallets.
+
+### `let` blocks
+#### Description
+These blocks define the setup for the tests, creating necessary objects:
+- `organization`: A factory-created organization
+- `customer`: A factory-created customer associated with the organization
+- `wallet`: A factory-created wallet associated with the customer
+
+### `before` block
+#### Description
+This block sets up the test environment by creating a wallet and stubbing the `Wallets::Balance::RefreshOngoingService.call` method.
+
+### `around` block (in "when premium" context)
+#### Description
+This block wraps the premium tests in a `lago_premium!` method call, which likely sets up the environment to simulate premium mode.
+
+## Test Cases
+
+### "when freemium"
+#### Description
+Tests that the job does not enqueue `Wallets::RefreshOngoingBalanceJob` in freemium mode.
+
+### "when premium"
+#### Description
+Tests that the job enqueues `Wallets::RefreshOngoingBalanceJob` for active wallets in premium mode.
+
+### "when premium" and "when not active"
+#### Description
+Tests that the job does not enqueue `Wallets::RefreshOngoingBalanceJob` for inactive (terminated) wallets in premium mode.
+
+## Dependencies
+The test file depends on:
+- RSpec testing framework
+- FactoryBot for creating test objects
+- Custom helpers and configurations from `rails_helper`
+
+## Configuration
+The test uses RSpec's `describe`, `context`, `it`, `let`, `before`, and `around` blocks for structuring and setting up tests.
+
+## Error Handling
+No explicit error handling is implemented in this test suite. It relies on RSpec's built-in assertion and expectation mechanisms.
+
+## Performance Considerations
+The test suite uses factories to create test objects, which can impact performance if many objects are created. However, for this specific test suite, the impact should be minimal as only a few objects are created.

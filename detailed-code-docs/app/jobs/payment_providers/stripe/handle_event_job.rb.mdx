@@ -1,0 +1,46 @@
+---
+title: "handle_event_job.rb"
+---
+
+## High-level description
+This code defines a job class `HandleEventJob` within the `PaymentProviders::Stripe` module. Its purpose is to handle Stripe webhook events asynchronously, processing them through the `PaymentProviders::StripeService`.
+
+## Code Structure
+The `HandleEventJob` class inherits from `ApplicationJob` and is responsible for executing the `handle_event` method of the `PaymentProviders::StripeService`. It's designed to work with Sidekiq for job processing.
+
+## Symbols
+
+### `HandleEventJob`
+#### Description
+This class represents a background job for processing Stripe webhook events. It's part of the payment processing system, specifically handling Stripe-related events.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization associated with the event |
+| event | String | JSON string representing the Stripe event |
+
+#### Internal Logic
+1. The job is queued in the 'providers' queue.
+2. It uses `retry_on` to handle `BaseService::NotFoundFailure` exceptions, which may occur if the webhook is received before the database is updated.
+3. In the `perform` method, it creates a new instance of `PaymentProviders::StripeService` and calls its `handle_event` method with the provided organization and event.
+4. The result of the `handle_event` call is checked for errors using `raise_if_error!`.
+
+## Side Effects
+This job processes Stripe webhook events, which may result in updates to the application's database or trigger other actions based on the event type.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ApplicationJob | Base job class that this job inherits from |
+| PaymentProviders::StripeService | Service used to handle the Stripe event |
+
+## Error Handling
+The job uses `retry_on BaseService::NotFoundFailure` to handle cases where the webhook is received before the database is updated with the relevant information. This allows the job to be retried later when the database has been updated.
+
+## Performance Considerations
+As this job handles webhook events, it's important to process them quickly to avoid blocking other incoming webhooks. The use of background job processing helps in managing the load and ensuring responsiveness.
+
+---
+
+This job plays a crucial role in the Stripe payment integration, allowing the application to react to various Stripe events asynchronously. It's designed to be resilient to timing issues between webhook receipt and database updates, which is a common challenge in webhook processing.

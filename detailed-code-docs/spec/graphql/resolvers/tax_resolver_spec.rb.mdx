@@ -1,0 +1,93 @@
+---
+title: "tax_resolver_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Resolvers::TaxResolver` GraphQL resolver. It tests the functionality of querying a single tax record, including error handling for missing organization and non-existent tax records.
+
+## Code Structure
+The test suite is organized into a main describe block for `Resolvers::TaxResolver`, with several test cases using `it` blocks and nested `context` blocks for different scenarios.
+
+## Symbols
+
+### RSpec.describe Resolvers::TaxResolver
+#### Description
+This is the main describe block that groups all the tests for the TaxResolver.
+
+### let(:query)
+#### Description
+Defines the GraphQL query used in the tests to fetch a single tax record.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| query | String | GraphQL query for fetching a single tax record |
+
+### let(:membership)
+#### Description
+Creates a test membership using FactoryBot.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| membership | Membership | A test membership object |
+
+### let(:organization)
+#### Description
+Retrieves the organization associated with the test membership.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization associated with the test membership |
+
+### let(:tax)
+#### Description
+Creates a test tax record associated with the test organization using FactoryBot.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tax | Tax | A test tax object |
+
+### before
+#### Description
+Ensures the test tax record is created before running the tests.
+
+### it 'returns a single tax'
+#### Description
+Tests the successful retrieval of a single tax record via the GraphQL query.
+
+#### Internal Logic
+1. Executes the GraphQL query with the current user, organization, and tax ID.
+2. Verifies that the returned data matches the expected tax record attributes.
+
+### context 'without current organization'
+#### Description
+Tests the error handling when no current organization is provided.
+
+#### Internal Logic
+1. Executes the GraphQL query without a current organization.
+2. Verifies that an error message about missing organization ID is returned.
+
+### context 'when tax is not found'
+#### Description
+Tests the error handling when an unknown tax ID is provided.
+
+#### Internal Logic
+1. Executes the GraphQL query with an unknown tax ID.
+2. Verifies that an error message about resource not found is returned.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Used for creating test data |
+| GraphQL | The query language being tested |
+
+## Error Handling
+The test suite covers two main error scenarios:
+1. Missing current organization
+2. Non-existent tax record
+
+These are tested in separate context blocks, ensuring that appropriate error messages are returned.

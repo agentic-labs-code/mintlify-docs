@@ -1,0 +1,63 @@
+---
+title: "delete_plan_spec.rb"
+---
+
+## High-level description
+This code defines a test scenario for deleting a plan in a subscription-based system. It verifies that when a plan is deleted, associated subscriptions are terminated, and draft invoices are finalized. The test simulates a timeline of events including subscription creation, billing, and plan deletion.
+
+## Code Structure
+The test is structured as a single RSpec example within a describe block. It uses time travel to simulate different dates and creates various objects (organization, customer, plan, metric) to set up the scenario. The test then performs actions and checks expectations at different points in time.
+
+## Symbols
+
+### `describe 'Delete Plan Scenarios'`
+#### Description
+This is the main describe block that groups the test scenario for deleting a plan.
+
+### `it 'deletes the plan, terminates subscriptions and finalizes draft invoices'`
+#### Description
+This is the main test case that simulates the process of deleting a plan and verifies its effects.
+
+#### Internal Logic
+1. Sets up initial objects (organization, customer, plan, metric)
+2. Simulates events on different dates:
+   - December 15: Creates a subscription and a charge
+   - January 1: Performs billing
+   - January 20: Deletes the plan and verifies the consequences
+
+#### Key steps:
+1. Create subscription and charge (Dec 15)
+2. Perform billing (Jan 1)
+3. Delete plan (Jan 20)
+4. Verify plan status (pending deletion, then discarded)
+5. Check subscription termination
+6. Verify invoice statuses (draft to finalized)
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| FactoryBot | Used for creating test objects (organization, customer, plan, etc.) |
+| ActiveSupport::Testing::TimeHelpers | Used for time travel in tests |
+
+## Configuration
+The test uses various RSpec configurations and helpers, which are likely defined in the `rails_helper.rb` file:
+
+| Option | Purpose |
+|:-------|:--------|
+| :scenarios | Likely a custom tag for categorizing this type of test |
+| type: :request | Indicates this is a request spec |
+
+## References
+The test references several methods that are not defined in this file:
+- `create_subscription`
+- `perform_billing`
+- `delete_plan`
+- `perform_all_enqueued_jobs`
+
+These methods are likely defined in a helper module, possibly `ScenariosHelper` which is included in the RSpec configuration in `rails_helper.rb`.
+
+## Notes
+- The test uses `travel_to` method to simulate different dates, allowing for testing time-dependent behavior.
+- The test creates and manipulates various objects (organization, customer, plan, subscription, invoices) to set up and verify the scenario.
+- The test checks for specific states and counts of objects at different points in time to ensure the plan deletion process works as expected.

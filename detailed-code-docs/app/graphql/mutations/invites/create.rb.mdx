@@ -1,0 +1,60 @@
+---
+title: "create.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation called `CreateInvite` within the `Mutations::Invites` module. It's responsible for creating a new invite in an organization, requiring authentication and organization membership. The mutation takes an email and role as arguments and returns an `Invite` object.
+
+## Code Structure
+The `Create` class inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the mutation's name, description, arguments, and return type. The `resolve` method handles the actual creation of the invite using the `Invites::CreateService`.
+
+## References
+- `Types::Memberships::RoleEnum`
+- `Types::Invites::Object`
+- `::Invites::CreateService`
+
+## Symbols
+
+### `Mutations::Invites::Create`
+#### Description
+This class defines the GraphQL mutation for creating a new invite in an organization. It ensures the user is authenticated and has the required permissions before processing the invite creation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| email | String | The email address of the person being invited |
+| role | Types::Memberships::RoleEnum | The role to be assigned to the invited user |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invite | Types::Invites::Object | The created invite object |
+
+#### Internal Logic
+1. The mutation checks if the user is authenticated and has the required organization membership.
+2. It then calls the `Invites::CreateService` with the provided arguments and the current organization.
+3. If successful, it returns the created invite; otherwise, it returns an error.
+
+## Side Effects
+- Creates a new invite in the database
+- May send an email to the invited user (depending on the implementation of `Invites::CreateService`)
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user belongs to the required organization |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class) to handle and return errors from the `Invites::CreateService`.
+
+## API/Interface Reference
+| Argument | Type | Required | Description |
+|:---------|:-----|:---------|:------------|
+| email | String | Yes | Email of the person to invite |
+| role | Types::Memberships::RoleEnum | Yes | Role to assign to the invited user |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'organization:members:create' | Permission required to create an invite |

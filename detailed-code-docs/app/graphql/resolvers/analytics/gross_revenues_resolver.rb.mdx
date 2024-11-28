@@ -1,0 +1,60 @@
+---
+title: "gross_revenues_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying gross revenue data of an organization. It's part of an analytics module and includes authentication and organization-specific access controls.
+
+## Code Structure
+The `GrossRevenuesResolver` class is defined within the `Resolvers::Analytics` module. It inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`.
+
+## References
+- `Resolvers::BaseResolver`
+- `Types::CurrencyEnum`
+- `Types::Analytics::GrossRevenues::Object`
+- `::Analytics::GrossRevenue`
+
+## Symbols
+
+### `Resolvers::Analytics::GrossRevenuesResolver`
+#### Description
+This resolver handles GraphQL queries for gross revenue data. It ensures the user is authenticated and has the required permissions to access the data for a specific organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| currency | Types::CurrencyEnum | Optional. The currency for the gross revenue data. |
+| external_customer_id | String | Optional. An identifier for a specific customer. |
+| expire_cache | Boolean | Optional. Whether to expire the cache for the query. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | [Types::Analytics::GrossRevenues::Object] | A collection of gross revenue objects. |
+
+#### Internal Logic
+1. The resolver checks for user authentication and organization access using the included modules.
+2. It defines the required permission as 'analytics:view'.
+3. The `resolve` method calls `::Analytics::GrossRevenue.find_all_by` with the current organization's ID and the provided arguments, adding a fixed 12-month period.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user has access to the specified organization |
+
+## Error Handling
+Error handling is primarily managed through the included modules:
+- `AuthenticableApiUser` raises an unauthorized error if there's no current user.
+- `RequiredOrganization` raises organization-related errors if the organization is missing or the user is not a member.
+
+## API/Interface Reference
+This resolver is part of the GraphQL API and is likely referenced in the `QueryType` as a field. It can be queried with optional arguments for currency, external customer ID, and cache expiration.
+
+| Argument | Type | Required | Description |
+|:---------|:-----|:---------|:------------|
+| currency | CurrencyEnum | No | The currency for gross revenue data |
+| external_customer_id | String | No | Identifier for a specific customer |
+| expire_cache | Boolean | No | Whether to expire the cache for this query |
+
+The response will be a collection of `GrossRevenue` objects, each containing fields for amount_cents, currency, invoices_count, and month.

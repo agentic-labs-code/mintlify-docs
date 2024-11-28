@@ -1,0 +1,56 @@
+---
+title: "adyen_create_job_spec.rb"
+---
+
+## High-level description
+This code defines a RSpec test for the `Invoices::Payments::AdyenCreateJob` job. It verifies that the job correctly initializes and calls the `Invoices::Payments::AdyenService` to create an Adyen payment for a given invoice.
+
+## Symbols
+
+### `RSpec.describe Invoices::Payments::AdyenCreateJob, type: :job`
+#### Description
+This is the main RSpec describe block that groups the tests for the `Invoices::Payments::AdyenCreateJob`.
+
+### `let(:invoice)`
+#### Description
+This creates a test invoice using FactoryBot.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | A test invoice object |
+
+### `let(:adyen_service)`
+#### Description
+This creates a double (mock) of the `Invoices::Payments::AdyenService`.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| adyen_service | Double | A mock of the AdyenService |
+
+### `it 'calls the stripe create service'`
+#### Description
+This is the main test case that verifies the job's behavior.
+
+#### Internal Logic
+1. Sets up expectations for the `Invoices::Payments::AdyenService`:
+   - Expects `new` to be called with the invoice and return the mock service.
+   - Expects `create` to be called on the mock service and return a `BaseService::Result`.
+2. Performs the job using `described_class.perform_now(invoice)`.
+3. Verifies that the expectations were met:
+   - `Invoices::Payments::AdyenService.new` was called.
+   - `adyen_service.create` was called.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and RSpec configurations |
+| FactoryBot | Used to create test objects (invoice in this case) |
+
+## Notes
+- The test is focused on ensuring that the job correctly initializes the AdyenService and calls its `create` method.
+- It uses RSpec's mocking capabilities to isolate the job's behavior from the actual AdyenService implementation.
+- The test doesn't verify the actual payment creation process or any side effects, as these are likely tested in the AdyenService specs.
+
+This test is part of a larger system that handles invoice payments through Adyen, a payment service provider. The job being tested is responsible for initiating the payment creation process for a given invoice using Adyen's services.

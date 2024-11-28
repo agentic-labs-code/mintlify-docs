@@ -1,0 +1,98 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL mutations related to add-ons in a Rails application. The tests cover the creation, updating, and deletion of add-ons through GraphQL mutations. These specs ensure that the mutations behave correctly, including permission checks and proper handling of input parameters.
+
+## What does it do?
+The test suite in this directory verifies the functionality of GraphQL mutations for managing add-ons. It checks that:
+
+1. Creating an add-on:
+   - Requires proper user authentication and permissions
+   - Correctly creates an add-on with the provided attributes
+   - Returns the expected data structure in the response
+
+2. Updating an add-on:
+   - Requires proper user authentication and permissions
+   - Successfully updates an existing add-on with new attributes
+   - Handles tax associations correctly
+
+3. Deleting an add-on:
+   - Requires proper user authentication and permissions
+   - Successfully removes the specified add-on from the system
+
+These tests ensure that the add-on management functionality works as expected, maintaining data integrity and enforcing proper access controls.
+
+## Key Files
+1. `create_spec.rb`: Tests the `Mutations::AddOns::Create` mutation
+   - Verifies the creation of add-ons with various attributes
+   - Checks permission requirements
+
+2. `update_spec.rb`: Tests the `Mutations::AddOns::Update` mutation
+   - Ensures add-ons can be updated with new attributes
+   - Verifies tax associations are handled correctly
+
+3. `destroy_spec.rb`: Tests the `Mutations::AddOns::Destroy` mutation
+   - Confirms that add-ons can be deleted
+   - Checks permission requirements for deletion
+
+## Dependencies
+The test suite relies on the following key dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data objects (e.g., memberships, organizations, add-ons).
+3. GraphQL: The GraphQL implementation being tested, specifically for mutations.
+
+These dependencies are likely managed through the project's Gemfile, with versions specified there.
+
+## Configuration
+The test files use RSpec configuration, which is typically defined in the `rails_helper.rb` file. This includes:
+
+- Setting up factories for creating test data
+- Configuring RSpec for Rails and GraphQL testing
+- Defining shared examples for common test scenarios (e.g., permission checks)
+
+Each test file uses the `:graphql` type specification, indicating that these are GraphQL-specific tests.
+
+Here's an example of how the tests are structured:
+
+```ruby
+RSpec.describe Mutations::AddOns::Create, type: :graphql do
+  let(:required_permission) { 'addons:create' }
+  let(:membership) { create(:membership) }
+  let(:organization) { membership.organization }
+  let(:tax) { create(:tax, organization: organization) }
+
+  let(:mutation) do
+    &lt;&lt;-GQL
+      mutation($input: CreateAddOnInput!) {
+        createAddOn(input: $input) {
+          id
+          name
+          invoiceDisplayName
+          code
+          description
+          amountCents
+          amountCurrency
+          taxes {
+            id
+            code
+            rate
+          }
+        }
+      }
+    GQL
+  end
+
+  it_behaves_like 'requires current user'
+  it_behaves_like 'requires current organization'
+  it_behaves_like 'requires permission', 'addons:create'
+
+  it 'creates an add-on' do
+    # Test implementation
+  end
+end
+```
+
+This structure is consistent across the test files, with variations in the specific mutations and assertions being tested.

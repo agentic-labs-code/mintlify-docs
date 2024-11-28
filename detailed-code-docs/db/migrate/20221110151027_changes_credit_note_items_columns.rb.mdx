@@ -1,0 +1,48 @@
+---
+title: "20221110151027_changes_credit_note_items_columns.rb"
+---
+
+## High-level description
+This Ruby on Rails migration file modifies the structure of the `credit_note_items` table. It removes two columns related to refund amounts and renames two columns related to credit amounts. The migration is reversible, allowing for both up and down migrations.
+
+## Symbols
+
+### `ChangesCreditNoteItemsColumns`
+#### Description
+This class is a Rails migration that alters the `credit_note_items` table structure. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0.
+
+#### Internal Logic
+The class defines two methods: `up` and `down`, which handle the forward and backward migrations respectively.
+
+### `up`
+#### Description
+This method performs the forward migration, removing refund-related columns and renaming credit-related columns.
+
+#### Internal Logic
+1. Uses `safety_assured` to bypass Strong Migrations checks.
+2. Calls `change_table` with `bulk: true` for optimized performance.
+3. Removes `refund_amount_cents` and `refund_amount_currency` columns.
+4. Renames `credit_amount_cents` to `amount_cents`.
+5. Renames `credit_amount_currency` to `amount_currency`.
+
+### `down`
+#### Description
+This method performs the reverse migration, adding back refund-related columns and reverting the renamed columns.
+
+#### Internal Logic
+1. Calls `change_table` with `bulk: true` for optimized performance.
+2. Adds `refund_amount_cents` as a `bigint` column with default 0 and not null.
+3. Adds `refund_amount_currency` as a `string` column allowing null values.
+4. Renames `amount_cents` back to `credit_amount_cents`.
+5. Renames `amount_currency` back to `credit_amount_currency`.
+
+## Performance Considerations
+The migration uses `bulk: true` in `change_table` calls, which can improve performance by combining multiple ALTER TABLE statements into a single operation.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+
+## Error Handling
+The migration uses `safety_assured` in the `up` method, which bypasses Strong Migrations safety checks. This should be used cautiously and only when the developer is certain that the migration is safe to run.

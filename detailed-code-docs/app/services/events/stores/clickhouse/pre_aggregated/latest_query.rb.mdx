@@ -1,0 +1,92 @@
+---
+title: "latest_query.rb"
+---
+
+## High-level description
+This code defines a `LatestQuery` class within the `Events::Stores::Clickhouse::PreAggregated` module. It is designed to perform queries on pre-aggregated event data stored in Clickhouse, specifically for retrieving the latest aggregated values for given charges within a specified time range.
+
+## Code Structure
+The `LatestQuery` class inherits from a `Base` class and overrides several methods to define its specific behavior. It primarily focuses on constructing and executing a query to retrieve the latest event data from the Clickhouse database.
+
+## Symbols
+
+### `Events::Stores::Clickhouse::PreAggregated::LatestQuery`
+#### Description
+This class is responsible for querying the latest pre-aggregated event data from Clickhouse. It provides methods to define the aggregation type, model, and query structure.
+
+#### Internal Logic
+1. Sets the aggregation type to 'latest_agg'.
+2. Defines methods for pre-aggregated model and clickhouse aggregation (both return nil in this implementation).
+3. Implements a method to assign units to a bucket.
+4. Constructs and executes a query to retrieve the latest enriched events data.
+
+### `aggregation_type`
+#### Description
+Defines the type of aggregation used for this query.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @aggregation_type | String | The aggregation type, set to 'latest_agg' |
+
+### `pre_aggregated_model`
+#### Description
+Defines the pre-aggregated model for the query.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| nil | NilClass | No pre-aggregated model is used |
+
+### `clickhouse_aggregation`
+#### Description
+Defines the Clickhouse aggregation for the query.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| nil | NilClass | No Clickhouse aggregation is used |
+
+### `assign_units(bucket, units)`
+#### Description
+Assigns the given units to the provided bucket.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bucket | Hash | The bucket to which units will be assigned |
+| units | Number | The units to be assigned |
+
+#### Internal Logic
+Sets the `:units` key in the bucket hash to the provided units value.
+
+### `enriched_events_query`
+#### Description
+Constructs and executes a query to retrieve the latest enriched events data from Clickhouse.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| query result | ActiveRecord::Result | The result of the executed query |
+
+#### Internal Logic
+1. Constructs a query using the `Clickhouse::EventsEnriched` model.
+2. Applies filters for organization, subscription, charge IDs, and timestamp range.
+3. Selects specific columns, including a distinct combination of charge_id, grouped_by, and filters.
+4. Orders the results to get the latest event for each unique combination.
+5. Executes the query and returns the result.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Clickhouse::EventsEnriched | Used to query the events_enriched table in Clickhouse |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| ClickhouseStore::DECIMAL_SCALE | Integer | 26 | The scale used for decimal conversions in Clickhouse |
+
+## TODOs
+- There is a TODO comment to check for milliseconds in the timestamp filtering.
+
+This class is part of a larger system for querying and aggregating event data stored in Clickhouse, specifically designed to retrieve the latest aggregated values for given parameters.

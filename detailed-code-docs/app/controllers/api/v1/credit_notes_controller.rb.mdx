@@ -1,0 +1,149 @@
+---
+title: "credit_notes_controller.rb"
+---
+
+## High-level description
+This code defines the `CreditNotesController` within the `Api::V1` namespace, which handles various API endpoints related to credit notes. It provides functionality for creating, showing, updating, downloading, voiding, listing, and estimating credit notes for an organization.
+
+## Code Structure
+The `CreditNotesController` inherits from `Api::BaseController` and contains several action methods that interact with credit note-related services and serializers. Each action typically involves finding a credit note, performing an operation, and rendering the result as JSON.
+
+## Symbols
+
+### `CreditNotesController`
+#### Description
+This controller manages credit note-related API endpoints for version 1 of the API.
+
+#### Internal Logic
+1. `create`: Creates a new credit note using the `CreditNotes::CreateService`.
+2. `show`: Retrieves a specific finalized credit note.
+3. `update`: Updates a credit note using the `CreditNotes::UpdateService`.
+4. `download`: Initiates the generation of a PDF for a credit note.
+5. `void`: Voids a credit note using the `CreditNotes::VoidService`.
+6. `index`: Lists finalized credit notes with optional filtering and pagination.
+7. `estimate`: Estimates a credit note using the `CreditNotes::EstimateService`.
+
+### `create`
+#### Description
+Creates a new credit note for an invoice.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| input_params | Hash | Parameters for creating a credit note |
+
+#### Internal Logic
+1. Initializes a `CreditNotes::CreateService` with the invoice and input parameters.
+2. Calls the service and renders the result as JSON if successful, or renders an error response if not.
+
+### `show`
+#### Description
+Retrieves a specific finalized credit note.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:id] | String | ID of the credit note to retrieve |
+
+#### Internal Logic
+1. Finds the credit note by ID within the current organization's finalized credit notes.
+2. Renders the credit note as JSON if found, or returns a not found error if not.
+
+### `update`
+#### Description
+Updates an existing credit note.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:id] | String | ID of the credit note to update |
+| update_params | Hash | Parameters for updating the credit note |
+
+#### Internal Logic
+1. Finds the credit note by ID within the current organization.
+2. Uses `CreditNotes::UpdateService` to update the credit note.
+3. Renders the updated credit note as JSON if successful, or renders an error response if not.
+
+### `download`
+#### Description
+Initiates the generation of a PDF for a credit note.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:id] | String | ID of the credit note to download |
+
+#### Internal Logic
+1. Finds the finalized credit note by ID within the current organization.
+2. If the file is already present, renders the credit note as JSON.
+3. If not, enqueues a `CreditNotes::GeneratePdfJob` to generate the PDF.
+
+### `void`
+#### Description
+Voids a credit note.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:id] | String | ID of the credit note to void |
+
+#### Internal Logic
+1. Finds the credit note by ID within the current organization.
+2. Uses `CreditNotes::VoidService` to void the credit note.
+3. Renders the voided credit note as JSON if successful, or renders an error response if not.
+
+### `index`
+#### Description
+Lists finalized credit notes with optional filtering and pagination.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:external_customer_id] | String | (Optional) External customer ID for filtering |
+| params[:page] | Integer | (Optional) Page number for pagination |
+| params[:per_page] | Integer | (Optional) Number of items per page |
+
+#### Internal Logic
+1. Retrieves finalized credit notes for the current organization.
+2. Applies filtering by external customer ID if provided.
+3. Orders the credit notes by creation date (descending) and applies pagination.
+4. Renders the list of credit notes as JSON with pagination metadata.
+
+### `estimate`
+#### Description
+Estimates a credit note based on provided parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| estimate_params | Hash | Parameters for estimating the credit note |
+
+#### Internal Logic
+1. Uses `CreditNotes::EstimateService` to estimate the credit note.
+2. Renders the estimated credit note as JSON if successful, or renders an error response if not.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| CreditNotes::CreateService | Creates new credit notes |
+| CreditNotes::UpdateService | Updates existing credit notes |
+| CreditNotes::VoidService | Voids credit notes |
+| CreditNotes::EstimateService | Estimates credit notes |
+| CreditNotes::GeneratePdfJob | Generates PDF for credit notes |
+| V1::CreditNoteSerializer | Serializes credit note data for API responses |
+| V1::CreditNotes::EstimateSerializer | Serializes estimated credit note data |
+| CollectionSerializer | Serializes collections of objects |
+
+## Error Handling
+The controller uses `render_error_response` and `not_found_error` methods (likely defined in a parent controller) to handle and render error responses.
+
+## API/Interface Reference
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| /api/v1/credit_notes | POST | Create a new credit note |
+| /api/v1/credit_notes/:id | GET | Retrieve a specific credit note |
+| /api/v1/credit_notes/:id | PUT | Update a credit note |
+| /api/v1/credit_notes/:id/download | GET | Download or generate PDF for a credit note |
+| /api/v1/credit_notes/:id/void | POST | Void a credit note |
+| /api/v1/credit_notes | GET | List credit notes |
+| /api/v1/credit_notes/estimate | POST | Estimate a credit note |

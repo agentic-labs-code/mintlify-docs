@@ -1,0 +1,70 @@
+---
+title: "apply_taxes_service.rb"
+---
+
+## High-level description
+The `ApplyTaxesService` is a service class within the `AddOns` module that manages the application of taxes to an add-on. It handles the creation, deletion, and updating of applied taxes based on the provided tax codes for a given add-on.
+
+## Code Structure
+The `ApplyTaxesService` inherits from `BaseService` and contains a single public method `call` that performs the main logic. It also includes a private method `taxes` for retrieving the relevant tax records.
+
+## References
+This service is used by other services such as `AddOns::CreateService` and `AddOns::UpdateService` to handle tax application during add-on creation and updates.
+
+## Symbols
+
+### `ApplyTaxesService`
+#### Description
+This service class manages the application of taxes to an add-on based on provided tax codes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| add_on | AddOn | The add-on to which taxes will be applied |
+| tax_codes | Array | An array of tax codes to be applied to the add-on |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An instance of `BaseService::Result` containing the operation result |
+
+#### Internal Logic
+1. Validates the existence of the add-on and tax codes.
+2. Removes applied taxes that are no longer in the provided tax codes.
+3. Creates or finds applied taxes for each provided tax code.
+4. Handles any record validation errors.
+
+### `call`
+#### Description
+The main method that executes the tax application logic.
+
+#### Internal Logic
+1. Checks if the add-on exists, returning a not found failure if it doesn't.
+2. Verifies all provided tax codes exist, returning a not found failure if any are missing.
+3. Removes applied taxes that are no longer in the provided tax codes.
+4. Creates or finds applied taxes for each provided tax code.
+5. Handles any record validation errors, returning a validation failure if encountered.
+
+### `taxes`
+#### Description
+A private method that retrieves the tax records for the given tax codes within the add-on's organization.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| taxes | ActiveRecord::Relation | A relation of Tax records matching the provided tax codes |
+
+## Error Handling
+The service handles two main types of errors:
+1. Not found errors for non-existent add-ons or tax codes.
+2. Record validation errors when creating or updating applied taxes.
+
+These errors are communicated through the `result` object, which is an instance of `BaseService::Result`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseService | Parent class providing common service functionality |
+| ActiveRecord | Used for database operations and error handling |
+
+This service is an integral part of the add-on tax management system, providing a reusable way to apply taxes to add-ons across different operations such as creation and updating.

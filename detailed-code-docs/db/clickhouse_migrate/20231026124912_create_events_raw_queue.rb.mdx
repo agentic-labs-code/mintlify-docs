@@ -1,0 +1,46 @@
+---
+title: "20231026124912_create_events_raw_queue.rb"
+---
+
+## High-level description
+This code defines a database migration to create a table called `events_raw_queue` in ClickHouse. The table is designed to consume events from a Kafka topic, with the table acting as a queue for raw event data.
+
+## Symbols
+
+### `CreateEventsRawQueue`
+#### Description
+This class is an ActiveRecord migration that defines the structure for the `events_raw_queue` table in ClickHouse. It uses Kafka as the data source for populating the table.
+
+#### Internal Logic
+1. Defines Kafka-related options as a SQL string, including broker list, topic, consumer group, and message format.
+2. Creates the `events_raw_queue` table with specific columns to store event data.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations |
+
+### Configuration
+The migration relies on several environment variables for Kafka configuration:
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| LAGO_KAFKA_BOOTSTRAP_SERVERS | String | Kafka broker list |
+| LAGO_KAFKA_RAW_EVENTS_TOPIC | String | Kafka topic for raw events |
+| LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP | String | Kafka consumer group for ClickHouse |
+
+## Table Structure
+The `events_raw_queue` table is created with the following columns:
+| Column | Type | Constraints | Description |
+|:-------|:-----|:------------|:------------|
+| organization_id | string | NOT NULL | Identifier for the organization |
+| external_customer_id | string | NOT NULL | External identifier for the customer |
+| external_subscription_id | string | NOT NULL | External identifier for the subscription |
+| transaction_id | string | NOT NULL | Identifier for the transaction |
+| timestamp | string | NOT NULL | Timestamp of the event |
+| code | string | NOT NULL | Event code |
+| properties | string | NOT NULL | Event properties |
+
+Note: The table is created without a primary key (`id: false`).
+
+## Performance Considerations
+By using Kafka as the data source, this table is designed for high-throughput event ingestion. The table structure allows for efficient querying of event data based on various attributes like organization, customer, and subscription.

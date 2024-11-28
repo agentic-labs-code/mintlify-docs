@@ -3,67 +3,60 @@ title: "release.yml"
 ---
 
 ## High-level description
-This GitHub Actions workflow, named "Release package," is triggered when a version tag is pushed. It automates the process of publishing the package to PyPI, building and pushing a Docker image to GitHub Container Registry (GHCR), and creating a pull request to merge the master branch into the docs branch.
+This GitHub Actions workflow, named "Release", is designed to build and publish Docker images for the Lago API. It is triggered either by a release event or manually, and builds multi-architecture images (amd64 and arm64) before merging them into a single manifest.
 
 ## Code Structure
-The workflow consists of three jobs: `publish-to-pypi`, `build-and-push-docker-image`, and `merge-to-docs`. Each job performs a specific task in the release process.
+The workflow consists of two main jobs: `build-images` and `merge`. The `build-images` job runs in parallel for different platforms, while the `merge` job depends on the completion of `build-images` and combines the results.
 
 ## Symbols
 
-### `publish-to-pypi` job
+### Job: build-images
 #### Description
-This job builds the Python package and publishes it to PyPI.
+This job builds Docker images for different platforms (linux/amd64 and linux/arm64) and pushes them to Docker Hub.
 
 #### Internal Logic
-1. Checks out the repository
-2. Sets up Python 3.8
-3. Installs the 'build' package
-4. Builds the package (both sdist and wheel)
-5. Uploads the built artifacts
-6. Publishes the package to PyPI using provided credentials
+1. Prepares the environment and checks out the repository
+2. Sets up Docker metadata for tagging
+3. Sets up Docker Buildx
+4. Logs in to Docker Hub
+5. Adds the version to the Docker image
+6. Builds and pushes the Docker image for the specific platform
+7. Exports and uploads the image digest as an artifact
 
-### `build-and-push-docker-image` job
+### Job: merge
 #### Description
-This job builds a Docker image and pushes it to GitHub Container Registry.
+This job merges the platform-specific images into a single multi-architecture image and pushes it to Docker Hub.
 
 #### Internal Logic
-1. Checks out the repository
-2. Logs in to the container registry (GHCR)
-3. Extracts metadata for Docker image tagging
-4. Builds and pushes the Docker image with appropriate tags and labels
-
-### `merge-to-docs` job
-#### Description
-This job creates a pull request to merge the master branch into the docs branch.
-
-#### Internal Logic
-1. Checks out the repository
-2. Creates a pull request from the master branch to the docs branch
+1. Downloads the digests from the `build-images` job
+2. Sets up Docker metadata for tagging
+3. Sets up Docker Buildx
+4. Logs in to Docker Hub
+5. Creates a manifest combining the platform-specific images
+6. Inspects the resulting image
+7. Cleans up temporary files
 
 ## Dependencies
 | Dependency | Purpose |
 |:-----------|:--------|
-| actions/checkout@v3 | Checks out the repository |
-| actions/setup-python@v4 | Sets up Python environment |
-| actions/upload-artifact@v3 | Uploads build artifacts |
-| pypa/gh-action-pypi-publish@release/v1 | Publishes package to PyPI |
-| docker/login-action@v2 | Logs in to container registry |
-| docker/metadata-action@v4 | Extracts metadata for Docker image |
-| docker/build-push-action@v3 | Builds and pushes Docker image |
-| repo-sync/pull-request@v2 | Creates pull request for merging branches |
+| actions/checkout@v4 | Checking out the repository |
+| docker/metadata-action@v5 | Generating Docker metadata |
+| docker/setup-buildx-action@v3 | Setting up Docker Buildx |
+| docker/login-action@v3 | Logging in to Docker Hub |
+| docker/build-push-action@v6 | Building and pushing Docker images |
+| actions/upload-artifact@v4 | Uploading image digests as artifacts |
+| actions/download-artifact@v4 | Downloading image digests as artifacts |
 
 ## Configuration
 | Option | Type | Default | Description |
 |:-------|:-----|:--------|:------------|
-| REGISTRY | string | ghcr.io | The container registry to use |
-| IMAGE_NAME | string | ${{ github.repository }} | The name of the Docker image |
+| REGISTRY_IMAGE | string | getlago/api | The Docker Hub repository for the image |
 
 ## Error Handling
-The workflow does not implement specific error handling mechanisms. It relies on the default behavior of GitHub Actions, which will stop the workflow if any step fails.
+The workflow uses GitHub Actions' built-in error handling. If any step fails, the workflow will stop and report the error.
 
-## API/Interface Reference
-| Endpoint | Method | Request | Response | Description |
-|:---------|:-------|:--------|:---------|:------------|
-| N/A | N/A | Push with tag v[0-9].[0-9]+.[0-9]+ | Workflow execution | Triggers the release process when a version tag is pushed |
+## Logging
+The workflow uses GitHub Actions' built-in logging mechanisms. Each step's output is logged and can be viewed in the GitHub Actions UI.
 
-This workflow is triggered by pushing a tag that matches the pattern `v[0-9].[0-9]+.[0-9]+`, representing version numbers (e.g., v1.2.3).
+## TODOs
+There are no explicit TODOs in the code.

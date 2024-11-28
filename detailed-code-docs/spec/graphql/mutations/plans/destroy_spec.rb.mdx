@@ -1,0 +1,87 @@
+---
+title: "destroy_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Mutations::Plans::Destroy` GraphQL mutation. It verifies the behavior of the mutation that destroys a plan, including permission checks and the expected changes to the plan's state.
+
+## Code Structure
+The test suite is organized as a single RSpec describe block for the `Mutations::Plans::Destroy` mutation. It uses shared examples for common behaviors and defines specific tests for the mutation's functionality.
+
+## Symbols
+
+### `RSpec.describe Mutations::Plans::Destroy, type: :graphql`
+#### Description
+This is the main describe block for the test suite, focusing on the `Mutations::Plans::Destroy` GraphQL mutation.
+
+### `graphql_request`
+#### Description
+A subject that executes the GraphQL mutation with the specified parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| current_user | User | The user performing the mutation |
+| permissions | String | The required permission for the mutation |
+| query | String | The GraphQL mutation query |
+| variables | Hash | Input variables for the mutation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| GraphQL response | Hash | The response from the GraphQL mutation |
+
+### `required_permission`
+#### Description
+A let block that defines the required permission for the mutation.
+
+### `membership`
+#### Description
+A let block that creates a membership using FactoryBot.
+
+### `organization`
+#### Description
+A let block that retrieves the organization associated with the membership.
+
+### `plan`
+#### Description
+A let block that creates a plan associated with the membership's organization.
+
+### `mutation`
+#### Description
+A let block that defines the GraphQL mutation query string.
+
+### Shared Examples
+#### Description
+The test suite includes shared examples for common behaviors:
+- `it_behaves_like 'requires current user'`
+- `it_behaves_like 'requires permission', 'plans:delete'`
+
+These shared examples likely test that the mutation requires a current user and the specific 'plans:delete' permission.
+
+### Individual Test Cases
+#### Description
+The test suite includes two specific test cases:
+
+1. "marks plan as pending_deletion"
+   - Verifies that the plan's `pending_deletion` attribute changes from false to true after the mutation is executed.
+
+2. "returns the deleted plan"
+   - Checks that the mutation response includes the correct plan ID.
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails and RSpec configuration |
+| FactoryBot | Creates test data |
+| GraphQL | Executes and tests GraphQL mutations |
+
+## Error Handling
+This test suite doesn't explicitly test error handling scenarios. It focuses on the happy path where the user has the required permissions and the plan is successfully marked for deletion.
+
+## Notes
+- The test suite uses FactoryBot to create test data.
+- It relies on shared examples for testing common behaviors, which are likely defined in a separate support file.
+- The actual implementation of the `Mutations::Plans::Destroy` class is not shown here, but the tests imply that it marks a plan for deletion rather than immediately destroying it.
+- The `execute_graphql` method used in the `graphql_request` subject is likely a helper method defined elsewhere to simplify GraphQL test execution.

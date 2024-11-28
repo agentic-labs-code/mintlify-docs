@@ -1,0 +1,76 @@
+---
+title: "paid_credit_added_service.rb"
+---
+
+## High-level description
+This code defines a service class `PaidCreditAddedService` within the `Webhooks::Invoices` module. It is responsible for handling webhook events related to paid credits being added to an invoice. The class inherits from `Webhooks::BaseService` and provides specific implementations for webhook handling related to paid credit additions.
+
+## Code Structure
+The `PaidCreditAddedService` class is part of a larger webhook handling system. It inherits from `BaseService` and overrides specific methods to customize the behavior for the "invoice.paid_credit_added" event type.
+
+## References
+- `Webhooks::BaseService`: The parent class from which this service inherits.
+- `::V1::InvoiceSerializer`: Used to serialize the invoice object.
+
+## Symbols
+
+### `Webhooks::Invoices::PaidCreditAddedService`
+#### Description
+This class handles the webhook event for when a paid credit is added to an invoice. It provides specific implementations for retrieving the current organization, serializing the invoice object, and defining the webhook and object types.
+
+#### Internal Logic
+The class overrides four private methods:
+
+1. `current_organization`: Retrieves the organization associated with the invoice.
+2. `object_serializer`: Creates a serializer for the invoice object with specific options.
+3. `webhook_type`: Defines the type of webhook event as 'invoice.paid_credit_added'.
+4. `object_type`: Specifies the type of object as 'invoice'.
+
+### `current_organization`
+#### Description
+Retrieves and memoizes the organization associated with the invoice.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @current_organization | Organization | The organization associated with the invoice |
+
+### `object_serializer`
+#### Description
+Creates an instance of `::V1::InvoiceSerializer` to serialize the invoice object.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| serializer | ::V1::InvoiceSerializer | Serializer for the invoice object |
+
+#### Internal Logic
+- Creates a new `::V1::InvoiceSerializer` instance with the following options:
+  - `object`: The invoice object
+  - `root_name`: Set to 'invoice'
+  - `includes`: An array of symbols specifying related objects to include (customer, fees, applied_taxes)
+
+### `webhook_type`
+#### Description
+Defines the type of webhook event.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_type | String | The type of webhook event |
+
+### `object_type`
+#### Description
+Specifies the type of object involved in the webhook event.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object_type | String | The type of object ('invoice') |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ::V1::InvoiceSerializer | Used to serialize the invoice object for the webhook payload |
+
+This service class is part of a larger webhook system, as evidenced by the related `SendWebhookJob` file. The job file shows that this service is used when processing the 'invoice.paid_credit_added' webhook event. The `V1::InvoiceSerializer` is used to prepare the invoice data for the webhook payload, including related data such as customer information, fees, and applied taxes.

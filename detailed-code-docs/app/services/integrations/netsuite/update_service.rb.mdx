@@ -1,0 +1,80 @@
+---
+title: "update_service.rb"
+---
+
+## High-level description
+This code defines the `UpdateService` class within the `Integrations::Netsuite` module. Its primary purpose is to update an existing NetSuite integration for an organization, including various configuration options and triggering necessary synchronization jobs when specific changes occur.
+
+## Code Structure
+The `UpdateService` class inherits from `BaseService` and contains a single public method `call` that performs the update operation. It interacts with the integration object, updates its attributes based on the provided parameters, and handles related jobs and error cases.
+
+## References
+- `Integrations::Aggregator::SendRestletEndpointJob`
+- `Integrations::Aggregator::PerformSyncJob`
+
+## Symbols
+
+### `Integrations::Netsuite::UpdateService`
+#### Description
+This class is responsible for updating a NetSuite integration with new parameters and handling related synchronization tasks.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Object | The integration object to be updated |
+| params | Hash | A hash containing the new values for the integration |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the updated integration or error information |
+
+#### Internal Logic
+1. Checks if the integration exists and if the organization has the required premium integration.
+2. Updates the integration attributes based on the provided parameters.
+3. Saves the updated integration.
+4. If the integration type is 'Integrations::NetsuiteIntegration' and the script endpoint URL has changed:
+   - Enqueues a job to send the new restlet endpoint.
+   - Enqueues a job to perform synchronization with tax items.
+5. Returns the result object with the updated integration.
+6. Handles validation errors by updating the result object with the failure information.
+
+## Side Effects
+- Modifies the integration object in the database.
+- Enqueues background jobs for sending restlet endpoint and performing synchronization.
+
+### `initialize`
+#### Description
+Initializes the UpdateService with the given integration and parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Object | The integration object to be updated |
+| params | Hash | A hash containing the new values for the integration |
+
+### `call`
+#### Description
+Performs the update operation on the integration.
+
+#### Internal Logic
+1. Validates the existence of the integration and premium integration access.
+2. Updates integration attributes based on provided parameters.
+3. Saves the updated integration.
+4. Triggers additional jobs if specific conditions are met.
+5. Handles errors and returns the result object.
+
+## Dependencies
+This code relies on the following external dependencies:
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | For database operations and validations |
+
+## Error Handling
+The code implements error handling for `ActiveRecord::RecordInvalid` exceptions, updating the result object with validation failure information.
+
+## Logging
+No explicit logging mechanisms are implemented in this code.
+
+## API/Interface Reference
+This service is likely called from the GraphQL mutation `Mutations::Integrations::Netsuite::Update`, as seen in the related code snippets.

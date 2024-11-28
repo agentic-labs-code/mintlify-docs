@@ -1,0 +1,67 @@
+---
+title: "percentage_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Charges::ChargeModels::PercentageService` class. It tests various scenarios of applying percentage-based charges, including handling of free units, fixed amounts, and minimum/maximum transaction amounts.
+
+## Symbols
+
+### `RSpec.describe Charges::ChargeModels::PercentageService`
+#### Description
+This is the main test suite for the `Charges::ChargeModels::PercentageService` class. It tests the `apply` method of the service under different conditions.
+
+#### Internal Logic
+The tests cover various scenarios:
+1. When aggregation value is 0
+2. When fixed amount value is 0
+3. When rate is 0
+4. When free units per events is nil
+5. When free units per total aggregation is nil
+6. When free units are not set
+7. When free units per total aggregation is greater than the last running total
+8. When free units count is greater than the number of events
+9. When applying minimum and maximum amounts per transaction
+
+Each test case sets up specific conditions using let statements and before blocks, then calls the `apply` method and checks the results.
+
+### `subject(:apply_percentage_service)`
+#### Description
+This is the main subject of the tests, calling the `apply` method of the `Charges::ChargeModels::PercentageService` class.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Object | The charge object with properties |
+| aggregation_result | BaseService::Result | The result of aggregation |
+| properties | Hash | Properties of the charge |
+
+### `let(:charge)`
+#### Description
+Creates a percentage charge object with specified properties for testing.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| rate | String | The percentage rate for the charge |
+| fixed_amount | String | The fixed amount to be added to the charge |
+| free_units_per_events | Integer | Number of free events |
+| free_units_per_total_aggregation | String | Total free units for aggregation |
+| per_transaction_max_amount | String | Maximum amount per transaction |
+| per_transaction_min_amount | String | Minimum amount per transaction |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+
+## Error Handling
+The tests don't explicitly handle errors but use RSpec's expectation syntax to check for correct behavior.
+
+## Performance Considerations
+The tests include a scenario with a large aggregation value (11,100) to ensure the service can handle larger numbers correctly.
+
+## TODOs
+There are no explicit TODOs in the code.
+
+This test file provides comprehensive coverage for the `Charges::ChargeModels::PercentageService`, ensuring it correctly calculates charges under various conditions, including edge cases and premium features.

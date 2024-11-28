@@ -1,0 +1,49 @@
+---
+title: "20230420114754_remove_invoice_credit_amount.rb"
+---
+
+## High-level description
+This migration file removes the `credit_amount_cents` column from the `invoices` table. It provides methods for both removing the column (`up`) and adding it back with calculated values (`down`).
+
+## Symbols
+
+### `RemoveInvoiceCreditAmount`
+#### Description
+This class is an ActiveRecord migration that handles the removal and potential re-addition of the `credit_amount_cents` column in the `invoices` table.
+
+#### Internal Logic
+The class defines two main methods:
+
+1. `up`: Removes the `credit_amount_cents` column from the `invoices` table.
+2. `down`: Adds the `credit_amount_cents` column back to the `invoices` table and populates it with calculated values.
+
+### `up`
+#### Description
+This method removes the `credit_amount_cents` column from the `invoices` table.
+
+#### Internal Logic
+The method uses `safety_assured` to bypass any safety checks and then calls `remove_column` to remove the `credit_amount_cents` column from the `invoices` table.
+
+### `down`
+#### Description
+This method adds the `credit_amount_cents` column back to the `invoices` table and populates it with calculated values.
+
+#### Internal Logic
+1. Adds the `credit_amount_cents` column to the `invoices` table as a `bigint`, not null, with a default value of 0.
+2. Uses a `reversible` block to execute SQL that calculates and updates the `credit_amount_cents` values:
+   - Calculates the sum of `amount_cents` from the `credits` table, grouped by `invoice_id`.
+   - Updates the `invoices` table, setting `credit_amount_cents` to the sum of the calculated credit amount and the existing `prepaid_credit_amount_cents`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the migration framework for database schema changes |
+
+## Performance Considerations
+The `down` method executes a complex SQL query that involves a subquery and an update operation. This could potentially be slow on large datasets, especially if there are many invoices and credits.
+
+## Error Handling
+This migration does not implement explicit error handling. It relies on the default error handling provided by ActiveRecord migrations.
+
+## TODOs
+There are no explicit TODOs in this code.

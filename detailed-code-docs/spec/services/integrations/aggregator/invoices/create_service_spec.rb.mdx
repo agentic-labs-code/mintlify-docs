@@ -1,0 +1,56 @@
+---
+title: "create_service_spec.rb"
+---
+
+## High-level description
+This RSpec file tests the `Integrations::Aggregator::Invoices::CreateService` class, which is responsible for creating invoices in an external system (NetSuite) through an integration. The tests cover various scenarios of the service's functionality, including successful and unsuccessful API calls, different response types, and error handling.
+
+## Code Structure
+The test file is organized into two main describe blocks: `#call_async` and `#call`. Each block tests different aspects of the service's functionality. The tests use extensive setup with let statements to create the necessary objects and mock external dependencies.
+
+## Symbols
+
+### `RSpec.describe Integrations::Aggregator::Invoices::CreateService`
+#### Description
+This is the main describe block for the `CreateService` class. It sets up the test environment and defines the subject of the tests.
+
+### `describe '#call_async'`
+#### Description
+This block tests the asynchronous call method of the service.
+
+#### Internal Logic
+- Tests if the job is enqueued when the invoice exists
+- Tests error handling when the invoice doesn't exist
+
+### `describe '#call'`
+#### Description
+This block tests the synchronous call method of the service.
+
+#### Internal Logic
+- Tests successful service calls with different response types (hash and string)
+- Tests unsuccessful service calls with different error scenarios
+- Verifies the creation of `IntegrationResource` objects
+- Checks for webhook job enqueuing in error scenarios
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| LagoHttpClient::Client | Mocked to simulate HTTP requests |
+
+## Error Handling
+The service handles different types of errors:
+- Client errors (400-499): Doesn't raise an error, returns a result object
+- Server errors (500-599): Raises an error
+
+## Side Effects
+- Creates `IntegrationResource` objects
+- Enqueues `SendWebhookJob` in error scenarios
+
+## Performance Considerations
+The tests mock external HTTP calls to improve test performance and reliability.
+
+## TODOs
+None explicitly mentioned in the code.
+
+This test file provides comprehensive coverage for the `CreateService` class, ensuring its functionality across various scenarios and edge cases.

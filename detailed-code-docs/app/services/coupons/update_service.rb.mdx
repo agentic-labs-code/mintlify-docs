@@ -1,0 +1,76 @@
+---
+title: "update_service.rb"
+---
+
+## High-level description
+This code defines the `UpdateService` class within the `Coupons` module, responsible for updating an existing coupon in the system. It handles various coupon attributes, including limitations on plans and billable metrics, and ensures data consistency through database transactions.
+
+## Code Structure
+The `UpdateService` class inherits from `BaseService` and contains a main `call` method that orchestrates the update process. It also includes several private methods for handling specific aspects of the update, such as processing plans and billable metrics.
+
+## Symbols
+
+### `Coupons::UpdateService`
+#### Description
+This service class is responsible for updating an existing coupon with new attributes and managing its associations with plans and billable metrics.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| coupon | Coupon | The coupon object to be updated |
+| params | Hash | A hash containing the new attributes for the coupon |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the updated coupon or error information |
+
+#### Internal Logic
+1. Validates the input parameters
+2. Updates basic coupon attributes
+3. Handles limitations on plans and billable metrics
+4. Processes plans and billable metrics associations
+5. Saves the updated coupon within a transaction
+6. Handles any validation errors
+
+### `call`
+#### Description
+The main method that orchestrates the coupon update process.
+
+#### Internal Logic
+1. Checks if the coupon exists and if the params are valid
+2. Updates basic coupon attributes
+3. Handles limitations on plans and billable metrics
+4. Saves the coupon and processes associations within a transaction
+5. Returns the result with the updated coupon or error information
+
+### `process_plans`
+#### Description
+Processes the plans associated with the coupon, creating new associations and removing outdated ones.
+
+### `process_billable_metrics`
+#### Description
+Processes the billable metrics associated with the coupon, creating new associations and removing outdated ones.
+
+## Side Effects
+- Updates the coupon record in the database
+- Creates or destroys `CouponTarget` records to manage associations with plans and billable metrics
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | For database interactions and transactions |
+| Coupons::ValidateService | For validating input parameters |
+
+## Error Handling
+- Returns appropriate error responses for not found resources (coupon, plans, billable metrics)
+- Handles ActiveRecord::RecordInvalid errors and returns validation failure results
+
+## Performance Considerations
+- Uses database transactions to ensure data consistency when updating the coupon and its associations
+- Performs bulk operations on CouponTarget records to minimize database queries
+
+## TODOs
+- Consider adding more detailed error messages for specific validation failures
+- Evaluate the need for additional error handling or logging
+- Consider optimizing the process_plans and process_billable_metrics methods to reduce database queries

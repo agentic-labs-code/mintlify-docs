@@ -1,0 +1,74 @@
+---
+title: "failure_hash_response.json"
+---
+
+## High-level description
+This JSON file represents a response structure for an invoice processing operation, specifically focusing on failed invoices. It contains an empty array for successful invoices and a detailed structure for failed invoices, including validation errors.
+
+## Symbols
+
+### Root Object
+#### Description
+The root object of the JSON structure contains two main arrays: `succeededInvoices` and `failedInvoices`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| succeededInvoices | array | An array of successfully processed invoices (empty in this case) |
+| failedInvoices | array | An array of invoices that failed processing |
+
+### failedInvoices Array
+#### Description
+This array contains detailed information about invoices that failed processing. In this case, it contains one failed invoice.
+
+#### Internal Logic
+Each object in the `failedInvoices` array represents a single failed invoice with its associated details and errors.
+
+### Failed Invoice Object
+#### Description
+Represents a single invoice that failed processing, including its details and validation errors.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | Unique identifier for the invoice |
+| type | string | Type of the invoice (e.g., "ACCREC" for accounts receivable) |
+| external_contact_id | string | Identifier for the associated external contact |
+| status | string | Current status of the invoice |
+| issuing_date | string | Date when the invoice was issued (ISO 8601 format) |
+| payment_due_date | string | Date when the payment is due (ISO 8601 format) |
+| number | string | Invoice number |
+| currency | string | Currency used for the invoice |
+| purchase_order | null | Purchase order number (null in this case) |
+| fees | array | Array of fee objects associated with the invoice |
+| validation_errors | array | Array of error objects describing why the invoice failed processing |
+
+### Fee Object
+#### Description
+Represents a single fee or line item on the invoice.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| description | string | Description of the fee |
+| units | number | Quantity of units |
+| precise_unit_amount | number | Price per unit |
+| account_code | string | Account code associated with the fee |
+| amount_cents | number | Total amount in cents |
+| taxes_amount_cents | number or null | Tax amount in cents, can be null |
+
+### Validation Error Object
+#### Description
+Represents an error message explaining why the invoice failed processing.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Message | string | Description of the validation error |
+
+## Error Handling
+The `validation_errors` array in the failed invoice object provides specific error messages indicating why the invoice processing failed. In this case, there are two error messages:
+1. An error related to updating fields on a paid invoice line item without supplying a LineItemID.
+2. An error indicating that the status "AUTHORISED" cannot be applied to the invoice because it has payments or credit notes allocated to it.
+
+These error messages provide valuable information for debugging and understanding why the invoice processing failed.

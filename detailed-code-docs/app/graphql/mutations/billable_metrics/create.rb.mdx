@@ -1,0 +1,55 @@
+---
+title: "create.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for creating a new Billable Metric. It's part of a larger GraphQL API and handles the creation of billable metrics within an organization, ensuring proper authentication and authorization.
+
+## Code Structure
+The `Mutations::BillableMetrics::Create` class inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the input, output, and resolution logic for creating a billable metric.
+
+## References
+- `Types::BillableMetrics::CreateInput`
+- `Types::BillableMetrics::Object`
+- `::BillableMetrics::CreateService`
+
+## Symbols
+
+### `Mutations::BillableMetrics::Create`
+#### Description
+This class defines a GraphQL mutation for creating a new Billable Metric. It handles authentication, authorization, and delegates the actual creation to a service object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | Arguments for creating a billable metric, as defined in `Types::BillableMetrics::CreateInput` |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| billable_metric | Types::BillableMetrics::Object | The created billable metric object |
+
+#### Internal Logic
+1. Authenticates the user and checks for organization membership.
+2. Delegates the creation of the billable metric to `::BillableMetrics::CreateService`.
+3. Returns the created billable metric if successful, or an error if not.
+
+## Side Effects
+- Creates a new billable metric in the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication logic |
+| RequiredOrganization | Ensures the user belongs to the required organization |
+
+## Error Handling
+- Returns a `GraphQL::ExecutionError` if the user is not authenticated or not a member of the required organization.
+- Uses `result_error` method to handle errors from the `CreateService`.
+
+## API/Interface Reference
+| Field | Type | Description |
+|:------|:-----|:------------|
+| createBillableMetric | Types::BillableMetrics::Object | Creates a new billable metric |
+
+This mutation is part of the larger GraphQL API and can be accessed through the `createBillableMetric` field in the `MutationType`.

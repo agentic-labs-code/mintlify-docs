@@ -1,0 +1,69 @@
+---
+title: "destroy_service.rb"
+---
+
+## High-level description
+This code defines the `AdjustedFees::DestroyService` class, which is responsible for destroying an adjusted fee associated with a given fee. It also refreshes the draft invoice after the adjusted fee is destroyed.
+
+## Code Structure
+The `AdjustedFees::DestroyService` class inherits from `BaseService` and contains an `initialize` method and a `call` method. The `call` method performs the main logic of destroying the adjusted fee and refreshing the invoice.
+
+## References
+- `Invoices::RefreshDraftService`: Used to refresh the draft invoice after destroying the adjusted fee.
+- `BaseService`: The parent class that provides common functionality for service objects.
+
+## Symbols
+
+### `AdjustedFees::DestroyService`
+#### Description
+This service class is responsible for destroying an adjusted fee and refreshing the associated invoice.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fee | Fee | The fee object associated with the adjusted fee to be destroyed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result object containing the status of the operation and the updated fee |
+
+#### Internal Logic
+1. Check if the fee exists, return a not found failure if it doesn't.
+2. Check if the adjusted fee exists, return a not found failure if it doesn't.
+3. Destroy the adjusted fee.
+4. Refresh the draft invoice using `Invoices::RefreshDraftService`.
+5. Set the fee in the result object and return the result.
+
+### `initialize`
+#### Description
+Initializes the service with the given fee.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fee | Fee | The fee object associated with the adjusted fee to be destroyed |
+
+### `call`
+#### Description
+Executes the main logic of the service, destroying the adjusted fee and refreshing the invoice.
+
+#### Internal Logic
+1. Check for the existence of the fee and adjusted fee.
+2. Destroy the adjusted fee.
+3. Refresh the draft invoice.
+4. Update and return the result object.
+
+## Error Handling
+The service uses the `result` object to handle and return errors:
+- Returns a "fee not found" error if the fee doesn't exist.
+- Returns an "adjusted fee not found" error if the adjusted fee doesn't exist.
+- Raises any errors that occur during the invoice refresh process.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Invoices::RefreshDraftService | Used to refresh the draft invoice after destroying the adjusted fee |
+
+## Performance Considerations
+The service performs a database deletion operation and triggers a refresh of the invoice, which may involve additional database operations. The performance impact depends on the complexity of the invoice and the number of associated records.

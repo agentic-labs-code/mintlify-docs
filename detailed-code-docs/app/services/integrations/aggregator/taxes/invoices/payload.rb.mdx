@@ -1,0 +1,90 @@
+---
+title: "payload.rb"
+---
+
+## High-level description
+This code defines a `Payload` class within the `Integrations::Aggregator::Taxes::Invoices` module. It is responsible for generating a structured payload for tax-related invoice data, including customer information and fee details. The class inherits from `BasePayload` and provides methods to format the data according to specific requirements.
+
+## Code Structure
+The `Payload` class extends `BasePayload` and defines methods to initialize the object and generate the payload body. It also includes a helper method `fee_item` to format individual fee entries. The class relies on data from customer, invoice, and fee objects to construct the payload.
+
+## References
+This code references the `BasePayload` class, which is defined in the related file `app/services/integrations/aggregator/base_payload.rb`. It inherits methods and functionality from `BasePayload`.
+
+## Symbols
+
+### `Payload`
+#### Description
+This class is responsible for creating a structured payload for tax-related invoice data. It formats customer information, invoice details, and associated fees into a specific structure.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Object | The integration object |
+| customer | Object | The customer object |
+| invoice | Object | The invoice object |
+| integration_customer | Object | The integration customer object |
+| fees | Array/ActiveRecord::Relation | An array or relation of fee objects |
+
+#### Internal Logic
+1. Initializes the object with provided data.
+2. Generates a body containing invoice and customer information.
+3. Maps fee items to a specific structure based on their type.
+
+### `initialize`
+#### Description
+Initializes the `Payload` object with the necessary data for generating the payload.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Object | The integration object |
+| customer | Object | The customer object |
+| invoice | Object | The invoice object |
+| integration_customer | Object | The integration customer object |
+| fees | Array/ActiveRecord::Relation | An array or relation of fee objects |
+
+### `body`
+#### Description
+Generates the main structure of the payload, including invoice details, customer information, and fee items.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| body | Array | An array containing a hash with formatted invoice and customer data |
+
+### `fee_item`
+#### Description
+Formats a single fee item based on its type (charge, add-on, commitment, or subscription).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fee | Object | A fee object to be formatted |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fee_item | Hash | A hash containing formatted fee item data |
+
+#### Internal Logic
+1. Determines the fee type (charge, add-on, commitment, or subscription).
+2. Calls the appropriate method from `BasePayload` to get the mapped item.
+3. Formats the fee item with item_id, item_code, and amount_cents.
+
+### `empty_struct`
+#### Description
+Creates and memoizes an empty `OpenStruct` object to use as a fallback for unmapped items.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| empty_struct | OpenStruct | An empty OpenStruct object |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| OpenStruct | Used to create an empty structure for fallback items |
+
+## Performance Considerations
+The `fees` input is converted to an array if it's not already one, and ordered by creation date if it's an ActiveRecord::Relation. This ensures consistent processing of fees regardless of the input type.

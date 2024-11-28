@@ -1,0 +1,80 @@
+---
+title: "wallet_transactions_controller.rb"
+---
+
+## High-level description
+This code defines the `WalletTransactionsController` in the API V1 namespace, which handles the creation and retrieval of wallet transactions. It provides two main endpoints: one for creating new wallet transactions and another for listing wallet transactions with various filtering and pagination options.
+
+## Code Structure
+The `WalletTransactionsController` inherits from `Api::BaseController` and contains two main actions: `create` and `index`. These actions interact with service objects and query objects to perform their respective operations and then render the results using a `CollectionSerializer`.
+
+## Symbols
+
+### `WalletTransactionsController`
+#### Description
+This controller manages wallet transactions, providing endpoints for creating and listing transactions.
+
+#### Internal Logic
+1. `create` action:
+   - Calls the `WalletTransactions::CreateService` to create new wallet transactions.
+   - Renders the created transactions or an error response.
+2. `index` action:
+   - Uses `WalletTransactionsQuery` to fetch and filter wallet transactions.
+   - Renders the list of transactions with pagination metadata or an error response.
+
+### `create`
+#### Description
+Creates new wallet transactions based on the provided parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| input_params | Hash | Parameters for creating wallet transactions |
+
+#### Internal Logic
+1. Calls `WalletTransactions::CreateService` with the current organization and input parameters.
+2. If successful, renders the created transactions using `CollectionSerializer`.
+3. If unsuccessful, renders an error response.
+
+### `index`
+#### Description
+Retrieves a list of wallet transactions with filtering and pagination.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:id] | String | Wallet ID |
+| params[:page] | Integer | Page number for pagination |
+| params[:per_page] | Integer | Number of items per page |
+| params[:status] | String | Filter by transaction status |
+| params[:transaction_type] | String | Filter by transaction type |
+
+#### Internal Logic
+1. Calls `WalletTransactionsQuery` with the current organization, wallet ID, pagination, and filter parameters.
+2. If successful, renders the list of transactions with pagination metadata using `CollectionSerializer`.
+3. If unsuccessful, renders an error response.
+
+### `input_params` (private method)
+#### Description
+Defines and sanitizes the permitted parameters for creating wallet transactions.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @input_params | ActionController::Parameters | Sanitized parameters for wallet transaction creation |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| WalletTransactions::CreateService | Service object for creating wallet transactions |
+| WalletTransactionsQuery | Query object for fetching and filtering wallet transactions |
+| CollectionSerializer | Serializer for rendering collections of objects |
+| V1::WalletTransactionSerializer | Serializer for individual wallet transactions |
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /api/v1/wallet_transactions | POST | wallet_transaction params | JSON array of created wallet transactions | Creates new wallet transactions |
+| /api/v1/wallet_transactions | GET | query params (id, page, per_page, status, transaction_type) | JSON array of wallet transactions with pagination metadata | Retrieves a list of wallet transactions |
+
+This controller provides a RESTful API for managing wallet transactions, allowing clients to create new transactions and retrieve existing ones with various filtering and pagination options.

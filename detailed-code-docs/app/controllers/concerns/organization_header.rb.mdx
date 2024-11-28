@@ -1,0 +1,46 @@
+---
+title: "organization_header.rb"
+---
+
+## High-level description
+The `OrganizationHeader` module provides functionality to handle organization-specific headers in HTTP requests. It defines methods to retrieve the current organization based on the user and the organization header value.
+
+## Symbols
+
+### `OrganizationHeader`
+#### Description
+This module is designed to be included in controllers that need to handle organization-specific requests. It provides methods to access the current organization and the organization header value.
+
+### `current_organization`
+#### Description
+This method retrieves the current organization for the authenticated user based on the organization header value.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @current_organization | Organization | The organization object associated with the current user and header value |
+
+#### Internal Logic
+1. Checks if the organization header is present
+2. Checks if there is a current user
+3. If both conditions are met, finds and memoizes the organization for the current user based on the organization header value
+
+### `organization_header`
+#### Description
+This method retrieves the organization header value from the request headers.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_header | String | The value of the 'x-lago-organization' header |
+
+## References
+The `OrganizationHeader` module is referenced in the `GraphqlController` class, where it is included along with other modules such as `AuthenticableUser`, `CustomerPortalUser`, and `Trackable`.
+
+## Dependencies
+This module relies on the presence of a `current_user` method, which is likely defined in another module or the base controller class.
+
+## Notes
+1. The module uses memoization (@current_organization ||=) to cache the current organization, improving performance for subsequent calls within the same request.
+2. The organization header is expected to be 'x-lago-organization' in the request headers.
+3. This module is designed to work in conjunction with user authentication, as it requires a current_user to be present.

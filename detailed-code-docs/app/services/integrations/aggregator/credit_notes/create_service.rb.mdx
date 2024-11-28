@@ -1,0 +1,76 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines a service class `CreateService` within the `Integrations::Aggregator::CreditNotes` module. Its primary purpose is to create credit notes in an external aggregator system by making HTTP requests and handling the responses. It also manages the creation of integration resources and error handling.
+
+## Code Structure
+The `CreateService` class inherits from `Integrations::Aggregator::Invoices::BaseService` and contains two main public methods: `call` and `call_async`. These methods orchestrate the credit note creation process and handle both synchronous and asynchronous operations.
+
+## Symbols
+
+### `CreateService`
+#### Description
+This class is responsible for creating credit notes in an external aggregator system. It handles the HTTP request, processes the response, and manages the creation of integration resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_note | CreditNote | The credit note object to be created in the external system |
+
+#### Internal Logic
+1. Checks if the integration exists and is configured to sync credit notes
+2. Ensures the credit note is finalized
+3. Makes an HTTP POST request to the external system
+4. Processes the response (either hash or string)
+5. Creates an `IntegrationResource` if successful
+6. Handles errors and delivers error webhooks if necessary
+
+### `call`
+#### Description
+This method performs the synchronous creation of a credit note in the external system.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the result of the operation, including the external_id if successful |
+
+#### Internal Logic
+1. Performs various checks (integration existence, sync configuration, credit note status)
+2. Makes an HTTP POST request using the `http_client`
+3. Processes the response based on its type (hash or string)
+4. Creates an `IntegrationResource` if successful
+5. Handles errors and delivers error webhooks if necessary
+
+### `call_async`
+#### Description
+This method initiates an asynchronous creation of a credit note by enqueueing a background job.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the result of the operation, including the credit_note_id |
+
+#### Internal Logic
+1. Checks if the credit note exists
+2. Enqueues a `CreateJob` for asynchronous processing
+3. Sets the credit_note_id in the result object
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| LagoHttpClient | Used for making HTTP requests to the external system |
+| IntegrationResource | Model for storing integration resource information |
+| Integrations::Aggregator::CreditNotes::CreateJob | Background job for asynchronous credit note creation |
+| Integrations::Aggregator::CreditNotes::Payloads::Factory | Factory for creating credit note payloads |
+
+## Error Handling
+The service implements error handling for HTTP errors. It catches `LagoHttpClient::HttpError` exceptions, delivers error webhooks for certain cases, and re-raises the error for server errors (status code &gt;= 500).
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| v1/#{provider}/creditnotes | POST | Credit note payload | JSON response | Creates a credit note in the external system |
+
+This service class provides a robust implementation for creating credit notes in external aggregator systems, handling both synchronous and asynchronous operations, and managing error scenarios effectively.

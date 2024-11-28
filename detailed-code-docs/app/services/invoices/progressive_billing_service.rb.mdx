@@ -1,0 +1,112 @@
+---
+title: "progressive_billing_service.rb"
+---
+
+## High-level description
+This code defines the `ProgressiveBillingService` class within the `Invoices` module. It handles the creation and processing of progressive billing invoices, including fee calculation, credit application, and various post-invoice creation tasks such as PDF generation, webhook notifications, and payment processing.
+
+## Code Structure
+The `ProgressiveBillingService` class inherits from `BaseService` and contains a main `call` method that orchestrates the entire progressive billing process. It utilizes several other services and models to perform specific tasks, such as fee creation, credit application, and invoice finalization.
+
+## Symbols
+
+### `ProgressiveBillingService`
+#### Description
+This service handles the creation and processing of progressive billing invoices.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| usage_thresholds | Array | List of usage thresholds to be applied |
+| lifetime_usage | LifetimeUsage | The lifetime usage object for the subscription |
+| timestamp | Time | The timestamp for the invoice (default: current time) |
+
+#### Internal Logic
+1. Creates a generating invoice
+2. Creates fees for the invoice
+3. Creates applied usage thresholds
+4. Applies credits (progressive billing, coupons)
+5. Computes amounts from fees
+6. Creates credit note credits and applied prepaid credits
+7. Finalizes the invoice
+8. Performs post-creation tasks (PDF generation, webhooks, payments)
+
+#### Side Effects
+- Creates and updates database records (Invoice, Fee, AppliedUsageThreshold, etc.)
+- Triggers background jobs for various tasks (PDF generation, webhooks, payments)
+
+### `call`
+#### Description
+The main method that orchestrates the progressive billing process.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the created invoice and any errors |
+
+#### Internal Logic
+1. Executes the billing process within a database transaction
+2. Handles various error cases and rolls back the transaction if needed
+3. Triggers post-creation tasks after successful invoice creation
+
+### `create_generating_invoice`
+#### Description
+Creates a new invoice in the generating state.
+
+#### Internal Logic
+1. Calls the `CreateGeneratingService` to create a new invoice
+2. Creates invoice subscriptions using `CreateInvoiceSubscriptionService`
+
+### `create_fees`
+#### Description
+Creates fees for the invoice based on the subscription's charges.
+
+#### Internal Logic
+1. Retrieves applicable charges for the subscription
+2. Calls `Fees::ChargeService` for each charge to create corresponding fees
+
+### `create_applied_usage_thresholds`
+#### Description
+Creates `AppliedUsageThreshold` records for the invoice.
+
+#### Internal Logic
+Creates an `AppliedUsageThreshold` record for each usage threshold passed to the service.
+
+### `should_deliver_email?`
+#### Description
+Determines if an email should be sent for the finalized invoice.
+
+#### Internal Logic
+Checks if the license is premium and if the organization's email settings include 'invoice.finalized'.
+
+### `create_credit_note_credit`
+#### Description
+Applies credit notes to the invoice if applicable.
+
+#### Internal Logic
+Calls `Credits::CreditNoteService` to apply available credit notes to the invoice.
+
+### `create_applied_prepaid_credit`
+#### Description
+Applies prepaid credit to the invoice if applicable.
+
+#### Internal Logic
+Calls `Credits::AppliedPrepaidCreditService` to apply available prepaid credit to the invoice.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Credits::ProgressiveBillingService | Applies progressive billing credits |
+| Credits::AppliedCouponsService | Applies coupon credits |
+| Invoices::ComputeAmountsFromFees | Computes invoice amounts based on fees |
+| Utils::SegmentTrack | Tracks invoice creation event |
+| SendWebhookJob | Sends webhook notifications |
+| Invoices::GeneratePdfAndNotifyJob | Generates PDF and sends email notifications |
+| Integrations::Aggregator::Invoices::CreateJob | Creates invoice in aggregator service |
+| Integrations::Aggregator::SalesOrders::CreateJob | Creates sales order in aggregator service |
+| Invoices::Payments::CreateService | Initiates payment processing for the invoice |
+
+## TODOs
+- Deduct previous progressive billing invoices (commented in the code)
+
+This service is a crucial part of the progressive billing system, handling the entire process of creating and finalizing invoices based on usage thresholds and applying various credits and payments.

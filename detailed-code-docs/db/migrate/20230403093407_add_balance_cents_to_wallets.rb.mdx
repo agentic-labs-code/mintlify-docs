@@ -1,0 +1,65 @@
+---
+title: "20230403093407_add_balance_cents_to_wallets.rb"
+---
+
+## High-level description
+This migration file adds new columns to the `wallets` table to store balance and consumed amount in cents, along with their respective currencies. It also migrates existing data to the new columns and removes the old columns.
+
+## Code Structure
+The migration defines a single `change` method that performs all the necessary modifications to the `wallets` table.
+
+## Symbols
+
+### `AddBalanceCentsToWallets`
+#### Description
+This class is an ActiveRecord migration that modifies the `wallets` table structure and migrates existing data to new columns.
+
+#### Internal Logic
+1. Adds new columns to the `wallets` table.
+2. Migrates existing data to the new columns.
+3. Sets default values and null constraints for the new columns.
+4. Removes old columns in a reversible manner.
+
+## Side Effects
+- Modifies the `wallets` table structure.
+- Updates existing wallet records with new column values.
+
+### `change`
+#### Description
+This method defines the changes to be applied to the database schema and data.
+
+#### Internal Logic
+1. Adds new columns to the `wallets` table:
+   - `balance_cents` (bigint)
+   - `balance_currency` (string)
+   - `consumed_amount_cents` (bigint)
+   - `consumed_amount_currenty` (string) [Note: There's a typo in 'currenty']
+
+2. Migrates existing data:
+   - Iterates through each wallet record.
+   - Converts the existing `balance` and `consumed_amount` to cents.
+   - Updates the wallet with new values for the new columns.
+
+3. Sets default values and null constraints:
+   - Sets default value of 0 for `balance_cents` and `consumed_amount_cents`.
+   - Makes `balance_cents`, `balance_currency`, `consumed_amount_cents`, and `consumed_amount_currenty` non-nullable.
+
+4. Removes old columns:
+   - In a reversible manner, removes `balance`, `consumed_amount`, and `currency` columns.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the migration framework |
+| Money::Currency | Used for currency conversions and information |
+
+## Error Handling
+The migration uses `safety_assured` to bypass Strong Migrations checks, indicating that the migration has been reviewed for safety.
+
+## TODOs
+- Fix the typo in the column name: `consumed_amount_currenty` should be `consumed_amount_currency`.
+
+## Notes
+1. The migration handles deleted customers by using `Customer.with_discarded.find(wallet.customer_id)` to prevent validation issues.
+2. The migration uses `bigint` for cent values, which allows for storing large monetary amounts.
+3. The `reversible` block ensures that the column removal can be reversed if needed.

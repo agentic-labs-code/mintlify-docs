@@ -1,0 +1,56 @@
+---
+title: "object.rb"
+---
+
+## High-level description
+This code defines a GraphQL object type for representing invoiced usage data in an analytics context. It specifies the structure and fields of the `InvoicedUsage` object, which includes information about the amount, currency, code, and month of the invoiced usage.
+
+## Symbols
+
+### `Types::Analytics::InvoicedUsages::Object`
+#### Description
+This class defines a GraphQL object type for invoiced usage data. It inherits from `Types::BaseObject` and sets up the fields that represent the properties of an invoiced usage entry.
+
+#### Inputs
+This class doesn't have explicit inputs as it's a type definition.
+
+#### Outputs
+The class defines the following fields:
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| amount_cents | GraphQL::Types::BigInt | The amount in cents (non-null) |
+| code | String | A code associated with the usage (nullable) |
+| currency | Types::CurrencyEnum | The currency of the amount (non-null) |
+| month | GraphQL::Types::ISO8601DateTime | The month of the invoiced usage (non-null) |
+
+#### Internal Logic
+1. The class is namespaced under `Types::Analytics::InvoicedUsages`.
+2. It inherits from `Types::BaseObject`.
+3. The `graphql_name` is set to 'InvoicedUsage'.
+4. Four fields are defined using the `field` method:
+   - `amount_cents`: A non-null `BigInt` representing the amount in cents.
+   - `code`: A nullable `String` that may contain a code associated with the usage.
+   - `currency`: A non-null `CurrencyEnum` representing the currency of the amount.
+   - `month`: A non-null `ISO8601DateTime` representing the month of the invoiced usage.
+
+## References
+- `Types::BaseObject`: The base class for this GraphQL object type.
+- `Types::CurrencyEnum`: Used as the type for the `currency` field.
+- `GraphQL::Types::BigInt`: Used for the `amount_cents` field.
+- `GraphQL::Types::ISO8601DateTime`: Used for the `month` field.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| GraphQL | Provides the types and structure for defining GraphQL schemas |
+
+## Related Information
+From the related code snippets, we can infer:
+
+1. The `Types::CurrencyEnum` is likely an enumeration of accepted currencies, defined in `app/graphql/types/currency_enum.rb`.
+2. There's a resolver (`Resolvers::Analytics::InvoicedUsagesResolver`) that uses this object type to query invoiced usage data for an organization. It's defined in `app/graphql/resolvers/analytics/invoiced_usages_resolver.rb`.
+3. The resolver suggests that this functionality is part of a premium feature set, as it checks for `License.premium?`.
+4. The `InvoicedUsage` object is used in a collection context in the resolver, indicating that multiple invoiced usage entries can be returned.
+
+This `InvoicedUsage` object type serves as a crucial part of the GraphQL schema for representing invoiced usage data in the analytics module of the application.

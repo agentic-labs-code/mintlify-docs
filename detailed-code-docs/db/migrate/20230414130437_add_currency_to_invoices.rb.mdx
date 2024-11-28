@@ -1,0 +1,46 @@
+---
+title: "20230414130437_add_currency_to_invoices.rb"
+---
+
+## High-level description
+This migration adds a new `currency` column to the `invoices` table while removing several existing currency-related columns. It consolidates the currency information into a single column, simplifying the table structure and data management for invoices.
+
+## Symbols
+
+### AddCurrencyToInvoices
+#### Description
+This class is an ActiveRecord migration that modifies the `invoices` table structure. It adds a new `currency` column and removes four existing currency-related columns, consolidating the currency information.
+
+#### Internal Logic
+The migration is divided into two main methods: `up` and `down`, which handle the forward migration and rollback, respectively.
+
+##### `up` method
+1. Adds a new `currency` column to the `invoices` table.
+2. Uses `safety_assured` to bypass Strong Migrations checks.
+3. Executes an SQL UPDATE to populate the new `currency` column with data from `amount_currency`.
+4. Removes four existing currency-related columns: `amount_currency`, `vat_amount_currency`, `total_amount_currency`, and `credit_amount_currency`.
+
+##### `down` method
+1. Adds back the four previously removed currency-related columns.
+2. Executes an SQL UPDATE to populate the restored columns with data from the `currency` column.
+3. Removes the `currency` column.
+
+## Side Effects
+- Modifies the `invoices` table structure by adding and removing columns.
+- Updates existing data in the `invoices` table.
+
+## Performance Considerations
+- The migration uses `bulk: true` when modifying multiple columns, which can improve performance for large tables.
+- The `safety_assured` block is used to bypass Strong Migrations checks, which may have performance implications. This should be used cautiously and only when necessary.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations |
+| Strong Migrations | Implied by the use of `safety_assured`, used for safer database migrations |
+
+## Error Handling
+This migration does not implement specific error handling beyond what is provided by ActiveRecord migrations. If an error occurs during the migration, it will be raised and the migration will be rolled back.
+
+## TODOs
+There are no explicit TODOs in this migration.

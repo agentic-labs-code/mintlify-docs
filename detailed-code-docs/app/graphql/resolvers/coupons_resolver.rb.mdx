@@ -1,0 +1,65 @@
+---
+title: "coupons_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying coupons of an organization. It handles authentication, organization validation, and applies filters and pagination to the coupon query results.
+
+## Code Structure
+The `CouponsResolver` class inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the resolver's arguments, return type, and the main `resolve` method.
+
+## References
+- `Types::Coupons::StatusEnum`
+- `Types::Coupons::Object`
+- `CouponsQuery`
+
+## Symbols
+
+### `CouponsResolver`
+#### Description
+This resolver handles GraphQL queries for coupons within an organization. It ensures the user is authenticated and has the required permissions before executing the query.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| limit | Integer | Optional. Limits the number of results returned. |
+| page | Integer | Optional. Specifies the page number for pagination. |
+| search_term | String | Optional. Used to filter coupons by name or code. |
+| status | Types::Coupons::StatusEnum | Optional. Filters coupons by their status. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| coupons | [Types::Coupons::Object] | A collection of coupon objects matching the query parameters. |
+
+#### Internal Logic
+1. The resolver first checks for authentication and organization membership using the included modules.
+2. It then calls the `CouponsQuery` service with the provided parameters and the current organization.
+3. The query results are processed and returned as a collection of coupon objects.
+
+## Side Effects
+This resolver does not have any side effects. It only reads data based on the provided parameters and user context.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated before executing the query. |
+| RequiredOrganization | Validates that the user belongs to the organization they're querying. |
+| CouponsQuery | Handles the actual database query for coupons based on the provided parameters. |
+
+## Error Handling
+Error handling is primarily managed through the included modules:
+- `AuthenticableApiUser` raises an unauthorized error if the user is not authenticated.
+- `RequiredOrganization` raises a forbidden error if the organization ID is missing or the user is not a member of the organization.
+
+## API/Interface Reference
+This resolver is part of the GraphQL API and is typically accessed through the `coupons` field in the `QueryType`. It requires the `coupons:view` permission to access.
+
+| Argument | Type | Required | Description |
+|:---------|:-----|:---------|:------------|
+| limit | Integer | No | Limits the number of results |
+| page | Integer | No | Specifies the page for pagination |
+| search_term | String | No | Filters coupons by name or code |
+| status | CouponStatusEnum | No | Filters coupons by status |
+
+The resolver returns a collection of `Types::Coupons::Object`, which represents coupon data in the GraphQL schema.

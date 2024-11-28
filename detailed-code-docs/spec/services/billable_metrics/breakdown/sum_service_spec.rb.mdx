@@ -1,0 +1,75 @@
+---
+title: "sum_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `BillableMetrics::Breakdown::SumService` class. It tests the breakdown functionality of the service, which is responsible for calculating and providing detailed information about billable metrics based on sum aggregation.
+
+## Code Structure
+The test suite is organized around the `#breakdown` method of the `BillableMetrics::Breakdown::SumService` class. It includes various contexts to test different scenarios, such as persisted metrics over a full period, terminated subscriptions, and subscriptions started within the period.
+
+## Symbols
+
+### `BillableMetrics::Breakdown::SumService`
+#### Description
+This is the main class being tested. It's responsible for providing a breakdown of billable metrics using sum aggregation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event_store_class | Class | The class used for event storage (e.g., `Events::Stores::PostgresStore`) |
+| charge | Object | The charge associated with the billable metric |
+| subscription | Object | The subscription being analyzed |
+| boundaries | Hash | Contains `from_datetime` and `to_datetime` for the period being analyzed |
+| filters | Hash | Contains `matching_filters` and `ignored_filters` for event filtering |
+
+#### Outputs
+The service returns a breakdown object with detailed information about the billable metrics.
+
+### `#breakdown`
+#### Description
+This is the main method being tested. It returns a breakdown of the billable metrics for the given period and subscription.
+
+#### Internal Logic
+The method calculates the sum of the billable metric values for the given period, taking into account various factors such as subscription status changes and event timestamps.
+
+## Test Cases
+
+### Context: "with persisted metric on full period"
+#### Description
+Tests the breakdown for a full billing period with persisted metrics.
+
+#### Internal Logic
+1. Sets up a subscription and billable metric
+2. Creates old and latest events
+3. Calls the `breakdown` method
+4. Verifies the result contains the correct number of items, dates, actions, amounts, and durations
+
+### Context: "when subscription was terminated in the period"
+#### Description
+Tests the breakdown for a subscription that was terminated during the billing period.
+
+#### Internal Logic
+1. Sets up a terminated subscription
+2. Calls the `breakdown` method
+3. Verifies the result reflects the termination date and correct durations
+
+### Context: "when subscription was started in the period"
+#### Description
+Tests the breakdown for a subscription that started during the billing period.
+
+#### Internal Logic
+1. Sets up a subscription with a start date within the period
+2. Calls the `breakdown` method
+3. Verifies the result only includes events after the subscription start date
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides the testing environment and configuration |
+| FactoryBot | Used for creating test data (subscriptions, events, etc.) |
+
+## Error Handling
+The test suite doesn't explicitly test error handling. It focuses on the happy path and various scenarios of subscription and event timing.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

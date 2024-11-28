@@ -1,0 +1,67 @@
+---
+title: "refresh_draft_service_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `CreditNotes::RefreshDraftService` class. It tests the functionality of refreshing a draft credit note, specifically focusing on updating the credit note's attributes and items based on changes in the associated fee.
+
+## Code Structure
+The test suite is organized around the `#call` method of the `CreditNotes::RefreshDraftService` class. It sets up various scenarios using FactoryBot to create test data and then verifies the behavior of the service under different conditions.
+
+## Symbols
+
+### `RSpec.describe CreditNotes::RefreshDraftService`
+#### Description
+This is the main describe block for the `CreditNotes::RefreshDraftService` test suite.
+
+### `describe '#call'`
+#### Description
+This describe block focuses on testing the `#call` method of the `CreditNotes::RefreshDraftService`.
+
+#### Internal Logic
+The test suite sets up various objects (organization, customer, tax, invoice, fee, credit note) using FactoryBot. It then creates different scenarios to test the behavior of the `#call` method:
+
+1. When the credit note is finalized
+2. When assigning a credit note to a fee
+3. When updating VAT amounts of the credit note
+
+For each scenario, it uses RSpec expectations to verify the changes (or lack thereof) in the credit note's attributes.
+
+### `let` statements
+#### Description
+These statements define the test data used throughout the spec file. They create various objects needed for testing, such as organization, customer, tax, invoice, fee, and credit note.
+
+### `context 'when credit_note is finalized'`
+#### Description
+This context block tests the behavior of the service when the credit note is already finalized.
+
+#### Internal Logic
+It sets the credit note status to `:finalized` and expects that calling the service does not change the `updated_at` timestamp of the credit note.
+
+### `it 'assigns credit note to the fee'`
+#### Description
+This test verifies that the service correctly assigns the credit note to the given fee.
+
+#### Internal Logic
+It expects the `fee_id` of the credit note items to change to the ID of the new fee after calling the service.
+
+### `it 'updates vat amounts of the credit note'`
+#### Description
+This test checks if the service correctly updates various amounts on the credit note.
+
+#### Internal Logic
+It expects changes in the following attributes of the credit note after calling the service:
+- `taxes_amount_cents`
+- `coupons_adjustment_amount_cents`
+- `credit_amount_cents`
+- `balance_amount_cents`
+- `total_amount_cents`
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails and RSpec configuration |
+| FactoryBot | Creates test data |
+
+Note: The `rails_helper` file includes various configurations and helper modules that are used throughout the test suite.

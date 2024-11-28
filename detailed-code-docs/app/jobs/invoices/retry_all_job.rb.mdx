@@ -1,0 +1,48 @@
+---
+title: "retry_all_job.rb"
+---
+
+## High-level description
+This code defines a background job class `Invoices::RetryAllJob` that retries processing a batch of invoices for a given organization. It utilizes the `Invoices::RetryBatchService` to perform the actual retry operation.
+
+## Code Structure
+The `Invoices::RetryAllJob` class is defined within the `Invoices` module and inherits from `ApplicationJob`. It contains a single method `perform` that executes the retry operation.
+
+## Symbols
+
+### `Invoices::RetryAllJob`
+#### Description
+This class represents a background job for retrying the processing of multiple invoices. It uses the `Invoices::RetryBatchService` to handle the retry logic.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization associated with the invoices |
+| invoice_ids | Array | An array of invoice IDs to be retried |
+
+#### Internal Logic
+1. The job is queued in the 'invoices' queue.
+2. When performed, it creates a new instance of `Invoices::RetryBatchService` with the given organization.
+3. It calls the `call` method of the service with the provided `invoice_ids`.
+4. If the service returns an error, it raises an exception.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ApplicationJob | Base class for background jobs |
+| Invoices::RetryBatchService | Service class for retrying a batch of invoices |
+
+## Error Handling
+The job uses the `raise_if_error!` method on the result object returned by the `RetryBatchService`. This suggests that any errors encountered during the retry process will be raised as exceptions, which will likely be caught and handled by the job processing system.
+
+## Related Code
+The `Invoices::RetryBatchService` class, defined in a separate file, is crucial for understanding the full functionality of this job:
+
+1. It has a `call` method that processes the given invoice IDs.
+2. For each invoice, it uses an `Invoices::RetryService` to attempt a retry.
+3. If any retry fails, it immediately returns the error result.
+4. If all retries succeed, it returns a success result with the processed invoices.
+
+The `RetryAllJob` is also referenced in the `call_async` method of `RetryBatchService`, suggesting that this job can be enqueued asynchronously to process failed invoices for an organization.
+
+This structure allows for flexible retry strategies, supporting both synchronous and asynchronous processing of invoice batches.

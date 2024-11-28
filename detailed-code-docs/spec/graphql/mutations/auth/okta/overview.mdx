@@ -1,0 +1,72 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL mutations related to Okta authentication in the application. The tests cover various aspects of Okta integration, including accepting invites, authorizing users, and logging in through Okta.
+
+## What does it do?
+These test files ensure that the Okta authentication process works correctly within the application's GraphQL API. They verify:
+
+1. Accepting invites using Okta authentication
+2. Generating Okta authorization URLs
+3. Logging in users through Okta
+
+The tests simulate different scenarios, including successful operations and error cases, to ensure robust handling of Okta-related authentication processes.
+
+## Key Files
+
+1. `accept_invite_spec.rb`: Tests the `Mutations::Auth::Okta::AcceptInvite` mutation, which handles accepting invitations using Okta authentication.
+
+2. `authorize_spec.rb`: Tests the `Mutations::Auth::Okta::Authorize` mutation, responsible for generating Okta authorization URLs.
+
+3. `login_spec.rb`: Tests the `Mutations::Auth::Okta::Login` mutation, which handles user login through Okta.
+
+Each file contains comprehensive tests for their respective mutations, including success scenarios and error handling.
+
+## Dependencies
+The test files rely on the following key dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data (users, organizations, invites, and Okta integrations).
+3. LagoHttpClient::Client: Mocked in the tests to simulate HTTP requests to the Okta API.
+
+## Configuration
+The tests use various configurations and mocked responses to simulate different scenarios:
+
+1. Okta integration settings: Created using FactoryBot to simulate Okta integration configurations.
+2. Mocked HTTP responses: Simulated responses from the Okta API for token and user information requests.
+3. GraphQL mutation strings: Defined within each test file to execute the respective mutations.
+
+Here's an example of how the Okta integration is configured in the tests:
+
+```ruby
+let(:okta_integration) { create(:okta_integration, organization:) }
+```
+
+And an example of mocking the Okta API responses:
+
+```ruby
+let(:okta_token_response) do
+  OpenStruct.new(
+    success?: true,
+    body: {
+      'access_token' =&gt; 'access_token',
+      'id_token' =&gt; 'id_token',
+    },
+  )
+end
+
+let(:okta_userinfo_response) do
+  OpenStruct.new(
+    success?: true,
+    body: {
+      'email' =&gt; invite.email,
+    },
+  )
+end
+```
+
+These configurations allow the tests to cover various scenarios without making actual API calls to Okta, ensuring fast and reliable test execution.
+
+The test files make extensive use of RSpec's `let` statements, `before` blocks, and context-specific setups to create a comprehensive test suite for Okta-related authentication processes in the application's GraphQL API.

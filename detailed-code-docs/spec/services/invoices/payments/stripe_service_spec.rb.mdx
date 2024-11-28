@@ -1,0 +1,80 @@
+---
+title: "stripe_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Invoices::Payments::StripeService` class. It tests various scenarios related to creating Stripe payments, generating payment URLs, and updating payment statuses for invoices.
+
+## Code Structure
+The test suite is organized into several describe blocks, each focusing on a specific method of the `StripeService` class. The main methods tested are `.create`, `#generate_payment_url`, `#payment_url_payload`, `#description`, and `.update_payment_status`.
+
+## Symbols
+
+### RSpec.describe Invoices::Payments::StripeService
+#### Description
+This is the main describe block for the `Invoices::Payments::StripeService` class. It sets up the necessary test data and contains all the test cases.
+
+### describe '.create'
+#### Description
+Tests the `create` method of the `StripeService` class, which is responsible for creating a Stripe payment for an invoice.
+
+#### Internal Logic
+- Sets up test data including customer, organization, and invoice
+- Mocks Stripe API calls
+- Tests successful payment creation
+- Tests various edge cases (no payment provider, zero amount, missing customer data)
+- Tests error handling for Stripe card errors
+
+### describe '#generate_payment_url'
+#### Description
+Tests the `generate_payment_url` method, which generates a Stripe Checkout Session URL for invoice payment.
+
+#### Internal Logic
+- Mocks Stripe Checkout Session creation
+- Tests URL generation for valid invoices
+- Tests behavior for already paid or voided invoices
+
+### describe '#payment_url_payload'
+#### Description
+Tests the `payment_url_payload` method, which generates the payload for creating a Stripe Checkout Session.
+
+#### Internal Logic
+- Verifies the structure and content of the generated payload
+
+### describe '#description'
+#### Description
+Tests the `description` method, which generates a description for the Stripe payment.
+
+#### Internal Logic
+- Verifies the format of the generated description
+
+### describe '.update_payment_status'
+#### Description
+Tests the `update_payment_status` method, which updates the status of a payment and the associated invoice.
+
+#### Internal Logic
+- Tests status updates for successful and failed payments
+- Tests behavior for already paid invoices
+- Tests error handling for invalid statuses
+- Tests creation of new payments for one-time payments without existing payment records
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| Stripe | Mocked for simulating Stripe API responses |
+
+## Error Handling
+The tests cover various error scenarios, including Stripe card errors, invalid request errors, and not found errors. These are handled through RSpec expectations and by checking the result object returned by the service methods.
+
+## Side Effects
+The tests mock several external services and jobs to isolate the behavior of the `StripeService`:
+- `SegmentTrackJob`
+- `Invoices::PrepaidCreditJob`
+- `SendWebhookJob`
+- `Invoices::Payments::DeliverErrorWebhookService`
+
+## Performance Considerations
+The tests use mocking and stubbing extensively to avoid making real API calls, which improves test performance and reliability.
+
+This test suite provides comprehensive coverage of the `Invoices::Payments::StripeService` class, ensuring that it correctly handles various scenarios related to Stripe payments for invoices.

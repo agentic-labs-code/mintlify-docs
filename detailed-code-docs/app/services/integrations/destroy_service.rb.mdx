@@ -1,0 +1,72 @@
+---
+title: "destroy_service.rb"
+---
+
+## High-level description
+This code defines the `DestroyService` class within the `Integrations` module. Its primary purpose is to handle the deletion of an integration object, ensuring proper error handling and returning a result object with the destroyed integration or an error message.
+
+## Code Structure
+The `DestroyService` class inherits from `BaseService` and contains a single public method `call` that performs the destruction of the integration. It uses a `result` object (likely defined in the `BaseService`) to handle the operation's outcome.
+
+## Symbols
+
+### `Integrations::DestroyService`
+#### Description
+This class is responsible for destroying an integration object. It encapsulates the logic for checking the existence of the integration and performing the deletion operation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Integration | The integration object to be destroyed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the operation's outcome, including the destroyed integration or error information |
+
+#### Internal Logic
+1. Check if the integration exists
+2. If the integration doesn't exist, return a not found error
+3. If the integration exists, destroy it
+4. Set the destroyed integration in the result object
+5. Return the result object
+
+### `initialize`
+#### Description
+Initializes the `DestroyService` with the given integration.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Integration | The integration object to be destroyed |
+
+### `call`
+#### Description
+Executes the destruction of the integration and returns the result.
+
+#### Internal Logic
+1. Check if the integration exists using `unless integration`
+2. If it doesn't exist, call `result.not_found_failure!(resource: 'integration')`
+3. If it exists, call `integration.destroy!`
+4. Set `result.integration = integration`
+5. Return the `result` object
+
+## References
+This code references:
+1. `BaseService` class, which it inherits from
+2. `Integration` model, which is the object being destroyed
+
+## Dependencies
+The code depends on the `BaseService` class, which is not shown in the provided snippets but is likely defined elsewhere in the application.
+
+## Error Handling
+The code handles the case where the integration is not found by returning a not found error through the `result` object. Any exceptions raised during the `destroy!` operation will propagate up the call stack.
+
+## Related Code Context
+From the related code snippets, we can infer:
+
+1. The `DestroyService` is used in the GraphQL mutation `Mutations::Integrations::Destroy`, which provides an API endpoint for destroying integrations.
+2. Integrations are associated with organizations and have various related models (e.g., `integration_items`, `integration_resources`, etc.) as seen in the `Integrations::BaseIntegration` model.
+3. The destruction of an integration will likely cascade to its associated records due to the `dependent: :destroy` options on the associations in the `BaseIntegration` model.
+
+This context helps understand the broader impact and usage of the `DestroyService` within the application's integration management system.

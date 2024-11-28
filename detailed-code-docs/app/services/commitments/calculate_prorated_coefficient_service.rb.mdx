@@ -1,0 +1,77 @@
+---
+title: "calculate_prorated_coefficient_service.rb"
+---
+
+## High-level description
+This code defines a service class `CalculateProratedCoefficientService` within the `Commitments` module. Its primary purpose is to calculate a prorated coefficient for a given commitment and invoice subscription, which is used to determine the appropriate amount to charge for a partial billing period.
+
+## Code Structure
+The main class `CalculateProratedCoefficientService` inherits from `BaseService` and contains methods to initialize the service, calculate the proration coefficient, and access a dates service. The core logic is implemented in the private `calculate_proration_coefficient` method.
+
+## References
+- `Commitments::DatesService`
+- `Commitments::FetchInvoicesService`
+- `Utils::Datetime`
+
+## Symbols
+
+### `CalculateProratedCoefficientService`
+#### Description
+This service calculates a prorated coefficient for a commitment based on the associated invoice subscription and subscription details.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| commitment | Commitment | The commitment object for which the coefficient is calculated |
+| invoice_subscription | InvoiceSubscription | The invoice subscription associated with the commitment |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the calculated proration coefficient |
+
+#### Internal Logic
+1. Initializes the service with a commitment and invoice subscription.
+2. Calculates the proration coefficient using the `calculate_proration_coefficient` method.
+3. Uses `Commitments::FetchInvoicesService` to retrieve relevant invoices.
+4. Determines the date range for the proration calculation.
+5. Calculates the coefficient based on the number of days in the billing period and the total number of days in the period.
+
+### `proration_coefficient`
+#### Description
+This method calculates and returns the proration coefficient.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the calculated proration coefficient |
+
+### `dates_service`
+#### Description
+This method provides access to a `Commitments::DatesService` instance for date-related calculations.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dates_service | Commitments::DatesService | An instance of the dates service |
+
+### `calculate_proration_coefficient` (private)
+#### Description
+This method performs the actual calculation of the proration coefficient.
+
+#### Internal Logic
+1. Fetches relevant invoices using `Commitments::FetchInvoicesService`.
+2. Retrieves all invoice subscriptions within the billing period.
+3. Calculates the number of days for the current period using `Utils::Datetime.date_diff_with_timezone`.
+4. Calculates the total number of days in the billing period.
+5. Returns the ratio of days in the current period to the total days in the billing period.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Commitments::DatesService | Provides date-related calculations for the commitment |
+| Commitments::FetchInvoicesService | Retrieves relevant invoices for the calculation |
+| Utils::Datetime | Performs date difference calculations with timezone consideration |
+
+## Performance Considerations
+The service uses database queries to fetch invoice subscriptions, which could potentially impact performance for subscriptions with a large number of invoices. The use of `COALESCE` in the order clause of the database query suggests careful handling of null values in the `to_datetime` field.

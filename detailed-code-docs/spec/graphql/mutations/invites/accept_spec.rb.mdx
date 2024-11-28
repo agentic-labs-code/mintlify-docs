@@ -1,0 +1,72 @@
+---
+title: "accept_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Mutations::Invites::Accept` GraphQL mutation. It tests the functionality of accepting an invite in different scenarios, including successful acceptance for a new user and error handling for revoked or already accepted invites.
+
+## Code Structure
+The test suite is organized into a single `RSpec.describe` block with nested `context` blocks for different scenarios. Each scenario uses a GraphQL mutation to test the invite acceptance process and verifies the expected outcomes.
+
+## Symbols
+
+### `RSpec.describe Mutations::Invites::Accept, type: :graphql`
+#### Description
+This is the main describe block for the test suite, focusing on the `Mutations::Invites::Accept` GraphQL mutation.
+
+### `let` blocks
+#### Description
+These blocks define shared variables used across the tests, including:
+- `membership`: A factory-created membership object
+- `organization`: The organization associated with the membership
+- `password`: A randomly generated password
+- `mutation`: The GraphQL mutation string for accepting an invite
+
+### `describe 'Invite revoke mutation'`
+#### Description
+This block groups all the test cases related to the invite acceptance mutation.
+
+### `context 'with a new user'`
+#### Description
+Tests the successful scenario of accepting an invite for a new user.
+
+#### Internal Logic
+1. Creates a new invite
+2. Executes the GraphQL mutation with the invite details
+3. Verifies that the returned data contains the correct email and a token
+
+### `context 'when invite is revoked'`
+#### Description
+Tests the error handling when trying to accept a revoked invite.
+
+#### Internal Logic
+1. Creates a revoked invite
+2. Executes the GraphQL mutation with the revoked invite details
+3. Verifies that the appropriate error response is returned
+
+### `context 'when invite is already accepted'`
+#### Description
+Tests the error handling when trying to accept an already accepted invite.
+
+#### Internal Logic
+1. Creates an already accepted invite
+2. Executes the GraphQL mutation with the accepted invite details
+3. Verifies that the appropriate error response is returned
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails and RSpec configuration |
+| FactoryBot | Used for creating test data (membership, invite) |
+| Faker | Generates random password for testing |
+
+## Error Handling
+The test suite checks for specific error responses when dealing with invalid invites:
+- For revoked or already accepted invites, it expects a 404 status code, 'not_found' error code, and specific error details.
+
+## API/Interface Reference
+| Mutation | Input | Response | Description |
+|:---------|:------|:---------|:------------|
+| acceptInvite | AcceptInviteInput (email, password, token) | token, user (id, email) | Accepts an invite and returns user information and authentication token |
+
+This test suite provides comprehensive coverage for the invite acceptance functionality, including both successful and error scenarios, ensuring the robustness of the GraphQL mutation.

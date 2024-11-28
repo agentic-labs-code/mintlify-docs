@@ -1,0 +1,53 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines a GraphQL mutation for updating an organization. It is part of a larger GraphQL API and handles the process of updating various attributes of an organization, including its details, settings, and configurations.
+
+## Code Structure
+The `Update` class is defined within the `Mutations::Organizations` module. It inherits from `BaseMutation` and includes two concerns: `AuthenticableApiUser` and `RequiredOrganization`. The class defines the GraphQL mutation structure, including its name, description, input object class, and return type.
+
+## References
+- `Types::Organizations::UpdateOrganizationInput`
+- `Types::Organizations::CurrentOrganizationType`
+- `::Organizations::UpdateService`
+
+## Symbols
+
+### `Mutations::Organizations::Update`
+#### Description
+This class defines a GraphQL mutation for updating an organization. It authenticates the user, ensures the presence of an organization, and delegates the update process to the `::Organizations::UpdateService`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| **args | Hash | A hash of arguments passed to the mutation, containing organization update parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Types::Organizations::CurrentOrganizationType | The updated organization or an error object |
+
+#### Internal Logic
+1. The `resolve` method is called with the input arguments.
+2. It calls the `::Organizations::UpdateService` with the current organization and input parameters.
+3. If the update is successful, it returns the updated organization.
+4. If the update fails, it returns an error result.
+
+## Side Effects
+- Updates the organization's attributes in the database.
+- May update related records (e.g., webhook endpoints, invoice settings).
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the presence of an organization |
+
+## Error Handling
+The mutation relies on the `result_error` method (likely defined in a parent class) to handle and format errors returned by the `UpdateService`.
+
+___
+
+This documentation provides a comprehensive overview of the `Update` mutation for organizations, explaining its purpose, structure, and key components. It highlights the authentication and authorization mechanisms in place, as well as the delegation of the actual update logic to a separate service class.

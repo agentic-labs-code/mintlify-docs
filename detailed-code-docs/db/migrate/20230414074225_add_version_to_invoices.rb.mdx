@@ -1,0 +1,39 @@
+---
+title: "20230414074225_add_version_to_invoices.rb"
+---
+
+## High-level description
+This migration adds a `version_number` column to the `invoices` table, replacing the existing `legacy` boolean column. It updates the data to maintain the legacy information and provides methods for both upgrading and rolling back the changes.
+
+## Symbols
+
+### `AddVersionToInvoices`
+#### Description
+This class is a Rails migration that modifies the `invoices` table structure. It adds a new `version_number` column and removes the existing `legacy` column, updating the data accordingly.
+
+#### Internal Logic
+
+##### `up` method
+1. Adds a new `version_number` column to the `invoices` table.
+2. Updates existing records, setting `version_number` to 1 for legacy invoices.
+3. Removes the `legacy` column.
+
+##### `down` method
+1. Adds back the `legacy` column to the `invoices` table.
+2. Updates existing records, setting `legacy` to true for invoices with `version_number` 1.
+3. Removes the `version_number` column.
+
+## Side Effects
+- Modifies the `invoices` table structure in the database.
+- Updates existing data in the `invoices` table.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the migration framework for database changes |
+
+## Error Handling
+The migration uses `safety_assured` in the `up` method to bypass Strong Migrations checks, indicating that the developer has verified the safety of the operation.
+
+## Performance Considerations
+The migration performs bulk updates on the `invoices` table, which may impact performance on large datasets. Consider running this migration during off-peak hours for production environments with a significant number of records.

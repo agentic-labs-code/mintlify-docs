@@ -1,0 +1,58 @@
+---
+title: "create.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for creating a new invoice in a billing system. It's part of the `Mutations::Invoices` module and inherits from `BaseMutation`. The mutation handles authentication, organization requirements, and uses a service to create a one-off invoice for a customer.
+
+## Code Structure
+The `Create` class is the main symbol, which includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the GraphQL mutation structure, including input and output types, and implements the `resolve` method to handle the creation of the invoice.
+
+## References
+- `Types::Invoices::CreateInvoiceInput`
+- `Types::Invoices::Object`
+- `Customer` model
+- `::Invoices::CreateOneOffService`
+
+## Symbols
+
+### `Mutations::Invoices::Create`
+#### Description
+This class defines a GraphQL mutation for creating a new invoice. It ensures the user is authenticated and has the required organization access before processing the invoice creation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | Contains customer_id, currency, and fees for the invoice |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Types::Invoices::Object | The created invoice object |
+
+#### Internal Logic
+1. Finds the customer based on the provided `customer_id` and the current organization.
+2. Uses the `::Invoices::CreateOneOffService` to create a new invoice with the provided details.
+3. Returns the created invoice if successful, or calls `result_error` if there's an error.
+
+## Side Effects
+- Creates a new invoice in the database.
+- May trigger additional actions through the `::Invoices::CreateOneOffService`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user has access to the required organization |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'invoices:create' | The permission required to create an invoice |
+
+## Error Handling
+The mutation uses the `result_error` method to handle errors returned by the `CreateOneOffService`. Specific error handling details are not visible in this code snippet.
+
+___
+
+This documentation provides a comprehensive overview of the `Mutations::Invoices::Create` class, explaining its purpose, inputs, outputs, and key functionalities. The class is responsible for creating new invoices in a GraphQL-based billing system, ensuring proper authentication and authorization before processing the invoice creation.

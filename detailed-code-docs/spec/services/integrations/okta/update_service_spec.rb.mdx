@@ -1,0 +1,80 @@
+---
+title: "update_service_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Integrations::Okta::UpdateService` class. It tests various scenarios for updating an Okta integration, including cases with and without a premium license, and with valid and invalid input parameters.
+
+## Symbols
+
+### `RSpec.describe Integrations::Okta::UpdateService`
+#### Description
+This is the main describe block for the `Integrations::Okta::UpdateService` class. It sets up the context for all the tests related to this service.
+
+### `describe '#call'`
+#### Description
+This describe block focuses on testing the `call` method of the `Integrations::Okta::UpdateService` class.
+
+#### Internal Logic
+The tests are organized into different contexts:
+1. Without a premium license
+2. With a premium license
+   a. Without Okta premium integration
+   b. With Okta premium integration (valid and invalid inputs)
+
+Each context tests the behavior of the `call` method under different conditions.
+
+### `let` statements
+#### Description
+These statements define variables used throughout the tests, such as `integration`, `organization`, `membership`, `domain`, and `organization_name`.
+
+### `subject(:service_call)`
+#### Description
+Defines the subject of the test, which is the call to the `UpdateService` with the given integration and update parameters.
+
+### `context 'without premium license'`
+#### Description
+Tests the behavior of the service when the organization doesn't have a premium license.
+
+#### Internal Logic
+- Expects the service call to be unsuccessful
+- Expects the error to be of type `BaseService::MethodNotAllowedFailure`
+
+### `context 'with premium license'`
+#### Description
+Tests the behavior of the service when the organization has a premium license.
+
+#### Internal Logic
+1. Without Okta premium integration:
+   - Expects the service call to be unsuccessful
+   - Expects the error to be of type `BaseService::MethodNotAllowedFailure`
+
+2. With Okta premium integration:
+   a. Without validation errors:
+      - Expects the integration to be updated with the new domain and organization name
+   b. With validation error (nil domain):
+      - Expects the service call to be unsuccessful
+      - Expects the error to be of type `BaseService::ValidationFailure`
+      - Expects the error message to indicate that the domain is mandatory
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| rspec | Testing framework |
+| FactoryBot | Used for creating test data (e.g., `create(:okta_integration)`) |
+
+## Configuration
+The test uses the following configuration:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| type: :service | Symbol | N/A | Specifies that this is a service test |
+
+## Error Handling
+The test checks for different types of errors returned by the service:
+1. `BaseService::MethodNotAllowedFailure`: When the operation is not allowed (e.g., no premium license)
+2. `BaseService::ValidationFailure`: When there are validation errors in the input parameters
+
+## TODOs
+There are no explicit TODOs in this test file.

@@ -1,0 +1,64 @@
+---
+title: "eu_auto_taxes_service_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Customers::EuAutoTaxesService` class. It tests various scenarios for determining the appropriate EU tax code based on customer and organization details, including B2B and non-B2B cases, country comparisons, and zipcode-based exceptions.
+
+## Symbols
+
+### `Customers::EuAutoTaxesService`
+#### Description
+This is the main service class being tested. It determines the appropriate EU tax code for a customer based on various factors such as B2B status, country, and zipcode.
+
+### `describe '.call'`
+#### Description
+This describes the main method of the service, `.call`, which is responsible for determining the tax code.
+
+#### Internal Logic
+The test cases are organized into two main contexts:
+1. B2B organizations
+2. Non-B2B organizations
+
+For B2B organizations, it tests:
+- Same country as the organization
+- Different country from the organization
+- Country exceptions based on zipcode
+
+For non-B2B organizations, it tests:
+- Customer with no country
+- Customer country in Europe
+- Customer country outside Europe
+
+### `let(:organization)`
+#### Description
+Creates a factory-generated organization with a country set to 'FR' (France).
+
+### `let(:customer)`
+#### Description
+Creates a factory-generated customer associated with the organization, initially with no zipcode.
+
+### `let(:vies_service)`
+#### Description
+Creates a double of the Valvat service, which is used to validate VAT numbers for B2B customers.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| valvat | Used for VAT number validation |
+
+## Error Handling
+The test file doesn't explicitly test error handling scenarios. It focuses on the expected behavior of the service under different conditions.
+
+## Side Effects
+The test checks for a side effect in the B2B scenario:
+- It verifies that a `SendWebhookJob` is enqueued with the VIES check result.
+
+## Performance Considerations
+There are no explicit performance considerations in this test file. The tests focus on functionality rather than performance.
+
+## TODOs
+There are no explicit TODOs in the code.
+
+This test file provides comprehensive coverage for the `Customers::EuAutoTaxesService`, ensuring it correctly determines EU tax codes based on various customer and organization attributes. It uses RSpec's `let` statements for setup, mocks the Valvat service for B2B scenarios, and checks both the returned tax codes and side effects like webhook enqueueing.

@@ -1,0 +1,78 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL mutations for managing adjusted fees in a billing system. It includes functionality for creating and destroying adjusted fees, which are likely modifications to standard fees in invoices. The code is structured to ensure proper authentication, authorization, and organization-specific access control.
+
+## What does it do?
+The code in this directory allows users to:
+
+1. Create or update adjusted fees:
+   - Users can modify existing fees by providing a new display name, unit amount, or number of units.
+   - This process ensures that only authorized users with the correct permissions can make these adjustments.
+
+2. Delete adjusted fees:
+   - Users can remove previously created adjusted fees from draft invoices.
+   - Again, this operation is restricted to authorized users with the appropriate permissions.
+
+These operations are crucial for managing billing flexibility, allowing for customized fee adjustments on invoices before they are finalized.
+
+## Key Files
+
+1. `create.rb`:
+   - Defines the `Create` mutation for creating or updating adjusted fees.
+   - Handles input validation and calls the `AdjustedFees::CreateService` to process the request.
+   - Returns the updated fee object or an error message.
+
+2. `destroy.rb`:
+   - Defines the `Destroy` mutation for removing adjusted fees.
+   - Locates the fee within draft invoices and uses the `AdjustedFees::DestroyService` to delete it.
+   - Returns the ID of the deleted fee or an error message.
+
+Both files implement similar security measures, including user authentication and organization-specific access control.
+
+## Dependencies
+The code relies on several internal dependencies:
+
+1. `BaseMutation`: A parent class for GraphQL mutations, likely providing common functionality.
+2. `AuthenticableApiUser`: A module for handling user authentication.
+3. `RequiredOrganization`: A module for ensuring users belong to the correct organization.
+4. `Types::AdjustedFees::CreateInput`: Defines the input structure for the create mutation.
+5. `Types::Fees::Object`: Represents the fee object returned by the create mutation.
+6. `AdjustedFees::CreateService`: A service object that handles the business logic for creating adjusted fees.
+7. `AdjustedFees::DestroyService`: A service object that handles the deletion of adjusted fees.
+
+## Configuration
+Both mutations use a `REQUIRED_PERMISSION` constant set to `'invoices:update'`. This configuration ensures that only users with the appropriate permission can perform these operations on adjusted fees.
+
+The mutations are designed to be used within a GraphQL API, likely accessible through a standard GraphQL endpoint in the application. They follow GraphQL conventions for input and output types, making them easily integrable with GraphQL clients.
+
+Here's an example of how the `Create` mutation might be used in a GraphQL query:
+
+```graphql
+mutation CreateAdjustedFee($input: AdjustedFeeCreateInput!) {
+  createAdjustedFee(input: $input) {
+    result {
+      id
+      invoiceDisplayName
+      unitAmountCents
+      units
+    }
+    error
+  }
+}
+```
+
+And similarly for the `Destroy` mutation:
+
+```graphql
+mutation DestroyAdjustedFee($id: ID!) {
+  destroyAdjustedFee(id: $id) {
+    id
+    error
+  }
+}
+```
+
+These mutations provide a secure and structured way to manage adjusted fees within the application's billing system, ensuring that only authorized users can make changes to invoice fees.

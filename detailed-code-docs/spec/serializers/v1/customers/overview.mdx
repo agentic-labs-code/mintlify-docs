@@ -1,0 +1,65 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various serializers related to customer data in the V1 API of the application. The serializers being tested are responsible for formatting different aspects of customer information, including charge usage, metadata, past usage, and current usage.
+
+## What does it do?
+These test files ensure that the serializers correctly transform complex customer-related data structures into JSON format suitable for API responses. They verify that:
+
+1. Charge usage data is properly formatted, including groups and filters.
+2. Customer metadata is correctly serialized with all relevant attributes.
+3. Past usage information is accurately represented, including invoice details and charge usage.
+4. Current usage data is properly formatted with datetime, currency, amounts, and charge usage details.
+
+These tests play a crucial role in maintaining the integrity and consistency of the API responses, ensuring that client applications receive well-structured and accurate data about customer usage, charges, and metadata.
+
+## Key Files
+
+1. `charge_usage_serializer_spec.rb`:
+   - Tests the `V1::Customers::ChargeUsageSerializer`
+   - Verifies correct formatting of charge usage data, including handling of groups and filters
+   - Ensures proper serialization of units, events count, amount, charge details, and billable metric information
+
+2. `metadata_serializer_spec.rb`:
+   - Tests the `V1::Customers::MetadataSerializer`
+   - Checks the correct transformation of `CustomerMetadata` objects into JSON format
+   - Verifies the presence and format of key metadata attributes
+
+3. `past_usage_serializer_spec.rb`:
+   - Tests the `V1::Customers::PastUsageSerializer`
+   - Ensures accurate representation of a customer's past usage, including invoice details and charge usage
+   - Verifies the inclusion of date ranges, financial information, and charges usage data
+
+4. `usage_serializer_spec.rb`:
+   - Tests the `V1::Customers::UsageSerializer`
+   - Checks the correct formatting of current customer usage data
+   - Verifies the inclusion of datetime fields, currency, amounts, and charge usage details
+
+## Dependencies
+All test files in this directory rely on the following dependencies:
+
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and RSpec configuration |
+| FactoryBot | Used for creating test data and mock objects |
+| RSpec | The testing framework used for writing and running the tests |
+| JSON | Used for parsing serializer output for verification |
+
+## Configuration
+The test files use RSpec configuration from the `rails_helper.rb` file, which sets up the testing environment, including database cleaner, SimpleCov for code coverage, and various RSpec configurations.
+
+Some serializers use specific configuration options:
+
+1. `PastUsageSerializer`:
+   - `root_name`: 'usage_period'
+   - `includes`: [:charges_usage]
+
+2. `UsageSerializer`:
+   - `root_name`: 'customer_usage'
+   - `includes`: [:charges_usage]
+
+These configurations determine the structure of the serialized JSON output and what additional data is included in the serialization.
+
+The tests in this directory are crucial for ensuring the reliability and consistency of the API's responses regarding customer data. They cover various scenarios and edge cases, helping to maintain the quality of the application's data serialization processes.

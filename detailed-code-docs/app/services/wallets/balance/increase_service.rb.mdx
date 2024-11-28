@@ -1,0 +1,54 @@
+---
+title: "increase_service.rb"
+---
+
+## High-level description
+This code defines the `IncreaseService` class within the `Wallets::Balance` module. Its primary purpose is to increase the balance of a wallet by a specified amount of credits, updating related fields, and optionally resetting consumed credits.
+
+## Code Structure
+The `IncreaseService` class inherits from `BaseService` and contains an `initialize` method to set up the service and a `call` method to perform the balance increase operation.
+
+## References
+This code references the `Wallets::Balance::RefreshOngoingService` class, which is called after updating the wallet balance.
+
+## Symbols
+
+### `Wallets::Balance::IncreaseService`
+#### Description
+This service is responsible for increasing the balance of a wallet by a specified amount of credits. It updates the wallet's balance, credits balance, and other related fields. Optionally, it can reset consumed credits.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet | Wallet | The wallet object to be updated |
+| credits_amount | Numeric | The amount of credits to be added to the wallet |
+| reset_consumed_credits | Boolean | Flag to determine if consumed credits should be reset |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the updated wallet |
+
+#### Internal Logic
+1. Calculate the amount in cents based on the wallet's rate and the credits amount.
+2. Prepare update parameters for the wallet, including new balance, credits balance, and last sync time.
+3. If `reset_consumed_credits` is true, adjust consumed credits and consumed amount.
+4. Update the wallet with the new parameters.
+5. Call `Wallets::Balance::RefreshOngoingService` to refresh ongoing balance.
+6. Set the updated wallet in the result object.
+
+## Side Effects
+- Updates the wallet object in the database.
+- Triggers a refresh of the ongoing balance through `Wallets::Balance::RefreshOngoingService`.
+
+## Performance Considerations
+The service performs database updates, so it should be used judiciously in high-frequency scenarios. The `RefreshOngoingService` call may also have performance implications depending on its implementation.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseService | Parent class providing common functionality |
+| Wallets::Balance::RefreshOngoingService | Used to refresh ongoing balance after update |
+
+## Error Handling
+The service uses `update!` which will raise an exception if the update fails. This exception should be handled by the caller if necessary.

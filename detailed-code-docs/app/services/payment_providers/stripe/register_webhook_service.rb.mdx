@@ -1,0 +1,69 @@
+---
+title: "register_webhook_service.rb"
+---
+
+## High-level description
+This code defines a `RegisterWebhookService` class within the `PaymentProviders::Stripe` module. Its primary purpose is to register a webhook endpoint with Stripe for handling payment-related events and update the payment provider with the webhook details.
+
+## Code Structure
+The `RegisterWebhookService` class inherits from `BaseService` and contains a single public method `call`. It interacts with the Stripe API to create a webhook endpoint and updates the payment provider with the webhook information.
+
+## Symbols
+
+### `RegisterWebhookService#call`
+#### Description
+This method registers a webhook endpoint with Stripe and updates the payment provider with the webhook details.
+
+#### Inputs
+This method doesn't have explicit inputs, but it uses instance variables that are likely set in the initializer of the base class.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the updated payment provider |
+
+#### Internal Logic
+1. Creates a webhook endpoint using the Stripe API with the specified URL and enabled events.
+2. Updates the payment provider with the webhook ID and secret.
+3. Sets the payment provider in the result object.
+4. Handles various exceptions:
+   - ActiveRecord::RecordInvalid
+   - Stripe::AuthenticationError
+   - Stripe::InvalidRequestError (specifically for the "maximum webhook endpoints" error)
+
+### `RegisterWebhookService#webhook_end_point` (private)
+#### Description
+Generates the webhook endpoint URL for Stripe.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_end_point | String | The full URL for the Stripe webhook endpoint |
+
+#### Internal Logic
+Constructs the URL using the `LAGO_API_URL` environment variable, the organization ID, and the encoded payment provider code.
+
+## Side Effects
+- Creates a webhook endpoint in Stripe.
+- Updates the payment provider record in the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Stripe | Used to interact with the Stripe API for creating webhook endpoints |
+| URI | Used for URL manipulation and encoding |
+
+## Error Handling
+- Catches and handles `ActiveRecord::RecordInvalid` for database-related errors.
+- Catches `Stripe::AuthenticationError` and delivers an error webhook.
+- Catches `Stripe::InvalidRequestError` specifically for the "maximum webhook endpoints" error and delivers an error webhook.
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LAGO_API_URL | String | N/A | The base URL for the Lago API, used in constructing the webhook endpoint |
+
+## Notes
+- The service uses environment variables and instance variables, suggesting that it relies on configuration and context set elsewhere in the application.
+- The service is designed to work with a specific payment provider (Stripe) and assumes the existence of a `payment_provider` object with certain attributes.
+- The service includes error handling for specific Stripe-related errors, indicating a robust approach to dealing with potential issues when interacting with the Stripe API.

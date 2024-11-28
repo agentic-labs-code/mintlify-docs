@@ -1,0 +1,64 @@
+---
+title: "create_service_spec.rb"
+---
+
+## High-level description
+This RSpec file contains unit tests for the `PaymentRequests::CreateService` class. It tests various scenarios for creating payment requests, including validations, error handling, and successful creation of payment requests with associated invoices.
+
+## Code Structure
+The test suite is organized around the `#call` method of the `PaymentRequests::CreateService` class. It includes multiple contexts to test different scenarios and edge cases.
+
+## Symbols
+
+### `RSpec.describe PaymentRequests::CreateService`
+#### Description
+This is the main describe block for the `PaymentRequests::CreateService` class tests.
+
+#### Internal Logic
+- Sets up necessary test data using `let` statements
+- Uses `around` hook to ensure premium features are enabled for all tests
+- Tests various scenarios in different contexts within the `#call` method
+
+### `describe "#call"`
+#### Description
+This describe block focuses on testing the `#call` method of the `PaymentRequests::CreateService` class.
+
+#### Internal Logic
+- Tests various error scenarios:
+  - Organization not being premium
+  - Organization not having premium dunning integration
+  - Customer not existing
+  - Invoices not found
+  - Invoices not being overdue
+  - Invoices having different currencies
+  - Invoices not ready for payment processing
+- Tests successful creation of a payment request
+- Verifies webhook delivery
+- Checks creation of a payment for the payment request
+- Validates the returned payment request attributes
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| FactoryBot | Used for creating test data (implied by `create` method usage) |
+
+## Error Handling
+The test suite covers various error scenarios, checking for specific error types and codes:
+- `BaseService::MethodNotAllowedFailure` for premium feature and invoice-related issues
+- `BaseService::NotFoundFailure` for customer and invoice not found cases
+
+## Logging
+No specific logging mechanisms are implemented in this test file.
+
+## TODOs
+There are no explicit TODOs in the code.
+
+## Performance Considerations
+The test suite uses `create` method to generate test data, which might impact test performance. Consider using `build_stubbed` for non-persisted objects where possible to improve test speed.
+
+## Notes
+1. The test suite uses the `lago_premium!` method, which is likely a custom helper to enable premium features for testing.
+2. The test covers both happy path and various error scenarios, providing good coverage for the service.
+3. The test verifies side effects like webhook delivery and payment creation, which is good for ensuring the service's complete functionality.
+4. The test file adheres to RSpec best practices, using `let` for setup, descriptive context blocks, and clear expectations.

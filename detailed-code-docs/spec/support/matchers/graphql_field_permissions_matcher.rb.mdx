@@ -1,0 +1,59 @@
+---
+title: "graphql_field_permissions_matcher.rb"
+---
+
+## High-level description
+This code defines custom RSpec matchers for testing GraphQL field permissions in Ruby. It provides a way to check if a GraphQL field or argument has specific permissions associated with it, enhancing the ability to write expressive and precise tests for GraphQL schemas.
+
+## Code Structure
+The code defines modules and classes within the `RSpec::GraphqlMatchers` namespace. It introduces the `WithPermissions` module, which is included in both `HaveAField` and `AcceptArgument` classes. The core functionality is implemented in the `WithPermissionsMatcher` class.
+
+## Symbols
+
+### `RSpec::GraphqlMatchers::WithPermissions`
+#### Description
+This module defines methods for adding permission expectations to GraphQL field and argument matchers.
+
+#### Internal Logic
+- Defines `with_permissions` method that adds a new `WithPermissionsMatcher` to the expectations array.
+- Aliases `with_permission` to `with_permissions` for flexibility in method naming.
+
+### `RSpec::GraphqlMatchers::HaveAField`
+#### Description
+A class that includes the `WithPermissions` module, allowing permission checks on GraphQL fields.
+
+### `RSpec::GraphqlMatchers::AcceptArgument`
+#### Description
+A class that includes the `WithPermissions` module, allowing permission checks on GraphQL arguments.
+
+### `RSpec::GraphqlMatchers::WithPermissionsMatcher`
+#### Description
+The core class that implements the permission matching logic.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| expected_permissions | Array or String | The permissions expected to be associated with the field or argument |
+
+#### Internal Logic
+- Initializes with expected permissions, wrapping them in an array.
+- `description` method returns a string representation of the expected permissions.
+- `matches?` method compares the actual permissions of the field/argument with the expected permissions.
+- `failure_message` method provides a descriptive error message when the matcher fails.
+
+## Usage Example
+```ruby
+it { is_expected.to have_a_field(:api_key).with_permissions('developers:manage') }
+```
+This example demonstrates how to use the custom matcher to check if a GraphQL field named `:api_key` has the permission 'developers:manage'.
+
+## Dependencies
+The code relies on the following Ruby/Rails features:
+| Dependency | Purpose |
+|:-----------|:--------|
+| Array.wrap | Used to ensure the expected_permissions is always an array |
+
+## Error Handling
+The matcher doesn't implement explicit error handling. It relies on RSpec's built-in mechanisms for reporting test failures.
+
+This custom matcher enhances RSpec's capabilities for testing GraphQL schemas, particularly in the area of permission checking. It allows developers to write more expressive and precise tests for their GraphQL API implementations.

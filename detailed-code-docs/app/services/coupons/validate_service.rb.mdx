@@ -1,0 +1,64 @@
+---
+title: "validate_service.rb"
+---
+
+## High-level description
+The `Coupons::ValidateService` class is responsible for validating coupon data, specifically focusing on the expiration date of the coupon. It inherits from `BaseValidator` and provides methods to check if the coupon data is valid, particularly the expiration date.
+
+## Code Structure
+The main class `ValidateService` contains two methods: `valid?` and `valid_expiration_at?`. The `valid?` method calls `valid_expiration_at?` and handles the overall validation logic, while `valid_expiration_at?` specifically validates the expiration date.
+
+## Symbols
+
+### `Coupons::ValidateService`
+#### Description
+This class is responsible for validating coupon data, with a focus on the expiration date. It inherits from `BaseValidator`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | A hash containing the coupon data, including the `:expiration_at` key |
+
+#### Internal Logic
+1. The `valid?` method calls `valid_expiration_at?` to check the expiration date.
+2. If there are any errors, it sets a validation failure result and returns false.
+3. If there are no errors, it returns true.
+
+### `valid?`
+#### Description
+This method orchestrates the validation process by calling `valid_expiration_at?` and handling the result.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid | Boolean | Returns true if the coupon data is valid, false otherwise |
+
+#### Internal Logic
+1. Calls `valid_expiration_at?` to check the expiration date.
+2. If there are errors, it sets a validation failure result and returns false.
+3. If there are no errors, it returns true.
+
+### `valid_expiration_at?`
+#### Description
+This private method validates the expiration date of the coupon.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid | Boolean | Returns true if the expiration date is valid, false otherwise |
+
+#### Internal Logic
+1. Returns true if `args[:expiration_at]` is blank (no expiration date set).
+2. Parses the expiration date from `args[:expiration_at]`, handling both Time and String inputs.
+3. Checks if the parsed expiration date is greater than or equal to the current date.
+4. If the date is invalid, it adds an error and returns false.
+5. Returns true if the date is valid.
+
+## Error Handling
+The class uses an error collection mechanism (likely inherited from `BaseValidator`). When an invalid expiration date is detected, it adds an error with the field `:expiration_at` and error code `'invalid_date'`.
+
+## Dependencies
+The class depends on the `BaseValidator` class, which is not shown in the provided code snippets.
+
+## References
+This service is used by both `Coupons::CreateService` and `Coupons::UpdateService` to validate coupon data before creation or update operations.

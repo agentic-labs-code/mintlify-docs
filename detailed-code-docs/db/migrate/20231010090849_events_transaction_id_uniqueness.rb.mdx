@@ -1,0 +1,38 @@
+---
+title: "20231010090849_events_transaction_id_uniqueness.rb"
+---
+
+## High-level description
+This migration file adds a unique index to the `events` table and removes an existing index. It ensures uniqueness of transaction IDs within the context of an organization and external subscription while removing a previous index that was likely less specific or no longer needed.
+
+## Symbols
+
+### `EventsTransactionIdUniqueness`
+#### Description
+This class is an ActiveRecord migration that modifies the indexing structure of the `events` table. It adds a new unique index and removes an existing index to improve data integrity and query performance.
+
+#### Internal Logic
+1. Disables DDL transactions for this migration using `disable_ddl_transaction!`.
+2. Defines a `change` method that performs two main actions:
+   a. Adds a new unique index using `add_index` within a `safety_assured` block.
+   b. Removes an existing index using `remove_index`.
+
+## Side Effects
+- Adds a new unique index to the `events` table, which will enforce uniqueness of the combination of `organization_id`, `external_subscription_id`, and `transaction_id`.
+- Removes an existing index on `subscription_id` and `transaction_id` from the `events` table.
+- These changes may affect query performance and data integrity constraints for the `events` table.
+
+## Performance Considerations
+- Adding a unique index can slightly slow down insert and update operations on the `events` table but can significantly improve query performance for lookups using the indexed columns.
+- Removing the old index may improve insert and update performance but could potentially slow down queries that were using that index.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+
+## Error Handling
+The `safety_assured` block is used to bypass Strong Migrations' safety checks. This indicates that the developer has manually verified the safety of this migration, particularly the addition of the unique index.
+
+## TODOs
+There are no explicit TODOs in this migration file.

@@ -1,0 +1,66 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains a collection of background jobs related to invoice processing and management. These jobs handle various aspects of the invoice lifecycle, including creation, finalization, PDF generation, payment processing, and status updates. The jobs are designed to work asynchronously, improving the overall performance and responsiveness of the invoicing system.
+
+## What does it do?
+The jobs in this directory perform the following key functions:
+
+1. Create and finalize invoices, including handling pay-in-advance charges and refreshing draft invoices.
+2. Generate PDF versions of invoices and optionally send email notifications.
+3. Process payments for invoices using various payment providers (Adyen, GoCardless, Stripe).
+4. Handle prepaid credits and apply them to wallets.
+5. Void provider taxes for invoices when necessary.
+6. Update payment statuses for invoice fees.
+7. Retry failed invoice operations in bulk.
+
+These jobs work together to ensure that invoices are created, processed, and managed efficiently, handling various scenarios such as different payment methods, prepaid credits, and tax considerations.
+
+## Entry points
+The main entry points for this directory are the individual job classes. Each job is typically enqueued by other parts of the system when specific actions need to be performed asynchronously. Some key jobs include:
+
+- `Invoices::FinalizeJob`: Finalizes invoices, often called after an invoice is ready to be processed.
+- `Invoices::GeneratePdfAndNotifyJob`: Generates PDF versions of invoices and optionally sends notifications.
+- `Invoices::Payments::AdyenCreateJob`, `Invoices::Payments::GocardlessCreateJob`, `Invoices::Payments::StripeCreateJob`: Handle payment creation for different payment providers.
+- `Invoices::RetryAllJob`: Retries processing for a batch of invoices, useful for handling failed operations.
+
+The flow of control typically starts from other services or controllers in the application that enqueue these jobs when certain conditions are met or actions are triggered.
+
+## Key Files
+1. `finalize_job.rb`: Handles the finalization of invoices.
+2. `generate_pdf_and_notify_job.rb`: Generates PDF versions of invoices and sends notifications.
+3. `payments/adyen_create_job.rb`, `payments/gocardless_create_job.rb`, `payments/stripe_create_job.rb`: Handle payment creation for different payment providers.
+4. `prepaid_credit_job.rb`: Processes prepaid credits for invoices.
+5. `refresh_draft_job.rb`: Refreshes draft invoices.
+6. `retry_all_job.rb`: Retries processing for a batch of invoices.
+7. `update_fees_payment_status_job.rb`: Updates payment status for invoice fees.
+
+## Dependencies
+The jobs in this directory rely on several external libraries and frameworks:
+
+1. ActiveJob: Used as the base for all job classes, providing the job queuing and execution framework.
+2. Sidekiq: Implied to be used as the backend for ActiveJob, based on Sidekiq-specific options set in some jobs.
+3. Stripe: Used in the `StripeCreateJob` for handling Stripe-specific errors.
+4. Faraday: Used in the `AdyenCreateJob` for handling connection errors when communicating with the Adyen API.
+
+## Configuration
+The jobs use various configurations to manage their behavior:
+
+1. Queue names: Different jobs are assigned to specific queues like 'invoices', 'providers', or 'pdfs'.
+2. Job uniqueness: Some jobs use the `unique` method to ensure only one job with the same arguments is enqueued or executed at a time.
+3. Retry behavior: Several jobs implement custom retry logic for specific errors, often using polynomial backoff strategies.
+4. Environment variables: Some jobs use environment variables to determine their behavior, such as `SIDEKIQ_PDFS` for PDF generation.
+
+For example, the `GeneratePdfJob` uses the following configuration:
+
+```ruby
+queue_as do
+  ActiveModel::Type::Boolean.new.cast(ENV['SIDEKIQ_PDFS']) ? :pdfs : :invoices
+end
+
+retry_on LagoHttpClient::HttpError, wait: :exponentially_longer, attempts: 6
+```
+
+This configuration ensures that jobs are processed in the appropriate queues and are resilient to temporary failures, improving the overall reliability of the invoicing system.

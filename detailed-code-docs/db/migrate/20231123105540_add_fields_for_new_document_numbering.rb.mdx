@@ -1,0 +1,59 @@
+---
+title: "20231123105540_add_fields_for_new_document_numbering.rb"
+---
+
+## High-level description
+This migration file adds new fields to the `organizations` and `invoices` tables to support a new document numbering system. It also includes data migration logic to populate these new fields with initial values.
+
+## Code Structure
+The migration defines a single `change` method that contains all the schema changes and data migrations. It uses the `safety_assured` block to bypass certain safety checks, likely due to the complexity of the migration.
+
+## Symbols
+
+### `AddFieldsForNewDocumentNumbering`
+#### Description
+This is a Rails migration class that adds new fields for document numbering to the `organizations` and `invoices` tables, and performs data migration to populate these fields.
+
+#### Internal Logic
+1. Adds new columns to the `organizations` table:
+   - `document_numbering`: An integer field with a default value of 0.
+   - `document_number_prefix`: A string field, initially nullable.
+2. Adds a new column `organization_sequential_id` to the `invoices` table.
+3. Performs data migration in a reversible block:
+   - Updates `document_number_prefix` for organizations.
+   - Updates `organization_sequential_id` for invoices.
+4. Changes `document_number_prefix` to be non-nullable.
+
+## Side Effects
+- Modifies the schema of the `organizations` and `invoices` tables.
+- Updates existing data in both tables.
+
+## Performance Considerations
+The data migration involves updating potentially large numbers of records, which could be time-consuming for databases with many organizations and invoices.
+
+___
+
+### `change`
+#### Description
+This method defines the changes to be applied to the database schema and data.
+
+#### Internal Logic
+1. Uses `safety_assured` to bypass certain safety checks.
+2. Modifies the `organizations` table:
+   - Adds `document_numbering` (integer) with default 0.
+   - Adds `document_number_prefix` (string), initially nullable.
+3. Adds `organization_sequential_id` (integer) to the `invoices` table with default 0.
+4. Performs data migration in a reversible block:
+   - Updates `document_number_prefix` for organizations using a combination of the organization's name and ID.
+   - Updates `organization_sequential_id` for invoices, assigning sequential numbers within each organization and month.
+5. Changes `document_number_prefix` to be non-nullable.
+
+#### Performance Considerations
+- The UPDATE statements for both organizations and invoices could be slow for large datasets.
+- The invoice update uses a window function (ROW_NUMBER()) which may impact performance on very large invoice tables.
+
+## Error Handling
+The migration does not include explicit error handling. It relies on Rails' default migration behavior to handle any issues that may arise during the migration process.
+
+## TODOs
+There are no explicit TODOs in the code.

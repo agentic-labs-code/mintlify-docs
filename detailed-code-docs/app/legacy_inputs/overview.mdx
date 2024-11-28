@@ -1,0 +1,71 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This Ruby code defines a `BaseLegacyInput` class that serves as a foundation for handling legacy input data within an organization context. It provides initialization with organization and arguments, and includes a utility method for converting dates to the organization's timezone.
+
+## Symbols
+
+### `BaseLegacyInput`
+#### Description
+The `BaseLegacyInput` class is designed to be a base class for handling legacy input data. It initializes with an organization and a set of arguments, and provides a protected method for date conversion.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Object | An object representing the organization, expected to have a `timezone` attribute |
+| args | Hash or Object | Arguments that can be converted to a hash, which will be symbolized |
+
+#### Internal Logic
+1. The constructor initializes instance variables:
+   - `@organization`: Stores the provided organization object
+   - `@args`: Converts the provided args to a hash with symbolized keys
+
+2. The class provides a protected method `date_in_organization_timezone` for date conversion:
+   - Converts a given date to the organization's timezone
+   - Optionally sets the time to the end of the day
+   - Returns the result in UTC
+
+### `initialize`
+#### Description
+The constructor method for the `BaseLegacyInput` class. It sets up the initial state of the object with the provided organization and arguments.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Object | An object representing the organization |
+| args | Hash or Object | Arguments to be stored, converted to a hash with symbolized keys |
+
+#### Internal Logic
+1. Assigns the `organization` parameter to the `@organization` instance variable
+2. Converts `args` to a hash, symbolizes its keys, and assigns it to the `@args` instance variable
+
+### `date_in_organization_timezone`
+#### Description
+A protected method that converts a given date to the organization's timezone, with an option to set it to the end of the day, and returns the result in UTC.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| date | Date or DateTime | The date to be converted |
+| end_of_day | Boolean | Optional flag to set the time to the end of the day (default: false) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Time | The converted date in UTC, or nil if input is blank |
+
+#### Internal Logic
+1. Returns nil if the input date is blank
+2. Converts the input date to a Date object and then to a Time object in the organization's timezone (or UTC if not specified)
+3. If `end_of_day` is true, sets the time to the end of the day
+4. Converts the resulting time to UTC and returns it
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| active_support | Implied use of `blank?`, `in_time_zone`, `end_of_day`, and `symbolize_keys` methods |
+
+## Error Handling
+The code includes basic error handling by checking for blank input in the `date_in_organization_timezone` method and returning nil in such cases.

@@ -1,0 +1,30 @@
+---
+title: "20240820090312_attach_progressive_billing_invoices_to_credits.rb"
+---
+
+## High-level description
+This migration adds a new column to the `credits` table to establish a relationship between credits and progressive billing invoices. It also creates a foreign key constraint and an index to optimize database queries and maintain data integrity.
+
+## Symbols
+
+### `AttachProgressiveBillingInvoicesToCredits`
+#### Description
+This class is an ActiveRecord migration that modifies the `credits` table to associate it with progressive billing invoices. It adds a new column, creates a foreign key constraint, and adds an index for improved query performance.
+
+#### Internal Logic
+The migration performs the following steps:
+1. Adds a new column `progressive_billing_invoice_id` of type `uuid` to the `credits` table.
+2. Within a `safety_assured` block:
+   - Creates a foreign key constraint linking the `credits` table to the `invoices` table using the new column.
+   - Adds an index on the new `progressive_billing_invoice_id` column.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database schema modifications |
+
+## Error Handling
+The `safety_assured` block is used to bypass Strong Migrations' safety checks. This indicates that the migration has been carefully reviewed and is considered safe to run, even though it might typically trigger warnings or errors from the Strong Migrations gem.
+
+## Performance Considerations
+The addition of an index on the `progressive_billing_invoice_id` column will improve query performance when searching or joining credits based on their associated progressive billing invoices.

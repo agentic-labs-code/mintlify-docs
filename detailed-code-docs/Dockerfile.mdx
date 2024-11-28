@@ -3,93 +3,67 @@ title: "Dockerfile"
 ---
 
 ## High-level description
-This Dockerfile sets up a Python environment for running an application called "edr". It installs necessary dependencies, copies the application code, and configures the environment for running the application.
+This Dockerfile defines a multi-stage build process for a Ruby application. It creates a lean production image by first building dependencies in a separate stage and then copying only the necessary artifacts to the final image. The final image includes environment variables for Segment and GoCardless integration.
 
 ## Code Structure
-The Dockerfile follows a typical structure for building a Docker image, starting with a base image, setting up the environment, installing dependencies, copying application code, and defining the entry point.
+The Dockerfile is structured in two main stages:
+1. Build stage: Sets up the build environment and installs dependencies.
+2. Final stage: Creates the production image with minimal dependencies and copies artifacts from the build stage.
 
 ## Symbols
 
-### FROM
+### Build Stage
 #### Description
-Specifies the base image for the Docker container.
-
-#### Inputs
-| Name | Type | Description |
-|:-----|:-----|:------------|
-| python:3.10.7 | string | The specific Python version to use as the base image |
-
-### ARG
-#### Description
-Defines a build-time variable that can be used in subsequent instructions.
-
-#### Inputs
-| Name | Type | Description |
-|:-----|:-----|:------------|
-| USR_APP_PATH | string | The path where the application will be installed |
-
-### ENV
-#### Description
-Sets environment variables in the container.
-
-#### Inputs
-| Name | Type | Description |
-|:-----|:-----|:------------|
-| DBT_LOG_PATH | string | The path for DBT logs |
-| DBT_TARGET_PATH | string | The path for DBT target files |
-
-### WORKDIR
-#### Description
-Sets the working directory for subsequent instructions.
-
-#### Inputs
-| Name | Type | Description |
-|:-----|:-----|:------------|
-| $USR_APP_PATH | string | The path set by the ARG instruction |
-
-### RUN
-#### Description
-Executes commands in the container during the build process.
+This stage prepares the build environment and installs dependencies.
 
 #### Internal Logic
-1. Updates package lists
-2. Upgrades installed packages
-3. Installs specific development libraries
-4. Cleans up unnecessary files to reduce image size
-5. Changes permissions of the working directory
-6. Upgrades pip
-7. Installs the application and its dependencies
+1. Uses `ruby:3.3.4-slim` as the base image
+2. Sets the working directory to `/app`
+3. Copies Gemfile and Gemfile.lock
+4. Installs system dependencies
+5. Installs a specific version of Bundler
+6. Configures and installs Ruby gems
 
-### COPY
+### Final Stage
 #### Description
-Copies files from the host machine to the container.
+This stage creates the production image with minimal dependencies.
 
-#### Inputs
-| Name | Type | Description |
-|:-----|:-----|:------------|
-| . | string | The source directory (current directory on host) |
-| /app | string | The destination directory in the container |
-
-### ENTRYPOINT
-#### Description
-Specifies the command to run when the container starts.
-
-#### Inputs
-| Name | Type | Description |
-|:-----|:-----|:------------|
-| ["edr"] | array | The command to run (in this case, "edr") |
+#### Internal Logic
+1. Uses `ruby:3.3.4-slim` as the base image
+2. Sets the working directory to `/app`
+3. Copies the application code
+4. Sets up build arguments for sensitive information
+5. Installs minimal system dependencies
+6. Sets environment variables using build arguments
+7. Copies installed gems from the build stage
+8. Sets the entry point to `./scripts/start.sh`
 
 ## Dependencies
 | Dependency | Purpose |
 |:-----------|:--------|
-| python-dev | Python development files |
-| libsasl2-dev | SASL authentication library |
+| ruby:3.3.4-slim | Base image for both build and final stages |
+| nodejs | System dependency for the build stage |
+| build-essential | System dependency for the build stage |
+| git | System dependency for both stages |
+| pkg-config | System dependency for the build stage |
+| libpq-dev | PostgreSQL development files for both stages |
+| curl | System dependency for both stages |
+| bundler 2.5.5 | Ruby dependency manager |
 
 ## Configuration
 | Option | Type | Default | Description |
 |:-------|:-----|:--------|:------------|
-| USR_APP_PATH | string | /usr/app | The path where the application will be installed |
-| DBT_LOG_PATH | string | $USR_APP_PATH/logs | The path for DBT logs |
-| DBT_TARGET_PATH | string | $USR_APP_PATH/target | The path for DBT target files |
+| SEGMENT_WRITE_KEY | string | - | API key for Segment integration |
+| GOCARDLESS_CLIENT_ID | string | - | Client ID for GoCardless integration |
+| GOCARDLESS_CLIENT_SECRET | string | - | Client secret for GoCardless integration |
 
-This Dockerfile sets up a Python 3.10.7 environment, installs necessary system libraries, and prepares the container for running an application called "edr". It uses build arguments and environment variables to configure paths, copies the application code into the container, and installs the application along with its dependencies using pip. The entrypoint is set to run the "edr" command when the container starts.
+## Performance Considerations
+1. Multi-stage build reduces the final image size by excluding build-only dependencies.
+2. Ruby gems are installed with parallel jobs (`--jobs=3`) to speed up the installation process.
+3. The `--without development test` flag is used to exclude development and test dependencies from the production image.
+
+## Side Effects
+1. The Dockerfile sets environment variables for Segment and GoCardless integration, which may affect the application's behavior.
+2. The entry point script `./scripts/start.sh` is executed when the container starts, potentially performing additional setup or configuration.
+
+This Dockerfile creates a production-ready image for a Ruby application with minimal dependencies and configuration for third-party services. It uses best practices such as multi-stage builds and careful management of dependencies to create an efficient and secure container image.

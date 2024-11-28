@@ -1,0 +1,78 @@
+---
+title: "retry_service_spec.rb"
+---
+
+## High-level description
+This code defines a test suite for the `Invoices::RetryService` class, which is responsible for retrying failed invoices. The tests cover various scenarios, including successful retries, error handling, and interactions with external services like tax calculation and payment processing.
+
+## Code Structure
+The main test suite is defined using RSpec, with multiple contexts and examples testing different aspects of the `RetryService`. The tests use factory_bot for creating test data and mock external services using RSpec's mocking capabilities.
+
+## Symbols
+
+### `Invoices::RetryService`
+#### Description
+This is the main service class being tested. It handles retrying failed invoices, including recalculating taxes, updating invoice status, and triggering payment processing.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The failed invoice to be retried |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result of the retry operation |
+
+#### Internal Logic
+1. Validates the invoice status and existence
+2. Fetches taxes for the invoice
+3. Updates invoice details (status, dates, number)
+4. Applies credit notes if applicable
+5. Triggers payment processing
+6. Enqueues various jobs for PDF generation, webhooks, and tracking
+
+### `#call`
+#### Description
+This is the main method of the `RetryService` that orchestrates the retry process.
+
+#### Internal Logic
+The test suite covers various scenarios for the `#call` method:
+1. Successful retry of a failed invoice
+2. Handling of non-existent invoices
+3. Handling of invoices with invalid statuses
+4. Tax calculation and application
+5. Credit note application
+6. Payment processing initiation
+7. Webhook and tracking job enqueuing
+
+## Side Effects
+- Enqueues various background jobs (SendWebhookJob, GeneratePdfAndNotifyJob, SegmentTrackJob)
+- Updates invoice status and related fields
+- Creates payment records
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| FactoryBot | Creating test data |
+| RSpec | Test framework |
+| LagoHttpClient | Mocked for API calls |
+
+## Error Handling
+The test suite covers various error scenarios, including:
+- Invoice not found
+- Invalid invoice status
+- Tax calculation failures
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /v1/anrok/finalized_invoices | POST | Invoice data | Tax calculation result | Mocked API call for tax calculation |
+
+## TODOs
+There are no explicit TODOs in the code, but potential improvements could include:
+1. Testing more edge cases for tax calculation
+2. Adding tests for different payment providers
+3. Testing performance implications of the retry process
+
+This test suite provides comprehensive coverage of the `Invoices::RetryService`, ensuring that it handles various scenarios correctly and interacts properly with external services and background jobs.

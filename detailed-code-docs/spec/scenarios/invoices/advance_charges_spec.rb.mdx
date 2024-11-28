@@ -1,0 +1,73 @@
+---
+title: "advance_charges_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the Advance Charges Invoices feature. It tests various scenarios related to subscription renewals, upgrades, and downgrades, focusing on how these actions affect invoice generation and fee calculations.
+
+## Code Structure
+The test file is organized into three main contexts: subscription renewal, upgrade, and downgrade. Each context contains a detailed test scenario that simulates subscription changes and verifies the resulting invoices and fees.
+
+## Symbols
+
+### `describe 'Advance Charges Invoices Scenarios'`
+#### Description
+This is the main describe block for the test suite, focusing on Advance Charges Invoices scenarios.
+
+#### Internal Logic
+- Sets up the test environment with necessary objects (organization, customer, billable metric, plan, etc.)
+- Defines helper methods and before hooks
+- Contains three main contexts for different subscription scenarios
+
+### `send_card_event!`
+#### Description
+A helper method to create an event for the billable metric.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| item_id | String | Optional unique identifier for the event (default: SecureRandom.uuid) |
+
+#### Internal Logic
+Creates an event with specified properties using the `create_event` method.
+
+### Context: `when subscription is renewed`
+#### Description
+Tests the scenario where a subscription is renewed and generates invoices with correct charges.
+
+#### Internal Logic
+1. Creates a subscription and performs initial billing
+2. Simulates events over several days and checks fee creation
+3. Marks some fees as succeeded
+4. Performs billing at the end of the month and verifies invoice and fee statuses
+5. Repeats the process for the next month and verifies the results
+
+### Context: `when subscription is upgraded`
+#### Description
+Tests the scenario where a subscription is upgraded to a higher-tier plan.
+
+#### Internal Logic
+1. Creates an initial subscription and simulates events
+2. Upgrades the subscription to a new plan
+3. Verifies invoice generation and fee statuses after upgrade
+4. Simulates more events and performs billing at the end of the month
+5. Checks the resulting invoices and fees
+
+### Context: `when subscription is downgraded`
+#### Description
+Tests the scenario where a subscription is downgraded to a lower-tier plan.
+
+#### Internal Logic
+1. Creates an initial subscription and simulates events
+2. Downgrades the subscription to a new plan
+3. Verifies invoice generation and fee statuses after downgrade
+4. Simulates more events and performs billing at the end of the month
+5. Checks the resulting invoices and fees
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+
+## TODOs
+There are commented-out sections in the upgrade scenario that suggest additional tests or verifications may be added in the future.

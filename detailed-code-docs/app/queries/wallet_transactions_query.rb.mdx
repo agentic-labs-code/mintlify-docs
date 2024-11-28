@@ -1,0 +1,131 @@
+---
+title: "wallet_transactions_query.rb"
+---
+
+## High-level description
+The `WalletTransactionsQuery` class is responsible for querying and filtering wallet transactions for a specific wallet within an organization. It provides functionality to paginate, order, and filter transactions based on transaction type and status.
+
+## Code Structure
+The `WalletTransactionsQuery` class inherits from `BaseQuery` and defines methods to initialize the query, execute the query (`call`), and apply various filters. The class uses the `result` object (likely defined in the parent class) to store and return the query results.
+
+## Symbols
+
+### `WalletTransactionsQuery`
+#### Description
+This class encapsulates the logic for querying wallet transactions with various filtering and pagination options.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Object | The organization context for the query |
+| wallet_id | String/Integer | The ID of the wallet to query transactions for |
+| pagination | Hash | Pagination parameters (default provided) |
+| filters | Hash | Filtering options for the query |
+| search_term | String | (Unused in this implementation) |
+| order | Object | (Unused in this implementation) |
+
+#### Internal Logic
+1. Initializes the query by finding the wallet within the organization
+2. Executes the query in the `call` method:
+   - Checks if the wallet exists
+   - Retrieves wallet transactions
+   - Applies pagination
+   - Orders transactions by creation date (descending)
+   - Applies transaction type filter if valid
+   - Applies status filter if valid
+3. Stores the filtered transactions in the result object
+
+### `initialize`
+#### Description
+Initializes the query object with the given parameters and finds the wallet within the organization.
+
+#### Inputs
+(Same as class inputs)
+
+### `call`
+#### Description
+Executes the query, applying filters and pagination, and returns the result.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | Contains the filtered wallet transactions or a not found error |
+
+#### Internal Logic
+1. Checks if the wallet exists
+2. Retrieves wallet transactions
+3. Applies pagination
+4. Orders transactions by creation date (descending)
+5. Applies transaction type filter if valid
+6. Applies status filter if valid
+7. Stores the filtered transactions in the result object
+
+### `with_transaction_type`
+#### Description
+Filters the transaction scope by transaction type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | ActiveRecord::Relation | The current scope of wallet transactions |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | ActiveRecord::Relation | The filtered scope of wallet transactions |
+
+### `with_status`
+#### Description
+Filters the transaction scope by status.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | ActiveRecord::Relation | The current scope of wallet transactions |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | ActiveRecord::Relation | The filtered scope of wallet transactions |
+
+### `valid_status?`
+#### Description
+Checks if the given status is valid for wallet transactions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | String/Symbol | The status to validate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid | Boolean | Whether the status is valid |
+
+### `valid_transaction_type?`
+#### Description
+Checks if the given transaction type is valid for wallet transactions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| transaction_type | String/Symbol | The transaction type to validate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid | Boolean | Whether the transaction type is valid |
+
+## Dependencies
+The class depends on the following models and classes:
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseQuery | Parent class providing common query functionality |
+| WalletTransaction | Model representing wallet transactions |
+
+## References
+This query class is used in:
+1. `Api::V1::WalletTransactionsController#index` for handling API requests
+2. `Resolvers::WalletTransactionsResolver#resolve` for handling GraphQL queries
+
+These references show that the `WalletTransactionsQuery` is a central component in retrieving wallet transactions across different interfaces (REST API and GraphQL).

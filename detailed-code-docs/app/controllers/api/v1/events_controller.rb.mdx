@@ -1,0 +1,109 @@
+---
+title: "events_controller.rb"
+---
+
+## High-level description
+This code defines the `EventsController` within the `Api::V1` namespace, which handles API requests related to events in a SaaS application. It provides endpoints for creating single events, batch creating events, showing event details, and estimating fees for events.
+
+## Code Structure
+The `EventsController` inherits from `Api::BaseController` and contains four main actions: `create`, `batch`, `show`, and `estimate_fees`. These actions interact with various services and serializers to process event-related operations.
+
+## Symbols
+
+### `EventsController`
+#### Description
+This controller manages event-related API endpoints, including creating events, batch creating events, retrieving event details, and estimating fees.
+
+#### Internal Logic
+1. `create`: Creates a single event using the `Events::CreateService`.
+2. `batch`: Creates multiple events using the `Events::CreateBatchService`.
+3. `show`: Retrieves and displays details of a specific event.
+4. `estimate_fees`: Estimates fees for an event using the `Fees::EstimatePayInAdvanceService`.
+
+### `create`
+#### Description
+Creates a single event for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| create_params | Hash | Event parameters |
+
+#### Internal Logic
+1. Calls `Events::CreateService` with organization, params, timestamp, and metadata.
+2. Renders the created event using `V1::EventSerializer` if successful.
+3. Renders an error response if unsuccessful.
+
+### `batch`
+#### Description
+Creates multiple events in a batch for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| batch_params | Hash | Parameters for multiple events |
+
+#### Internal Logic
+1. Calls `Events::CreateBatchService` with organization, events_params, timestamp, and metadata.
+2. Renders the created events using `CollectionSerializer` and `V1::EventSerializer` if successful.
+3. Renders an error response if unsuccessful.
+
+### `show`
+#### Description
+Retrieves and displays details of a specific event.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:id] | String | Transaction ID of the event |
+
+#### Internal Logic
+1. Finds the event by organization and transaction_id.
+2. Renders a not found error if the event doesn't exist.
+3. Renders the event details using `V1::EventSerializer` if found.
+
+### `estimate_fees`
+#### Description
+Estimates fees for an event using the pay-in-advance model.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| create_params | Hash | Event parameters for fee estimation |
+
+#### Internal Logic
+1. Calls `Fees::EstimatePayInAdvanceService` with organization and params.
+2. Renders the estimated fees using `CollectionSerializer` and `V1::FeeSerializer` if successful.
+3. Renders an error response if unsuccessful.
+
+### Private Methods
+
+#### `create_params`
+Defines permitted parameters for creating a single event.
+
+#### `batch_params`
+Defines permitted parameters for batch creating events.
+
+#### `event_metadata`
+Generates metadata for events, including user agent and IP address.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Events::CreateService | Handles creation of single events |
+| Events::CreateBatchService | Handles batch creation of events |
+| Fees::EstimatePayInAdvanceService | Estimates fees for pay-in-advance events |
+| V1::EventSerializer | Serializes event data for API responses |
+| V1::FeeSerializer | Serializes fee data for API responses |
+| CollectionSerializer | Serializes collections of objects for API responses |
+
+## Error Handling
+The controller uses `render_error_response` method to handle and render errors from service calls. It also includes a `not_found_error` method for handling cases where an event is not found.
+
+## API/Interface Reference
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| /api/v1/events | POST | Create a single event |
+| /api/v1/events/batch | POST | Create multiple events in a batch |
+| /api/v1/events/:id | GET | Retrieve details of a specific event |
+| /api/v1/events/estimate_fees | POST | Estimate fees for an event |

@@ -1,0 +1,79 @@
+---
+title: "credit_note_serializer.rb"
+---
+
+## High-level description
+The `CreditNoteSerializer` class is responsible for serializing `CreditNote` objects into a JSON representation for API responses. It includes details like invoice information, amounts, dates, and optionally, associated customer, items, and applied taxes.
+
+## Code Structure
+The `CreditNoteSerializer` class defines a `serialize` method that constructs a hash representing a credit note. It uses several private methods (`customer`, `items`, `applied_taxes`) to conditionally include serialized representations of associated objects.
+
+## References
+- `ModelSerializer`: The parent class, likely providing base serialization logic.
+- `CustomerSerializer`: Used to serialize the associated customer object.
+- `CreditNoteItemSerializer`: Used to serialize the associated credit note items.
+- `CreditNotes::AppliedTaxSerializer`: Used to serialize the associated applied taxes.
+- `CollectionSerializer`: Used to serialize collections of items and applied taxes.
+
+## Symbols
+
+### `CreditNoteSerializer`
+#### Description
+Serializes a `CreditNote` object into a hash representation suitable for JSON output.
+
+#### Inputs
+This class does not define any specific input parameters. It operates on the `model` attribute, which is assumed to be a `CreditNote` instance.
+
+#### Outputs
+Returns a hash containing the serialized representation of the credit note.
+
+#### Internal Logic
+1. **Base Payload:** Creates a hash `payload` with core credit note attributes like ID, number, dates, amounts, etc.
+2. **Conditional Inclusions:**
+   - Includes serialized `customer` data if `include?(:customer)` is true.
+   - Includes serialized `items` data if `include?(:items)` is true.
+   - Includes serialized `applied_taxes` data if `include?(:applied_taxes)` is true.
+3. **Returns Payload:** Returns the constructed `payload` hash.
+
+### `customer`
+#### Description
+Serializes the associated customer of the credit note.
+
+#### Inputs
+This method does not accept any explicit inputs. It relies on the `model` attribute (the `CreditNote` instance) to access the associated customer.
+
+#### Outputs
+Returns a hash with the key `customer` and the serialized customer data as the value.
+
+#### Internal Logic
+1. **Serializes Customer:** Uses the `CustomerSerializer` to serialize the `model.customer` object.
+2. **Returns Customer Data:** Returns the serialized customer data within a hash under the key `customer`.
+
+### `items`
+#### Description
+Serializes the collection of items associated with the credit note.
+
+#### Inputs
+This method does not accept any explicit inputs. It relies on the `model` attribute (the `CreditNote` instance) to access the associated items.
+
+#### Outputs
+Returns a hash containing the serialized representation of the credit note items.
+
+#### Internal Logic
+1. **Retrieves and Orders Items:** Fetches the credit note items using `model.items` and orders them by `created_at` in ascending order.
+2. **Serializes Items:** Uses the `CollectionSerializer` to serialize the ordered items using the `CreditNoteItemSerializer`.
+3. **Returns Serialized Items:** Returns the serialized items data.
+
+### `applied_taxes`
+#### Description
+Serializes the collection of applied taxes associated with the credit note.
+
+#### Inputs
+This method does not accept any explicit inputs. It relies on the `model` attribute (the `CreditNote` instance) to access the associated applied taxes.
+
+#### Outputs
+Returns a hash containing the serialized representation of the applied taxes.
+
+#### Internal Logic
+1. **Serializes Applied Taxes:** Uses the `CollectionSerializer` to serialize the `model.applied_taxes` using the `CreditNotes::AppliedTaxSerializer`.
+2. **Returns Serialized Taxes:** Returns the serialized applied taxes data.

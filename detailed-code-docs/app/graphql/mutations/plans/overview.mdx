@@ -1,0 +1,70 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL mutations for managing Plans in a SaaS billing system. It includes operations for creating, updating, and destroying plans. These mutations handle user authentication, organization validation, and process various plan attributes such as charges, minimum commitments, and usage thresholds.
+
+## What does it do?
+The mutations in this directory allow users to perform the following actions on Plans:
+
+1. Create a new Plan: Users can create a new plan by specifying details such as amount, currency, billing interval, charges, and other attributes. This mutation ensures that the user has the necessary permissions and belongs to a valid organization before creating the plan.
+
+2. Update an existing Plan: Users can modify various attributes of an existing plan, including its amount, currency, billing interval, charges, and other properties. The mutation checks for user authentication and permissions before processing the update.
+
+3. Delete a Plan: Users can initiate the deletion process for a plan. This mutation verifies the user's permissions and prepares the plan for deletion, which may involve updating its status and scheduling a background job for the actual deletion.
+
+These mutations work together to provide a comprehensive interface for managing plans within the SaaS billing system, ensuring that only authorized users can perform these operations and maintaining data integrity throughout the process.
+
+## Key Files
+
+1. `create.rb`:
+   - Defines the `Mutations::Plans::Create` class for creating new plans.
+   - Handles user authentication and organization validation.
+   - Processes input arguments and creates a new plan using the `Plans::CreateService`.
+
+2. `update.rb`:
+   - Defines the `Mutations::Plans::Update` class for updating existing plans.
+   - Authenticates users and checks for required permissions.
+   - Processes input arguments and updates the plan using the `Plans::UpdateService`.
+
+3. `destroy.rb`:
+   - Defines the `Mutations::Plans::Destroy` class for deleting plans.
+   - Authenticates users and verifies permissions.
+   - Initiates the plan deletion process using the `Plans::PrepareDestroyService`.
+
+## Dependencies
+These mutations rely on several external dependencies and internal services:
+
+1. GraphQL: The mutations are built using the GraphQL framework, which provides the structure for defining arguments, return types, and resolvers.
+
+2. AuthenticableApiUser: This module is included in all mutations to handle user authentication.
+
+3. RequiredOrganization: Used in the Create mutation to ensure a valid organization context.
+
+4. Plans::CreateService, Plans::UpdateService, and Plans::PrepareDestroyService: These service classes handle the actual business logic for creating, updating, and deleting plans, respectively.
+
+5. Various GraphQL types: The mutations use custom GraphQL types for input and output, such as `Types::Plans::Object`, `Types::CurrencyEnum`, and `Types::Charges::Input`.
+
+## Configuration
+The mutations use the following configuration:
+
+1. Permissions:
+   - Create: 'plans:create'
+   - Update: Not explicitly specified in the provided code
+   - Destroy: 'plans:delete'
+
+2. Input Arguments:
+   All mutations accept various arguments for plan attributes, including:
+   - amount_cents: The plan amount in cents (BigInt)
+   - amount_currency: The currency for the plan amount (CurrencyEnum)
+   - interval: Billing interval for the plan (Plans::IntervalEnum)
+   - charges: List of charges associated with the plan (array of Charges::Input)
+   - minimum_commitment: Optional minimum commitment for the plan (Commitments::Input)
+   - usage_thresholds: Optional usage thresholds for the plan (array of UsageThresholds::Input)
+
+3. Return Types:
+   - Create and Update: Return a `Types::Plans::Object` representing the created or updated plan
+   - Destroy: Returns the ID of the deleted plan
+
+These mutations form a crucial part of the plan management system, allowing for the creation, modification, and deletion of plans while ensuring proper authentication, authorization, and data integrity.

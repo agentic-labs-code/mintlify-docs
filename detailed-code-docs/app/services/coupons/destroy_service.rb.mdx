@@ -1,0 +1,78 @@
+---
+title: "destroy_service.rb"
+---
+
+## High-level description
+The `Coupons::DestroyService` is responsible for deleting a coupon and handling related operations. It discards the coupon, its associated targets, and terminates any active applied coupons. This service ensures that when a coupon is destroyed, all related data is properly handled to maintain data integrity.
+
+## Code Structure
+The `DestroyService` is part of the `Coupons` module and inherits from `BaseService`. It interacts with the `AppliedCoupons::TerminateService` to handle active applied coupons.
+
+## References
+- `BaseService`
+- `AppliedCoupons::TerminateService`
+
+## Symbols
+
+### `Coupons::DestroyService`
+#### Description
+This service class handles the destruction of a coupon, including associated data and active applied coupons.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| coupon | Coupon | The coupon object to be destroyed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An instance of `BaseService::Result` containing the operation outcome |
+
+#### Internal Logic
+1. Check if the coupon exists, return a not found failure if it doesn't.
+2. Within a transaction:
+   - Discard the coupon
+   - Discard all associated coupon targets
+   - Terminate all active applied coupons
+3. Set the coupon in the result and return the result
+
+### `initialize`
+#### Description
+Initializes the service with the given coupon.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| coupon | Coupon | The coupon object to be destroyed |
+
+### `call`
+#### Description
+Executes the coupon destruction process.
+
+#### Internal Logic
+1. Check for coupon existence
+2. Perform destruction operations within a transaction
+3. Handle active applied coupons
+4. Return the result
+
+## Side Effects
+- Discards the coupon and its associated targets
+- Terminates active applied coupons
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Base | For database transactions |
+| AppliedCoupons::TerminateService | To terminate active applied coupons |
+
+## Error Handling
+The service uses the error handling mechanisms provided by `BaseService`:
+- Returns a not found failure if the coupon doesn't exist
+- Any other errors would be handled by the calling code, as no specific error handling is implemented in this service
+
+## API/Interface Reference
+This service is used in the following contexts:
+1. API: In `Api::V1::CouponsController#destroy`
+2. GraphQL: In `Mutations::Coupons::Destroy`
+
+Both interfaces use the `call` method of this service to destroy a coupon.

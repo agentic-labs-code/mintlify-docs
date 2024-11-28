@@ -1,0 +1,62 @@
+---
+title: "integration_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying a single integration within an organization. It ensures that the user is authenticated and has the necessary permissions to view integrations for the organization.
+
+## Code Structure
+The `IntegrationResolver` class inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the resolver's description, arguments, return type, and the main `resolve` method.
+
+## References
+- `Resolvers::BaseResolver`
+- `Types::Integrations::Object`
+- `AuthenticableApiUser` module
+- `RequiredOrganization` module
+
+## Symbols
+
+### `IntegrationResolver`
+#### Description
+This resolver is responsible for fetching a single integration by its ID for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The unique identifier of the integration (optional) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Types::Integrations::Object | The requested integration object or null if not found |
+
+#### Internal Logic
+1. The resolver checks for user authentication and organization membership using the included modules.
+2. It attempts to find the integration by ID within the current organization's integrations.
+3. If the integration is not found, it raises a not found error.
+
+## Side Effects
+This resolver does not have any side effects as it only reads data from the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user belongs to the current organization |
+
+## Error Handling
+- If the integration is not found, a `not_found_error` is raised with the resource name "integration".
+- The included modules may raise unauthorized or forbidden errors if the user is not authenticated or doesn't have the required permissions.
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'organization:integrations:view' | The permission required to view integrations |
+
+## API/Interface Reference
+This resolver is part of a GraphQL API and can be queried as follows:
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| integration | Query | { integration(id: ID) { ... } } | Integration object or null | Fetches a single integration by ID |
+
+Note: The actual fields available on the Integration object would be defined in the `Types::Integrations::Object` type, which is not provided in the given code snippets.

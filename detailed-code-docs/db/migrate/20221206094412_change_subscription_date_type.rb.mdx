@@ -1,0 +1,35 @@
+---
+title: "20221206094412_change_subscription_date_type.rb"
+---
+
+## High-level description
+This migration changes the data type of the subscription date in the `subscriptions` table from `date` to `datetime`. It adds a new column, transfers the data, and removes the old column. The migration is reversible, allowing for both up and down operations.
+
+## Symbols
+
+### `ChangeSubscriptionDateType`
+#### Description
+This class is an ActiveRecord migration that changes the `subscription_date` column in the `subscriptions` table from a `date` type to a `datetime` type, renaming it to `subscription_at`.
+
+#### Internal Logic
+
+##### `up` method
+1. Adds a new `subscription_at` column of type `datetime` to the `subscriptions` table.
+2. Uses `safety_assured` to bypass Strong Migrations checks.
+3. Executes SQL to update the new `subscription_at` column with data from the old `subscription_date` column, converting it to a timestamp.
+4. Removes the old `subscription_date` column.
+
+##### `down` method
+1. Adds back the `subscription_date` column of type `date` to the `subscriptions` table.
+2. Executes SQL to update the `subscription_date` column with data from the `subscription_at` column, converting it to a date.
+3. Removes the `subscription_at` column.
+
+## Side Effects
+- Modifies the structure of the `subscriptions` table.
+- Converts existing date data to datetime format (in `up`) or datetime data to date format (in `down`).
+
+## Error Handling
+The migration uses `safety_assured` to bypass Strong Migrations checks, which could potentially lead to issues if not handled carefully.
+
+## TODOs
+There is an extra `WHERE` clause at the end of the SQL statement in the `down` method, which appears to be a mistake and should be removed.

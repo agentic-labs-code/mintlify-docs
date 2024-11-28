@@ -1,0 +1,70 @@
+---
+title: "update_service.rb"
+---
+
+## High-level description
+This code defines the `UpdateService` class within the `Invites` module, responsible for updating an existing invite in the system. It handles validation of the invite's state, updates the invite's role, and manages potential errors during the process.
+
+## Code Structure
+The `UpdateService` class inherits from `BaseService` and contains a single public method `call` that performs the invite update operation. It uses private attributes to store the invite and update parameters.
+
+## References
+This code references the `BaseService` class, which provides common functionality for service objects in the application.
+
+## Symbols
+
+### `Invites::UpdateService`
+#### Description
+This class encapsulates the logic for updating an invite, including validations and error handling.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invite | Invite | The invite object to be updated |
+| params | Hash | Parameters for updating the invite, including the new role |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the updated invite or error information |
+
+#### Internal Logic
+1. Checks if the invite exists
+2. Validates that the invite is not already accepted or revoked
+3. Updates the invite's role with the provided parameter
+4. Handles any validation errors that occur during the update process
+
+### `initialize`
+#### Description
+Initializes the service with the invite to be updated and the update parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invite | Invite | The invite object to be updated |
+| params | Hash | Parameters for updating the invite |
+
+### `call`
+#### Description
+Performs the invite update operation, including validations and error handling.
+
+#### Internal Logic
+1. Checks if the invite exists, returning a not found error if it doesn't
+2. Checks if the invite is already accepted, returning a forbidden error if it is
+3. Checks if the invite is already revoked, returning a forbidden error if it is
+4. Updates the invite's role using the provided parameters
+5. Sets the updated invite in the result object
+6. Handles any `ActiveRecord::RecordInvalid` errors that occur during the update
+
+## Error Handling
+The service uses the error handling mechanisms provided by the `BaseService` class:
+- `result.not_found_failure!`: Used when the invite is not found
+- `result.forbidden_failure!`: Used when the invite cannot be updated due to its current state
+- `result.record_validation_failure!`: Used when there are validation errors during the update
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Used for database operations and error handling |
+
+This service is likely used in conjunction with other parts of the application, such as the GraphQL mutation `Mutations::Invites::Update`, to provide invite management functionality.

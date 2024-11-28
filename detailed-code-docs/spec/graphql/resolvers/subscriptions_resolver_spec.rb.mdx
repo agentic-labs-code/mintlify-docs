@@ -1,0 +1,70 @@
+---
+title: "subscriptions_resolver_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Resolvers::SubscriptionsResolver` in a GraphQL API. It verifies the behavior of the subscriptions query, including permission checks, filtering, and response structure.
+
+## Code Structure
+The test suite is organized as a single RSpec describe block for the `Resolvers::SubscriptionsResolver`. It includes several shared examples for common checks and a main test case for querying subscriptions.
+
+## References
+This test file references the following:
+- `Resolvers::SubscriptionsResolver`
+- Various factory methods (e.g., `create(:membership)`, `create(:plan)`, `create(:customer)`, `create(:subscription)`)
+- GraphQL query execution helpers
+
+## Symbols
+
+### RSpec.describe Resolvers::SubscriptionsResolver
+#### Description
+This is the main describe block for the test suite, focusing on the `Resolvers::SubscriptionsResolver`.
+
+### let blocks
+#### Description
+These blocks define variables used throughout the tests, including the GraphQL query, test data (membership, plan, organization, customer), and required permissions.
+
+### before block
+#### Description
+This block sets up the test environment by creating a customer before each test.
+
+### Shared examples
+#### Description
+The test uses shared examples to check common requirements:
+- `it_behaves_like 'requires current user'`
+- `it_behaves_like 'requires current organization'`
+- `it_behaves_like 'requires permission', 'subscriptions:view'`
+
+These likely check for authentication, organization context, and permission requirements.
+
+### Main test case: 'returns a list of subscriptions'
+#### Description
+This test case verifies the behavior of the subscriptions query.
+
+#### Internal Logic
+1. Arrange: Creates test data (subscriptions with various statuses and plans)
+2. Act: Executes the GraphQL query with specific parameters
+3. Assert: Checks the response structure and content, including:
+   - Number of returned subscriptions
+   - Correct subscription IDs
+   - Plan code in the response
+   - Metadata (current page and total count)
+
+## Dependencies
+The test relies on the following dependencies:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails and RSpec configuration |
+| FactoryBot | Creates test data |
+| GraphQL | Executes and tests GraphQL queries |
+
+## Error Handling
+This test doesn't explicitly cover error handling scenarios. It focuses on the happy path where the query succeeds with the correct permissions.
+
+## API/Interface Reference
+The test covers the following GraphQL query:
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| subscriptions | Query | limit, planCode, status | collection (id, externalId, plan), metadata (currentPage, totalCount) | Retrieves a list of subscriptions with filtering and pagination |
+
+This test suite ensures that the `Resolvers::SubscriptionsResolver` correctly handles subscription queries, applies filters, respects permissions, and returns properly structured data.

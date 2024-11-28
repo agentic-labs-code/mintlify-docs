@@ -1,0 +1,86 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL mutations for managing payment providers within an organization's integrations. It includes mutations for creating, updating, and destroying payment providers, with specific implementations for Adyen, GoCardless, and Stripe payment services.
+
+## What does it do?
+The code in this directory enables the following functionalities:
+
+1. Adding new payment providers (Adyen, GoCardless, Stripe) to an organization
+2. Updating existing payment provider information
+3. Destroying payment providers
+4. Ensuring proper authentication and authorization for these operations
+5. Validating the presence and membership of the current organization
+6. Interacting with specific payment provider services to process the mutations
+
+These mutations allow administrators or authorized users to integrate and manage various payment services within their organization's payment system. The mutations handle the creation, modification, and deletion of payment provider details, such as API keys, merchant accounts, and success redirect URLs.
+
+## Key Files
+
+1. `adyen/base.rb`, `gocardless/base.rb`, `stripe/base.rb`: These files contain the base classes for each payment provider's mutations, handling user authentication, organization validation, and interaction with the respective payment provider services.
+
+2. `adyen/create.rb`, `gocardless/create.rb`, `stripe/create.rb`: These files define the Create mutation classes for adding new payment providers to an organization.
+
+3. `adyen/update.rb`, `gocardless/update.rb`, `stripe/update.rb`: These files contain the Update mutation classes for modifying existing payment provider information.
+
+4. `destroy.rb`: This file defines the Destroy mutation for removing a payment provider from an organization.
+
+## Dependencies
+The code in this directory relies on several internal dependencies:
+
+1. `BaseMutation`: A base class for all mutations in the application.
+2. `AuthenticableApiUser`: A module that ensures the current user is authenticated.
+3. `RequiredOrganization`: A module that validates the presence and membership of the current organization.
+4. Payment provider services: `PaymentProviders::AdyenService`, `PaymentProviders::GocardlessService`, `PaymentProviders::StripeService`, and `PaymentProviders::DestroyService`.
+5. Custom input and return types for each payment provider.
+
+## Configuration
+The mutations in this directory use the following configuration:
+
+1. Create mutations:
+   - Required permission: `'organization:integrations:create'`
+   - GraphQL names: `'AddAdyenPaymentProvider'`, `'AddGocardlessPaymentProvider'`, `'AddStripePaymentProvider'`
+
+2. Update mutations:
+   - Required permission: `'organization:integrations:update'`
+   - GraphQL names: `'UpdateAdyenPaymentProvider'`, `'UpdateGocardlessPaymentProvider'`, `'UpdateStripePaymentProvider'`
+
+3. Destroy mutation:
+   - Required permission: `'organization:integrations:delete'`
+   - GraphQL name: `'DestroyPaymentProvider'`
+
+All mutations use custom input types and return specific payment provider objects or an ID in the case of the destroy mutation.
+
+Example usage of the create mutation for Stripe:
+
+```graphql
+mutation {
+  addStripePaymentProvider(input: {
+    code: "stripe_provider"
+    name: "Stripe Payment"
+    secretKey: "sk_test_1234567890"
+    successRedirectUrl: "https://example.com/success"
+  }) {
+    id
+    code
+    name
+    successRedirectUrl
+  }
+}
+```
+
+Example usage of the destroy mutation:
+
+```graphql
+mutation {
+  destroyPaymentProvider(input: {
+    id: "payment_provider_id"
+  }) {
+    id
+  }
+}
+```
+
+These mutations provide a structured and secure way to manage payment providers within the application, ensuring proper authentication and authorization before processing any changes to the payment integrations.

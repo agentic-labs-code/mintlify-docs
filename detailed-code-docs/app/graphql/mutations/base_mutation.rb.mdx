@@ -1,0 +1,68 @@
+---
+title: "base_mutation.rb"
+---
+
+## High-level description
+The `Mutations::BaseMutation` class serves as the foundation for all GraphQL mutations in the application. It extends `GraphQL::Schema::RelayClassicMutation` and includes modules for error handling and permission management. This base class sets up common configurations for arguments, fields, input objects, and object classes used across all mutations.
+
+## Code Structure
+The `BaseMutation` class is defined within the `Mutations` module and inherits from `GraphQL::Schema::RelayClassicMutation`. It includes two modules: `ExecutionErrorResponder` and `CanRequirePermissions`. The class also sets up four class-level configurations for GraphQL types.
+
+## References
+- `ExecutionErrorResponder` module
+- `CanRequirePermissions` module
+- `Types::BaseArgument` class
+- `Types::BaseField` class
+- `Types::BaseInputObject` class
+- `Types::BaseObject` class
+
+## Symbols
+
+### `Mutations::BaseMutation`
+#### Description
+This class serves as the base class for all GraphQL mutations in the application. It provides common functionality and configurations that will be inherited by all specific mutation classes.
+
+#### Inputs
+This class doesn't define any specific inputs, as it's meant to be subclassed.
+
+#### Outputs
+This class doesn't define any specific outputs, as it's meant to be subclassed.
+
+#### Internal Logic
+1. Includes the `ExecutionErrorResponder` module, which provides methods for handling various types of execution errors in GraphQL mutations.
+2. Includes the `CanRequirePermissions` module, which adds functionality to require specific permissions for executing mutations.
+3. Sets up four class-level configurations:
+   - `argument_class`: Uses `Types::BaseArgument` for defining arguments in mutations.
+   - `field_class`: Uses `Types::BaseField` for defining fields in mutations.
+   - `input_object_class`: Uses `Types::BaseInputObject` for defining input objects in mutations.
+   - `object_class`: Uses `Types::BaseObject` for defining objects in mutations.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| GraphQL::Schema::RelayClassicMutation | Provides the base implementation for Relay-style mutations |
+
+## Error Handling
+Error handling is primarily managed through the included `ExecutionErrorResponder` module, which provides methods for creating various types of execution errors (e.g., not found, forbidden, validation errors).
+
+## API/Interface Reference
+This base class doesn't expose a direct API but sets up the foundation for all GraphQL mutations in the application. Specific mutations will inherit from this class and define their own arguments, fields, and resolve methods.
+
+Example usage in a specific mutation:
+
+```ruby
+module Mutations
+  class LoginUser &lt; BaseMutation
+    argument :email, String, required: true
+    argument :password, String, required: true
+
+    type Types::Payloads::LoginUserType
+
+    def resolve(email:, password:)
+      # Implementation
+    end
+  end
+end
+```
+
+In this example, `LoginUser` inherits from `BaseMutation` and defines its own arguments, return type, and resolve method while benefiting from the error handling and permission management provided by the base class.

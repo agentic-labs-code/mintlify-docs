@@ -1,0 +1,80 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains services and payload generators for managing contacts within an integration aggregator system. It provides functionality for creating, updating, and handling contact information across different accounting providers such as NetSuite, Xero, and Anrok through a unified API.
+
+## What does it do?
+The code in this directory facilitates the following workflows:
+
+1. Contact Creation: It allows creating new contacts in external accounting systems by sending formatted payloads via HTTP requests.
+2. Contact Update: It provides functionality to update existing contact information in the integrated systems.
+3. Payload Generation: It generates standardized data structures (payloads) for different integration types, ensuring that customer information is correctly formatted for each specific system.
+4. Webhook Notifications: It sends webhook notifications for both successful operations and error scenarios, allowing for real-time updates on the status of contact operations.
+5. Error Handling: It processes API responses and handles errors, providing a consistent way to manage and report issues across different integration types.
+
+## Entry points
+The main entry points for this directory are:
+
+1. `CreateService`: Used to create new contacts in external systems.
+2. `UpdateService`: Used to update existing contact information.
+3. `Payloads::Factory`: Used to generate appropriate payloads for different integration types.
+
+The data flow typically follows this pattern:
+1. A service (Create or Update) is called with necessary parameters.
+2. The service uses the Payload Factory to generate the appropriate payload.
+3. An HTTP request is made to the external system using the generated payload.
+4. The response is processed, and webhooks are sent based on the outcome.
+
+## Key Files
+1. `base_service.rb`: Defines the `BaseService` class, which provides common functionality for contact-related operations across different accounting providers.
+
+2. `create_service.rb`: Contains the `CreateService` class, responsible for creating new contacts in external systems.
+
+3. `update_service.rb`: Implements the `UpdateService` class, handling the updating of existing contact information.
+
+4. `payloads/factory.rb`: Implements the Factory pattern to create instances of specific payload classes based on the integration type.
+
+5. `payloads/base_payload.rb`: Defines the `BasePayload` class, providing common functionality for all payload types.
+
+6. `payloads/netsuite.rb`: Contains the `Netsuite` class for generating NetSuite-specific payloads.
+
+## Dependencies
+The code in this directory relies on the following dependencies:
+
+1. `LagoHttpClient`: Used for making HTTP requests and handling errors.
+2. `SendWebhookJob`: Used for asynchronously sending webhook notifications.
+3. `JSON`: Used for parsing JSON responses.
+4. Environment variables: The NetSuite payload generation uses the `LAGO_FRONT_URL` environment variable.
+
+## Configuration
+The main configuration for this directory is handled through:
+
+1. Environment variables:
+   - `LAGO_FRONT_URL`: Used in the NetSuite payload generation to construct customer URLs. It defaults to "https://app.getlago.com" if not set.
+
+2. Factory configuration:
+   The `Payloads::Factory` class is configured to handle three types of integrations:
+   - NetSuite: `Integrations::NetsuiteIntegration`
+   - Xero: `Integrations::XeroIntegration`
+   - Anrok: `Integrations::AnrokIntegration`
+
+Here's an example of how the Factory class determines which payload class to instantiate:
+
+```ruby
+def self.new_instance(integration, customer, integration_customer, subsidiary_id)
+  case integration.type.to_s
+  when 'Integrations::NetsuiteIntegration'
+    Netsuite.new(integration, customer, integration_customer, subsidiary_id)
+  when 'Integrations::XeroIntegration'
+    Xero.new(integration, customer, integration_customer, subsidiary_id)
+  when 'Integrations::AnrokIntegration'
+    Anrok.new(integration, customer, integration_customer, subsidiary_id)
+  else
+    raise NotImplementedError, "Unknown integration type: #{integration.type}"
+  end
+end
+```
+
+This structure allows for easy extension to support new integration types in the future by adding new case statements and corresponding payload classes.

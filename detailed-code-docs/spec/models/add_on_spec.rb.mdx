@@ -1,0 +1,77 @@
+---
+title: "add_on_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the AddOn model. It verifies the model's associations, validations, and the behavior of the `invoice_name` method. The tests ensure that the AddOn model is correctly configured and functions as expected within the application.
+
+## Symbols
+
+### RSpec.describe AddOn
+#### Description
+This is the main describe block for the AddOn model tests. It groups all the tests related to the AddOn model.
+
+#### Internal Logic
+The tests are organized into several sections:
+1. Association tests
+2. Validation tests
+3. Specific validation tests for amount currency and code uniqueness
+4. Tests for the `invoice_name` method
+
+### Association tests
+#### Description
+These tests verify that the AddOn model has the correct associations with other models.
+
+#### Internal Logic
+The tests use RSpec's `is_expected.to` syntax to check for the following associations:
+- belongs_to :organization
+- has_many :applied_add_ons
+- has_many :customers
+- has_many :fees
+- has_many :applied_taxes (with dependent: :destroy)
+- has_many :taxes
+- has_many :netsuite_mappings (with dependent: :destroy)
+
+### Validation tests
+#### Description
+These tests ensure that the AddOn model has the correct validations in place.
+
+#### Internal Logic
+The tests check for the presence of the `name` attribute and the numericality of the `amount_cents` attribute.
+
+### Specific validation tests
+#### Description
+These tests focus on more complex validations for the `amount_currency` and `code` attributes.
+
+#### Internal Logic
+1. For `amount_currency`, it tests inclusion in a predefined currency list.
+2. For `code`, it tests uniqueness within the scope of an organization.
+
+### #invoice_name tests
+#### Description
+These tests verify the behavior of the `invoice_name` method.
+
+#### Internal Logic
+The tests check two scenarios:
+1. When `invoice_display_name` is blank, it should return the `name` attribute.
+2. When `invoice_display_name` is present, it should return the `invoice_display_name` attribute.
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides the necessary setup for Rails-specific RSpec tests |
+| FactoryBot | Used for creating test data |
+
+## References
+The test file references the following models and associations:
+- AddOn
+- Organization
+- AppliedAddOn
+- Customer
+- Fee
+- AppliedTax
+- Tax
+- NetsuiteMapping
+
+These references are crucial for understanding the relationships and validations being tested in the AddOn model.

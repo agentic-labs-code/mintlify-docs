@@ -1,0 +1,51 @@
+---
+title: "bill_add_on_job.rb"
+---
+
+## High-level description
+The `BillAddOnJob` is an ActiveJob class responsible for processing and creating an invoice for an applied add-on. It uses the `Invoices::AddOnService` to generate the invoice based on the provided applied add-on and timestamp.
+
+## Code Structure
+The `BillAddOnJob` class inherits from `ApplicationJob` and defines a single `perform` method that orchestrates the invoice creation process.
+
+## References
+- `Invoices::AddOnService`: Used to create the invoice for the applied add-on.
+- `Sequenced::SequenceError`: Referenced in the `retry_on` statement.
+
+## Symbols
+
+### `BillAddOnJob`
+#### Description
+This job class is responsible for billing an add-on by creating an invoice using the `Invoices::AddOnService`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| applied_add_on | AppliedAddOn | The applied add-on to be billed |
+| timestamp | Integer | Unix timestamp representing the billing date/time |
+
+#### Internal Logic
+1. Sets the job queue to 'billing'.
+2. Configures retry behavior for `Sequenced::SequenceError`.
+3. In the `perform` method:
+   - Instantiates an `Invoices::AddOnService` with the applied add-on and converted timestamp.
+   - Calls the `create` method on the service.
+   - Raises an error if the result indicates a failure.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveJob | Provides the base class for background job processing |
+
+## Error Handling
+The job is configured to retry on `Sequenced::SequenceError`, which is likely related to generating sequential IDs for invoices or related records.
+
+## API/Interface Reference
+| Method | Inputs | Description |
+|:-------|:-------|:------------|
+| perform | applied_add_on, timestamp | Creates an invoice for the given applied add-on at the specified timestamp |
+
+## Additional Notes
+1. The job uses the 'billing' queue, which suggests it may be processed separately from other job types for better resource management.
+2. The use of `Time.zone.at(timestamp)` indicates that the job handles timezone-aware datetime conversion.
+3. The `raise_if_error!` call ensures that any errors during invoice creation are propagated and can trigger the job's retry mechanism if necessary.

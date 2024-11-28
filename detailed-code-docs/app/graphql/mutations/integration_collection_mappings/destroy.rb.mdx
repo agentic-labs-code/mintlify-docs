@@ -1,0 +1,56 @@
+---
+title: "destroy.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for destroying an integration collection mapping. It's part of a larger application that manages integrations and their associated mappings within an organization context.
+
+## Code Structure
+The `Destroy` class is nested within the `Mutations::IntegrationCollectionMappings` module. It inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`.
+
+## References
+- `AuthenticableApiUser` module
+- `RequiredOrganization` module
+- `::IntegrationCollectionMappings::BaseCollectionMapping` model
+- `::IntegrationCollectionMappings::DestroyService`
+
+## Symbols
+
+### `Mutations::IntegrationCollectionMappings::Destroy`
+#### Description
+This class defines a GraphQL mutation for destroying an integration collection mapping. It ensures that the user is authenticated and has the required organization permissions before proceeding with the deletion.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the integration collection mapping to be destroyed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the destroyed integration collection mapping (if successful) |
+
+#### Internal Logic
+1. Defines the required permission as 'organization:integrations:update'.
+2. Retrieves the integration collection mapping based on the provided ID and the current organization.
+3. Calls the `DestroyService` to perform the actual deletion.
+4. Returns the destroyed mapping if successful, or an error result if not.
+
+## Side Effects
+- Deletes an integration collection mapping from the database if the operation is successful.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user has the required organization context |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class) to handle and return errors from the `DestroyService`.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| DestroyIntegrationCollectionMapping | Mutation | `{ id: ID! }` | `{ id: ID }` | Destroys an integration collection mapping |
+
+This mutation is part of a GraphQL API and can be accessed through the standard GraphQL endpoint of the application.

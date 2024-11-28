@@ -1,0 +1,55 @@
+---
+title: "cors.rb"
+---
+
+## High-level description
+This code configures Cross-Origin Resource Sharing (CORS) for a Rails application. It allows specific origins to access the API resources and sets up the necessary headers and HTTP methods for cross-origin requests.
+
+## Code Structure
+The code uses the Rack::Cors middleware to define CORS rules. It determines the allowed origins based on environment variables or the Rails environment and sets up the resource sharing rules accordingly.
+
+## Symbols
+
+### Rails.application.config.middleware.insert_before
+#### Description
+This method inserts the Rack::Cors middleware into the Rails application's middleware stack. It's used to configure CORS settings for the application.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| 0 | Integer | The position in the middleware stack where Rack::Cors should be inserted |
+| Rack::Cors | Class | The CORS middleware class |
+
+#### Internal Logic
+The method takes a block that defines the CORS configuration using the `allow` method.
+
+### allow
+#### Description
+This method defines the CORS rules for the application. It determines the allowed origins and sets up the resource sharing rules.
+
+#### Internal Logic
+1. Checks if the `LAGO_FRONT_URL` environment variable is set.
+2. If set, it parses the URL and determines the frontend origin based on the host and port.
+3. If not set and in development environment, it allows specific predefined origins.
+4. Sets up resource sharing rules for all paths ('*') with any headers and specific HTTP methods.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Rack::Cors | Provides CORS middleware for handling cross-origin AJAX requests |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LAGO_FRONT_URL | String | None | The URL of the frontend application |
+
+## Error Handling
+The code doesn't implement specific error handling mechanisms. It relies on the default behavior of Rack::Cors and Rails for handling any issues that may arise during CORS processing.
+
+## Notes
+1. The code includes a comment referencing the Rack::Cors GitHub repository for more information.
+2. The configuration is flexible, allowing for different origins based on the environment and configuration.
+3. In development mode, it allows specific origins like 'app.lago.dev', 'api', and 'lago.ngrok.dev'.
+4. The resource sharing rules are quite permissive, allowing all headers and a wide range of HTTP methods for all paths.
+
+This configuration is crucial for enabling cross-origin requests in a Rails API application, particularly when the frontend and backend are hosted on different domains or ports.

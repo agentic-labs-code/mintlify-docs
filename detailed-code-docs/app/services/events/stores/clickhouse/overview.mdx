@@ -1,0 +1,55 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains a set of classes that handle various types of event data queries and aggregations in a Clickhouse database. The classes are designed to perform different types of calculations on event data, including pre-aggregated queries, unique count queries, and weighted sum queries. These classes are part of a larger system for managing and analyzing event data, likely in a subscription-based or usage-based billing context.
+
+## What does it do?
+The code in this directory provides a framework for querying and processing event data stored in Clickhouse. It allows for efficient retrieval and calculation of various metrics, including:
+
+1. Pre-aggregated data (count, latest, max, and sum) for specific subscriptions within specified time boundaries.
+2. Unique count and prorated unique count of events, with support for grouped queries.
+3. Weighted sum calculations on time-series event data.
+
+These functionalities are crucial for generating reports, calculating usage-based charges, or providing analytics on user activity. The workflow typically involves:
+
+1. Initializing a query with specific parameters (e.g., subscription, time boundaries, grouping).
+2. Generating the appropriate SQL query based on the required calculation type.
+3. Executing the query against the Clickhouse database.
+4. Processing the query results and organizing them into a structured format.
+5. Returning the processed data for further use in the application.
+
+## Entry points
+The main entry points for this functionality are:
+
+1. The `Base` class in the `pre_aggregated` subdirectory, which provides core logic for querying and processing pre-aggregated event data.
+2. The `UniqueCountQuery` class, which generates SQL queries for unique count calculations.
+3. The `WeightedSumQuery` class, which generates SQL queries for weighted sum calculations on time-series data.
+
+Each of these classes provides specific methods for generating SQL queries tailored to different types of aggregations and calculations.
+
+## Key Files
+1. `pre_aggregated/base.rb`: Defines the `Base` class for handling pre-aggregated event data queries.
+2. `pre_aggregated/count_query.rb`, `pre_aggregated/latest_query.rb`, `pre_aggregated/max_query.rb`, `pre_aggregated/sum_query.rb`: Implement specific query types for pre-aggregated data.
+3. `unique_count_query.rb`: Implements the `UniqueCountQuery` class for unique count calculations.
+4. `weighted_sum_query.rb`: Implements the `WeightedSumQuery` class for weighted sum calculations.
+
+## Dependencies
+The code relies on several external dependencies and models:
+
+1. Clickhouse: The underlying database system used for storing and querying event data.
+2. Clickhouse models:
+   - `Clickhouse::EventsEnriched`: Used for querying real-time event data.
+   - `Clickhouse::EventsCountAgg`, `Clickhouse::EventsMaxAgg`, `Clickhouse::EventsSumAgg`: Used for pre-aggregated data.
+
+## Configuration
+The code uses several configuration options, some of which are expected to be defined in subclasses:
+
+1. `aggregation_type`: Defines the type of aggregation (e.g., 'count_agg', 'latest_agg', 'max_agg', 'sum_agg').
+2. `pre_aggregated_model`: Specifies the Clickhouse model for pre-aggregated data.
+3. `clickhouse_aggregation`: Defines the Clickhouse aggregation function to be used.
+
+Additionally, there's a `ClickhouseStore::DECIMAL_SCALE` constant used for decimal conversions in Clickhouse queries.
+
+In summary, this directory contains a set of classes that provide a flexible and efficient way to query and process various types of event data stored in Clickhouse. The system is designed to handle different types of aggregations and calculations, and can be easily extended to support additional query types or customized logic.

@@ -1,0 +1,55 @@
+---
+title: "invoice_collections_controller_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Api::V1::Analytics::InvoiceCollectionsController`. It tests the GET request to the '/analytics/invoice_collection' endpoint, focusing on the behavior when the license is premium and when it's not.
+
+## Code Structure
+The test suite is organized into two main contexts: one for when the license is premium and another for when it's not. Each context contains specific tests to verify the expected behavior of the API endpoint.
+
+## Symbols
+
+### `RSpec.describe Api::V1::Analytics::InvoiceCollectionsController`
+#### Description
+This is the main describe block for the test suite, focusing on the `InvoiceCollectionsController` in the API v1 Analytics namespace.
+
+### `describe 'GET /analytics/invoice_collection'`
+#### Description
+This describe block focuses on testing the GET request to the '/analytics/invoice_collection' endpoint.
+
+### `context 'when licence is premium'`
+#### Description
+This context block tests the behavior of the endpoint when the license is premium.
+
+#### Internal Logic
+1. Uses the `lago_premium!` method to set up a premium license environment.
+2. Makes a GET request to the endpoint using the `get_with_token` method.
+3. Checks the response status and various attributes of the returned JSON data.
+
+### `context 'when licence is not premium'`
+#### Description
+This context block tests the behavior of the endpoint when the license is not premium.
+
+#### Internal Logic
+1. Makes a GET request to the endpoint using the `get_with_token` method.
+2. Checks that the response status is forbidden.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used for creating test data (e.g., `create(:customer)`) |
+
+## References
+- `lago_premium!`: A custom method (likely defined in a helper) to set up a premium license environment for testing.
+- `get_with_token`: A custom method (likely defined in a helper) to make authenticated GET requests in tests.
+- `json`: A helper method to parse the JSON response body.
+
+## Notes
+1. The test uses `aggregate_failures` to group multiple expectations together, allowing all expectations to be evaluated even if one fails.
+2. The test creates a customer and an organization using FactoryBot, but these aren't directly used in the visible test cases.
+3. The test checks various attributes of the returned invoice collection data, including the month, payment status, invoice count, amount, and currency.
+4. The `# rubocop:disable RSpec/FilePath` comment suggests that there might be a mismatch between the file path and the described class, which is being intentionally ignored.
+
+This test suite ensures that the invoice collection analytics endpoint behaves correctly based on the license type, returning appropriate data for premium licenses and forbidding access for non-premium licenses.

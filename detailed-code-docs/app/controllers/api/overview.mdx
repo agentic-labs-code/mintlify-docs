@@ -1,0 +1,84 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `app/controllers/api` directory contains the core API controllers for a SaaS application, with a focus on version 1 (v1) of the API. It includes a base controller (`base_controller.rb`) that serves as the foundation for all API controllers, and a subdirectory `v1` that houses specific controllers for various aspects of the application such as customer management, subscriptions, invoicing, analytics, and more.
+
+## What does it do?
+This directory implements the backend logic for a comprehensive API that manages a SaaS or subscription-based business. The API handles various operations including:
+
+1. Customer management: Creating, updating, and retrieving customer information.
+2. Subscription handling: Managing the lifecycle of customer subscriptions, including creation, modification, and termination.
+3. Invoicing: Generating, updating, finalizing, and processing payments for invoices.
+4. Analytics: Providing data on business metrics like gross revenues, invoice collections, and monthly recurring revenue (MRR).
+5. Plan management: Creating, updating, and listing available subscription plans.
+6. Event tracking: Handling and processing events for usage-based billing.
+7. Webhook management: Setting up webhook endpoints and providing public keys for signature verification.
+8. Additional features: Managing add-ons, coupons, taxes, digital wallets, and other payment-related operations.
+
+The API is designed to be the central point of interaction for client applications, providing a robust and secure interface for managing all aspects of a SaaS business.
+
+## Entry points
+The main entry points for this API are:
+
+1. `base_controller.rb`: This serves as the foundation for all API controllers, implementing authentication, error handling, and common functionality.
+
+2. Controllers in the `v1` subdirectory, including:
+   - `customers_controller.rb`: Handles customer-related operations.
+   - `subscriptions_controller.rb`: Manages subscription lifecycle.
+   - `invoices_controller.rb`: Deals with invoice generation and management.
+   - `analytics/base_controller.rb`: Provides analytics data.
+   - `events_controller.rb`: Handles event tracking.
+   - `plans_controller.rb`: Manages subscription plans.
+
+The typical data flow for an API request is:
+1. The request is received by the appropriate controller action.
+2. Authentication and authorization are handled by the `base_controller.rb`.
+3. The controller action processes the request parameters.
+4. The controller interacts with service objects, queries, or models to perform the required operations.
+5. The result is serialized using appropriate serializers.
+6. The controller renders the response, usually in JSON format.
+
+## Key Files
+1. `base_controller.rb`: Implements core functionality for all API controllers, including authentication, error handling, and common methods.
+
+2. In the `v1` subdirectory:
+   - `customers_controller.rb`: Manages customer data and operations.
+   - `subscriptions_controller.rb`: Handles subscription-related actions.
+   - `invoices_controller.rb`: Deals with invoice management.
+   - `plans_controller.rb`: Manages subscription plans.
+   - `events_controller.rb`: Handles event tracking and processing.
+   - `analytics/base_controller.rb`: Provides base functionality for analytics controllers.
+   - `webhooks_controller.rb`: Manages webhook-related operations.
+
+Each of these controllers plays a crucial role in the overall functionality of the API, handling specific domains of the SaaS application.
+
+## Dependencies
+The API controllers rely on several external dependencies and internal services:
+
+1. Ruby on Rails framework
+2. Various service objects (e.g., `Customers::CreateService`, `Subscriptions::TerminateService`)
+3. Query objects (e.g., `InvoicesQuery`, `FeesQuery`)
+4. Serializers (e.g., `V1::CustomerSerializer`, `V1::SubscriptionSerializer`)
+5. Modules included in `base_controller.rb`:
+   - `Pagination`
+   - `Common`
+   - `ApiErrors`
+   - `Trackable`
+
+These dependencies provide the necessary infrastructure for processing requests, interacting with the database, and formatting responses.
+
+## Configuration
+While there are no explicit configuration files, the API uses several configuration-like elements:
+
+1. API versioning: The controllers are namespaced under `Api::V1`, indicating a versioned API structure.
+2. Authentication: The `base_controller.rb` implements API key-based authentication using the Authorization header.
+3. Pagination: Many controllers use `page` and `per_page` parameters for pagination, often with a default `PER_PAGE` constant.
+4. Serializers: The use of specific serializers for each model type ensures consistent API responses.
+5. Service objects: The extensive use of service objects suggests a well-structured application with separation of concerns.
+6. Error handling: The `base_controller.rb` sets up error handling for parameter missing errors and likely other API-specific errors through the `ApiErrors` module.
+
+These elements allow for flexible and maintainable API design while ensuring consistency across different endpoints.
+
+In conclusion, the `app/controllers/api` directory contains a comprehensive set of controllers that form the backbone of a SaaS application's API. The controllers are well-structured, following RESTful principles and leveraging service objects and serializers to maintain clean, modular code. The API provides extensive functionality for managing all aspects of a subscription-based business, from customer and subscription management to analytics and billing, with a focus on security, scalability, and maintainability.

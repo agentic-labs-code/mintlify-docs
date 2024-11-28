@@ -1,0 +1,53 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL mutations related to the customer portal functionality. It includes operations for downloading invoices and generating customer portal URLs. These mutations are part of a larger GraphQL API and handle authentication, data retrieval, and interaction with various services.
+
+## What does it do?
+The code in this directory enables two main functionalities for a customer portal:
+
+1. Invoice Download: It allows authenticated customers to download PDF versions of their invoices. When a customer requests an invoice download, the system authenticates the user, locates the specific invoice, generates a PDF version of it, and returns the invoice object with the attached PDF.
+
+2. Customer Portal URL Generation: It provides a way for authenticated API users to generate a unique URL for a customer's portal. This URL can then be used to access the customer-specific portal interface.
+
+Both of these functionalities are implemented as GraphQL mutations, which means they are operations that can change data on the server-side. They involve authentication checks, interaction with database models, and utilization of specialized services to perform their tasks.
+
+## Key Files
+
+1. `download_invoice.rb`:
+   This file defines the `DownloadInvoice` mutation. It's responsible for authenticating the customer portal user, finding the requested invoice, and generating a PDF version of it. The mutation uses the `Invoices::GeneratePdfService` to create the PDF and attaches it to the invoice object before returning it.
+
+2. `generate_url.rb`:
+   This file contains the `GenerateUrl` mutation. It authenticates an API user, ensures the presence of an organization, finds a specific customer, and generates a unique URL for that customer's portal using the `CustomerPortal::GenerateUrlService`.
+
+## Dependencies
+The mutations in this directory rely on several external dependencies and services:
+
+1. GraphQL: The mutations are built using a GraphQL framework, likely graphql-ruby, as evidenced by the use of `BaseMutation` and GraphQL-specific types.
+
+2. Authentication Modules:
+   - `AuthenticableCustomerPortalUser`: Used in `DownloadInvoice` for authenticating customer portal users.
+   - `AuthenticableApiUser`: Used in `GenerateUrl` for authenticating API users.
+
+3. Services:
+   - `Invoices::GeneratePdfService`: Used to generate PDF versions of invoices.
+   - `CustomerPortal::GenerateUrlService`: Used to create unique URLs for customer portals.
+
+4. Custom Types:
+   - `Types::Invoices::Object`: Defines the structure of invoice objects returned by the `DownloadInvoice` mutation.
+
+These dependencies suggest a well-structured application with separation of concerns, where authentication, data processing, and business logic are handled by specialized components.
+
+## Configuration
+While there are no explicit configuration files mentioned in the provided summaries, the mutations likely rely on environment-specific configurations for:
+
+1. Authentication mechanisms
+2. Database connections
+3. PDF generation settings
+4. URL generation parameters
+
+These configurations would typically be managed through environment variables or application-wide configuration files.
+
+The mutations are designed to be flexible and reusable across different parts of the application. They handle error cases and use a consistent pattern for returning results, whether successful or not. This approach allows for easy integration with the rest of the GraphQL API and provides a clear interface for client applications to interact with the customer portal functionality.

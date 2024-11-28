@@ -1,0 +1,57 @@
+---
+title: "recredit_service_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `WalletTransactions::RecreditService` class. It tests the behavior of the service when recrediting a wallet, covering scenarios for both terminated and active wallets.
+
+## Symbols
+
+### `RSpec.describe WalletTransactions::RecreditService, type: :service`
+#### Description
+This is the main describe block for the `WalletTransactions::RecreditService` test suite. It sets up the context for all the tests related to this service.
+
+### `subject(:service)`
+#### Description
+Defines the subject of the test, which is an instance of the `WalletTransactions::RecreditService` class.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet_transaction | WalletTransaction | The wallet transaction associated with the service |
+
+### `context 'when wallet is terminated'`
+#### Description
+This context block tests the behavior of the service when the associated wallet is terminated.
+
+#### Internal Logic
+1. Creates a terminated wallet
+2. Calls the service
+3. Expects the result to be a failure with a specific error message
+
+### `context 'when wallet is active'`
+#### Description
+This context block tests the behavior of the service when the associated wallet is active.
+
+#### Internal Logic
+1. Creates an active wallet with consumed credits
+2. Tests if the service call increases the wallet's credit balance
+3. Tests if the service call resets the wallet's consumed credits to zero
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used for creating test objects (wallets and wallet transactions) |
+
+## Error Handling
+The test suite checks for specific error conditions:
+- When the wallet is terminated, it expects a `BaseService::MethodNotAllowedFailure` error with the message 'wallet_not_active'.
+
+## Notes
+1. The test suite uses `aggregate_failures` to group multiple expectations together, allowing all expectations to be evaluated even if one fails.
+2. The tests use `change` matcher to verify changes in the wallet's credits balance and consumed credits.
+3. The `create` method used in the tests is likely provided by FactoryBot, allowing easy creation of test objects.
+4. The `:terminated` and `:active` symbols used with `create(:wallet, ...)` suggest that there are different traits defined for the wallet factory to create wallets in different states.
+
+This test suite ensures that the `WalletTransactions::RecreditService` behaves correctly for both terminated and active wallets, properly updating credit balances and consumed credits when appropriate.

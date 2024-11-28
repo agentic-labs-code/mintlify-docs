@@ -1,0 +1,34 @@
+---
+title: "20240423155113_add_organization_timestamp_index_on_events.rb"
+---
+
+## High-level description
+This migration adds a composite index on the `events` table for the columns `organization_id` and `timestamp`, but only for non-deleted records. It's designed to improve query performance for lookups based on organization and timestamp for active events.
+
+## Symbols
+
+### `AddOrganizationTimestampIndexOnEvents`
+#### Description
+This class is an ActiveRecord migration that adds a new index to the `events` table. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0.
+
+#### Internal Logic
+1. The migration disables DDL transactions using `disable_ddl_transaction!`.
+2. It defines a `change` method that will be called when the migration is run.
+3. Inside the `change` method, it uses `safety_assured` to bypass certain safety checks.
+4. It adds a new index on the `events` table for the columns `organization_id` and `timestamp`, with a condition that `deleted_at IS NULL`.
+
+## Side Effects
+- This migration will add a new index to the `events` table, which may temporarily lock the table during index creation.
+- Subsequent queries filtering on `organization_id` and `timestamp` for non-deleted events should see improved performance.
+
+## Performance Considerations
+- Adding an index can improve query performance for lookups based on `organization_id` and `timestamp` for non-deleted events.
+- The index is partial (due to the `where` clause), which can be more space-efficient than a full index on these columns.
+- Large tables may take some time to create this index, potentially impacting database performance during migration.
+
+## Error Handling
+The `safety_assured` block is used to bypass certain safety checks that might otherwise prevent the migration from running. This should be used cautiously and only when the developer is confident about the safety of the operation.
+
+## TODOs
+- Consider monitoring query performance after this migration to ensure it provides the expected benefits.
+- Evaluate if any existing queries need to be updated to take advantage of this new index.

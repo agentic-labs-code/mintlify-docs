@@ -1,0 +1,52 @@
+---
+title: "send_restlet_endpoint_job.rb"
+---
+
+## High-level description
+This code defines a background job class `SendRestletEndpointJob` within the `Integrations::Aggregator` module. Its purpose is to asynchronously send a Restlet endpoint for a given integration, likely related to NetSuite integration functionality.
+
+## Code Structure
+The `SendRestletEndpointJob` class inherits from `ApplicationJob` and uses the `Integrations::Aggregator::SendRestletEndpointService` to perform its main task.
+
+## References
+- `Integrations::Aggregator::SendRestletEndpointService`
+- `LagoHttpClient::HttpError`
+
+## Symbols
+
+### `Integrations::Aggregator::SendRestletEndpointJob`
+#### Description
+This job is responsible for sending a Restlet endpoint for a given integration. It uses a queue named 'integrations' and implements a retry mechanism for HTTP errors.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Object | The integration object for which the Restlet endpoint needs to be sent |
+
+#### Internal Logic
+1. The job is enqueued in the 'integrations' queue.
+2. It retries up to 3 times with a polynomial backoff strategy in case of `LagoHttpClient::HttpError`.
+3. The `perform` method calls the `SendRestletEndpointService` with the provided integration.
+4. If the service call results in an error, it raises an exception.
+
+## Side Effects
+This job may cause network requests to be made when sending the Restlet endpoint.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| LagoHttpClient | Used for handling HTTP errors and potentially making HTTP requests |
+
+## Error Handling
+The job implements a retry mechanism for `LagoHttpClient::HttpError`, attempting the job up to 3 times with increasing delays between attempts.
+
+## Related Code Context
+1. The `SendRestletEndpointService` is responsible for actually sending the Restlet endpoint. It checks if the integration is of type 'Integrations::NetsuiteIntegration' and if it has a script_endpoint_url before sending the request.
+
+2. This job is called from both the `Integrations::Netsuite::UpdateService` and `Integrations::Netsuite::CreateService` when a NetSuite integration is created or updated with a new script_endpoint_url.
+
+3. The job is part of a larger NetSuite integration system, which includes syncing various types of data (credit notes, invoices, payments, sales orders) and tax items.
+
+4. The `LagoHttpClient::HttpError` is a custom error class used for handling HTTP-related errors, providing details such as error code, body, and URI.
+
+This job plays a crucial role in maintaining the connection between the application and NetSuite by ensuring that the Restlet endpoint is properly configured and updated when necessary.

@@ -1,0 +1,132 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains services for handling webhooks from different payment providers, specifically Adyen and Stripe. It includes a base service class that provides common functionality for webhook processing, as well as specific services for handling chargeback and dispute events from these payment providers.
+
+## What does it do?
+The code in this directory processes incoming webhook events from payment providers (Adyen and Stripe) related to chargebacks and disputes. When a payment provider sends a notification about a chargeback or dispute being closed, these services handle the event by:
+
+1. Parsing the incoming event data
+2. Identifying the associated payment and invoice in the system
+3. Updating the status of the payment and invoice if the dispute was lost
+4. Potentially triggering further actions or notifications within the system
+
+This allows the application to automatically respond to payment disputes and chargebacks, keeping the system's records up-to-date with the latest information from payment providers.
+
+## Key Files
+
+### BaseService (base_service.rb)
+This is the foundation class for all webhook handling services. It provides:
+- Initialization with organization ID and event JSON data
+- Access to the associated organization record
+- Storage of the event JSON for processing
+
+### Adyen ChargebackService (adyen/chargeback_service.rb)
+This service handles Adyen chargeback events. It:
+- Parses the Adyen event data
+- Extracts dispute status, reason, and provider payment ID
+- Finds the corresponding payment in the system
+- If the dispute is lost, marks the associated invoice as lost
+
+### Stripe ChargeDisputeClosedService (stripe/charge_dispute_closed_service.rb)
+This service processes Stripe charge dispute closed events. It:
+- Parses the Stripe event data
+- Extracts dispute status, reason, and provider payment ID
+- Finds the corresponding payment in the system
+- If the dispute is lost, marks the associated invoice as lost
+
+## Dependencies
+- Stripe: Used for parsing and working with Stripe event objects
+- JSON: Used for parsing JSON event data
+- Time: Used for timestamp handling
+- BaseService: A parent class providing common functionality (not shown in the provided code)
+- Organization: A model representing the organization associated with the webhook event
+- Payment: A model representing a payment record in the system
+- Invoices::LoseDisputeService: A service for marking an invoice as lost due to a dispute
+
+## Configuration
+No specific configuration files are mentioned in the provided code. However, the services likely rely on environment variables or configuration settings for:
+- Stripe API credentials
+- Adyen API credentials
+- Database connection settings
+
+## Code Examples
+
+Here's an example of how the Adyen ChargebackService processes a chargeback event:
+
+```ruby
+class ChargebackService &lt; BaseService
+  def call
+    return result.not_found_failure! unless payment
+
+    if event['status'] == 'Lost' && event['success']
+      Invoices::LoseDisputeService.new(
+        invoice: payment.payable,
+        payment_dispute_lost_at: payment_dispute_lost_at,
+        reason: event['reason']
+      ).call
+    end
+
+    result
+  end
+
+  private
+
+  def event
+    @event ||= JSON.parse(@event_json)['notificationItems'].first['NotificationRequestItem']
+  end
+
+  def payment
+    @payment ||= Payment.find_by(provider_payment_id: event['pspReference'])
+  end
+
+  def payment_dispute_lost_at
+    Time.zone.parse(event['eventDate'])
+  end
+end
+```
+
+This code demonstrates how the service:
+1. Checks if the payment exists
+2. Verifies if the dispute was lost
+3. Calls the `Invoices::LoseDisputeService` to update the invoice status
+4. Returns the result of the operation
+
+The Stripe `ChargeDisputeClosedService` follows a similar pattern, adapting to Stripe's specific event structure:
+
+```ruby
+class ChargeDisputeClosedService &lt; BaseService
+  def call
+    status = event.data.object.status
+    reason = event.data.object.reason
+    provider_payment_id = event.data.object.charge
+
+    payment = Payment.find_by(provider_payment_id: provider_payment_id)
+    return result.not_found_failure! unless payment
+
+    if status == 'lost'
+      Invoices::LoseDisputeService.new(
+        invoice: payment.payable,
+        payment_dispute_lost_at: payment_dispute_lost_at,
+        reason: reason
+      ).call
+    end
+
+    result
+  end
+
+  private
+
+  def event
+    @event ||= Stripe::Event.construct_from(JSON.parse(@event_json))
+  end
+
+  def payment_dispute_lost_at
+    Time.zone.at(event.created)
+  end
+end
+```
+
+These services provide a structured way to handle payment provider webhooks, ensuring that the application can respond appropriately to chargeback and dispute events from different providers while maintaining a consistent internal process for updating payment and invoice statuses.

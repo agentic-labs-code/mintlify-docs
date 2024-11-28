@@ -1,0 +1,76 @@
+---
+title: "one_off_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Fees::OneOffService` class. It tests the functionality of creating one-off fees for invoices, including handling of add-ons, taxes, and various input scenarios.
+
+## Code Structure
+The test suite is organized around the `Fees::OneOffService` class, with a focus on its `create` method. It uses FactoryBot to create test data and RSpec's `let` statements to define shared objects across multiple tests.
+
+## Symbols
+
+### `RSpec.describe Fees::OneOffService`
+#### Description
+This is the main describe block for the `Fees::OneOffService` class tests.
+
+### `subject(:one_off_service)`
+#### Description
+Defines the subject of the tests, which is an instance of `Fees::OneOffService` with the specified invoice and fees.
+
+### `let` statements
+#### Description
+These statements define shared objects used across multiple tests, including:
+- `invoice`: A created invoice associated with an organization and customer
+- `organization`: A created organization
+- `customer`: A created customer associated with the organization
+- `tax` and `tax2`: Created tax objects
+- `add_on_first` and `add_on_second`: Created add-on objects
+- `fees`: An array of hashes representing fee data
+
+### `describe 'create'`
+#### Description
+This describe block focuses on testing the `create` method of the `Fees::OneOffService` class.
+
+#### Internal Logic
+1. Sets the `CurrentContext.source` to 'api'
+2. Calls the `create` method on the `one_off_service` instance
+3. Verifies the result and checks the attributes of the created fees
+
+### `it 'creates fees'`
+#### Description
+This test verifies that the `create` method successfully creates fees with the correct attributes.
+
+#### Internal Logic
+1. Calls `one_off_service.create`
+2. Checks if the result is successful
+3. Verifies the attributes of the created fees, including their associations with add-ons and taxes
+
+### `context 'when add_on_code is invalid'`
+#### Description
+This context tests the behavior when an invalid add-on code is provided in the fees data.
+
+#### Internal Logic
+1. Sets up fees data with an invalid add-on code
+2. Calls `one_off_service.create`
+3. Verifies that no fee is created for the invalid add-on code
+
+### `context 'when units is passed as string'`
+#### Description
+This context tests the behavior when the units value is passed as a string instead of a number.
+
+#### Internal Logic
+1. Sets up fees data with units as a string
+2. Calls `one_off_service.create`
+3. Verifies that the fee is created correctly, implying that the string is properly converted to a number
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Creates test data |
+| RSpec | Testing framework |
+
+## Error Handling
+The tests implicitly check for error handling by verifying the success of operations and the absence of fee creation for invalid inputs.

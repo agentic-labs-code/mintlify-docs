@@ -1,0 +1,68 @@
+---
+title: "credit_note.rb"
+---
+
+## High-level description
+The `CreditNote` class represents a credit note issued to a customer, typically as a refund or adjustment for an invoice. It manages the credit amount, refund amount, balance, and associated items, fees, and taxes.
+
+## Code Structure
+The `CreditNote` class utilizes several concerns and modules:
+- `PaperTrailTraceable`: Enables tracking of changes to credit note records.
+- `Sequenced`: Provides sequential numbering for credit notes within an invoice.
+- `RansackUuidSearch`: Allows searching for credit notes by UUID using Ransack.
+
+It also has relationships with other models like `Customer`, `Invoice`, `CreditNoteItem`, `Fee`, `Refund`, `AppliedTax`, `Tax`, and `IntegrationResource`.
+
+## References
+- `CreditNoteItem`: Represents an item within a credit note, linked to a specific fee.
+- `Fee`: Represents a charge on an invoice, to which a credit note item can be associated.
+- `Invoice`: Represents an invoice, to which a credit note is linked.
+- `Customer`: Represents a customer, to whom the credit note is issued.
+- `AppliedTax`: Represents taxes applied to the credit note.
+- `Refund`: Represents a refund transaction associated with the credit note.
+
+## Symbols
+
+### `CreditNote`
+#### Description
+Represents a credit note in the system. It encapsulates the logic for managing credit note amounts, statuses, and related entities.
+
+#### Inputs
+This class does not have explicit input parameters. It primarily interacts with data through its associations and attributes.
+
+#### Outputs
+This class does not have explicit output parameters. It primarily modifies its own state and associated records.
+
+#### Internal Logic
+The class defines several enums for credit and refund statuses, reasons, and overall status. It includes callbacks to ensure a unique number is generated before saving and to update related amounts. It also provides methods for checking if a credit note is creditable, refundable, voidable, and for marking it as voided.
+
+## Side Effects
+- Creating or updating a `CreditNote` record will also create or update associated records like `CreditNoteItem`, `AppliedTax`, and `Refund`.
+- Marking a `CreditNote` as voided will update its status and balance.
+- Finalizing a `CreditNote` might trigger webhook calls and email notifications.
+
+#### Performance Considerations
+- The `creditable_amount_cents` and `refundable_amount_cents` methods calculate values based on associated records. For performance-critical scenarios, consider caching these values.
+- The `ensure_number` method uses a sequential ID generator. Ensure this generator is performant for high-volume credit note creation.
+
+## Dependencies
+- `ActiveRecord`: Provides the ORM framework for database interactions.
+- `PaperTrail`: Enables record change tracking.
+- `Ransack`: Provides advanced searching capabilities.
+- `Money`: Handles currency and money operations.
+
+### Configuration
+This class does not define any specific configuration options.
+
+## Error Handling
+- The class raises `ActiveRecord::RecordInvalid` exceptions for validation errors.
+- The `ensure_number` method raises a `SequenceError` if it cannot acquire a lock for generating the sequential ID.
+
+## Logging
+This class does not implement specific logging mechanisms.
+
+## API/Interface Reference
+This class does not expose a public API. It is primarily used internally within the application.
+
+## TODOs
+- The code comment in `creditable_amount_cents` mentions a potential TODO related to progressive billing.

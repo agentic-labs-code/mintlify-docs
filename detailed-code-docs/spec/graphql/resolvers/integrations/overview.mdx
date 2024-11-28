@@ -1,0 +1,60 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines a RSpec test suite for the `Resolvers::Integrations::SubsidiariesResolver` GraphQL resolver. It tests the functionality of retrieving subsidiaries for a given integration, specifically focusing on NetSuite integration.
+
+## Code Structure
+The test suite is structured as a typical RSpec describe block, with various let statements for setup, shared examples for common behaviors, and a main test case for verifying the resolver's output.
+
+## Symbols
+
+### RSpec.describe Resolvers::Integrations::SubsidiariesResolver
+#### Description
+This is the main describe block that encapsulates all the tests for the SubsidiariesResolver.
+
+### let statements
+#### Description
+These statements set up the test environment by defining variables and mocking external dependencies.
+
+#### Internal Logic
+- Defines the GraphQL query to be tested
+- Creates necessary database records (membership, organization, integration)
+- Mocks the LagoHttpClient to return a predefined response
+- Sets up headers for the API request
+
+### it_behaves_like shared examples
+#### Description
+These shared examples test common behaviors across different resolvers.
+
+#### Internal Logic
+- Checks if the resolver requires a current user
+- Verifies if it requires a current organization
+- Ensures the resolver checks for the required permission
+
+### Main test case: 'returns a list of subsidiaries'
+#### Description
+This test case verifies that the resolver correctly returns a list of subsidiaries for a given integration.
+
+#### Internal Logic
+1. Executes the GraphQL query with the necessary context (current user, organization, permissions)
+2. Verifies the response structure and content
+3. Checks if the correct number of subsidiaries is returned
+4. Validates the external ID of the first subsidiary
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| LagoHttpClient::Client | Mocked to simulate API responses |
+
+## Error Handling
+The test doesn't explicitly test error handling, but it implicitly checks for correct behavior when valid inputs are provided.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| integrationSubsidiaries | Query | integrationId: ID! | collection: [{ externalId, externalName }] | Retrieves subsidiaries for a given integration |
+
+This test suite ensures that the SubsidiariesResolver correctly interacts with the NetSuite integration API and returns the expected data structure. It verifies permissions, input handling, and output formatting for the GraphQL query.

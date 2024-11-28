@@ -1,0 +1,34 @@
+---
+title: "application_job.rb"
+---
+
+## High-level description
+This code defines the `ApplicationJob` class, which serves as the base class for all background jobs in the application. It inherits from `ActiveJob::Base` and sets a default Sidekiq option for retries.
+
+## Symbols
+
+### `ApplicationJob`
+#### Description
+`ApplicationJob` is a class that inherits from `ActiveJob::Base`. It serves as the base class for all background jobs in the application, providing a common configuration for Sidekiq options.
+
+#### Internal Logic
+The class sets a Sidekiq option using the `sidekiq_options` method:
+- `retry: 0`: This configuration disables automatic retries for failed jobs. When a job fails, it will not be automatically retried by Sidekiq.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveJob::Base | Provides the base functionality for background job processing in Rails |
+| Sidekiq | Used as the backend for ActiveJob to handle background job processing |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| retry | Integer | 0 | Sets the number of automatic retries for failed jobs to zero |
+
+## Notes
+1. This base class is used by various job classes in the application, as seen in the related code snippets (e.g., `BillPaidCreditJob`, `HandleEventJob`, `GeneratePdfJob`, etc.).
+2. While this base class disables automatic retries, some specific job classes implement their own retry logic using the `retry_on` method, as seen in several of the related code snippets.
+3. The `# frozen_string_literal: true` comment at the top of the file is a Ruby optimization that prevents the creation of new string objects for string literals within the file.
+
+By setting up this base class, the application ensures consistent behavior across all background jobs and provides a centralized place to configure common job settings.

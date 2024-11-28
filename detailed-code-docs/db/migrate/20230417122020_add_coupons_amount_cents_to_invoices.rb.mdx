@@ -1,0 +1,50 @@
+---
+title: "20230417122020_add_coupons_amount_cents_to_invoices.rb"
+---
+
+## High-level description
+This migration adds a new column `coupons_amount_cents` to the `invoices` table and populates it with the sum of coupon-related credits for each invoice. It's designed to track the total amount of coupons applied to each invoice in cents.
+
+## Symbols
+
+### `AddCouponsAmountCentsToInvoices`
+#### Description
+This is a Rails migration class that inherits from `ActiveRecord::Migration[7.0]`. It defines the changes to be made to the database schema and data.
+
+#### Internal Logic
+The migration performs two main actions:
+1. Adds a new column to the `invoices` table.
+2. Populates the new column with data from the `credits` table.
+
+### `change`
+#### Description
+This method defines the changes to be applied to the database schema and data.
+
+#### Internal Logic
+1. Adds a new column `coupons_amount_cents` to the `invoices` table using `add_column`.
+2. Uses `safety_assured` and `reversible` to ensure safe execution and potential rollback.
+3. Executes a SQL query to update the new column with the sum of coupon-related credits for each invoice.
+
+## Side Effects
+- Modifies the `invoices` table schema by adding a new column.
+- Updates existing invoice records with calculated coupon amounts.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+
+## Error Handling
+The migration uses `safety_assured` to bypass certain safety checks, indicating that the developer has reviewed and approved the migration as safe to run.
+
+## SQL Query Explanation
+The SQL query used in the migration:
+1. Creates a CTE (Common Table Expression) named `coupons_total` that:
+   - Selects from the `credits` table
+   - Groups by `invoice_id`
+   - Sums the `amount_cents` for credits with a non-null `applied_coupon_id`
+2. Updates the `invoices` table:
+   - Sets the `coupons_amount_cents` column to the calculated sum from the CTE
+   - Joins with the CTE using the invoice ID to match the correct amounts
+
+This query efficiently calculates and updates the coupon amounts for all relevant invoices in a single operation.

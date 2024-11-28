@@ -1,0 +1,37 @@
+---
+title: "paper_trail_traceable.rb"
+---
+
+## High-level description
+This code defines a concern `PaperTrailTraceable` that integrates the `paper_trail` gem into ActiveRecord models. It automatically tracks changes made to model instances, including who made the change and the current Lago version.
+
+## Symbols
+
+### `PaperTrailTraceable`
+#### Description
+This concern sets up `paper_trail` tracking for models that include it. It configures `paper_trail` to store metadata about the user who made the change (`whodunnit`) and the Lago version at the time of the change (`lago_version`).
+
+#### Inputs
+This concern is included in other models and doesn't have its own inputs.
+
+#### Outputs
+This concern doesn't have its own outputs.
+
+#### Internal Logic
+- `included do ... end`: This block is executed when the concern is included in a model.
+- `has_paper_trail`: This line enables `paper_trail` tracking for the model.
+- `meta`: This option allows specifying additional metadata to be stored with each version.
+    - `whodunnit: proc { |_| CurrentContext.membership }`: This proc defines how to determine the user responsible for the change. It uses `CurrentContext.membership` to retrieve the current user's membership.
+    - `lago_version: LAGO_VERSION.number`: This line stores the current Lago version number in the metadata.
+
+## Side Effects
+- **Model changes are tracked:** Including this concern in a model will cause `paper_trail` to track changes made to instances of that model.
+- **Metadata is stored:** Each version will include metadata about the user who made the change and the Lago version.
+
+## References
+- `CurrentContext`: This symbol is assumed to be a module or class that provides access to the current context, including the current user's membership.
+- `LAGO_VERSION`: This symbol is assumed to be a constant or module that provides access to the Lago version information.
+
+## Dependencies
+- `paper_trail`: This gem provides version tracking for ActiveRecord models.
+- `active_support/concern`: This module provides a way to include modules in other modules or classes.

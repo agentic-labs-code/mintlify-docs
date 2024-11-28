@@ -1,0 +1,74 @@
+---
+title: "ruby_sandbox_spec.rb"
+---
+
+## High-level description
+This code is a test suite for the `LagoUtils::RubySandbox` class, which appears to be a utility for executing Ruby code in a sandboxed environment. The tests verify that the sandbox can run simple Ruby code, handle method definitions, and prevent potentially dangerous operations like requiring libraries or executing system commands.
+
+## Symbols
+
+### `LagoUtils::RubySandbox.run`
+#### Description
+This method is the main functionality being tested. It takes a string of Ruby code as input and executes it in a sandboxed environment.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | Ruby code to be executed in the sandbox |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | The result of executing the provided Ruby code |
+
+## Test Cases
+
+### Basic code execution
+#### Description
+Tests that the sandbox can execute simple Ruby code and return the correct result.
+
+#### Internal Logic
+1. Defines a simple Ruby code that sums the values of a hash.
+2. Expects the `run` method to return the correct sum (3).
+
+### Method definition and execution
+#### Description
+Verifies that the sandbox can handle method definitions and execute them correctly.
+
+#### Internal Logic
+1. Defines a Ruby code block that includes a method definition and its invocation.
+2. Expects the `run` method to return the correct result of the method call (3).
+
+### Library requirement restriction
+#### Description
+Ensures that the sandbox prevents the loading of external libraries.
+
+#### Internal Logic
+1. Attempts to require the 'json' library and use it in the code.
+2. Expects the `run` method to raise a `LagoUtils::RubySandbox::SandboxError`.
+
+### Blacklisted method restriction
+#### Description
+Verifies that the sandbox prevents the execution of blacklisted methods.
+
+#### Internal Logic
+1. Attempts to call the `Kernel.exit` method, which is likely blacklisted.
+2. Expects the `run` method to raise a `LagoUtils::RubySandbox::SandboxError`.
+
+### External script execution restriction
+#### Description
+Ensures that the sandbox prevents the execution of external system commands.
+
+#### Internal Logic
+1. Attempts to execute a system command using backticks.
+2. Expects the `run` method to raise a `LagoUtils::RubySandbox::SandboxError`.
+
+## Error Handling
+The test suite checks for proper error handling by expecting `LagoUtils::RubySandbox::SandboxError` to be raised in cases where the code attempts to perform restricted operations.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+
+Note: The `rails_helper` file is included in the related code snippets and sets up the testing environment for Rails applications, including RSpec configuration, SimpleCov for code coverage, and various testing helpers.

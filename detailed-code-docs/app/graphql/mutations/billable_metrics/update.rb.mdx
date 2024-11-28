@@ -1,0 +1,56 @@
+---
+title: "update.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for updating an existing Billable Metric. It's part of a larger GraphQL API and handles the process of updating a billable metric's attributes based on user input.
+
+## Code Structure
+The `Update` class is defined within the `Mutations::BillableMetrics` module. It inherits from `BaseMutation` and includes the `AuthenticableApiUser` concern. The class defines the GraphQL mutation structure, including input and output types, and implements the `resolve` method to handle the update operation.
+
+## References
+- `Types::BillableMetrics::UpdateInput`: Defines the input structure for the mutation.
+- `Types::BillableMetrics::Object`: Defines the output structure for the mutation.
+- `::BillableMetrics::UpdateService`: A service class that handles the actual update logic.
+
+## Symbols
+
+### `Mutations::BillableMetrics::Update`
+#### Description
+This class defines a GraphQL mutation for updating a Billable Metric. It authenticates the user, validates permissions, and uses a service object to perform the update operation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | A hash containing the update parameters for the billable metric |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Types::BillableMetrics::Object | The updated billable metric object |
+
+#### Internal Logic
+1. Finds the billable metric using the provided ID and the current user's context.
+2. Calls the `::BillableMetrics::UpdateService` to perform the update operation.
+3. Returns the updated billable metric if successful, or an error result if the operation fails.
+
+## Side Effects
+- Updates the billable metric in the database if the operation is successful.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication functionality for the API user |
+
+## Error Handling
+The mutation handles errors by returning the error result from the `UpdateService` if the operation fails.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| updateBillableMetric | POST | UpdateInput | BillableMetrics::Object | Updates an existing Billable metric |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'billable_metrics:update' | The permission required to perform this mutation |

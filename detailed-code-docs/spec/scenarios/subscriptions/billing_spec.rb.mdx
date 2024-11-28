@@ -1,0 +1,63 @@
+---
+title: "billing_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the billing functionality of subscriptions in different scenarios. It tests various combinations of plan intervals, billing times, and timezones to ensure that invoices are created correctly and without duplication.
+
+## Code Structure
+The test suite is organized into several nested contexts, each focusing on a specific plan interval (weekly, monthly, quarterly, yearly) and billing type (calendar or anniversary). Within these contexts, it defines shared examples for testing subscription billing behavior and applies them to different scenarios.
+
+## Symbols
+
+### `describe 'Billing Subscriptions Scenario'`
+#### Description
+This is the main describe block that encapsulates all the subscription billing tests.
+
+#### Internal Logic
+- Sets up common test data (organization, customer, plan)
+- Defines shared examples for testing billing behavior
+- Contains nested contexts for different plan intervals and billing types
+
+### Shared Example: `'a subscription billing without duplicated invoices'`
+#### Description
+This shared example tests that invoices are created correctly for a subscription without duplication.
+
+#### Internal Logic
+1. Creates a subscription at a specified time
+2. Checks that no invoices are created before the billing day
+3. Verifies that only one invoice is created on the billing day
+4. Ensures no additional invoices are created after the billing day
+
+### Shared Example: `'a subscription billing on every billing day'`
+#### Description
+This shared example tests that invoices are created on every specified billing day for a subscription.
+
+#### Internal Logic
+1. Creates a subscription at a specified time
+2. Verifies that an invoice is created on each specified billing day
+
+### Nested Contexts
+#### Description
+The test file contains nested contexts for different plan intervals (weekly, monthly, quarterly, yearly) and billing types (calendar, anniversary). Each context sets up specific test scenarios with different timezones and subscription start dates.
+
+#### Internal Logic
+- Defines relevant time variables (subscription_time, before_billing_times, billing_times, after_billing_times)
+- Applies shared examples to test billing behavior in various scenarios
+- Includes additional contexts for UTC+ and UTC- timezones to test timezone-specific behavior
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Used for creating test data (organization, customer, plan) |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| plan_monthly_charges | Boolean | false | Determines if the plan has monthly charges |
+
+## TODOs
+There are no explicit TODOs in the code.
+
+This test suite provides comprehensive coverage for subscription billing scenarios, ensuring that invoices are created correctly across different plan intervals, billing types, and timezones. It helps maintain the integrity of the billing system by catching potential issues related to invoice creation and timing.

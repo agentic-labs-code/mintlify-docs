@@ -1,0 +1,87 @@
+---
+title: "customer_metadata_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Metadata::CustomerMetadata` model. It verifies the validation rules for the `key` and `value` attributes, including uniqueness and length constraints.
+
+## Code Structure
+The test suite is organized into two main describe blocks: one for key validations and another for value validations. Each block contains multiple contexts to test different scenarios.
+
+## References
+- `Metadata::CustomerMetadata` model
+- `Customer` model (referenced through factory)
+
+## Symbols
+
+### RSpec.describe Metadata::CustomerMetadata
+#### Description
+This is the main describe block for the `Metadata::CustomerMetadata` model tests.
+
+#### Internal Logic
+- Sets up a subject (`metadata`) using the `described_class.new` method with predefined attributes.
+- Defines let variables for `customer`, `key`, `value`, and `attributes`.
+
+### describe 'key validations'
+#### Description
+This describe block focuses on testing the validation rules for the `key` attribute.
+
+#### Internal Logic
+Contains three contexts:
+1. Tests uniqueness when conditions are satisfied.
+2. Tests uniqueness when a duplicate key exists.
+3. Tests key length validation.
+
+### describe 'value validations'
+#### Description
+This describe block focuses on testing the validation rules for the `value` attribute.
+
+#### Internal Logic
+Contains two contexts:
+1. Tests value length when constraints are satisfied.
+2. Tests value length when it exceeds the maximum allowed length.
+
+### context 'when uniqueness condition is satisfied'
+#### Description
+Tests that the metadata is valid when the key is unique.
+
+#### Internal Logic
+Expects the `metadata` to be valid.
+
+### context 'when key is not unique'
+#### Description
+Tests that the metadata is invalid when a duplicate key exists for the same customer.
+
+#### Internal Logic
+- Creates an existing metadata record with the same key and customer.
+- Expects the new `metadata` to be invalid.
+
+### context 'when key length is invalid'
+#### Description
+Tests that the metadata is invalid when the key length exceeds the maximum allowed length.
+
+#### Internal Logic
+- Sets the `key` to a string longer than 20 characters.
+- Expects the `metadata` to be invalid.
+
+### context 'when length constraint is satisfied'
+#### Description
+Tests that the metadata is valid when the value length is within the allowed range.
+
+#### Internal Logic
+Expects the `metadata` to be valid.
+
+### context 'when value length is invalid'
+#### Description
+Tests that the metadata is valid even when the value length exceeds the maximum allowed length.
+
+#### Internal Logic
+- Sets the `value` to a string longer than 40 characters.
+- Expects the `metadata` to be valid (This appears to be a bug in the test, as it should likely be invalid).
+
+## Dependencies
+- RSpec
+- FactoryBot (implied by the use of `create` method)
+
+## TODOs
+The test for value length validation when the length is invalid appears to have an incorrect expectation. It should likely expect the metadata to be invalid when the value length exceeds 40 characters.

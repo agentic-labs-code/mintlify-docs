@@ -1,0 +1,67 @@
+---
+title: "lose_dispute_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Invoices::LoseDisputeService` class. It tests various scenarios when calling the service, including cases where the invoice doesn't exist, is voided, is in draft status, or is finalized. The tests verify the service's behavior, error handling, and side effects such as enqueuing jobs.
+
+## Symbols
+
+### `RSpec.describe Invoices::LoseDisputeService`
+#### Description
+This is the main describe block for the `Invoices::LoseDisputeService` tests. It sets up the context for all the tests related to this service.
+
+### `subject(:lose_dispute_service)`
+#### Description
+Defines the subject of the tests, which is an instance of the `Invoices::LoseDisputeService` class, initialized with an invoice.
+
+### `describe '#call'`
+#### Description
+This describe block groups all the tests for the `call` method of the `LoseDisputeService`.
+
+### `context 'when invoice does not exist'`
+#### Description
+Tests the behavior of the service when the invoice is nil.
+
+#### Internal Logic
+1. Tests that the service returns a failure result with a `NotFoundFailure` error.
+2. Verifies that no `SendWebhookJob` is enqueued.
+
+### `context 'when invoice exists'`
+#### Description
+Groups tests for scenarios where the invoice exists but has different statuses.
+
+#### Internal Logic
+1. Tests the behavior when the invoice is voided:
+   - Expects a failure result with a `MethodNotAllowedFailure` error.
+   - Verifies that no `SendWebhookJob` is enqueued.
+
+2. Tests the behavior when the invoice is in draft status:
+   - Expects a failure result with a `MethodNotAllowedFailure` error.
+   - Verifies that no `SendWebhookJob` is enqueued.
+
+3. Tests the behavior when the invoice is finalized:
+   - Expects a successful result with the invoice's `payment_dispute_lost_at` field set.
+   - Verifies that a `SendWebhookJob` is enqueued with the correct parameters.
+   - Verifies that an `Invoices::ProviderTaxes::VoidJob` is enqueued with the invoice.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used to create test data (invoices) |
+| RSpec | The testing framework used |
+
+## Error Handling
+The tests cover various error scenarios:
+1. Invoice not found (nil invoice)
+2. Invoice in a state that doesn't allow dispute loss (voided or draft)
+
+These errors are expected to be handled by the service and returned as specific failure types (`NotFoundFailure` or `MethodNotAllowedFailure`).
+
+## Side Effects
+The tests verify two main side effects of the service:
+1. Enqueuing a `SendWebhookJob` when the dispute is successfully marked as lost.
+2. Enqueuing an `Invoices::ProviderTaxes::VoidJob` when the dispute is successfully marked as lost.
+
+These side effects are only expected to occur when the invoice is in a finalized state.

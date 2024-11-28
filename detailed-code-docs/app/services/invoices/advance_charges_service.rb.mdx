@@ -1,0 +1,79 @@
+---
+title: "advance_charges_service.rb"
+---
+
+## High-level description
+The `Invoices::AdvanceChargesService` is responsible for creating and processing invoices for advance charges associated with subscriptions. It handles the creation of group invoices, updates payment statuses, and triggers various related jobs such as webhook notifications, PDF generation, and integration with external systems.
+
+## Code Structure
+The main class `AdvanceChargesService` inherits from `BaseService` and contains methods for initializing the service, executing the main logic (`call`), and several private helper methods for creating invoices and checking charge conditions.
+
+## Symbols
+
+### `Invoices::AdvanceChargesService`
+#### Description
+This service class handles the creation and processing of advance charge invoices for a given set of subscriptions at a specific billing time.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscriptions | Array&lt;Subscription&gt; | List of subscriptions to process |
+| billing_at | DateTime | The billing date and time |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the created invoice and any errors |
+
+#### Internal Logic
+1. Check if there are charges with statements and if subscriptions exist.
+2. Create a group invoice for the subscriptions.
+3. If an invoice is created:
+   - Trigger webhook notification for invoice creation.
+   - Generate PDF and notify (without email).
+   - Create integration jobs for invoice and sales order synchronization if needed.
+   - Track invoice creation using Segment.
+4. Return the result with the created invoice.
+
+### `initialize`
+#### Description
+Initializes the service with the given subscriptions and billing time, and sets up related attributes.
+
+### `call`
+#### Description
+The main method that orchestrates the invoice creation and processing workflow.
+
+### `has_charges_with_statement?`
+#### Description
+Checks if there are any charges associated with the subscriptions that require invoicing.
+
+### `create_group_invoice`
+#### Description
+Creates a group invoice for the subscriptions, updates related fees, and computes amounts.
+
+### `create_generating_invoice`
+#### Description
+Creates a generating invoice using the `Invoices::CreateGeneratingService` and sets up invoice subscriptions.
+
+## Side Effects
+- Creates and updates database records (invoices, fees, invoice subscriptions).
+- Triggers background jobs for webhook notifications, PDF generation, and external integrations.
+- Tracks invoice creation events using Segment.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| SendWebhookJob | Sends webhook notifications for invoice creation |
+| Invoices::GeneratePdfAndNotifyJob | Generates PDF for the invoice |
+| Integrations::Aggregator::Invoices::CreateJob | Syncs invoice with external aggregator |
+| Integrations::Aggregator::SalesOrders::CreateJob | Syncs sales order with external aggregator |
+| Utils::SegmentTrack | Tracks invoice creation events |
+
+## Error Handling
+The service uses the `result` object to handle and propagate errors. It also relies on database transactions to ensure data consistency when creating invoices.
+
+## Logging
+No explicit logging is implemented in this service.
+
+## Performance Considerations
+The service uses database transactions to ensure atomicity when creating and updating invoice-related records. It also delegates potentially time-consuming tasks (like PDF generation and external integrations) to background jobs to improve responsiveness.

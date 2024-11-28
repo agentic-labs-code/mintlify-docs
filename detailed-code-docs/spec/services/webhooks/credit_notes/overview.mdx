@@ -1,0 +1,74 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for webhook services related to credit notes in a Rails application. The tests cover three main services: `CreatedService`, `GeneratedService`, and `PaymentProviderRefundFailureService`, all within the `Webhooks::CreditNotes` namespace. These services are responsible for creating webhooks when specific credit note-related events occur.
+
+## What does it do?
+The test files in this directory ensure that the webhook services correctly create webhook events for different credit note scenarios:
+
+1. When a credit note is created
+2. When a credit note is generated
+3. When a credit note refund fails due to a payment provider error
+
+Each test file sets up the necessary test data (organization, customer, invoice, and credit note) and verifies that the corresponding service creates a webhook with the correct event type, resource type, and payload structure. This helps maintain the integrity of the webhook system for credit note-related events in the application, ensuring that external systems or services receive accurate and timely information about credit note activities.
+
+## Key Files
+
+1. `created_service_spec.rb`:
+   - Tests the `Webhooks::CreditNotes::CreatedService`
+   - Ensures that a webhook is created with the event type 'credit_note.created' when a credit note is created
+   - Verifies the payload structure includes customer information and an empty items array
+
+2. `generated_service_spec.rb`:
+   - Tests the `Webhooks::CreditNotes::GeneratedService`
+   - Confirms that a webhook is created with the event type 'credit_note.generated' when a credit note is generated
+   - Checks that the payload contains customer information
+
+3. `payment_provider_refund_failure_service_spec.rb`:
+   - Tests the `Webhooks::CreditNotes::PaymentProviderRefundFailureService`
+   - Verifies that a webhook is created with the event type 'credit_note.refund_failure' when a credit note refund fails
+   - Ensures that the webhook includes error details from the payment provider
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests
+2. FactoryBot: Used for creating test data (organizations, customers, invoices, and credit notes)
+3. Rails testing environment and configurations (via `rails_helper`)
+
+## Configuration
+The test files use a shared example called 'creates webhook', which is likely defined elsewhere in the test suite. This shared example encapsulates common webhook creation testing logic, promoting code reuse across different webhook-related tests.
+
+Each test file uses the `frozen_string_literal: true` pragma, indicating that string literals in these files are frozen by default.
+
+Example of how the shared example is used:
+
+```ruby
+it_behaves_like 'creates webhook' do
+  let(:expected_event_name) { 'credit_note.created' }
+  let(:expected_object_type) { 'credit_note' }
+  let(:expected_payload) do
+    hash_including(
+      'customer' =&gt; be_a(Hash),
+      'items' =&gt; be_an(Array)
+    )
+  end
+end
+```
+
+This structure allows for consistent testing of webhook creation across different services while allowing for service-specific variations in event names, object types, and payload structures.
+
+The tests use FactoryBot to create test data, which allows for easy setup of complex object relationships. For example:
+
+```ruby
+let(:organization) { create(:organization) }
+let(:customer) { create(:customer, organization:) }
+let(:invoice) { create(:invoice, organization:, customer:) }
+let(:credit_note) { create(:credit_note, customer:, invoice:) }
+```
+
+This approach ensures that the test data is properly interconnected, reflecting real-world scenarios and relationships between different entities in the system.
+
+By thoroughly testing these webhook services, the application can maintain reliable communication with external systems or services that depend on credit note-related events, ensuring data consistency and proper error handling across the entire system.

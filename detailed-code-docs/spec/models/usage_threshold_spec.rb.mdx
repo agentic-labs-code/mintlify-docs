@@ -1,0 +1,68 @@
+---
+title: "usage_threshold_spec.rb"
+---
+
+## High-level description
+This code defines RSpec tests for the UsageThreshold model. It verifies the model's associations, validations, scopes, and custom methods, ensuring that the UsageThreshold behaves as expected within the application.
+
+## Symbols
+
+### `RSpec.describe UsageThreshold, type: :model`
+#### Description
+This is the main describe block for the UsageThreshold model tests. It sets up the context for all the tests related to this model.
+
+#### Internal Logic
+- Uses `build(:usage_threshold)` to create a test instance of UsageThreshold.
+- Defines various test cases to verify the model's behavior.
+
+___
+
+### `it { is_expected.to have_many(:applied_usage_thresholds) }`
+#### Description
+This test verifies that the UsageThreshold model has a "has many" association with applied_usage_thresholds.
+
+___
+
+### `it { is_expected.to have_many(:invoices).through(:applied_usage_thresholds) }`
+#### Description
+This test checks that the UsageThreshold model has a "has many" association with invoices through applied_usage_thresholds.
+
+___
+
+### `it { is_expected.to validate_numericality_of(:amount_cents).is_greater_than(0) }`
+#### Description
+This test ensures that the amount_cents attribute of UsageThreshold is validated to be a number greater than 0.
+
+___
+
+### `describe 'default scope'`
+#### Description
+This block tests the default scope of the UsageThreshold model.
+
+#### Internal Logic
+- Creates a deleted usage threshold using `create(:usage_threshold, :deleted)`.
+- Verifies that the default scope only returns non-deleted usage thresholds.
+- Checks that the unscoped query with discarded filter returns the deleted usage threshold.
+
+___
+
+### `describe 'invoice_name'`
+#### Description
+This block tests the invoice_name method of the UsageThreshold model.
+
+#### Internal Logic
+- Tests two scenarios:
+  1. When threshold_display_name is present, it should return that value.
+  2. When threshold_display_name is null, it should return a localized fallback string.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used for creating test instances of UsageThreshold |
+
+## Notes
+- The code uses RSpec's expectation syntax (`is_expected.to`) for most of its tests.
+- It relies on FactoryBot for creating test instances, indicating that there's a factory defined for UsageThreshold elsewhere in the test suite.
+- The tests cover associations, validations, scoping, and a custom method (invoice_name), providing good coverage of the model's functionality.
+- The use of `build` instead of `create` for the main subject suggests an emphasis on unit testing without unnecessary database interactions.

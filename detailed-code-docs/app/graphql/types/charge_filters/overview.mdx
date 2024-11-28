@@ -1,0 +1,85 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions for charge filters in a Ruby on Rails application. It defines the structure and behavior of charge filter objects, including input types, output types, and a custom scalar for handling filter values. These types are crucial for querying and manipulating charge filter data through the GraphQL API.
+
+## What does it do?
+The code in this directory enables the following functionalities:
+
+1. Defining the structure for inputting charge filter criteria in GraphQL queries or mutations.
+2. Specifying the output structure for charge filter objects when queried through GraphQL.
+3. Handling the conversion and validation of charge filter values between the application and GraphQL layer.
+
+These components work together to allow users of the GraphQL API to:
+- Filter charges based on invoice display names, properties, and specific values.
+- Retrieve information about existing charge filters, including their IDs, invoice display names, properties, and associated values.
+- Ensure that charge filter values are properly formatted and validated when sent to or received from the API.
+
+## Key Files
+
+1. `input.rb`:
+   - Defines the `Types::ChargeFilters::Input` class, which specifies the structure for inputting charge filter criteria.
+   - Includes arguments for invoice display name, properties, and values.
+   - Uses `Types::Charges::PropertiesInput` and `Types::ChargeFilters::Values` for complex input types.
+
+2. `object.rb`:
+   - Defines the `Types::ChargeFilters::Object` class, which represents the output structure of a charge filter.
+   - Includes fields for ID, invoice display name, properties, and values.
+   - Uses `Types::Charges::Properties` and `Types::ChargeFilters::Values` for complex field types.
+
+3. `values.rb`:
+   - Defines the `Types::ChargeFilters::Values` class, a custom GraphQL scalar type for handling charge filter values.
+   - Implements `coerce_input` and `coerce_result` methods to ensure proper formatting and type coercion of filter values.
+
+## Dependencies
+The code in this directory relies on the following external libraries and internal dependencies:
+
+1. GraphQL Ruby gem (version not specified): Used as the underlying framework for implementing GraphQL in Ruby.
+2. `Types::BaseInputObject`: Base class for GraphQL input object types.
+3. `Types::BaseObject`: Base class for GraphQL object types.
+4. `Types::BaseScalar`: Base class for custom GraphQL scalar types.
+5. `Types::Charges::PropertiesInput`: Used for defining properties in the input type.
+6. `Types::Charges::Properties`: Used for defining properties in the object type.
+
+These dependencies were chosen to provide a robust and type-safe implementation of GraphQL types for charge filters, leveraging the existing GraphQL infrastructure in the application.
+
+## Configuration
+This directory does not contain any specific configuration files or environment variables. The behavior of the charge filter types is determined by their class definitions and the overall GraphQL schema configuration of the application.
+
+To illustrate the usage of these types, here's an example of how a GraphQL query might look using the `ChargeFilter` object type:
+
+```graphql
+query {
+  chargeFilter(id: "123") {
+    id
+    invoiceDisplayName
+    properties {
+      # fields from Types::Charges::Properties
+    }
+    values
+  }
+}
+```
+
+And an example of a mutation that might use the `ChargeFilters::Input` type:
+
+```graphql
+mutation {
+  createChargeFilter(input: {
+    invoiceDisplayName: "Monthly Service Fee",
+    properties: {
+      # fields from Types::Charges::PropertiesInput
+    },
+    values: {
+      "amount": ["100", "200"],
+      "currency": ["USD"]
+    }
+  }) {
+    # return fields
+  }
+}
+```
+
+These examples demonstrate how the types defined in this directory work together to provide a structured and type-safe way of working with charge filters in the GraphQL API.

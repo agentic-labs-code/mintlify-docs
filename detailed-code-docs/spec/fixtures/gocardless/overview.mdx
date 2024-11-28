@@ -1,0 +1,80 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains JSON fixtures representing GoCardless events. These fixtures are likely used for testing or as sample data for systems integrating with the GoCardless API. The directory includes two JSON files: one for a general payment event and another specifically for a refund event.
+
+## What does it do?
+These JSON files simulate the structure and content of webhook events that would be sent by GoCardless to notify systems about various actions or changes related to payments and refunds. They provide developers with sample data to test their integrations, ensuring that their systems can correctly parse and process GoCardless webhook events without needing to trigger real events in a live environment.
+
+## Key Files
+
+1. `events.json`:
+   This file contains a fixture for a general GoCardless event, specifically a payment being paid out. It includes:
+   - An `events` array with a single event object
+   - Event details such as ID, creation time, resource type (payments), and action (paid_out)
+   - Links to related resources
+   - A `meta` object with a webhook ID
+
+2. `events_refund.json`:
+   This file represents a fixture for a GoCardless refund event. It includes:
+   - An `events` array with a single event object
+   - Event details for a paid refund, including ID, creation time, resource type (refunds), and action (paid)
+   - Links to the related refund resource
+   - Additional details about the event's origin, cause, and description
+   - A `meta` object with a webhook ID
+
+Both files follow a similar structure, providing developers with examples of different types of events they might receive from GoCardless.
+
+## Dependencies
+These JSON files don't have direct dependencies, but they are likely used in conjunction with:
+- GoCardless API integration code
+- Testing frameworks
+- Mock servers or fixtures for simulating GoCardless webhook responses
+
+## Configuration
+While these files don't contain configuration options themselves, they serve as reference structures for GoCardless events. Developers integrating with GoCardless should configure their systems to handle events with similar structures.
+
+Key fields to consider when processing these events include:
+- `events[].id`: Unique identifier for the event
+- `events[].resource_type`: Type of resource (e.g., "payments" or "refunds")
+- `events[].action`: Action performed on the resource
+- `events[].links`: References to related resources
+- `events[].details`: Additional information about the event
+- `meta.webhook_id`: Identifier of the webhook that triggered the event
+
+Developers should ensure their systems can parse these JSON structures and extract relevant information for processing GoCardless events.
+
+Here's an example of how a developer might use these fixtures in a test case:
+
+```python
+import json
+import unittest
+
+class TestGoCardlessWebhookHandler(unittest.TestCase):
+    def test_payment_paid_out_event(self):
+        with open('spec/fixtures/gocardless/events.json', 'r') as f:
+            event_data = json.load(f)
+        
+        handler = GoCardlessWebhookHandler()
+        result = handler.process_event(event_data['events'][0])
+        
+        self.assertEqual(result['status'], 'success')
+        self.assertEqual(result['action'], 'payment_paid_out')
+
+    def test_refund_paid_event(self):
+        with open('spec/fixtures/gocardless/events_refund.json', 'r') as f:
+            event_data = json.load(f)
+        
+        handler = GoCardlessWebhookHandler()
+        result = handler.process_event(event_data['events'][0])
+        
+        self.assertEqual(result['status'], 'success')
+        self.assertEqual(result['action'], 'refund_paid')
+
+if __name__ == '__main__':
+    unittest.main()
+```
+
+This example demonstrates how the JSON fixtures can be used to test a hypothetical `GoCardlessWebhookHandler` class, ensuring it correctly processes different types of events.

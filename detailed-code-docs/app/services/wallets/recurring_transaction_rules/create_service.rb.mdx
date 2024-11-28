@@ -1,0 +1,80 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines a service class `CreateService` within the `Wallets::RecurringTransactionRules` module. Its primary purpose is to create a new recurring transaction rule for a given wallet, handling various parameters and conditions for rule creation.
+
+## Code Structure
+The `CreateService` class inherits from `BaseService` and contains a single public method `call` that orchestrates the creation of a recurring transaction rule. It uses private methods and attributes to manage input data and perform specific operations.
+
+## Symbols
+
+### `Wallets::RecurringTransactionRules::CreateService`
+#### Description
+This service class is responsible for creating a new recurring transaction rule for a wallet. It handles the logic of setting up rule attributes based on input parameters and wallet properties.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet | Wallet | The wallet for which the rule is being created |
+| wallet_params | Hash | Parameters for creating the rule |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the created recurring transaction rule |
+
+#### Internal Logic
+1. Checks if the premium license is active.
+2. Determines the credits (paid and granted) based on the method and provided parameters.
+3. Builds a hash of attributes for the new rule.
+4. Handles the `invoice_requires_successful_payment` attribute.
+5. Creates a new recurring transaction rule for the wallet.
+6. Stores the created rule in the result object.
+
+### `initialize`
+#### Description
+Initializes the service with the required wallet and parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet | Wallet | The wallet for which the rule is being created |
+| wallet_params | Hash | Parameters for creating the rule |
+
+### `call`
+#### Description
+The main method that executes the rule creation process.
+
+#### Internal Logic
+1. Checks for premium license.
+2. Determines credits based on the method.
+3. Builds attributes for the new rule.
+4. Handles `invoice_requires_successful_payment` attribute.
+5. Creates and returns the new rule.
+
+### `rule_params`
+#### Description
+A private method that extracts the first recurring transaction rule from the wallet parameters.
+
+### `method`
+#### Description
+A private method that determines the method for the rule, defaulting to 'fixed' if not specified.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| License | Used to check if the premium feature is available |
+| ActiveModel::Type::Boolean | Used for casting boolean values |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| method | string | 'fixed' | The method for the recurring transaction rule |
+
+## Error Handling
+The service uses Rails' built-in error handling for ActiveRecord operations. Any validation errors during rule creation will raise an `ActiveRecord::RecordInvalid` exception.
+
+## Performance Considerations
+The service performs a single database write operation to create the new rule, which should be relatively efficient. However, it's worth noting that this operation is part of a larger transaction (as seen in the related `Wallets::CreateService`), which could impact overall performance if many rules are being created simultaneously.

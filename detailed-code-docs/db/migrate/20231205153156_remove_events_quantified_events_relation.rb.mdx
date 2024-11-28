@@ -1,0 +1,49 @@
+---
+title: "20231205153156_remove_events_quantified_events_relation.rb"
+---
+
+## High-level description
+This migration removes the `quantified_event_id` column from the `events` table, effectively removing the relation between `events` and `quantified_events`. It provides both `up` and `down` methods for applying and reverting the migration.
+
+## Symbols
+
+### `RemoveEventsQuantifiedEventsRelation`
+#### Description
+This class is an ActiveRecord migration that removes the relationship between `events` and `quantified_events` by dropping the `quantified_event_id` column from the `events` table.
+
+#### Internal Logic
+The migration consists of two methods:
+
+1. `up`: Removes the `quantified_event_id` column from the `events` table.
+2. `down`: Adds the `quantified_event_id` column back to the `events` table and creates an index on it.
+
+### `up`
+#### Description
+This method is called when the migration is run to apply the changes. It removes the `quantified_event_id` column from the `events` table.
+
+#### Internal Logic
+- Uses `safety_assured` block, which is likely a custom method to bypass safety checks in production environments.
+- Calls `remove_column` to drop the `quantified_event_id` column from the `events` table.
+
+### `down`
+#### Description
+This method is called when the migration is rolled back. It adds the `quantified_event_id` column back to the `events` table and creates an index on it.
+
+#### Internal Logic
+1. Adds the `quantified_event_id` column of type `uuid` to the `events` table.
+2. Creates an index on the `quantified_event_id` column in the `events` table.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the migration framework for database schema changes |
+
+## Performance Considerations
+- Removing or adding columns and indexes can be potentially slow operations on large tables.
+- The `safety_assured` block suggests that there might be safety checks in place for production environments, which are being bypassed for this migration.
+
+## Notes
+- This migration is part of a larger schema change, likely removing a relationship between `events` and `quantified_events`.
+- The use of `uuid` for the `quantified_event_id` suggests that the application uses UUIDs for primary keys or foreign keys.
+- The migration is reversible, allowing for easy rollback if needed.
+- The `[7.0]` in the class definition indicates that this migration is compatible with Rails 7.0.

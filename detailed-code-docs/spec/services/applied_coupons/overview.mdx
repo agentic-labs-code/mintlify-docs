@@ -1,0 +1,92 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for the `AppliedCoupons` services, specifically focusing on the `CreateService` and `TerminateService`. These tests ensure the correct functionality of coupon application and termination processes within the system.
+
+## What does it do?
+The tests in this directory verify the behavior of two main services:
+
+1. `AppliedCoupons::CreateService`: This service is responsible for applying coupons to customers. The tests cover various scenarios such as:
+   - Basic coupon application
+   - Percentage-based coupons
+   - Multiple coupon applications
+   - Handling of overridden coupon amounts
+   - Error cases (e.g., customer not found, coupon not found)
+   - Currency matching
+   - Coupon reusability
+   - Plan and billable metric limitations
+
+2. `AppliedCoupons::TerminateService`: This service handles the termination of applied coupons. The tests verify:
+   - Successful termination of an applied coupon
+   - Behavior when attempting to terminate an already terminated coupon
+
+These tests ensure that the coupon application and termination processes work correctly under various conditions and handle errors appropriately.
+
+## Key Files
+
+1. `create_service_spec.rb`:
+   This file contains comprehensive tests for the `AppliedCoupons::CreateService`. It verifies the correct application of coupons under different scenarios and checks for proper error handling. The tests use factory methods to set up test data and mock external services like `SegmentTrackJob`.
+
+   Example test case:
+   ```ruby
+   it 'creates an applied coupon' do
+     expect { create_service.call }.to change(AppliedCoupon, :count).by(1)
+     expect(result).to be_success
+     expect(result.applied_coupon).to have_attributes(
+       customer_id: customer.id,
+       coupon_id: coupon.id,
+       amount_cents: 100,
+       amount_currency: 'EUR'
+     )
+   end
+   ```
+
+2. `terminate_service_spec.rb`:
+   This file tests the `AppliedCoupons::TerminateService`, focusing on the termination of applied coupons. It verifies both successful termination and the handling of already terminated coupons.
+
+   Example test case:
+   ```ruby
+   it 'terminates the applied coupon' do
+     expect { terminate_service.call }.to change { applied_coupon.reload.terminated_at }.from(nil)
+     expect(result).to be_success
+     expect(applied_coupon).to be_terminated
+   end
+   ```
+
+## Dependencies
+The test files rely on the following dependencies:
+
+| Dependency | Purpose | Version |
+|:-----------|:--------|:--------|
+| RSpec | Testing framework | Not specified |
+| FactoryBot | Test data generation | Not specified |
+| rails_helper | Loads Rails testing environment | Not specified |
+
+FactoryBot is used extensively to create test data, allowing for easy setup of complex object relationships. This choice enables more readable and maintainable tests.
+
+## Configuration
+The test files use the standard RSpec configuration, which is likely defined in a separate `spec_helper.rb` or `rails_helper.rb` file. No specific configuration files are mentioned within these test files.
+
+The tests make use of RSpec's `let` statements and `before` blocks for setting up test data and common actions. This approach helps in organizing the tests and reducing duplication.
+
+Example configuration:
+```ruby
+RSpec.describe AppliedCoupons::CreateService do
+  let(:membership) { create(:membership) }
+  let(:organization) { membership.organization }
+  let(:customer) { create(:customer, organization:) }
+  let(:coupon) { create(:coupon, organization:) }
+  # ... more let statements ...
+
+  before do
+    create(:billable_metric, organization:)
+    allow(SegmentTrackJob).to receive(:perform_later)
+  end
+
+  # ... test cases ...
+end
+```
+
+These tests provide a robust suite for verifying the functionality of the `AppliedCoupons` services, ensuring that coupon application and termination work correctly under various conditions and handle errors appropriately.

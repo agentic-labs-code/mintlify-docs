@@ -1,0 +1,52 @@
+---
+title: "20240411114759_create_integrations_base_mappings.rb"
+---
+
+## High-level description
+This migration file creates a new table called `integration_mappings` in the database. The table is designed to store mappings between integrations and various mappable entities, allowing for flexible and extensible integration configurations.
+
+## Symbols
+
+### CreateIntegrationsBaseMappings
+#### Description
+This class is an ActiveRecord migration that defines the structure for the `integration_mappings` table. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0.
+
+#### Internal Logic
+The migration uses the `change` method to define the table structure:
+
+1. Creates a new table named `integration_mappings` with a UUID as the primary key.
+2. Adds several columns to the table:
+   - `integration_id`: A foreign key reference to the `integrations` table.
+   - `mappable_id` and `mappable_type`: For polymorphic associations.
+   - `type`: To support Single Table Inheritance (STI).
+   - `settings`: A JSONB column for storing flexible configuration data.
+   - Timestamps (`created_at` and `updated_at`).
+
+## Code Structure
+
+The migration file contains a single class `CreateIntegrationsBaseMappings` with a `change` method that defines the table structure using ActiveRecord's DSL (Domain Specific Language) for migrations.
+
+## Dependencies
+
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the migration framework and database abstraction |
+
+## Configuration
+
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| id | :uuid | N/A | Sets the primary key type to UUID |
+| foreign_key | boolean | true | Creates a foreign key constraint for `integration_id` |
+| null | boolean | false | Ensures the column cannot contain null values |
+| index | boolean | true | Creates an index on the `integration_id` column |
+| polymorphic | boolean | true | Sets up a polymorphic association for `mappable` |
+| default | hash | {} | Sets an empty hash as the default value for the `settings` column |
+
+## Performance Considerations
+
+1. The use of UUIDs as primary keys can have performance implications for very large tables but provides better distribution for sharding and uniqueness across systems.
+2. Indexes are created on `integration_id` and implicitly on `(mappable_type, mappable_id)` to improve query performance.
+3. The `settings` column uses JSONB, which allows for efficient querying and indexing of JSON data in PostgreSQL.
+
+This migration sets up a flexible and performant structure for storing integration mappings, supporting polymorphic associations and allowing for extensible configuration through the JSONB `settings` column.

@@ -1,0 +1,63 @@
+---
+title: "20231016115055_create_cached_aggregations.rb"
+---
+
+## High-level description
+This migration file creates a new table called `cached_aggregations` in the database. The table is designed to store aggregated data related to charges, events, and subscriptions, with various indexes for efficient querying.
+
+## Code Structure
+The code defines a single class `CreateCachedAggregations` that inherits from `ActiveRecord::Migration[7.0]`. This class contains a `change` method that creates the `cached_aggregations` table with specific columns and indexes.
+
+## Symbols
+
+### CreateCachedAggregations
+#### Description
+This class is an ActiveRecord migration that defines the structure for the `cached_aggregations` table. It creates the table with various columns and indexes to store and efficiently retrieve aggregated data.
+
+#### Internal Logic
+The `change` method uses the `create_table` method to define the structure of the `cached_aggregations` table. It specifies the following:
+
+1. The table uses UUID as the primary key.
+2. It creates several columns with different data types and constraints.
+3. It sets up foreign key relationships and indexes for efficient querying.
+4. It adds timestamp columns for record creation and update times.
+5. It creates composite indexes for specific column combinations.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| id | symbol | :uuid | Specifies that the primary key should use UUID |
+
+## Symbols
+
+### change
+#### Description
+This method defines the structure of the `cached_aggregations` table, including its columns, indexes, and foreign key relationships.
+
+#### Internal Logic
+1. Creates the `cached_aggregations` table with UUID as the primary key.
+2. Adds the following columns:
+   - `organization_id` (UUID, not null, indexed)
+   - `event_id` (UUID, not null, indexed)
+   - `timestamp` (datetime, not null)
+   - `external_subscription_id` (string, not null, indexed)
+   - `charge_id` (UUID, not null, indexed)
+   - `group_id` (UUID, nullable, foreign key, indexed)
+   - `current_aggregation` (decimal)
+   - `max_aggregation` (decimal)
+   - `max_aggregation_with_proration` (decimal)
+3. Adds timestamp columns (`created_at` and `updated_at`).
+4. Creates composite indexes:
+   - On `organization_id`, `timestamp`, and `charge_id`
+   - On `organization_id`, `timestamp`, `charge_id`, and `group_id`
+
+## Side Effects
+This migration will create a new table in the database when run, which may affect the database schema and potentially impact existing queries or applications interacting with the database.
+
+## Performance Considerations
+The migration creates several indexes, which can improve query performance but may slightly increase the time required for inserting or updating records. The use of UUID as the primary key and for foreign key relationships can provide benefits in distributed systems but may have a small performance overhead compared to integer IDs.

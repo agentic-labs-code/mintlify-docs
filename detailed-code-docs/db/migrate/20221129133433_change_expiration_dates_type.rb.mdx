@@ -1,0 +1,46 @@
+---
+title: "20221129133433_change_expiration_dates_type.rb"
+---
+
+## High-level description
+This migration changes the data type of the expiration date for coupons from a `date` type to a `datetime` type. It adds a new column, transfers the data with appropriate conversion, and then removes the old column. The migration is reversible, allowing for both upgrading and downgrading of the database schema.
+
+## Symbols
+
+### `ChangeExpirationDatesType`
+#### Description
+This is a Rails migration class that inherits from `ActiveRecord::Migration[7.0]`. It defines the process for changing the expiration date column in the `coupons` table from a `date` type to a `datetime` type.
+
+#### Internal Logic
+The migration consists of two main methods:
+
+1. `up`: This method is called when migrating the database forward.
+   - Adds a new `expiration_at` column of type `datetime` to the `coupons` table.
+   - Uses `safety_assured` to bypass Strong Migrations checks.
+   - Updates the new column with data from the old column, converting the date to the end of the day (23:59:59).
+   - Removes the old `expiration_date` column.
+
+2. `down`: This method is called when rolling back the migration.
+   - Adds back the `expiration_date` column of type `date` to the `coupons` table.
+   - Updates the new column with data from the `expiration_at` column, converting the datetime to a date.
+   - Removes the `expiration_at` column.
+
+## Side Effects
+- Modifies the schema of the `coupons` table by changing the data type of the expiration date column.
+- Converts existing data from `date` to `datetime` and vice versa.
+
+## Performance Considerations
+- The migration uses raw SQL for data conversion, which may be more efficient for large datasets compared to ActiveRecord methods.
+- The `safety_assured` block is used to bypass Strong Migrations checks, which could potentially be risky for large tables or in production environments.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+| Strong Migrations | Implied by the use of `safety_assured`, used for safer database migrations |
+
+## Error Handling
+The migration does not implement explicit error handling. It relies on the default behavior of Rails migrations to roll back changes if an error occurs during execution.
+
+## TODOs
+There are no explicit TODOs in this migration file.

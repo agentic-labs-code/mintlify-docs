@@ -1,0 +1,48 @@
+---
+title: "gocardless_create_job.rb"
+---
+
+## High-level description
+This code defines a background job class `GocardlessCreateJob` within the `PaymentProviderCustomers` module. Its primary purpose is to create a GoCardless customer asynchronously, handling potential errors and implementing retry logic for specific exceptions.
+
+## Code Structure
+The `GocardlessCreateJob` class inherits from `ApplicationJob` and uses the `queue_as` method to specify the queue for job processing. It also defines retry behavior for specific GoCardless-related errors.
+
+## Symbols
+
+### `GocardlessCreateJob`
+#### Description
+This class represents a background job for creating a GoCardless customer. It utilizes the `PaymentProviderCustomers::GocardlessService` to perform the actual creation process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| gocardless_customer | Object | An instance of a GoCardless customer model |
+
+#### Internal Logic
+1. The job is enqueued in the `:providers` queue.
+2. Retry logic is defined for specific GoCardless-related errors and deserialization errors.
+3. The `perform` method creates a new instance of `PaymentProviderCustomers::GocardlessService` with the given `gocardless_customer`.
+4. It calls the `create` method on the service and raises an error if the result indicates a failure.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| GoCardlessPro | Used for handling GoCardless-specific errors |
+| ActiveJob | Provides the base job functionality and handles deserialization errors |
+
+## Error Handling
+The job implements retry logic for the following errors:
+- `GoCardlessPro::GoCardlessError`
+- `GoCardlessPro::ApiError`
+- `GoCardlessPro::RateLimitError`
+- `ActiveJob::DeserializationError`
+
+For the GoCardless-related errors, the job will retry up to 6 times with a polynomially increasing wait time between attempts.
+
+## Related Code
+The `GocardlessCreateJob` relies on the `PaymentProviderCustomers::GocardlessService` class, which is responsible for the actual creation of the GoCardless customer. The service class handles the interaction with the GoCardless API, updates the local customer record, and triggers relevant webhooks.
+
+The `PaymentProviderCustomers::CreateService` is a higher-level service that determines whether to create a customer on the provider or generate a checkout URL. It can invoke the `GocardlessCreateJob` when necessary.
+
+This job is part of a larger system for managing payment provider customers, which includes similar jobs for other providers like Stripe and Adyen.

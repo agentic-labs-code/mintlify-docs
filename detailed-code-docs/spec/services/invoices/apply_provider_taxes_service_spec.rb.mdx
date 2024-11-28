@@ -1,0 +1,74 @@
+---
+title: "apply_provider_taxes_service_spec.rb"
+---
+
+## High-level description
+This RSpec file tests the `Invoices::ApplyProviderTaxesService` class, which is responsible for applying provider taxes to invoices. It verifies the service's behavior in various scenarios, including handling different tax types, special provider rules, and edge cases like zero fees.
+
+## Code Structure
+The test suite is organized into several contexts, each testing different aspects of the service:
+1. Non-zero fees amount with non-zero taxes
+2. Special provider rules (e.g., not collecting, product not taxed)
+3. Zero fees amount
+
+Each context sets up the necessary data and expectations, then calls the service and verifies the results.
+
+## Symbols
+
+### `RSpec.describe Invoices::ApplyProviderTaxesService`
+#### Description
+This is the main describe block for the `Invoices::ApplyProviderTaxesService` test suite.
+
+### `subject(:apply_service)`
+#### Description
+Defines the subject of the test, which is an instance of the `Invoices::ApplyProviderTaxesService` class.
+
+### `let(:customer)`, `let(:organization)`, `let(:invoice)`, `let(:fees_amount_cents)`, `let(:coupons_amount_cents)`, `let(:result)`, `let(:fee_taxes)`
+#### Description
+These `let` statements define the test data used throughout the spec file, including the customer, organization, invoice, fees, coupons, result, and fee taxes.
+
+### `describe 'call'`
+#### Description
+This describe block focuses on testing the `call` method of the service.
+
+#### Internal Logic
+1. Sets up the test environment by creating necessary data and mocking the `Integrations::Aggregator::Taxes::Invoices::CreateService`.
+2. Tests different scenarios:
+   - Non-zero fees amount with non-zero taxes
+   - Special provider rules
+   - Zero fees amount
+
+### `context 'with non zero fees amount'`
+#### Description
+Tests the service behavior when the invoice has non-zero fees.
+
+#### Internal Logic
+1. Creates fees and applied taxes for the invoice.
+2. Verifies that the service creates the correct applied taxes and updates the invoice attributes.
+
+### `context 'with special provider rules'`
+#### Description
+Tests the service behavior with special tax rules like "Not collecting", "Product not taxed", and "Juris not taxed".
+
+#### Internal Logic
+1. Iterates through different special rules.
+2. For each rule, sets up the test data and verifies that the service creates the correct applied taxes.
+
+### `context 'when invoices fees_amount_cents is zero'`
+#### Description
+Tests the service behavior when the invoice has zero fees.
+
+#### Internal Logic
+1. Creates fees with zero amount and applied taxes.
+2. Verifies that the service creates the correct applied taxes with zero amounts and updates the invoice attributes accordingly.
+
+## Dependencies
+- RSpec
+- FactoryBot (implied by the use of `create` method)
+- Rails (implied by the use of `rails_helper`)
+
+## Error Handling
+The spec file doesn't explicitly test error handling scenarios. It focuses on successful execution paths and various tax calculation scenarios.
+
+## Performance Considerations
+There are no specific performance considerations mentioned in this spec file. The tests focus on correctness rather than performance.

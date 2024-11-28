@@ -1,0 +1,54 @@
+---
+title: "20240412085450_create_integration_collection_mappings.rb"
+---
+
+## High-level description
+This migration file creates a new table called `integration_collection_mappings` in the database. It defines the structure for storing mappings between integrations and collections, including various attributes and indexes to optimize data retrieval and ensure data integrity.
+
+## Symbols
+
+### `CreateIntegrationCollectionMappings`
+#### Description
+This class is an ActiveRecord migration that defines the schema changes for creating the `integration_collection_mappings` table.
+
+#### Internal Logic
+The migration performs the following actions:
+1. Creates a new table named `integration_collection_mappings` with a UUID as the primary key.
+2. Defines columns for the table, including references, integers, strings, and JSON fields.
+3. Adds timestamps for record creation and update tracking.
+4. Creates an index on the `integration_id` column.
+5. Adds a unique composite index on `mapping_type` and `integration_id`.
+
+### `change`
+#### Description
+This method defines the changes to be applied to the database schema when the migration is run.
+
+#### Internal Logic
+1. Creates the `integration_collection_mappings` table with the following columns:
+   - `id`: UUID, primary key
+   - `integration_id`: UUID, foreign key referencing the `integrations` table
+   - `mapping_type`: integer, not null
+   - `type`: string, not null
+   - `settings`: jsonb, not null, default empty object
+   - `created_at` and `updated_at`: timestamps
+2. Adds an index on the `integration_id` column.
+3. Creates a unique composite index on `mapping_type` and `integration_id`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for defining database schema changes |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| id | symbol | :uuid | Specifies the primary key type for the table |
+| foreign_key | boolean | true | Ensures referential integrity for the `integration_id` column |
+| null | boolean | false | Specifies that certain columns cannot contain null values |
+| default | hash | {} | Sets a default empty JSON object for the `settings` column |
+
+## Performance Considerations
+1. The migration adds an index on the `integration_id` column to improve query performance when filtering or joining on this column.
+2. A unique composite index is created on `mapping_type` and `integration_id` to ensure uniqueness and optimize queries that filter on both columns simultaneously.
+
+This migration sets up a table structure that allows for efficient storage and retrieval of integration collection mappings, with appropriate constraints and indexes to maintain data integrity and query performance.

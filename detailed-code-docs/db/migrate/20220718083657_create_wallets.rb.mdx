@@ -1,0 +1,63 @@
+---
+title: "20220718083657_create_wallets.rb"
+---
+
+## High-level description
+This code defines an ActiveRecord migration to create a `wallets` table in the database. The migration sets up the structure for storing wallet information, including customer references, financial details, and various timestamps for tracking wallet activities.
+
+## Symbols
+
+### CreateWallets
+#### Description
+This class inherits from `ActiveRecord::Migration[7.0]` and defines a migration to create the `wallets` table in the database.
+
+#### Internal Logic
+The `change` method is used to define the table structure:
+
+1. Creates a new table named `wallets` with UUID as the primary key.
+2. Sets up various columns to store wallet-related information:
+   - Customer reference (foreign key)
+   - Status and currency
+   - Financial details (rate amount, credits balance, balance, consumed credits)
+   - Various timestamps for tracking wallet activities
+3. Applies appropriate constraints (null: false) and default values where necessary.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the migration framework for database schema modifications |
+
+## Code Structure
+The migration defines a single table `wallets` with various columns to store wallet-related information. The table uses UUID as the primary key and includes a foreign key reference to the `customers` table.
+
+## References
+This migration references the `customers` table through the `customer` foreign key.
+
+## Symbols
+
+### change
+#### Description
+Defines the structure of the `wallets` table using ActiveRecord's table creation DSL.
+
+#### Internal Logic
+1. Creates the `wallets` table with UUID as the primary key.
+2. Adds a reference to the `customers` table with a foreign key constraint.
+3. Defines various columns for storing wallet information:
+   - `status`: An integer column to represent the wallet's status.
+   - `currency`: A string column to store the wallet's currency.
+   - `name`: An optional string column for the wallet's name.
+   - Financial columns: `rate_amount`, `credits_balance`, `balance`, and `consumed_credits`, all as decimal types with precision of 5.
+   - Timestamp columns: `expiration_date`, `last_balance_sync_at`, `last_consumed_credit_at`, and `terminated_at`.
+4. Includes the standard `created_at` and `updated_at` timestamps.
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| id | uuid | N/A | Sets the primary key type to UUID |
+| null | boolean | varies | Specifies whether the column can contain null values |
+| default | varies | varies | Sets the default value for specific columns |
+| precision | integer | 5 | Sets the precision for decimal columns |
+| foreign_key | boolean | true | Establishes a foreign key constraint for the customer reference |
+| index | boolean | true | Creates an index on the customer reference column |
+
+This migration sets up a comprehensive structure for managing wallet information, including financial details and various timestamps for tracking wallet activities. The use of UUID as the primary key and the foreign key reference to the customers table suggests a well-designed database schema for handling wallet data in a larger application context.

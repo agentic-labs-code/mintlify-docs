@@ -1,0 +1,58 @@
+---
+title: "20230206143214_create_webhooks.rb"
+---
+
+## High-level description
+This Ruby code defines an ActiveRecord migration to create a `webhooks` table in the database. The migration sets up the structure for storing webhook-related information, including details about the webhook's target, status, payload, and response.
+
+## Symbols
+
+### CreateWebhooks
+#### Description
+This class inherits from `ActiveRecord::Migration[7.0]` and defines a migration to create the `webhooks` table in the database.
+
+#### Internal Logic
+The `change` method is used to define the table structure:
+
+1. Creates a new table named `webhooks` with a UUID as the primary key.
+2. Defines various columns to store webhook-related information:
+   - `organization`: A reference to an organization (likely a foreign key)
+   - `object_id` and `object_type`: Identifies the object associated with the webhook
+   - `status` and `retries`: Tracks the webhook's status and retry attempts
+   - `http_status`: Stores the HTTP status code of the webhook response
+   - `endpoint` and `webhook_type`: Defines the target and type of the webhook
+   - `payload` and `response`: Stores the webhook payload and response as JSON
+   - `last_retried_at`: Timestamp for the last retry attempt
+   - `timestamps`: Adds `created_at` and `updated_at` columns
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the migration framework for database schema modifications |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| id | symbol | :uuid | Sets the primary key type to UUID |
+| status | integer | 0 | Default status for new webhooks |
+| retries | integer | 0 | Default number of retries for new webhooks |
+
+## API/Interface Reference
+| Column | Type | Nullable | Default | Description |
+|:-------|:-----|:---------|:--------|:------------|
+| id | uuid | false | - | Primary key |
+| organization_id | uuid | true | - | Reference to an organization |
+| object_id | uuid | false | - | ID of the associated object |
+| object_type | string | false | - | Type of the associated object |
+| status | integer | false | 0 | Current status of the webhook |
+| retries | integer | false | 0 | Number of retry attempts |
+| http_status | integer | true | - | HTTP status code of the response |
+| endpoint | string | true | - | URL endpoint for the webhook |
+| webhook_type | string | true | - | Type of the webhook |
+| payload | json | true | - | JSON payload sent with the webhook |
+| response | json | true | - | JSON response received from the webhook |
+| last_retried_at | timestamp | true | - | Timestamp of the last retry attempt |
+| created_at | timestamp | false | - | Timestamp of record creation |
+| updated_at | timestamp | false | - | Timestamp of last record update |
+
+This migration creates a comprehensive structure for managing webhooks, allowing for tracking of webhook statuses, retries, and responses. The use of UUID for the primary key and the `object_id` suggests a distributed system design, while the inclusion of `organization_id` implies a multi-tenant architecture.

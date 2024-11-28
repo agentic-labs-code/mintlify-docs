@@ -1,0 +1,80 @@
+---
+title: "internal-build.yml"
+---
+
+## High-level description
+This GitHub Actions workflow, named "Internal Build", is designed to build and push a Docker image for an API to Amazon Elastic Container Registry (ECR). It is triggered on pushes to the main branch or can be manually dispatched.
+
+## Code Structure
+The workflow consists of a single job named "build-api-image" with several steps that checkout the code, configure AWS credentials, log in to ECR, build the Docker image, and push it to the repository.
+
+## Symbols
+
+### `build-api-image` (Job)
+#### Description
+This job runs on the latest Ubuntu runner and is responsible for building and pushing the API Docker image to Amazon ECR.
+
+#### Internal Logic
+1. Checks out the repository code
+2. Configures AWS credentials
+3. Logs in to Amazon ECR
+4. Adds a version file to the Docker image
+5. Generates a Docker tag
+6. Builds and pushes the Docker image to ECR
+
+### Steps
+
+#### `Configure AWS Credentials`
+##### Description
+Configures AWS credentials for accessing ECR.
+
+##### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| aws-access-key-id | secret | AWS access key ID |
+| aws-secret-access-key | secret | AWS secret access key |
+| aws-region | string | AWS region (set to us-east-1) |
+
+#### `Login to Amazon ECR`
+##### Description
+Logs in to Amazon ECR using the configured AWS credentials.
+
+#### `Add version into docker image`
+##### Description
+Creates a file named LAGO_VERSION containing the GitHub commit SHA.
+
+#### `Docker tag`
+##### Description
+Generates a Docker tag for the image using the ECR registry, repository name, and GitHub commit SHA.
+
+##### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tag | string | Full Docker image tag |
+
+#### `Build and push`
+##### Description
+Builds the Docker image and pushes it to Amazon ECR.
+
+##### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| context | string | Docker build context (set to current directory) |
+| push | boolean | Whether to push the image (set to true) |
+| tags | string | Docker image tag to use |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| actions/checkout@v4 | Checkout repository code |
+| aws-actions/configure-aws-credentials@v4 | Configure AWS credentials |
+| aws-actions/amazon-ecr-login@v2 | Login to Amazon ECR |
+| docker/build-push-action@v6 | Build and push Docker image |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| ECR_REPOSITORY | string | lago-api-production | Name of the ECR repository |
+
+## Error Handling
+This workflow does not implement explicit error handling. It relies on the default behavior of GitHub Actions, which will stop the workflow if any step fails.

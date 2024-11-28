@@ -1,0 +1,113 @@
+---
+title: "weighted_sum_service.rb"
+---
+
+## High-level description
+This code defines the `WeightedSumService` class within the `BillableMetrics::Aggregations` module. It is responsible for computing weighted sum aggregations for billable metrics, supporting both regular and grouped-by aggregations. The service handles recurring and non-recurring metrics, and manages the calculation of initial values, variations, and total aggregated units.
+
+## Code Structure
+The `WeightedSumService` inherits from `BillableMetrics::Aggregations::BaseService` and overrides the `initialize`, `compute_aggregation`, and `compute_grouped_by_aggregation` methods. It also defines private helper methods for calculating initial and latest values.
+
+## Symbols
+
+### `WeightedSumService`
+#### Description
+This class implements the weighted sum aggregation logic for billable metrics.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event_store_class | Class | The class used for event storage |
+| charge | Object | The charge object associated with the billable metric |
+| subscription | Object | The subscription object |
+| boundaries | Hash | Time boundaries for the aggregation |
+| filters | Hash | Additional filters for the aggregation |
+
+#### Internal Logic
+1. Initializes the service with necessary properties.
+2. Computes aggregation for both regular and grouped-by scenarios.
+3. Handles recurring and non-recurring metrics differently.
+4. Calculates initial values, variations, and total aggregated units.
+5. Manages cached aggregations for optimization.
+
+### `compute_aggregation`
+#### Description
+Computes the weighted sum aggregation for a single group.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing aggregation results |
+
+#### Internal Logic
+1. Calculates the weighted sum using the event store.
+2. Sets the count, variation, and total aggregated units.
+3. Handles recurring metrics by updating total aggregated units and recurring_updated_at.
+
+### `compute_grouped_by_aggregation`
+#### Description
+Computes the weighted sum aggregation for multiple groups.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing aggregation results for each group |
+
+#### Internal Logic
+1. Retrieves grouped weighted sums, counts, and sums from the event store.
+2. Handles recurring metrics by fetching latest values and last events.
+3. Creates a Result object for each group with aggregation details.
+
+### `initial_value`
+#### Description
+Determines the initial value for the aggregation based on whether the metric is recurring.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| initial_value | Numeric | The initial value for the aggregation |
+
+### `latest_value`
+#### Description
+Retrieves the latest value for recurring metrics from cached aggregations or previous events.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| latest_value | BigDecimal | The latest value for the recurring metric |
+
+### `latest_value_from_events`
+#### Description
+Fetches the latest value from previous events for upgrade/downgrade scenarios.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| latest_value | Numeric | The latest value from previous events |
+
+### `grouped_latest_values`
+#### Description
+Retrieves the latest values for grouped recurring metrics from cached aggregations or previous events.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| grouped_latest_values | Array | An array of hashes containing groups and their latest values |
+
+### `grouped_latest_values_from_events`
+#### Description
+Fetches the latest grouped values from previous events for upgrade/downgrade scenarios.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| grouped_latest_values | Array | An array of hashes containing groups and their latest values from events |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BillableMetrics::Aggregations::BaseService | Parent class providing common functionality |
+| CachedAggregation | Model for storing and retrieving cached aggregation data |
+
+## Performance Considerations
+The service uses caching mechanisms (CachedAggregation) to optimize performance for recurring metrics and grouped aggregations. It also handles upgrade/downgrade scenarios by fetching data from previous events when necessary.

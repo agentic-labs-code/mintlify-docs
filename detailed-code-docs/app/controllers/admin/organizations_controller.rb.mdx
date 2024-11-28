@@ -1,0 +1,78 @@
+---
+title: "organizations_controller.rb"
+---
+
+## High-level description
+This code defines the `OrganizationsController` within the `Admin` module, responsible for handling the update action for organizations. It utilizes a service object pattern to perform the update operation and renders the updated organization data using a serializer.
+
+## Code Structure
+The `OrganizationsController` inherits from `BaseController` and contains an `update` action. It uses the `Admin::Organizations::UpdateService` to perform the update operation and the `V1::OrganizationSerializer` to serialize the response.
+
+## References
+- `Admin::Organizations::UpdateService`
+- `V1::OrganizationSerializer`
+- `Organization` model
+
+## Symbols
+
+### `Admin::OrganizationsController`
+#### Description
+This controller handles the update action for organizations within the admin namespace.
+
+#### Internal Logic
+1. Calls the `Admin::Organizations::UpdateService` with the organization and update parameters.
+2. Renders an error response if the update fails.
+3. Renders the updated organization using `V1::OrganizationSerializer` if successful.
+
+### `update`
+#### Description
+Handles the update action for an organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | ActionController::Parameters | HTTP request parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON response | String | Serialized organization data or error message |
+
+#### Internal Logic
+1. Calls the `Admin::Organizations::UpdateService` with the organization and update parameters.
+2. If the update is successful, renders the updated organization using `V1::OrganizationSerializer`.
+3. If the update fails, renders an error response.
+
+### `organization`
+#### Description
+A memoized method to find the organization based on the `id` parameter.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The found organization or nil |
+
+### `update_params`
+#### Description
+Permits only the `name` parameter for updating an organization.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| permitted_params | ActionController::Parameters | Permitted parameters for update |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Admin::Organizations::UpdateService | Service object for updating organizations |
+| V1::OrganizationSerializer | Serializer for organization data |
+
+## Error Handling
+The controller uses the `render_error_response` method (likely defined in the `BaseController`) to handle and render error responses when the update operation fails.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /admin/organizations/:id | PATCH/PUT | { name: string } | Serialized organization data | Updates an organization's name |
+
+This controller provides a RESTful API endpoint for updating an organization's name. It uses strong parameters to ensure only the `name` attribute can be updated through this action. The response includes the serialized organization data, which contains various attributes of the organization as defined in the `V1::OrganizationSerializer`.

@@ -1,0 +1,75 @@
+---
+title: "webhooks_resolver_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Resolvers::WebhooksResolver` GraphQL resolver. It tests the functionality of querying webhooks, including permission checks, pagination, and payload handling. The tests ensure that the resolver returns the expected data structure and handles different scenarios correctly.
+
+## Code Structure
+The test suite is organized into a main describe block for `Resolvers::WebhooksResolver`, with several shared examples and individual test cases. It uses FactoryBot for creating test data and includes various helper methods for executing GraphQL queries and assertions.
+
+## Symbols
+
+### RSpec.describe Resolvers::WebhooksResolver
+#### Description
+This is the main describe block for the WebhooksResolver tests. It sets up the test environment, defines shared examples, and contains individual test cases.
+
+#### Internal Logic
+1. Sets up test data using FactoryBot
+2. Defines a GraphQL query for fetching webhooks
+3. Includes shared examples for permission checks
+4. Tests the main functionality of the resolver
+5. Tests a specific case with JSON-serialized payloads
+
+### let(:query)
+#### Description
+Defines the GraphQL query used in the tests to fetch webhooks.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| query | String | GraphQL query for fetching webhooks |
+
+### before block
+#### Description
+Sets up test data by creating a list of webhook records.
+
+### it_behaves_like shared examples
+#### Description
+Includes shared examples for testing common behaviors:
+- 'requires current user'
+- 'requires current organization'
+- 'requires permission'
+
+### Main test case: 'returns a list of webhooks'
+#### Description
+Tests the main functionality of the WebhooksResolver.
+
+#### Internal Logic
+1. Executes the GraphQL query with necessary context
+2. Verifies the structure and content of the response
+3. Checks the number of webhooks, pagination, and payload format
+
+### Context: 'when the webhook payload is json-serialized in the database'
+#### Description
+Tests the resolver's behavior when webhook payloads are stored as JSON strings in the database.
+
+#### Internal Logic
+1. Updates all webhook records with JSON-serialized payloads
+2. Executes the GraphQL query
+3. Verifies the response structure and content, ensuring payloads are correctly handled
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Creates test data |
+| GraphQL | Defines and executes GraphQL queries |
+
+## Error Handling
+The test suite doesn't explicitly test error handling, but it implicitly checks for correct behavior under various conditions.
+
+## Notes
+- The test suite uses `aggregate_failures` to group multiple expectations together, allowing all assertions to be checked even if one fails.
+- The tests rely on shared examples and helper methods, which are likely defined in separate files (not provided in the given code).
+- The use of `create_list` and `update_column` suggests that the test is interacting directly with the database, which might be slower but allows for more comprehensive testing of the resolver's behavior.

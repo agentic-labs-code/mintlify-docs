@@ -1,0 +1,47 @@
+---
+title: "20231107110809_undiscard_incorrectly_deleted_events.rb"
+---
+
+## High-level description
+This migration file, `UndiscardIncorrectlyDeletedEvents`, is designed to restore (undiscard) events that were incorrectly marked as deleted. It targets specific events based on certain criteria, including their timestamp, associated subscriptions, and billable metrics.
+
+## Code Structure
+The migration defines a single `change` method that uses a reversible block to execute an SQL update statement in the "up" direction of the migration.
+
+## Symbols
+
+### UndiscardIncorrectlyDeletedEvents
+#### Description
+This is a Rails migration class that inherits from `ActiveRecord::Migration[7.0]`. It defines a migration to update incorrectly deleted events in the database.
+
+#### Internal Logic
+1. The migration uses a reversible block, which allows Rails to automatically revert the migration if needed.
+2. Inside the `up` direction of the migration, it uses `safety_assured` to bypass Strong Migrations checks.
+3. The core of the migration is an SQL statement that:
+   a. Identifies discarded events using a Common Table Expression (CTE).
+   b. Updates these events by setting their `deleted_at` column to NULL.
+
+The SQL logic for identifying discarded events includes the following criteria:
+- Events with a timestamp on or after October 1, 2023
+- Events that are currently marked as deleted (`deleted_at IS NOT NULL`)
+- Events where the deletion happened after the associated billable metric was created
+- Associated billable metrics that are not deleted
+- Associated subscriptions that are either pending or active
+
+## Side Effects
+This migration will modify the database by updating the `deleted_at` column for certain events, effectively "undiscarding" them.
+
+## Performance Considerations
+The migration uses a CTE and joins multiple tables, which could potentially be slow on large datasets. It's advisable to monitor the execution time and consider running this migration during off-peak hours if the affected tables are large.
+
+## Error Handling
+The migration uses `safety_assured` to bypass Strong Migrations checks. This should be used cautiously, ensuring that the migration is indeed safe to run.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+| Strong Migrations | Implied by the use of `safety_assured`, used for migration safety checks |
+
+## TODOs
+There are no explicit TODOs in the code, but it's worth noting that this migration only defines the "up" direction. If there's a need to revert this change, a corresponding "down" migration should be considered.

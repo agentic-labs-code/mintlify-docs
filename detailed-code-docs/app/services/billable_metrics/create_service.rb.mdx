@@ -1,0 +1,70 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines a service class `BillableMetrics::CreateService` responsible for creating a new billable metric in the system. It handles the creation process, including validation, transaction management, and tracking the creation event.
+
+## Code Structure
+The `CreateService` class inherits from `BaseService` and contains a single public method `create` that orchestrates the creation process. It also includes a private method `track_billable_metric_created` for tracking the creation event.
+
+## Symbols
+
+### `BillableMetrics::CreateService#create`
+#### Description
+This method creates a new billable metric based on the provided arguments.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | Contains the attributes for creating the billable metric |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the created billable metric or error information |
+
+#### Internal Logic
+1. Finds the organization based on the provided `organization_id`.
+2. Checks if the aggregation type is custom and if the organization supports custom aggregation.
+3. Creates the billable metric within a transaction.
+4. Creates or updates associated filters if provided.
+5. Tracks the billable metric creation event.
+6. Handles various error cases and returns the result.
+
+### `BillableMetrics::CreateService#track_billable_metric_created`
+#### Description
+This private method is responsible for tracking the creation of a billable metric using Segment analytics.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| metric | BillableMetric | The newly created billable metric |
+
+#### Internal Logic
+Enqueues a `SegmentTrackJob` with the relevant information about the created billable metric.
+
+## Side Effects
+- Creates a new `BillableMetric` record in the database.
+- Creates or updates associated `BillableMetricFilter` records if filters are provided.
+- Enqueues a `SegmentTrackJob` for analytics tracking.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BillableMetric | The model representing a billable metric |
+| BillableMetricFilters::CreateOrUpdateBatchService | Service for creating or updating filters |
+| SegmentTrackJob | Job for tracking events in Segment analytics |
+| CurrentContext | Module for accessing current context information |
+
+## Error Handling
+The service handles the following error cases:
+- `ActiveRecord::RecordInvalid`: When there's a validation error on the billable metric.
+- `BaseService::FailedResult`: When a sub-service fails.
+
+It uses the `result` object to store and communicate errors.
+
+## Logging
+This service does not implement any explicit logging mechanisms.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

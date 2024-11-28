@@ -1,0 +1,61 @@
+---
+title: "override_service.rb"
+---
+
+## High-level description
+This code defines the `Plans::OverrideService` class, which is responsible for creating a new plan based on an existing one with optional overrides. It handles various aspects of plan creation, including duplicating the original plan, applying changes, and managing related entities like charges, usage thresholds, and commitments.
+
+## Code Structure
+The main class `OverrideService` inherits from `BaseService` and contains a single public method `call`. It uses several other services and models to complete its task, such as `Plans::ApplyTaxesService`, `Charges::OverrideService`, `UsageThresholds::OverrideService`, and `Commitments::OverrideService`.
+
+## Symbols
+
+### Plans::OverrideService
+#### Description
+This service creates a new plan based on an existing one, applying overrides specified in the params. It handles various aspects of plan creation and modification, including charges, taxes, usage thresholds, and commitments.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| plan | Plan | The original plan to be overridden |
+| params | Hash | Parameters for overriding the plan |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Contains the new plan and any error information |
+
+#### Internal Logic
+1. Check if the premium license is active.
+2. Create a new plan by duplicating the original and applying overrides.
+3. Apply taxes if specified in the params.
+4. Override charges associated with the original plan.
+5. Handle usage thresholds if specified and conditions are met.
+6. Create a minimum commitment if specified and premium license is active.
+7. Track the creation of the new plan.
+
+## Side Effects
+- Creates a new plan in the database.
+- May create or modify associated records (taxes, charges, usage thresholds, commitments).
+- Tracks plan creation event using SegmentTrackJob.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Plans::ApplyTaxesService | Applies taxes to the new plan |
+| Charges::OverrideService | Overrides charges for the new plan |
+| UsageThresholds::OverrideService | Handles usage thresholds for the new plan |
+| Commitments::OverrideService | Creates minimum commitment for the new plan |
+| SegmentTrackJob | Tracks plan creation event |
+
+## Error Handling
+The service uses a `result` object to handle and propagate errors. It catches `ActiveRecord::RecordInvalid` and `BaseService::FailedResult` exceptions, updating the result accordingly.
+
+## Logging
+This service doesn't implement explicit logging, but it does track plan creation using SegmentTrackJob.
+
+## Performance Considerations
+The service uses a database transaction to ensure data consistency when creating the new plan and its associated records. This may impact performance for large or complex plans.
+
+## TODOs
+There are no explicit TODOs in the code.

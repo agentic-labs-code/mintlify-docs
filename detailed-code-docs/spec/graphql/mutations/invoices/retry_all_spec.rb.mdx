@@ -1,0 +1,89 @@
+---
+title: "retry_all_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Mutations::Invoices::RetryAll` GraphQL mutation. It tests the functionality of retrying all failed invoices in an organization, focusing on permissions, input validation, and the expected output of the mutation.
+
+## Code Structure
+The test file sets up a complex scenario with various interconnected models (organization, user, customer, invoice, subscription, etc.) and mocks external dependencies (LagoHttpClient). It then defines a GraphQL mutation and tests its execution under different conditions.
+
+## Symbols
+
+### RSpec.describe Mutations::Invoices::RetryAll
+#### Description
+This is the main test suite for the `Mutations::Invoices::RetryAll` GraphQL mutation. It sets up the necessary test data and environment to verify the mutation's behavior.
+
+#### Internal Logic
+1. Sets up test data including organization, user, customer, invoice, subscription, and related models.
+2. Mocks external HTTP client interactions.
+3. Defines shared examples for permission checks.
+4. Tests the mutation's execution and verifies the output.
+
+### let statements
+#### Description
+These statements define the test data and mocks used throughout the test suite.
+
+#### Inputs
+Various models and data structures are defined, including:
+- `membership`, `organization`, `user`, `customer`
+- `invoice`, `subscription`, `plan`
+- `integration`, `integration_customer`
+- `lago_client`, `response`, `body`
+
+### mutation
+#### Description
+Defines the GraphQL mutation to be tested.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| input | RetryAllInvoicesInput | Input for the mutation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| collection | [Invoice] | List of invoices scheduled for retry |
+
+### before block
+#### Description
+Sets up the test environment before each test.
+
+#### Internal Logic
+1. Creates integration_collection_mapping and fee_subscription.
+2. Sets up integration_customer.
+3. Mocks LagoHttpClient::Client and its interactions.
+
+### it_behaves_like statements
+#### Description
+These statements include shared examples to test common behaviors.
+
+#### Internal Logic
+Tests for:
+1. Requiring a current user
+2. Requiring a current organization
+3. Requiring the 'invoices:update' permission
+
+### context 'with valid preconditions'
+#### Description
+Tests the mutation's behavior when all preconditions are met.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with valid inputs.
+2. Verifies that the returned collection includes the expected invoice ID.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| LagoHttpClient::Client | Mocked for HTTP interactions |
+
+## Error Handling
+The test implicitly checks for error handling by expecting successful execution of the mutation when preconditions are met.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| retryAllInvoices | Mutation | RetryAllInvoicesInput | { collection: [{ id: String }] } | Retries all failed invoices |
+
+This test file provides comprehensive coverage for the `Mutations::Invoices::RetryAll` GraphQL mutation, ensuring it behaves correctly under various conditions and with different inputs.

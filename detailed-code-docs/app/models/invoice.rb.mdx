@@ -1,0 +1,80 @@
+---
+title: "invoice.rb"
+---
+
+## High-level description
+This code defines the `Invoice` model in a Ruby on Rails application. It represents an invoice in a billing system, with various attributes, associations, and methods to handle invoice-related operations such as payment processing, credit notes, and tax calculations.
+
+## Code Structure
+The `Invoice` model is the central entity, with associations to other models like `Customer`, `Organization`, `Fee`, `Credit`, and `CreditNote`. It includes several modules for additional functionality and uses enums for status and type classifications. The model also defines various scopes and validations for invoice-related operations.
+
+## Symbols
+
+### `Invoice` (class)
+#### Description
+Represents an invoice in the billing system, with various attributes and methods for managing invoice data and operations.
+
+#### Inputs
+N/A (This is a model definition)
+
+#### Outputs
+N/A (This is a model definition)
+
+#### Internal Logic
+- Includes various modules for additional functionality (e.g., AASM, PaperTrailTraceable, Sequenced)
+- Defines associations with other models (e.g., Customer, Organization, Fee, Credit)
+- Sets up monetized attributes for financial amounts
+- Defines enums for invoice types, payment statuses, and overall statuses
+- Implements AASM state machine for invoice status management
+- Defines scopes for querying invoices
+- Implements various methods for calculating amounts, handling credits, and managing invoice data
+
+### `ensure_number` (method)
+#### Description
+Ensures that the invoice has a number, generating one if not present.
+
+#### Internal Logic
+- Checks if the number is blank
+- If blank, generates a number based on organization prefix and draft status
+- For finalized invoices, generates a more complex number based on organization settings and sequential IDs
+
+### `ensure_organization_sequential_id` (method)
+#### Description
+Ensures that the invoice has an organization sequential ID when finalized.
+
+#### Internal Logic
+- Checks if the organization sequential ID is present and positive
+- If not, generates a new sequential ID using `generate_organization_sequential_id`
+
+### `generate_organization_sequential_id` (method)
+#### Description
+Generates a unique sequential ID for the invoice within the organization.
+
+#### Internal Logic
+- Uses database locking to ensure uniqueness
+- Handles different numbering schemes (customer-based or organization-based)
+- Generates the next available sequential ID
+
+## Side Effects
+- Modifies invoice attributes (number, organization_sequential_id)
+- Interacts with the database for locking and querying
+
+## Dependencies
+- Rails framework and various Rails modules (e.g., ActiveRecord, AASM)
+- Other models in the application (e.g., Customer, Organization, Fee)
+- External gems (e.g., paper_trail, sequenced)
+
+## Configuration
+- Uses environment variables (e.g., `ENV['LAGO_API_URL']`)
+- Defines constants for version numbers and status mappings
+
+## Error Handling
+- Raises `SequenceError` if unable to acquire a lock on the database during sequential ID generation
+
+## API/Interface Reference
+The `Invoice` model provides various methods and associations that can be used to interact with invoice data, including:
+- Status management (e.g., `finalize`, `void`)
+- Amount calculations (e.g., `fee_total_amount_cents`, `creditable_amount_cents`)
+- Association accessors (e.g., `customer`, `fees`, `credits`)
+
+This model serves as a core component of the billing system, handling various aspects of invoice management and calculations.

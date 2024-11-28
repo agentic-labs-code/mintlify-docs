@@ -1,0 +1,105 @@
+---
+title: "base_query.rb"
+---
+
+## High-level description
+The `BaseQuery` class is a foundational class for implementing query objects in a Ruby on Rails application. It provides a structure for organizing and executing database queries with support for pagination, filtering, and search functionality. This class is designed to be inherited by specific query classes, allowing for consistent query handling across the application.
+
+## Code Structure
+The `BaseQuery` class inherits from `BaseService` and defines several key components:
+1. Default pagination parameters
+2. A `Pagination` struct for handling pagination details
+3. A `Filters` class for managing query filters
+4. An initializer method that sets up common query parameters
+5. Private methods for handling pagination and datetime parsing
+
+## Symbols
+
+### `BaseQuery`
+#### Description
+This is the main class that serves as a base for other query classes in the application. It provides common functionality for querying data with pagination, filtering, and search capabilities.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization context for the query |
+| pagination | Hash | Pagination parameters (default: `DEFAULT_PAGINATION_PARAMS`) |
+| filters | Hash | Query filters (default: `{}`) |
+| search_term | String | Search term for the query (default: `nil`) |
+| order | String | Ordering parameter for the query (default: `nil`) |
+
+#### Internal Logic
+- Initializes query parameters and sets up filters using the `Filters` class
+- Provides methods for pagination and datetime parsing
+- Defines a structure for implementing specific query logic in subclasses
+
+### `DEFAULT_PAGINATION_PARAMS`
+#### Description
+A constant hash defining default pagination parameters.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| page | nil | Default page number (uses Kaminari default) |
+| limit | nil | Default limit per page (uses Kaminari default) |
+
+### `Pagination`
+#### Description
+A Struct for encapsulating pagination details.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| page | Integer | Page number |
+| limit | Integer | Number of items per page |
+
+### `Filters`
+#### Description
+A class inheriting from OpenStruct for managing query filters.
+
+### `pagination`
+#### Description
+A private method that creates a `Pagination` object from the pagination parameters.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| pagination | Pagination | A Pagination object or nil if params are blank |
+
+### `paginate`
+#### Description
+A private method that applies pagination to a given scope.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | ActiveRecord::Relation | The query scope to paginate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | ActiveRecord::Relation | The paginated scope |
+
+### `parse_datetime_filter`
+#### Description
+A private method for parsing datetime filters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| field_name | Symbol | The name of the datetime field |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| datetime | DateTime | Parsed datetime value |
+
+#### Internal Logic
+- Attempts to parse the filter value as an ISO8601 datetime
+- Raises a validation error if parsing fails
+
+## Side Effects
+- The `parse_datetime_filter` method may raise a validation error if the datetime parsing fails.
+
+## Dependencies
+This class depends on the `BaseService` class, which is not shown in the provided code.

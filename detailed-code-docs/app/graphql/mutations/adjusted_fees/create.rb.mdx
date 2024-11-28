@@ -1,0 +1,63 @@
+---
+title: "create.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for creating an adjusted fee in a billing system. It's part of a larger application that handles invoicing and fee adjustments, utilizing GraphQL for its API.
+
+## Code Structure
+The `Create` class is nested within the `Mutations::AdjustedFees` module and inherits from `BaseMutation`. It includes two modules: `AuthenticableApiUser` and `RequiredOrganization`, which add authentication and organization-related functionality.
+
+## Symbols
+
+### `Mutations::AdjustedFees::Create`
+#### Description
+This class defines a GraphQL mutation for creating an adjusted fee. It ensures the user is authenticated and has the required permissions before processing the request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | Contains the input arguments for creating an adjusted fee, including `fee_id` and optional fields like `invoice_display_name`, `unit_amount_cents`, and `units`. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Types::Fees::Object | The created or updated fee object if successful |
+| error | GraphQL::ExecutionError | An error object if the operation fails |
+
+#### Internal Logic
+1. Finds the fee using the provided `fee_id`.
+2. Calls the `AdjustedFees::CreateService` to create or update the adjusted fee.
+3. Returns the resulting fee if successful, or an error if not.
+
+## Side Effects
+- Creates or updates an adjusted fee in the database.
+- May modify the state of the associated fee and invoice.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication functionality |
+| RequiredOrganization | Ensures the user belongs to the required organization |
+| Types::AdjustedFees::CreateInput | Defines the input object for the mutation |
+| Types::Fees::Object | Defines the return type for the mutation |
+| AdjustedFees::CreateService | Service object that handles the business logic for creating adjusted fees |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'invoices:update' | The permission required to perform this mutation |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class) to handle and return errors from the `AdjustedFees::CreateService`.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| createAdjustedFee | POST | CreateInput | Types::Fees::Object | Creates an adjusted fee |
+
+The `CreateInput` object includes the following arguments:
+- `fee_id` (ID, required)
+- `invoice_display_name` (String, optional)
+- `unit_amount_cents` (BigInt, optional)
+- `units` (Float, optional)

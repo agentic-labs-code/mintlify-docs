@@ -1,0 +1,93 @@
+---
+title: "create_spec.rb"
+---
+
+## High-level description
+This code defines a RSpec test for the `Mutations::Integrations::Xero::Create` GraphQL mutation. It verifies the creation of a Xero integration within the context of a premium organization, ensuring proper user authentication, organization context, and permission checks.
+
+## Code Structure
+The test is structured as a typical RSpec describe block, with various let statements for setup, shared examples for common checks, and a main test case for creating a Xero integration.
+
+## Symbols
+
+### `RSpec.describe Mutations::Integrations::Xero::Create, type: :graphql`
+#### Description
+This is the main describe block for the test suite, focusing on the `Mutations::Integrations::Xero::Create` GraphQL mutation.
+
+### `let` statements
+#### Description
+These statements set up the test environment by defining variables and objects used throughout the tests.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| required_permission | String | The permission required to create an integration |
+| membership | Object | A factory-created membership object |
+| code | String | The code for the Xero integration |
+| name | String | The name for the Xero integration |
+| script_endpoint_url | String | A randomly generated URL (unused in this test) |
+
+### `mutation`
+#### Description
+Defines the GraphQL mutation query string used in the test.
+
+### `around { |test| lago_premium!(&test) }`
+#### Description
+Ensures that the test runs in a premium context.
+
+### `before` block
+#### Description
+Sets up the organization with premium Xero integration enabled.
+
+### Shared examples
+#### Description
+These are common test cases shared across multiple specs:
+- `it_behaves_like 'requires current user'`
+- `it_behaves_like 'requires current organization'`
+- `it_behaves_like 'requires permission', 'organization:integrations:create'`
+
+### Main test case: `it 'creates a xero integration'`
+#### Description
+This is the primary test case that verifies the creation of a Xero integration.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with the necessary inputs and context.
+2. Retrieves the result data from the mutation response.
+3. Uses `aggregate_failures` to group multiple expectations:
+   - Checks if the returned ID is present.
+   - Verifies that the returned code matches the input code.
+   - Ensures that the returned name matches the input name.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| RSpec | Testing framework used for writing and running the tests |
+| FactoryBot | Used for creating test data (e.g., `create(:membership)`) |
+
+## Configuration
+The test uses the following configuration options:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| type: :graphql | Symbol | N/A | Specifies that this is a GraphQL-related test |
+
+## Error Handling
+This test doesn't explicitly handle errors but relies on RSpec's built-in error handling and reporting mechanisms.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| createXeroIntegration | Mutation | CreateXeroIntegrationInput | XeroIntegration | Creates a new Xero integration |
+
+The `CreateXeroIntegrationInput` includes:
+- code: String
+- name: String
+- connectionId: String
+
+The response includes:
+- id: ID
+- code: String
+- name: String
+- syncInvoices: Boolean
+- syncCreditNotes: Boolean
+- syncPayments: Boolean

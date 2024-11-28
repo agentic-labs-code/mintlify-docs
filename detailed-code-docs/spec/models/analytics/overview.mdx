@@ -1,0 +1,56 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various analytics models within the application. The tests focus on verifying the behavior of the `cache_key` class method for different analytics models, including GrossRevenue, InvoiceCollection, InvoicedUsage, Mrr (Monthly Recurring Revenue), and OverdueBalance.
+
+## What does it do?
+These test files ensure that the `cache_key` methods of various analytics models generate correct and consistent cache keys based on different input parameters. The cache keys are crucial for proper caching behavior in the analytics system. Each test file covers multiple scenarios, such as generating cache keys with no arguments, with all possible arguments, and with various combinations of optional arguments.
+
+## Key Files
+1. `gross_revenue_spec.rb`: Tests the `cache_key` method of the `Analytics::GrossRevenue` model.
+2. `invoice_collection_spec.rb`: Tests the `cache_key` method of the `Analytics::InvoiceCollection` model.
+3. `invoiced_usage_spec.rb`: Tests the `cache_key` method of the `Analytics::InvoicedUsage` model.
+4. `mrr_spec.rb`: Tests the `cache_key` method of the `Analytics::Mrr` model.
+5. `overdue_balance_spec.rb`: Tests the `cache_key` method of the `Analytics::OverdueBalance` model.
+
+Each file follows a similar structure:
+
+1. It describes the model being tested.
+2. It focuses on the `cache_key` class method.
+3. It defines test cases for various scenarios, including:
+   - No arguments provided
+   - All possible arguments provided
+   - Different combinations of optional arguments
+
+## Dependencies
+The test files depend on the following:
+
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configurations |
+| rspec | Testing framework used for writing and running the tests |
+| securerandom | Used to generate random UUIDs for organization_id |
+
+## Configuration
+The tests use RSpec's configuration, which is likely set up in the `rails_helper` file. No specific configuration files are mentioned in the provided summaries.
+
+## Notes
+1. The tests use RSpec's `let` syntax for defining variables, promoting DRY (Don't Repeat Yourself) principles and allowing for lazy evaluation.
+2. The `described_class` method is used to refer to the class being tested, making the tests more maintainable if class names change.
+3. The cache keys include the current date, which is obtained using `Date.current.strftime("%Y-%m-%d")`. This ensures that the cache key changes daily, potentially affecting cache invalidation strategies.
+4. The tests cover various combinations of input parameters to ensure the `cache_key` methods handle different scenarios correctly.
+5. Error handling is not explicitly tested in these files. The tests focus on the correct generation of cache keys under various input conditions.
+
+Example of a typical cache key format:
+```ruby
+"model-name/[date]/[organization_id]/[optional_param1]/[optional_param2]/[optional_param3]"
+```
+
+Where:
+- `[date]` is the current date in 'YYYY-MM-DD' format
+- `[organization_id]` is a UUID
+- Optional parameters are included if provided, otherwise replaced with empty strings
+
+These tests are crucial for maintaining consistent caching behavior in the analytics system, ensuring that cache keys are generated correctly for various analytics models under different scenarios.

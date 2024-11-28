@@ -1,0 +1,62 @@
+---
+title: "create_generating_service.rb"
+---
+
+## High-level description
+This code defines the `Invoices::CreateGeneratingService` class, which is responsible for creating a new invoice in a "generating" status. It handles the initial setup of an invoice, including customer details, invoice type, currency, and dates.
+
+## Code Structure
+The `CreateGeneratingService` class inherits from `BaseService` and contains a single public method `call` that performs the main functionality. It uses a transaction to ensure data consistency when creating the invoice.
+
+## Symbols
+
+### `Invoices::CreateGeneratingService`
+#### Description
+This class is responsible for creating a new invoice in the "generating" status. It sets up the initial invoice details and allows for additional customization through a block.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Customer | The customer associated with the invoice |
+| invoice_type | Symbol | The type of invoice (e.g., :subscription, :credit) |
+| datetime | DateTime | The datetime for the invoice |
+| currency | String | The currency for the invoice |
+| charge_in_advance | Boolean | Whether the charge is in advance (default: false) |
+| skip_charges | Boolean | Whether to skip charges (default: false) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the created invoice and any errors |
+
+#### Internal Logic
+1. Initializes instance variables with input parameters.
+2. In a transaction, creates a new `Invoice` record with the provided details.
+3. Sets the invoice status to "generating".
+4. Calculates the issuing date and payment due date based on customer settings and grace period.
+5. Yields the created invoice to a block if provided, allowing for additional customization.
+6. Returns the result object containing the created invoice.
+
+### Private Methods
+
+#### `issuing_date`
+Calculates the issuing date for the invoice, considering the grace period and charge in advance settings.
+
+#### `grace_period?`
+Determines if a grace period should be applied based on the invoice type and customer settings.
+
+#### `payment_due_date`
+Calculates the payment due date based on the issuing date and the customer's net payment term.
+
+## Dependencies
+- ActiveRecord
+- BaseService (inherited)
+
+## Configuration
+The class uses customer-specific settings for timezone, net payment term, and invoice grace period.
+
+## Error Handling
+The service uses the error handling mechanism provided by the `BaseService` class. Any exceptions raised during the transaction will be caught and added to the result object.
+
+## API/Interface Reference
+This service is typically called by other services or controllers that need to create a new invoice. It provides a flexible interface through the use of a block, allowing callers to perform additional operations on the newly created invoice before the transaction is committed.

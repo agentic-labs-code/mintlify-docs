@@ -1,0 +1,50 @@
+---
+title: "have_empty_charge_fees.rb"
+---
+
+## High-level description
+This code defines a custom RSpec matcher called `have_empty_charge_fees`. It is used to test whether an invoice object has charge fees that are all empty (zero amount) and have valid date ranges.
+
+## Symbols
+
+### `have_empty_charge_fees`
+#### Description
+This is a custom RSpec matcher that checks if all charge fees in an invoice have zero total amount and valid date ranges.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Object | The invoice object to be tested |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Boolean | True if all charge fees are empty and have valid date ranges, false otherwise |
+
+#### Internal Logic
+1. Iterates through all charge fees of the invoice.
+2. For each fee:
+   - Parses the 'charges_from_datetime' and 'charges_to_datetime' from the fee properties.
+   - Checks if the total amount is zero and the 'from' date is before the 'to' date.
+3. Returns true if all fees meet the criteria, false otherwise.
+
+### Failure Messages
+The matcher includes two failure messages:
+
+1. `failure_message`: Used when the matcher fails (i.e., when there are non-empty charge fees).
+2. `failure_message_when_negated`: Used when the negated matcher fails (i.e., when there are no charge fees when some were expected).
+
+Both messages include the total amounts of all charge fees for debugging purposes.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| RSpec | Testing framework used to define the custom matcher |
+| Time | Used to parse and compare datetime strings |
+
+## Notes
+- The matcher assumes that the `invoice` object has a `fees` association with a `charge` scope.
+- The matcher relies on the presence of 'charges_from_datetime' and 'charges_to_datetime' properties in each fee object.
+- The code uses `Time.zone.parse` to handle timezone-aware datetime parsing.
+
+This custom matcher can be used in RSpec tests to easily verify that an invoice has empty charge fees, which can be useful for testing billing or invoicing functionality in a Rails application.

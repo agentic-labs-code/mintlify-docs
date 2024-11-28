@@ -1,0 +1,75 @@
+---
+title: "Overview"
+---
+
+## High-level description
+
+This directory contains RSpec test files for GraphQL types related to organizations in the application. The tests cover three main GraphQL types: `CurrentOrganizationType`, `OrganizationType`, and `UpdateOrganizationInput`. These tests ensure that the GraphQL schema for organization-related operations is correctly defined and includes all necessary fields, types, and permissions.
+
+## What does it do?
+
+The test files in this directory verify the structure and behavior of GraphQL types used for handling organization data in the application. They ensure that:
+
+1. The `CurrentOrganizationType` includes all required fields for representing the current organization, with correct types and permissions.
+2. The `OrganizationType` inherits from a base type and has the necessary fields for representing an organization.
+3. The `UpdateOrganizationInput` type accepts all required arguments for updating an organization, with correct types and associated permissions.
+
+These tests help maintain the integrity of the GraphQL schema, ensuring that any changes to the organization-related types are intentional and do not break existing functionality.
+
+## Key Files
+
+1. `current_organization_type_spec.rb`:
+   This file tests the `Types::Organizations::CurrentOrganizationType`. It verifies that the type inherits from the correct base type and includes all expected fields with their respective types and permissions. Fields tested include `id`, `default_currency`, `email`, and various other organization attributes.
+
+2. `organization_type_spec.rb`:
+   This file tests the `Types::Organizations::OrganizationType`. It checks that the type inherits from `BaseOrganizationType` and has specific fields like `id`, `logo_url`, `name`, `timezone`, and `default_currency` with correct types.
+
+3. `update_organization_input_spec.rb`:
+   This file tests the `Types::Organizations::UpdateOrganizationInput`. It verifies that the input type accepts various arguments for updating an organization, including fields like `default_currency`, `email`, `legal_name`, `tax_identification_number`, and many others. It also checks for specific permissions associated with certain fields.
+
+## Dependencies
+
+The test files depend on the following:
+
+1. `rails_helper`: This is likely a custom helper file that loads the Rails testing environment and configuration.
+2. RSpec: The testing framework used for writing and running these tests.
+3. Custom RSpec matchers: The tests use matchers like `have_field`, `of_type`, `with_permission`, and `accept_argument`, which are likely defined in a support file or a testing library specific to GraphQL.
+
+## Configuration
+
+While there are no explicit configuration files mentioned in the provided summaries, the tests implicitly rely on the configuration of the GraphQL schema and the RSpec testing environment. The tests assume the existence of certain custom GraphQL types and enums, such as:
+
+- `CurrencyEnum`
+- `TimezoneEnum`
+- `CountryCode`
+- `DocumentNumberingEnum`
+- `OrganizationBillingConfigurationInput`
+- `EmailSettingsEnum`
+
+These types are used in the field and argument definitions being tested.
+
+## Code Snippets
+
+Here are some example code snippets illustrating the testing patterns used in these files:
+
+1. Testing field presence and type in `current_organization_type_spec.rb`:
+
+```ruby
+it { is_expected.to have_field(:id).of_type('ID!') }
+it { is_expected.to have_field(:default_currency).of_type('CurrencyEnum!') }
+```
+
+2. Testing inheritance in `organization_type_spec.rb`:
+
+```ruby
+it { is_expected.to be &lt; ::Types::Organizations::BaseOrganizationType }
+```
+
+3. Testing input arguments in `update_organization_input_spec.rb`:
+
+```ruby
+it { is_expected.to accept_argument(:default_currency).of_type('CurrencyEnum') }
+it { is_expected.to accept_argument(:tax_identification_number).of_type('String').with_permission('organization:taxes:view') }
+```
+
+These tests ensure that the GraphQL types for organizations are correctly defined and maintain their expected structure and behavior as the application evolves.

@@ -1,0 +1,98 @@
+---
+title: "count_service.rb"
+---
+
+## High-level description
+This code defines the `CountService` class within the `BillableMetrics::Aggregations` module. It is responsible for computing aggregations for count-based billable metrics, handling both regular and grouped-by aggregations, and calculating running totals for free units.
+
+## Code Structure
+The `CountService` class inherits from `BillableMetrics::Aggregations::BaseService` and implements methods for computing aggregations, grouped-by aggregations, running totals, and per-event aggregations.
+
+## Symbols
+
+### `CountService`
+#### Description
+This class provides methods to compute aggregations for count-based billable metrics. It handles both regular and grouped-by aggregations, as well as calculating running totals for free units.
+
+#### Internal Logic
+The class implements four main methods:
+1. `compute_aggregation`: Calculates the main aggregation result.
+2. `compute_grouped_by_aggregation`: Computes aggregations for grouped data.
+3. `running_total`: Calculates the running total based on free units.
+4. `compute_per_event_aggregation`: Generates an array of per-event aggregations.
+
+### `compute_aggregation`
+#### Description
+This method computes the main aggregation result for the count-based metric.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| options | Hash | Optional parameters for the aggregation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Object containing aggregation results |
+
+#### Internal Logic
+1. Sets the aggregation value as the count from the event store.
+2. Sets current usage units and count to the same aggregation value.
+3. Sets pay-in-advance aggregation to 1.
+4. Calculates and stores the running total in the options.
+
+### `compute_grouped_by_aggregation`
+#### Description
+This method computes aggregations for grouped data.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Object containing grouped aggregation results |
+
+#### Internal Logic
+1. Retrieves grouped counts from the event store.
+2. If no aggregations are found, returns empty results.
+3. For each aggregation, creates a group result with grouped_by, aggregation, count, and current_usage_units.
+4. Stores all group results in the result object.
+
+### `running_total`
+#### Description
+Calculates the running total based on the number of free units.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| options | Hash | Contains free_units_per_events and free_units_per_total_aggregation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Array | Array of Integers | Running total array |
+
+#### Internal Logic
+1. Extracts free units per events and per total aggregation from options.
+2. If both are zero, returns an empty array.
+3. Otherwise, returns an array from 1 to the aggregation value.
+
+### `compute_per_event_aggregation`
+#### Description
+Generates an array of per-event aggregations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| exclude_event | Boolean | Flag to exclude an event (unused in this implementation) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Array | Array of Integers | Array of 1s with length equal to the event count |
+
+## Dependencies
+The `CountService` class depends on the `BillableMetrics::Aggregations::BaseService` class, which it inherits from.
+
+## Performance Considerations
+The `running_total` method creates an array with a size equal to the aggregation value, which could be memory-intensive for large aggregations. Consider optimizing this if dealing with very large counts.
+
+This documentation provides a comprehensive overview of the `CountService` class and its methods, explaining their purpose, inputs, outputs, and internal logic. The class is crucial for handling count-based billable metrics in the application's billing system.

@@ -1,0 +1,37 @@
+---
+title: "20231102141929_add_index_on_event_external_subscription_id.rb"
+---
+
+## High-level description
+This migration file adds a new index to the `events` table in the database. The index is created on multiple columns to improve query performance for specific lookups related to external subscriptions, event codes, and timestamps within an organization, excluding deleted records.
+
+## Symbols
+
+### `AddIndexOnEventExternalSubscriptionId`
+#### Description
+This class is a database migration that adds a new index to the `events` table. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0 migrations.
+
+#### Internal Logic
+1. The migration disables DDL (Data Definition Language) transactions using `disable_ddl_transaction!`.
+2. It defines a `change` method that will be called when the migration is run.
+3. Inside the `change` method, it uses `safety_assured` to bypass Strong Migrations safety checks.
+4. The `add_index` method is called to create the new index on the `events` table.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| disable_ddl_transaction! | Method | N/A | Disables DDL transactions for this migration |
+
+## Performance Considerations
+This migration adds an index to improve query performance on the `events` table. The index is created on multiple columns (`organization_id`, `external_subscription_id`, `code`, `timestamp`) and includes a condition to exclude deleted records. This can significantly speed up queries that filter on these columns, especially for large datasets.
+
+## Error Handling
+The migration uses `safety_assured` to bypass Strong Migrations safety checks. This should be used with caution, as it may potentially cause issues in production environments if not properly tested.
+
+## TODOs
+There are no explicit TODOs in this migration file.

@@ -1,0 +1,80 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `app/services/analytics` directory contains a collection of service classes responsible for retrieving and processing various types of analytics data for organizations. These services act as intermediaries between controllers and models, encapsulating business logic and data retrieval operations. The services cover different aspects of analytics, including gross revenues, invoice collections, invoiced usages, monthly recurring revenues (MRR), and overdue balances.
+
+## What does it do?
+This directory provides a set of services that handle analytics-related operations for an organization. Each service is responsible for a specific type of analytics data:
+
+1. Gross Revenues: Retrieves gross revenue data for an organization.
+2. Invoice Collections: Fetches invoice collection records, but only for users with a premium license.
+3. Invoiced Usages: Retrieves invoiced usage records, also requiring a premium license.
+4. Monthly Recurring Revenues (MRR): Fetches MRR records, again limited to premium users.
+5. Overdue Balances: Retrieves overdue balance records for an organization.
+
+These services typically check for premium license status (where applicable), apply filters to queries, and return the requested data in a standardized format. They provide a clean interface for controllers to interact with the underlying data models without directly coupling them.
+
+## Entry points
+The main entry point for each service is the `call` method. This method is typically invoked by a controller to retrieve the desired analytics data. The general workflow is as follows:
+
+1. The controller creates an instance of the service, passing the organization and any filters.
+2. The controller calls the `call` method on the service instance.
+3. The service checks for premium access if required.
+4. The service queries the appropriate model to retrieve the data.
+5. The service returns a result object containing the retrieved records or an error status.
+
+## Key Files
+1. `base_service.rb`: Defines the `BaseService` class, which serves as a foundation for all other analytics services. It provides common initialization logic and attribute readers.
+
+2. `gross_revenues_service.rb`: Implements the `GrossRevenuesService` for retrieving gross revenue data.
+
+3. `invoice_collections_service.rb`: Implements the `InvoiceCollectionsService` for fetching invoice collection records, with premium license checks.
+
+4. `invoiced_usages_service.rb`: Implements the `InvoicedUsagesService` for retrieving invoiced usage records, also with premium license checks.
+
+5. `mrrs_service.rb`: Implements the `MrrsService` for fetching Monthly Recurring Revenue (MRR) records, limited to premium users.
+
+6. `overdue_balances_service.rb`: Implements the `OverdueBalancesService` for retrieving overdue balance records.
+
+## Dependencies
+These services rely on several external dependencies and internal modules:
+
+1. `License` module: Used to check if a user has premium access.
+2. Various `Analytics` models: Each service interacts with a corresponding model (e.g., `Analytics::GrossRevenue`, `Analytics::InvoiceCollection`) to fetch the required data.
+3. `BaseService` class: All services inherit from this base class, which likely provides common functionality such as error handling and result object creation.
+
+## Configuration
+While there are no explicit configuration files mentioned, the services use filters passed from the controllers to customize their queries. Common filter parameters include:
+
+- `currency`: Filter results by currency (usually automatically upcased)
+- `months`: Filter results by a specific number of months
+- `external_customer_id`: Filter results by external customer ID (used in `OverdueBalancesService`)
+
+These filters are typically passed as optional parameters when initializing the service or calling the `call` method.
+
+Here's an example of how a controller might use one of these services:
+
+```ruby
+class Api::V1::Analytics::GrossRevenuesController &lt; Api::V1::Analytics::BaseController
+  def index
+    service = Analytics::GrossRevenuesService.new(current_organization, filters: filter_params)
+    result = service.call
+
+    if result.success?
+      render json: result.records
+    else
+      render json: { error: result.error }, status: :unprocessable_entity
+    end
+  end
+
+  private
+
+  def filter_params
+    params.permit(:currency, :months)
+  end
+end
+```
+
+This structure allows for easy extension and maintenance of analytics-related functionality, as each type of analytics data is encapsulated in its own service class. The use of a common `BaseService` class ensures consistency across all analytics services, while the individual service classes handle the specific logic and data retrieval for each type of analytics data.

@@ -1,0 +1,87 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions for the Anrok integration, specifically focusing on objects related to tax breakdowns and fees. The Anrok integration appears to be a system for handling tax calculations and representations within a larger application.
+
+## What does it do?
+The code in this directory defines the structure and behavior of GraphQL objects used to represent tax-related information in the Anrok integration. It provides a way to query and retrieve detailed information about fees and their associated tax breakdowns. This allows the application to present precise tax calculations to users or other parts of the system, including breakdowns of different tax components, rates, and amounts.
+
+## Key Files
+1. `breakdown_object.rb`: Defines the `BreakdownObject` GraphQL type, which represents a single component of a tax breakdown. It includes fields for the name, rate, tax amount, and type of the breakdown.
+
+2. `fee_object.rb`: Defines the `FeeObject` GraphQL type, which represents a fee in the Anrok integration. It includes fields for the fee amount, tax amount, associated item details, and a list of tax breakdowns.
+
+These files work together to provide a comprehensive representation of fees and their tax implications within the Anrok integration.
+
+## Dependencies
+The code relies on the `graphql` gem, which provides the framework for defining and working with GraphQL schemas in Ruby. This dependency allows the application to expose these types through a GraphQL API, enabling efficient and flexible querying of tax-related data.
+
+## Configuration
+There are no explicit configuration files or environment variables mentioned in the provided code. However, the structure and naming of the files suggest that they are part of a larger GraphQL schema configuration within the application.
+
+## Code Examples and Explanations
+
+### BreakdownObject
+
+The `BreakdownObject` is defined as follows:
+
+```ruby
+module Types
+  module Integrations
+    module AnrokObjects
+      class BreakdownObject &lt; Types::BaseObject
+        field :name, String, null: true
+        field :rate, GraphQL::Types::Float, null: true
+        field :tax_amount, GraphQL::Types::BigInt, null: true
+        field :type, String, null: true
+
+        def rate
+          object.rate&.to_d
+        end
+      end
+    end
+  end
+end
+```
+
+This object represents a single component of a tax breakdown. It includes:
+- `name`: A string describing the breakdown component (e.g., "State Tax", "City Tax").
+- `rate`: The tax rate as a floating-point number.
+- `tax_amount`: The amount of tax for this component, represented as a big integer (likely in cents).
+- `type`: A string indicating the type of tax (e.g., "Sales Tax", "VAT").
+
+The `rate` method is overridden to ensure that the rate is returned as a `BigDecimal` object, which provides more precise decimal arithmetic than standard floating-point numbers.
+
+### FeeObject
+
+The `FeeObject` is defined as follows:
+
+```ruby
+module Types
+  module Integrations
+    module AnrokObjects
+      class FeeObject &lt; Types::BaseObject
+        field :amount_cents, GraphQL::Types::BigInt, null: true
+        field :item_code, String, null: true
+        field :item_id, String, null: true
+        field :tax_amount_cents, GraphQL::Types::BigInt, null: true
+        field :tax_breakdown, [Types::Integrations::AnrokObjects::BreakdownObject], null: true
+      end
+    end
+  end
+end
+```
+
+This object represents a fee within the Anrok integration and includes:
+- `amount_cents`: The total amount of the fee in cents.
+- `item_code` and `item_id`: Identifiers for the item associated with the fee.
+- `tax_amount_cents`: The total tax amount for the fee in cents.
+- `tax_breakdown`: An array of `BreakdownObject` instances, providing a detailed breakdown of the tax components.
+
+The use of `GraphQL::Types::BigInt` for monetary amounts ensures that large values can be represented accurately without loss of precision.
+
+These GraphQL type definitions allow clients to query detailed information about fees and their tax breakdowns. For example, a client could request the total fee amount, the total tax amount, and a detailed breakdown of the tax components, all in a single GraphQL query.
+
+The modular structure of these types (nested under `Types::Integrations::AnrokObjects`) suggests that they are part of a larger, well-organized GraphQL schema, likely with other types and queries related to the Anrok integration and possibly other integrations as well.

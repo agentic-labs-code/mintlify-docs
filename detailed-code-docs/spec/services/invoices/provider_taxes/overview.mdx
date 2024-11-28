@@ -1,0 +1,94 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Invoices::ProviderTaxes::VoidService` class. It tests the `#call` method of the service, which is responsible for voiding invoices and handling tax-related operations, particularly with integration to external tax providers like Anrok.
+
+## Code Structure
+The test file is structured around a single `describe` block for the `#call` method, with multiple contexts testing different scenarios. It uses factory methods to create test data and mocks external HTTP requests to simulate interactions with tax provider APIs.
+
+## Symbols
+
+### `Invoices::ProviderTaxes::VoidService#call`
+#### Description
+This method is the main functionality of the service, responsible for voiding an invoice and handling related tax operations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice to be voided |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result of the void operation |
+
+#### Internal Logic
+1. Checks if the invoice exists
+2. Attempts to void the invoice with the tax provider (Anrok in this case)
+3. If successful, discards previous tax errors
+4. If unsuccessful, keeps the invoice in voided status and creates a new tax error
+
+## Side Effects
+- Modifies the status of the invoice
+- Creates or discards error records related to tax voiding
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| LagoHttpClient::Client | Used to make HTTP requests to tax provider APIs |
+
+## Error Handling
+The service handles various error scenarios:
+1. When the invoice doesn't exist
+2. When the void operation fails at the tax provider
+3. When the negate operation fails at the tax provider
+
+## Testing Scenarios
+
+### Context: When invoice does not exist
+#### Description
+Tests the behavior when trying to void a non-existent invoice.
+
+#### Internal Logic
+- Calls the service with a nil invoice
+- Expects an unsuccessful result with a specific error code
+
+### Context: When voided invoice is successfully synced
+#### Description
+Tests the happy path where the invoice is successfully voided and synced with the tax provider.
+
+#### Internal Logic
+- Sets up mock responses for successful void and negate operations
+- Calls the service and expects a successful result
+- Checks that previous tax errors are discarded
+
+### Context: When failed result is returned from void endpoint
+#### Description
+Tests the scenario where the void operation fails at the tax provider.
+
+#### Internal Logic
+- Sets up a mock response indicating a failure from the void endpoint
+- Calls the service and expects an unsuccessful result
+- Verifies that the invoice remains in voided status
+- Checks that old tax errors are resolved and a new one is created
+
+### Context: When failed result is returned from negate endpoint
+#### Description
+Tests the scenario where the void operation succeeds but the negate operation fails.
+
+#### Internal Logic
+- Sets up mock responses for a successful void but failed negate operation
+- Calls the service and expects an unsuccessful result
+- Verifies that the invoice remains in voided status
+- Checks that old tax errors are resolved and a new one is created
+
+## Performance Considerations
+The test file uses factory methods to create test data, which can impact test performance. However, this is a common practice in Rails testing for creating complex object graphs.
+
+## TODOs
+There are no explicit TODOs in the code.
+
+This test file provides comprehensive coverage for the `Invoices::ProviderTaxes::VoidService`, testing various scenarios including success and failure cases, and verifying the correct handling of invoice status and error records.

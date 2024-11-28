@@ -1,0 +1,39 @@
+---
+title: "common_factory.rb"
+---
+
+## High-level description
+This code defines the `Events::CommonFactory` class, which is responsible for creating instances of `Events::Common` from different source types. It provides a flexible way to create event objects with consistent attributes, regardless of the input source.
+
+## Code Structure
+The `Events::CommonFactory` class contains a single class method `new_instance` that takes a `source` parameter. This method uses a case statement to determine the type of the source and create an `Events::Common` instance accordingly.
+
+## Symbols
+
+### `Events::CommonFactory.new_instance`
+#### Description
+This class method creates a new `Events::Common` instance based on the provided source object. It handles different source types and extracts the relevant information to create a consistent event object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| source | Object | The source object containing event data (Events::Common, Hash, Event, or Clickhouse::EventsRaw) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | Events::Common | A new Events::Common instance created from the source data |
+
+#### Internal Logic
+1. Determines the class of the source object using `source.class.name`.
+2. Based on the source type, extracts the relevant attributes:
+   - For `Events::Common`: Returns the source as-is.
+   - For `Hash`: Creates a new `Events::Common` instance using the hash values.
+   - For `Event`: Creates a new `Events::Common` instance using the Event object's attributes.
+   - For `Clickhouse::EventsRaw`: Creates a new `Events::Common` instance using the Clickhouse::EventsRaw object's attributes, with `id` set to `nil`.
+
+## Dependencies
+This code depends on the `Events::Common` struct and potentially the `Clickhouse::EventsRaw` model, depending on the source types it handles.
+
+## Performance Considerations
+The `new_instance` method uses a case statement to determine the source type, which is generally efficient. However, if this method is called frequently with a large number of events, it might be worth considering caching or optimizing the object creation process for frequently used source types.

@@ -1,0 +1,52 @@
+---
+title: "terminate_relations_job.rb"
+---
+
+## High-level description
+This code defines a background job `Customers::TerminateRelationsJob` that terminates various relations associated with a customer. It's part of a customer deletion process, handling the asynchronous termination of subscriptions, invoices, coupons, and wallets for a given customer.
+
+## Code Structure
+The `TerminateRelationsJob` is defined within the `Customers` module and inherits from `ApplicationJob`. It uses the `Customers::TerminateRelationsService` to perform the actual termination of customer relations.
+
+## References
+- `Customer` model
+- `Customers::TerminateRelationsService`
+- `ApplicationJob`
+
+## Symbols
+
+### `Customers::TerminateRelationsJob`
+#### Description
+This job is responsible for terminating all relations associated with a customer. It's designed to be run asynchronously, likely after a customer has been marked for deletion.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer_id | Integer | The ID of the customer whose relations are to be terminated |
+
+#### Internal Logic
+1. Finds the customer using the provided `customer_id`, including soft-deleted customers (using `with_discarded`).
+2. Calls the `Customers::TerminateRelationsService` with the found customer.
+3. Raises an error if the service call results in an error.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveJob | Provides the base class for background job processing |
+
+## Error Handling
+The job uses the `raise_if_error!` method on the result object returned by `TerminateRelationsService`. This suggests that any errors occurring during the termination process will be raised, potentially triggering a job retry or failure notification.
+
+## Related Information
+From the related code snippets, we can infer:
+
+1. This job is enqueued by `Customers::DestroyService` after a customer is soft-deleted (discarded).
+2. The job inherits from `ApplicationJob`, which sets Sidekiq options to not retry failed jobs.
+3. The `Customers::TerminateRelationsService` performs the following actions:
+   - Terminates active subscriptions
+   - Cancels pending subscriptions
+   - Finalizes draft invoices
+   - Terminates applied coupons
+   - Terminates active wallets
+
+This job plays a crucial role in cleaning up customer-related data after a customer is marked for deletion, ensuring that all associated records are properly handled.

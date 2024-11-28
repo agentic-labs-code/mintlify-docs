@@ -1,0 +1,55 @@
+---
+title: "events_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying events of an organization. It's part of a larger GraphQL API and handles pagination and organization-specific event retrieval.
+
+## Code Structure
+The `EventsResolver` class inherits from `BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the resolver's arguments, return type, and the main `resolve` method.
+
+## References
+- `Types::Events::Object`: Used to define the return type of the resolver.
+- `Event`: The model used to query events from the database.
+- `current_organization`: Accessed from the context, likely set by the `RequiredOrganization` module.
+
+## Symbols
+
+### `EventsResolver`
+#### Description
+A GraphQL resolver for querying events of an organization. It ensures the user is authenticated and has access to the organization before resolving the query.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| page | Integer | Optional. The page number for pagination. |
+| limit | Integer | Optional. The number of items per page. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| events | Types::Events::Object.collection_type | A paginated collection of event objects. |
+
+#### Internal Logic
+1. Queries the `Event` model for records belonging to the current organization.
+2. Orders the events by timestamp in descending order.
+3. Applies pagination using the `page` and `limit` arguments.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated before resolving the query. |
+| RequiredOrganization | Ensures the user has access to the current organization. |
+
+## Error Handling
+Error handling is primarily managed by the included modules:
+- `AuthenticableApiUser` raises an unauthorized error if there's no current user.
+- `RequiredOrganization` raises a forbidden error if the organization is missing or the user is not a member.
+
+## API/Interface Reference
+This resolver is part of the GraphQL API and can be queried as follows:
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| events | GET | { page: Int, limit: Int } | [Event] | Retrieves a paginated list of events for the current organization. |
+
+Note: The actual GraphQL query syntax will depend on the fields defined in the `Types::Events::Object` type.

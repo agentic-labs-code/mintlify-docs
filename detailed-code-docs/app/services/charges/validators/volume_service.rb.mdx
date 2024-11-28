@@ -1,0 +1,75 @@
+---
+title: "volume_service.rb"
+---
+
+## High-level description
+This code defines a `VolumeService` class within the `Charges::Validators` module. It is responsible for validating the volume ranges and associated amounts for a volume-based charge model. The service ensures that the ranges are properly defined and that the amounts are valid.
+
+## Code Structure
+The `VolumeService` class inherits from `Charges::Validators::BaseService` and includes the `Validators::RangeBoundsValidator` module. It defines a `valid?` method to perform the validation and uses private methods to handle specific validation tasks.
+
+## Symbols
+
+### `VolumeService`
+#### Description
+This class validates the volume ranges and associated amounts for a volume-based charge model.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| properties | Hash | Contains the charge properties, including volume ranges |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid? | Boolean | Returns true if the validation passes, false otherwise |
+
+#### Internal Logic
+1. Checks if volume ranges are present
+2. Iterates through each range, validating:
+   - The amounts (per_unit_amount and flat_amount)
+   - The range bounds (from_value and to_value)
+3. Adds errors if any validation fails
+4. Calls the superclass's `valid?` method
+
+### `valid?`
+#### Description
+Performs the validation of volume ranges and amounts.
+
+#### Internal Logic
+1. Checks if ranges are present, adds an error if missing
+2. Iterates through each range:
+   - Validates amounts using `validate_amounts`
+   - Validates bounds using `valid_bounds?`
+   - Updates `next_from_value` for the next iteration
+3. Calls the superclass's `valid?` method
+
+### `ranges` (private)
+#### Description
+Retrieves and processes the volume ranges from the properties.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ranges | Array | Processed volume ranges with indifferent access |
+
+### `validate_amounts` (private)
+#### Description
+Validates the per_unit_amount and flat_amount of a range.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| range | Hash | A single volume range |
+
+#### Internal Logic
+Uses `Validators::DecimalAmountService` to validate both per_unit_amount and flat_amount, adding errors if invalid.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Validators::RangeBoundsValidator | Provides the `valid_bounds?` method for validating range bounds |
+| Validators::DecimalAmountService | Used to validate decimal amounts |
+
+## Error Handling
+The service adds errors to the result object using the `add_error` method. Errors are added for missing volume ranges, invalid volume ranges, and invalid amounts.

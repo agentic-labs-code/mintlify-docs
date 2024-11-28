@@ -1,0 +1,60 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains custom validators for a Ruby on Rails application. These validators are designed to ensure data integrity and consistency across various models in the application. They cover a range of validations including email formats, URLs, country codes, language codes, timezones, and image attachments.
+
+## What does it do?
+The validators in this directory perform the following tasks:
+
+1. Validate Adyen-specific URLs
+2. Check country codes against ISO 3166 standards
+3. Validate email addresses using RFC5322 compliant regular expressions
+4. Verify image attachments for size and content type
+5. Validate language codes against available locales
+6. Ensure timezone values are either 'UTC' or recognized by Rails
+7. Validate general URLs for correct format and protocol
+
+These validators can be used across different models in the application to ensure that data entered by users or processed by the system meets specific criteria. They help maintain data quality and prevent invalid or potentially harmful data from being stored in the database.
+
+## Key Files
+
+1. `adyen_url_validator.rb`: Validates URLs specifically for Adyen integration.
+2. `country_code_validator.rb`: Ensures country codes are valid according to ISO 3166 standards.
+3. `email_validator.rb`: Validates email addresses using a complex regular expression based on RFC5322.
+4. `image_validator.rb`: Checks image attachments for size and content type.
+5. `language_code_validator.rb`: Verifies language codes against the list of available locales.
+6. `timezone_validator.rb`: Validates timezone values.
+7. `url_validator.rb`: Provides general URL validation for HTTP and HTTPS protocols.
+
+Each validator is implemented as a separate class that inherits from `ActiveModel::EachValidator`, allowing them to be easily integrated into Rails models using the `validates` method.
+
+## Dependencies
+The validators rely on the following dependencies:
+
+1. ActiveModel: Part of the Ruby on Rails framework, used as the base for custom validators.
+2. ISO3166::Country: Used in the `CountryCodeValidator` to check country codes against ISO standards.
+3. I18n: Rails internationalization system, used in the `LanguageCodeValidator`.
+4. ActiveSupport::TimeZone: Used in the `TimezoneValidator` for timezone validation.
+5. URI: Ruby standard library for parsing and manipulating URIs, used in the `UrlValidator`.
+
+These dependencies are typically included in a standard Rails application and don't require additional installation.
+
+## Configuration
+While the validators themselves don't require specific configuration, they often accept options when used in models. For example:
+
+- The `ImageValidator` accepts `max_size` and `authorized_content_type` options:
+
+```ruby
+validates :image, image: { max_size: 5.megabytes, authorized_content_type: ['image/jpeg', 'image/png'] }
+```
+
+- The `UrlValidator` and `AdyenUrlValidator` can be used simply by specifying `url: true` in the model validation:
+
+```ruby
+validates :website, url: true
+validates :adyen_endpoint, adyen_url: true
+```
+
+These validators enhance the application's data integrity by providing custom, reusable validation logic that can be applied consistently across different models and attributes.

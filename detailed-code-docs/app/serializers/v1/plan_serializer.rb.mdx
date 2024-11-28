@@ -1,0 +1,82 @@
+---
+title: "plan_serializer.rb"
+---
+
+## High-level description
+The `PlanSerializer` class is responsible for serializing `Plan` model objects into a JSON representation for API responses. It includes options for including nested relationships like charges, usage thresholds, taxes, and minimum commitments.
+
+## Code Structure
+The `PlanSerializer` class inherits from `ModelSerializer` and overrides the `serialize` method. It uses several private methods (`charges`, `usage_thresholds`, `minimum_commitment`, `taxes`) to serialize nested relationships based on the `includes` option.
+
+## References
+- `ModelSerializer`: Parent class providing basic serialization functionality.
+- `CollectionSerializer`: Used to serialize collections of related objects.
+- `ChargeSerializer`, `UsageThresholdSerializer`, `TaxSerializer`, `CommitmentSerializer`: Serializers for nested relationships.
+
+## Symbols
+
+### `PlanSerializer`
+#### Description
+Serializes a `Plan` object into a JSON representation.
+
+#### Inputs
+The `PlanSerializer` class itself doesn't have explicit inputs. It operates on the `model` instance variable, which is implicitly set by the parent `ModelSerializer` class.
+
+#### Outputs
+Returns a hash representing the serialized `Plan` object, including optional nested relationships.
+
+#### Internal Logic
+1. **Base Payload:** Creates a hash `payload` with basic attributes of the `Plan` object.
+2. **Conditional Inclusions:**
+    - Merges serialized `charges` if `include?(:charges)` is true.
+    - Merges serialized `usage_thresholds` if `include?(:usage_thresholds)` is true.
+    - Merges serialized `taxes` if `include?(:taxes)` is true.
+    - Merges serialized `minimum_commitment` if `include?(:minimum_commitment)` is true and `model.minimum_commitment` exists.
+3. **Returns Payload:** Returns the assembled `payload` hash.
+
+### `charges`
+#### Description
+Serializes the `charges` association of the `Plan` object.
+
+#### Outputs
+Returns a hash representing the serialized `charges` collection.
+
+#### Internal Logic
+Uses the `CollectionSerializer` to serialize the `model.charges` collection with `ChargeSerializer`. It includes `taxes` if `include?(:taxes)` is true.
+
+### `usage_thresholds`
+#### Description
+Serializes the `usage_thresholds` association of the `Plan` object.
+
+#### Outputs
+Returns a hash representing the serialized `usage_thresholds` collection.
+
+#### Internal Logic
+Uses the `CollectionSerializer` to serialize the `model.usage_thresholds` collection with `UsageThresholdSerializer`.
+
+### `minimum_commitment`
+#### Description
+Serializes the `minimum_commitment` association of the `Plan` object.
+
+#### Outputs
+Returns a hash containing the serialized `minimum_commitment` object.
+
+#### Internal Logic
+- Checks if `include?(:minimum_commitment)` is true and `model.minimum_commitment` exists.
+- If both conditions are met, it serializes the `model.minimum_commitment` object using `CommitmentSerializer` and includes `taxes` if `include?(:taxes)` is true.
+
+### `taxes`
+#### Description
+Serializes the `taxes` association of the `Plan` object.
+
+#### Outputs
+Returns a hash representing the serialized `taxes` collection.
+
+#### Internal Logic
+Uses the `CollectionSerializer` to serialize the `model.taxes` collection with `TaxSerializer`.
+
+## Dependencies
+- `active_model_serializers`: Provides the base `ModelSerializer` class and serialization utilities.
+
+## Error Handling
+This code does not implement specific error handling beyond what is provided by the parent `ModelSerializer` class and Rails framework.

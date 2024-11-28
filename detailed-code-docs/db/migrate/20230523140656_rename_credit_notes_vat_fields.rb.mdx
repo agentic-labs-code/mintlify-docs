@@ -1,0 +1,42 @@
+---
+title: "20230523140656_rename_credit_notes_vat_fields.rb"
+---
+
+## High-level description
+This migration renames and modifies VAT (Value Added Tax) related fields in the `credit_notes` table to more generic tax fields. It also adds a new `taxes_rate` column and removes the `vat_amount_currency` column.
+
+## Symbols
+
+### `RenameCreditNotesVatFields`
+#### Description
+This class is an ActiveRecord migration that updates the structure of the `credit_notes` table, specifically focusing on renaming VAT-related fields to more generic tax fields and adding a new `taxes_rate` column.
+
+#### Internal Logic
+The migration defines two methods: `up` for applying the changes and `down` for reverting them.
+
+##### `up` method
+1. Adds a new `taxes_rate` column to the `credit_notes` table.
+2. Renames `vat_amount_cents` to `taxes_amount_cents`.
+3. Renames `precise_vat_amount_cents` to `precise_taxes_amount_cents`.
+4. Removes the `vat_amount_currency` column.
+
+##### `down` method
+1. Removes the `taxes_rate` column.
+2. Renames `taxes_amount_cents` back to `vat_amount_cents`.
+3. Renames `precise_taxes_amount_cents` back to `precise_vat_amount_cents`.
+4. Adds back the `vat_amount_currency` column.
+5. Executes an SQL query to update the `vat_amount_currency` with values from `balance_amount_currency`.
+
+## Side Effects
+- The structure of the `credit_notes` table is modified, which may affect any code or queries relying on the old column names.
+- The `vat_amount_currency` column is removed in the `up` method, potentially causing data loss if not handled properly in the application code.
+
+## Performance Considerations
+- The `safety_assured` block is used in the `up` method, which bypasses certain safety checks in the Strong Migrations gem. This should be used cautiously and only when the developer is certain that the migration is safe to run.
+- The `down` method includes a direct SQL execution, which updates all rows in the `credit_notes` table. This operation could be slow on large tables.
+
+## Error Handling
+No specific error handling is implemented in this migration. It relies on the default ActiveRecord migration error handling.
+
+## TODOs
+There are no explicit TODOs in the code.

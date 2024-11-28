@@ -1,0 +1,68 @@
+---
+title: "revoke_service.rb"
+---
+
+## High-level description
+This code defines a `RevokeService` class within the `Invites` module, responsible for revoking pending invites in an organization. It finds a pending invite by its ID and organization, marks it as revoked, and returns the result.
+
+## Symbols
+
+### `Invites::RevokeService`
+#### Description
+A service class that handles the revocation of pending invites within an organization. It inherits from `BaseService`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | A hash containing the parameters for revoking an invite |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the result of the operation, including the revoked invite if successful |
+
+#### Internal Logic
+1. Find a pending invite in the current organization using the provided ID.
+2. If the invite is not found, return a not found failure result.
+3. Mark the invite as revoked.
+4. Set the revoked invite in the result object.
+5. Return the result object.
+
+### `call(**args)`
+#### Description
+The main method of the `RevokeService` class that performs the invite revocation process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | A hash containing `:current_organization` and `:id` |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the result of the operation |
+
+#### Internal Logic
+1. Retrieve the pending invite from the current organization using the provided ID.
+2. If the invite is not found, return a not found failure result.
+3. Mark the invite as revoked using the `mark_as_revoked!` method.
+4. Set the revoked invite in the result object.
+5. Return the result object.
+
+## References
+- `BaseService`: The parent class of `RevokeService`, likely providing common functionality for service classes.
+- `result`: An instance variable or method provided by `BaseService` for storing and returning operation results.
+- `Invite` model: Referenced indirectly through the `invites` association on the `current_organization`.
+
+## Dependencies
+The code relies on the following Rails/Ruby features and conventions:
+- ActiveRecord querying methods (`find_by`, `pending` scope)
+- Rails associations (`invites` association on the organization model)
+
+## Related Code
+The `RevokeService` is used in the `Mutations::Invites::Revoke` GraphQL mutation:
+- The mutation requires the 'organization:members:delete' permission.
+- It calls the `RevokeService` with the provided arguments and the current organization.
+- The mutation returns the revoked invite if successful, or an error if the operation fails.
+
+This relationship demonstrates that the `RevokeService` is part of a larger system for managing invites through a GraphQL API, with proper authorization checks in place.

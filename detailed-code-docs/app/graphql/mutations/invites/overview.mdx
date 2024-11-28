@@ -1,0 +1,44 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL mutations related to invite management within an organization. It includes functionality for creating, accepting, revoking, and updating invites. These mutations are part of a larger GraphQL API and handle various aspects of invite lifecycle management.
+
+## What does it do?
+The code in this directory provides a set of GraphQL mutations that allow users to:
+
+1. Create new invites for people to join an organization
+2. Accept invites to join an organization
+3. Revoke existing invites
+4. Update the role associated with an existing invite
+
+These mutations work together to manage the entire invite process within an organization. They ensure that only authenticated users with the proper permissions can perform these actions, and they use service objects to handle the business logic of each operation.
+
+## Key Files
+1. `accept.rb`: Defines the `AcceptInvite` mutation, which allows a user to accept an invite and join an organization.
+2. `create.rb`: Implements the `CreateInvite` mutation for generating new invites to join an organization.
+3. `revoke.rb`: Contains the `RevokeInvite` mutation, which allows authorized users to cancel an existing invite.
+4. `update.rb`: Defines the `UpdateInvite` mutation, used to modify the role of an existing invite.
+
+Each of these files defines a separate GraphQL mutation class that inherits from `BaseMutation` and includes necessary modules for authentication and organization membership checks.
+
+## Dependencies
+The mutations in this directory rely on several shared dependencies:
+
+1. `BaseMutation`: A parent class for all GraphQL mutations, likely providing common functionality.
+2. `AuthenticableApiUser`: A module that ensures the user is authenticated before performing actions.
+3. `RequiredOrganization`: A module that checks if the user belongs to the required organization.
+4. Various service objects (e.g., `::Invites::CreateService`, `::Invites::AcceptService`) that encapsulate the business logic for each operation.
+5. GraphQL types from the `Types` namespace, such as `Types::Invites::Object` and `Types::Memberships::RoleEnum`.
+
+## Configuration
+Each mutation has a `REQUIRED_PERMISSION` constant that specifies the permission needed to perform the action. For example:
+
+- `CreateInvite`: 'organization:members:create'
+- `RevokeInvite`: 'organization:members:delete'
+- `UpdateInvite`: 'organization:members:update'
+
+These permissions are likely checked against the user's role within the organization to determine if they can perform the requested action.
+
+In summary, this directory contains a set of GraphQL mutations that work together to provide a comprehensive invite management system for an organization-based application. The mutations handle the creation, acceptance, revocation, and updating of invites, ensuring proper authentication and authorization at each step.

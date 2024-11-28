@@ -1,0 +1,36 @@
+---
+title: "20230705213846_update_provider_payment_methods_for_stripe_customers.rb"
+---
+
+## High-level description
+This migration updates the `settings` column of `payment_provider_customers` table for Stripe customers. It specifically sets the `provider_payment_methods` field to `["card"]` for all records where the `type` is 'PaymentProviderCustomers::StripeCustomer'.
+
+## Symbols
+
+### UpdateProviderPaymentMethodsForStripeCustomers
+#### Description
+This is a Rails migration class that inherits from `ActiveRecord::Migration[7.0]`. It defines a change to be applied to the database schema.
+
+#### Internal Logic
+1. The migration is wrapped in a `safety_assured` block, indicating that the migration has been reviewed for safety.
+2. It uses a `reversible` block to define the migration, allowing for potential rollback.
+3. In the `up` direction, it executes a SQL statement to update the `payment_provider_customers` table.
+4. The SQL statement uses PostgreSQL's `jsonb_set` function to modify the `settings` column, setting the `provider_payment_methods` field to `["card"]`.
+5. The update is only applied to records where the `type` is 'PaymentProviderCustomers::StripeCustomer'.
+
+## Side Effects
+This migration will modify existing data in the `payment_provider_customers` table. Specifically, it will update the `settings` column for all Stripe customers, setting their `provider_payment_methods` to `["card"]`.
+
+## Performance Considerations
+This migration performs a bulk update on potentially many rows in the `payment_provider_customers` table. Depending on the size of the table and the number of Stripe customers, this could be a time-consuming operation.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for defining database schema changes |
+
+## Error Handling
+The migration does not include explicit error handling. If the SQL execution fails, it will raise an exception and the migration will be rolled back by Rails' migration system.
+
+## TODOs
+There are no explicit TODOs in this migration.

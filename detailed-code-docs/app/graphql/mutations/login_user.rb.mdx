@@ -1,0 +1,65 @@
+---
+title: "login_user.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation called `LoginUser` that handles user authentication. It takes an email and password as input, attempts to log in the user, and returns a token and user information upon successful authentication.
+
+## Code Structure
+The `LoginUser` mutation is defined within the `Mutations` module and inherits from `BaseMutation`. It interacts with the `UsersService` to perform the login operation and returns a `LoginUserType` payload.
+
+## References
+- `Types::Payloads::LoginUserType`
+- `UsersService`
+
+## Symbols
+
+### `Mutations::LoginUser`
+#### Description
+This class defines a GraphQL mutation for user login. It takes email and password as arguments and returns a token and user information upon successful authentication.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| email | String | The user's email address |
+| password | String | The user's password |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| token | String | JWT token for authenticated session |
+| user | Types::UserType | User information |
+
+#### Internal Logic
+1. The `resolve` method is called with email and password arguments.
+2. It uses the `UsersService` to attempt a login with the provided credentials.
+3. If successful, it returns the result; otherwise, it returns an error.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| UsersService | Handles the actual login logic |
+| Types::Payloads::LoginUserType | Defines the structure of the mutation's return type |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in `BaseMutation`) to handle and return errors from the `UsersService`.
+
+## Related Code Context
+
+### MutationType
+The `LoginUser` mutation is registered in the `MutationType` as `field :login_user, mutation: Mutations::LoginUser`, making it available in the GraphQL schema.
+
+### UsersService
+The `UsersService` class contains the `login` method, which:
+1. Finds the user by email and authenticates the password.
+2. Checks if the user has any active memberships.
+3. Generates a JWT token for successful logins.
+4. Triggers a `SegmentIdentifyJob` for tracking purposes.
+
+### LoginUserType
+This type defines the structure of the mutation's return payload, including `token` and `user` fields.
+
+### BaseMutation
+The `LoginUser` mutation inherits from `BaseMutation`, which includes error handling and permission management functionality.
+
+This mutation serves as the entry point for user authentication in the GraphQL API, leveraging the `UsersService` for the core login logic and returning a standardized payload structure.

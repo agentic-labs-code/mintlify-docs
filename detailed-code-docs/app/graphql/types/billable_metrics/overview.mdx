@@ -1,0 +1,126 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions related to billable metrics in a billing system. It includes various input types, object types, and enums that define the structure and behavior of billable metrics within the GraphQL schema.
+
+## What does it do?
+This directory provides the necessary GraphQL type definitions for handling billable metrics in a billing system. It allows for:
+
+1. Creating new billable metrics with specific attributes such as aggregation type, code, name, and filters.
+2. Updating existing billable metrics with modified attributes.
+3. Querying billable metric information, including associated data like active subscriptions count and integration mappings.
+4. Defining standardized enums for aggregation types and weighted intervals used in billable metrics.
+
+These type definitions enable the GraphQL API to handle operations related to billable metrics in a structured and type-safe manner, facilitating the creation, modification, and retrieval of billing-related data in the system.
+
+## Key Files
+
+1. `object.rb`: Defines the main GraphQL object type for billable metrics, representing their structure and associated data.
+
+2. `create_input.rb`: Specifies the input structure for creating new billable metrics, defining required and optional fields.
+
+3. `update_input.rb`: Defines the input structure for updating existing billable metrics, allowing modification of various attributes.
+
+4. `aggregation_type_enum.rb`: Creates an enum type for different aggregation methods used in billable metrics.
+
+5. `weighted_interval_enum.rb`: Establishes an enum type for weighted intervals applicable to billable metrics.
+
+Each file plays a crucial role in defining the GraphQL schema for billable metrics, enabling type-safe operations and providing a clear structure for data manipulation and retrieval.
+
+## Dependencies
+The code in this directory relies on several external and internal dependencies:
+
+1. GraphQL Ruby: The underlying framework for implementing GraphQL in Ruby.
+2. `Types::BaseObject` and `Types::BaseEnum`: Custom base classes for GraphQL types, likely defined elsewhere in the application.
+3. `BillableMetric` model: Referenced for constants like `AGGREGATION_TYPES` and `WEIGHTED_INTERVAL`.
+4. Other custom types:
+   - `Types::Organizations::OrganizationType`
+   - `Types::BillableMetricFilters::Object`
+   - `Types::IntegrationMappings::Object`
+
+These dependencies provide the foundation for defining GraphQL types and integrate the billable metrics functionality with the rest of the application's data model.
+
+## Configuration
+While there are no explicit configuration files in this directory, the behavior of the billable metrics types is influenced by constants defined in the `BillableMetric` model:
+
+1. `BillableMetric::AGGREGATION_TYPES`: Defines the available aggregation types for billable metrics.
+2. `BillableMetric::WEIGHTED_INTERVAL`: Specifies the possible weighted interval values.
+
+These constants are used to dynamically generate enum values, ensuring consistency between the GraphQL schema and the underlying data model.
+
+## Code Examples
+
+Here's an example of how the `Types::BillableMetrics::Object` is defined:
+
+```ruby
+module Types
+  module BillableMetrics
+    class Object &lt; Types::BaseObject
+      field :id, ID, null: false
+      field :organization, Types::Organizations::OrganizationType, null: false
+      field :code, String, null: false
+      field :name, String, null: false
+      field :description, String
+      field :aggregation_type, Types::BillableMetrics::AggregationTypeEnum, null: false
+      field :field_name, String
+      field :weighted_interval, Types::BillableMetrics::WeightedIntervalEnum
+      field :filters, [Types::BillableMetricFilters::Object], null: false
+      field :active_subscriptions_count, Integer, null: false
+      field :draft_invoices_count, Integer, null: false
+      field :plans_count, Integer, null: false
+      field :recurring, Boolean, null: false
+      field :subscriptions_count, Integer, null: false
+      field :created_at, GraphQL::Types::ISO8601DateTime, null: false
+      field :deleted_at, GraphQL::Types::ISO8601DateTime
+      field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
+
+      # ... (method definitions)
+    end
+  end
+end
+```
+
+This object type defines the structure of a billable metric, including its attributes and relationships. It also includes methods for calculating related counts and retrieving associated data.
+
+The input types for creating and updating billable metrics are structured similarly. For example, here's a snippet from the `CreateInput`:
+
+```ruby
+module Types
+  module BillableMetrics
+    class CreateInput &lt; BaseInputObject
+      description 'Attributes for creating a billable metric'
+
+      argument :aggregation_type, Types::BillableMetrics::AggregationTypeEnum, required: true
+      argument :code, String, required: true
+      argument :description, String, required: false
+      argument :field_name, String, required: false
+      argument :name, String, required: true
+      argument :recurring, Boolean, required: false
+      argument :weighted_interval, Types::BillableMetrics::WeightedIntervalEnum, required: false
+      argument :filters, [Types::BillableMetricFilters::Input], required: false
+    end
+  end
+end
+```
+
+This input type defines the structure for creating a new billable metric, specifying which fields are required and which are optional.
+
+The enum types are defined dynamically based on constants from the `BillableMetric` model. For example:
+
+```ruby
+module Types
+  module BillableMetrics
+    class AggregationTypeEnum &lt; Types::BaseEnum
+      BillableMetric::AGGREGATION_TYPES.keys.each do |type|
+        value type
+      end
+    end
+  end
+end
+```
+
+This approach ensures that the GraphQL schema stays in sync with the underlying data model, as any changes to the `AGGREGATION_TYPES` constant will be reflected in the GraphQL enum.
+
+These type definitions work together to provide a comprehensive and type-safe way of handling billable metrics through the GraphQL API, enabling creation, updating, and querying of billable metrics with proper validation and structure.

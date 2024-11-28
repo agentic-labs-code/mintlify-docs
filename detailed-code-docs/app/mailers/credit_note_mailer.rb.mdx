@@ -1,0 +1,75 @@
+---
+title: "credit_note_mailer.rb"
+---
+
+## High-level description
+The `CreditNoteMailer` class is responsible for sending email notifications when a credit note is created. It handles the attachment of the credit note PDF and sets up the email with the appropriate content and recipients based on the organization and customer information.
+
+## Code Structure
+The `CreditNoteMailer` class inherits from `ApplicationMailer` and defines a single public method `created` for sending the credit note creation email. It also includes a private method `ensure_pdf` that is executed before the main action.
+
+## References
+- `ApplicationMailer`: The parent class that provides common mailer functionality.
+- `CreditNotes::GenerateService`: Used to generate the PDF for the credit note.
+
+## Symbols
+
+### `CreditNoteMailer`
+#### Description
+This class handles the creation and sending of emails related to credit notes.
+
+#### Internal Logic
+1. Executes `ensure_pdf` before any action.
+2. In the `created` method:
+   - Sets up instance variables for credit note, organization, and customer.
+   - Checks if the organization and customer emails are present.
+   - Attaches the credit note PDF to the email.
+   - Sets up the email content using the customer's preferred locale.
+   - Sends the email with the appropriate subject, sender, and recipient information.
+
+### `created`
+#### Description
+Prepares and sends an email notification for a newly created credit note.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:credit_note] | CreditNote | The credit note object for which the email is being sent |
+
+#### Internal Logic
+1. Retrieves credit note, organization, and customer information.
+2. Checks if both organization and customer emails are present.
+3. Attaches the credit note PDF to the email.
+4. Sets up the email content using the customer's preferred locale.
+5. Sends the email with the appropriate subject, sender, and recipient information.
+
+### `ensure_pdf`
+#### Description
+A private method that ensures the credit note PDF is generated before sending the email.
+
+#### Internal Logic
+Calls the `CreditNotes::GenerateService` to create the PDF for the credit note if it doesn't already exist.
+
+## Side Effects
+- Generates a PDF file for the credit note if it doesn't exist.
+- Sends an email with the credit note information and attachment.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| I18n | For internationalization of email content |
+| ENV['LAGO_FROM_EMAIL'] | Environment variable for the sender's email address |
+
+## Configuration
+The mailer uses the following configuration:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LAGO_FROM_EMAIL | String | N/A | The email address used as the sender for credit note emails |
+
+## Error Handling
+The code includes basic error prevention by checking for the presence of organization and customer emails before attempting to send the email.
+
+## Logging
+No explicit logging is implemented in this class.
+
+This mailer class is crucial for notifying customers about newly created credit notes, ensuring that they receive a professional and localized email with the credit note attached as a PDF.

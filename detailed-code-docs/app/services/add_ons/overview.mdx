@@ -1,0 +1,62 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains service classes responsible for managing add-ons within the application. These services handle various operations related to add-ons, including creation, updating, deletion, and tax application. The services are designed to encapsulate business logic and provide a clean interface for performing complex operations on add-ons.
+
+## What does it do?
+The services in this directory work together to manage the lifecycle of add-ons in the system. Here's a breakdown of the main functionalities:
+
+1. Creating add-ons: The `CreateService` allows for the creation of new add-ons, including the application of taxes if specified. It also tracks the creation event using Segment analytics.
+
+2. Updating add-ons: The `UpdateService` handles the modification of existing add-ons, including updating their attributes and applying new tax codes if provided.
+
+3. Deleting add-ons: The `DestroyService` manages the soft deletion of add-ons from the system, using the `discard!` method to mark them as deleted without removing them from the database.
+
+4. Applying taxes: The `ApplyTaxesService` is responsible for managing the application of taxes to an add-on. It can create, delete, and update applied taxes based on provided tax codes.
+
+These services work together to provide a comprehensive system for managing add-ons, ensuring data consistency, handling errors, and maintaining the integrity of the add-on lifecycle within the application.
+
+## Key Files
+
+1. `apply_taxes_service.rb`:
+   - Purpose: Manages the application of taxes to an add-on.
+   - Functionality: Creates, deletes, and updates applied taxes based on provided tax codes.
+   - Key method: `call` - Executes the main logic for tax application.
+
+2. `create_service.rb`:
+   - Purpose: Handles the creation of new add-ons in the system.
+   - Functionality: Creates a new add-on, applies taxes if specified, and tracks the creation event.
+   - Key method: `create` - Manages the entire creation process, including error handling.
+
+3. `destroy_service.rb`:
+   - Purpose: Manages the deletion (soft delete) of an add-on.
+   - Functionality: Marks an add-on as discarded using the `discard!` method.
+   - Key method: `call` - Executes the deletion logic and handles potential errors.
+
+4. `update_service.rb`:
+   - Purpose: Handles the updating of existing add-ons.
+   - Functionality: Modifies add-on attributes and applies new tax codes if provided.
+   - Key method: `call` - Manages the update process within a database transaction.
+
+## Dependencies
+The services in this directory rely on several external dependencies and internal modules:
+
+1. ActiveRecord: Used for database operations and error handling.
+2. BaseService: A parent class providing common service functionality.
+3. SegmentTrackJob: Used for tracking events using Segment analytics.
+4. CurrentContext: A module for accessing the current membership context.
+
+These dependencies are crucial for the proper functioning of the add-on services, enabling database interactions, error handling, and analytics tracking.
+
+## Configuration
+While there are no explicit configuration files mentioned in the provided summaries, the services may rely on environment variables or application-wide configurations for settings such as:
+
+1. Database connection details
+2. Segment analytics configuration
+3. Logging settings
+
+It's important to ensure that these configurations are properly set up in the broader application context for the add-on services to function correctly.
+
+In conclusion, the `app/services/add_ons` directory contains a set of well-structured service classes that work together to manage the lifecycle of add-ons in the system. These services encapsulate complex business logic, handle errors gracefully, and provide a clean interface for performing operations on add-ons, contributing to a maintainable and scalable application architecture.

@@ -1,0 +1,108 @@
+---
+title: "volume_service.rb"
+---
+
+## High-level description
+This code defines the `VolumeService` class within the `Charges::ChargeModels` module. It is responsible for calculating charges based on a volume-based pricing model, where the price per unit and flat fees can vary depending on the volume of units consumed.
+
+## Code Structure
+The `VolumeService` class inherits from `Charges::ChargeModels::BaseService` and implements several protected methods to calculate charges based on volume ranges. The main calculation logic is encapsulated in the `compute_amount` method, which uses helper methods to determine the appropriate pricing tier and calculate the total charge.
+
+## Symbols
+
+### `VolumeService`
+#### Description
+This class implements a volume-based pricing model for calculating charges. It determines the appropriate pricing tier based on the number of units and calculates the total charge accordingly.
+
+#### Internal Logic
+1. Determines the applicable volume range based on the number of units.
+2. Calculates the total charge by combining a flat fee and a per-unit charge.
+3. Handles prorated charges when applicable.
+4. Provides detailed breakdown of the charge components.
+
+### `ranges`
+#### Description
+Retrieves and sorts the volume ranges from the `properties` hash.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ranges | Array of Hashes | Sorted array of volume ranges |
+
+### `compute_amount`
+#### Description
+Calculates the total charge amount based on the number of units and the matching volume range.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| amount | BigDecimal | The total charge amount |
+
+### `unit_amount`
+#### Description
+Calculates the amount per unit by dividing the total amount by the number of units.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| unit_amount | BigDecimal | The amount per unit |
+
+### `amount_details`
+#### Description
+Provides a detailed breakdown of the charge components.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| amount_details | Hash | Detailed breakdown of charge components |
+
+### `flat_unit_amount`
+#### Description
+Retrieves the flat amount from the matching range.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| flat_unit_amount | BigDecimal | The flat amount for the matching range |
+
+### `per_unit_amount`
+#### Description
+Calculates the per-unit amount by dividing the total per-unit amount by the number of units.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| per_unit_amount | BigDecimal | The amount per unit |
+
+### `per_unit_total_amount`
+#### Description
+Calculates the total amount for per-unit charges by multiplying the number of units by the per-unit amount from the matching range.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| per_unit_total_amount | BigDecimal | The total amount for per-unit charges |
+
+### `matching_range`
+#### Description
+Finds the appropriate volume range that matches the number of units.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| matching_range | Hash | The volume range that matches the number of units |
+
+### `number_of_units`
+#### Description
+Determines the number of units to use for calculations, considering proration if applicable.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| number_of_units | Numeric | The number of units used for calculations |
+
+## Dependencies
+The `VolumeService` class depends on the `Charges::ChargeModels::BaseService` class, which it inherits from. It also uses Ruby's `BigDecimal` class for precise decimal calculations.
+
+## Performance Considerations
+The class memoizes several calculations using instance variables (e.g., `@flat_unit_amount`, `@per_unit_amount`, `@per_unit_total_amount`, `@matching_range`, `@number_of_units`) to avoid redundant computations, which can improve performance when these values are accessed multiple times.

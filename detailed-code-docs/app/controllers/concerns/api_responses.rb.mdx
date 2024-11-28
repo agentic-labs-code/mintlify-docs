@@ -1,0 +1,67 @@
+---
+title: "api_responses.rb"
+---
+
+## High-level description
+The `ApiResponses` module is a Ruby on Rails concern that provides standardized API response handling for controllers. It sets the response format to JSON and includes a method for generating a consistent "not found" error response.
+
+## Code Structure
+The `ApiResponses` module is defined as a concern, which allows it to be easily included in multiple controllers. It contains a `before_action` hook and two methods: `not_found_error` and `set_json_format`.
+
+## References
+This module is referenced in the `ApplicationController`, which includes it using the `include ApiResponses` statement.
+
+## Symbols
+
+### ApiResponses
+#### Description
+This module encapsulates common API response functionality, ensuring consistent JSON responses and providing a standardized "not found" error response.
+
+#### Internal Logic
+1. Extends `ActiveSupport::Concern` to make it a proper Rails concern.
+2. Uses the `included` block to define a `before_action` that sets the JSON format for all requests.
+3. Defines methods for handling not found errors and setting the JSON format.
+
+### not_found_error
+#### Description
+Renders a standardized JSON response for "not found" errors.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resource | Symbol or String | The name of the resource that was not found |
+
+#### Outputs
+Renders a JSON response with a 404 status code.
+
+#### Internal Logic
+Constructs a JSON object with status code, error message, and a resource-specific error code, then renders it with a `:not_found` HTTP status.
+
+### set_json_format (protected)
+#### Description
+Sets the request format to JSON.
+
+#### Internal Logic
+Assigns `:json` to `request.format` to ensure all responses are in JSON format.
+
+## Side Effects
+- Modifies the `request.format` to always be JSON.
+- Affects the response format and content for all actions in controllers that include this concern.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveSupport::Concern | Provides modular and reusable controller functionality |
+
+## Error Handling
+The `not_found_error` method provides a standardized way to handle and respond to "not found" errors across the application.
+
+## API/Interface Reference
+While not explicitly defining an API, this module influences the API response format:
+
+| Endpoint | Method | Response | Description |
+|:---------|:-------|:---------|:------------|
+| Any | Any | JSON | All responses will be in JSON format |
+| Any (not found) | Any | `{ status: 404, error: 'Not Found', code: "&lt;resource&gt;_not_found" }` | Standard not found error response |
+
+This module ensures consistent API responses across the application, particularly for error handling and response format. It's designed to be included in controllers that need standardized API response handling.

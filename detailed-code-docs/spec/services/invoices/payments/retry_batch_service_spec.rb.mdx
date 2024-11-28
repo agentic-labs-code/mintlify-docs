@@ -1,0 +1,56 @@
+---
+title: "retry_batch_service_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Invoices::Payments::RetryBatchService` class. It tests two main methods: `call_async` and `call`, which are responsible for retrying failed invoice payments in batch.
+
+## Code Structure
+The test file contains two main describe blocks for the `#call_async` and `#call` methods. Each block tests different scenarios and expected outcomes of the service.
+
+## Symbols
+
+### `Invoices::Payments::RetryBatchService`
+#### Description
+This is the main service class being tested. It handles retrying failed invoice payments in batch for a given organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | Integer | The ID of the organization for which to retry payments |
+
+### `#call_async`
+#### Description
+This method enqueues a job to retry all payments asynchronously.
+
+#### Internal Logic
+The test checks if the `Invoices::Payments::RetryAllJob` is enqueued when `call_async` is called.
+
+### `#call`
+#### Description
+This method processes a batch of invoices for payment retry.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice_ids | Array | An array of invoice IDs to process |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | A result object containing processed invoices and success status |
+
+#### Internal Logic
+1. The method filters invoices based on their status and payment status.
+2. It processes only invoices that are finalized, have failed payment status, and are ready for payment processing.
+3. Returns a success result with processed invoices if all goes well.
+4. Returns an error result if any invoice is not ready for payment processing.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides RSpec configuration for Rails |
+| FactoryBot | Used for creating test data |
+
+## Error Handling
+The service returns a `BaseService::MethodNotAllowedFailure` error when an invoice is not ready for payment processing.

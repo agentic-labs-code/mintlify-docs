@@ -1,0 +1,64 @@
+---
+title: "refresh_lifetime_usages_job_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Clock::RefreshLifetimeUsagesJob` class. It verifies the behavior of the job's `perform` method under different conditions, specifically testing how it handles lifetime usage recalculations for both freemium and premium scenarios.
+
+## Symbols
+
+### `Clock::RefreshLifetimeUsagesJob`
+#### Description
+This is the main class being tested. It's a job responsible for refreshing lifetime usages.
+
+### `.perform`
+#### Description
+This is the main method being tested within the `Clock::RefreshLifetimeUsagesJob` class. It's responsible for performing the refresh operation on lifetime usages.
+
+### `describe Clock::RefreshLifetimeUsagesJob, job: true do`
+#### Description
+This is the main describe block for the test suite, focusing on the `Clock::RefreshLifetimeUsagesJob` class and marking it as a job test.
+
+#### Internal Logic
+The test suite sets up three lifetime usage objects with different recalculation flags and tests the behavior of the `perform` method in both freemium and premium contexts.
+
+### `describe '.perform' do`
+#### Description
+This describe block focuses on testing the `.perform` class method of `Clock::RefreshLifetimeUsagesJob`.
+
+#### Internal Logic
+1. Sets up three lifetime usage objects with different recalculation flags.
+2. Tests the behavior in freemium context.
+3. Tests the behavior in premium context.
+
+### `context 'when freemium' do`
+#### Description
+This context block tests the behavior of the `perform` method in a freemium environment.
+
+#### Internal Logic
+Verifies that the refresh service is not called for any lifetime usage objects in freemium mode.
+
+### `context 'when premium' do`
+#### Description
+This context block tests the behavior of the `perform` method in a premium environment.
+
+#### Internal Logic
+1. Uses the `lago_premium!` helper to set up a premium environment.
+2. Verifies that jobs are enqueued only for lifetime usage objects that need recalculation.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used for creating test objects (lifetime usages) |
+| LifetimeUsages::RecalculateAndCheckJob | The job that is expected to be enqueued for recalculation |
+
+## References
+- `LifetimeUsages::RecalculateAndCheckJob`: This job is referenced in the expectations, suggesting it's responsible for recalculating and checking lifetime usages.
+- `lago_premium!`: This seems to be a custom helper method used to set up a premium environment for testing.
+
+## Notes
+1. The test uses FactoryBot to create test objects, as evidenced by the `create(:lifetime_usage, ...)` calls.
+2. The `lago_premium!` method is used to switch between freemium and premium contexts, likely defined in a helper file.
+3. The test uses RSpec's `have_been_enqueued` matcher to check if jobs are properly enqueued.
+4. The test is structured to cover both freemium and premium scenarios, ensuring the job behaves correctly in different environments.

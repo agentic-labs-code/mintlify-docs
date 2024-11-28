@@ -1,0 +1,67 @@
+---
+title: "refresh_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Mutations::Invoices::Refresh` GraphQL mutation. It verifies that the mutation correctly refreshes an invoice, checks for required permissions, and ensures the updated invoice details are returned.
+
+## Code Structure
+The test suite defines a set of let variables to set up the test environment and a GraphQL mutation query. It then runs several shared examples for common checks and a specific test for the refresh functionality.
+
+## Symbols
+
+### RSpec.describe Mutations::Invoices::Refresh
+#### Description
+This is the main describe block for the test suite, focusing on the `Mutations::Invoices::Refresh` GraphQL mutation.
+
+### let variables
+#### Description
+These variables set up the test environment with necessary objects and data.
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| required_permission | String | The permission required to perform the mutation |
+| membership | Membership | A factory-created membership object |
+| organization | Organization | The organization associated with the membership |
+| customer | Customer | A factory-created customer associated with the organization |
+| invoice | Invoice | A factory-created invoice associated with the customer and organization |
+| mutation | String | The GraphQL mutation query for refreshing an invoice |
+
+### Shared Examples
+#### Description
+These are reusable test cases that check common requirements for the mutation.
+
+| Name | Description |
+|:-----|:------------|
+| 'requires current user' | Ensures the mutation requires a current user |
+| 'requires current organization' | Ensures the mutation requires a current organization |
+| 'requires permission' | Checks if the mutation requires the 'invoices:update' permission |
+
+### Main Test Case
+#### Description
+This test case verifies that the mutation successfully refreshes the given invoice and returns the expected data.
+
+#### Internal Logic
+1. Freezes time to ensure consistent timestamp comparisons
+2. Executes the GraphQL mutation with necessary inputs and permissions
+3. Retrieves the result data
+4. Checks that the returned invoice ID is present
+5. Verifies that the returned `updatedAt` timestamp matches the current time
+
+## Dependencies
+The test suite relies on the following dependencies:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| RSpec | Testing framework |
+| FactoryBot | Used for creating test objects |
+| GraphQL | The query language being tested |
+| ActiveSupport::Testing::TimeHelpers | Used for time manipulation in tests |
+
+## Configuration
+The test suite uses the following configuration:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| type | Symbol | :graphql | Specifies that this is a GraphQL-related test |
+
+Note: This configuration is inferred from the `type: :graphql` parameter in the describe block.

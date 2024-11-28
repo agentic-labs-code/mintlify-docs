@@ -1,0 +1,97 @@
+---
+title: "adyen_service.rb"
+---
+
+## High-level description
+This code defines the `CreditNotes::Refunds::AdyenService` class, which is responsible for creating and updating refunds for credit notes using the Adyen payment provider. It handles the creation of refunds, updates their status, and manages the associated credit note status.
+
+## Code Structure
+The `AdyenService` class inherits from `BaseService` and includes the `Customers::PaymentProviderFinder` module. It contains two main public methods: `create` for creating refunds and `update_status` for updating refund statuses. The class interacts with the Adyen API, creates `Refund` records, and updates `CreditNote` statuses.
+
+## Symbols
+
+### `CreditNotes::Refunds::AdyenService`
+#### Description
+This class handles the creation and status updates of refunds for credit notes using the Adyen payment provider.
+
+#### Methods
+
+### `initialize(credit_note = nil)`
+#### Description
+Initializes the service with an optional credit note.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_note | CreditNote | The credit note associated with the refund (optional) |
+
+### `create`
+#### Description
+Creates a refund for the associated credit note using the Adyen payment provider.
+
+#### Internal Logic
+1. Checks if the refund should be processed
+2. Creates an Adyen refund
+3. Creates a local `Refund` record
+4. Updates the credit note status
+5. Tracks the refund status change
+
+### `update_status(provider_refund_id:, status:, metadata: {})`
+#### Description
+Updates the status of an existing refund based on the Adyen provider refund ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| provider_refund_id | String | The Adyen provider refund ID |
+| status | String | The new status of the refund |
+| metadata | Hash | Additional metadata (optional) |
+
+#### Internal Logic
+1. Finds the refund by provider refund ID
+2. Updates the refund status
+3. Updates the credit note status
+4. Tracks the refund status change
+5. Handles failed refunds by delivering error webhooks
+
+### Private Methods
+
+#### `should_process_refund?`
+Determines if a refund should be processed based on the credit note and invoice status.
+
+#### `payment`
+Retrieves the most recent payment associated with the credit note's invoice.
+
+#### `client`
+Creates and returns an Adyen API client.
+
+#### `create_adyen_refund`
+Creates a refund in the Adyen system.
+
+#### `adyen_refund_params`
+Prepares the parameters for creating an Adyen refund.
+
+#### `deliver_error_webhook`
+Sends a webhook for refund failures.
+
+#### `update_credit_note_status`
+Updates the status of the associated credit note.
+
+#### `handle_missing_refund`
+Handles cases where a refund is not found in the system.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Adyen::Client | Interacts with the Adyen API |
+| Lago::Adyen::Params | Prepares parameters for Adyen API calls |
+| Utils::SegmentTrack | Tracks refund status changes |
+| SendWebhookJob | Sends webhooks for refund failures |
+
+## Error Handling
+The service handles various error scenarios, including Adyen API errors, missing refunds, and invalid refund statuses. It uses the `result` object to communicate success or failure of operations.
+
+## Logging
+The service uses `Utils::SegmentTrack` to log refund status changes.
+
+This service is crucial for managing refunds through the Adyen payment provider, ensuring that refunds are properly created, tracked, and updated in both the Lago system and Adyen's system.

@@ -1,0 +1,59 @@
+---
+title: "login_user.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for logging in a user using Google OAuth. It's part of the authentication system, specifically handling the Google login process within a Ruby on Rails application using GraphQL.
+
+## Code Structure
+The `LoginUser` class is nested within the `Mutations::Auth::Google` module, indicating its role in the authentication system. It inherits from `BaseMutation`, suggesting a common structure for mutations in this application.
+
+## Symbols
+
+### `Mutations::Auth::Google::LoginUser`
+#### Description
+This class defines a GraphQL mutation for logging in a user with Google OAuth. It takes a Google OAuth code as input and returns login information if successful.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | The Google OAuth authorization code |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| token | String | Authentication token for the logged-in user |
+| user | Types::UserType | User object containing user information |
+
+#### Internal Logic
+1. The `resolve` method is called with the provided `code`.
+2. It uses the `::Auth::GoogleService` to perform the login operation.
+3. If successful, it returns the result directly.
+4. If unsuccessful, it calls `result_error` with the result.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseMutation | Parent class for GraphQL mutations |
+| Types::Payloads::LoginUserType | Defines the structure of the mutation's return type |
+| ::Auth::GoogleService | Service class that handles the actual Google login logic |
+
+## References
+- `::Auth::GoogleService`: This service is used to perform the actual login operation.
+- `Types::Payloads::LoginUserType`: This type is used to define the structure of the mutation's return value.
+
+## Side Effects
+The main side effect of this mutation is the creation of a new user session if the login is successful. This likely involves setting cookies or generating and storing a new authentication token.
+
+## Error Handling
+Error handling is delegated to the `result_error` method (not shown in this snippet) when the login operation is unsuccessful. The specific error messages and codes would depend on the implementation of `::Auth::GoogleService` and `result_error`.
+
+## API/Interface Reference
+This mutation is exposed in the GraphQL API with the following details:
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| googleLoginUser | POST | `{ code: String }` | `{ token: String, user: UserType }` | Logs in a user with Google OAuth |
+
+Note: The actual endpoint URL would depend on the GraphQL server configuration.
+
+This mutation provides a clean interface for client applications to initiate a Google OAuth login process, handling the complexities of OAuth token exchange and user authentication behind the scenes.

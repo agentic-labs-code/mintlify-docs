@@ -1,0 +1,67 @@
+---
+title: "paid_credit_service.rb"
+---
+
+## High-level description
+This code defines the `PaidCreditService` class within the `Invoices` module. Its primary purpose is to handle the process of creating and finalizing an invoice for paid credits, including creating fees, computing amounts, and triggering various related jobs and notifications.
+
+## Code Structure
+The main class `PaidCreditService` inherits from `BaseService`. It contains a `call` method that orchestrates the entire process of creating and finalizing a paid credit invoice. The class interacts with several other services and jobs to complete its task.
+
+## Symbols
+
+### `PaidCreditService`
+#### Description
+This service handles the creation and finalization of invoices for paid credits. It manages the entire process from creating the invoice to triggering related jobs and notifications.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet_transaction | WalletTransaction | The wallet transaction associated with the paid credit |
+| timestamp | Integer | The timestamp for the invoice |
+| invoice | Invoice (optional) | An existing invoice, if any |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result object containing the created invoice and any errors |
+
+#### Internal Logic
+1. Creates a generating invoice if one doesn't exist
+2. Creates a credit fee for the invoice
+3. Computes amounts for the invoice
+4. Finalizes or opens the invoice based on conditions
+5. Triggers various jobs and notifications if the invoice is finalized
+6. Creates a payment for the invoice
+7. Handles errors and retries if necessary
+
+#### Side Effects
+- Creates or updates an invoice in the database
+- Triggers several background jobs (e.g., SendWebhookJob, GeneratePdfAndNotifyJob)
+- Creates a payment for the invoice
+
+#### Performance Considerations
+The service uses database transactions to ensure data consistency when creating and updating records.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | For database operations and transactions |
+| Utils::SegmentTrack | For tracking invoice creation events |
+| SendWebhookJob | For sending webhooks related to invoice events |
+| GeneratePdfAndNotifyJob | For generating PDF and notifying users |
+| Integrations::Aggregator::Invoices::CreateJob | For creating invoices in external systems |
+| Integrations::Aggregator::SalesOrders::CreateJob | For creating sales orders in external systems |
+| Invoices::Payments::CreateService | For creating payments for invoices |
+
+## Error Handling
+The service catches and handles various exceptions:
+- `ActiveRecord::RecordInvalid`: For validation errors on records
+- `Sequenced::SequenceError`: Re-raised without handling
+- Other exceptions: Captured and added to the result object
+
+## Logging
+No explicit logging mechanisms are implemented in this service.
+
+## TODOs
+There are no explicit TODOs in the code.

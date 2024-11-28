@@ -1,0 +1,46 @@
+---
+title: "gocardless_spec.rb"
+---
+
+## High-level description
+This code defines RSpec tests for the `Types::PaymentProviders::Gocardless` GraphQL type. It verifies the presence and types of various fields in the Gocardless payment provider type, including some fields with specific permissions.
+
+## Symbols
+
+### `RSpec.describe Types::PaymentProviders::Gocardless`
+#### Description
+This is the main RSpec test suite for the `Types::PaymentProviders::Gocardless` GraphQL type. It contains several individual test cases that check the structure and permissions of the type's fields.
+
+#### Internal Logic
+The test suite uses RSpec's `subject` to refer to the described class (`Types::PaymentProviders::Gocardless`). It then uses RSpec expectations to verify the presence and types of various fields in the GraphQL type.
+
+The tests are organized as follows:
+
+1. Basic fields without permissions:
+   - `id`: Expected to be of type `'ID!'` (non-null ID)
+   - `code`: Expected to be of type `'String!'` (non-null String)
+   - `name`: Expected to be of type `'String!'` (non-null String)
+
+2. Fields with specific permissions:
+   - `has_access_token`: Expected to be of type `'Boolean'` with permission `'organization:integrations:view'`
+   - `success_redirect_url`: Expected to be of type `'String'` with permission `'organization:integrations:view'`
+   - `webhook_secret`: Expected to be of type `'String'` with permission `'organization:integrations:view'`
+
+Each test case uses the `have_field` matcher, which is likely provided by a GraphQL testing library (possibly `graphql-ruby`). This matcher checks if the specified field exists in the GraphQL type and has the correct type.
+
+For fields with permissions, the `with_permission` chain is used to verify that the field has the specified permission requirement.
+
+## Dependencies
+The test file requires the following dependency:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and RSpec configuration |
+
+This dependency suggests that the project is using Ruby on Rails and RSpec for testing.
+
+## Notes
+1. The use of `frozen_string_literal: true` at the beginning of the file indicates that string literals in this file are frozen, which can provide performance benefits and prevent unintended string mutations.
+2. The tests focus on the structure of the GraphQL type and do not test any actual data or resolver logic.
+3. The permissions `'organization:integrations:view'` suggest that access to certain fields (has_access_token, success_redirect_url, and webhook_secret) is restricted and likely requires specific user permissions to view.
+
+This test file ensures that the `Types::PaymentProviders::Gocardless` GraphQL type is correctly defined with the expected fields and permissions, which is crucial for maintaining the integrity of the API schema and enforcing proper access controls.

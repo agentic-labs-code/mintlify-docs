@@ -1,0 +1,52 @@
+---
+title: "send_email_job.rb"
+---
+
+## High-level description
+The `SendEmailJob` class is a custom job for sending emails in a Rails application. It extends the `ActionMailer::MailDeliveryJob` and configures specific retry behavior for certain error types, ensuring robustness in email delivery.
+
+## Code Structure
+The `SendEmailJob` class is defined with a specific queue and retry configurations. It is used as the delivery job for the `ApplicationMailer`, as seen in the related `application_mailer.rb` file.
+
+## Symbols
+
+### `SendEmailJob`
+#### Description
+`SendEmailJob` is a custom job class that inherits from `ActionMailer::MailDeliveryJob`. It is responsible for handling email delivery in the application, with specific configurations for queuing and error handling.
+
+#### Internal Logic
+1. Sets the queue for this job to 'mailers'.
+2. Configures retry behavior for three types of errors:
+   - `ActiveJob::DeserializationError`
+   - `LagoHttpClient::HttpError`
+   - `Net::ReadTimeout`
+3. For each error type, it sets a polynomially increasing wait time between retries and a maximum of 6 retry attempts.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActionMailer::MailDeliveryJob | Base job class for email delivery in Rails |
+| ActiveJob | Framework for declaring jobs and making them run on a variety of queuing backends |
+| LagoHttpClient | Custom HTTP client, likely used for API interactions |
+
+## Error Handling
+The job implements specific error handling for three types of errors:
+1. `ActiveJob::DeserializationError`: Occurs when ActiveJob fails to deserialize job arguments.
+2. `LagoHttpClient::HttpError`: A custom error type, likely related to HTTP requests made by the Lago client.
+3. `Net::ReadTimeout`: Occurs when a read operation times out.
+
+For each of these errors, the job will retry up to 6 times with a polynomially increasing wait time between attempts.
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| queue_as | Symbol/String | 'mailers' | Specifies the queue to use for this job |
+
+## References
+This job class is referenced in the `ApplicationMailer` class (from the related code snippet) as the delivery job:
+
+```ruby
+self.delivery_job = SendEmailJob
+```
+
+This means that all emails sent through mailers inheriting from `ApplicationMailer` will use `SendEmailJob` for delivery.

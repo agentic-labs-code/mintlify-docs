@@ -1,0 +1,144 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL resolvers related to customer data in a billing or subscription management system. The resolvers being tested are `InvoicesResolver` and `UsageResolver`, which are responsible for fetching customer invoices and usage data, respectively.
+
+## What does it do?
+These test files ensure that the GraphQL resolvers for customer data are functioning correctly. They verify that:
+
+1. Customer invoices can be retrieved and filtered by status.
+2. Access to invoice data is restricted to organization members with proper permissions.
+3. Customer usage data, including charges and metrics, can be accurately fetched.
+4. Usage data can be filtered based on various criteria.
+5. Both resolvers handle edge cases, such as non-existent customers or unauthorized access attempts.
+
+The tests simulate various scenarios a real user might encounter when querying for customer data through a GraphQL API, ensuring that the system responds correctly in each case.
+
+## Key Files
+
+1. `invoices_resolver_spec.rb`:
+   This file tests the `Resolvers::Customers::InvoicesResolver`. It verifies that the resolver can:
+   - Fetch a list of invoices for a given customer
+   - Filter invoices by status (e.g., 'draft')
+   - Handle permission checks for organization members
+   - Respond appropriately to queries for non-existent customers
+
+2. `usage_resolver_spec.rb`:
+   This file tests the `Resolvers::Customers::UsageResolver`. It ensures that the resolver can:
+   - Retrieve detailed usage data for a customer's subscription
+   - Include information such as charges, billable metrics, and grouped usage
+   - Apply filters to the usage data based on various criteria
+   - Respect permission requirements for accessing customer data
+
+Both files use RSpec's describe and context blocks to organize tests, and they rely on FactoryBot for creating test data.
+
+## Dependencies
+The test files depend on the following key components:
+
+1. RSpec (version not specified): The testing framework used to write and run the tests.
+2. FactoryBot (version not specified): Used to create test data objects.
+3. GraphQL (version not specified): The GraphQL implementation for Ruby, used to define and execute test queries.
+
+These dependencies are likely managed through the project's Gemfile, with specific versions defined there.
+
+## Configuration
+While there are no explicit configuration files mentioned, the tests rely on several shared configurations and helpers:
+
+1. `rails_helper`: This file is required at the beginning of each test file, likely setting up the Rails testing environment.
+2. Shared examples: Both test files use shared examples for common checks, such as:
+   - `it_behaves_like 'requires current user'`
+   - `it_behaves_like 'requires permission', 'customers:view'`
+
+3. `execute_graphql` helper: This method is used to run GraphQL queries consistently across tests.
+
+These configurations ensure that the tests are run in a consistent environment and that common checks are standardized across different resolver tests.
+
+Code snippets demonstrating key aspects of the tests:
+
+1. Defining a GraphQL query (from `invoices_resolver_spec.rb`):
+```ruby
+let(:query) do
+  &lt;&lt;-GQL
+    query($customerId: ID!, $page: Int, $limit: Int) {
+      customerInvoices(customerId: $customerId, page: $page, limit: $limit) {
+        collection {
+          id
+        }
+        metadata {
+          currentPage
+          totalPages
+        }
+      }
+    }
+  GQL
+end
+```
+
+2. Testing basic functionality (from `invoices_resolver_spec.rb`):
+```ruby
+it 'returns a list of invoices' do
+  result = execute_graphql(
+    current_user: membership.user,
+    current_organization: organization,
+    query: query,
+    variables: {
+      customerId: customer.id
+    }
+  )
+
+  aggregate_failures do
+    expect(result['data']['customerInvoices']['collection'].count).to eq(2)
+    expect(result['data']['customerInvoices']['collection'].pluck('id')).to contain_exactly(
+      invoice1.id,
+      invoice2.id
+    )
+    expect(result['data']['customerInvoices']['metadata']['currentPage']).to eq(1)
+    expect(result['data']['customerInvoices']['metadata']['totalPages']).to eq(1)
+  end
+end
+```
+
+3. Testing usage data retrieval with filters (from `usage_resolver_spec.rb`):
+```ruby
+context 'with filters' do
+  let(:billable_metric_filter) do
+    create(:billable_metric_filter, billable_metric:)
+  end
+  let(:charge_filter) do
+    create(:charge_filter, charge:)
+  end
+
+  let(:event1) do
+    create(
+      :event,
+      subscription:,
+      customer:,
+      properties: {
+        billable_metric_filter.key =&gt; billable_metric_filter.values.first,
+        charge_filter.key =&gt; charge_filter.values.first,
+      }
+    )
+  end
+
+  it 'returns the usage for the customer' do
+    result = execute_graphql(
+      current_user: membership.user,
+      current_organization: organization,
+      query: query,
+      variables: {
+        customerId: customer.id,
+        subscriptionId: subscription.id,
+      }
+    )
+
+    usage = result['data']['customerUsage']
+    expect(usage['charges'].first['filters'].count).to eq(2)
+    expect(usage['charges'].first['filters'].first['values']).to eq([billable_metric_filter.values.first])
+    expect(usage['charges'].first['filters'].last['values']).to eq([charge_filter.values.first])
+  end
+end
+```
+
+These tests ensure that the GraphQL resolvers for customer invoices and usage data are functioning correctly, handling various scenarios and edge cases that might occur in a real-world application.

@@ -1,0 +1,73 @@
+---
+title: "stripe_service.rb"
+---
+
+## High-level description
+This code defines a `StripeService` class within the `CreditNotes::Refunds` module. It handles the creation and status updates of Stripe refunds for credit notes. The service interacts with the Stripe API to process refunds and updates the local database accordingly.
+
+## Code Structure
+The `StripeService` class inherits from `BaseService` and includes the `Customers::PaymentProviderFinder` module. It contains two main public methods: `create` and `update_status`, along with several private helper methods.
+
+## Symbols
+
+### `StripeService`
+#### Description
+This class manages the creation and status updates of Stripe refunds for credit notes.
+
+#### Methods
+
+### `create`
+#### Description
+Creates a Stripe refund for a credit note and updates the local database.
+
+#### Internal Logic
+1. Checks if the refund should be processed.
+2. Creates a Stripe refund using the Stripe API.
+3. Creates a local `Refund` record.
+4. Updates the credit note status.
+5. Tracks the refund status change using Segment.
+
+### `update_status`
+#### Description
+Updates the status of an existing refund based on Stripe webhook events.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| provider_refund_id | String | The Stripe refund ID |
+| status | String | The new status of the refund |
+| metadata | Hash | Additional metadata from Stripe |
+
+#### Internal Logic
+1. Finds the local `Refund` record.
+2. Updates the refund status.
+3. Updates the credit note status.
+4. Tracks the refund status change using Segment.
+5. Handles failed refunds by delivering an error webhook and updating the result.
+
+### Private Methods
+- `should_process_refund?`: Determines if a refund should be processed.
+- `payment`: Retrieves the associated payment for the credit note.
+- `stripe_api_key`: Gets the Stripe API key.
+- `create_stripe_refund`: Creates a refund in Stripe.
+- `stripe_refund_payload`: Prepares the payload for Stripe refund creation.
+- `stripe_reason`: Maps Lago refund reasons to Stripe refund reasons.
+- `deliver_error_webhook`: Sends a webhook for refund failures.
+- `update_credit_note_status`: Updates the status of the credit note.
+- `handle_missing_refund`: Handles cases where a refund is not found.
+- `stripe_payment_provider`: Retrieves the Stripe payment provider for the customer.
+
+## Dependencies
+- Stripe API
+- `Customers::PaymentProviderFinder` module
+- `Utils::SegmentTrack` for analytics
+- `SendWebhookJob` for sending webhooks
+
+## Error Handling
+The service handles various error scenarios, including Stripe API errors and missing refunds. It uses result objects to communicate success or failure.
+
+## Logging
+The service uses `Utils::SegmentTrack` to log refund status changes.
+
+## API/Interface Reference
+This service is primarily used internally and does not expose a public API. It is typically called by other parts of the application, such as webhook handlers or background jobs.

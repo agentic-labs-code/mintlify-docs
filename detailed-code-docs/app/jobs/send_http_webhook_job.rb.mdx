@@ -1,0 +1,56 @@
+---
+title: "send_http_webhook_job.rb"
+---
+
+## High-level description
+The `SendHttpWebhookJob` is an ActiveJob class responsible for asynchronously sending HTTP webhooks. It delegates the actual sending of the webhook to the `Webhooks::SendHttpService`.
+
+## Code Structure
+This job class inherits from `ApplicationJob` and defines a single `perform` method that calls the `Webhooks::SendHttpService`.
+
+## References
+- `Webhooks::SendHttpService`: The service class that handles the actual sending of the webhook.
+- `ApplicationJob`: The base job class from which `SendHttpWebhookJob` inherits.
+
+## Symbols
+
+### `SendHttpWebhookJob`
+#### Description
+A job class that encapsulates the asynchronous sending of HTTP webhooks.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook | Webhook | The webhook object to be sent |
+
+#### Internal Logic
+The job's `perform` method simply calls the `Webhooks::SendHttpService.call` method, passing the webhook object as an argument.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveJob | Provides the base job functionality |
+| Sidekiq | Used for job queueing and processing (inferred from `ApplicationJob`) |
+
+## Performance Considerations
+This job is designed to be run asynchronously, which helps in improving the overall performance of the application by not blocking the main execution thread when sending webhooks.
+
+## Error Handling
+The job itself doesn't implement any error handling. Error handling is likely managed by the `Webhooks::SendHttpService` and the job processing system (Sidekiq).
+
+## Additional Context
+From the related files, we can infer some additional important details:
+
+1. The job is set to not retry automatically (`sidekiq_options retry: 0` in `ApplicationJob`).
+
+2. The actual sending of the webhook is handled by `Webhooks::SendHttpService`, which includes logic for:
+   - Sending the HTTP request
+   - Handling various types of errors
+   - Marking the webhook as succeeded or failed
+   - Implementing a custom retry mechanism with exponential backoff
+
+3. The `Webhooks::RetryService` can be used to manually retry failed webhooks, which will enqueue this job again.
+
+4. The job is typically enqueued with a delay when retrying failed webhooks, as seen in the `SendHttpService`.
+
+This design allows for a separation of concerns, where the job is responsible for the asynchronous execution, while the service handles the complex logic of sending the webhook and managing retries.

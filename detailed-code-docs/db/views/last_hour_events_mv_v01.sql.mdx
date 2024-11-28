@@ -1,0 +1,83 @@
+---
+title: "last_hour_events_mv_v01.sql"
+---
+
+## High-level description
+This SQL code defines a materialized view named `last_hour_events_mv_v01`. It retrieves and processes event data from the last hour, joining it with billable metrics and their associated groups. The view is designed to facilitate analysis and billing calculations based on event properties and billable metric configurations.
+
+## Code Structure
+The code consists of two main parts:
+1. A Common Table Expression (CTE) named `billable_metric_groups` that aggregates information about billable metrics and their associated groups.
+2. The main SELECT statement that joins event data with billable metrics and the CTE, applying various conditions and calculations.
+
+## Symbols
+
+### billable_metric_groups (CTE)
+#### Description
+This CTE aggregates information about billable metrics and their associated parent and child groups.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| billable_metrics | table | Contains information about billable metrics |
+| groups | table | Contains information about groups associated with billable metrics |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bm_id | integer | Billable metric ID |
+| bm_code | string | Billable metric code |
+| parent_group_count | integer | Number of parent groups for the billable metric |
+| parent_group_keys | array | Array of parent group keys |
+| child_group_count | integer | Number of child groups for the billable metric |
+| child_group_keys | array | Array of child group keys |
+
+#### Internal Logic
+1. Joins billable_metrics with groups table twice (for parent and child groups).
+2. Filters out deleted billable metrics.
+3. Groups results by billable metric ID and code.
+4. Counts and aggregates parent and child group information.
+
+### Main SELECT statement
+#### Description
+This query retrieves event data from the last hour and joins it with billable metrics and the `billable_metric_groups` CTE to provide a comprehensive view of events with their associated billing information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| events | table | Contains event data |
+| billable_metrics | table | Contains billable metric information |
+| billable_metric_groups | CTE | Contains aggregated group information for billable metrics |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | integer | Organization ID associated with the event |
+| transaction_id | string | Transaction ID of the event |
+| timestamp | timestamp | Timestamp of the event |
+| properties | jsonb | JSON object containing event properties |
+| billable_metric_code | string | Code of the associated billable metric |
+| field_name_mandatory | boolean | Indicates if a field name is mandatory for the billable metric |
+| numeric_field_mandatory | boolean | Indicates if a numeric field is mandatory for the billable metric |
+| field_value | string | Value of the field specified by the billable metric |
+| is_numeric_field_value | boolean | Indicates if the field value is numeric |
+| parent_group_mandatory | boolean | Indicates if a parent group is mandatory for the billable metric |
+| has_parent_group_key | boolean | Indicates if the event has a parent group key |
+| child_group_mandatory | boolean | Indicates if a child group is mandatory for the billable metric |
+| has_child_group_key | boolean | Indicates if the event has a child group key |
+
+#### Internal Logic
+1. Joins events with billable_metrics based on code and organization_id.
+2. Joins the result with the billable_metric_groups CTE.
+3. Filters events from the last hour and excludes deleted events and billable metrics.
+4. Calculates various boolean flags and extracts relevant information from event properties and billable metric configurations.
+
+## Performance Considerations
+1. The materialized view is likely refreshed periodically to maintain up-to-date data for the last hour of events.
+2. Indexes on `events.created_at`, `events.organization_id`, `events.code`, and `billable_metrics.code` would improve query performance.
+3. The use of a CTE helps organize the query and may provide performance benefits in some database systems.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| PostgreSQL | This SQL code uses PostgreSQL-specific features such as the `?|` operator for JSON arrays and the `date_trunc` function. |

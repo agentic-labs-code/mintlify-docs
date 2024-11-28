@@ -1,0 +1,50 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL mutations related to Credit Notes in a billing or invoicing system. It includes operations for creating, updating, downloading, and voiding credit notes. These mutations are part of a larger GraphQL API and handle various aspects of credit note management.
+
+## What does it do?
+The code in this directory provides the following functionalities:
+
+1. Create Credit Notes: Allows users to create new credit notes by specifying details such as description, invoice ID, reason, amounts, and items.
+2. Download Credit Notes: Enables users to download a PDF version of a credit note, generating it if it doesn't exist.
+3. Update Credit Notes: Provides the ability to update the refund status of an existing credit note.
+4. Void Credit Notes: Allows users to void a credit note, effectively canceling it.
+
+These operations are implemented as GraphQL mutations, which are special types of queries that modify data on the server. Each mutation includes authentication checks, input validation, and uses dedicated service classes to perform the actual operations.
+
+## Key Files
+
+1. `create.rb`: Defines the mutation for creating a new credit note. It handles input processing, invoice association, and uses the `CreditNotes::CreateService` to perform the creation.
+
+2. `download.rb`: Implements the mutation for downloading a credit note PDF. It checks if the PDF exists and generates it if necessary using the `CreditNotes::GenerateService`.
+
+3. `update.rb`: Contains the mutation for updating a credit note's refund status. It uses the `CreditNotes::UpdateService` to perform the update operation.
+
+4. `void.rb`: Defines the mutation for voiding a credit note. It utilizes the `CreditNotes::VoidService` to handle the voiding process.
+
+Each of these files defines a separate GraphQL mutation class that inherits from `BaseMutation` and includes necessary modules for authentication and organization checks.
+
+## Dependencies
+The code in this directory relies on several external dependencies and internal services:
+
+1. GraphQL: The entire codebase is built on top of the GraphQL framework, which is used to define the mutation structure and types.
+
+2. Authentication and Authorization: The mutations use `AuthenticableApiUser` and `RequiredOrganization` modules to ensure proper authentication and authorization.
+
+3. Service Classes: Each mutation delegates the main operation to a corresponding service class (e.g., `CreditNotes::CreateService`, `CreditNotes::GenerateService`, etc.). These service classes are not defined in this directory but are crucial for the actual implementation of the operations.
+
+4. Custom Types: The mutations use custom GraphQL types defined elsewhere in the application, such as `Types::CreditNotes::Object`, `Types::CreditNotes::ReasonTypeEnum`, and `Types::CreditNoteItems::Input`.
+
+## Configuration
+While there's no explicit configuration file in this directory, some configuration aspects are embedded in the code:
+
+1. Permissions: Each mutation defines a required permission (e.g., 'credit_notes:update', 'credit_notes:void') that the user must have to perform the operation.
+
+2. Error Handling: The mutations use a `result_error` method (likely defined in a parent class) to handle and return errors from the service classes.
+
+3. Input Validation: The mutations define the structure and types of input arguments, which serves as a form of configuration for what data is required or optional for each operation.
+
+In summary, this directory contains the GraphQL mutation definitions for managing credit notes in a billing system. It provides a structured and type-safe way to perform create, read, update, and delete (CRUD) operations on credit notes, along with additional functionalities like PDF generation and voiding.

@@ -1,0 +1,64 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains services related to calculating and managing minimum commitments for subscriptions billed in arrears. It includes services for calculating true-up fees, handling date-related operations, and fetching relevant invoices. These services are specialized implementations for in-arrears billing scenarios within the broader commitments system.
+
+## What does it do?
+The code in this directory handles various aspects of minimum commitments for subscriptions that are billed in arrears:
+
+1. It calculates true-up fees, which are additional charges applied when a customer's usage falls below their minimum commitment.
+2. It manages date-related operations specific to in-arrears billing, including handling terminated subscriptions.
+3. It fetches relevant invoices for fee calculations, taking into account different billing frequencies and plan types.
+
+These services work together to ensure that customers are billed correctly according to their minimum commitments, even when their actual usage is lower than the committed amount.
+
+## Key Files
+
+1. `calculate_true_up_fee_service.rb`:
+   This file contains the `CalculateTrueUpFeeService` class, which is responsible for calculating true-up fees for minimum commitments in arrears billing scenarios. It handles various types of fees, including subscription fees, charge fees, and fees paid in advance.
+
+   Example usage:
+   ```ruby
+   service = Commitments::Minimum::InArrears::CalculateTrueUpFeeService.new(commitment, invoice_subscription)
+   true_up_fee = service.call
+   ```
+
+2. `dates_service.rb`:
+   This file defines the `DatesService` class, which handles date-related operations for in-arrears minimum commitments. It specifically checks if a subscription is terminated to determine if current usage should be considered.
+
+   Example usage:
+   ```ruby
+   dates_service = Commitments::Minimum::InArrears::DatesService.new(subscription, invoice_timestamp)
+   is_current_usage = dates_service.current_usage
+   ```
+
+3. `fetch_invoices_service.rb`:
+   This file contains the `FetchInvoicesService` class, which is responsible for retrieving relevant invoices for fee calculations. It handles different scenarios based on the subscription's plan type and billing frequency.
+
+   Example usage:
+   ```ruby
+   service = Commitments::Minimum::InArrears::FetchInvoicesService.new(commitment, invoice_subscription)
+   invoices = service.call
+   ```
+
+## Dependencies
+The services in this directory rely on several external dependencies and models:
+
+1. ActiveRecord: Used for database queries and model interactions.
+2. Parent classes from the `Commitments` module, such as `Commitments::Minimum::CalculateTrueUpFeeService` and `Commitments::DatesService`.
+3. Models: `Fee`, `Subscription`, `Plan`, `Charge`, `BillableMetric`, and `Invoice`.
+4. Other services: `FetchInvoicesService`, `Commitments::DatesService`, `Subscriptions::DatesService`, and `Subscriptions::TerminatedDatesService`.
+
+## Configuration
+While there are no explicit configuration files in this directory, the behavior of these services may be influenced by configuration settings in the broader application, particularly related to billing cycles, plan types, and fee calculations.
+
+## Performance Considerations
+The services in this directory, especially `CalculateTrueUpFeeService`, use complex database queries with multiple joins and conditions. To ensure optimal performance, consider the following:
+
+1. Proper indexing on relevant columns (e.g., `subscription_id`, `invoice_id`, `charge_id`) is crucial, especially as the number of fees and invoices grows.
+2. The `fetch_invoices` method in `FetchInvoicesService` uses a subquery to get invoice IDs before fetching the actual invoices for yearly plans with monthly charge billing. This approach can be more efficient than fetching all invoice data upfront.
+3. Monitor the performance of these services, particularly when dealing with subscriptions that have a large number of invoices or fees, and consider optimizing queries if necessary.
+
+In conclusion, this directory contains specialized services for handling minimum commitments in arrears billing scenarios. These services work together to calculate true-up fees, manage dates, and fetch relevant invoices, ensuring accurate billing for customers with minimum commitments.

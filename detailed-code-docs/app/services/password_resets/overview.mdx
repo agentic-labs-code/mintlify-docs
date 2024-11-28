@@ -1,0 +1,89 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains service classes responsible for managing password reset functionality in a Ruby on Rails application. It includes two main services: `CreateService` for initiating a password reset and `ResetService` for completing the password reset process.
+
+## What does it do?
+The password reset services handle the following workflows:
+
+1. Initiating a password reset:
+   - A user requests a password reset.
+   - The system generates a unique token and creates a password reset record.
+   - An email containing the reset instructions is sent to the user.
+
+2. Completing a password reset:
+   - The user provides the reset token and a new password.
+   - The system validates the token and updates the user's password.
+   - The user is automatically logged in after a successful password reset.
+
+These services work together to provide a secure and user-friendly password reset feature for the application.
+
+## Key Files
+
+1. `create_service.rb`:
+   - Handles the creation of password reset tokens.
+   - Generates a secure random token with a 30-minute expiration.
+   - Creates a `PasswordReset` record in the database.
+   - Triggers the sending of a password reset email.
+
+2. `reset_service.rb`:
+   - Manages the actual password reset process.
+   - Validates the reset token and new password.
+   - Updates the user's password and logs them in.
+   - Cleans up by destroying the used password reset record.
+
+Both services inherit from a `BaseService` class, which likely provides common functionality and error handling mechanisms.
+
+## Dependencies
+The password reset services rely on the following dependencies:
+
+1. `SecureRandom`: Used to generate secure random tokens for password resets.
+2. `ActiveRecord`: For database operations and transactions.
+3. `PasswordReset` model: Represents the password reset records in the database.
+4. `PasswordResetMailer`: Handles the sending of password reset emails.
+5. `UsersService`: Used for logging in users after a successful password reset.
+
+## Configuration
+While not explicitly shown in the provided code, the password reset functionality likely relies on the following configuration:
+
+1. Email settings: Configuration for sending password reset emails, possibly using environment variables.
+2. Token expiration: The `CreateService` sets a 30-minute expiration for reset tokens, which may be configurable.
+3. Password policies: The application may have password strength requirements enforced during the reset process.
+
+## Code Examples
+
+1. Initiating a password reset:
+
+```ruby
+user = User.find_by(email: 'user@example.com')
+result = PasswordResets::CreateService.new(user).call
+
+if result.success?
+  # Password reset initiated successfully
+  password_reset_id = result.password_reset_id
+else
+  # Handle error
+  error_message = result.errors.full_messages.join(', ')
+end
+```
+
+2. Completing a password reset:
+
+```ruby
+token = 'received_reset_token'
+new_password = 'new_secure_password'
+
+result = PasswordResets::ResetService.new(token: token, new_password: new_password).call
+
+if result.success?
+  # Password reset successful, user is logged in
+  logged_in_user = result.user
+else
+  # Handle error
+  error_message = result.errors.full_messages.join(', ')
+end
+```
+
+These services provide a robust and secure implementation of password reset functionality, handling token generation, email notifications, and secure password updates while maintaining proper error handling and user experience.

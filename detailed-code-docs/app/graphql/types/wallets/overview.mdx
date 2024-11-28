@@ -1,0 +1,62 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL types related to wallets in the application. It defines various input types, object types, and enums that are used to create, update, and query wallet information through the GraphQL API. The code is structured to handle wallet-related operations, including managing recurring transaction rules associated with wallets.
+
+## What does it do?
+The code in this directory provides the structure and types needed to interact with wallets through a GraphQL API. It allows clients to:
+
+1. Create new wallets by specifying attributes such as currency, customer ID, granted credits, and recurring transaction rules.
+2. Update existing wallets, modifying attributes like expiration date, name, and recurring transaction rules.
+3. Query information about existing wallets, including their balance, status, associated customer, and recurring transaction rules.
+4. Define and manage recurring transaction rules for wallets, including creation, updating, and querying of these rules.
+5. Use predefined sets of values (enums) for certain attributes like wallet status, currency, and recurring transaction rule properties (interval, method, trigger), ensuring consistency and preventing invalid inputs.
+
+These types work together to enable a flexible and type-safe way of managing wallets and their associated recurring transactions within the application, likely used for handling regular credit allocations, payments, or other financial operations.
+
+## Key Files
+
+1. `create_input.rb`: Defines the input type for creating a new wallet.
+2. `update_input.rb`: Defines the input type for updating an existing wallet.
+3. `object.rb`: Defines the object type representing a wallet, which is used when querying wallet information.
+4. `status_enum.rb`: Defines an enum for the possible statuses of a wallet.
+5. `recurring_transaction_rules/`: A subdirectory containing types related to recurring transaction rules, including:
+   - `create_input.rb`: Input type for creating new recurring transaction rules.
+   - `update_input.rb`: Input type for updating existing recurring transaction rules.
+   - `object.rb`: Object type representing a recurring transaction rule.
+   - `interval_enum.rb`, `method_enum.rb`, `trigger_enum.rb`: Enums for various attributes of recurring transaction rules.
+
+These files work together to provide a complete set of types for managing wallets and their recurring transaction rules:
+
+- The `create_input.rb` and `update_input.rb` files define the structure for mutations that create or modify wallets.
+- The `object.rb` file defines how wallet data is represented when queried.
+- The `status_enum.rb` file provides a predefined set of values for wallet statuses.
+- The `recurring_transaction_rules/` subdirectory contains types specifically for managing recurring transaction rules associated with wallets.
+
+## Dependencies
+This code relies on the following external libraries and frameworks:
+
+1. GraphQL Ruby gem: The code uses GraphQL-specific types and structures, such as `GraphQL::Schema::Enum`, `GraphQL::Schema::InputObject`, `GraphQL::Types::ISO8601DateTime`, and `GraphQL::Types::BigInt`.
+
+2. Rails framework: While not explicitly shown in the provided code, the structure and naming conventions suggest that this is part of a Rails application.
+
+The code also references internal types and models:
+
+- `Types::BaseEnum`, `Types::BaseInputObject`, and `Types::BaseObject`: These are likely custom base classes for GraphQL types, probably defined elsewhere in the application.
+- `Types::CurrencyEnum`: An enum type for currency codes.
+- `Types::Customers::Object`: An object type representing a customer, used in the wallet object type.
+- `Wallet` and `RecurringTransactionRule`: These appear to be model classes that define constants and attributes used in the GraphQL types.
+
+## Configuration
+While there are no explicit configuration files in this directory, the code does use several predefined sets of values:
+
+1. `Wallet::STATUSES`: Defines the possible statuses for a wallet.
+2. `RecurringTransactionRule::INTERVALS`, `RecurringTransactionRule::METHODS`, and `RecurringTransactionRule::TRIGGERS`: Define the possible values for recurring transaction rule attributes.
+
+These constants are likely defined in their respective models and are used to ensure consistency between the database schema and the GraphQL API.
+
+The use of these predefined sets allows for easy modification of the allowed values without changing the GraphQL type definitions. If a new status or attribute value needs to be added, it can be done by updating the corresponding constant in the model, and the GraphQL types will automatically reflect this change.
+
+In summary, this directory provides a well-structured set of GraphQL types for managing wallets and their associated recurring transaction rules. It offers a clear separation of concerns between input types, output types, and enums, making it easy to maintain and extend the API as needed for wallet-related operations.

@@ -1,0 +1,49 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains classes responsible for generating payloads for different invoice integration services within the Integrations::Aggregator::Invoices::Payloads module. It includes a base payload class, specific implementations for Netsuite, Xero, and Anrok integrations, and a factory class for creating the appropriate payload instances.
+
+## What does it do?
+The code in this directory handles the creation of structured data (payloads) for invoices that need to be sent to various external accounting and tax systems. Here's a simplified explanation of the workflow:
+
+1. When an invoice needs to be sent to an external system, the application uses the Factory class to create the appropriate payload object based on the integration type (Netsuite, Xero, or Anrok).
+2. The created payload object (e.g., Netsuite, Xero, or Anrok) inherits from BasePayload, which provides common functionality for generating invoice data.
+3. The specific payload classes (like Netsuite) may add or modify the data structure to meet the requirements of their respective integration systems.
+4. The payload objects process the invoice data, including customer information, line items (fees), discounts, and taxes, formatting it according to the needs of the external system.
+5. The resulting payload can then be used to send the invoice data to the external system in the correct format.
+
+## Entry points
+The main entry point for this directory is the `Factory` class in the `factory.rb` file. This class is responsible for creating the appropriate payload instance based on the integration type. The workflow typically starts with a call to `Factory.new_instance`, which then instantiates the correct payload class (Netsuite, Xero, or Anrok).
+
+The data flow begins with the invoice and customer information being passed to the Factory, which then flows through the specific payload classes, and finally results in a structured payload ready for the external system.
+
+## Key Files
+1. `base_payload.rb`: Contains the `BasePayload` class, which provides the foundation for all payload types. It includes methods for generating the main structure of the invoice payload, processing fees, and handling discounts.
+
+2. `netsuite.rb`: Implements the `Netsuite` class, which extends `BasePayload` to create Netsuite-specific invoice payloads. It includes methods for formatting data according to Netsuite's requirements, such as handling columns, items, and discounts.
+
+3. `factory.rb`: Defines the `Factory` class, which is responsible for creating the appropriate payload instance based on the integration type. It acts as a central point for instantiating payload objects.
+
+4. `xero.rb` and `anrok.rb`: Implement the `Xero` and `Anrok` classes respectively, which are currently minimal implementations that inherit from `BasePayload`. These classes serve as placeholders for future development of Xero and Anrok-specific payload generation.
+
+## Dependencies
+The code in this directory relies on several external dependencies and internal modules:
+
+1. Rails framework: The code structure and naming conventions suggest that this is part of a Rails application.
+2. ActiveSupport: Used for various helper methods and extensions (e.g., `freeze`).
+3. Internal models: The code references models such as `Invoice`, `Fee`, and `IntegrationCustomer`, which are likely defined elsewhere in the application.
+4. Environment variables: The Netsuite payload uses an environment variable `LAGO_FRONT_URL` for constructing invoice URLs.
+
+## Configuration
+The main configuration point in this directory is the `Factory` class, which determines which payload class to instantiate based on the integration type. This allows for easy extension to support additional integration types in the future.
+
+The `Netsuite` class uses an environment variable:
+- `LAGO_FRONT_URL`: Sets the base URL for the Lago frontend (default: "https://app.getlago.com")
+
+Additionally, the `Netsuite` class defines a constant `MAX_DECIMALS` set to 15, which is used to limit the number of decimal places in rate calculations.
+
+The payload classes are designed to be flexible and can handle various invoice scenarios, including different types of fees (charges, add-ons, credits, commitments, subscriptions), discounts (coupons, prepaid credits, credit notes), and tax adjustments.
+
+In summary, this directory contains a well-structured system for generating invoice payloads for different external integrations, with a focus on extensibility and specific implementations for Netsuite, while providing placeholders for Xero and Anrok integrations.

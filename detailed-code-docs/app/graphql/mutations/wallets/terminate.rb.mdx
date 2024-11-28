@@ -1,0 +1,51 @@
+---
+title: "terminate.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation called `Terminate` within the `Mutations::Wallets` module. It allows authenticated users with the required permission to terminate a customer wallet in the current organization.
+
+## Code Structure
+The `Terminate` class inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the mutation's name, description, arguments, and return type, and implements the `resolve` method to handle the termination logic.
+
+## References
+- `Types::Wallets::Object`
+- `::Wallets::TerminateService`
+
+## Symbols
+
+### `Terminate`
+#### Description
+This class represents a GraphQL mutation for terminating a customer wallet. It ensures the user is authenticated and has the required permission to perform this action.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the wallet to be terminated |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet | Types::Wallets::Object | The terminated wallet object |
+
+#### Internal Logic
+1. Finds the wallet in the current organization using the provided ID.
+2. Calls the `::Wallets::TerminateService` to perform the termination.
+3. Returns the terminated wallet if successful, or an error if the operation fails.
+
+## Side Effects
+- Terminates the specified wallet if found and the operation is successful.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user belongs to the required organization |
+
+## Error Handling
+- If the wallet is not found or the termination fails, the method returns an error result.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| TerminateCustomerWallet | Mutation | `{ id: ID! }` | Wallet object or error | Terminates a customer wallet |

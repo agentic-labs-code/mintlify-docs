@@ -1,0 +1,66 @@
+---
+title: "void_service_spec.rb"
+---
+
+## High-level description
+This code defines a RSpec test suite for the `Invoices::VoidService` class. It tests various scenarios for voiding an invoice, including cases where the invoice is nil, draft, already voided, or finalized with different payment statuses.
+
+## Code Structure
+The test suite is organized into a single `describe` block for the `#call` method, with nested `context` blocks for different invoice scenarios. Each scenario is tested with one or more `it` blocks that verify the expected behavior of the `VoidService`.
+
+## Symbols
+
+### `RSpec.describe Invoices::VoidService`
+#### Description
+This is the main describe block for the `Invoices::VoidService` test suite.
+
+### `subject(:void_service)`
+#### Description
+Defines the subject of the test, which is an instance of `Invoices::VoidService` with the `invoice` parameter.
+
+### `describe '#call'`
+#### Description
+Describes the tests for the `#call` method of the `VoidService`.
+
+### Various `context` blocks
+#### Description
+Each `context` block sets up a specific scenario for testing the `VoidService`, such as when the invoice is nil, draft, voided, or finalized with different payment statuses.
+
+### Various `it` blocks
+#### Description
+Each `it` block contains a specific test case, checking the result of calling the `VoidService` under different conditions.
+
+#### Internal Logic
+Most test cases follow this pattern:
+1. Arrange: Set up the invoice with specific attributes.
+2. Act: Call the `void_service.call` method.
+3. Assert: Check the result using `aggregate_failures` to group multiple expectations.
+
+## Side Effects
+The tests check for side effects such as:
+- Changing the invoice status to voided
+- Setting the `voided_at` timestamp
+- Changing the `payment_overdue` status
+- Enqueuing a `Invoices::ProviderTaxes::VoidJob`
+- Flagging lifetime usage for refresh
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used to create test data (invoices, subscriptions) |
+| RSpec | The testing framework used |
+
+## Error Handling
+The tests check for various error conditions, including:
+- `BaseService::NotFoundFailure` when the invoice is nil
+- `BaseService::MethodNotAllowedFailure` when the invoice is not voidable
+
+## Notes
+- The test suite covers various scenarios for voiding an invoice, ensuring that the `VoidService` behaves correctly under different conditions.
+- The use of `aggregate_failures` allows multiple expectations to be grouped together, providing more comprehensive test results.
+- The test suite makes use of FactoryBot to create test data, which helps in setting up different invoice scenarios easily.
+- The tests check not only the success/failure of the operation but also the specific error types and codes returned.
+- There's a commented-out expectation for `balance_amount_cents`, which might be a TODO item or a temporarily disabled test.
+
+This test suite provides comprehensive coverage for the `Invoices::VoidService`, ensuring its reliability across various invoice states and conditions.

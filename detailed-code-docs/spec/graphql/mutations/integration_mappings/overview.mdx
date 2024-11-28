@@ -1,0 +1,78 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test suites for GraphQL mutations related to integration mappings. The tests cover the creation, updating, and deletion of integration mappings, ensuring proper functionality, permission checks, and error handling.
+
+## What does it do?
+These test suites verify the behavior of GraphQL mutations for managing integration mappings. They ensure that:
+
+1. Users can create new integration mappings with the correct input data.
+2. Existing integration mappings can be updated with new information.
+3. Integration mappings can be deleted when no longer needed.
+4. Proper permissions are required to perform these operations.
+5. Error handling is in place for scenarios like attempting to delete non-existent mappings.
+
+The tests simulate various scenarios, including successful operations and error cases, to ensure the robustness of the integration mapping system.
+
+## Key Files
+
+1. `create_spec.rb`: Tests the creation of integration mappings.
+   - Verifies that the mutation correctly creates a mapping with provided input.
+   - Checks for required permissions and authentication.
+
+2. `update_spec.rb`: Tests the updating of existing integration mappings.
+   - Ensures that mappings can be updated with new information.
+   - Validates that the updated data is correctly reflected in the response.
+
+3. `destroy_spec.rb`: Tests the deletion of integration mappings.
+   - Verifies that mappings can be successfully deleted.
+   - Checks error handling for attempts to delete non-existent mappings.
+
+Each file follows a similar structure, setting up test data, defining GraphQL mutation queries, and running test cases to verify the expected behavior.
+
+## Dependencies
+The test suites rely on the following key dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data objects, such as integrations, mappings, and organizations.
+3. Faker: Generates random data for testing purposes, like external account codes and names.
+4. GraphQL: The GraphQL implementation for Ruby, used to define and execute the mutation queries.
+
+## Configuration
+While there are no explicit configuration files in this directory, the tests use several important setup elements:
+
+1. `rails_helper`: Required at the beginning of each spec file, it sets up the Rails testing environment.
+2. Shared examples: Used across the test files for common behaviors like checking permissions and authentication.
+3. Let statements: Used to define shared variables and objects for each test suite, such as required permissions, integrations, and memberships.
+
+Example of a typical let statement setup:
+
+```ruby
+let(:required_permission) { 'manage_integration_mappings' }
+let(:integration) { create(:netsuite_integration, organization: organization) }
+let(:mappable) { create(:add_on, organization: organization) }
+let(:organization) { membership.organization }
+let(:membership) { create(:membership) }
+let(:external_account_code) { Faker::Barcode.ean }
+let(:external_id) { SecureRandom.uuid }
+let(:external_name) { Faker::Commerce.department }
+```
+
+These setups ensure that each test has the necessary data and context to run effectively.
+
+The test suites make extensive use of RSpec's `aggregate_failures` to group multiple expectations together, allowing for more comprehensive error reporting:
+
+```ruby
+aggregate_failures do
+  expect(result['data']['createIntegrationMapping']['integrationMapping']).to include(
+    'externalAccountCode' =&gt; external_account_code,
+    'externalId' =&gt; external_id,
+    'externalName' =&gt; external_name
+  )
+  # Additional expectations...
+end
+```
+
+This approach helps in identifying all potential issues within a single test run, improving the efficiency of the testing process.

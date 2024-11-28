@@ -1,0 +1,70 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions for billable metric filters within the application. It includes two main components: an input type for creating or updating billable metric filters, and an object type for representing billable metric filters in the GraphQL schema.
+
+## What does it do?
+The code in this directory defines the structure and behavior of billable metric filters in the context of GraphQL operations. It allows the API to:
+
+1. Accept input for creating or updating billable metric filters, specifying a key and an array of values.
+2. Represent billable metric filters as objects in the GraphQL schema, including an ID, key, and a sorted list of values.
+
+These types enable filtering functionality for billable metrics, allowing clients to query or mutate data based on specific criteria defined by key-value pairs.
+
+## Key Files
+
+### input.rb
+This file defines the `Types::BillableMetricFilters::Input` class, which creates a GraphQL input object type named `BillableMetricFiltersInput`. This input type is used when creating or updating billable metrics and requires two arguments:
+
+- `key` (String): The key of the filter.
+- `values` ([String]): An array of values to filter by for the given key.
+
+Example usage in a GraphQL mutation:
+
+```graphql
+mutation {
+  createBillableMetric(input: {
+    # other fields...
+    filters: [
+      { key: "region", values: ["US", "EU"] }
+    ]
+  }) {
+    # result fields
+  }
+}
+```
+
+### object.rb
+This file defines the `Types::BillableMetricFilters::Object` class, which creates a GraphQL object type named `BillableMetricFilter`. This object type represents a billable metric filter in the schema and includes the following fields:
+
+- `id` (ID): Unique identifier of the filter.
+- `key` (String): The key or name of the filter.
+- `values` ([String]): A sorted list of string values associated with the filter key.
+
+The `values` field is overridden to ensure that the returned list is always sorted alphabetically.
+
+Example query using this object type:
+
+```graphql
+query {
+  billableMetric(id: "123") {
+    filters {
+      id
+      key
+      values
+    }
+  }
+}
+```
+
+## Dependencies
+Both files depend on the `graphql` gem, which provides the framework for defining GraphQL schemas in Ruby. The exact version of the gem is not specified in the provided code snippets, but it's a core dependency for the GraphQL functionality in the application.
+
+The types defined in this directory are likely used in conjunction with other GraphQL types and resolvers in the broader application context, particularly in relation to billable metrics and filtering operations.
+
+## Configuration
+There are no explicit configuration files or environment variables mentioned in the provided code. The behavior of these types is primarily determined by their definition and the overall GraphQL schema configuration of the application.
+
+In summary, this directory provides the essential GraphQL type definitions for handling billable metric filters, enabling the creation, updating, and querying of these filters within the application's GraphQL API.

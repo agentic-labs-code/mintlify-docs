@@ -1,0 +1,81 @@
+---
+title: "fees_query.rb"
+---
+
+## High-level description
+The `FeesQuery` class is responsible for querying and filtering fees based on various criteria. It extends the `BaseQuery` class and provides a flexible way to retrieve fees with pagination and multiple filter options.
+
+## Code Structure
+The `FeesQuery` class contains a main `call` method that applies various filters to the fee query. It also includes several helper methods for specific filtering operations, such as date range filtering and fee type filtering.
+
+## Symbols
+
+### `FeesQuery#call`
+#### Description
+This method is the main entry point for querying fees. It applies various filters based on the provided parameters and returns a paginated result set of fees.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization to query fees for |
+| pagination | Hash | Pagination parameters |
+| filters | Hash | Filter parameters for the query |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the filtered and paginated fees |
+
+#### Internal Logic
+1. Initializes the fee query with pagination and basic ordering
+2. Applies various filters based on the provided parameters
+3. Handles specific filters like external subscription, external customer, currency, billable metric code, fee type, payment status, and date ranges
+4. Sets the resulting fees in the result object
+
+### `FeesQuery#with_external_subscription`
+#### Description
+Filters fees based on the external subscription ID.
+
+### `FeesQuery#with_external_customer`
+#### Description
+Filters fees based on the external customer ID, handling different scenarios for pay-in-advance fees, add-ons, and regular fees.
+
+### `FeesQuery#with_billable_metric_code`
+#### Description
+Filters fees based on the billable metric code.
+
+### `FeesQuery#with_fee_type`
+#### Description
+Filters fees based on the fee type, validating that the provided fee type is valid.
+
+### `FeesQuery#with_payment_status`
+#### Description
+Filters fees based on the payment status, validating that the provided status is valid.
+
+### `FeesQuery#with_created_date_range`
+#### Description
+Filters fees based on the creation date range.
+
+### `FeesQuery#with_succeeded_date_range`
+#### Description
+Filters fees based on the succeeded date range.
+
+### `FeesQuery#with_failed_date_range`
+#### Description
+Filters fees based on the failed date range.
+
+### `FeesQuery#with_refunded_date_range`
+#### Description
+Filters fees based on the refunded date range.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseQuery | Parent class providing common query functionality |
+| Fee | The model class for fees |
+
+## Error Handling
+The class uses the error handling mechanisms provided by the `BaseService` class, such as `result.single_validation_failure!` for invalid filter values.
+
+## Performance Considerations
+The query is built incrementally, applying filters only when necessary. This approach helps to optimize the database query by avoiding unnecessary joins or conditions.

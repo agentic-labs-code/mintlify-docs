@@ -1,0 +1,64 @@
+---
+title: "generate_pdf_and_notify_job.rb"
+---
+
+## High-level description
+This code defines a background job class `GeneratePdfAndNotifyJob` within the `Invoices` module. Its purpose is to generate a PDF for an invoice and optionally send an email notification. The job is designed to be executed asynchronously using a job queue system.
+
+## Code Structure
+The `GeneratePdfAndNotifyJob` class inherits from `ApplicationJob` and defines two main methods: `queue_as` and `perform`. The `queue_as` method determines which queue the job should be processed in, while the `perform` method contains the main logic for generating the PDF and sending the email notification.
+
+## Symbols
+
+### `Invoices::GeneratePdfAndNotifyJob`
+#### Description
+This class represents a background job for generating invoice PDFs and sending email notifications.
+
+#### Internal Logic
+1. The `queue_as` method determines the queue based on the `SIDEKIQ_PDFS` environment variable.
+2. The `perform` method:
+   - Calls the `Invoices::GeneratePdfService` to generate the PDF.
+   - If the `email` parameter is true, it sends an email notification using `InvoiceMailer`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice object for which to generate the PDF |
+| email | Boolean | Whether to send an email notification |
+
+#### Side Effects
+- Generates a PDF file for the invoice
+- Potentially sends an email notification
+
+### `queue_as`
+#### Description
+Determines which queue the job should be processed in.
+
+#### Internal Logic
+- If the `SIDEKIQ_PDFS` environment variable is set to a truthy value, it returns the `:pdfs` queue.
+- Otherwise, it returns the `:invoices` queue.
+
+### `perform`
+#### Description
+Executes the main logic of the job.
+
+#### Internal Logic
+1. Calls `Invoices::GeneratePdfService` to generate the PDF for the invoice.
+2. If the `email` parameter is true, it uses `InvoiceMailer` to send a finalized invoice email.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice object for which to generate the PDF |
+| email | Boolean | Whether to send an email notification |
+
+## Error Handling
+The job uses `retry_on` to handle `LagoHttpClient::HttpError` exceptions. It will retry the job up to 6 times with a polynomially increasing delay between attempts.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Invoices::GeneratePdfService | Generates the PDF for the invoice |
+| InvoiceMailer | Sends email notifications for finalized invoices |
+
+This job is crucial for generating invoice PDFs and notifying customers about finalized invoices. It's designed to work asynchronously, which helps in managing system resources efficiently, especially when dealing with a large number of invoices.

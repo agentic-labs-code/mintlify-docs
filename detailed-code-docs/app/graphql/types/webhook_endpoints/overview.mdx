@@ -1,0 +1,62 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions related to webhook endpoints in a Ruby on Rails application. It includes input types for creating and updating webhook endpoints, an object type for representing webhook endpoints, and an enum type for signature algorithms.
+
+## What does it do?
+This set of GraphQL types enables the API to handle operations related to webhook endpoints. It allows clients to:
+
+1. Create new webhook endpoints by providing a URL and optionally specifying a signature algorithm.
+2. Update existing webhook endpoints by modifying their URL or signature algorithm.
+3. Query webhook endpoint data, including associated organization information and timestamps.
+4. Use a standardized set of signature algorithms when working with webhook endpoints.
+
+These types work together to ensure that webhook endpoint data is consistently structured and validated across the GraphQL API, providing a robust interface for managing webhook integrations.
+
+## Key Files
+
+1. `create_input.rb`:
+   - Defines the `CreateInput` type for creating new webhook endpoints.
+   - Specifies required and optional fields for webhook endpoint creation.
+
+2. `object.rb`:
+   - Defines the `Object` type representing a webhook endpoint.
+   - Specifies all queryable fields for a webhook endpoint, including relationships and timestamps.
+
+3. `signature_algo_enum.rb`:
+   - Defines the `SignatureAlgoEnum` type for webhook endpoint signature algorithms.
+   - Dynamically generates enum values based on the `SIGNATURE_ALGOS` constant from the `WebhookEndpoint` model.
+
+4. `update_input.rb`:
+   - Defines the `UpdateInput` type for updating existing webhook endpoints.
+   - Specifies required and optional fields for webhook endpoint updates.
+
+## Dependencies
+The code in this directory relies on the following key dependencies:
+
+1. GraphQL Ruby gem: Used for defining GraphQL types and schema.
+2. Rails: The underlying framework for the application.
+
+## Configuration
+While there are no explicit configuration files in this directory, the types are configured through their definitions. Key configuration points include:
+
+1. The `SignatureAlgoEnum` is dynamically generated based on the `SIGNATURE_ALGOS` constant in the `WebhookEndpoint` model, which is defined as `[:jwt, :hmac]`.
+2. The `Object` type references `Types::Organizations::OrganizationType`, which is a "safe" organization type that doesn't expose sensitive information.
+
+Here's an example of how the `SignatureAlgoEnum` is dynamically generated:
+
+```ruby
+class SignatureAlgoEnum &lt; Types::BaseEnum
+  WebhookEndpoint::SIGNATURE_ALGOS.each do |algo|
+    value algo.to_s.upcase, value: algo
+  end
+end
+```
+
+This approach ensures that the GraphQL enum stays in sync with the available signature algorithms defined in the `WebhookEndpoint` model.
+
+The input and object types are designed to work together with corresponding resolvers and mutations in the GraphQL API. For example, the `UpdateInput` type is used by a `Mutations::WebhookEndpoints::Update` mutation, which requires the 'developers:manage' permission and uses a `WebhookEndpoints::UpdateService` to perform the update operation.
+
+Overall, these types provide a well-structured and type-safe interface for managing webhook endpoints through the GraphQL API, ensuring consistency between the API schema and the underlying data model.

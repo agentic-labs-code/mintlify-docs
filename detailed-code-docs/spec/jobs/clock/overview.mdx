@@ -1,0 +1,59 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various clock jobs in the application. These jobs are likely scheduled tasks that run periodically to perform maintenance, updates, or other recurring operations. The tests ensure that these jobs function correctly under different scenarios and conditions.
+
+## What does it do?
+The tests in this directory verify the behavior of several clock jobs:
+
+1. CreateIntervalWalletTransactionsJob: Creates interval wallet transactions.
+2. EventsValidationJob: Validates events and refreshes materialized views.
+3. FinalizeInvoicesJob: Finalizes invoices based on customer grace periods.
+4. MarkInvoicesAsPaymentOverdueJob: Marks invoices as payment overdue and sends webhook notifications.
+5. RefreshDraftInvoicesJob: Refreshes draft invoices under certain conditions.
+6. RefreshLifetimeUsagesJob: Refreshes lifetime usages for both freemium and premium scenarios.
+7. RefreshWalletsOngoingBalanceJob: Refreshes ongoing balances for active wallets.
+8. SubscriptionsToBeTerminatedJob: Sends termination alert webhooks for subscriptions about to end.
+9. TerminateEndedSubscriptionsJob: Terminates subscriptions that have reached their end date.
+10. TerminateWalletsJob: Terminates expired wallets while keeping active ones unchanged.
+11. WebhooksCleanupJob: Removes old webhooks from the database.
+
+These tests ensure that each job performs its intended function correctly, handles edge cases appropriately, and interacts with other parts of the system as expected.
+
+## Key Files
+1. create_interval_wallet_transactions_job_spec.rb
+2. events_validation_job_spec.rb
+3. finalize_invoices_job_spec.rb
+4. mark_invoices_as_payment_overdue_job_spec.rb
+5. refresh_draft_invoices_jobs_spec.rb
+6. refresh_lifetime_usages_job_spec.rb
+7. refresh_wallets_ongoing_balance_job_spec.rb
+8. subscriptions_to_be_terminated_job_spec.rb
+9. terminate_ended_subscriptions_job_spec.rb
+10. terminate_wallets_job_spec.rb
+11. webhooks_cleanup_job_spec.rb
+
+Each file contains tests for a specific job, ensuring its correct behavior under various conditions.
+
+## Dependencies
+The test files depend on the following:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data and objects.
+3. ActiveSupport::Testing::TimeHelpers: Used for time manipulation in tests.
+4. SimpleCov: Likely used for code coverage reporting (mentioned in rails_helper).
+5. DatabaseCleaner: Likely used for cleaning the test database between runs (mentioned in rails_helper).
+
+Additionally, these tests interact with various models and services within the application, such as Invoice, Subscription, Wallet, and various service classes like Invoices::RefreshDraftAndFinalizeService and Subscriptions::TerminateService.
+
+## Configuration
+Some tests use configuration options that affect job behavior:
+
+1. LAGO_SUBSCRIPTION_TERMINATION_ALERT_SENT_AT_DAYS: Configures the days before subscription end when alerts should be sent.
+2. lago_premium!: A helper method used to set up a premium environment for testing.
+
+These configuration options allow the tests to verify job behavior under different system settings.
+
+The tests in this directory play a crucial role in ensuring the reliability and correctness of the application's background jobs, which are essential for maintaining data integrity, performing scheduled tasks, and keeping the system up-to-date.

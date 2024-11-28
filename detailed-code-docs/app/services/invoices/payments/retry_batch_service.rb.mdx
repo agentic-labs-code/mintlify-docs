@@ -1,0 +1,95 @@
+---
+title: "retry_batch_service.rb"
+---
+
+## High-level description
+The `RetryBatchService` is a service class within the `Invoices::Payments` module that handles retrying payments for multiple invoices in an organization. It provides functionality to asynchronously process a batch of invoices or to process a specific set of invoice IDs.
+
+## Code Structure
+The `RetryBatchService` class contains two main public methods: `call_async` and `call`. The `call_async` method initiates an asynchronous job to process all eligible invoices, while the `call` method processes a specific set of invoice IDs. The class also includes private methods for fetching invoices and the organization.
+
+## References
+This code references the following:
+- `Invoices::Payments::RetryAllJob`
+- `Invoices::Payments::RetryService`
+- `Invoice` model
+- `Organization` model
+
+## Symbols
+
+### `RetryBatchService`
+#### Description
+This class is responsible for managing the retry process for multiple invoices within an organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | String/Integer | The ID of the organization for which to retry invoice payments |
+
+### `call_async`
+#### Description
+This method initiates an asynchronous job to retry payments for all eligible invoices in the organization.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the list of invoices to be processed |
+
+#### Internal Logic
+1. Enqueues a `Invoices::Payments::RetryAllJob` with the organization ID and invoice IDs.
+2. Sets the `invoices` attribute of the result object.
+3. Returns the result object.
+
+### `call`
+#### Description
+This method processes a specific set of invoice IDs, retrying payments for each invoice.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice_ids | Array | An array of invoice IDs to process |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the list of successfully processed invoices |
+
+#### Internal Logic
+1. Iterates through each invoice ID.
+2. Calls `Invoices::Payments::RetryService` for each invoice.
+3. If any retry fails, it immediately returns the failure result.
+4. Collects successfully processed invoices.
+5. Sets the `invoices` attribute of the result object with the processed invoices.
+6. Returns the result object.
+
+### `invoices` (private method)
+#### Description
+This method fetches eligible invoices for payment retry from the organization.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoices | ActiveRecord::Relation | A collection of eligible invoices |
+
+#### Internal Logic
+1. Queries the organization's invoices.
+2. Filters invoices with payment status 'pending' or 'failed'.
+3. Selects invoices that are ready for payment processing.
+4. Includes only finalized invoices.
+
+### `organization` (private method)
+#### Description
+This method fetches the organization based on the provided organization ID.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization object |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseService | Parent class for service objects |
+
+## Error Handling
+The service relies on the underlying `RetryService` for individual invoice processing errors. If any invoice retry fails, the `call` method immediately returns the failure result.

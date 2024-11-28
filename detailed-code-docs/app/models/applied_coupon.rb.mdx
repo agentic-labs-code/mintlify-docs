@@ -1,0 +1,65 @@
+---
+title: "applied_coupon.rb"
+---
+
+## High-level description
+The `AppliedCoupon` model represents a coupon that has been applied to a customer. It tracks the status, frequency, and monetary details of the applied coupon, and is associated with both the `Coupon` and `Customer` models.
+
+## Code Structure
+The `AppliedCoupon` class inherits from `ApplicationRecord` and includes several modules for additional functionality. It defines associations, enums, validations, and a method for terminating the applied coupon.
+
+## References
+- `Coupon` model
+- `Customer` model
+- `Credit` model
+- `PaperTrailTraceable` module
+- `Currencies` module
+
+## Symbols
+
+### `AppliedCoupon`
+#### Description
+This class represents an applied coupon in the system.
+
+#### Inputs
+N/A (This is a model class, not a method)
+
+#### Outputs
+N/A (This is a model class, not a method)
+
+#### Internal Logic
+- Includes `PaperTrailTraceable` and `Currencies` modules
+- Defines associations with `Coupon`, `Customer`, and `Credit` models
+- Defines enums for `status` and `frequency`
+- Uses `monetize` for `amount_cents`
+- Implements validations for `amount_cents`, `amount_currency`
+- Defines a method `mark_as_terminated!` to change the status to terminated
+
+### `mark_as_terminated!`
+#### Description
+Marks the applied coupon as terminated.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| timestamp | Time | The timestamp for termination (default: current time) |
+
+#### Outputs
+N/A (modifies the object's state)
+
+#### Internal Logic
+- Sets the `terminated_at` attribute if not already set
+- Changes the status to `terminated`
+
+## Dependencies
+- `paper_trail` gem (inferred from `PaperTrailTraceable`)
+- `money-rails` gem (inferred from `monetize` usage)
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| STATUSES | Array | `[:active, :terminated]` | Possible statuses for an applied coupon |
+| FREQUENCIES | Array | `[:once, :recurring, :forever]` | Possible frequencies for an applied coupon |
+
+## Schema Information
+The schema information at the end of the file provides details about the database table structure for the `applied_coupons` table, including column names, types, and indexes.

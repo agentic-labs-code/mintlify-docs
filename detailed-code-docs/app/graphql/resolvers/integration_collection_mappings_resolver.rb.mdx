@@ -1,0 +1,52 @@
+---
+title: "integration_collection_mappings_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying integration collection mappings. It's part of a larger GraphQL API and handles authentication, organization requirements, and filtering of integration collection mappings based on provided arguments.
+
+## Code Structure
+The `IntegrationCollectionMappingsResolver` class inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines arguments, return type, and a resolve method to fetch and return integration collection mappings.
+
+## References
+- `Types::IntegrationCollectionMappings::MappingTypeEnum`
+- `Types::IntegrationCollectionMappings::Object`
+- `::IntegrationCollectionMappingsQuery`
+
+## Symbols
+
+### `IntegrationCollectionMappingsResolver`
+#### Description
+This class is a GraphQL resolver for querying integration collection mappings. It ensures the user is authenticated and has the required organization access before resolving the query.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| page | Integer | Optional page number for pagination |
+| limit | Integer | Optional limit for number of results |
+| integration_id | ID | Optional ID to filter mappings by integration |
+| mapping_type | MappingTypeEnum | Optional type to filter mappings |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration_collection_mappings | [Types::IntegrationCollectionMappings::Object] | Collection of integration collection mapping objects |
+
+#### Internal Logic
+1. Checks user authentication and organization access (via included modules)
+2. Calls `::IntegrationCollectionMappingsQuery` with provided arguments and current organization
+3. Returns the resulting integration collection mappings
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user has access to the required organization |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'organization:integrations:view' | Permission required to access this resolver |
+
+## Error Handling
+Error handling is primarily managed through the included `AuthenticableApiUser` and `RequiredOrganization` modules, which raise GraphQL execution errors for unauthorized access or missing organization information.

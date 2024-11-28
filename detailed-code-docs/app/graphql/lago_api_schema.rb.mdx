@@ -1,0 +1,51 @@
+---
+title: "lago_api_schema.rb"
+---
+
+## High-level description
+The code defines the `LagoApiSchema` class, which inherits from `GraphQL::Schema` and sets up the main GraphQL schema for the Lago API. It defines the root query and mutation types, configures data loading, sets limits on query depth and complexity, and implements object identification and resolution for Relay-style pagination.
+
+## Code Structure
+The `LagoApiSchema` class acts as a container for the overall GraphQL schema definition. It references `Types::MutationType` and `Types::QueryType` to define the root mutation and query types, respectively. It also utilizes `GraphQL::Dataloader` for batch-loading data. The class overrides methods like `resolve_type`, `id_from_object`, and `object_from_id` to customize type resolution and object identification.
+
+## References
+- `Types::MutationType`: Defines the root mutation type for the schema.
+- `Types::QueryType`: Defines the root query type for the schema.
+- `GraphQL::Dataloader`: Used for batch-loading data in GraphQL queries.
+- `GlobalID`: Used for generating and parsing globally unique identifiers for database records.
+
+## Symbols
+
+### `LagoApiSchema`
+#### Description
+This class defines the main GraphQL schema for the Lago API, configuring various aspects of how the API processes and responds to GraphQL queries.
+
+#### Inputs
+This class does not have explicit inputs.
+
+#### Outputs
+This class does not have explicit outputs.
+
+#### Internal Logic
+- **`mutation(Types::MutationType)`**: Defines the root mutation type for the schema, allowing clients to modify data.
+- **`query(Types::QueryType)`**: Defines the root query type for the schema, allowing clients to fetch data.
+- **`use GraphQL::Dataloader`**: Enables batch-loading of data for more efficient query resolution.
+- **`max_depth 15`**: Sets the maximum allowed depth for nested queries to prevent overly complex requests.
+- **`max_complexity 350`**: Sets the maximum allowed complexity for queries to prevent resource-intensive operations.
+- **`resolve_type`**: Placeholder method intended to be overridden for resolving abstract types to concrete types.
+- **`id_from_object`**: Implements object identification by generating a Base64-encoded, type-hinted GlobalID from a given object.
+- **`object_from_id`**: Implements object resolution by parsing a type-hinted GlobalID and retrieving the corresponding object from the database.
+- **`default_max_page_size 25`**: Sets a default limit on the number of records returned per page for paginated queries.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| `graphql` | Provides the core GraphQL implementation and DSL for defining the schema. |
+| `globalid` | Used for generating and parsing globally unique identifiers for database records. |
+| `base64` | Used for encoding and decoding object IDs in a URL-safe format. |
+
+## Error Handling
+The code includes a placeholder `resolve_type` method that raises a `GraphQL::RequiredImplementationMissingError` if not overridden. This suggests that error handling for type resolution is expected to be handled by subclasses or specific resolvers.
+
+## TODOs
+- The `resolve_type` method is marked as TODO and needs to be implemented to return the correct GraphQL object type based on the provided object.

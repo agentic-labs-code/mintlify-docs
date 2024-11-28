@@ -1,0 +1,78 @@
+---
+title: "created_service.rb"
+---
+
+## High-level description
+This code defines the `CreatedService` class within the `Webhooks::CreditNotes` module, which is responsible for handling the creation of webhooks when a credit note is created. It extends the `Webhooks::BaseService` class and provides specific implementations for credit note-related webhook creation.
+
+## Code Structure
+The `CreatedService` class inherits from `Webhooks::BaseService` and overrides several methods to provide credit note-specific functionality. It defines methods for retrieving the current organization, serializing the credit note object, and specifying the webhook and object types.
+
+## References
+This code references the following:
+- `Webhooks::BaseService` (parent class)
+- `::V1::CreditNoteSerializer` (used for object serialization)
+
+## Symbols
+
+### `Webhooks::CreditNotes::CreatedService`
+#### Description
+This class handles the creation of webhooks for newly created credit notes. It provides specific implementations for credit note-related webhook creation by overriding methods from the base service.
+
+#### Internal Logic
+The class overrides four methods from the base service:
+1. `current_organization`: Retrieves the organization associated with the credit note.
+2. `object_serializer`: Creates a new instance of `V1::CreditNoteSerializer` with specific options.
+3. `webhook_type`: Defines the type of webhook as 'credit_note.created'.
+4. `object_type`: Specifies the object type as 'credit_note'.
+
+### `current_organization`
+#### Description
+Retrieves and memoizes the organization associated with the credit note.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @current_organization | Organization | The organization associated with the credit note |
+
+### `object_serializer`
+#### Description
+Creates a new instance of `V1::CreditNoteSerializer` with specific options for serializing the credit note object.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | V1::CreditNoteSerializer | Serializer instance for the credit note |
+
+#### Internal Logic
+Creates a new `V1::CreditNoteSerializer` with the following options:
+- `object` as the target for serialization
+- `root_name` set to 'credit_note'
+- `includes` set to include customer, items, and applied taxes
+
+### `webhook_type`
+#### Description
+Defines the type of webhook for credit note creation.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | String | The webhook type 'credit_note.created' |
+
+### `object_type`
+#### Description
+Specifies the object type for the webhook payload.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | String | The object type 'credit_note' |
+
+## Dependencies
+This code depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| Webhooks::BaseService | Parent class providing base webhook functionality |
+| V1::CreditNoteSerializer | Serializer for credit note objects |
+
+The `CreatedService` class is part of the webhook system and is used by the `SendWebhookJob` to handle 'credit_note.created' events. It works in conjunction with the base service to create and send webhooks when credit notes are created in the system.

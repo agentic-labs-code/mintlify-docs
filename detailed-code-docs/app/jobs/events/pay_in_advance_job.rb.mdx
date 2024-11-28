@@ -1,0 +1,71 @@
+---
+title: "pay_in_advance_job.rb"
+---
+
+## High-level description
+The `Events::PayInAdvanceJob` is a background job responsible for processing pay-in-advance events in a billing system. It ensures unique execution of the job and delegates the actual processing to the `Events::PayInAdvanceService`.
+
+## Code Structure
+The `Events::PayInAdvanceJob` class inherits from `ApplicationJob` and defines methods for queue selection, job uniqueness, and performance. It interacts with the `Events::PayInAdvanceService` and `Events::CommonFactory` for event processing and instantiation.
+
+## Symbols
+
+### `Events::PayInAdvanceJob`
+#### Description
+This class defines a background job for processing pay-in-advance events. It uses Sidekiq for job queuing and ensures unique execution of jobs to prevent duplicate processing.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | Hash or Event object | The pay-in-advance event to be processed |
+
+#### Internal Logic
+1. Determines the queue to use based on the `SIDEKIQ_EVENTS` environment variable.
+2. Ensures job uniqueness using the `unique` method from the Sidekiq library.
+3. Performs the job by calling the `Events::PayInAdvanceService` with the given event.
+4. Defines a `lock_key_arguments` method to generate a unique key for job locking.
+
+### `queue_as`
+#### Description
+Determines which queue the job should be processed in based on the `SIDEKIQ_EVENTS` environment variable.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queue_name | Symbol | Either `:events` or `:default` |
+
+### `perform(event)`
+#### Description
+Executes the pay-in-advance processing by calling the `Events::PayInAdvanceService`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | Hash or Event object | The pay-in-advance event to be processed |
+
+### `lock_key_arguments`
+#### Description
+Generates a unique key for job locking to prevent duplicate processing.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lock_key | Array | An array containing organization_id, external_subscription_id, and transaction_id |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Events::PayInAdvanceService | Processes the pay-in-advance event |
+| Events::CommonFactory | Creates a new instance of the event object |
+| ActiveModel::Type::Boolean | Casts the `SIDEKIQ_EVENTS` environment variable to a boolean |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| SIDEKIQ_EVENTS | String | N/A | Determines whether to use the `:events` queue or the `:default` queue |
+
+## Error Handling
+The job uses the `raise_if_error!` method from the `Events::PayInAdvanceService` to handle and propagate any errors that occur during event processing.
+
+## Performance Considerations
+The job uses Sidekiq's `unique` feature to ensure that only one job with the same arguments is executed at a time, preventing duplicate processing and potential race conditions.

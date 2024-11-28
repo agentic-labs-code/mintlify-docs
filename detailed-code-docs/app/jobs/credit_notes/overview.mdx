@@ -1,0 +1,62 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `app/jobs/credit_notes` directory contains background job classes responsible for handling various operations related to credit notes, specifically PDF generation and refund processing for different payment providers. These jobs are designed to run asynchronously, improving the overall performance and responsiveness of the main application by offloading potentially time-consuming tasks.
+
+## What does it do?
+This directory implements two main workflows:
+
+1. PDF Generation: The `GeneratePdfJob` creates PDF documents for credit notes. When a credit note's PDF needs to be generated, this job is enqueued to handle the task asynchronously. It uses a dedicated service to generate the PDF, attach it to the credit note, and optionally send webhooks.
+
+2. Refund Processing: The jobs in the `refunds` subdirectory handle refund creation for credit notes through various payment providers (Adyen, GoCardless, and Stripe). When a refund needs to be processed, the appropriate job is enqueued based on the payment provider used for the original transaction. These jobs communicate with the respective payment provider's API to initiate the refund process.
+
+By processing these operations asynchronously, the system maintains responsiveness while dealing with potentially slow or unreliable external services and time-consuming tasks.
+
+## Key Files
+1. `generate_pdf_job.rb`: Contains the `CreditNotes::GeneratePdfJob` class, responsible for generating PDFs for credit notes.
+
+2. `refunds/adyen_create_job.rb`: Defines the `AdyenCreateJob` class, which handles refund creation through the Adyen payment service provider.
+
+3. `refunds/gocardless_create_job.rb`: Contains the `GocardlessCreateJob` class, responsible for processing refunds using the GoCardless payment service.
+
+4. `refunds/stripe_create_job.rb`: Includes the `StripeCreateJob` class, which manages refund creation through the Stripe payment platform.
+
+All these job classes inherit from `ApplicationJob` and follow a similar structure:
+
+```ruby
+class CreditNotes::SomeJob &lt; ApplicationJob
+  queue_as :some_queue
+
+  def perform(credit_note)
+    # Job-specific logic
+    service = SomeService.new(credit_note)
+    result = service.call
+    raise_if_error!(result)
+  end
+end
+```
+
+## Dependencies
+These job classes rely on several external dependencies and internal services:
+
+1. ActiveJob: Part of the Ruby on Rails framework, providing base functionality for background job processing.
+
+2. Service Classes: Each job uses corresponding service classes (e.g., `CreditNotes::GenerateService`, `CreditNotes::Refunds::AdyenService`) to handle specific tasks.
+
+3. Payment Provider APIs: The refund jobs indirectly interact with the APIs of Adyen, GoCardless, and Stripe to process refunds.
+
+## Configuration
+The jobs are configured with specific queues:
+
+- `GeneratePdfJob` uses the 'invoices' queue.
+- Refund jobs use the 'providers' queue.
+
+```ruby
+queue_as :invoices  # or :providers for refund jobs
+```
+
+Additionally, these jobs are likely configured with `retry: 0` in the `ApplicationJob` class, meaning they won't automatically retry on failure. This suggests that failed attempts are meant to be handled manually or through a separate error handling process.
+
+The consistent structure across the different jobs indicates a well-organized and maintainable approach to handling various asynchronous tasks related to credit notes in the application.

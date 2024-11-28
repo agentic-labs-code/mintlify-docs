@@ -1,0 +1,79 @@
+---
+title: "update_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Integrations::Aggregator::Contacts::UpdateService` class. It tests the functionality of updating contact information in external systems (NetSuite and Xero) through an integration aggregator service.
+
+## Code Structure
+The test suite is organized into contexts for successful and unsuccessful service calls, with sub-contexts for different integration types (NetSuite and Xero) and response formats (string and hash).
+
+## Symbols
+
+### `RSpec.describe Integrations::Aggregator::Contacts::UpdateService`
+#### Description
+This is the main describe block for the test suite, focusing on the `UpdateService` class.
+
+### `subject(:service_call)`
+#### Description
+Defines the subject of the test as the result of calling the described class with the given parameters.
+
+### `let` statements
+#### Description
+These statements define various test doubles and variables used throughout the tests, including:
+- `customer`, `organization`, `lago_client`
+- `endpoint`, `headers`
+- `customer_link`
+
+### `describe '#call'`
+#### Description
+This block contains the main tests for the `call` method of the service.
+
+#### Internal Logic
+The tests are divided into two main contexts:
+1. Successful service calls
+   - Tests for NetSuite integration with string response
+   - Tests for Xero integration with hash response
+2. Unsuccessful service calls
+   - Tests for server errors
+   - Tests for server payload errors
+   - Tests for client errors
+
+Each test verifies the expected behavior of the service, including:
+- Correct formatting of request parameters
+- Proper handling of responses
+- Error handling and webhook delivery in case of failures
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| LagoHttpClient::Client | HTTP client for making API requests |
+
+## Error Handling
+The tests cover various error scenarios, including:
+- Server errors (500-599 status codes)
+- Server payload errors
+- Client errors (e.g., 404 status code)
+
+For each error type, the test verifies that:
+1. The service returns an unsuccessful result
+2. The error code and message are correctly captured
+3. An error webhook is delivered with appropriate details
+
+## Logging
+The tests indirectly verify logging behavior by checking the delivery of error webhooks in failure scenarios.
+
+## API/Interface Reference
+The tests implicitly define the expected interface for the `UpdateService`:
+
+| Method | Inputs | Outputs | Description |
+|:-------|:-------|:--------|:------------|
+| call | integration, integration_customer | Result object | Updates contact information in the external system |
+
+The Result object is expected to have:
+- `success?` method
+- `contact_id` attribute (for successful calls)
+- `error` object (for failed calls) with `code` and `message` attributes
+
+This test suite provides comprehensive coverage for the `UpdateService`, ensuring it correctly handles various scenarios when updating contact information in external systems through the integration aggregator.

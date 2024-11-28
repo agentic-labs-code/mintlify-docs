@@ -1,0 +1,78 @@
+---
+title: "generated_service.rb"
+---
+
+## High-level description
+This code defines the `GeneratedService` class within the `Webhooks::CreditNotes` module. It is responsible for handling webhook events related to generated credit notes, providing necessary data and serialization for webhook payloads.
+
+## Code Structure
+The `GeneratedService` class inherits from `Webhooks::BaseService` and overrides several methods to provide specific functionality for credit note generation events.
+
+## References
+This code references the following:
+- `Webhooks::BaseService`
+- `::V1::CreditNoteSerializer`
+
+## Symbols
+
+### `Webhooks::CreditNotes::GeneratedService`
+#### Description
+This class handles the webhook event for when a credit note is generated. It provides methods to access the current organization, serialize the credit note object, and define the webhook and object types.
+
+#### Internal Logic
+The class overrides four methods from the base class:
+1. `current_organization`: Retrieves the organization associated with the credit note.
+2. `object_serializer`: Creates a new instance of `V1::CreditNoteSerializer` to serialize the credit note object.
+3. `webhook_type`: Defines the type of webhook event as 'credit_note.generated'.
+4. `object_type`: Specifies the object type as 'credit_note'.
+
+### `current_organization`
+#### Description
+Retrieves and memoizes the organization associated with the credit note.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @current_organization | Organization | The organization associated with the credit note |
+
+### `object_serializer`
+#### Description
+Creates a new instance of `V1::CreditNoteSerializer` to serialize the credit note object.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| serializer | V1::CreditNoteSerializer | Serializer instance for the credit note |
+
+#### Internal Logic
+- Creates a new `V1::CreditNoteSerializer` instance with the following parameters:
+  - `object`: The credit note object
+  - `root_name`: Set to 'credit_note'
+  - `includes`: An array containing `:customer`
+
+### `webhook_type`
+#### Description
+Defines the type of webhook event.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_type | String | The type of webhook event |
+
+### `object_type`
+#### Description
+Specifies the type of object involved in the webhook event.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object_type | String | The type of object ('credit_note') |
+
+## Dependencies
+This code depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| Webhooks::BaseService | Parent class providing base webhook functionality |
+| V1::CreditNoteSerializer | Serializer for credit note objects |
+
+The `GeneratedService` class is designed to work within the larger webhook system, as evidenced by its inclusion in the `WEBHOOK_SERVICES` hash in the `SendWebhookJob` class. When a credit note is generated, this service will be used to prepare and send the appropriate webhook payload to the organization's registered webhook endpoints.

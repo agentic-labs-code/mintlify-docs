@@ -1,0 +1,64 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines a service class `Integrations::Xero::CreateService` responsible for creating a new Xero integration for an organization. It validates the organization's eligibility, creates the integration with specified parameters, and initiates a synchronization job.
+
+## Code Structure
+The `CreateService` class inherits from `BaseService` and contains a single `call` method that handles the integration creation process. It interacts with the `Organization` model, `Integrations::XeroIntegration` model, and the `Integrations::Aggregator::PerformSyncJob` job.
+
+## References
+- `Organization` model
+- `Integrations::XeroIntegration` model
+- `Integrations::Aggregator::PerformSyncJob` job
+
+## Symbols
+
+### `Integrations::Xero::CreateService#call`
+#### Description
+This method creates a new Xero integration for an organization, validates the organization's eligibility, and initiates a synchronization job.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | Contains parameters for creating the integration |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the created integration or error information |
+
+#### Internal Logic
+1. Find the organization by ID
+2. Check if the organization has the 'xero' premium integration
+3. Create a new `Integrations::XeroIntegration` instance with provided parameters
+4. Save the integration
+5. Schedule a synchronization job
+6. Return the result with the created integration
+
+## Side Effects
+- Creates a new `Integrations::XeroIntegration` record in the database
+- Schedules an `Integrations::Aggregator::PerformSyncJob` to run after 2 seconds
+
+## Error Handling
+The method rescues `ActiveRecord::RecordInvalid` exceptions and adds validation errors to the result object.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveModel::Type::Boolean | Used to cast boolean values for sync options |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| sync_credit_notes | Boolean | N/A | Determines if credit notes should be synced |
+| sync_invoices | Boolean | N/A | Determines if invoices should be synced |
+| sync_payments | Boolean | N/A | Determines if payments should be synced |
+
+## API/Interface Reference
+This service is likely called by the `Mutations::Integrations::Xero::Create` GraphQL mutation, as seen in the related code snippets.
+
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| N/A | call | Hash with organization_id, name, code, connection_id, sync options | Result object | Creates a Xero integration |

@@ -1,0 +1,79 @@
+---
+title: "lose_dispute_service.rb"
+---
+
+## High-level description
+The `Invoices::LoseDisputeService` is a service class responsible for marking an invoice as having lost a payment dispute. It updates the invoice's status, sends a webhook notification, and triggers a job to void provider taxes.
+
+## Code Structure
+The `LoseDisputeService` is part of the `Invoices` module and inherits from `BaseService`. It initializes with an invoice, an optional payment dispute lost timestamp, and an optional reason. The main functionality is implemented in the `call` method.
+
+## Symbols
+
+### `Invoices::LoseDisputeService`
+#### Description
+This service class handles the process of marking an invoice as having lost a payment dispute. It updates the invoice's status, sends a webhook notification, and triggers a job to void provider taxes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice that lost the dispute |
+| payment_dispute_lost_at | DateTime | The timestamp when the dispute was lost (default: current time) |
+| reason | String | The reason for losing the dispute (optional) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result object containing the updated invoice or error information |
+
+#### Internal Logic
+1. Check if the invoice exists, return a not found failure if it doesn't.
+2. Mark the invoice as dispute lost with the given timestamp.
+3. Send a webhook notification for the lost dispute event.
+4. Trigger a job to void provider taxes for the invoice.
+5. Return the result object with the updated invoice.
+6. Handle any `ActiveRecord::RecordInvalid` errors by returning a not allowed failure.
+
+## Side Effects
+- Updates the invoice status in the database.
+- Sends a webhook notification.
+- Triggers an asynchronous job to void provider taxes.
+
+### `initialize`
+#### Description
+Initializes the service with the required parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice that lost the dispute |
+| payment_dispute_lost_at | DateTime | The timestamp when the dispute was lost (optional) |
+| reason | String | The reason for losing the dispute (optional) |
+
+### `call`
+#### Description
+Executes the main logic of the service.
+
+#### Internal Logic
+1. Check if the invoice exists.
+2. Update the invoice status to mark it as dispute lost.
+3. Send a webhook notification.
+4. Trigger a job to void provider taxes.
+5. Handle potential errors and return the result.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| SendWebhookJob | To send webhook notifications |
+| Invoices::ProviderTaxes::VoidJob | To void provider taxes for the invoice |
+
+## Error Handling
+The service handles two main error cases:
+1. If the invoice is not found, it returns a not found failure.
+2. If there's an `ActiveRecord::RecordInvalid` error when updating the invoice, it returns a not allowed failure with the code 'not_disputable'.
+
+## Logging
+This service does not implement any explicit logging mechanisms.
+
+## API/Interface Reference
+This service is typically called from other parts of the application, such as controllers or other services. For example, it's used in the `lose_dispute` action of the `InvoicesController` and the `ChargebackService` for Adyen webhooks.

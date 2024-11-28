@@ -1,0 +1,41 @@
+---
+title: "20220811155332_refresh_stripe_webhooks.rb"
+---
+
+## High-level description
+This migration file, `RefreshStripeWebhooks`, is designed to refresh the registered Stripe webhooks for the Lago API application. It utilizes Rails' migration framework to execute a Rake task that updates the Stripe webhook configurations during the database migration process.
+
+## Code Structure
+The migration consists of a single `change` method that loads the application's Rake tasks and invokes a specific task to refresh Stripe webhooks.
+
+## Symbols
+
+### `RefreshStripeWebhooks`
+#### Description
+This class is a Rails migration that refreshes the Stripe webhooks registered for the application.
+
+#### Internal Logic
+1. Loads all Rake tasks defined in the application using `LagoApi::Application.load_tasks`.
+2. Invokes the `stripe:refresh_registered_webhooks` Rake task using `Rake::Task['stripe:refresh_registered_webhooks'].invoke`.
+
+## Side Effects
+- This migration will trigger the refresh of Stripe webhooks, which may involve API calls to Stripe and updates to the webhook configurations.
+- It's important to note that this operation is performed as part of a database migration, which is not a typical approach and may have implications for the deployment process.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Rails | The migration is built on the Rails framework |
+| Rake | Used to invoke the Stripe webhook refresh task |
+
+## Performance Considerations
+Running external tasks during a database migration can potentially increase the migration time and may cause issues if the external service (Stripe in this case) is unavailable. It's generally recommended to separate such operations from database migrations.
+
+## Notes
+1. This migration doesn't make any direct changes to the database schema. Instead, it performs an operational task (refreshing Stripe webhooks) as part of the migration process.
+2. The approach of running Rake tasks within migrations is unconventional and may lead to issues in certain deployment scenarios, especially if the migration needs to be rolled back.
+3. It's assumed that the `stripe:refresh_registered_webhooks` Rake task is defined elsewhere in the application, likely in the `lib/tasks` directory.
+4. This migration is dependent on the application code being available and loaded, which may not always be the case during database migrations in some deployment strategies.
+
+## TODOs
+There are no explicit TODOs in this migration file. However, it might be worth considering whether this operation should be moved out of the database migration process and into a separate deployment step or application initialization task.

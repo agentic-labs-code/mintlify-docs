@@ -1,0 +1,70 @@
+---
+title: "update.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for updating an existing Plan in a subscription management system. It includes authentication, permission checks, and various arguments for updating plan details such as amount, currency, interval, and associated charges.
+
+## Code Structure
+The `Update` class is defined within the `Mutations::Plans` module and inherits from `BaseMutation`. It includes the `AuthenticableApiUser` concern for authentication. The class defines the mutation's arguments, return type, and resolve method.
+
+## References
+- `AuthenticableApiUser` concern
+- `Types::CurrencyEnum`
+- `Types::Plans::IntervalEnum`
+- `Types::Charges::Input`
+- `Types::Commitments::Input`
+- `Types::UsageThresholds::Input`
+- `Types::Plans::Object`
+- `::Plans::UpdateService`
+
+## Symbols
+
+### `Mutations::Plans::Update`
+#### Description
+This class defines a GraphQL mutation for updating an existing Plan. It includes authentication, permission checks, and handles the update process using the `::Plans::UpdateService`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| amount_cents | GraphQL::Types::BigInt | The plan amount in cents |
+| amount_currency | Types::CurrencyEnum | The currency for the plan amount |
+| bill_charges_monthly | Boolean | Optional flag for monthly charge billing |
+| code | String | The plan code |
+| description | String | Optional plan description |
+| id | String | The ID of the plan to update |
+| interval | Types::Plans::IntervalEnum | The billing interval for the plan |
+| invoice_display_name | String | Optional display name for invoices |
+| name | String | The name of the plan |
+| pay_in_advance | Boolean | Flag indicating if the plan is paid in advance |
+| tax_codes | [String] | Optional array of tax codes |
+| trial_period | Float | Optional trial period duration |
+| charges | [Types::Charges::Input] | Array of charge inputs |
+| minimum_commitment | Types::Commitments::Input | Optional minimum commitment input |
+| usage_thresholds | [Types::UsageThresholds::Input] | Optional array of usage threshold inputs |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| plan | Types::Plans::Object | The updated plan object |
+
+#### Internal Logic
+1. Converts the `charges` argument to an array of hashes.
+2. Finds the plan to update using the provided `id` and the current user's context.
+3. Calls the `::Plans::UpdateService` with the plan and input parameters.
+4. Returns the updated plan if successful, or an error result if the update fails.
+
+## Side Effects
+- Updates an existing Plan in the database.
+- May modify associated charges, commitments, and usage thresholds.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication functionality |
+| GraphQL | Defines the mutation structure and types |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class) to handle and return errors from the `::Plans::UpdateService`.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

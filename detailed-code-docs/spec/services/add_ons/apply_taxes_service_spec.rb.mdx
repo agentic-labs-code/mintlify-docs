@@ -1,0 +1,90 @@
+---
+title: "apply_taxes_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `AddOns::ApplyTaxesService` class. It tests the functionality of applying taxes to add-ons, including various scenarios such as successful application, handling errors, and edge cases.
+
+## Symbols
+
+### `RSpec.describe AddOns::ApplyTaxesService`
+#### Description
+This is the main describe block for the `AddOns::ApplyTaxesService` tests. It sets up the context for all the tests related to this service.
+
+#### Internal Logic
+- Sets up the subject of the tests as an instance of `AddOns::ApplyTaxesService`
+- Defines let variables for organization, add_on, taxes, and tax codes
+- Contains nested describe and context blocks for different test scenarios
+
+### `describe 'call'`
+#### Description
+This describe block focuses on testing the `call` method of the `AddOns::ApplyTaxesService`.
+
+#### Internal Logic
+Contains various test cases to verify the behavior of the `call` method:
+
+1. Successful application of taxes
+2. Handling of errors (add_on not found, tax not found)
+3. Edge cases (already applied taxes, applying the same tax twice)
+
+### Test: "applies taxes to the add_on"
+#### Description
+Verifies that calling the service increases the count of applied taxes on the add_on.
+
+#### Internal Logic
+- Arrange: Set up add_on and taxes
+- Act: Call the service
+- Assert: Check that the count of applied taxes has increased from 0 to 2
+
+### Test: "returns applied taxes"
+#### Description
+Ensures that the service returns the applied taxes after a successful call.
+
+#### Internal Logic
+- Arrange: Set up add_on and taxes
+- Act: Call the service
+- Assert: Check that the result contains 2 applied taxes
+
+### Context: "when add_on is not found"
+#### Description
+Tests the error handling when the add_on is not found (nil).
+
+#### Internal Logic
+- Arrange: Set add_on to nil
+- Act: Call the service
+- Assert: Check that the result is not successful and has the correct error code
+
+### Context: "when tax is not found"
+#### Description
+Tests the error handling when a tax code is not found.
+
+#### Internal Logic
+- Arrange: Set tax_codes to an unknown value
+- Act: Call the service
+- Assert: Check that the result is not successful and has the correct error code
+
+### Context: "when applied tax is already present"
+#### Description
+Verifies that the service doesn't create duplicate applied taxes.
+
+#### Internal Logic
+- Arrange: Create an applied tax for one of the taxes
+- Act: Call the service
+- Assert: Check that only one new applied tax is created
+
+### Context: "when trying to apply twice the same tax"
+#### Description
+Ensures that the service doesn't apply the same tax multiple times.
+
+#### Internal Logic
+- Arrange: Set tax_codes to contain the same tax code twice
+- Act: Call the service
+- Assert: Check that only one applied tax is created
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| FactoryBot | Used for creating test data (implied by the use of `create` method) |
+
+Note: The actual `AddOns::ApplyTaxesService` implementation is not shown in this file, as this is a test file.

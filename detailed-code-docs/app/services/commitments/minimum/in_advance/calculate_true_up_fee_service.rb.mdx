@@ -1,0 +1,80 @@
+---
+title: "calculate_true_up_fee_service.rb"
+---
+
+## High-level description
+This code defines a service class `CalculateTrueUpFeeService` within the `Commitments::Minimum::InAdvance` module. It is responsible for calculating the true-up fee for minimum commitments in advance payment scenarios. The service extends the base `Commitments::Minimum::CalculateTrueUpFeeService` and overrides several methods to handle the specific logic for in-advance payments.
+
+## Code Structure
+The `CalculateTrueUpFeeService` class inherits from `Commitments::Minimum::CalculateTrueUpFeeService` and overrides several private methods to implement the specific logic for in-advance payments. These methods are used to calculate different types of fees (subscription, charge, charge in advance, and charge in advance recurring) based on the commitment and invoice subscription data.
+
+## Symbols
+
+### `CalculateTrueUpFeeService`
+#### Description
+This class calculates the true-up fee for minimum commitments in advance payment scenarios. It overrides several methods from its parent class to implement the specific logic for in-advance payments.
+
+#### Internal Logic
+The class overrides the following private methods:
+- `amount_cents`: Returns 0 if there's no previous invoice subscription, otherwise calls the parent method.
+- `subscription_fees`: Calculates subscription fees for the previous period.
+- `charge_fees`: Calculates charge fees for the current invoice.
+- `charge_in_advance_fees`: Calculates charge fees paid in advance for the previous period.
+- `charge_in_advance_recurring_fees`: Calculates recurring charge fees paid in advance for the previous period.
+
+### `amount_cents`
+#### Description
+This method determines the amount in cents for the true-up fee. It returns 0 if there's no previous invoice subscription, otherwise it calls the parent method.
+
+#### Internal Logic
+Checks if `invoice_subscription.previous_invoice_subscription` exists. If not, returns 0. Otherwise, calls the parent method using `super`.
+
+### `subscription_fees`
+#### Description
+This method calculates the subscription fees for the previous period.
+
+#### Internal Logic
+1. Creates a `DatesService` instance for the previous invoice subscription.
+2. Queries the database for subscription fees within the date range of the previous period.
+3. Filters fees based on the subscription, plan (pay in advance), and date range.
+
+### `charge_fees`
+#### Description
+This method calculates the charge fees for the current invoice.
+
+#### Internal Logic
+1. Fetches invoices using `FetchInvoicesService`.
+2. Queries the database for charge fees associated with the fetched invoices.
+3. Filters fees based on the subscription and charges not paid in advance.
+
+### `charge_in_advance_fees`
+#### Description
+This method calculates the charge fees paid in advance for the previous period.
+
+#### Internal Logic
+1. Creates a `DatesService` instance for the previous invoice subscription.
+2. Queries the database for charge fees paid in advance within the date range of the previous period.
+3. Filters fees based on the subscription, charges paid in advance, and date range.
+
+### `charge_in_advance_recurring_fees`
+#### Description
+This method calculates the recurring charge fees paid in advance for the previous period.
+
+#### Internal Logic
+1. Returns an empty relation if there's no previous invoice subscription.
+2. Creates a `DatesService` instance for the previous invoice subscription.
+3. Queries the database for recurring charge fees paid in advance within the date range of the previous period.
+4. Filters fees based on the subscription, recurring billable metrics, charges paid in advance but fees not paid in advance, and date range.
+
+## Dependencies
+The code relies on several other services and models:
+- `Commitments::DatesService`
+- `FetchInvoicesService`
+- `Fee` model
+- `Subscription` model
+- `Plan` model
+- `Charge` model
+- `BillableMetric` model
+
+## Performance Considerations
+The code makes several database queries, which could potentially impact performance for large datasets. The use of joins and multiple where clauses suggests that proper indexing on the relevant columns would be beneficial for query optimization.

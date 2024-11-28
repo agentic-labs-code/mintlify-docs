@@ -1,0 +1,59 @@
+---
+title: "invoices_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying invoices of a customer. It is part of the Resolvers::Customers module and extends the BaseResolver class. The resolver includes authentication and organization checks, and uses the InvoicesQuery service to fetch and filter invoices based on the provided arguments.
+
+## Code Structure
+The `InvoicesResolver` class is the main symbol in this code. It includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. The class defines arguments for the GraphQL query and a resolve method that processes these arguments and returns the filtered invoices.
+
+## References
+- `Resolvers::BaseResolver`
+- `Types::Invoices::StatusTypeEnum`
+- `Types::Invoices::Object`
+- `InvoicesQuery`
+
+## Symbols
+
+### Resolvers::Customers::InvoicesResolver
+#### Description
+This class is a GraphQL resolver for querying customer invoices. It authenticates the user, checks for organization membership, and applies filters to the invoice query.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer_id | ID | Required. The ID of the customer whose invoices are being queried. |
+| limit | Integer | Optional. The number of invoices to return. |
+| page | Integer | Optional. The page number for pagination. |
+| search_term | String | Optional. A term to search for in the invoices. |
+| status | [Types::Invoices::StatusTypeEnum] | Optional. An array of invoice statuses to filter by. |
+
+#### Outputs
+| Name | Type | Description |
+| :--- | :--- | :---------- |
+| invoices | [Types::Invoices::Object] | A collection of invoice objects matching the query parameters. |
+
+#### Internal Logic
+1. The resolver first checks for user authentication and organization membership.
+2. It then calls the `InvoicesQuery` service with the provided arguments and the current organization.
+3. The resulting invoices are returned.
+4. If the customer is not found, a not_found_error is raised.
+
+## Side Effects
+This resolver does not have any side effects. It only reads data based on the provided inputs.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides user authentication functionality |
+| RequiredOrganization | Ensures the user belongs to the required organization |
+| InvoicesQuery | Service for querying and filtering invoices |
+
+## Error Handling
+- If the customer is not found, a `not_found_error` is raised with the resource set to 'customer'.
+- The included `AuthenticableApiUser` module raises an `unauthorized_error` if the user is not authenticated.
+- The included `RequiredOrganization` module raises an `organization_error` if the organization is missing or the user is not a member.
+
+## Performance Considerations
+The resolver uses the `InvoicesQuery` service, which includes pagination and eager loading of the customer association. This helps to optimize the query performance, especially when dealing with large numbers of invoices.

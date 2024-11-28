@@ -1,0 +1,68 @@
+---
+title: "xero_service.rb"
+---
+
+## High-level description
+This code defines the `XeroService` class within the `IntegrationCustomers` module. It is responsible for creating a new integration customer for Xero, which involves creating a contact in the Xero system and then storing the integration customer details in the local database.
+
+## Code Structure
+The `XeroService` class inherits from `::BaseService` and contains two main methods: `initialize` and `create`. The `create` method uses the `Integrations::Aggregator::Contacts::CreateService` to create a contact in Xero and then creates a new `IntegrationCustomers::XeroCustomer` record in the local database.
+
+## References
+- `Integrations::Aggregator::Contacts::CreateService`
+- `IntegrationCustomers::BaseCustomer`
+
+## Symbols
+
+### `XeroService`
+#### Description
+This class is responsible for creating a new Xero integration customer. It creates a contact in Xero and then stores the integration customer details locally.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Integrations::XeroIntegration | The Xero integration instance |
+| customer | Customer | The customer to be integrated |
+| subsidiary_id | String | The subsidiary ID (not used in this implementation) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Contains the created integration customer or error information |
+
+#### Internal Logic
+1. Creates a contact in Xero using `Integrations::Aggregator::Contacts::CreateService`
+2. If successful, creates a new `IntegrationCustomers::XeroCustomer` record
+3. Returns the result with the new integration customer or error information
+
+### `initialize`
+#### Description
+Initializes the `XeroService` instance with the provided integration, customer, and subsidiary_id.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Integrations::XeroIntegration | The Xero integration instance |
+| customer | Customer | The customer to be integrated |
+| subsidiary_id | String | The subsidiary ID (not used in this implementation) |
+
+### `create`
+#### Description
+Creates a new Xero integration customer by first creating a contact in Xero and then storing the integration customer details locally.
+
+#### Internal Logic
+1. Calls `Integrations::Aggregator::Contacts::CreateService` to create a contact in Xero
+2. If successful, creates a new `IntegrationCustomers::XeroCustomer` record using `IntegrationCustomers::BaseCustomer.create!`
+3. Sets the `integration_customer` in the result and returns it
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Integrations::Aggregator::Contacts::CreateService | Creates a contact in Xero |
+| IntegrationCustomers::BaseCustomer | Base class for creating integration customer records |
+
+## Error Handling
+The `create` method checks for errors returned by the `Integrations::Aggregator::Contacts::CreateService`. If an error occurs, it returns the error result without creating a local integration customer record.
+
+## TODOs
+- The `subsidiary_id` parameter is not used in the current implementation. Consider removing it or implementing its usage if needed.

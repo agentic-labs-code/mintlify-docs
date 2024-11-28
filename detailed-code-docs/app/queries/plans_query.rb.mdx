@@ -1,0 +1,75 @@
+---
+title: "plans_query.rb"
+---
+
+## High-level description
+The `PlansQuery` class is responsible for querying and retrieving plans from the database. It extends the `BaseQuery` class and provides functionality to filter, paginate, and order plans based on specific criteria.
+
+## Code Structure
+The `PlansQuery` class contains a main `call` method that orchestrates the query execution and two private methods: `base_scope` and `search_params` that help in constructing the query.
+
+## Symbols
+
+### `PlansQuery`
+#### Description
+This class encapsulates the logic for querying plans. It filters out plans that are pending deletion, allows searching by name or code, and orders the results by creation date.
+
+### `call`
+#### Description
+This method executes the main query logic, applying pagination and ordering to the base scope of plans.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the queried plans |
+
+#### Internal Logic
+1. Retrieves plans using the `base_scope`
+2. Applies pagination to the plans
+3. Orders the plans by creation date in descending order
+4. Assigns the resulting plans to the `result` object
+
+### `base_scope` (private)
+#### Description
+This method defines the base query scope for retrieving plans.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Relation | ActiveRecord::Relation | A relation object representing the base query scope |
+
+#### Internal Logic
+1. Starts with `Plan.parents` to get parent plans
+2. Filters plans by the current organization
+3. Excludes plans pending deletion
+4. Applies search parameters using Ransack
+
+### `search_params` (private)
+#### Description
+This method constructs the search parameters for Ransack based on the search term.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Hash or nil | Hash | Search parameters for Ransack, or nil if no search term is provided |
+
+#### Internal Logic
+1. Returns nil if the search term is blank
+2. Constructs a hash with 'or' matching for name and code containing the search term
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseQuery | Parent class that `PlansQuery` inherits from |
+| Plan | ActiveRecord model representing plans |
+| ransack | Used for constructing search queries |
+
+## Configuration
+The class assumes the existence of certain methods or attributes:
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| organization | Object | The current organization context |
+| search_term | String | The term used for searching plans |
+| paginate | Method | A method for paginating results |
+
+Note: These are likely provided by the `BaseQuery` class or mixed in from elsewhere.

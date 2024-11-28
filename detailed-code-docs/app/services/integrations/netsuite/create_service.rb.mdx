@@ -1,0 +1,55 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines a service class `CreateService` within the `Integrations::Netsuite` module. Its primary purpose is to create a new Netsuite integration for an organization, validating the organization's eligibility and handling the creation process, including scheduling related jobs.
+
+## Code Structure
+The `CreateService` class inherits from `BaseService` and contains a single public method `call`. It interacts with the `Organization` and `Integrations::NetsuiteIntegration` models, and schedules background jobs using `Integrations::Aggregator::SendRestletEndpointJob` and `Integrations::Aggregator::PerformSyncJob`.
+
+## References
+- `BaseService`
+- `Organization`
+- `Integrations::NetsuiteIntegration`
+- `Integrations::Aggregator::SendRestletEndpointJob`
+- `Integrations::Aggregator::PerformSyncJob`
+
+## Symbols
+
+### `call`
+#### Description
+This method creates a new Netsuite integration for an organization, validates the organization's eligibility, and schedules related jobs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | A hash containing integration details and organization ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the created integration or error information |
+
+#### Internal Logic
+1. Find the organization by ID
+2. Check if the organization has the 'netsuite' premium integration
+3. Create a new `Integrations::NetsuiteIntegration` instance with provided arguments
+4. Save the integration
+5. If the integration type is 'Integrations::NetsuiteIntegration':
+   - Schedule a job to send the restlet endpoint
+   - Schedule a job to perform sync with tax items
+6. Set the created integration in the result object
+7. Handle any `ActiveRecord::RecordInvalid` errors
+
+## Side Effects
+- Creates a new `Integrations::NetsuiteIntegration` record in the database
+- Schedules background jobs for sending restlet endpoint and performing sync
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveModel::Type::Boolean | Used for casting boolean values |
+
+## Error Handling
+The method handles `ActiveRecord::RecordInvalid` errors by calling `result.record_validation_failure!` with the invalid record.

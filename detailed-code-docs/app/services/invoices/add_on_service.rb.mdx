@@ -1,0 +1,112 @@
+---
+title: "add_on_service.rb"
+---
+
+## High-level description
+This code defines the `Invoices::AddOnService` class, which is responsible for creating invoices for add-ons in a billing system. It handles the entire process of creating an invoice, including fee calculation, tax application, and triggering various post-creation actions such as webhook notifications and PDF generation.
+
+## Code Structure
+The `Invoices::AddOnService` class inherits from `BaseService` and contains a main `create` method that orchestrates the invoice creation process. It interacts with several other services and models to complete its task, including `Fees::AddOnService`, `Invoices::ApplyTaxesService`, and `Invoices::Payments::CreateService`.
+
+## Symbols
+
+### Invoices::AddOnService
+#### Description
+This service class is responsible for creating invoices for add-ons. It handles the entire process from invoice creation to post-creation actions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| applied_add_on | AppliedAddOn | The add-on being invoiced |
+| datetime | DateTime | The datetime for the invoice |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Contains the created invoice and any errors |
+
+#### Internal Logic
+1. Creates a new invoice within a transaction
+2. Creates an add-on fee for the invoice
+3. Computes amounts including taxes
+4. Saves the invoice
+5. Performs post-creation actions (tracking, webhooks, PDF generation, etc.)
+6. Creates a payment for the invoice
+
+### create
+#### Description
+This method orchestrates the entire process of creating an invoice for an add-on.
+
+#### Internal Logic
+1. Starts a database transaction
+2. Creates a new invoice
+3. Creates an add-on fee
+4. Computes amounts including taxes
+5. Saves the invoice
+6. Performs various post-creation actions:
+   - Tracks the invoice creation event
+   - Sends a webhook notification
+   - Generates a PDF and notifies (if applicable)
+   - Syncs the invoice with external systems (if applicable)
+   - Creates a payment for the invoice
+7. Handles any record validation failures
+
+### compute_amounts
+#### Description
+Calculates the various amounts for the invoice, including fees, taxes, and totals.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice to compute amounts for |
+
+#### Internal Logic
+1. Sums up the fee amounts
+2. Applies taxes using `Invoices::ApplyTaxesService`
+3. Calculates subtotals and total amounts
+
+### create_add_on_fee
+#### Description
+Creates a fee for the add-on and associates it with the invoice.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice to associate the fee with |
+
+#### Internal Logic
+Uses `Fees::AddOnService` to create the fee and handles any errors.
+
+### create_payment
+#### Description
+Initiates the payment creation process for the invoice.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice to create a payment for |
+
+#### Internal Logic
+Uses `Invoices::Payments::CreateService` to create the payment.
+
+## Side Effects
+- Creates database records (Invoice, Fee)
+- Enqueues background jobs for various tasks (webhook sending, PDF generation, etc.)
+- Potentially interacts with external systems for invoice and sales order syncing
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Database interactions |
+| Utils::SegmentTrack | Tracking invoice creation events |
+| SendWebhookJob | Sending webhook notifications |
+| GeneratePdfAndNotifyJob | Generating invoice PDFs and notifications |
+| Integrations::Aggregator::Invoices::CreateJob | Syncing invoices with external systems |
+| Integrations::Aggregator::SalesOrders::CreateJob | Syncing sales orders with external systems |
+| Invoices::Payments::CreateService | Creating payments for invoices |
+
+## Error Handling
+The service uses a `result` object to handle and propagate errors. It specifically catches and handles `ActiveRecord::RecordInvalid` errors, recording validation failures in the result object.
+
+## TODOs
+There is a TODO comment indicating that a condition for handling webhook_id is temporary and should be removed after queued jobs are processed.

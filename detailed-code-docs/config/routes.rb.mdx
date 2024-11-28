@@ -1,0 +1,88 @@
+---
+title: "routes.rb"
+---
+
+## High-level description
+This file defines the routing configuration for a Rails application. It sets up various API endpoints, admin routes, and development tools, as well as mounting external services like Sidekiq and Karafka. The routes are primarily focused on handling customer, subscription, and billing-related operations through a RESTful API structure.
+
+## Code Structure
+The routes are organized into several namespaces, including `api/v1`, `admin`, and `dev_tools`. The main API routes are under the `api/v1` namespace, which contains nested resources for various entities like customers, subscriptions, and invoices. The file also includes configuration for external services and error handling for unmatched routes.
+
+## Symbols
+
+### `Rails.application.routes.draw`
+#### Description
+This is the main block where all the routes for the Rails application are defined.
+
+#### Internal Logic
+1. Mounts external services (Sidekiq and Karafka) if they are available.
+2. Sets up GraphiQL in development environment.
+3. Defines a GraphQL endpoint.
+4. Creates a health check endpoint.
+5. Defines API routes under the `api/v1` namespace.
+6. Sets up webhook endpoints for payment providers.
+7. Creates admin routes.
+8. Adds development tools routes in the development environment.
+9. Handles unmatched routes.
+
+### `namespace :api do`
+#### Description
+This namespace groups all API-related routes, further nested under `v1`.
+
+### `namespace :v1 do`
+#### Description
+This namespace contains the version 1 of the API routes, including various resources and analytics endpoints.
+
+### `namespace :analytics do`
+#### Description
+Defines analytics-related endpoints for gross revenue, invoiced usage, invoice collection, MRR, and overdue balance.
+
+### `resources :customers`
+#### Description
+Sets up RESTful routes for customer management, including custom actions for portal URL, usage, and checkout URL.
+
+### `resources :subscriptions`
+#### Description
+Defines routes for subscription management, including a custom terminate action.
+
+### `resources :credit_notes`
+#### Description
+Sets up routes for credit note management, including custom actions for downloading, voiding, and estimating.
+
+### `resources :invoices`
+#### Description
+Defines routes for invoice management, including various custom actions like downloading, voiding, and payment-related operations.
+
+### `namespace :admin do`
+#### Description
+Groups admin-related routes, including memberships, organizations, and invoice regeneration.
+
+### `namespace :dev_tools do`
+#### Description
+Defines development-specific routes, only available in the development environment.
+
+### `match '*unmatched'`
+#### Description
+Catches all unmatched routes and directs them to the `application#not_found` action, excluding Active Storage paths.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Sidekiq::Web | Job processing dashboard |
+| Karafka::Web::App | Kafka management interface |
+| GraphiQL::Rails::Engine | GraphQL IDE for development |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| KARAFKA_WEB | Environment Variable | N/A | Enables Karafka web interface when set |
+
+## API/Interface Reference
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| /health | GET | Health check status |
+| /api/v1/... | Various | API endpoints for customer, subscription, and billing management |
+| /webhooks/... | POST | Webhook endpoints for payment providers |
+| /admin/... | Various | Admin-related endpoints |
+
+This routing configuration sets up a comprehensive API for managing customers, subscriptions, invoices, and various billing-related operations. It also includes admin routes and development tools, as well as integration with external services like Sidekiq and Karafka.

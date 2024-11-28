@@ -1,0 +1,79 @@
+---
+title: "charge_usage_serializer_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `V1::Customers::ChargeUsageSerializer` class. It verifies that the serializer correctly formats charge usage data, including handling of groups, filters, and various charge-related attributes.
+
+## Code Structure
+The test suite is organized into a main describe block for the serializer, with nested contexts and examples testing different aspects of the serialization process. It includes tests for the main serialization output, as well as specific tests for the `groups` and `filters` methods.
+
+## Symbols
+
+### RSpec.describe ::V1::Customers::ChargeUsageSerializer
+#### Description
+This is the main describe block for the serializer tests. It sets up the test environment and contains all the examples.
+
+#### Internal Logic
+- Creates a test instance of the serializer with sample usage data
+- Tests the serialized output for correctness
+- Includes nested describe blocks for testing specific methods (`groups` and `filters`)
+
+### subject(:serializer)
+#### Description
+Creates an instance of the serializer to be tested.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| usage | Array | An array of OpenStruct objects representing usage data |
+| root_name | Symbol | The root name for the serialized JSON output |
+
+### let(:charge)
+#### Description
+Creates a test instance of a standard charge using FactoryBot.
+
+### let(:billable_metric)
+#### Description
+References the billable metric associated with the charge.
+
+### let(:usage)
+#### Description
+Defines the usage data to be serialized, using an OpenStruct to mimic the structure of real usage data.
+
+### let(:result)
+#### Description
+Parses the JSON output of the serializer for testing.
+
+### it 'serializes the fee'
+#### Description
+Tests that the serializer correctly formats the charge usage data.
+
+#### Internal Logic
+Uses `aggregate_failures` to group multiple expectations:
+- Checks various attributes of the serialized output, including units, events count, amount, charge details, billable metric details, and grouped usage
+
+### describe '#groups'
+#### Description
+Tests the `groups` method of the serializer.
+
+#### Internal Logic
+- Tests two scenarios: when all fees have groups and when one fee does not have a filter
+- Verifies that the method correctly formats group data, including lago_id, key, value, units, amount_cents, and events_count
+
+### describe '#filters'
+#### Description
+Tests the `filters` method of the serializer.
+
+#### Internal Logic
+- Sets up test data with a billable metric filter and a charge filter
+- Verifies that the serialized output includes correct filter information in both the main charges array and the grouped_usage array
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Used for creating test data |
+
+## Configuration
+The test suite uses RSpec configuration from the `rails_helper.rb` file, which sets up the testing environment, including database cleaner, SimpleCov for code coverage, and various RSpec configurations.

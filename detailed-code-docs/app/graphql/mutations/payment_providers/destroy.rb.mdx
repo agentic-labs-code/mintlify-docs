@@ -1,0 +1,54 @@
+---
+title: "destroy.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for destroying a payment provider. It's part of a larger application that manages payment providers and integrations, likely for a billing or financial system.
+
+## Code Structure
+The `Destroy` class is nested within the `Mutations::PaymentProviders` module and inherits from `BaseMutation`. It includes the `AuthenticableApiUser` module and defines a required permission for the operation.
+
+## References
+- `::PaymentProviders::DestroyService`: Used to perform the actual destruction of the payment provider.
+- `BaseMutation`: The parent class that this mutation inherits from.
+- `AuthenticableApiUser`: A module included for user authentication.
+
+## Symbols
+
+### `Mutations::PaymentProviders::Destroy`
+#### Description
+This class defines a GraphQL mutation for destroying a payment provider. It authenticates the user, checks for the required permission, and delegates the actual destruction to a service object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the payment provider to be destroyed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the destroyed payment provider (if successful) |
+
+#### Internal Logic
+1. The mutation is named 'DestroyPaymentProvider' and requires the 'organization:integrations:delete' permission.
+2. It takes an `id` argument of type `ID`.
+3. The `resolve` method is called with the provided `id`.
+4. It creates a new instance of `::PaymentProviders::DestroyService` with the current user from the context.
+5. The service's `destroy` method is called with the provided `id`.
+6. If successful, it returns the destroyed payment provider; otherwise, it returns an error.
+
+## Side Effects
+The main side effect of this mutation is the destruction of a payment provider record in the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides user authentication functionality |
+| ::PaymentProviders::DestroyService | Handles the actual destruction of the payment provider |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class or included module) to handle and return errors if the destruction process fails.
+
+---
+
+Note: The related code snippets provide context about the application's structure and other components, but they are not directly part of the target file's documentation. They show that this mutation is part of a larger GraphQL API with various other mutations and services.

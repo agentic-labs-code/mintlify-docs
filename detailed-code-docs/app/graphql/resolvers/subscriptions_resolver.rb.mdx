@@ -1,0 +1,67 @@
+---
+title: "subscriptions_resolver.rb"
+---
+
+## High-level description
+The `SubscriptionsResolver` is a GraphQL resolver that handles querying subscriptions for an organization. It provides a way to fetch subscriptions with optional filtering and pagination, ensuring that the user has the necessary permissions and is associated with the organization.
+
+## Code Structure
+The `SubscriptionsResolver` class inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. These modules provide authentication and organization-related functionality.
+
+## References
+- `Types::Subscriptions::Object`
+- `Types::Subscriptions::StatusTypeEnum`
+- `SubscriptionsQuery`
+
+## Symbols
+
+### `SubscriptionsResolver`
+#### Description
+This class resolves GraphQL queries for subscriptions, applying filters, pagination, and ensuring proper authentication and organization access.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| limit | Integer | Optional. Limits the number of results returned. |
+| page | Integer | Optional. Specifies the page number for pagination. |
+| plan_code | String | Optional. Filters subscriptions by plan code. |
+| status | [Types::Subscriptions::StatusTypeEnum] | Optional. Filters subscriptions by status. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscriptions | [Types::Subscriptions::Object] | A collection of subscription objects. |
+
+#### Internal Logic
+1. The resolver checks for authentication and organization access using the included modules.
+2. It defines the required permission as 'subscriptions:view'.
+3. The `resolve` method calls the `SubscriptionsQuery` service with the provided filters and pagination options.
+4. The query result's subscriptions are returned.
+
+## Side Effects
+No notable side effects beyond querying the database and potentially raising authorization errors.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication checks |
+| RequiredOrganization | Ensures the user has access to the organization |
+| Types::Subscriptions::StatusTypeEnum | Defines the possible subscription status values |
+| Types::Subscriptions::Object | Defines the structure of a subscription object |
+| SubscriptionsQuery | Handles the actual database query for subscriptions |
+
+## Error Handling
+The included modules (`AuthenticableApiUser` and `RequiredOrganization`) handle authentication and authorization errors, raising `GraphQL::ExecutionError` when necessary.
+
+## API/Interface Reference
+This resolver is part of the GraphQL API and is referenced in the `Types::QueryType` as the `subscriptions` field. It can be queried like this:
+
+```graphql
+query {
+  subscriptions(limit: 10, page: 1, planCode: "BASIC", status: [ACTIVE]) {
+    # fields from Types::Subscriptions::Object
+  }
+}
+```
+
+The exact fields available in the response depend on the `Types::Subscriptions::Object` definition.

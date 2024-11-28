@@ -1,0 +1,69 @@
+---
+title: "update.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for updating a webhook endpoint. It's part of a larger GraphQL API and includes authentication and organization-specific logic. The mutation is responsible for updating the webhook endpoint's details using a service object.
+
+## Code Structure
+The `Update` class is defined within the `Mutations::WebhookEndpoints` module. It inherits from `BaseMutation` and includes two concerns: `AuthenticableApiUser` and `RequiredOrganization`. The class defines the GraphQL mutation structure and delegates the actual update operation to a service object.
+
+## References
+- `Types::WebhookEndpoints::UpdateInput`
+- `Types::WebhookEndpoints::Object`
+- `::WebhookEndpoints::UpdateService`
+
+## Symbols
+
+### `Mutations::WebhookEndpoints::Update`
+#### Description
+This class defines a GraphQL mutation for updating a webhook endpoint. It includes authentication and organization checks, and uses a service object to perform the actual update.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | GraphQL input arguments for updating a webhook endpoint |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_endpoint | Types::WebhookEndpoints::Object | The updated webhook endpoint object |
+
+#### Internal Logic
+1. The class includes `AuthenticableApiUser` and `RequiredOrganization` concerns for authentication and organization checks.
+2. It defines the GraphQL mutation name, description, input object class, and return type.
+3. The `resolve` method is called with the input arguments.
+4. It uses the `::WebhookEndpoints::UpdateService` to perform the update operation.
+5. If successful, it returns the updated webhook endpoint; otherwise, it returns an error.
+
+## Side Effects
+This mutation may modify the webhook endpoint record in the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication checks |
+| RequiredOrganization | Ensures the user has access to the organization |
+| Types::WebhookEndpoints::UpdateInput | Defines the input structure for the mutation |
+| Types::WebhookEndpoints::Object | Defines the return type for the mutation |
+| ::WebhookEndpoints::UpdateService | Service object that performs the actual update operation |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'developers:manage' | The permission required to perform this mutation |
+
+## Error Handling
+The mutation uses the `result_error` method to handle errors returned by the `UpdateService`. Specific error handling logic is not visible in this file but is likely implemented in the base class or a concern.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| updateWebhookEndpoint | Mutation | UpdateInput | WebhookEndpoint Object | Updates a webhook endpoint |
+
+The mutation accepts the following arguments:
+- `id`: ID (required)
+- `signature_algo`: WebhookEndpoints::SignatureAlgoEnum (optional)
+- `webhook_url`: String (required)
+
+These arguments are defined in the `Types::WebhookEndpoints::UpdateInput` class.

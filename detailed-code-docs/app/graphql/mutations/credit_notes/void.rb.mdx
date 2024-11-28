@@ -1,0 +1,55 @@
+---
+title: "void.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation called `VoidCreditNote` that allows authenticated users to void a credit note. It uses the `CreditNotes::VoidService` to perform the voiding operation and returns the updated credit note object or an error if the operation fails.
+
+## Code Structure
+The `Void` class is defined within the `Mutations::CreditNotes` module and inherits from `BaseMutation`. It includes the `AuthenticableApiUser` concern for authentication. The class defines the GraphQL mutation structure, including its name, description, arguments, and return type.
+
+## References
+- `Types::CreditNotes::Object`: The return type for the mutation.
+- `::CreditNotes::VoidService`: The service class used to perform the voiding operation.
+
+## Symbols
+
+### Void
+#### Description
+This class represents a GraphQL mutation for voiding a credit note. It authenticates the user, finds the credit note by ID, and uses the `VoidService` to perform the voiding operation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the credit note to be voided |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_note | Types::CreditNotes::Object | The voided credit note object |
+
+#### Internal Logic
+1. Finds the credit note by ID for the current user.
+2. Initializes and calls the `CreditNotes::VoidService` with the found credit note.
+3. Returns the voided credit note if successful, or calls `result_error` if the operation fails.
+
+## Side Effects
+- The specified credit note is voided if the operation is successful.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication functionality for the API user |
+
+## Error Handling
+The mutation uses the `result_error` method to handle and return errors if the voiding operation fails.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| voidCreditNote | POST | { id: ID! } | CreditNote object | Voids the specified credit note |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'credit_notes:void' | The permission required to perform this mutation |

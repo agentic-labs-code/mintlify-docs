@@ -1,0 +1,92 @@
+---
+title: "create_generating_service_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Invoices::CreateGeneratingService` class. It tests the service's ability to create invoices with various configurations, including different customer settings, invoice types, and timezones.
+
+## Symbols
+
+### `RSpec.describe Invoices::CreateGeneratingService`
+#### Description
+This is the main describe block for the `Invoices::CreateGeneratingService` class. It sets up the context for all the tests related to this service.
+
+### `subject(:create_service)`
+#### Description
+Defines the subject of the test, which is an instance of the `Invoices::CreateGeneratingService` class with specified parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Customer | The customer for whom the invoice is being created |
+| invoice_type | Symbol | The type of invoice (e.g., :one_off, :subscription) |
+| currency | String | The currency for the invoice |
+| datetime | Time | The datetime for the invoice |
+| charge_in_advance | Boolean | Whether the charge is in advance |
+
+### `describe 'call'`
+#### Description
+This describe block focuses on testing the `call` method of the `CreateGeneratingService`.
+
+#### Internal Logic
+The tests in this block verify various aspects of invoice creation, including:
+1. Basic invoice creation with default settings
+2. Handling of customer timezone
+3. Application of net payment terms
+4. Handling of subscription invoices
+5. Application of grace periods for subscription invoices
+6. Handling of charge-in-advance invoices
+
+### `it 'creates an invoice'`
+#### Description
+This test verifies that the service successfully creates a basic invoice with the expected attributes.
+
+#### Internal Logic
+1. Calls the service
+2. Checks if the result is successful
+3. Verifies various attributes of the created invoice
+
+### `context 'with customer timezone'`
+#### Description
+This context block tests the service's behavior when the customer has a specific timezone set.
+
+#### Internal Logic
+1. Creates a customer with a specific timezone
+2. Verifies that the invoice's issuing date is correctly set in the customer's timezone
+
+### `context 'with applicable net payment term'`
+#### Description
+This context block tests the service's behavior when the customer has a specific net payment term.
+
+#### Internal Logic
+1. Creates a customer with a specific net payment term
+2. Verifies that the invoice's payment due date is correctly calculated based on the net payment term
+
+### `context 'when a block is passed to the method'`
+#### Description
+This context block tests the service's behavior when a block is passed to the `call` method, specifically for subscription invoices.
+
+#### Internal Logic
+1. Creates a subscription for the customer
+2. Passes a block to the `call` method to create an invoice subscription
+3. Verifies that the invoice and its associated subscription are correctly created
+
+### `context 'when invoice type is subscription'`
+#### Description
+This context block tests the service's behavior for subscription invoices, including grace periods and charge-in-advance scenarios.
+
+#### Internal Logic
+1. Tests the application of grace periods for subscription invoices
+2. Tests the handling of charge-in-advance invoices
+3. Verifies correct issuing date calculation in different scenarios and timezones
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides the necessary setup for Rails-specific RSpec tests |
+| FactoryBot | Used for creating test data (e.g., customers, subscriptions) |
+
+## Notes
+- The test file makes extensive use of RSpec's `let` statements to define variables used across multiple tests.
+- The tests cover various edge cases and scenarios, ensuring robust behavior of the `CreateGeneratingService`.
+- The file uses RSpec's `context` blocks to group related tests and improve readability.

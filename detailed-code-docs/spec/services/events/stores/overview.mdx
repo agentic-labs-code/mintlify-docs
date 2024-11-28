@@ -1,0 +1,53 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for the `Events::Stores` module, which is responsible for handling event data storage and retrieval in both ClickHouse and PostgreSQL databases. The tests cover various query types and aggregation methods for event data, ensuring the correct functionality of the stores across different scenarios.
+
+## What does it do?
+The code in this directory tests the functionality of different event store implementations (ClickHouse and PostgreSQL) and their associated query services. These services are designed to efficiently retrieve, aggregate, and analyze event data for billing purposes. The tests ensure that:
+
+1. Events can be correctly retrieved, filtered, and grouped.
+2. Various aggregation methods (count, sum, max, latest, weighted sum) work correctly.
+3. Unique and prorated calculations are performed accurately.
+4. Time-based queries and aggregations function as expected.
+5. The stores handle different scenarios such as basic aggregation, grouped events, filtered events, and combinations of grouping and filtering.
+
+## Key Files
+1. `clickhouse/count_query_spec.rb`, `clickhouse/latest_query_spec.rb`, `clickhouse/max_query_spec.rb`, `clickhouse/sum_query_spec.rb`: These files test specific query types for the ClickHouse store, focusing on pre-aggregated event data.
+
+2. `clickhouse_store_spec.rb`: Tests the `Events::Stores::ClickhouseStore` class, covering a wide range of methods for querying and aggregating event data in ClickHouse.
+
+3. `postgres_store_spec.rb`: Tests the `Events::Stores::PostgresStore` class, ensuring that all event-related operations work correctly in a PostgreSQL database.
+
+Each of these files follows a similar structure, setting up test data using FactoryBot, calling the respective store or query service methods, and asserting the expected results.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test objects and data.
+3. Rails helper methods and configurations: Utilized for setting up the testing environment.
+4. Clickhouse::EventsRaw: Represents the ClickHouse events table (in ClickHouse-specific tests).
+
+## Configuration
+The tests are configured to use either ClickHouse or PostgreSQL as the data store, depending on the specific test file. For ClickHouse tests, the `clickhouse: true` metadata is used on the main describe blocks.
+
+The tests typically use specific time ranges for queries, such as:
+- From: '2024-07-01T03:42:00'
+- To: '2024-07-31T22:47:00'
+
+These time ranges are used consistently across the test files to ensure consistency in testing scenarios.
+
+The tests are structured to cover various scenarios, including:
+
+1. Basic event retrieval and aggregation
+2. Handling of enriched events at the boundaries of time periods
+3. Grouped-by scenarios
+4. Filtered scenarios
+5. Combinations of grouped-by and filtered scenarios
+6. Unique and prorated calculations
+7. Time-based aggregations and breakdowns
+
+These comprehensive test scenarios ensure that the event stores and query services can handle a wide range of real-world use cases and edge cases in the billing system, regardless of the underlying database technology.

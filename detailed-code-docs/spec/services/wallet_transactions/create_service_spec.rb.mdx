@@ -1,0 +1,82 @@
+---
+title: "create_service_spec.rb"
+---
+
+## High-level description
+This RSpec file tests the `WalletTransactions::CreateService` class, which is responsible for creating wallet transactions. It verifies the service's behavior when creating different types of transactions (paid, granted, and voided credits), updating wallet balances, and enqueueing related jobs.
+
+## Code Structure
+The test suite is organized around the `#call` method of the `WalletTransactions::CreateService` class. It uses various contexts to test different scenarios and edge cases.
+
+## Symbols
+
+### `RSpec.describe WalletTransactions::CreateService`
+#### Description
+This is the main describe block for the `WalletTransactions::CreateService` class. It sets up the test environment and defines the subject of the tests.
+
+### `describe '#call'`
+#### Description
+This describe block focuses on testing the `#call` method of the service.
+
+#### Internal Logic
+The tests in this block cover various aspects of the service's functionality:
+1. Creating wallet transactions
+2. Setting transaction statuses
+3. Setting transaction sources
+4. Enqueueing the `BillPaidCreditJob`
+5. Updating wallet balances
+6. Enqueueing `SendWebhookJob` for each transaction
+7. Handling metadata
+8. Error handling for invalid inputs
+
+### `let` statements
+#### Description
+These statements define the test data used across the specs.
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| membership | Membership | A factory-created membership |
+| organization | Organization | The organization associated with the membership |
+| customer | Customer | A factory-created customer associated with the organization |
+| subscription | Subscription | A factory-created subscription for the customer |
+| wallet | Wallet | A factory-created wallet for the customer with initial balances |
+| paid_credits | String | The amount of paid credits |
+| granted_credits | String | The amount of granted credits |
+| voided_credits | String | The amount of voided credits |
+| params | Hash | The parameters passed to the service |
+
+### Individual test cases
+#### Description
+Each `it` block represents a specific test case that checks a particular aspect of the service's behavior.
+
+#### Internal Logic
+- Arrange: Set up the test data and expectations
+- Act: Call the service with the prepared parameters
+- Assert: Verify the results against the expected outcomes
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| FactoryBot | Used for creating test data |
+
+## Error Handling
+The test suite includes a scenario for handling validation errors, specifically when trying to create a transaction with negative paid credits.
+
+## Logging
+No specific logging mechanisms are implemented in this test file.
+
+## API/Interface Reference
+The main interface being tested is the `#call` method of the `WalletTransactions::CreateService` class.
+
+| Method | Inputs | Outputs | Description |
+|:-------|:-------|:--------|:------------|
+| call | organization, params | Result object | Creates wallet transactions based on the provided parameters |
+
+The `params` hash includes:
+- `wallet_id`
+- `paid_credits`
+- `granted_credits`
+- `voided_credits`
+- `source`
+- `metadata` (optional)

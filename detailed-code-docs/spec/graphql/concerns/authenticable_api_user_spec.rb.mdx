@@ -1,0 +1,54 @@
+---
+title: "authenticable_api_user_spec.rb"
+---
+
+## High-level description
+This code defines a set of RSpec tests for the `AuthenticableApiUser` concern in a GraphQL API. It tests the authentication behavior of a GraphQL mutation, ensuring that it works correctly when a user is authenticated and returns an error when no user is present.
+
+## Code Structure
+The code defines a test module `AuthenticableApiUserSpec` containing GraphQL types and mutations, and then uses RSpec to test the behavior of the `AuthenticableApiUser` concern in different scenarios.
+
+## Symbols
+
+### `AuthenticableApiUserSpec` module
+#### Description
+This module defines the GraphQL types and mutations used for testing the `AuthenticableApiUser` concern.
+
+#### Internal Logic
+- Defines `ThingType`, a GraphQL object type with `name` and `count` fields.
+- Defines `RenameThingMutation`, a mutation that includes the `AuthenticableApiUser` concern.
+- Defines `ThingsMutationType`, which includes the `RenameThingMutation`.
+- Defines `TestApiSchema`, a test GraphQL schema that uses `ThingsMutationType` for mutations.
+
+### RSpec test for `AuthenticableApiUser`
+#### Description
+This RSpec test suite verifies the behavior of the `AuthenticableApiUser` concern in different scenarios.
+
+#### Internal Logic
+1. Defines a GraphQL mutation query string for renaming a thing.
+2. Tests two contexts:
+   a. With a current user:
+      - Creates a membership
+      - Executes the mutation with a current user in the context
+      - Expects the mutation to succeed and return the new name
+   b. Without a current user:
+      - Executes the mutation without a current user in the context
+      - Expects the mutation to fail and return an unauthorized error
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| AuthenticableApiUser | The concern being tested |
+
+## References
+- The `AuthenticableApiUser` concern (defined in `app/graphql/concerns/authenticable_api_user.rb`)
+- `LagoApiSchema` (not shown in the provided code snippets)
+- `Types::BaseObject` and `Mutations::BaseMutation` (not shown in the provided code snippets)
+
+## Error Handling
+The test specifically checks for error handling when no user is authenticated. It expects an "unauthorized" error with specific extensions (status and code) to be returned.
+
+---
+
+This test file ensures that the `AuthenticableApiUser` concern is working as expected, providing authentication checks for GraphQL mutations. It verifies that authenticated users can perform the mutation, while unauthenticated requests are properly rejected with an unauthorized error.

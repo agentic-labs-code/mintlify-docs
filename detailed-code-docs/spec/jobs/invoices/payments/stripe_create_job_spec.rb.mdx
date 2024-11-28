@@ -1,0 +1,60 @@
+---
+title: "stripe_create_job_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test file for the `Invoices::Payments::StripeCreateJob` job. It verifies that the job correctly calls the `Invoices::Payments::StripeService` to create a Stripe payment for an invoice.
+
+## Symbols
+
+### `RSpec.describe Invoices::Payments::StripeCreateJob, type: :job`
+#### Description
+This is the main RSpec describe block that groups the tests for the `Invoices::Payments::StripeCreateJob` job.
+
+### `let(:invoice)`
+#### Description
+This `let` block creates a test invoice using FactoryBot.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | A test invoice instance |
+
+### `let(:stripe_service)`
+#### Description
+This `let` block creates a double (mock) of the `Invoices::Payments::StripeService`.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| stripe_service | Double | A mock of the StripeService |
+
+### `it 'calls the stripe create service'`
+#### Description
+This is the main test case that verifies the behavior of the `StripeCreateJob`.
+
+#### Internal Logic
+1. Arrange:
+   - Set up expectations for the `Invoices::Payments::StripeService.new` method to return the mock service.
+   - Set up expectations for the `create` method on the mock service to return a `BaseService::Result`.
+2. Act:
+   - Call `described_class.perform_now(invoice)` to execute the job.
+3. Assert:
+   - Verify that `Invoices::Payments::StripeService.new` was called with the invoice.
+   - Verify that the `create` method was called on the mock service.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and RSpec configuration |
+| FactoryBot | Used to create test data (invoice) |
+| RSpec | Testing framework |
+
+## Notes
+1. The test uses RSpec's `allow` and `receive` methods to set up expectations and mock behavior.
+2. The `described_class` refers to `Invoices::Payments::StripeCreateJob`, which is the subject of this test file.
+3. The test verifies that the job correctly instantiates the `StripeService` with the given invoice and calls the `create` method on it.
+4. The actual implementation of the `StripeCreateJob` is not shown in this file, but we can infer that it should create a new `StripeService` instance and call its `create` method.
+5. The test uses `perform_now` to execute the job synchronously, which is typical for unit testing background jobs.
+
+This test ensures that the `StripeCreateJob` correctly delegates the payment creation to the `StripeService`, which is crucial for maintaining the separation of concerns and testability of the payment processing system.

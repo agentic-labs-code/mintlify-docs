@@ -1,0 +1,88 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for the `Wallets::RecurringTransactionRules` services. These services are responsible for creating, updating, and validating recurring transaction rules for wallets in a financial application. The tests cover various scenarios for premium and freemium plans, different rule configurations, and validation of rule parameters.
+
+## What does it do?
+The code in this directory tests the functionality of services that manage recurring transaction rules for wallets. These rules determine how and when transactions should occur automatically. The tests ensure that:
+
+1. Rules are created correctly for different plan types (premium vs freemium).
+2. Existing rules can be updated or replaced.
+3. Rules can be removed when necessary.
+4. The parameters for these rules are properly validated before being applied.
+
+This helps maintain the integrity and correct functioning of the wallet system, especially for features that involve automated, recurring transactions.
+
+## Key Files
+1. `create_service_spec.rb`: Tests the creation of recurring transaction rules, focusing on different scenarios for freemium and premium plans.
+
+2. `update_service_spec.rb`: Tests the updating of existing recurring transaction rules, including creating new rules, modifying existing ones, and removing rules when necessary.
+
+3. `validate_service_spec.rb`: Tests the validation of parameters for recurring transaction rules, ensuring that only valid configurations are accepted.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+| Dependency | Purpose | Version |
+|:-----------|:--------|:--------|
+| RSpec | Testing framework | Not specified |
+| FactoryBot | Test data generation | Not specified |
+| SimpleCov | Code coverage analysis | Not specified |
+| DatabaseCleaner | Cleaning test database | Not specified |
+
+These dependencies are likely specified in the project's Gemfile and configured in the `rails_helper` file, which is included in all test files.
+
+## Configuration
+The tests use a `lago_premium!` method to simulate a premium plan environment. This method is likely defined in a helper file not shown in the provided code.
+
+The `rails_helper` file, which is included in all test files, sets up the testing environment, including:
+
+- SimpleCov for code coverage
+- DatabaseCleaner for cleaning the test database
+- Various RSpec configurations
+
+Example configuration from `rails_helper`:
+
+```ruby
+require 'simplecov'
+SimpleCov.start 'rails' do
+  add_filter '/spec/'
+  add_filter '/config/'
+  add_filter '/vendor/'
+  add_filter '/db/'
+end
+
+ENV['RAILS_ENV'] ||= 'test'
+require File.expand_path('../config/environment', __dir__)
+abort("The Rails environment is running in production mode!") if Rails.env.production?
+require 'rspec/rails'
+require 'database_cleaner'
+
+RSpec.configure do |config|
+  config.use_transactional_fixtures = false
+
+  config.before(:suite) do
+    DatabaseCleaner.clean_with(:truncation)
+  end
+
+  config.before(:each) do
+    DatabaseCleaner.strategy = :transaction
+  end
+
+  config.before(:each, js: true) do
+    DatabaseCleaner.strategy = :truncation
+  end
+
+  config.before(:each) do
+    DatabaseCleaner.start
+  end
+
+  config.after(:each) do
+    DatabaseCleaner.clean
+  end
+end
+```
+
+This configuration ensures a clean and consistent testing environment for all the service specs in this directory.

@@ -1,0 +1,52 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This `db` directory contains database-related files for a complex billing and subscription management system. It includes migration files, schema definitions, seed data, and SQL views. The database structure is primarily designed for PostgreSQL and utilizes features like UUID primary keys, JSON columns, and custom enum types.
+
+## What does it do?
+The database structure and associated files in this directory support the following key functionalities:
+
+1. Data Model Definition: Migrations and schema files define tables for entities such as organizations, customers, plans, subscriptions, invoices, payments, and various other related entities.
+
+2. Data Processing Pipeline: ClickHouse migrations set up a system for ingesting, processing, and aggregating large volumes of event data, likely for analytics or billing purposes in a multi-tenant application.
+
+3. Sample Data Generation: Seed files populate the database with realistic sample data for development and testing purposes, covering various aspects of the billing and subscription system.
+
+4. Data Aggregation and Analysis: SQL views aggregate and process data from various tables to provide comprehensive information about billable metrics, charges, and events.
+
+## Entry points
+The main entry points for developers working with this database structure are:
+
+1. `db/schema.rb`: Defines the current state of the database schema.
+2. `db/migrate`: Contains individual migration files that define changes to the database structure over time.
+3. `db/clickhouse_migrate`: Contains migrations specific to ClickHouse for event data processing.
+4. `db/seeds`: Includes seed files for populating the database with sample data.
+5. `db/views`: Contains SQL view definitions for data aggregation and analysis.
+
+## Key Files
+1. `db/schema.rb`: Defines the overall database structure, including tables, indexes, and constraints.
+2. `db/migrate/20220525122759_init_schema.rb`: Initial schema setup for the application.
+3. `db/clickhouse_migrate/20231024084411_create_events_raw.rb`: Creates the initial table for raw event data in ClickHouse.
+4. `db/seeds/base.rb`: Creates foundational data for the system, including users, organizations, and billing models.
+5. `db/views/billable_metrics_grouped_charges_v03.sql`: Combines data from billable metrics, charges, and filters for billing structure analysis.
+
+## Dependencies
+The database structure relies on several key dependencies:
+
+1. PostgreSQL: The primary database system, used for most application data.
+2. ClickHouse: A column-oriented database used for event data processing and analytics.
+3. ActiveRecord: Provides the migration framework and database abstraction layer.
+4. Kafka: Used for event streaming and queueing in the ClickHouse data pipeline.
+5. faker and factory_bot_rails: Used in seed files for generating sample data.
+
+## Configuration
+The database setup uses various configuration options and environment variables:
+
+1. PostgreSQL-specific features: UUID primary keys, JSONB columns, and custom enum types.
+2. ClickHouse-specific configurations: Table engines (e.g., ReplacingMergeTree, SummingMergeTree) and materialized views for data transformation and aggregation.
+3. Kafka configuration: Environment variables for broker lists, topics, and consumer groups.
+4. Index creation options: Many migrations use `disable_ddl_transaction!` and `algorithm: :concurrently` for minimizing table locking during index creation.
+
+This database structure forms the backbone of a sophisticated billing and subscription management system, providing robust support for data storage, processing, and analysis across multiple database technologies.

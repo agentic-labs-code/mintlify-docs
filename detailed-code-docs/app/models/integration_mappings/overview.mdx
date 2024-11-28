@@ -1,0 +1,53 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `app/models/integration_mappings` directory contains a set of Ruby classes that define mappings between resources in the Lago system and external integrations. These mappings are used to facilitate data synchronization and communication between Lago and various third-party services.
+
+## What does it do?
+This directory implements a system for managing mappings between Lago resources and external integration resources. It provides a base class (`BaseMapping`) that defines common attributes and relationships for all integration mappings, as well as specific mapping classes for different integrations such as Anrok, Netsuite, and Xero.
+
+The mapping system allows Lago to:
+1. Associate internal resources with corresponding external resources in integrated systems.
+2. Store external identifiers, account codes, and names for mapped resources.
+3. Track changes to mappings over time using versioning.
+4. Flexibly handle different types of mappable resources through polymorphic associations.
+
+## Key Files
+1. `base_mapping.rb`: This file defines the `BaseMapping` class, which serves as the foundation for all integration mappings. It includes common functionality such as:
+   - Associations with the `integration` and `mappable` (polymorphic) models.
+   - Settings accessors for `external_id`, `external_account_code`, and `external_name`.
+   - Integration with PaperTrail for versioning.
+   - Use of `SettingsStorable` for JSON-based settings storage.
+
+2. `anrok_mapping.rb`: Defines the `AnrokMapping` class for Anrok integrations.
+3. `netsuite_mapping.rb`: Defines the `NetsuiteMapping` class for Netsuite integrations.
+4. `xero_mapping.rb`: Defines the `XeroMapping` class for Xero integrations.
+
+These specific mapping classes currently inherit from `BaseMapping` without adding any additional functionality, serving as placeholders for future integration-specific logic.
+
+## Dependencies
+The code in this directory relies on the following dependencies:
+1. ActiveRecord: Used as the base for database-backed models.
+2. PaperTrail: Utilized for versioning through the `PaperTrailTraceable` concern.
+3. Custom concerns:
+   - `PaperTrailTraceable`: Adds versioning functionality to models.
+   - `SettingsStorable`: Provides JSON-based settings storage in the `settings` column.
+
+## Configuration
+The `BaseMapping` class defines several configuration options:
+1. `MAPPABLE_TYPES`: An array constant that specifies the allowed types for the polymorphic `mappable` association.
+2. Settings accessors: The class uses `settings_accessors` to define getter and setter methods for `external_id`, `external_account_code`, and `external_name`, which are stored in the `settings` JSON column.
+
+Example usage of settings accessors:
+```ruby
+mapping = IntegrationMappings::BaseMapping.new
+mapping.external_id = "ext_123"
+mapping.external_account_code = "ACC456"
+mapping.external_name = "External Resource"
+```
+
+These settings can be used to store integration-specific data without requiring additional database columns.
+
+The specific mapping classes (`AnrokMapping`, `NetsuiteMapping`, and `XeroMapping`) do not currently define any additional configuration options beyond what is inherited from `BaseMapping`.

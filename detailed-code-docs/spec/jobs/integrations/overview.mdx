@@ -1,0 +1,72 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various jobs related to integrations with an aggregator system. The tests cover different aspects of data synchronization, creation, and fetching operations for entities such as credit notes, invoices, payments, sales orders, and tax items.
+
+## What does it do?
+The tests in this directory ensure that the various jobs responsible for integrating with an aggregator system function correctly. These jobs handle tasks such as:
+
+1. Creating credit notes, invoices, payments, and sales orders in the aggregator system.
+2. Fetching items and tax items from the aggregator.
+3. Performing synchronization operations between the local system and the aggregator.
+4. Sending restlet endpoint information to the aggregator.
+
+The tests verify that these jobs correctly initialize and call their respective service classes, passing the appropriate parameters and handling the results as expected.
+
+## Key Files
+1. `spec/jobs/integrations/aggregator/credit_notes/create_job_spec.rb`: Tests the job for creating credit notes in the aggregator system.
+2. `spec/jobs/integrations/aggregator/fetch_items_job_spec.rb`: Verifies the job that fetches items from the aggregator.
+3. `spec/jobs/integrations/aggregator/fetch_tax_items_job_spec.rb`: Tests the job responsible for fetching tax items from the aggregator.
+4. `spec/jobs/integrations/aggregator/invoices/create_job_spec.rb`: Checks the job that creates invoices in the aggregator system.
+5. `spec/jobs/integrations/aggregator/payments/create_job_spec.rb`: Tests the job for creating payments in the aggregator system.
+6. `spec/jobs/integrations/aggregator/perform_sync_job_spec.rb`: Verifies the job that performs synchronization operations with the aggregator.
+7. `spec/jobs/integrations/aggregator/sales_orders/create_job_spec.rb`: Tests the job for creating sales orders in the aggregator system.
+8. `spec/jobs/integrations/aggregator/send_restlet_endpoint_job_spec.rb`: Checks the job that sends restlet endpoint information to the aggregator.
+
+## Dependencies
+The test files in this directory rely on the following key dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test objects and data.
+3. Rails: The tests are written in the context of a Rails application, using `rails_helper` to load the necessary testing environment.
+
+## Configuration
+The tests use RSpec's configuration and syntax, including:
+
+1. `describe` blocks to group related tests.
+2. `let` statements for defining test data and mock objects.
+3. `before` blocks for setting up test environments.
+4. `it` blocks for individual test cases.
+5. Expectations using RSpec's `expect` syntax.
+
+The tests make extensive use of doubles (mocks) to isolate the behavior of the jobs being tested from their dependent services. This approach allows for focused testing of the job's responsibilities without invoking the actual service implementations.
+
+Example of a typical test structure:
+
+```ruby
+RSpec.describe Integrations::Aggregator::SomeJob, type: :job do
+  subject(:job) { described_class }
+
+  let(:service) { instance_double(Integrations::Aggregator::SomeService) }
+  let(:integration) { create(:netsuite_integration) }
+  let(:result) { instance_double(BaseService::Result) }
+
+  before do
+    allow(Integrations::Aggregator::SomeService).to receive(:new).and_return(service)
+    allow(service).to receive(:call).and_return(result)
+  end
+
+  it 'calls the appropriate service' do
+    job.perform_now(integration: integration)
+
+    expect(Integrations::Aggregator::SomeService).to have_received(:new)
+    expect(service).to have_received(:call)
+  end
+end
+```
+
+This structure ensures that each job correctly initializes and calls its corresponding service, passing the necessary parameters and handling the results appropriately.
+
+The tests in this directory provide confidence in the correct functioning of the integration jobs, ensuring that data is properly synchronized, created, and fetched between the local system and the aggregator system.

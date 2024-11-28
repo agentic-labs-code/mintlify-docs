@@ -1,0 +1,38 @@
+---
+title: "20240426143059_add_integration_item_uniqueness_index.rb"
+---
+
+## High-level description
+This migration adds a unique index to the `integration_items` table in a Rails application. The index ensures uniqueness for the combination of `external_id` and `integration_id` columns, preventing duplicate entries with the same values for these fields.
+
+## Symbols
+
+### `AddIntegrationItemUniquenessIndex`
+#### Description
+This class is a Rails migration that adds a unique index to the `integration_items` table. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0 migrations.
+
+#### Internal Logic
+The migration uses the `change` method, which is reversible by default in Rails migrations. Inside the `change` method:
+
+1. It wraps the index creation in a `safety_assured` block, which is likely provided by a database migration safety gem (such as strong_migrations).
+2. It calls `add_index` to create a new index on the `integration_items` table.
+   - The index is created on the combination of `external_id` and `integration_id` columns.
+   - The `unique: true` option ensures that the combination of these two columns must be unique across all rows in the table.
+
+## Side Effects
+- This migration will add a new unique index to the `integration_items` table in the database.
+- After this migration, attempts to insert or update rows in the `integration_items` table with duplicate combinations of `external_id` and `integration_id` will fail.
+- Existing data in the table must already satisfy this uniqueness constraint, or the migration will fail.
+
+## Performance Considerations
+- Adding this index will improve query performance for lookups based on the combination of `external_id` and `integration_id`.
+- However, it may slightly slow down insert and update operations on the `integration_items` table, as the database will need to check the uniqueness constraint for each operation.
+- If the table is large, creating this index might take some time and could potentially lock the table during the operation, depending on the database system being used.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the migration framework |
+
+## Error Handling
+The `safety_assured` block suggests that there might be additional safety checks in place (likely through a gem like strong_migrations) that are being bypassed for this specific operation. This implies that the developers have manually verified the safety of this migration.

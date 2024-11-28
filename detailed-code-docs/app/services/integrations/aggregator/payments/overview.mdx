@@ -1,0 +1,90 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains services and classes responsible for managing payment integrations with external aggregator systems, specifically focusing on creating payments and generating appropriate payloads for different integration types such as NetSuite and Xero. The code is organized within the `Integrations::Aggregator::Payments` module, providing a structured approach to handling payment data for various external accounting and ERP systems.
+
+## What does it do?
+The code in this directory facilitates the creation of payments in external aggregator systems and generates standardized payment payloads for different integration systems. The main functionalities include:
+
+1. Creating payments in external aggregator systems through HTTP requests.
+2. Processing responses from external systems and creating `IntegrationResource` records.
+3. Handling errors and delivering error webhooks when necessary.
+4. Providing asynchronous payment creation capabilities through background jobs.
+5. Defining a common structure for payment payloads and specialized formats for specific integrations like NetSuite and Xero.
+6. Implementing a factory pattern to create appropriate payload objects based on the integration type.
+
+These components work together to format payment data, transmit it to external systems, and manage the integration process, ensuring compatibility and consistency across different integrations.
+
+## Entry points
+The main entry points for this functionality are:
+
+1. `CreateService` class in `create_service.rb`: This class is responsible for creating payments in external aggregator systems. It provides both synchronous (`call`) and asynchronous (`call_async`) methods for payment creation.
+
+2. `Factory` class in `payloads/factory.rb`: This class is the entry point for generating payment payloads. It creates the appropriate payload object based on the integration type.
+
+The typical workflow follows these steps:
+
+1. The `CreateService` is instantiated with a payment object.
+2. The `call` or `call_async` method is invoked to create the payment in the external system.
+3. During this process, the `Factory` class is used to generate the appropriate payload for the integration.
+4. The payment is created in the external system, and the response is processed.
+5. An `IntegrationResource` record is created if the operation is successful.
+
+## Key Files
+1. `create_service.rb`: Contains the `CreateService` class, which manages the process of creating payments in external systems.
+
+2. `payloads/base_payload.rb`: Defines the `BasePayload` class, providing the foundation for all payment payloads.
+
+3. `payloads/factory.rb`: Implements the `Factory` class, which creates the appropriate payload object based on the integration type.
+
+4. `payloads/netsuite.rb`: Implements the `Netsuite` class for NetSuite-specific payload formatting.
+
+5. `payloads/xero.rb`: Contains a placeholder `Xero` class for future implementation of Xero-specific payload formatting.
+
+## Dependencies
+The code in this directory relies on the following dependencies:
+
+1. Ruby: The programming language used for implementation.
+2. Rails: Implied by the module structure and coding conventions, likely used for the overall application framework.
+3. LagoHttpClient: Used for making HTTP requests to external systems.
+4. JSON: For parsing JSON responses.
+5. External Integration Libraries: While not directly visible in the provided code, the implementation suggests integration with NetSuite and Xero APIs or SDKs.
+
+## Configuration
+While there are no explicit configuration files in this directory, the code structure suggests that configuration for different integrations (such as NetSuite and Xero) is handled elsewhere in the application. Key configurable aspects include:
+
+1. Integration Types: The `Factory` class supports 'Integrations::NetsuiteIntegration' and 'Integrations::XeroIntegration'. Adding new integration types would require updating this class.
+
+2. Payload Structures: Each integration-specific class (e.g., `Netsuite`) defines its own payload structure. These structures can be modified or extended to meet specific integration requirements.
+
+3. HTTP Endpoints: The `CreateService` class defines an `action_path` for the HTTP request, which may need to be configured based on the external system's API.
+
+Here's an example of how the `Netsuite` class structures its payload:
+
+```ruby
+def body
+  {
+    type: 'customerpayment',
+    isDynamic: true,
+    customer: {
+      externalId: integration_customer.external_id
+    },
+    apply: [
+      {
+        apply: true,
+        doc: integration_invoice.external_id,
+        amount: payment.amount.to_f
+      }
+    ],
+    options: {
+      ignoreMandatoryFields: false
+    }
+  }
+end
+```
+
+This structure can be adjusted as needed to accommodate changes in the NetSuite API or specific business requirements.
+
+In conclusion, this directory provides a flexible and extensible system for creating payments in external aggregator systems and generating payment payloads for different accounting and ERP integrations. It allows for easy addition of new integration types and customization of payload structures, making it a crucial component in a larger financial integration system.

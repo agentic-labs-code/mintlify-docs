@@ -1,0 +1,69 @@
+---
+title: "create.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for creating a new Plan in a SaaS billing system. It handles user authentication, organization validation, and processes various plan attributes including charges, minimum commitment, and usage thresholds.
+
+## Code Structure
+The `Mutations::Plans::Create` class inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the mutation's arguments, return type, and resolve method, which processes the input and creates a new plan using the `Plans::CreateService`.
+
+## References
+- `Types::Plans::Object`: The GraphQL type for the Plan object
+- `Plans::CreateService`: The service class that handles the actual creation of the Plan
+
+## Symbols
+
+### `Mutations::Plans::Create`
+#### Description
+This class defines a GraphQL mutation for creating a new Plan. It handles user authentication, organization validation, and processes the input to create a new plan.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| amount_cents | GraphQL::Types::BigInt | The plan amount in cents |
+| amount_currency | Types::CurrencyEnum | The currency for the plan amount |
+| bill_charges_monthly | Boolean | Optional flag for monthly charge billing |
+| code | String | Unique code for the plan |
+| description | String | Optional description of the plan |
+| interval | Types::Plans::IntervalEnum | Billing interval for the plan |
+| invoice_display_name | String | Optional display name for invoices |
+| name | String | Name of the plan |
+| pay_in_advance | Boolean | Flag to determine if payment is made in advance |
+| tax_codes | [String] | Optional list of tax codes |
+| trial_period | Float | Optional trial period duration |
+| charges | [Types::Charges::Input] | List of charges associated with the plan |
+| minimum_commitment | Types::Commitments::Input | Optional minimum commitment for the plan |
+| usage_thresholds | [Types::UsageThresholds::Input] | Optional usage thresholds for the plan |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| plan | Types::Plans::Object | The created Plan object |
+
+#### Internal Logic
+1. Converts the charges input to a hash
+2. Calls the `Plans::CreateService` to create the plan with the provided arguments and the current organization
+3. Returns the created plan if successful, otherwise returns an error
+
+## Side Effects
+- Creates a new Plan in the database
+- May create associated records (charges, minimum commitment, usage thresholds)
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Handles user authentication |
+| RequiredOrganization | Ensures a valid organization context |
+| Plans::CreateService | Handles the actual creation of the Plan |
+
+## Error Handling
+- Returns a GraphQL execution error if the user is not authenticated or if the organization is invalid
+- Returns result errors from the `Plans::CreateService` if the plan creation fails
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'plans:create' | The required permission to create a plan |
+
+This mutation is part of a larger GraphQL API for managing plans and billing in a SaaS application. It ensures that only authenticated users with the correct permissions and organization context can create new plans.

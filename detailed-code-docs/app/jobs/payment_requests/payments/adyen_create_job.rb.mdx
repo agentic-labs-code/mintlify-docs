@@ -1,0 +1,50 @@
+---
+title: "adyen_create_job.rb"
+---
+
+## High-level description
+This code defines a background job class `AdyenCreateJob` within the `PaymentRequests::Payments` module. The job is responsible for creating a payment using the Adyen payment provider for a given payable object. It utilizes the `AdyenService` to perform the actual payment creation and handles potential connection failures with a retry mechanism.
+
+## Code Structure
+The `AdyenCreateJob` class inherits from `ApplicationJob` and is configured to run in the 'providers' queue. It uses the `unique` method to ensure the job is only executed once, and the `retry_on` method to handle connection failures.
+
+## Symbols
+
+### `AdyenCreateJob`
+#### Description
+This class represents a background job for creating payments using the Adyen payment provider. It encapsulates the logic for executing the payment creation process asynchronously.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payable | Object | The payable object for which the payment is to be created |
+
+#### Internal Logic
+1. The job is configured to run in the 'providers' queue.
+2. It uses the `unique` method to ensure the job is only executed once.
+3. The `retry_on` method is used to handle `Faraday::ConnectionFailed` errors with a polynomial backoff strategy, attempting up to 6 times.
+4. In the `perform` method, it creates an instance of `PaymentRequests::Payments::AdyenService` with the given payable object.
+5. It calls the `create` method on the service and raises any errors that occur during the process.
+
+## Side Effects
+- Creates a payment using the Adyen payment provider.
+- May modify the state of the payable object and associated records.
+- May trigger webhooks or other notifications based on the payment result.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ApplicationJob | Base job class that this job inherits from |
+| PaymentRequests::Payments::AdyenService | Service class used to create the Adyen payment |
+
+## Error Handling
+The job implements a retry mechanism for `Faraday::ConnectionFailed` errors, which are likely to occur due to network issues when communicating with the Adyen API. It will retry the job up to 6 times with a polynomial backoff strategy.
+
+## Related Code
+The `AdyenCreateJob` is part of a larger payment processing system:
+
+1. It is enqueued by the `PaymentRequests::Payments::CreateService` when the payment provider is Adyen.
+2. It uses the `PaymentRequests::Payments::AdyenService` to perform the actual payment creation.
+3. The `AdyenService` handles the communication with the Adyen API, creates the payment record, updates the payable status, and triggers any necessary webhooks or integrations.
+
+This job serves as an intermediary between the initial payment request and the actual payment creation, allowing for asynchronous processing and better error handling in case of API communication issues.

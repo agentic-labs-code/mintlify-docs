@@ -1,0 +1,79 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL mutations related to webhook endpoints. The tests cover the creation, updating, and destruction of webhook endpoints through GraphQL mutations. These tests ensure that the mutations behave correctly, including proper authentication, authorization, and data manipulation.
+
+## What does it do?
+The test suite in this directory verifies the functionality of GraphQL mutations for managing webhook endpoints. Here's a breakdown of what each test file does:
+
+1. `create_spec.rb`: Tests the creation of a new webhook endpoint. It ensures that users with the correct permissions can successfully create a webhook endpoint with the provided input data.
+
+2. `update_spec.rb`: Verifies the updating of an existing webhook endpoint. It checks that users can modify webhook endpoint properties, such as the URL, when they have the necessary permissions.
+
+3. `destroy_spec.rb`: Tests the deletion of a webhook endpoint. It confirms that users with the appropriate permissions can successfully remove a webhook endpoint from the system.
+
+Each test file includes checks for authentication and authorization, ensuring that only users with the correct permissions can perform these operations.
+
+## Key Files
+1. `create_spec.rb`:
+   - Tests the `Mutations::WebhookEndpoints::Create` GraphQL mutation
+   - Verifies successful creation of a webhook endpoint with valid input
+   - Checks for proper permission requirements
+
+2. `update_spec.rb`:
+   - Tests the `Mutations::WebhookEndpoints::Update` GraphQL mutation
+   - Ensures that existing webhook endpoints can be updated with new information
+   - Verifies permission checks and correct handling of input parameters
+
+3. `destroy_spec.rb`:
+   - Tests the `Mutations::WebhookEndpoints::Destroy` GraphQL mutation
+   - Confirms that webhook endpoints can be successfully deleted
+   - Checks for proper authentication and authorization
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data, such as memberships and webhook endpoints.
+3. Faker: Employed to generate fake data, like webhook URLs, for testing purposes.
+4. GraphQL: The GraphQL implementation for Ruby, used to define and execute the mutations being tested.
+
+## Configuration
+While there are no explicit configuration files in this directory, the tests use several important setup elements:
+
+1. `rails_helper`: This is likely included to load the Rails testing environment and configurations.
+
+2. Shared examples: The tests use shared examples for common checks, such as:
+   - `'requires current user'`
+   - `'requires current organization'`
+   - `'requires permission'`
+
+3. Test data setup: Each test file uses `let` statements to set up necessary test data, including:
+   - `required_permission`: Specifies the permission needed to execute the mutation
+   - `membership`: Creates a test membership object
+   - `organization`: Retrieves or creates a test organization
+   - `webhook_endpoint`: Creates a test webhook endpoint
+   - `input`: Defines the input data for the GraphQL mutations
+
+4. GraphQL mutation queries: Each test file defines the GraphQL mutation query as a string, which is then executed in the tests.
+
+Here's an example of how a GraphQL mutation is defined in these tests:
+
+```ruby
+let(:mutation) do
+  &lt;&lt;-GRAPHQL
+    mutation($input: WebhookEndpointUpdateInput!) {
+      webhookEndpointUpdate(input: $input) {
+        webhookEndpoint {
+          id
+          url
+        }
+      }
+    }
+  GRAPHQL
+end
+```
+
+These tests play a crucial role in ensuring the reliability and correctness of the webhook endpoint management functionality in the application's GraphQL API. They verify that users can create, update, and delete webhook endpoints when they have the appropriate permissions, and that the operations behave as expected.

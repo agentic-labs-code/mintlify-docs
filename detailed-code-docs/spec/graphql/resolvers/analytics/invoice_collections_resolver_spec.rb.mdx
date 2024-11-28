@@ -1,0 +1,91 @@
+---
+title: "invoice_collections_resolver_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Resolvers::Analytics::InvoiceCollectionsResolver` GraphQL resolver. It verifies the behavior of the invoice collections query, including permission checks, premium feature requirements, and the structure of the returned data.
+
+## Code Structure
+The test suite is organized into several contexts, testing different scenarios and requirements for the invoice collections query. It uses shared examples for common checks and sets up necessary test data using FactoryBot.
+
+## Symbols
+
+### RSpec.describe Resolvers::Analytics::InvoiceCollectionsResolver
+#### Description
+This is the main describe block for the test suite, focusing on the InvoiceCollectionsResolver.
+
+#### Internal Logic
+The test suite is divided into several sections:
+1. Shared examples for common checks (user, organization, and permission requirements)
+2. A context for testing behavior without the premium feature
+3. A context for testing behavior with the premium feature enabled
+
+### let(:required_permission)
+#### Description
+Defines the required permission for accessing the invoice collections data.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| required_permission | String | The permission required to access invoice collections |
+
+### let(:query)
+#### Description
+Defines the GraphQL query used to fetch invoice collections data.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| query | String | The GraphQL query for fetching invoice collections |
+
+### let(:membership)
+#### Description
+Creates a test membership using FactoryBot.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| membership | Membership | A test membership object |
+
+### let(:organization)
+#### Description
+Retrieves the organization associated with the test membership.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization associated with the test membership |
+
+### context 'without premium feature'
+#### Description
+Tests the behavior of the resolver when the premium feature is not enabled.
+
+#### Internal Logic
+Executes the GraphQL query and expects an 'unauthorized' error to be returned.
+
+### context 'with premium feature'
+#### Description
+Tests the behavior of the resolver when the premium feature is enabled.
+
+#### Internal Logic
+1. Enables the premium feature using the `lago_premium!` method.
+2. Executes the GraphQL query and verifies the structure and content of the returned data.
+3. Checks that the returned month is the current month, and that initial amount and invoice count are zero.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| RSpec | Testing framework used for writing and running tests |
+| FactoryBot | Used for creating test data (memberships, organizations) |
+| GraphQL | The query language used for defining the test query |
+
+## Error Handling
+The test suite checks for specific error conditions, such as the 'unauthorized' error when the premium feature is not enabled.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| invoiceCollections | QUERY | { currency: CurrencyEnum } | { collection: [{ month, amountCents, invoicesCount, currency }] } | Fetches invoice collection data |
+
+This test suite ensures that the InvoiceCollectionsResolver behaves correctly under different scenarios, properly enforces permissions and premium feature requirements, and returns the expected data structure when queried.

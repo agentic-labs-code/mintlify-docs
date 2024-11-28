@@ -1,0 +1,55 @@
+---
+title: "create_job_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `IntegrationCustomers::CreateJob` job. It verifies that the job correctly calls the `IntegrationCustomers::CreateService` to create an integration customer.
+
+## Symbols
+
+### `RSpec.describe IntegrationCustomers::CreateJob, type: :job`
+#### Description
+This is the main RSpec describe block that groups all the tests for the `IntegrationCustomers::CreateJob` job.
+
+### `subject(:create_job)`
+#### Description
+Defines the subject of the test as the described class (`IntegrationCustomers::CreateJob`).
+
+### `let` statements
+#### Description
+These statements define the test doubles and variables used in the tests:
+
+- `create_service`: A double of the `IntegrationCustomers::CreateService`
+- `integration`: A factory-created `netsuite_integration`
+- `customer`: A factory-created `customer`
+- `result`: An instance of `BaseService::Result`
+- `integration_customer_params`: A hash containing parameters for creating an integration customer
+
+### `before` block
+#### Description
+Sets up the test environment by stubbing the `IntegrationCustomers::CreateService.new` method to return the `create_service` double, and stubbing the `call` method on `create_service` to return the `result`.
+
+### `it 'calls the create service'`
+#### Description
+This is the main test case that verifies the behavior of the `IntegrationCustomers::CreateJob`.
+
+#### Internal Logic
+1. Arrange: The test setup is done in the `before` block and `let` statements.
+2. Act: Calls `described_class.perform_now` with the necessary parameters.
+3. Assert: 
+   - Verifies that `IntegrationCustomers::CreateService.new` was called.
+   - Verifies that `create_service.call` was called.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| FactoryBot | Used implicitly for creating test data (`:netsuite_integration` and `:customer`) |
+
+## Notes
+1. The test uses RSpec's `instance_double` for mocking the `IntegrationCustomers::CreateService`.
+2. The test doesn't verify the actual creation of an integration customer, only that the correct service is called.
+3. The test uses FactoryBot to create test data for `integration` and `customer`.
+4. The `sync_with_provider` parameter in `integration_customer_params` suggests that the job might be responsible for syncing customer data with an external provider.
+
+This test ensures that the `IntegrationCustomers::CreateJob` correctly delegates the creation process to the `IntegrationCustomers::CreateService`, which is a crucial part of maintaining separation of concerns and testability in the application's architecture.

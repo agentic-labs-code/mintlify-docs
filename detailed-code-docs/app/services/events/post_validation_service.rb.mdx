@@ -1,0 +1,101 @@
+---
+title: "post_validation_service.rb"
+---
+
+## High-level description
+The `Events::PostValidationService` is a Ruby service class that performs post-validation checks on events for a given organization. It queries a materialized view to identify events with invalid codes, missing aggregation properties, or invalid filter values, and delivers a webhook with the validation errors if any are found.
+
+## Code Structure
+The main class `Events::PostValidationService` inherits from `BaseService`. It initializes with an organization and defines a `call` method that performs the validation checks and delivers the results via webhook if errors are found.
+
+## References
+- `BaseService`: The parent class that provides common functionality for service objects.
+- `SendWebhookJob`: Used to deliver webhooks with validation errors.
+- `ApplicationRecord`: Used to execute SQL queries.
+
+## Symbols
+
+### `Events::PostValidationService`
+#### Description
+This service performs post-validation checks on events for a given organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization for which to perform event validation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing validation errors, if any |
+
+#### Internal Logic
+1. Executes three SQL queries to check for invalid codes, missing aggregation properties, and invalid filter values.
+2. Processes the query results to extract transaction IDs.
+3. If any errors are found, delivers a webhook with the error information.
+4. Returns a result object containing the errors.
+
+### `call`
+#### Description
+The main method that performs the validation checks and delivers the results.
+
+#### Internal Logic
+1. Executes three SQL queries using `process_query` method.
+2. Stores the results in an `errors` hash.
+3. If any errors are present, calls `deliver_webhook` method.
+4. Sets the errors on the result object and returns it.
+
+### `invalid_code_query`
+#### Description
+SQL query to find events with invalid codes.
+
+### `missing_aggregation_property_query`
+#### Description
+SQL query to find events with missing or invalid aggregation properties.
+
+### `invalid_filter_values_query`
+#### Description
+SQL query to find events with invalid filter values.
+
+### `process_query`
+#### Description
+Executes an SQL query and returns an array of transaction IDs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sql | String | SQL query to execute |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| transaction_ids | Array&lt;String&gt; | Array of transaction IDs |
+
+### `deliver_webhook`
+#### Description
+Enqueues a job to send a webhook with validation errors.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| errors | Hash | Validation errors to be sent in the webhook |
+
+## Side Effects
+- Executes SQL queries on the `last_hour_events_mv` materialized view.
+- Enqueues a `SendWebhookJob` if validation errors are found.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseService | Parent class providing common functionality |
+| SendWebhookJob | Used to deliver webhooks with validation errors |
+| ApplicationRecord | Used to execute SQL queries |
+
+## Error Handling
+The service does not implement specific error handling beyond collecting and reporting validation errors.
+
+## Logging
+No explicit logging is implemented in this service.
+
+## TODOs
+None present in the code.

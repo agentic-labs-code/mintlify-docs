@@ -1,0 +1,103 @@
+---
+title: "latest_service.rb"
+---
+
+## High-level description
+This code defines the `LatestService` class within the `BillableMetrics::Aggregations` module. It is responsible for computing aggregations based on the latest value of a specific field in events related to a billable metric. The service can handle both single and grouped aggregations.
+
+## Code Structure
+The `LatestService` class inherits from `BillableMetrics::Aggregations::BaseService` and overrides several methods to implement its specific aggregation logic. It uses an `event_store` to retrieve and process event data.
+
+## Symbols
+
+### `LatestService`
+#### Description
+This class implements the aggregation logic for the "latest" aggregation type. It computes the aggregation based on the most recent value of a specified field.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event_store_class | Class | The class used for event storage and retrieval |
+| charge | Object | The charge associated with the billable metric |
+| subscription | Object | The subscription for which the aggregation is being computed |
+| boundaries | Hash | Time boundaries for the aggregation period |
+| filters | Hash | Optional filters to apply to the events |
+
+#### Internal Logic
+1. Initializes the service with the given parameters and sets up the `event_store`.
+2. Computes the aggregation using the latest value from the `event_store`.
+3. Handles grouped aggregations by processing multiple groups and their respective latest values.
+4. Ensures non-negative results and handles potential database errors.
+
+### `initialize`
+#### Description
+Initializes the `LatestService` instance and sets up the `event_store` with specific properties.
+
+#### Internal Logic
+1. Calls the superclass initializer.
+2. Sets `numeric_property` to `true` on the `event_store`.
+3. Sets `aggregation_property` to the `field_name` of the `billable_metric`.
+
+### `compute_aggregation`
+#### Description
+Computes the aggregation for a single (non-grouped) metric.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| options | Hash | Optional parameters for the aggregation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the aggregation result, count, and options |
+
+#### Internal Logic
+1. Retrieves the last value from the `event_store`.
+2. Computes the aggregation value using `compute_aggregation_value`.
+3. Sets the count and options on the result object.
+4. Handles potential database errors by setting a service failure on the result.
+
+### `compute_grouped_by_aggregation`
+#### Description
+Computes aggregations for grouped metrics.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing an array of group-specific aggregation results |
+
+#### Internal Logic
+1. Retrieves grouped last values and counts from the `event_store`.
+2. For each group:
+   - Computes the aggregation value.
+   - Creates a group-specific result object with the grouped_by values, aggregation, and count.
+3. Handles potential database errors by setting a service failure on the result.
+
+### `compute_aggregation_value`
+#### Description
+Computes the final aggregation value from the latest event value.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| latest_value | Numeric | The latest value retrieved from events |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BigDecimal | The computed aggregation value |
+
+#### Internal Logic
+1. Converts the input to a `BigDecimal`.
+2. Returns 0 if the result is negative, otherwise returns the computed value.
+
+## Error Handling
+The service catches `ActiveRecord::StatementInvalid` exceptions in both `compute_aggregation` and `compute_grouped_by_aggregation` methods. When caught, it sets a service failure on the result object with the code 'aggregation_failure' and the error message.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BigDecimal | Used for precise decimal arithmetic in aggregation calculations |
+
+This service is part of a larger system for handling billable metrics and their aggregations. It relies on the `BaseService` class and an `event_store` for data retrieval and processing. The service is designed to work with both single and grouped aggregations, providing flexibility in how metrics can be calculated and billed.

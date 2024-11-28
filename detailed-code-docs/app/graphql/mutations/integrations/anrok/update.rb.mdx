@@ -1,0 +1,48 @@
+---
+title: "update.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for updating an Anrok integration within an organization. It handles authentication, organization validation, and delegates the update process to a dedicated service.
+
+## Code Structure
+The `Update` class is nested within the `Mutations::Integrations::Anrok` module. It inherits from `BaseMutation` and includes two concerns: `AuthenticableApiUser` and `RequiredOrganization`. The class defines the GraphQL mutation structure and delegates the actual update logic to the `::Integrations::Anrok::UpdateService`.
+
+## Symbols
+
+### `Mutations::Integrations::Anrok::Update`
+#### Description
+This class defines a GraphQL mutation for updating an Anrok integration. It ensures the user is authenticated and has the required organization permissions before processing the update.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | GraphQL input arguments for updating the Anrok integration |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Types::Integrations::Anrok | Updated Anrok integration object |
+
+#### Internal Logic
+1. Finds the integration in the current organization using the provided ID.
+2. Calls the `::Integrations::Anrok::UpdateService` with the found integration and input parameters.
+3. Returns the updated integration if successful, otherwise returns an error.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Validates the presence of and membership in the organization |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'organization:integrations:update' | Permission required to perform this mutation |
+
+## References
+- `Types::Integrations::Anrok::UpdateInput`: Defines the input structure for the mutation
+- `Types::Integrations::Anrok`: Defines the return type for the mutation
+- `::Integrations::Anrok::UpdateService`: Service class that handles the actual update logic
+
+This mutation is part of a larger GraphQL API, as evidenced by its inclusion in the `MutationType` in the related `app/graphql/types/mutation_type.rb` file. The mutation leverages shared authentication and organization validation logic through the included concerns, ensuring consistent security checks across different mutations.

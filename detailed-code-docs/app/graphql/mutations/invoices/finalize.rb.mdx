@@ -1,0 +1,51 @@
+---
+title: "finalize.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation called `FinalizeInvoice` within the `Mutations::Invoices` module. Its purpose is to finalize a draft invoice for a given organization, ensuring proper authentication and authorization before processing the request.
+
+## Code Structure
+The `Finalize` class inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the mutation's name, description, input argument, and return type. The main logic is implemented in the `resolve` method.
+
+## References
+- `::Invoices::RefreshDraftAndFinalizeService`
+- `Types::Invoices::Object`
+
+## Symbols
+
+### `Mutations::Invoices::Finalize`
+#### Description
+This class defines a GraphQL mutation for finalizing a draft invoice. It includes authentication and organization checks, and uses a service to perform the actual finalization process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the draft invoice to be finalized |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Types::Invoices::Object | The finalized invoice object |
+
+#### Internal Logic
+1. Authenticates the user and checks for organization membership.
+2. Finds the draft invoice in the current organization using the provided ID.
+3. Calls the `::Invoices::RefreshDraftAndFinalizeService` to finalize the invoice.
+4. Returns the finalized invoice if successful, or an error result if not.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication checks for the API user |
+| RequiredOrganization | Ensures the user belongs to the required organization |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'invoices:update' | The permission required to perform this mutation |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class) to handle and return errors from the service call.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

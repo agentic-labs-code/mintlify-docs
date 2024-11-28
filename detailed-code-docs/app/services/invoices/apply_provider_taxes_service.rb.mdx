@@ -1,0 +1,72 @@
+---
+title: "apply_provider_taxes_service.rb"
+---
+
+## High-level description
+This code defines the `ApplyProviderTaxesService` class within the `Invoices` module. Its primary purpose is to apply provider-specific taxes to an invoice, calculating and updating the invoice's tax-related fields based on the provided tax information.
+
+## Code Structure
+The main class `ApplyProviderTaxesService` inherits from `BaseService`. It initializes with an invoice and optional provider taxes, then processes these taxes in the `call` method. The class uses several private methods to handle specific calculations and data manipulations.
+
+## Symbols
+
+### `ApplyProviderTaxesService`
+#### Description
+This service applies provider-specific taxes to an invoice, calculating the total tax amount and updating the invoice accordingly.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice to which taxes will be applied |
+| provider_taxes | Array | Optional. Provider-specific tax information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the updated invoice and applied taxes |
+
+#### Internal Logic
+1. Initialize variables for tracking applied taxes and amounts.
+2. Iterate through applicable taxes, creating and adding `AppliedTax` records to the invoice.
+3. Calculate and update tax amounts, rates, and totals for the invoice.
+4. Save applied taxes if the invoice is persisted.
+5. Update the invoice with the calculated tax information.
+6. Handle any record validation failures.
+
+### Private Methods
+
+#### `applicable_taxes`
+Processes provider taxes to create a hash of unique, applicable taxes.
+
+#### `indexed_fees`
+Creates a hash of fees indexed by tax key for efficient lookup.
+
+#### `compute_tax_amount_cents`
+Calculates the tax amount in cents for a given tax.
+
+#### `pro_rated_taxes_rate`
+Calculates the pro-rated tax rate based on the invoice's total amount or number of fees.
+
+#### `fees_amount_cents`
+Calculates the total amount of fees in cents for a given tax.
+
+#### `fetch_provider_taxes_result`
+Fetches provider taxes using the `Integrations::Aggregator::Taxes::Invoices::CreateService`.
+
+#### `calculate_key`
+Generates a unique key for a tax based on its type, name, and rate.
+
+## Error Handling
+The service uses a `rescue` block to catch `ActiveRecord::RecordInvalid` errors, which are then added to the result object using `result.record_validation_failure!`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseService | Parent class for the service |
+| Integrations::Aggregator::Taxes::Invoices::CreateService | Used to fetch provider taxes |
+
+## Performance Considerations
+The service uses memoization (`@applicable_taxes` and `@indexed_fees`) to optimize repeated calculations and reduce database queries.
+
+## TODOs
+There is a NOTE in the code regarding the application of taxes on user current usage, indicating that the invoice is not created in the database in such cases.

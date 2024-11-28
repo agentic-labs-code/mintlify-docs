@@ -1,0 +1,83 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the implementation of a Ruby sandbox environment within the `LagoUtils::RubySandbox` module. The sandbox is designed to execute potentially untrusted Ruby code in a controlled and safe manner, preventing access to dangerous operations and limiting the available methods and constants.
+
+## What does it do?
+The Ruby sandbox provides a secure environment for executing user-provided Ruby code. It sanitizes the input code, removes access to potentially harmful operations like `require` and `system`, and limits the available methods and constants. The sandbox captures the output of the executed code and handles any errors that occur during execution. This allows for safe evaluation of Ruby code without risking the security of the host system.
+
+## Entry points
+The main entry point for using the Ruby sandbox is the `Runner` class in `runner.rb`. This class orchestrates the entire process of sanitizing, preparing, and executing the Ruby code in the sandbox. The workflow typically involves:
+
+1. Creating a `Runner` instance with the code to be executed.
+2. Calling the `run` method on the `Runner` instance.
+3. Receiving the parsed result of the code execution or handling any `SandboxError` that may occur.
+
+The code flow goes through the following steps:
+1. Sanitization of the input code using the `Sanitizer` class.
+2. Preparation of a temporary Ruby file with the sanitized code and necessary setup.
+3. Execution of the temporary file in a separate process with a restricted environment.
+4. Capturing and parsing the output of the executed code.
+5. Error handling and cleanup.
+
+## Key Files
+
+### runner.rb
+This file contains the `Runner` class, which is the main orchestrator of the sandbox execution process. It handles the preparation of the code, its execution in a separate process, and the parsing of results.
+
+### safe_environment.rb
+Defines the `SafeEnvironment` module, which contains the configuration for the restricted Ruby environment. It specifies allowed constants, methods, and classes, and provides a `SAFE_ENV` constant with code to set up the restricted environment.
+
+### sanitizer.rb
+Implements the `Sanitizer` class, which is responsible for removing or replacing potentially dangerous operations in the input code, specifically the `require` statement.
+
+### sandbox_error.rb
+Defines the `SandboxError` class, a custom error type used to encapsulate errors that occur within the sandbox environment.
+
+## Dependencies
+The Ruby sandbox implementation relies primarily on the Ruby standard library. It uses the following core Ruby modules:
+
+- `open3`: For executing the Ruby code in a separate process.
+- `json`: For parsing the output of the executed code.
+- `tempfile`: For creating temporary files to store the code for execution.
+
+No external gems or libraries are required for the core functionality of the sandbox.
+
+## Configuration
+The sandbox's behavior is primarily configured through the `SafeEnvironment` module in `safe_environment.rb`. This module defines several constants that control the allowed operations within the sandbox:
+
+- `ALLOWED_CONSTANTS`: Specifies the constants that will be available in the safe environment.
+- Various method lists (e.g., `KERNEL_METHODS`, `STRING_METHODS`): Define the allowed methods for different Ruby classes.
+- `SAFE_ENV`: A string containing Ruby code that sets up the restricted environment by removing unwanted methods and constants.
+
+To modify the sandbox's behavior, you would typically adjust these constants in the `SafeEnvironment` module. For example, to allow additional methods or constants, you would add them to the appropriate lists.
+
+The sandbox does not use environment variables for configuration. All settings are hard-coded within the `SafeEnvironment` module, which provides a clear and centralized location for managing the sandbox's restrictions.
+
+Here's an example of how you might use the Ruby sandbox:
+
+```ruby
+require 'lago_utils/ruby_sandbox'
+
+code_to_execute = &lt;&lt;~RUBY
+  result = (1..10).map { |n| n * 2 }
+  puts result.inspect
+RUBY
+
+runner = LagoUtils::RubySandbox::Runner.new(code_to_execute)
+
+begin
+  result = runner.run
+  puts "Execution result: #{result}"
+rescue LagoUtils::RubySandbox::SandboxError =&gt; e
+  puts "An error occurred in the sandbox: #{e.message}"
+  puts "Original error: #{e.initial_error}"
+  puts "Backtrace: #{e.backtrace}"
+end
+```
+
+This example demonstrates creating a `Runner` instance with some Ruby code, executing it within the sandbox, and handling both successful results and potential errors.
+
+The Ruby sandbox provides a powerful tool for safely executing untrusted Ruby code, making it suitable for applications that need to run user-provided scripts or expressions in a controlled environment.

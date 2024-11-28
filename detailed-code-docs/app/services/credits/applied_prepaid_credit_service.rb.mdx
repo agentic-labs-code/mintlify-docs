@@ -1,0 +1,53 @@
+---
+title: "applied_prepaid_credit_service.rb"
+---
+
+## High-level description
+This code defines the `AppliedPrepaidCreditService` class within the `Credits` module. Its primary purpose is to apply prepaid credit from a customer's wallet to an invoice, reducing the invoice's total amount and updating the wallet balance accordingly.
+
+## Code Structure
+The `AppliedPrepaidCreditService` class inherits from `BaseService` and contains a single public method `call`. It interacts with the `Invoice`, `WalletTransaction`, and `Wallet` models to perform its operations.
+
+## Symbols
+
+### `AppliedPrepaidCreditService`
+#### Description
+This service applies prepaid credit from a customer's wallet to an invoice.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice to which prepaid credit will be applied |
+| wallet | Wallet | The wallet from which prepaid credit will be deducted |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the created wallet transaction and the amount of prepaid credit applied |
+
+#### Internal Logic
+1. Check if credit has already been applied to the invoice.
+2. Compute the amount to be applied, which is the minimum of the wallet balance and the invoice total.
+3. Create a wallet transaction within a database transaction.
+4. Decrease the wallet balance using the `Wallets::Balance::DecreaseService`.
+5. Update the invoice's prepaid credit amount.
+6. Trigger a webhook for the created wallet transaction.
+
+## Side Effects
+- Creates a new `WalletTransaction` record
+- Updates the `Wallet` balance
+- Updates the `Invoice` prepaid credit amount
+- Triggers a webhook
+
+#### Performance Considerations
+The service uses a database transaction to ensure atomicity of the operations, which may impact performance for high-volume scenarios.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| WalletTransaction | To create a record of the applied prepaid credit |
+| Wallets::Balance::DecreaseService | To decrease the wallet balance |
+| SendWebhookJob | To notify external systems about the created wallet transaction |
+
+## Error Handling
+The service rescues `ActiveRecord::RecordInvalid` exceptions and reports them using `result.record_validation_failure!`.

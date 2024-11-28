@@ -1,0 +1,42 @@
+---
+title: "generate_pdf_job.rb"
+---
+
+## High-level description
+The `CreditNotes::GeneratePdfJob` is a background job responsible for generating a PDF for a given credit note. It utilizes the `CreditNotes::GenerateService` to perform the actual PDF generation and handles any errors that may occur during the process.
+
+## Symbols
+
+### `CreditNotes::GeneratePdfJob`
+#### Description
+This class is a subclass of `ApplicationJob` and is designed to be run asynchronously. It generates a PDF for a credit note using the `CreditNotes::GenerateService`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_note | CreditNote | The credit note object for which the PDF should be generated |
+
+#### Internal Logic
+1. The job is queued in the 'invoices' queue.
+2. When performed, it creates a new instance of `CreditNotes::GenerateService` with the provided credit note and a context of 'api'.
+3. It calls the `call` method on the service and stores the result.
+4. If there's an error in the result, it raises an exception.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| CreditNotes::GenerateService | Used to generate the PDF for the credit note |
+
+## References
+- `ApplicationJob`: The parent class for this job, likely defined in `app/jobs/application_job.rb`.
+- `CreditNotes::GenerateService`: The service class used to generate the PDF, defined in `app/services/credit_notes/generate_service.rb`.
+
+## Error Handling
+The job uses the `raise_if_error!` method on the result object returned by the `GenerateService`. This suggests that any errors occurring during PDF generation will be raised as exceptions, which will likely be caught and handled by the job processing system (e.g., Sidekiq).
+
+## Related Code Context
+1. The `CreditNotesController` in the API uses this job in its `download` action when a credit note's file is not present.
+2. The `GenerateService` handles the actual PDF generation, file attachment, and optional webhook sending.
+3. The `ApplicationJob` sets Sidekiq options for no retries, which applies to this job as well.
+
+This job serves as a crucial part of the asynchronous PDF generation process for credit notes, allowing the API to respond quickly to download requests while the potentially time-consuming PDF generation happens in the background.

@@ -1,0 +1,79 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various analytics services in the application. These services are related to different aspects of financial analytics, including gross revenues, invoice collections, invoiced usages, monthly recurring revenue (MRR), and overdue balances.
+
+## What does it do?
+The test files in this directory verify the behavior of analytics services under different license conditions (premium and non-premium). They ensure that:
+
+1. Services return successful results for premium licenses.
+2. Services return appropriate errors for non-premium licenses when trying to access premium features.
+3. Specific methods are called with correct parameters within the services.
+
+These tests help maintain the integrity of the analytics functionality, ensuring that premium features are only accessible to premium license holders and that the services behave as expected in various scenarios.
+
+## Key Files
+1. `gross_revenues_service_spec.rb`: Tests the `Analytics::GrossRevenuesService` class.
+2. `invoice_collections_service_spec.rb`: Tests the `Analytics::InvoiceCollectionsService` class.
+3. `invoiced_usages_service_spec.rb`: Tests the `Analytics::InvoicedUsagesService` class.
+4. `mrrs_service_spec.rb`: Tests the `Analytics::MrrsService` class.
+5. `overdue_balances_service_spec.rb`: Tests the `Analytics::OverdueBalancesService` class.
+
+Each of these files contains tests for the respective service's `call` method, checking its behavior under different license conditions.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data (organizations and customers).
+3. Rails helper: Loads the Rails testing environment and configuration.
+
+## Configuration
+The tests use several RSpec configuration options:
+
+1. `type: :service`: Specifies that these are service tests.
+2. `let` blocks: Used for setting up test data.
+3. `around` hooks: Used for setting up the premium license context in some tests.
+
+A notable configuration is the use of the `lago_premium!` method, which is likely defined in a helper file (possibly in the `LicenseHelper` module) and is used to simulate a premium license environment for testing purposes.
+
+## Code Snippets and Examples
+
+Here's an example of how the tests are structured, taken from the `mrrs_service_spec.rb` file:
+
+```ruby
+RSpec.describe Analytics::MrrsService, type: :service do
+  let(:service) { described_class.new(organization: organization) }
+  let(:customer) { create(:customer, organization:) }
+  let(:organization) { create(:organization) }
+
+  describe '#call' do
+    subject(:service_call) { service.call }
+
+    context 'when licence is premium' do
+      around { |test| lago_premium!(&test) }
+
+      it 'returns success' do
+        expect(service_call).to be_success
+      end
+    end
+
+    context 'when licence is not premium' do
+      it 'returns an error' do
+        aggregate_failures do
+          expect(service_call).not_to be_success
+          expect(service_call.error.code).to eq('feature_unavailable')
+        end
+      end
+    end
+  end
+end
+```
+
+This structure is consistent across all the test files in the directory, with minor variations depending on the specific service being tested.
+
+The tests make use of RSpec's `let` syntax for setting up test data, and use `context` blocks to test different scenarios (premium vs non-premium licenses). The `aggregate_failures` block is used to group multiple expectations together, allowing all expectations to be evaluated even if one fails.
+
+In summary, this directory contains a comprehensive set of tests for various analytics services, ensuring they behave correctly under different license conditions and maintain the expected functionality of the application's analytics features.

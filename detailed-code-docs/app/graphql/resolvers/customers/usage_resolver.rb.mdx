@@ -1,0 +1,63 @@
+---
+title: "usage_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying customer usage data for a specific subscription during the current billing period. It's part of a larger GraphQL API structure and handles authentication, permission checks, and data retrieval for customer usage information.
+
+## Code Structure
+The `UsageResolver` class is nested within the `Resolvers::Customers` module and inherits from `Resolvers::BaseResolver`. It includes the `AuthenticableApiUser` concern for authentication. The resolver defines arguments, return type, and the main `resolve` method to fetch and return customer usage data.
+
+## References
+- `Resolvers::BaseResolver`
+- `AuthenticableApiUser` concern
+- `Invoices::CustomerUsageService`
+- `Types::Customers::Usage::Current`
+
+## Symbols
+
+### `UsageResolver`
+#### Description
+This class is a GraphQL resolver that handles queries for customer usage data. It authenticates the user, checks for required permissions, and retrieves usage information for a given customer and subscription.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer_id | ID | Optional. The ID of the customer. |
+| subscription_id | ID | Required. The ID of the subscription. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Types::Customers::Usage::Current | Customer usage data for the current billing period. |
+
+#### Internal Logic
+1. The resolver checks for authentication and required permissions using the `AuthenticableApiUser` concern.
+2. It calls the `Invoices::CustomerUsageService` with the provided customer and subscription IDs.
+3. If the service call is successful, it returns the usage data. Otherwise, it returns an error.
+
+## Side Effects
+This resolver doesn't have any direct side effects, as it only retrieves and returns data.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication functionality |
+| Invoices::CustomerUsageService | Retrieves customer usage data |
+| Types::Customers::Usage::Current | Defines the structure of the returned usage data |
+
+## Error Handling
+The resolver uses the `result_error` method (likely defined in a parent class) to handle and return errors from the `CustomerUsageService`.
+
+## API/Interface Reference
+This resolver is part of a GraphQL API. It can be queried as follows:
+
+```graphql
+query {
+  customerUsage(customerId: "...", subscriptionId: "...") {
+    # Fields from Types::Customers::Usage::Current
+  }
+}
+```
+
+The exact fields available in the response depend on the definition of `Types::Customers::Usage::Current`, which includes information such as date range, currency, amounts, and charge usage details.

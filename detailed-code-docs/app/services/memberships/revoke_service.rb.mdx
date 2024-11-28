@@ -1,0 +1,72 @@
+---
+title: "revoke_service.rb"
+---
+
+## High-level description
+The `Memberships::RevokeService` is responsible for revoking a user's membership in an organization. It performs several checks to ensure the revocation is valid and then marks the membership as revoked if all conditions are met.
+
+## Code Structure
+This service is part of the `Memberships` module and inherits from `BaseService`. It contains a single public method `call` that handles the revocation process.
+
+## References
+- `Membership` model
+- `BaseService` class
+
+## Symbols
+
+### `Memberships::RevokeService#call`
+#### Description
+This method attempts to revoke a membership based on the provided ID. It performs several checks before revoking the membership and returns a result object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | String or Integer | The ID of the membership to be revoked |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the result of the operation |
+
+#### Internal Logic
+1. Find the membership by ID
+2. Check if the membership exists
+3. Ensure the user is not revoking their own membership
+4. Verify that revoking this membership won't leave the organization without admins
+5. Mark the membership as revoked
+6. Set the revoked membership in the result object
+
+## Side Effects
+- Modifies the status of a `Membership` record in the database
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Membership | Used to find and update membership records |
+
+## Error Handling
+The service uses the `result` object to handle various error scenarios:
+- Not found: When the membership doesn't exist
+- Not allowed: When trying to revoke own membership or when it's the last admin membership
+
+## API/Interface Reference
+| Method | Input | Output | Description |
+|:-------|:------|:-------|:------------|
+| call | id | Result object | Attempts to revoke the specified membership |
+
+---
+
+### `Memberships::RevokeService#call`
+#### Description
+This method is the main entry point for the service. It takes a membership ID, performs necessary checks, and revokes the membership if all conditions are met.
+
+#### Internal Logic
+1. Find the membership using the provided ID.
+2. If the membership is not found, return a not_found_failure result.
+3. Check if the user is trying to revoke their own membership. If so, return a not_allowed_failure result.
+4. Check if this is the last admin membership for the organization. If so, return a not_allowed_failure result.
+5. If all checks pass, mark the membership as revoked using the `mark_as_revoked!` method.
+6. Set the revoked membership in the result object and return the result.
+
+#### Performance Considerations
+The method performs database queries to find the membership and check for admin count. These operations should be optimized if used frequently or with large datasets.

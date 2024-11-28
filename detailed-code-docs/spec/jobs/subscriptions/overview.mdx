@@ -1,0 +1,80 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines a RSpec test suite for the `Subscriptions::TerminateJob` class. It verifies that the job correctly interacts with the `Subscriptions::TerminateService` to terminate a subscription and handle both successful and failed terminations.
+
+## Symbols
+
+### `RSpec.describe Subscriptions::TerminateJob, type: :job`
+#### Description
+This is the main RSpec describe block that groups all the tests for the `Subscriptions::TerminateJob` class.
+
+### `let(:subscription)`
+#### Description
+Creates a test subscription using FactoryBot.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription | Subscription | A test subscription object |
+
+### `let(:timestamp)`
+#### Description
+Creates a timestamp representing the current time.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| timestamp | Integer | Current time as a Unix timestamp |
+
+### `let(:subscription_service)`
+#### Description
+Creates a double (mock) of the `Subscriptions::TerminateService`.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription_service | Double | A mock of Subscriptions::TerminateService |
+
+### `let(:result)`
+#### Description
+Creates an instance of `BaseService::Result`.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An instance of the result object |
+
+### `it 'calls the subscription service'`
+#### Description
+Tests that the job correctly calls the `Subscriptions::TerminateService` with the right parameters.
+
+#### Internal Logic
+1. Sets up expectations for the `Subscriptions::TerminateService` mock.
+2. Calls the job's `perform_now` method.
+3. Verifies that the service was called with the correct arguments.
+
+### `context 'when result is a failure'`
+#### Description
+Groups tests for the scenario where the termination service returns a failure result.
+
+### `it 'raises an error'`
+#### Description
+Tests that the job raises a `BaseService::FailedResult` error when the termination service returns a failure result.
+
+#### Internal Logic
+1. Sets up the termination service to return a failure result.
+2. Expects that calling the job will raise a `BaseService::FailedResult` error.
+3. Verifies that the service was called with the correct arguments.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| Subscriptions::TerminateService | The service responsible for terminating subscriptions |
+| BaseService::Result | Represents the result of a service operation |
+
+## Error Handling
+The job is designed to raise a `BaseService::FailedResult` error when the termination service returns a failure result. This allows the job to propagate errors from the underlying service.

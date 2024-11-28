@@ -1,0 +1,75 @@
+---
+title: "apply_paid_credits_service.rb"
+---
+
+## High-level description
+The `ApplyPaidCreditsService` is responsible for applying paid credits to a wallet. It settles a wallet transaction and increases the wallet balance accordingly. This service is part of the `Wallets` module and is designed to handle the process of crediting a wallet after a successful payment.
+
+## Code Structure
+The main class `ApplyPaidCreditsService` inherits from `BaseService` and interacts with two other services: `WalletTransactions::SettleService` and `Wallets::Balance::IncreaseService`. These services are used to settle the transaction and increase the wallet balance, respectively.
+
+## References
+- `WalletTransactions::SettleService`
+- `Wallets::Balance::IncreaseService`
+
+## Symbols
+
+### `ApplyPaidCreditsService`
+#### Description
+This service applies paid credits to a wallet by settling the associated wallet transaction and increasing the wallet balance.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet_transaction | WalletTransaction | The wallet transaction to be processed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the processed wallet transaction |
+
+#### Internal Logic
+1. Check if the wallet transaction exists and is not already settled.
+2. If valid, settle the wallet transaction using `WalletTransactions::SettleService`.
+3. Increase the wallet balance using `Wallets::Balance::IncreaseService`.
+4. Set the processed wallet transaction in the result object.
+
+### `initialize`
+#### Description
+Initializes the service with a wallet transaction.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet_transaction | WalletTransaction | The wallet transaction to be processed |
+
+### `call`
+#### Description
+Executes the main logic of the service.
+
+#### Internal Logic
+1. Return early if the wallet transaction is nil or already settled.
+2. Settle the wallet transaction using `WalletTransactions::SettleService`.
+3. Increase the wallet balance using `Wallets::Balance::IncreaseService`.
+4. Set the processed wallet transaction in the result object.
+
+## Dependencies
+This service depends on the following internal services:
+| Dependency | Purpose |
+|:-----------|:--------|
+| WalletTransactions::SettleService | To settle the wallet transaction |
+| Wallets::Balance::IncreaseService | To increase the wallet balance |
+
+## Error Handling
+The service doesn't implement explicit error handling. It relies on the underlying services (`SettleService` and `IncreaseService`) to handle any errors that may occur during the process.
+
+## Related Information
+From the related code snippets, we can infer that:
+
+1. The `ApplyPaidCreditsService` is likely called by the `Invoices::PrepaidCreditJob`, which processes prepaid credits for invoices.
+
+2. The `WalletTransactions::SettleService` updates the wallet transaction status to 'settled' and triggers a webhook notification.
+
+3. The `Wallets::Balance::IncreaseService` updates the wallet balance, credits balance, and other related fields. It also handles the case of resetting consumed credits if specified.
+
+These related services and job provide context on how the `ApplyPaidCreditsService` fits into the larger system for managing wallet transactions and balances.

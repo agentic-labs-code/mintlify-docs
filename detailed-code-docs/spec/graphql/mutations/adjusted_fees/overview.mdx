@@ -1,0 +1,67 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL mutations related to adjusted fees in a billing or invoicing system. The tests cover the creation and destruction of adjusted fees, ensuring proper authentication, authorization, and handling of different invoice states.
+
+## What does it do?
+The tests in this directory verify the functionality of two main operations:
+
+1. Creating an adjusted fee:
+   - Checks if users have the required permissions to create an adjusted fee.
+   - Verifies that an adjusted fee can be successfully created for a draft invoice.
+   - Ensures that creating an adjusted fee for a finalized invoice is not allowed.
+
+2. Destroying an adjusted fee:
+   - Validates that users have the necessary permissions to destroy an adjusted fee.
+   - Confirms that an adjusted fee can be successfully deleted from the system.
+
+These tests help ensure that the adjusted fee functionality works correctly within the context of the larger invoicing or billing system, maintaining data integrity and enforcing business rules.
+
+## Key Files
+
+1. `create_spec.rb`:
+   This file contains tests for the `Mutations::AdjustedFees::Create` GraphQL mutation. It verifies the creation of adjusted fees, including permission checks and handling of different invoice states.
+
+   Key aspects:
+   - Tests successful creation of an adjusted fee
+   - Checks behavior when attempting to create an adjusted fee for a finalized invoice
+   - Uses shared examples for common authentication and authorization checks
+
+2. `destroy_spec.rb`:
+   This file contains tests for the `Mutations::AdjustedFees::Destroy` GraphQL mutation. It verifies the destruction of adjusted fees and ensures proper authentication and authorization.
+
+   Key aspects:
+   - Tests successful destruction of an adjusted fee
+   - Uses shared examples for common authentication and authorization checks
+
+Both files use FactoryBot to create test data and rely on GraphQL for mutation execution.
+
+## Dependencies
+The test files depend on the following key components:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: A library for creating test data objects. It's used to create memberships, fees, invoices, and other necessary objects for testing.
+3. GraphQL: The API query language used for defining and executing the mutations being tested.
+
+## Configuration
+While there are no explicit configuration files mentioned, the tests use several setup mechanisms:
+
+1. `let` statements: Used to define test data and objects, such as required permissions, memberships, fees, and input data.
+2. `before` hooks: Used to set up preconditions, such as setting an invoice to draft state before each test.
+3. `around` blocks: Used to wrap tests in specific contexts, such as enabling premium features for testing.
+
+Example of a `let` statement defining input data:
+
+```ruby
+let(:input) do
+  {
+    fee_id: fee.id,
+    invoice_id: fee.invoice.id,
+    unit_amount_cents: 100
+  }
+end
+```
+
+These configuration mechanisms allow for flexible and reusable test setups, making it easier to maintain and extend the test suite as the application evolves.

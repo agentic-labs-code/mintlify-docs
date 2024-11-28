@@ -1,0 +1,87 @@
+---
+title: "invoices_resolver_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Resolvers::Customers::InvoicesResolver` GraphQL resolver. It tests the functionality of querying customer invoices, including permission checks, filtering by status, and handling edge cases.
+
+## Code Structure
+The test suite is organized into several contexts, testing different aspects of the resolver:
+1. Basic functionality and permission checks
+2. Filtering invoices by status
+3. Handling non-member access
+4. Handling non-existent customers
+
+## Symbols
+
+### RSpec.describe Resolvers::Customers::InvoicesResolver
+#### Description
+This is the main test suite for the `InvoicesResolver`. It sets up the necessary test data and defines various test cases to ensure the resolver works as expected.
+
+#### Internal Logic
+1. Sets up test data including a membership, organization, customer, subscription, and invoices.
+2. Defines a GraphQL query for fetching customer invoices.
+3. Includes shared examples for permission and authentication checks.
+4. Tests the basic functionality of fetching invoices.
+5. Tests filtering invoices by status.
+6. Tests error handling for non-members and non-existent customers.
+
+### let(:query)
+#### Description
+Defines the GraphQL query used to fetch customer invoices.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| query | String | GraphQL query for fetching customer invoices |
+
+### it 'returns a list of invoices'
+#### Description
+Tests the basic functionality of the resolver, ensuring it returns the correct list of invoices for a customer.
+
+#### Internal Logic
+1. Executes the GraphQL query with the necessary context and variables.
+2. Verifies the response contains the correct number of invoices and their IDs.
+3. Checks the metadata for correct pagination information.
+
+### context 'with filter on status'
+#### Description
+Tests the ability to filter invoices by status.
+
+#### Internal Logic
+1. Defines a new GraphQL query that includes a status filter.
+2. Executes the query with a 'draft' status filter.
+3. Verifies that only the draft invoice is returned in the result.
+
+### context 'when not member of the organization'
+#### Description
+Tests the error handling when a non-member tries to access the invoices.
+
+#### Internal Logic
+1. Executes the GraphQL query with a user who is not a member of the organization.
+2. Verifies that an appropriate error message is returned.
+
+### context 'when customer does not exists'
+#### Description
+Tests the behavior when querying invoices for a non-existent customer.
+
+#### Internal Logic
+1. Executes the GraphQL query with an invalid customer ID.
+2. Verifies that an empty result set is returned.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| RSpec | Testing framework used for writing and running tests |
+| FactoryBot | Used for creating test data |
+
+## Error Handling
+The test suite includes scenarios to verify error handling:
+1. When a non-member tries to access invoices, it expects a "Not in organization" error.
+2. When querying for a non-existent customer, it expects an empty result set rather than an error.
+
+## Notes
+- The test suite uses shared examples for common checks like requiring a current user, current organization, and specific permissions.
+- The tests use `aggregate_failures` to group multiple expectations together, allowing all assertions to be checked even if one fails.
+- The `execute_graphql` helper method is used to run GraphQL queries in a consistent manner across tests.

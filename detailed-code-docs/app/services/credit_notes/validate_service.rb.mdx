@@ -1,0 +1,93 @@
+---
+title: "validate_service.rb"
+---
+
+## High-level description
+This code defines a `ValidateService` class within the `CreditNotes` module, responsible for validating credit notes. It checks various aspects of a credit note, including invoice status, item amounts, refund amounts, credit amounts, and global amounts to ensure the credit note is valid and consistent with the associated invoice.
+
+## Code Structure
+The `ValidateService` class inherits from `BaseValidator` and contains a main `valid?` method that orchestrates the validation process. It also includes several private methods for specific validation checks and helper calculations.
+
+## Symbols
+
+### `ValidateService`
+#### Description
+This class validates credit notes by performing various checks on the credit note and its associated invoice.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | Contains the credit note to be validated under the `:item` key |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid? | Boolean | Returns true if the credit note is valid, false otherwise |
+
+#### Internal Logic
+1. Checks the invoice status
+2. Validates the items amount
+3. Validates the refund amount
+4. Validates the credit amount
+5. Validates the global amount
+6. If any errors are found, sets a validation failure result and returns false
+7. Returns true if all validations pass
+
+### `valid?`
+#### Description
+The main method that orchestrates the validation process for the credit note.
+
+#### Internal Logic
+1. Calls various validation methods
+2. If any errors are found, sets a validation failure result and returns false
+3. Returns true if all validations pass
+
+### `valid_invoice_status?`
+#### Description
+Checks if the invoice status is valid for the credit note, particularly for refunds.
+
+#### Internal Logic
+1. If the credit note has a positive refund amount, checks if the invoice payment has succeeded
+2. If the payment hasn't succeeded, adds an error and returns false
+3. Returns true otherwise
+
+### `valid_items_amount?`
+#### Description
+Checks if the total amount of the credit note matches the sum of its items' amounts.
+
+#### Internal Logic
+1. Compares the total amount of the credit note with the calculated total items amount
+2. Adds an error if they don't match
+
+### `valid_refund_amount?`
+#### Description
+Validates that the refund amount is not higher than the remaining invoice amount.
+
+#### Internal Logic
+1. Checks if the refund amount is less than or equal to the invoice total amount minus previously refunded amounts
+2. Adds an error if the condition is not met
+
+### `valid_credit_amount?`
+#### Description
+Validates that the credit amount is not higher than the remaining invoice fee amount.
+
+#### Internal Logic
+1. Checks if the credit amount is less than or equal to the invoice fee total amount minus previously credited amounts
+2. Adds an error if the condition is not met
+
+### `valid_global_amount?`
+#### Description
+Validates that the total amount (credit + refund) is not higher than the remaining invoice fee amount.
+
+#### Internal Logic
+1. Checks if the total amount is less than or equal to the invoice fee total amount minus previously credited and refunded amounts
+2. Adds an error if the condition is not met
+
+## Dependencies
+This code relies on the `BaseValidator` class, which is not shown in the provided code snippets.
+
+## Error Handling
+The class uses an error accumulation mechanism, likely inherited from `BaseValidator`. Errors are added using the `add_error` method and checked with the `errors?` method.
+
+## Performance Considerations
+The code makes multiple database queries within the validation methods. In high-volume scenarios, these could potentially be optimized or combined to reduce database load.

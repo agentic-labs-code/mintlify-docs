@@ -1,0 +1,120 @@
+---
+title: "graphql_controller.rb"
+---
+
+## High-level description
+The `GraphqlController` is responsible for handling GraphQL requests in a Ruby on Rails application. It processes incoming GraphQL queries, executes them using the LagoApiSchema, and returns the results. The controller includes various modules for authentication, organization handling, and tracing.
+
+## Code Structure
+The `GraphqlController` inherits from `ApplicationController` and includes several modules: `AuthenticableUser`, `CustomerPortalUser`, `OrganizationHeader`, and `Trackable`. The main functionality is implemented in the `execute` method, which processes the GraphQL query and returns the result.
+
+## References
+- `LagoApiSchema`: Used to execute GraphQL queries
+- `LagoTracer`: Used for tracing query execution
+- `CurrentContext`: Used to set the context source
+
+## Symbols
+
+### `GraphqlController`
+#### Description
+This controller handles GraphQL requests, including authentication, query execution, and error handling.
+
+#### Internal Logic
+1. Sets the context source before any action
+2. Rescues from JWT::ExpiredSignature errors
+3. Prepares variables, query, and context for GraphQL execution
+4. Executes the GraphQL query using LagoApiSchema
+5. Renders the result as JSON
+6. Handles errors, including special handling for development environment
+
+### `execute`
+#### Description
+Processes and executes a GraphQL query.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:variables] | Hash/String | GraphQL variables |
+| params[:query] | String | GraphQL query |
+| params[:operationName] | String | Name of the GraphQL operation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON response | JSON | Result of the GraphQL query execution |
+
+#### Internal Logic
+1. Prepares variables using `prepare_variables` method
+2. Sets up the context with current user, organization, and permissions
+3. Adds query and operation name to OpenTelemetry tracing
+4. Executes the query using LagoApiSchema within a tracing span
+5. Renders the result as JSON
+6. Handles JWT::ExpiredSignature errors
+7. In development, handles other errors with detailed information
+
+### `prepare_variables`
+#### Description
+Processes and normalizes the variables input for GraphQL execution.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| variables_param | String/Hash/ActionController::Parameters/nil | Raw variables input |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| variables | Hash | Processed variables for GraphQL execution |
+
+### `handle_error_in_development`
+#### Description
+Handles errors in the development environment by logging and rendering detailed error information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| error | Exception | The error to be handled |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON response | JSON | Error details including message and backtrace |
+
+### `render_graphql_error`
+#### Description
+Renders a standardized GraphQL error response.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | Error code |
+| status | Integer | HTTP status code |
+| message | String (optional) | Error message |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON response | JSON | Standardized error response |
+
+### `set_context_source`
+#### Description
+Sets the context source for the current request to 'graphql'.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| JWT | Used for token decoding and handling expired signatures |
+| OpenTelemetry | Used for tracing and adding attributes to spans |
+
+## Error Handling
+The controller implements specific error handling for JWT::ExpiredSignature errors, rendering a standardized GraphQL error response. In the development environment, it provides detailed error information for debugging purposes.
+
+## Logging
+The controller logs error messages and backtraces in the development environment when handling errors.
+
+## API/Interface Reference
+This controller exposes a single endpoint for GraphQL queries:
+
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /graphql | POST | GraphQL query in the request body | JSON response with query results or errors | Executes a GraphQL query |

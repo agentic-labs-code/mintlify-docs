@@ -1,0 +1,92 @@
+---
+title: "update_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Taxes::UpdateService` class. It verifies the functionality of updating tax records, including handling various scenarios such as successful updates, validation errors, and the impact of changes on related invoices.
+
+## Symbols
+
+### `RSpec.describe Taxes::UpdateService`
+#### Description
+This is the main describe block for the `Taxes::UpdateService` test suite. It sets up the context for all the tests related to updating taxes.
+
+### `describe '#call'`
+#### Description
+This describe block focuses on testing the `#call` method of the `Taxes::UpdateService` class, which is the main method for updating a tax record.
+
+#### Internal Logic
+The tests in this block cover various scenarios:
+1. Successful tax update
+2. Handling of `applied_to_organization` changes
+3. Marking invoices as ready to be refreshed
+4. Error handling for non-existent taxes
+5. Validation error handling
+
+### `subject(:update_service)`
+#### Description
+Defines the subject of the test, which is an instance of `Taxes::UpdateService` with the given tax and params.
+
+### `let` statements
+#### Description
+These statements set up the test data and dependencies:
+- `membership`: Creates a membership record
+- `organization`: References the organization from the membership
+- `tax`: Creates a tax record associated with the organization
+- `customer`: Creates a customer record associated with the organization
+- `params`: Defines the parameters for updating the tax
+
+### Individual Test Cases
+
+#### "updates the tax"
+##### Description
+Verifies that the service successfully updates the tax record with the provided parameters.
+
+##### Internal Logic
+1. Calls the update service
+2. Checks if the result is successful
+3. Verifies that the updated tax has the expected attributes
+
+#### "returns tax in the result"
+##### Description
+Ensures that the service returns a Tax object in the result.
+
+#### "marks invoices as ready to be refreshed" (multiple contexts)
+##### Description
+Tests that changing the `applied_to_organization` flag or updating any tax attribute marks related draft invoices as ready to be refreshed.
+
+##### Internal Logic
+1. Creates a draft invoice
+2. Calls the update service
+3. Checks if the invoice's `ready_to_be_refreshed` attribute changes to true
+
+#### "when tax is not found"
+##### Description
+Tests the error handling when trying to update a non-existent tax.
+
+##### Internal Logic
+1. Sets the tax to nil
+2. Calls the update service
+3. Verifies that the result is not successful and has the correct error code
+
+#### "with validation error"
+##### Description
+Tests the handling of validation errors when updating a tax with invalid parameters.
+
+##### Internal Logic
+1. Sets invalid parameters (nil name)
+2. Calls the update service
+3. Verifies that the result is not successful and contains the expected validation error message
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| FactoryBot | Used for creating test data (implied by the use of `create` method) |
+
+## Error Handling
+The test suite covers error handling for two main scenarios:
+1. When the tax to be updated is not found
+2. When there are validation errors in the update parameters
+
+These are tested by checking the success status of the result and the specific error messages or codes returned.

@@ -1,0 +1,69 @@
+---
+title: "create_service_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Integrations::Anrok::CreateService` class. It tests the creation of Anrok integrations, focusing on different scenarios such as premium license availability and validation errors.
+
+## Code Structure
+The test file is organized into nested contexts, testing various conditions for creating an Anrok integration. It uses RSpec's `describe` and `context` blocks to group related tests and `it` blocks for individual test cases.
+
+## Symbols
+
+### `RSpec.describe Integrations::Anrok::CreateService`
+#### Description
+This is the main describe block for the `Integrations::Anrok::CreateService` class.
+
+### `#call`
+#### Description
+This describe block focuses on testing the `call` method of the `CreateService` class.
+
+#### Internal Logic
+The tests are organized into two main contexts:
+1. Without premium license
+2. With premium license
+   - When Anrok premium integration is not present
+   - When Anrok premium integration is present
+     - Without validation errors
+     - With validation errors
+
+Each context tests different scenarios and expected outcomes when calling the service.
+
+### `let` statements
+#### Description
+These statements define variables used throughout the tests:
+- `service`: An instance of the `CreateService`
+- `membership`: A factory-created membership
+- `organization`: The organization associated with the membership
+- `name`: The name for the Anrok integration
+- `create_args`: A hash of arguments for creating the integration
+
+### `subject(:service_call)`
+#### Description
+Defines the subject of the test as calling the service with the `create_args`.
+
+### Individual test cases
+#### Description
+Each `it` block represents a specific test case, checking for expected behavior such as:
+- Changes in the number of `Integrations::AnrokIntegration` records
+- Success or failure of the service call
+- Specific error types and messages
+- Correct creation of integration with expected attributes
+
+## Dependencies
+The test file depends on:
+- `rails_helper`: Likely contains RSpec configuration and other test setup
+- FactoryBot: Used for creating test data (e.g., `create(:membership)`)
+
+## Configuration
+The test uses the `lago_premium!` method, which is likely a custom helper method for simulating a premium license environment.
+
+## Error Handling
+The tests check for various error scenarios, including:
+- `BaseService::MethodNotAllowedFailure`: When premium license or integration is not available
+- `BaseService::ValidationFailure`: When there are validation errors in creating the integration
+
+## Notes
+1. The test file uses RSpec's `around` block with `lago_premium!` to simulate a premium license environment.
+2. The `aggregate_failures` block is used to group multiple expectations together, allowing all expectations to be evaluated even if one fails.
+3. The test file checks both the happy path (successful creation) and various error scenarios, ensuring comprehensive coverage of the service's behavior.

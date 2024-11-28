@@ -1,0 +1,49 @@
+---
+title: "20230221102035_add_precise_amount_cents_to_credit_note_items.rb"
+---
+
+## High-level description
+This migration adds a new column `precise_amount_cents` to the `credit_note_items` table, with higher precision than the existing `amount_cents` column. It also copies the existing data from `amount_cents` to `precise_amount_cents` and sets the new column as non-nullable.
+
+## Symbols
+
+### `AddPreciseAmountCentsToCreditNoteItems`
+#### Description
+This class is a Rails migration that adds a new column to the `credit_note_items` table and performs data migration.
+
+#### Internal Logic
+1. Adds a new column `precise_amount_cents` to the `credit_note_items` table.
+2. Copies data from the existing `amount_cents` column to the new `precise_amount_cents` column.
+3. Sets the new `precise_amount_cents` column as non-nullable.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Base class for database migrations in Rails |
+
+### `change`
+#### Description
+This method defines the changes to be made to the database schema and data.
+
+#### Internal Logic
+1. Adds the `precise_amount_cents` column to the `credit_note_items` table using `add_column`.
+2. Uses `safety_assured` to bypass strong_migrations checks.
+3. Implements a reversible migration using `reversible`.
+4. In the `up` direction, executes an SQL statement to copy data from `amount_cents` to `precise_amount_cents`.
+5. Sets the `precise_amount_cents` column as non-nullable using `change_column_null`.
+
+## Side Effects
+- Modifies the `credit_note_items` table schema by adding a new column.
+- Updates existing data in the `credit_note_items` table.
+
+## Performance Considerations
+The migration includes a data update operation, which may take some time for tables with a large number of rows. Consider running this migration during off-peak hours for production environments with significant data.
+
+## Error Handling
+The migration uses `safety_assured` to bypass strong_migrations checks. This should be used cautiously, ensuring that the migration is indeed safe to run.
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| precision | integer | 30 | The total number of digits for the `precise_amount_cents` column |
+| scale | integer | 5 | The number of digits after the decimal point for the `precise_amount_cents` column |

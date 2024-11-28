@@ -1,0 +1,48 @@
+---
+title: "20240115094827_create_commitments.rb"
+---
+
+## High-level description
+This migration file creates a new table called `commitments` in the database. It defines the structure of the table, including its columns, data types, and constraints. The table is designed to store information about commitments associated with plans, including their type, amount, and display name for invoices.
+
+## Symbols
+
+### `CreateCommitments`
+#### Description
+This class is a Rails migration that defines the structure for the `commitments` table. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0.
+
+#### Internal Logic
+The migration performs the following actions:
+1. Creates a new table named `commitments` with a UUID as the primary key.
+2. Defines columns for the table, including references, integers, and strings.
+3. Adds timestamps for tracking creation and update times.
+4. Creates an index on the `plan_id` column.
+5. Adds a unique composite index on `commitment_type` and `plan_id`.
+
+### `change`
+#### Description
+This method defines the changes to be applied to the database schema. It's automatically called by Rails when running migrations.
+
+#### Internal Logic
+1. Creates the `commitments` table with the following columns:
+   - `id`: UUID, primary key
+   - `plan_id`: UUID, foreign key referencing the `plans` table
+   - `commitment_type`: integer, not null
+   - `amount_cents`: bigint, not null
+   - `invoice_display_name`: string
+   - `created_at` and `updated_at`: timestamps
+2. Adds a foreign key constraint on `plan_id` referencing the `plans` table.
+3. Creates a unique composite index on `commitment_type` and `plan_id`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the migration framework and database abstraction |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| id | :uuid | N/A | Specifies that the primary key should be a UUID |
+
+## Performance Considerations
+The migration includes an index on the `plan_id` column, which can improve query performance when searching or joining on this column. Additionally, the unique composite index on `commitment_type` and `plan_id` ensures data integrity and can potentially improve query performance for lookups using these columns together.

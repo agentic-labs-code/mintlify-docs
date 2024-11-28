@@ -1,0 +1,54 @@
+---
+title: "20230522091400_add_unique_index_on_memberships.rb"
+---
+
+## High-level description
+This migration file adds a unique index to the `memberships` table in a Rails application. It ensures that there are no duplicate active memberships for a user in an organization by first revoking duplicates and then adding a unique index.
+
+## Code Structure
+The migration class `AddUniqueIndexOnMemberships` contains a single `change` method that performs the migration tasks.
+
+## Symbols
+
+### `AddUniqueIndexOnMemberships`
+#### Description
+This class is a Rails migration that adds a unique index to the `memberships` table.
+
+#### Internal Logic
+1. Loads Rails tasks using `LagoApi::Application.load_tasks`.
+2. Invokes a custom Rake task `memberships:revoke_duplicates` to remove duplicate memberships.
+3. Adds a unique index on the `user_id` and `organization_id` columns of the `memberships` table, but only for non-revoked memberships.
+
+### `change`
+#### Description
+This method defines the changes to be applied to the database schema.
+
+#### Internal Logic
+1. Loads Rails tasks.
+2. Invokes the `memberships:revoke_duplicates` Rake task.
+3. Uses `safety_assured` to bypass Strong Migrations checks.
+4. Adds a unique index on `user_id` and `organization_id` columns of the `memberships` table, with a condition that `revoked_at` is NULL.
+
+## Side Effects
+- Invokes a Rake task that may modify existing data in the `memberships` table.
+- Adds a new index to the `memberships` table, which may impact database performance and storage.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations |
+| Rake | Used to invoke custom tasks |
+
+## Performance Considerations
+Adding an index can temporarily lock the table and may take some time on large tables. However, it will improve query performance for lookups on `user_id` and `organization_id` columns.
+
+## Error Handling
+The migration uses `safety_assured` to bypass Strong Migrations checks. This should be used cautiously as it may lead to unsafe operations if not properly managed.
+
+## TODOs
+There are no explicit TODOs in this migration file. However, it's worth noting that the related `config/application.rb` file contains TODOs that might be relevant to the overall application:
+
+1. "TODO: Should be turned to false" regarding `config.add_autoload_paths_to_load_path`
+2. "TODO: turn this value to 7.1 after upgrading to Rails 7.1" for `config.active_support.cache_format_version`
+
+These TODOs in the application configuration might affect future migrations or application behavior.

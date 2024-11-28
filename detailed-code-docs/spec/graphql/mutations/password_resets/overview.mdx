@@ -1,0 +1,66 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL mutations related to password resets in the application. It includes tests for creating a password reset request and resetting a user's password through GraphQL mutations.
+
+## What does it do?
+These tests ensure that the password reset functionality in the application's GraphQL API works correctly. They verify two main processes:
+
+1. Creating a password reset request: This test checks if a user can successfully initiate a password reset by providing their email address.
+
+2. Resetting a password: This set of tests verifies that a user can successfully reset their password using a valid reset token, and that the system properly handles expired reset tokens.
+
+The tests simulate real-world scenarios, such as successful password resets and attempts to use expired reset tokens, to ensure the robustness of the password reset feature.
+
+## Key Files
+1. `create_spec.rb`: This file tests the `Mutations::PasswordResets::Create` GraphQL mutation, which is responsible for initiating a password reset request.
+
+2. `reset_spec.rb`: This file tests the `Mutations::PasswordResets::Reset` GraphQL mutation, which handles the actual password reset process.
+
+Both files use RSpec, a popular testing framework for Ruby, to define and run the tests. They also utilize FactoryBot for creating test data and custom helper methods for executing GraphQL queries and checking responses.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used to structure and run the tests.
+2. FactoryBot: A library for setting up Ruby objects as test data.
+3. GraphQL: The GraphQL implementation being tested.
+
+These dependencies are likely managed through the project's Gemfile, with specific versions defined there.
+
+## Configuration
+While there are no explicit configuration files mentioned in this directory, the tests rely on several implied configurations and helper methods:
+
+1. `rails_helper`: This file is required at the beginning of each test file and likely sets up the Rails testing environment and loads necessary configurations.
+
+2. `execute_graphql`: A custom helper method used to run GraphQL queries in the tests.
+
+3. `expect_not_found`: A custom matcher or helper method used to check for "not found" error responses.
+
+4. FactoryBot configurations: The tests use factories for creating test data, implying that there are corresponding factory definitions for `user`, `membership`, and `password_reset` models.
+
+These configurations and helper methods are likely defined in the broader test suite setup, possibly in files like `spec_helper.rb` or `rails_helper.rb`.
+
+Here's an example of how the GraphQL mutation for creating a password reset is structured in the test:
+
+```ruby
+let(:mutation) do
+  &lt;&lt;-GQL
+    mutation {
+      createPasswordReset(input: { email: "#{email}" }) {
+        id
+      }
+    }
+  GQL
+end
+```
+
+This mutation is then executed in the test using the `execute_graphql` helper method:
+
+```ruby
+result = execute_graphql(mutation)
+```
+
+The tests provide a comprehensive check of the password reset functionality, ensuring that the GraphQL API behaves correctly in both successful scenarios and error cases, such as expired reset tokens. This approach helps maintain the reliability and security of the password reset feature in the application.

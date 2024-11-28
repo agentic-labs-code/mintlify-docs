@@ -1,0 +1,77 @@
+---
+title: "create_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Mutations::Coupons::Create` GraphQL mutation. It verifies the functionality of creating coupons with various attributes and limitations, including plan-specific and billable metric-specific coupons.
+
+## Code Structure
+The test suite is organized into several contexts, each testing different aspects of coupon creation. It uses shared examples for common checks and defines multiple test cases to cover various scenarios.
+
+## Symbols
+
+### `RSpec.describe Mutations::Coupons::Create, type: :graphql`
+#### Description
+This is the main describe block for the test suite, focusing on the `Mutations::Coupons::Create` GraphQL mutation.
+
+#### Internal Logic
+The test suite sets up necessary test data, defines the GraphQL mutation query, and includes shared examples for common checks. It then proceeds to test various coupon creation scenarios.
+
+### `it 'creates a coupon'`
+#### Description
+This test case verifies the basic functionality of creating a coupon with various attributes.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with specific input parameters.
+2. Verifies the returned data matches the expected values for all coupon attributes.
+
+### `context 'with billable metric limitations'`
+#### Description
+This context tests the creation of coupons with billable metric limitations.
+
+#### Internal Logic
+1. Defines a modified GraphQL mutation query to include billable metric information.
+2. Executes the mutation with billable metric-specific input.
+3. Verifies the returned data includes correct billable metric limitations.
+
+### `context 'with an expiration date'`
+#### Description
+This context tests the creation of coupons with an expiration date.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with an expiration date.
+2. Verifies the returned data includes the correct expiration information.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides Rails-specific test configurations and helpers |
+| FactoryBot | Used for creating test data (e.g., `create(:membership)`) |
+
+## Configuration
+The test suite uses several let statements to set up test data:
+
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| required_permission | String | The permission required to create coupons |
+| membership | FactoryBot | A membership object for the test user |
+| expiration_at | Time | The expiration date for time-limited coupons |
+| plan | FactoryBot | A plan object associated with the test organization |
+| billable_metric | FactoryBot | A billable metric object for testing metric-limited coupons |
+
+## Error Handling
+The test suite includes shared examples to check for proper error handling:
+- `it_behaves_like 'requires current user'`
+- `it_behaves_like 'requires current organization'`
+- `it_behaves_like 'requires permission', 'coupons:create'`
+
+These shared examples likely test for appropriate error responses when the required conditions are not met.
+
+## API/Interface Reference
+The test suite defines the GraphQL mutation used for creating coupons:
+
+| Mutation | Input | Response | Description |
+|:---------|:------|:---------|:------------|
+| createCoupon | CreateCouponInput | Coupon details | Creates a new coupon with the specified attributes |
+
+The `CreateCouponInput` includes fields such as name, code, description, coupon type, frequency, amount, expiration, and various limitation options.

@@ -1,0 +1,64 @@
+---
+title: "flag_refresh_from_subscription_service.rb"
+---
+
+## High-level description
+This code defines a service class `FlagRefreshFromSubscriptionService` within the `LifetimeUsages` module. Its primary purpose is to flag a subscription's lifetime usage for recalculation based on certain conditions, such as the subscription being active and having usage thresholds defined in its plan.
+
+## Symbols
+
+### `LifetimeUsages::FlagRefreshFromSubscriptionService`
+#### Description
+This service class is responsible for flagging a subscription's lifetime usage for recalculation. It inherits from `BaseService` and operates on a given subscription.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription | Subscription | The subscription object to be processed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the operation result and potentially a lifetime_usage object |
+
+#### Internal Logic
+1. Check if the subscription is active and has usage thresholds defined in its plan.
+2. Retrieve or create a lifetime usage object for the subscription.
+3. Set the `recalculate_current_usage` flag to true on the lifetime usage object.
+4. Save the lifetime usage object.
+5. Add the lifetime usage object to the result.
+6. Handle any `ActiveRecord::RecordInvalid` errors by recording validation failures.
+
+### `initialize`
+#### Description
+Initializes the service with a subscription object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription | Subscription | The subscription object to be processed |
+
+### `call`
+#### Description
+Executes the main logic of the service, flagging the lifetime usage for recalculation if conditions are met.
+
+#### Internal Logic
+1. Return early if the subscription is not active or has no usage thresholds.
+2. Retrieve or create a lifetime usage object for the subscription.
+3. Set the `recalculate_current_usage` flag to true.
+4. Save the lifetime usage object and add it to the result.
+5. Handle any validation errors.
+
+## Error Handling
+The service handles `ActiveRecord::RecordInvalid` errors by calling `result.record_validation_failure!` with the invalid record.
+
+## Dependencies
+This service depends on the following Rails/ActiveRecord features:
+- ActiveRecord associations and validations
+- ActiveRecord::RecordInvalid exception
+
+## References
+This service is referenced in the `Events::PostProcessService` class, specifically in the `flag_refresh_from_subscription` method, where it is called for each active subscription.
+
+## Performance Considerations
+The service performs database operations (find or create, and save) which could impact performance if called frequently or with a large number of subscriptions. Consider batch processing or background jobs for high-volume scenarios.

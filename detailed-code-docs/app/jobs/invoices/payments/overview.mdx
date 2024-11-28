@@ -1,0 +1,56 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains a collection of background job classes responsible for processing payments for invoices using different payment providers. The jobs are part of the `Invoices::Payments` module and are designed to handle asynchronous payment creation and retry operations.
+
+## What does it do?
+The jobs in this directory facilitate the creation and management of payments for invoices using various payment providers such as Adyen, GoCardless, and Stripe. They also include a job for retrying payments in bulk. These jobs work as follows:
+
+1. When an invoice needs to be paid, the appropriate job (Adyen, GoCardless, or Stripe) is enqueued based on the customer's payment provider.
+2. The job then calls the corresponding payment service to create the payment.
+3. If there are any issues with payments, the RetryAllJob can be used to attempt to process payments for multiple invoices in a batch.
+
+This approach allows the main application to offload the potentially time-consuming and error-prone process of payment creation to background jobs, improving the overall responsiveness and reliability of the system.
+
+## Key Files
+
+1. `adyen_create_job.rb`: Handles the creation of payments using the Adyen payment provider.
+2. `gocardless_create_job.rb`: Manages payment creation through the GoCardless payment system.
+3. `stripe_create_job.rb`: Responsible for creating payments using the Stripe payment platform.
+4. `retry_all_job.rb`: A job that attempts to retry payments for multiple invoices in a batch.
+
+Each of these jobs is designed to work with a specific payment service (`AdyenService`, `GocardlessService`, `StripeService`, and `RetryBatchService` respectively) to process the payments.
+
+## Dependencies
+The jobs in this directory rely on the following external libraries and frameworks:
+
+1. ActiveJob: Used as the base for all job classes, providing the job queuing and execution framework.
+2. Sidekiq: Implied to be used as the backend for ActiveJob, based on the Sidekiq-specific options set in some jobs.
+3. Stripe: Used in the `StripeCreateJob` for handling Stripe-specific errors.
+4. Faraday: Used in the `AdyenCreateJob` for handling connection errors when communicating with the Adyen API.
+
+## Configuration
+The jobs in this directory use the following configuration:
+
+1. Queue names: 
+   - `AdyenCreateJob`, `GocardlessCreateJob`, and `StripeCreateJob` use the 'providers' queue.
+   - `RetryAllJob` uses the 'invoices' queue.
+
+2. Job uniqueness: 
+   - `AdyenCreateJob`, `GocardlessCreateJob`, and `StripeCreateJob` use the `unique` method to ensure only one job with the same arguments is enqueued or executed at a time.
+
+3. Retry behavior:
+   - `AdyenCreateJob` is configured to retry up to 6 times with a polynomial backoff strategy for `Faraday::ConnectionFailed` errors.
+   - `StripeCreateJob` is set to retry up to 6 times with polynomial backoff for `Stripe::RateLimitError` and `Stripe::APIConnectionError`.
+   - `RetryAllJob` inherits from `ApplicationJob`, which sets Sidekiq options to not retry failed jobs (`retry: 0`).
+
+Here's an example of how the retry configuration is set in the `StripeCreateJob`:
+
+```ruby
+retry_on Stripe::RateLimitError, wait: :exponentially_longer, attempts: 6
+retry_on Stripe::APIConnectionError, wait: :exponentially_longer, attempts: 6
+```
+
+This configuration ensures that the jobs are resilient to temporary failures and network issues, improving the overall reliability of the payment processing system.

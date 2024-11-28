@@ -1,0 +1,57 @@
+---
+title: "base_customer.rb"
+---
+
+## High-level description
+The `BaseCustomer` class represents a customer on a third-party payment provider platform. It serves as a base class for specific payment provider customer models (e.g., Stripe, GoCardless) and handles common attributes and relationships.
+
+## Code Structure
+The `BaseCustomer` class inherits from `ApplicationRecord` and includes modules for paper trail tracking (`PaperTrailTraceable`) and settings storage (`SettingsStorable`). It has relationships with `Customer`, `PaymentProvider`, `Payment`, and `Refund` models.
+
+## References
+- `PaymentProviderCustomers` module
+- `ApplicationRecord` class
+- `PaperTrailTraceable` and `SettingsStorable` modules
+- `Customer`, `PaymentProvider`, `Payment`, and `Refund` models
+
+## Symbols
+
+### `BaseCustomer`
+#### Description
+This class represents a customer on a third-party payment provider platform. It stores common attributes like `provider_customer_id`, `provider_mandate_id`, and `sync_with_provider`.
+
+#### Inputs
+This class doesn't define any specific input parameters.
+
+#### Outputs
+This class doesn't define any specific output parameters.
+
+#### Internal Logic
+The class defines several associations and validations:
+- `belongs_to :customer`: Associates the payment provider customer with a customer in the system.
+- `belongs_to :payment_provider`: Associates the customer with a specific payment provider.
+- `has_many :payments`: Links the customer to their payments.
+- `has_many :refunds`: Links the customer to their refunds.
+- `validates :customer_id, uniqueness: {scope: :type}`: Ensures that a customer is unique for a specific payment provider type.
+
+The `provider_payment_methods` method is meant to be overridden by subclasses to provide specific payment methods supported by the provider.
+
+## Side Effects
+This class doesn't have any notable side effects.
+
+## Dependencies
+- `ActiveRecord`: Provides the base class for database interactions.
+- `PaperTrail`: Enables tracking changes to the model.
+
+### Configuration
+The class uses the `settings_accessors` method from the `SettingsStorable` module to define accessors for the following settings:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| `provider_mandate_id` | string | nil | Stores the mandate ID from the payment provider. |
+| `sync_with_provider` | boolean | nil | Indicates whether the customer should be synced with the payment provider. |
+
+## Error Handling
+The class relies on ActiveRecord validations to handle errors related to data integrity.
+
+## Logging
+This class doesn't implement any specific logging mechanisms.

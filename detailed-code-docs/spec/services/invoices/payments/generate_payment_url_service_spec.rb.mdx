@@ -1,0 +1,89 @@
+---
+title: "generate_payment_url_service_spec.rb"
+---
+
+## High-level description
+This RSpec test file is designed to test the `Invoices::Payments::GeneratePaymentUrlService` class. It verifies the service's behavior in generating payment URLs for invoices, handling various scenarios such as linked payment providers, missing invoices, and invalid payment statuses.
+
+## Code Structure
+The test file is structured using RSpec's `describe` and `context` blocks to organize different test scenarios. It uses FactoryBot to create test data and mocks Stripe API calls.
+
+## Symbols
+
+### `RSpec.describe Invoices::Payments::GeneratePaymentUrlService`
+#### Description
+This is the main describe block for the `GeneratePaymentUrlService` class tests.
+
+#### Internal Logic
+- Sets up the subject of the tests as an instance of `GeneratePaymentUrlService`
+- Defines let blocks for creating test data (organization, customer, invoice, etc.)
+- Contains nested describe and context blocks for different test scenarios
+
+### `.call`
+#### Description
+This describe block focuses on testing the `call` method of the `GeneratePaymentUrlService`.
+
+#### Internal Logic
+- Tests various scenarios including:
+  1. When payment provider is linked
+  2. When invoice is blank
+  3. When payment provider is blank
+  4. When payment provider is gocardless
+  5. When invoice payment status is invalid
+
+### `context 'when payment provider is linked'`
+#### Description
+Tests the scenario where a valid payment provider (Stripe) is linked to the customer.
+
+#### Internal Logic
+- Creates a Stripe provider and links it to the customer
+- Mocks the Stripe::Checkout::Session.create method to return a fake URL
+- Expects the service to return the generated payment URL
+
+### `context 'when invoice is blank'`
+#### Description
+Tests the error handling when no invoice is provided to the service.
+
+#### Internal Logic
+- Calls the service with a nil invoice
+- Expects an error result with the message 'invoice_not_found'
+
+### `context 'when payment provider is blank'`
+#### Description
+Tests the error handling when the customer has no linked payment provider.
+
+#### Internal Logic
+- Sets the payment provider to nil
+- Expects an error result with the message 'no_linked_payment_provider'
+
+### `context 'when payment provider is gocardless'`
+#### Description
+Tests the error handling when an unsupported payment provider (gocardless) is used.
+
+#### Internal Logic
+- Sets the payment provider to 'gocardless'
+- Expects an error result with the message 'invalid_payment_provider'
+
+### `context 'when invoice payment status is invalid'`
+#### Description
+Tests the error handling when the invoice has an invalid payment status.
+
+#### Internal Logic
+- Sets the invoice status to 'payment_succeeded'
+- Expects an error result with the message 'invalid_invoice_status_or_payment_status'
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Used for creating test data |
+| Stripe | Mocked for simulating Stripe API calls |
+
+## Error Handling
+The test file checks various error scenarios, including:
+- Missing invoice
+- Missing payment provider
+- Unsupported payment provider
+- Invalid invoice payment status
+
+These errors are expected to be returned as `BaseService::ValidationFailure` objects with appropriate error messages.

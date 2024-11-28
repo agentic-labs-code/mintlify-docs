@@ -1,0 +1,48 @@
+---
+title: "factory.rb"
+---
+
+## High-level description
+This code defines a Factory class for creating credit note payloads based on different integration types. It's designed to generate the appropriate payload object for Netsuite, Xero, or Anrok integrations, depending on the customer's integration type.
+
+## Code Structure
+The `Factory` class is nested within several modules: `Integrations::Aggregator::CreditNotes::Payloads`. It contains a single class method `new_instance` that determines which payload class to instantiate based on the integration type.
+
+## Symbols
+
+### `Factory.new_instance`
+#### Description
+This class method creates and returns an instance of the appropriate payload class based on the integration type associated with the given customer.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration_customer | Object | An object representing the customer's integration |
+| credit_note | Object | An object representing the credit note |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payload | Object | An instance of the appropriate payload class (Netsuite, Xero, or Anrok) |
+
+#### Internal Logic
+1. The method uses a case statement to check the integration type of the customer.
+2. Based on the integration type, it instantiates and returns the corresponding payload class:
+   - For Netsuite: `Integrations::Aggregator::CreditNotes::Payloads::Netsuite`
+   - For Xero: `Integrations::Aggregator::CreditNotes::Payloads::Xero`
+   - For Anrok: `Integrations::Aggregator::CreditNotes::Payloads::Anrok`
+3. If the integration type doesn't match any of the above, it raises a `NotImplementedError`.
+
+## Error Handling
+The method raises a `NotImplementedError` if the integration type is not recognized or supported.
+
+## References
+This factory is used in the `Integrations::Aggregator::CreditNotes::CreateService` class, specifically in its `payload` method, to generate the appropriate payload for creating credit notes in different integration systems.
+
+## Dependencies
+The code depends on the existence of the following classes:
+- `Integrations::Aggregator::CreditNotes::Payloads::Netsuite`
+- `Integrations::Aggregator::CreditNotes::Payloads::Xero`
+- `Integrations::Aggregator::CreditNotes::Payloads::Anrok`
+
+These classes are not defined in the provided code but are expected to exist and follow a common interface, accepting `integration_customer` and `credit_note` as initialization parameters.

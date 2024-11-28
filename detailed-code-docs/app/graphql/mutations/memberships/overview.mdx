@@ -1,0 +1,64 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL mutations related to managing memberships within an organization. It includes two main operations: revoking a membership and updating a membership's role. These mutations are part of a larger GraphQL API and are designed to handle user permissions and authentication within the context of organizational memberships.
+
+## What does it do?
+The code in this directory provides functionality to modify user memberships in an organization through a GraphQL API. Here's a breakdown of the main operations:
+
+1. Revoking a Membership:
+   - Allows an authenticated user with the appropriate permissions to revoke another user's membership in an organization.
+   - This effectively removes the user's access to the organization.
+
+2. Updating a Membership:
+   - Enables an authenticated user with the correct permissions to change the role of another user within the organization.
+   - This can be used to promote or demote users, adjusting their level of access and responsibilities within the organization.
+
+Both operations require authentication and specific permissions to execute, ensuring that only authorized users can make these changes. The actual business logic for these operations is handled by separate service objects, keeping the GraphQL mutations focused on input/output handling and delegation.
+
+## Key Files
+
+1. `revoke.rb`:
+   - Defines the `RevokeMembership` mutation.
+   - Handles the process of revoking a user's membership in an organization.
+   - Uses the `::Memberships::RevokeService` to perform the actual revocation.
+
+2. `update.rb`:
+   - Defines the `UpdateMembership` mutation.
+   - Manages the process of updating a user's role within an organization.
+   - Utilizes the `::Memberships::UpdateService` to execute the role update.
+
+Both files follow a similar structure:
+- They inherit from `BaseMutation` and include necessary modules for authentication and organization context.
+- They define input arguments and return types specific to their operations.
+- They implement a `resolve` method that delegates the core logic to a service object.
+- They handle errors and return appropriate responses.
+
+## Dependencies
+The mutations in this directory rely on several external modules and types:
+
+1. `AuthenticableApiUser`: A module that provides authentication functionality for API users.
+2. `RequiredOrganization`: A module that ensures the presence of a valid organization context (used in the update mutation).
+3. `Types::MembershipType`: A GraphQL type representing a membership object.
+4. `Types::Memberships::RoleEnum`: An enumeration type for membership roles (used in the update mutation).
+
+These dependencies suggest that the mutations are part of a larger system that handles user authentication, organization management, and role-based access control.
+
+## Configuration
+Both mutations use a `REQUIRED_PERMISSION` constant to specify the permission needed to execute the mutation:
+
+```ruby
+REQUIRED_PERMISSION = 'organization:members:update'
+```
+
+This configuration ensures that only users with the appropriate permissions can perform these sensitive operations on memberships.
+
+The mutations also rely on the context provided by the GraphQL execution environment, particularly:
+- `context[:current_user]`: The authenticated user performing the mutation.
+- `context[:current_organization]`: The organization in which the membership changes are being made (used in the update mutation).
+
+These context variables are likely set by middleware or resolvers earlier in the GraphQL execution process.
+
+In summary, this directory contains GraphQL mutations for managing organizational memberships, providing a secure and structured way to revoke memberships and update member roles through a GraphQL API. The mutations are designed with authentication, authorization, and error handling in mind, delegating the core business logic to separate service objects for better separation of concerns.

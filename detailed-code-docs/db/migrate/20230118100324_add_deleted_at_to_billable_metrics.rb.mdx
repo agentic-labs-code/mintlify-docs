@@ -1,0 +1,48 @@
+---
+title: "20230118100324_add_deleted_at_to_billable_metrics.rb"
+---
+
+## High-level description
+This migration adds a `deleted_at` column to several tables in the database and creates corresponding indexes. It also modifies an existing index on the `billable_metrics` table to ensure uniqueness only for non-deleted records.
+
+## Symbols
+
+### `AddDeletedAtToBillableMetrics`
+#### Description
+This class is a Rails migration that adds a `deleted_at` column to multiple tables and creates indexes on these new columns. It also modifies an existing index on the `billable_metrics` table.
+
+#### Internal Logic
+1. Adds a `deleted_at` column of type `datetime` to the following tables:
+   - `billable_metrics`
+   - `charges`
+   - `groups`
+   - `group_properties`
+   - `events`
+   - `persisted_events`
+
+2. Creates indexes on the newly added `deleted_at` columns for all the above tables.
+
+3. Removes the existing index on `organization_id` and `code` columns of the `billable_metrics` table.
+
+4. Adds a new unique index on `organization_id` and `code` columns of the `billable_metrics` table, but only for records where `deleted_at` is NULL.
+
+#### Performance Considerations
+- Adding indexes on the `deleted_at` columns will improve query performance when filtering for non-deleted records.
+- The unique index on `billable_metrics` ensures that the combination of `organization_id` and `code` is unique only for non-deleted records, allowing for soft deletion without violating uniqueness constraints.
+
+## Side Effects
+- This migration will modify the schema of several tables by adding a new column and indexes.
+- Existing queries that rely on the old index structure of the `billable_metrics` table may need to be updated.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+
+## Error Handling
+The migration uses `safety_assured` block, which is likely provided by a gem like `strong_migrations`. This indicates that the potentially dangerous operations (adding indexes and modifying existing indexes) have been reviewed and deemed safe to run.
+
+## Notes
+- This migration implements soft delete functionality by adding `deleted_at` columns instead of actually deleting records.
+- The `safety_assured` block suggests that the developers are aware of the potential risks associated with adding indexes to existing tables and have taken necessary precautions.
+- The modification of the unique index on `billable_metrics` allows for soft deletion while maintaining uniqueness constraints for active records.

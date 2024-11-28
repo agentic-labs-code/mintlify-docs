@@ -1,0 +1,55 @@
+---
+title: "customer_checkout_serializer_spec.rb"
+---
+
+## High-level description
+This code defines a RSpec test for the `V1::PaymentProviders::CustomerCheckoutSerializer`. It verifies that the serializer correctly formats customer data, including a checkout URL, into a JSON structure.
+
+## Symbols
+
+### `RSpec.describe ::V1::PaymentProviders::CustomerCheckoutSerializer`
+#### Description
+This is the main test suite for the `CustomerCheckoutSerializer`. It sets up the context for testing the serializer's behavior.
+
+### `subject(:serializer)`
+#### Description
+Defines the subject of the test, which is an instance of the `CustomerCheckoutSerializer` with a customer and options.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Customer | A factory-created customer object |
+| options | Hash | A hash containing a checkout URL |
+
+### `let(:customer)`
+#### Description
+Creates a customer object using FactoryBot for use in the tests.
+
+### `let(:options)`
+#### Description
+Defines a hash with a checkout URL, used as options for the serializer.
+
+### `it 'serializes the object'`
+#### Description
+This test case verifies that the serializer correctly formats the customer data into JSON.
+
+#### Internal Logic
+1. Serializes the customer object to JSON
+2. Parses the JSON back into a Ruby hash
+3. Uses `aggregate_failures` to group multiple expectations
+4. Checks that various fields in the serialized data match the expected values from the customer object and options
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used to create test data (customer object) |
+| RSpec | Testing framework used for writing and running the tests |
+
+## Notes
+- The test uses `create(:customer)`, indicating that there's a factory defined for creating customer objects.
+- The serializer is expected to include both customer data and the provided checkout URL in its output.
+- The test checks for specific keys in the serialized data, including `lago_customer_id`, `external_customer_id`, `payment_provider`, `payment_provider_code`, and `checkout_url`.
+- The use of `with_indifferent_access` on the options hash allows for both string and symbol key access.
+
+This test ensures that the `CustomerCheckoutSerializer` correctly formats customer data along with a checkout URL, which is likely used in a payment flow within the application.

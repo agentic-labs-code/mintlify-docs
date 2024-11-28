@@ -1,0 +1,89 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions for credit note items within a larger application. It includes three main components: an estimate type, an input type, and an object type. These types are used to structure and handle data related to credit note items in GraphQL queries and mutations.
+
+## What does it do?
+The code in this directory defines the structure and behavior of credit note items for a GraphQL API. It allows the API to:
+
+1. Represent estimates for credit note items, including the amount and associated fee.
+2. Accept input for creating or updating credit note items, specifying the amount and fee ID.
+3. Define the structure of credit note item objects, including details like ID, amount, currency, creation time, and associated fee.
+
+These types work together to enable querying and mutating credit note item data through the GraphQL API. For example, a client could use these types to fetch details about existing credit note items, create new ones, or update existing ones.
+
+## Key Files
+
+1. `estimate.rb`:
+   - Defines the `CreditNoteItemEstimate` GraphQL type.
+   - Represents an estimate for a credit note item with fields for amount and fee.
+
+2. `input.rb`:
+   - Defines the `CreditNoteItemInput` GraphQL input type.
+   - Specifies the structure for input when creating or updating credit note items.
+
+3. `object.rb`:
+   - Defines the `CreditNoteItem` GraphQL object type.
+   - Represents the full structure of a credit note item, including all its attributes.
+
+## Dependencies
+The code relies on the following external libraries and types:
+
+1. `graphql` gem: Provides the core GraphQL functionality for Ruby.
+2. `GraphQL::Types::BigInt`: Used for representing large integer values (e.g., amount in cents).
+3. `GraphQL::Types::ISO8601DateTime`: Used for representing timestamps in ISO8601 format.
+4. `Types::CurrencyEnum`: A custom enum type for representing currencies.
+5. `Types::Fees::Object`: A custom type representing fee objects associated with credit note items.
+
+These dependencies are used to ensure proper typing and functionality within the GraphQL schema.
+
+## Configuration
+There are no explicit configuration options or environment variables used in these files. The behavior of these types is primarily determined by their field definitions and the larger GraphQL schema they are part of.
+
+Here's a more detailed look at each file:
+
+1. `estimate.rb`:
+   ```ruby
+   module Types
+     module CreditNoteItems
+       class Estimate &lt; Types::BaseObject
+         field :amount_cents, GraphQL::Types::BigInt, null: false
+         field :fee, Types::Fees::Object, null: false
+       end
+     end
+   end
+   ```
+   This type defines an estimate for a credit note item, including the amount in cents and the associated fee.
+
+2. `input.rb`:
+   ```ruby
+   module Types
+     module CreditNoteItems
+       class Input &lt; Types::BaseInputObject
+         argument :amount_cents, GraphQL::Types::BigInt, required: true
+         argument :fee_id, ID, required: true
+       end
+     end
+   end
+   ```
+   This input type specifies the required fields (amount_cents and fee_id) for creating or updating a credit note item.
+
+3. `object.rb`:
+   ```ruby
+   module Types
+     module CreditNoteItems
+       class Object &lt; Types::BaseObject
+         field :id, ID, null: false
+         field :amount_cents, GraphQL::Types::BigInt, null: false
+         field :amount_currency, Types::CurrencyEnum, null: false
+         field :created_at, GraphQL::Types::ISO8601DateTime, null: false
+         field :fee, Types::Fees::Object, null: false
+       end
+     end
+   end
+   ```
+   This object type represents a full credit note item, including its ID, amount, currency, creation timestamp, and associated fee.
+
+These types work together to provide a complete representation of credit note items within the GraphQL API. The `Estimate` type can be used for preliminary calculations or previews, the `Input` type for mutations, and the `Object` type for queries returning full credit note item details.

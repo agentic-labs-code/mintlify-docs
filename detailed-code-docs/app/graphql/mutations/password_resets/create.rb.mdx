@@ -1,0 +1,56 @@
+---
+title: "create.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation called `CreatePasswordReset` within the `Mutations::PasswordResets` module. It allows users to initiate a password reset process by providing their email address. The mutation creates a password reset token and sends an email to the user with reset instructions.
+
+## Code Structure
+The `Create` class inherits from `BaseMutation` and defines the structure of the GraphQL mutation. It uses the `PasswordResets::CreateService` to handle the actual creation of the password reset token and sending the email.
+
+## References
+- `User` model
+- `PasswordResets::CreateService`
+
+## Symbols
+
+### `Mutations::PasswordResets::Create`
+#### Description
+This class defines the GraphQL mutation for creating a password reset request. It takes an email as input and returns an ID if successful.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| email | String | The email address of the user requesting a password reset |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | String | The ID of the created password reset request |
+
+#### Internal Logic
+1. Find the user by the provided email address
+2. Call the `PasswordResets::CreateService` with the found user
+3. If successful, return the result; otherwise, return an error
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseMutation | Parent class for GraphQL mutations |
+| User | Model used to find the user by email |
+| PasswordResets::CreateService | Service object that handles the creation of the password reset |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in the `BaseMutation` class) to handle and return errors if the `CreateService` fails.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| createPasswordReset | POST | `{ email: String }` | `{ id: String }` | Creates a password reset request for the given email |
+
+## Additional Notes
+1. The `graphql_name` and `description` class methods are used to provide metadata for the GraphQL schema.
+2. The `argument` method defines the input field for the mutation.
+3. The `field` method defines the output field for the mutation.
+4. The `resolve` method contains the main logic for the mutation, which is executed when the mutation is called.
+5. The `PasswordResets::CreateService` is responsible for creating the actual password reset token, setting its expiration, and sending the email. The mutation class acts as a wrapper around this service.

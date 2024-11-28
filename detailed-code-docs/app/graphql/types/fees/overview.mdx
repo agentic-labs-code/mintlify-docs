@@ -1,0 +1,86 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `app/graphql/types/fees` directory contains GraphQL type definitions related to fees in the application. It provides a structured way to represent various aspects of fees, including fee details, applied taxes, and fee types. These types are crucial for representing complex fee structures and calculations in the application's GraphQL schema.
+
+## What does it do?
+This directory defines GraphQL types that allow the application to represent and query detailed information about fees. It supports various fee-related functionalities:
+
+1. Fee Amount Details: Represents complex fee structures, including graduated ranges, percentage-based fees, package pricing, and volume-based fees.
+2. Applied Taxes: Represents taxes applied to fees, linking them back to the associated fee.
+3. Fee Object: Provides a comprehensive representation of a fee, including its attributes, associated charges, subscriptions, and computed fields.
+4. Fee Types: Defines an enum of possible fee types in the system.
+
+These types enable the application to provide detailed information about fees, their structures, and calculations. This allows clients to query and display complex fee information, understand how fees are computed, and access related data such as applied taxes and associated charges or subscriptions.
+
+## Key Files
+1. `amount_details/object.rb`:
+   - Defines the `FeeAmountDetails` type.
+   - Provides a comprehensive representation of fee amount details.
+   - Includes fields for various fee calculation models like graduated ranges, percentages, package pricing, and volume-based fees.
+
+2. `applied_taxes/object.rb`:
+   - Defines the `AppliedTaxes` type.
+   - Represents taxes applied to a fee.
+   - Links back to the associated fee.
+
+3. `object.rb`:
+   - Defines the main `Fee` GraphQL type.
+   - Provides a comprehensive representation of a fee, including its attributes, associations, and computed fields.
+   - Implements the `Types::Invoices::InvoiceItem` interface.
+
+4. `types_enum.rb`:
+   - Defines the `FeeTypesEnum` GraphQL enum.
+   - Represents the different types of fees in the system.
+
+## Dependencies
+The code in this directory relies on the following dependencies:
+
+1. `graphql` gem: Provides the foundation for defining GraphQL types and fields in Ruby.
+2. `Types::BaseObject` and `Types::BaseEnum`: Custom base classes for GraphQL object types and enums, likely defined elsewhere in the application.
+3. Various other custom types (e.g., `Types::Charges::Object`, `Types::Subscriptions::Object`) that are referenced in the fee-related types.
+
+## Configuration
+While this directory does not contain explicit configuration files, the structure and fields of the GraphQL types serve as a form of configuration for the fee-related parts of the GraphQL schema. 
+
+The `FeeAmountDetails` type in `amount_details/object.rb` is particularly noteworthy as it defines a comprehensive structure for representing various fee calculation models. For example:
+
+```ruby
+class Types::Fees::AmountDetails::Object &lt; Types::BaseObject
+  graphql_name 'FeeAmountDetails'
+
+  field :graduated_ranges, [Types::Fees::AmountDetails::GraduatedRange], null: true
+  field :graduated_percentage_ranges, [Types::Fees::AmountDetails::GraduatedPercentageRange], null: true
+  field :percentage, String, null: true
+  field :percentage_with_additional_amount, String, null: true
+  # ... additional fields omitted for brevity
+end
+```
+
+The `Fee` type in `object.rb` also provides a comprehensive structure for representing fee information:
+
+```ruby
+class Types::Fees::Object &lt; Types::BaseObject
+  implements Types::Invoices::InvoiceItem
+
+  field :charge, Types::Charges::Object, null: true
+  field :currency, Types::CurrencyEnum, null: false
+  field :description, String, null: true
+  field :subscription, Types::Subscriptions::Object, null: true
+  # ... additional fields omitted for brevity
+
+  def applied_taxes
+    object.applied_taxes.order(tax_rate: :desc)
+  end
+
+  def adjusted_fee
+    object.adjusted_fee.present?
+  end
+
+  # ... additional methods omitted for brevity
+end
+```
+
+These structures allow for a flexible representation of various fee-related information, enabling the API to provide detailed fee data based on different scenarios and calculation methods. They play a crucial role in the application's ability to represent and communicate complex fee structures through its GraphQL API.

@@ -1,0 +1,50 @@
+---
+title: "object.rb"
+---
+
+## High-level description
+This code defines a GraphQL object type `FinalizedInvoiceCollection` within the `Types::Analytics::InvoiceCollections` module. It represents a collection of finalized invoices with aggregated data, including total amount, currency, invoice count, month, and payment status.
+
+## Code Structure
+The `Object` class inherits from `Types::BaseObject` and defines several fields that represent properties of a finalized invoice collection. These fields are used to structure the GraphQL response for queries related to invoice collections.
+
+## Symbols
+
+### `Types::Analytics::InvoiceCollections::Object`
+#### Description
+This class defines the structure of the `FinalizedInvoiceCollection` GraphQL object type. It specifies the fields that can be queried for an invoice collection.
+
+#### Fields
+| Name | Type | Nullable | Description |
+|:-----|:-----|:---------|:------------|
+| amount_cents | GraphQL::Types::BigInt | false | The total amount of the invoice collection in cents |
+| currency | Types::CurrencyEnum | true | The currency of the invoice collection |
+| invoices_count | GraphQL::Types::BigInt | false | The number of invoices in the collection |
+| month | GraphQL::Types::ISO8601DateTime | false | The month for which the collection is aggregated |
+| payment_status | Types::Invoices::PaymentStatusTypeEnum | true | The payment status of the invoice collection |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| GraphQL::Types::BigInt | Used for large integer values (amount_cents and invoices_count) |
+| GraphQL::Types::ISO8601DateTime | Used for representing the month as a datetime |
+| Types::CurrencyEnum | Custom enum type for currency representation |
+| Types::Invoices::PaymentStatusTypeEnum | Custom enum type for invoice payment status |
+
+## Related Code
+
+### Types::CurrencyEnum
+This enum type is used for the `currency` field. It defines values based on the `Currencies::ACCEPTED_CURRENCIES` constant, representing various currency codes and their descriptions.
+
+### Types::Invoices::PaymentStatusTypeEnum
+This enum type is used for the `payment_status` field. It defines values based on the `Invoice::PAYMENT_STATUS` constant, representing various payment status types for invoices.
+
+### Resolvers::Analytics::InvoiceCollectionsResolver
+This resolver is likely responsible for fetching the data that populates the `FinalizedInvoiceCollection` objects. It includes authentication and organization checks, and returns a collection of `Types::Analytics::InvoiceCollections::Object` instances.
+
+## Notes
+1. The `graphql_name 'FinalizedInvoiceCollection'` line explicitly sets the name of this GraphQL type, which may be different from the Ruby class name.
+2. The use of `GraphQL::Types::BigInt` for `amount_cents` and `invoices_count` suggests these values might be large and require more than 32 bits to represent.
+3. The `currency` and `payment_status` fields are nullable, indicating that these values might not always be available or applicable for every invoice collection.
+4. The `month` field uses `ISO8601DateTime`, which provides a standardized format for date and time representation in the GraphQL API.
+5. This object type is likely used in conjunction with the `InvoiceCollectionsResolver` to provide analytics data on finalized invoices for a given organization.

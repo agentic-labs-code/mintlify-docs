@@ -1,0 +1,49 @@
+---
+title: "charge_filter.rb"
+---
+
+## High-level description
+The `ChargeFilter` model represents a set of filters applied to a `Charge` to refine its application. It defines how a charge should be applied based on specific criteria defined by its associated `ChargeFilterValue` objects. This allows for flexible and dynamic charge calculations based on various attributes.
+
+## Code Structure
+The `ChargeFilter` model interacts with several other models:
+
+- **`Charge`:** A `ChargeFilter` belongs to a `Charge`, defining filtering criteria for that charge.
+- **`ChargeFilterValue`:** A `ChargeFilter` has many `ChargeFilterValue` objects, each representing a specific filter criterion and its associated values.
+- **`BillableMetricFilter`:** Accessed through `ChargeFilterValue`, it provides the possible values for each filter criterion.
+
+## References
+- `Charge`
+- `ChargeFilterValue`
+- `BillableMetricFilter`
+- `Charges::Validators::*` (various charge validator classes)
+
+## Symbols
+
+### `ChargeFilter`
+
+#### Description
+This class represents a filter applied to a charge, defining rules for its application based on specific criteria.
+
+#### Inputs
+This class doesn't have explicit input methods. It's instantiated and its attributes are set, likely during the charge creation or update process.
+
+#### Outputs
+- `display_name(separator: ', ')`: Returns a string representation of the filter, suitable for display purposes.
+- `to_h`: Returns a hash representation of the filter, with filter keys and their corresponding values.
+- `to_h_with_all_values`: Similar to `to_h`, but includes all possible values for each filter key, even if not explicitly selected.
+
+#### Internal Logic
+The class uses associated `ChargeFilterValue` objects to define specific filtering criteria. It validates the filter properties based on the associated charge's model, ensuring consistency and correctness.
+
+## Side Effects
+- Creating or updating a `ChargeFilter` might trigger validations and updates on associated `Charge` and `ChargeFilterValue` objects.
+- The `touch: true` option in the `belongs_to :charge` association ensures that the associated `Charge` is touched (its `updated_at` attribute is updated) whenever the `ChargeFilter` is saved.
+
+## Dependencies
+- `ApplicationRecord`
+- `PaperTrailTraceable` (for auditing changes)
+- `Discard::Model` (for soft deletion)
+
+### Configuration
+This class doesn't define any specific configuration options.

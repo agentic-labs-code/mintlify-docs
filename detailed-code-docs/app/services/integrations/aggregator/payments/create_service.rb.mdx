@@ -1,0 +1,83 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines a service class `CreateService` within the `Integrations::Aggregator::Payments` module. Its primary purpose is to create a payment in an external aggregator system, handle the response, and create an `IntegrationResource` record if successful. It also includes error handling and asynchronous processing capabilities.
+
+## Code Structure
+The `CreateService` class inherits from `Integrations::Aggregator::Invoices::BaseService` and defines methods for creating payments, processing responses, and handling errors. It interacts with external systems through HTTP requests and manages the creation of `IntegrationResource` records.
+
+## References
+- `Integrations::Aggregator::Invoices::BaseService`
+- `Integrations::Aggregator::Payments::Payloads::Factory`
+- `Integrations::Aggregator::Payments::CreateJob`
+- `LagoHttpClient::HttpError`
+- `IntegrationResource`
+
+## Symbols
+
+### `CreateService`
+#### Description
+This class is responsible for creating payments in an external aggregator system. It handles the HTTP request, processes the response, and creates an `IntegrationResource` record if successful.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payment | Payment | The payment object to be created in the external system |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the operation result, including external_id and payment_id |
+
+#### Internal Logic
+1. Initializes with a payment object and calls the superclass initializer with the associated invoice.
+2. Defines the `action_path` for the HTTP request.
+3. In the `call` method:
+   - Checks if the integration exists and is configured to sync payments.
+   - Sends a POST request to the external system with the payment payload.
+   - Processes the response (either hash or string).
+   - Creates an `IntegrationResource` record if successful.
+   - Handles errors and delivers error webhooks if necessary.
+4. Provides an asynchronous `call_async` method that enqueues a background job.
+
+### `call`
+#### Description
+This method performs the main logic of creating a payment in the external system.
+
+#### Internal Logic
+1. Checks if the integration exists and is configured to sync payments.
+2. Verifies if the associated invoice is finalized.
+3. Sends a POST request to the external system.
+4. Processes the response based on its type (hash or string).
+5. Creates an `IntegrationResource` record if successful.
+6. Handles errors and delivers error webhooks if necessary.
+
+### `call_async`
+#### Description
+This method enqueues a background job to create the payment asynchronously.
+
+#### Internal Logic
+1. Checks if the payment exists.
+2. Enqueues a `CreateJob` with the payment.
+3. Sets the `payment_id` in the result object.
+
+## Side Effects
+- Creates an `IntegrationResource` record in the database.
+- Sends HTTP requests to external systems.
+- Delivers error webhooks in case of failures.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| LagoHttpClient | For making HTTP requests to external systems |
+| JSON | For parsing JSON responses |
+
+## Error Handling
+The service rescues `LagoHttpClient::HttpError` exceptions. It delivers error webhooks for all errors and re-raises the exception for server errors (status code &gt;= 500).
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| v1/#{provider}/payments | POST | Payment payload | JSON with payment details | Creates a payment in the external system |

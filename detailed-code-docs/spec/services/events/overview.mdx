@@ -1,0 +1,48 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various services related to event handling and processing in a billing system. The tests cover a range of functionalities including event creation, validation, post-processing, and data storage in both PostgreSQL and ClickHouse databases. The services tested are responsible for managing events throughout their lifecycle, from initial creation and validation to post-processing and storage.
+
+## What does it do?
+The code in this directory tests several key aspects of event handling:
+
+1. Event Creation: Tests the `Events::CreateService` and `Events::CreateBatchService` to ensure events are correctly created and stored, including handling of timestamps and integration with Kafka.
+
+2. Event Validation: The `Events::ValidateCreationService` tests cover various scenarios for validating event creation, including subscription handling, transaction ID uniqueness, and property validations for billable metrics.
+
+3. Post-Processing: Tests for `Events::PostProcessService` verify the behavior of post-processing events, including assigning customer external IDs, flagging lifetime usage for refresh, and handling pay-in-advance charges.
+
+4. Pay-in-Advance Handling: The `Events::PayInAdvanceService` tests cover scenarios related to processing pay-in-advance events, including creating fees, invoices, and handling different charge configurations.
+
+5. Data Storage and Querying: Tests for both PostgreSQL (`Events::Stores::PostgresStore`) and ClickHouse (`Events::Stores::ClickhouseStore`) implementations ensure correct storage, retrieval, and aggregation of event data.
+
+6. Post-Validation: The `Events::PostValidationService` tests verify the service's ability to validate events from the last hour, identify various types of errors, and send webhooks with error information.
+
+These tests ensure that the event handling system can accurately process, store, and analyze event data for billing purposes, handling various scenarios and edge cases that may occur in a real-world billing system.
+
+## Key Files
+1. `create_service_spec.rb` and `create_batch_service_spec.rb`: Test event creation functionality, including batch creation.
+2. `validate_creation_service_spec.rb`: Tests event validation logic.
+3. `post_process_service_spec.rb`: Verifies post-processing of events.
+4. `pay_in_advance_service_spec.rb`: Tests handling of pay-in-advance events.
+5. `post_validation_service_spec.rb`: Checks post-validation of events and error reporting.
+6. `stores/postgres_store_spec.rb` and `stores/clickhouse_store_spec.rb`: Test data storage and querying in PostgreSQL and ClickHouse respectively.
+7. `stores/clickhouse/` directory: Contains tests for specific query types in ClickHouse (count, latest, max, sum).
+
+## Dependencies
+The test files rely on several key dependencies:
+1. RSpec: The testing framework used throughout.
+2. FactoryBot: Used for creating test data and objects.
+3. Rails testing helpers: Utilized for setting up the testing environment.
+4. Kafka: Some tests involve Kafka integration for event streaming.
+5. ClickHouse: Used in ClickHouse-specific tests for event data storage and querying.
+
+## Configuration
+The tests use various configurations:
+1. Environment variables for Kafka configuration in some tests.
+2. Specific time ranges for querying events, typically using dates in 2024.
+3. ClickHouse-specific tests are marked with `clickhouse: true` metadata.
+
+The tests cover a wide range of scenarios, including basic event handling, complex aggregations, time-based queries, and error handling, ensuring robust functionality of the event processing system across different database technologies and use cases.

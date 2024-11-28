@@ -1,0 +1,94 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL mutations for managing integration mappings within an application. It includes operations for creating, updating, and destroying integration mappings, which are likely used to configure how different systems or services integrate with each other.
+
+## What does it do?
+The code in this directory provides a set of GraphQL mutations that allow users to perform CRUD (Create, Read, Update, Delete) operations on integration mappings. These mutations handle the following tasks:
+
+1. Creating new integration mappings: Users can submit data to create a new mapping between different systems or services.
+2. Updating existing integration mappings: Users can modify the properties of an existing mapping to adjust how systems integrate.
+3. Destroying integration mappings: Users can remove mappings that are no longer needed.
+
+Each of these operations ensures that the user is authenticated and has the necessary permissions within their organization before allowing the action to proceed. The actual business logic for these operations is delegated to separate service objects, keeping the GraphQL layer focused on input/output handling and authorization.
+
+## Entry points
+The main entry points for this directory are the three mutation classes:
+
+1. `Create` (create.rb): Handles the creation of new integration mappings.
+2. `Update` (update.rb): Manages updates to existing integration mappings.
+3. `Destroy` (destroy.rb): Processes the deletion of integration mappings.
+
+These classes define the structure of the GraphQL mutations, including their inputs and outputs. They also manage the flow of data between the GraphQL API and the underlying service objects that perform the actual operations.
+
+## Key Files
+1. `create.rb`:
+   - Defines the `Create` mutation for creating new integration mappings.
+   - Uses `Types::IntegrationMappings::CreateInput` for input validation.
+   - Returns a `Types::IntegrationMappings::Object` representing the created mapping.
+   - Delegates creation logic to `::IntegrationMappings::CreateService`.
+
+2. `update.rb`:
+   - Defines the `Update` mutation for modifying existing integration mappings.
+   - Uses `Types::IntegrationMappings::UpdateInput` for input validation.
+   - Returns a `Types::IntegrationMappings::Object` representing the updated mapping.
+   - Delegates update logic to `::IntegrationMappings::UpdateService`.
+
+3. `destroy.rb`:
+   - Defines the `Destroy` mutation for removing integration mappings.
+   - Takes an `id` input to identify the mapping to be deleted.
+   - Returns the `id` of the destroyed mapping if successful.
+   - Delegates deletion logic to `::IntegrationMappings::DestroyService`.
+
+## Dependencies
+All three mutation classes share common dependencies:
+
+1. `BaseMutation`: A base class that likely provides common functionality for all mutations in the system.
+2. `AuthenticableApiUser`: A module that ensures the user making the request is authenticated.
+3. `RequiredOrganization`: A module that checks if the user belongs to the required organization.
+
+Additionally, each mutation relies on specific service objects and type definitions:
+
+- `::IntegrationMappings::CreateService`
+- `::IntegrationMappings::UpdateService`
+- `::IntegrationMappings::DestroyService`
+- `Types::IntegrationMappings::CreateInput`
+- `Types::IntegrationMappings::UpdateInput`
+- `Types::IntegrationMappings::Object`
+
+These dependencies suggest a well-structured application with clear separation of concerns between the GraphQL layer and the business logic layer.
+
+## Configuration
+All three mutations share a common configuration:
+
+```ruby
+REQUIRED_PERMISSION = 'organization:integrations:update'
+```
+
+This configuration specifies the permission required for a user to perform any of these mutations. It ensures that only users with the appropriate access rights can modify integration mappings.
+
+Each mutation class also includes specific configurations:
+
+1. Create mutation:
+   ```ruby
+   argument :args, Types::IntegrationMappings::CreateInput, required: true
+   field :integration_mapping, Types::IntegrationMappings::Object, null: true
+   ```
+
+2. Update mutation:
+   ```ruby
+   argument :args, Types::IntegrationMappings::UpdateInput, required: true
+   field :result, Types::IntegrationMappings::Object, null: true
+   ```
+
+3. Destroy mutation:
+   ```ruby
+   argument :id, ID, required: true
+   field :id, ID, null: true
+   ```
+
+These configurations define the input arguments and return fields for each mutation, ensuring proper type checking and validation at the GraphQL layer.
+
+In summary, this directory contains a set of GraphQL mutations for managing integration mappings, with a focus on security, proper authorization, and separation of concerns between the GraphQL interface and the underlying business logic.

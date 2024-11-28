@@ -1,0 +1,70 @@
+---
+title: "downgrade_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test scenario for a subscription downgrade process. It simulates the creation, billing, and downgrade of a subscription over several months, verifying the correct behavior of the subscription system, including invoice generation and date calculations.
+
+## Code Structure
+The test is structured as a single `it` block within an RSpec `describe` block. It uses factory methods to create test data and the `travel_to` method to simulate time progression. The test creates a subscription, bills it for several months, then downgrades it to a different plan, checking the expected behavior at each step.
+
+## Symbols
+
+### `describe 'Subscription Downgrade Scenario'`
+#### Description
+This is the main test group that encapsulates the entire downgrade scenario test.
+
+### `it 'downgrades and bill subscriptions'`
+#### Description
+This is the main test case that simulates the subscription lifecycle, including creation, billing, and downgrade.
+
+#### Internal Logic
+1. Creates initial test data (organization, customer, plans)
+2. Creates a monthly subscription on July 19th
+3. Bills the subscription on August 19th, September 19th, and October 19th
+4. Downgrades the subscription to a yearly plan on November 9th
+5. Bills the subscription on November 19th, checking the termination of the old subscription and activation of the new one
+
+### `let` blocks
+#### Description
+These blocks define the test data used throughout the scenario, including the organization, customer, and subscription plans.
+
+### `travel_to` blocks
+#### Description
+These blocks simulate time progression in the test, allowing the test to check behavior at specific dates.
+
+### `create_subscription`
+#### Description
+This method (likely defined in a helper) creates a subscription with the given parameters.
+
+### `Subscriptions::BillingService.call`
+#### Description
+This service method is called to simulate the billing process for subscriptions.
+
+### `perform_all_enqueued_jobs`
+#### Description
+This method executes all enqueued background jobs, likely related to the billing process.
+
+## Dependencies
+The test relies on several Rails and RSpec features:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| FactoryBot | Creates test data |
+| ActiveSupport::Testing::TimeHelpers | Provides time manipulation methods like `travel_to` |
+
+## Configuration
+The test uses specific configuration options:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| :scenarios | Symbol | N/A | Tags the test as a scenario |
+| type: :request | Symbol | N/A | Specifies the test type as a request spec |
+| transaction: false | Boolean | false | Disables transactional tests |
+
+## Error Handling
+The test doesn't explicitly handle errors but relies on RSpec's assertion system to catch and report any unexpected behavior or failed expectations.
+
+## Logging
+The test doesn't implement explicit logging but uses RSpec's output to report test results and any failures.
+
+This comprehensive test scenario ensures that the subscription downgrade process works correctly, including proper invoice generation, date calculations, and subscription state changes. It covers a complex business logic scenario spanning several months of subscription activity.

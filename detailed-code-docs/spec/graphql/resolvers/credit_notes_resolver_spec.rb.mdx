@@ -1,0 +1,86 @@
+---
+title: "credit_notes_resolver_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Resolvers::CreditNotesResolver` GraphQL resolver. It tests various scenarios for querying credit notes, including permission checks, filtering by customer, and searching by terms.
+
+## Code Structure
+The test suite is organized into several contexts, each testing different aspects of the credit notes resolver. It uses shared examples for common checks and defines various let variables for setting up the test environment.
+
+## Symbols
+
+### RSpec.describe Resolvers::CreditNotesResolver
+#### Description
+This is the main describe block for the test suite, focusing on the `Resolvers::CreditNotesResolver` GraphQL resolver.
+
+#### Internal Logic
+The test suite sets up a common environment with a membership, organization, customer, subscription, and credit notes. It then tests various scenarios for querying credit notes using GraphQL.
+
+### let variables
+#### Description
+These variables set up the test environment and define the GraphQL query used in the tests.
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| required_permission | String | The permission required to view credit notes |
+| query | String | The GraphQL query used to fetch credit notes |
+| membership | Membership | A test membership object |
+| organization | Organization | The organization associated with the membership |
+| customer | Customer | A test customer object |
+| subscription | Subscription | A test subscription object |
+| credit_note | CreditNote | A test credit note object |
+| customer_id | String | The ID of the customer used in the query |
+| search_term | String | The search term used in the query |
+
+### Shared examples
+#### Description
+These shared examples test common scenarios across different contexts.
+
+| Name | Description |
+|:-----|:------------|
+| 'requires current user' | Ensures the query requires a current user |
+| 'requires current organization' | Ensures the query requires a current organization |
+| 'requires permission' | Ensures the query requires the 'credit_notes:view' permission |
+
+### Main test case
+#### Description
+Tests the basic functionality of the credit notes resolver.
+
+#### Internal Logic
+1. Executes the GraphQL query with the necessary permissions and context.
+2. Verifies that only finalized credit notes are returned.
+3. Checks the metadata for correct pagination information.
+
+### Context: with customer_id
+#### Description
+Tests the resolver's behavior when a specific customer ID is provided.
+
+#### Internal Logic
+1. Sets the customer_id variable to a specific customer's ID.
+2. Executes the GraphQL query and verifies that only credit notes for the specified customer are returned.
+
+### Context: with search_terms
+#### Description
+Tests the resolver's search functionality.
+
+#### Internal Logic
+1. Sets the search_term variable to "yolo".
+2. Creates a new credit note with a matching number.
+3. Executes the GraphQL query and verifies that only the matching credit note is returned.
+
+### Context: when customer does not exist
+#### Description
+Tests the resolver's behavior when an invalid customer ID is provided.
+
+#### Internal Logic
+1. Sets the customer_id variable to an unknown value.
+2. Executes the GraphQL query and verifies that an empty collection is returned.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides Rails-specific testing utilities |
+| RSpec | Testing framework used for writing and running the tests |
+
+This test file ensures that the `Resolvers::CreditNotesResolver` correctly handles various scenarios, including permission checks, customer filtering, and search functionality, providing confidence in the resolver's behavior across different use cases.

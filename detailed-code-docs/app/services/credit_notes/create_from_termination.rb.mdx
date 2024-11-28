@@ -1,0 +1,67 @@
+---
+title: "create_from_termination.rb"
+---
+
+## High-level description
+This code defines a service class `CreditNotes::CreateFromTermination` that creates a credit note when a subscription is terminated. It calculates the amount to be credited based on the remaining duration of the subscription and handles various edge cases such as prorated fees and existing credit notes.
+
+## Code Structure
+The main class `CreateFromTermination` inherits from `BaseService` and contains a single public method `call` that orchestrates the credit note creation process. It uses several private methods to perform calculations and handle specific scenarios.
+
+## Symbols
+
+### `CreditNotes::CreateFromTermination`
+#### Description
+This class is responsible for creating a credit note when a subscription is terminated. It calculates the appropriate amount to be credited based on the remaining subscription duration and handles various edge cases.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription | Subscription | The subscription being terminated |
+| reason | String | The reason for termination (default: 'order_change') |
+| upgrade | Boolean | Indicates if the termination is due to an upgrade (default: false) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the result of the operation |
+
+#### Internal Logic
+1. Check if a credit note is needed (non-zero amount and non-voided invoice).
+2. Compute the amount to be credited.
+3. Adjust the amount if it exceeds the last subscription fee amount.
+4. Deduct any existing credit notes from the amount.
+5. Create a new credit note using the `CreditNotes::CreateService`.
+
+### Private Methods
+- `last_subscription_fee`: Retrieves the most recent subscription fee.
+- `compute_amount`: Calculates the amount to be credited based on the day price and remaining duration.
+- `date_service`: Creates a new instance of `Subscriptions::DatesService`.
+- `plan_amount_cents`: Retrieves the plan amount in cents.
+- `to_date`: Determines the end date for the credit calculation.
+- `day_price`: Calculates the price per day.
+- `terminated_at_in_timezone`: Converts the termination date to the customer's timezone.
+- `remaining_duration`: Calculates the remaining duration of the subscription in days.
+- `creditable_amount_cents`: Applies taxes and adjustments to the credit amount.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Subscriptions::DatesService | Handles date calculations for subscriptions |
+| CreditNotes::ApplyTaxesService | Applies taxes to the credit note items |
+| CreditNotes::CreateService | Creates the actual credit note |
+
+## Error Handling
+The service uses the `result` object to handle and propagate errors. It checks for various conditions (e.g., zero amount, voided invoice) and returns early if these conditions are met.
+
+## Performance Considerations
+The service performs several database queries and calculations. Care should be taken to optimize these operations for large-scale use, especially the retrieval of subscription fees and the calculation of remaining duration.
+
+## TODOs
+There are no explicit TODOs in the code, but the following note suggests a potential area for improvement:
+```ruby
+# NOTE: In some cases, if the fee was already prorated (in case of multiple upgrade) the amount
+#       could be greater than the last subscription fee amount.
+#       In that case, we have to use the last subscription fee amount
+```
+This edge case handling might benefit from further refinement or documentation.

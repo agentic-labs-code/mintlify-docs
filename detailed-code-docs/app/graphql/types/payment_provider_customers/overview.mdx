@@ -1,0 +1,56 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions related to payment provider customers. It includes three main components: a `Provider` object type, a `ProviderInput` input type, and a `ProviderPaymentMethodsEnum` enum type. These types are used to structure and validate data for payment provider customers in a GraphQL API, specifically focusing on Stripe integration.
+
+## What does it do?
+This code defines the structure for querying and inputting data related to payment provider customers in a GraphQL API. It allows developers to:
+
+1. Query payment provider customer information, including their ID, provider-specific customer ID, available payment methods, and synchronization status.
+2. Input payment provider customer data when creating or updating customer records.
+3. Specify and validate payment methods supported by the provider (Stripe in this case).
+
+The types defined here are likely used in various parts of the application to handle customer-related operations that involve payment providers, ensuring consistent data structure and validation across the GraphQL schema.
+
+## Key Files
+
+1. `provider.rb`:
+   - Defines the `Provider` GraphQL object type.
+   - Represents a customer's payment provider information.
+   - Includes fields for ID, provider customer ID, available payment methods, and sync status.
+
+2. `provider_input.rb`:
+   - Defines the `ProviderInput` GraphQL input object type.
+   - Used for structuring input data when creating or updating payment provider customer information.
+   - Includes optional fields for provider customer ID, payment methods, and sync status.
+
+3. `provider_payment_methods_enum.rb`:
+   - Defines the `ProviderPaymentMethodsEnum` GraphQL enum type.
+   - Represents the available payment methods for Stripe customers.
+   - Dynamically generates enum values based on the `PAYMENT_METHODS` constant from the `StripeCustomer` class.
+
+## Dependencies
+The code in this directory relies on the following dependencies:
+
+1. GraphQL: The core library for defining GraphQL types and schemas.
+2. Internal base classes:
+   - `Types::BaseObject`: Base class for GraphQL object types.
+   - `BaseInputObject`: Base class for GraphQL input object types.
+   - `Types::BaseEnum`: Base class for GraphQL enum types.
+
+3. `PaymentProviderCustomers::StripeCustomer`: A class that defines the `PAYMENT_METHODS` constant used to generate the enum values for `ProviderPaymentMethodsEnum`.
+
+## Configuration
+While there are no explicit configuration files in this directory, the payment methods supported by the system are defined in the `PaymentProviderCustomers::StripeCustomer::PAYMENT_METHODS` constant:
+
+```ruby
+PAYMENT_METHODS = %w[card sepa_debit us_bank_account bacs_debit link].freeze
+```
+
+This configuration determines the available payment methods in the `ProviderPaymentMethodsEnum` and influences the validation of payment methods throughout the system.
+
+The `ProviderPaymentMethodsEnum` is dynamically generated based on this constant, allowing for easy updates to supported payment methods by modifying the `PAYMENT_METHODS` constant in the `StripeCustomer` class.
+
+In summary, this directory provides the GraphQL type definitions necessary for handling payment provider customer data in a flexible and type-safe manner, with a focus on Stripe integration. The types defined here are likely used across various parts of the application to ensure consistent handling of payment provider-related operations within the GraphQL API.

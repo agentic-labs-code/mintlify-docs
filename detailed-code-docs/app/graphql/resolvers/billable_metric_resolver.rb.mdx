@@ -1,0 +1,54 @@
+---
+title: "billable_metric_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying a single billable metric of an organization. It ensures that the user is authenticated and has the necessary permissions to access the billable metric data.
+
+## Code Structure
+The `BillableMetricResolver` class is defined within the `Resolvers` module and inherits from `Resolvers::BaseResolver`. It includes two modules: `AuthenticableApiUser` and `RequiredOrganization`, which provide authentication and organization-related functionality.
+
+## References
+- `Types::BillableMetrics::Object`: The GraphQL type returned by this resolver.
+- `current_organization`: A method provided by the `RequiredOrganization` module to access the current organization.
+
+## Symbols
+
+### `BillableMetricResolver`
+#### Description
+This resolver is responsible for fetching a single billable metric based on its ID for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | Unique ID of the billable metric |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| billable_metric | Types::BillableMetrics::Object | The requested billable metric object |
+
+#### Internal Logic
+1. The resolver attempts to find the billable metric with the given ID within the current organization's billable metrics.
+2. If the record is found, it is returned.
+3. If the record is not found, a `not_found_error` is raised with the resource name 'billable_metric'.
+
+## Side Effects
+This resolver does not have any side effects as it only performs a read operation.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user has access to the current organization |
+
+## Error Handling
+- If the billable metric is not found, a `not_found_error` is raised.
+- The included modules (`AuthenticableApiUser` and `RequiredOrganization`) may raise unauthorized or forbidden errors if the user doesn't have the necessary permissions.
+
+## API/Interface Reference
+| Argument | Type | Required | Description |
+|:---------|:-----|:---------|:------------|
+| id | ID | Yes | Unique ID of the billable metric |
+
+This resolver is part of the GraphQL API and is used in the `QueryType` to provide access to individual billable metrics.

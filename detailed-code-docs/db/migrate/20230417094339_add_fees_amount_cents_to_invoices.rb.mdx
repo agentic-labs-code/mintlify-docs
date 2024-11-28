@@ -1,0 +1,34 @@
+---
+title: "20230417094339_add_fees_amount_cents_to_invoices.rb"
+---
+
+## High-level description
+This migration adds a new column `fees_amount_cents` to the `invoices` table and populates it with the sum of associated fees' amounts. It's designed to improve performance by storing the total fees amount directly on the invoice record.
+
+## Symbols
+
+### `AddFeesAmountCentsToInvoices`
+#### Description
+This class is an ActiveRecord migration that adds a new column to the `invoices` table and populates it with data from the `fees` table.
+
+#### Internal Logic
+1. Adds a new `bigint` column named `fees_amount_cents` to the `invoices` table.
+2. Uses a `safety_assured` block to bypass Strong Migrations checks.
+3. Implements a reversible migration with an `up` direction.
+4. Executes a SQL statement to:
+   - Calculate the sum of `amount_cents` for each invoice from the `fees` table.
+   - Update the `fees_amount_cents` column in the `invoices` table with the calculated sums.
+
+## Side Effects
+- Modifies the `invoices` table schema by adding a new column.
+- Updates existing records in the `invoices` table with calculated fee totals.
+
+## Performance Considerations
+- The migration uses a single SQL statement to calculate and update the `fees_amount_cents`, which is more efficient than updating each invoice individually.
+- The use of `bigint` for `fees_amount_cents` allows for storing large monetary values without overflow.
+
+## Error Handling
+The migration uses `safety_assured` to bypass Strong Migrations checks. This should be used cautiously, ensuring that the migration is safe to run on large tables.
+
+## TODOs
+None explicitly mentioned in the code.

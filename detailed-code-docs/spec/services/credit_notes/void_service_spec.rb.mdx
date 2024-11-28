@@ -1,0 +1,78 @@
+---
+title: "void_service_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `CreditNotes::VoidService` class. It tests the functionality of voiding credit notes, including successful voiding and various failure scenarios.
+
+## Symbols
+
+### `RSpec.describe CreditNotes::VoidService, type: :service`
+#### Description
+This is the main describe block for the `CreditNotes::VoidService` test suite. It sets up the context for all the tests related to this service.
+
+### `subject(:void_service)`
+#### Description
+Defines the subject of the test, which is an instance of `CreditNotes::VoidService` initialized with a credit note.
+
+### `let(:credit_note)`
+#### Description
+Creates a factory-generated credit note for use in the tests.
+
+### `describe '#call'`
+#### Description
+Groups tests for the `#call` method of the `VoidService`.
+
+#### Internal Logic
+The tests in this block cover different scenarios:
+1. Successful voiding of a credit note
+2. Failure when the credit note is nil
+3. Failure when the credit note is in draft status
+4. Failure when the credit note is not voidable
+
+### `it 'voids the credit_note'`
+#### Description
+Tests the successful voiding of a credit note.
+
+#### Internal Logic
+1. Calls the `void_service.call` method
+2. Checks that the result is successful
+3. Verifies that the credit note is voided, has a voided_at timestamp, and its balance is zero
+
+### `context 'when credit note is nil'`
+#### Description
+Tests the behavior when trying to void a nil credit note.
+
+#### Internal Logic
+1. Sets the credit note to nil
+2. Calls the `void_service.call` method
+3. Checks that the result is not successful
+4. Verifies that the error is a `BaseService::NotFoundFailure` with the correct resource
+
+### `context 'when credit note is draft'`
+#### Description
+Tests the behavior when trying to void a draft credit note.
+
+#### Internal Logic
+1. Creates a draft credit note
+2. Calls the `void_service.call` method
+3. Checks that the result is not successful
+4. Verifies that the error is a `BaseService::NotFoundFailure` with the correct resource
+
+### `context 'when the credit note is not voidable'`
+#### Description
+Tests the behavior when trying to void a credit note that is already voided.
+
+#### Internal Logic
+1. Creates a voided credit note
+2. Calls the `void_service.call` method
+3. Checks that the result is not successful
+4. Verifies that the error is a `BaseService::MethodNotAllowedFailure` with the correct error code
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Used for creating test data (credit notes) |
+
+Note: The `rails_helper` file is included in the related code snippets and sets up the testing environment, including RSpec configuration, database cleaner, and various helper modules.

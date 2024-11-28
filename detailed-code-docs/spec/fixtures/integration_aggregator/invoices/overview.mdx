@@ -1,0 +1,90 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains JSON fixtures used for testing the integration aggregator functionality, specifically focusing on invoice processing. The fixtures represent different scenarios and response structures for invoice operations, including both successful and failed cases.
+
+## What does it do?
+These fixtures simulate the responses that might be received from an invoice processing system. They are used to test how the integration aggregator handles various scenarios, such as:
+
+1. Successfully processed invoices
+2. Failed invoice processing with validation errors
+3. Simple string responses (possibly for testing basic connectivity or specific edge cases)
+
+These fixtures allow developers to test the integration aggregator's ability to parse and handle different types of responses without needing to interact with a live system. This is crucial for ensuring the reliability and robustness of the integration aggregator when dealing with various invoice processing outcomes.
+
+## Key Files
+
+1. `failure_hash_response.json`:
+   This file simulates a response where invoice processing has failed. It contains:
+   - An empty `succeededInvoices` array
+   - A `failedInvoices` array with detailed information about a failed invoice, including:
+     - Invoice details (id, type, dates, currency, etc.)
+     - Associated fees
+     - Validation errors explaining why the processing failed
+
+2. `success_hash_response.json`:
+   This file represents a successful invoice processing scenario. It includes:
+   - A `succeededInvoices` array with detailed information about a successfully processed invoice
+   - An empty `failedInvoices` array
+
+3. `success_string_response.json`:
+   This file contains a simple string value "456", which might be used to test basic response handling or specific edge cases in the integration aggregator.
+
+## Configuration
+These fixtures do not require any configuration. They are static JSON files used to simulate different response scenarios for testing purposes.
+
+## Dependencies
+As these are static JSON files, they do not have any external dependencies. However, the integration aggregator that uses these fixtures likely depends on a JSON parsing library to process the data.
+
+## Additional Notes
+
+1. Data Structure:
+   The successful and failed response fixtures use a consistent structure for representing invoices:
+   ```json
+   {
+     "succeededInvoices": [...],
+     "failedInvoices": [...]
+   }
+   ```
+   This structure allows the integration aggregator to handle both successful and failed invoices in a single response.
+
+2. Invoice Details:
+   Each invoice object contains comprehensive information, including:
+   - Unique identifier
+   - Type (e.g., "ACCREC" for accounts receivable)
+   - Associated contact
+   - Status
+   - Dates (issuing and payment due)
+   - Currency
+   - Fees (line items)
+
+3. Fee Structure:
+   Fees are represented as an array of objects, each containing:
+   - Description
+   - Quantity (units)
+   - Unit price
+   - Account code
+   - Total amount (in cents)
+   - Tax amount (in cents)
+
+4. Error Handling:
+   The `failure_hash_response.json` demonstrates how validation errors are communicated:
+   ```json
+   "validation_errors": [
+     {
+       "Message": "Error message details..."
+     },
+     ...
+   ]
+   ```
+   This structure allows for multiple error messages to be associated with a single failed invoice.
+
+5. Currency Representation:
+   Monetary values are consistently represented in cents throughout the fixtures. For example, 15000 cents equals $150.00. This approach helps avoid floating-point precision issues when dealing with currency values.
+
+6. Date Format:
+   Dates are represented in ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ), ensuring consistency and ease of parsing.
+
+These fixtures provide a comprehensive set of test cases for the integration aggregator, covering successful processing, failure scenarios, and potentially edge cases or basic connectivity tests. They allow developers to ensure that the aggregator can correctly parse and handle various response structures and data formats related to invoice processing.

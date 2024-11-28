@@ -1,0 +1,101 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines a service class `WalletTransactions::CreateService` that handles the creation of wallet transactions for an organization. It processes paid credits, granted credits, and voided credits, creating corresponding wallet transactions and updating the wallet balance accordingly.
+
+## Code Structure
+The `CreateService` class inherits from `BaseService` and contains a main `call` method that orchestrates the creation of wallet transactions. It utilizes helper methods to handle different types of transactions (paid, granted, and voided credits) and interacts with other services like `WalletTransactions::VoidService` and `Wallets::Balance::IncreaseService`.
+
+## Symbols
+
+### WalletTransactions::CreateService
+#### Description
+This service class is responsible for creating wallet transactions based on the provided parameters. It handles paid credits, granted credits, and voided credits, creating the appropriate transactions and updating the wallet balance.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization associated with the wallet transactions |
+| params | Hash | Parameters containing wallet transaction details |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the created wallet transactions and operation status |
+
+#### Internal Logic
+1. Validates the input parameters
+2. Processes paid credits (if any)
+3. Processes granted credits (if any)
+4. Processes voided credits (if any)
+5. Creates wallet transactions for each type of credit
+6. Enqueues webhook jobs for created transactions
+7. Returns the result with created wallet transactions
+
+### handle_paid_credits (private)
+#### Description
+Handles the creation of a wallet transaction for paid credits.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet | Wallet | The wallet to create the transaction for |
+| paid_credits | String | The amount of paid credits |
+| invoice_requires_successful_payment | Boolean | Whether the invoice requires successful payment |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet_transaction | WalletTransaction | The created wallet transaction for paid credits |
+
+### handle_granted_credits (private)
+#### Description
+Handles the creation of a wallet transaction for granted credits and updates the wallet balance.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet | Wallet | The wallet to create the transaction for |
+| granted_credits | String | The amount of granted credits |
+| invoice_requires_successful_payment | Boolean | Whether the invoice requires successful payment |
+| reset_consumed_credits | Boolean | Whether to reset consumed credits |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet_transaction | WalletTransaction | The created wallet transaction for granted credits |
+
+### valid? (private)
+#### Description
+Validates the input parameters using the `WalletTransactions::ValidateService`.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid | Boolean | Whether the input parameters are valid |
+
+## Side Effects
+- Creates `WalletTransaction` records in the database
+- Updates the wallet balance
+- Enqueues `BillPaidCreditJob` for paid credits
+- Enqueues `SendWebhookJob` for each created wallet transaction
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| WalletTransactions::VoidService | Handles voiding credits |
+| Wallets::Balance::IncreaseService | Updates the wallet balance for granted credits |
+| WalletTransactions::ValidateService | Validates input parameters |
+| BillPaidCreditJob | Processes billing for paid credits |
+| SendWebhookJob | Sends webhooks for created wallet transactions |
+
+## Error Handling
+The service uses the `valid?` method to validate input parameters. If validation fails, the service returns the result without creating any transactions.
+
+## Logging
+This service does not implement any specific logging mechanisms.
+
+## TODOs
+There are no explicit TODOs in the code.

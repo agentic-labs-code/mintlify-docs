@@ -1,0 +1,56 @@
+---
+title: "refresh_wallets_ongoing_balance_job.rb"
+---
+
+## High-level description
+This code defines a job class `RefreshWalletsOngoingBalanceJob` within the `Clock` module. Its primary purpose is to refresh the ongoing balance of active wallets in a premium license environment. The job is designed to run periodically and enqueue individual balance refresh jobs for each active wallet.
+
+## Code Structure
+The `RefreshWalletsOngoingBalanceJob` class inherits from `ApplicationJob` and includes the `SentryCronConcern` module. It defines a single `perform` method that iterates through active wallets and enqueues individual refresh jobs.
+
+## References
+- `License` class (not provided in the snippets)
+- `Wallet` model
+- `Wallets::RefreshOngoingBalanceJob` class
+
+## Symbols
+
+### `Clock::RefreshWalletsOngoingBalanceJob`
+#### Description
+This job class is responsible for refreshing the ongoing balance of all active wallets. It checks if the license is premium before proceeding and then enqueues individual refresh jobs for each active wallet.
+
+#### Inputs
+This job doesn't take any explicit inputs.
+
+#### Outputs
+This job doesn't return any explicit outputs. Its main effect is enqueuing individual refresh jobs for active wallets.
+
+#### Internal Logic
+1. Check if the license is premium using `License.premium?`.
+2. If premium, iterate through all active wallets using `Wallet.active.find_each`.
+3. For each active wallet, enqueue a `Wallets::RefreshOngoingBalanceJob` with the wallet as an argument.
+
+## Side Effects
+- Enqueues `Wallets::RefreshOngoingBalanceJob` for each active wallet.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| SentryCronConcern | Provides Sentry monitoring functionality for cron jobs |
+
+## Configuration
+The job is configured with the following settings:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| queue_as | Symbol | 'clock' | Specifies the queue for this job |
+| unique | Symbol | :until_executed | Ensures job uniqueness until executed |
+| on_conflict | Symbol | :log | Specifies conflict resolution strategy |
+
+## Error Handling
+This job doesn't implement any specific error handling beyond what's provided by the `ApplicationJob` class and the `SentryCronConcern` module.
+
+## Logging
+Logging is likely handled by the `SentryCronConcern` module, which sets up Sentry monitoring for cron jobs when enabled.
+
+## TODOs
+There are no explicit TODOs in the provided code.

@@ -1,0 +1,58 @@
+---
+title: "fetch_invoices_service.rb"
+---
+
+## High-level description
+This code defines a service class `FetchInvoicesService` within the `Commitments::Minimum::InArrears` module. It is responsible for fetching invoices related to a subscription, specifically for subscriptions that are billed in arrears. The service handles different scenarios based on the subscription's plan type and billing frequency.
+
+## Code Structure
+The `FetchInvoicesService` class inherits from `Commitments::FetchInvoicesService` and overrides two private methods: `dates_service` and `fetch_invoices`. These methods work together to determine the relevant date range and fetch the appropriate invoices.
+
+## Symbols
+
+### `FetchInvoicesService`
+#### Description
+This class is responsible for fetching invoices for subscriptions billed in arrears. It handles special cases for yearly plans with monthly charge billing.
+
+#### Internal Logic
+The class overrides two private methods:
+
+1. `dates_service`: This method creates and returns a `DatesService` instance. If the subscription is terminated, it uses a `TerminatedDatesService` to handle the date calculations.
+
+2. `fetch_invoices`: This method retrieves the relevant invoices based on the subscription's plan type and billing frequency. For yearly plans with monthly charge billing, it fetches invoices within a specific date range.
+
+### `dates_service`
+#### Description
+This private method creates and returns a `DatesService` instance, with special handling for terminated subscriptions.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ds | Subscriptions::DatesService | An instance of DatesService for date calculations |
+
+#### Internal Logic
+1. Creates a new `DatesService` instance using the subscription and invoice timestamp.
+2. If the subscription is terminated, it wraps the `DatesService` instance in a `TerminatedDatesService` to handle terminated subscription date calculations.
+
+### `fetch_invoices`
+#### Description
+This private method retrieves the relevant invoices based on the subscription's plan type and billing frequency.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoices | ActiveRecord::Relation | A relation of Invoice records |
+
+#### Internal Logic
+1. For non-yearly plans or yearly plans without monthly charge billing, it returns the invoice associated with the current invoice subscription.
+2. For yearly plans with monthly charge billing, it fetches invoices within a specific date range determined by the `dates_service`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Subscriptions::DatesService | Used for date calculations related to subscriptions |
+| Subscriptions::TerminatedDatesService | Handles date calculations for terminated subscriptions |
+| Invoice | ActiveRecord model for invoices |
+
+## Performance Considerations
+The `fetch_invoices` method uses database queries to retrieve invoices. For yearly plans with monthly charge billing, it performs a subquery to get invoice IDs before fetching the actual invoices, which can be more efficient than fetching all invoice data upfront.

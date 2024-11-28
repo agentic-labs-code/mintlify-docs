@@ -1,0 +1,93 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for two job classes related to event processing: `Events::PayInAdvanceJob` and `Events::PostProcessJob`. These tests are designed to verify the correct behavior of these background jobs, ensuring they interact properly with their respective service classes.
+
+## What does it do?
+The tests in this directory verify the functionality of two important background jobs in an event management system:
+
+1. Pay In Advance Job: This job is responsible for processing payments in advance for events. The test ensures that when the job is performed, it correctly calls the `Events::PayInAdvanceService` with the appropriate event data.
+
+2. Post Process Job: This job handles post-processing tasks for events. The test verifies that when this job runs, it properly instantiates and calls the `Events::PostProcessService` with the correct event information.
+
+These tests help maintain the integrity of the event processing system by confirming that the background jobs correctly delegate their tasks to the appropriate service classes, which likely contain the core business logic for these operations.
+
+## Key Files
+1. `pay_in_advance_job_spec.rb`:
+   - Tests the `Events::PayInAdvanceJob` class.
+   - Verifies that the job calls `Events::PayInAdvanceService.call` with the correct event parameter.
+   - Uses RSpec's mocking capabilities to isolate the job's behavior and verify its interactions.
+
+2. `post_process_job_spec.rb`:
+   - Tests the `Events::PostProcessJob` class.
+   - Ensures that the job creates an instance of `Events::PostProcessService` with the correct event and calls its `call` method.
+   - Also uses mocking to focus on the job's responsibilities without testing the service itself.
+
+## Dependencies
+Both test files rely on the following dependencies:
+
+1. RSpec: The testing framework used to structure and run the tests.
+   - Version: Not specified, but likely the latest stable version compatible with the project's Ruby version.
+   - Chosen for its expressive syntax and powerful mocking capabilities.
+
+2. FactoryBot: A library for setting up Ruby objects as test data.
+   - Version: Not specified, but likely the latest stable version compatible with the project's Ruby and RSpec versions.
+   - Chosen for its ability to create test objects easily and consistently.
+
+3. Rails: While not directly visible in the provided code, these tests are part of a Rails application.
+   - Version: Not specified, but inferred from the use of `rails_helper`.
+   - Chosen as the web application framework for the project.
+
+## Configuration
+The tests use the following configuration:
+
+1. `rails_helper`: This file is required at the beginning of each test file. It likely sets up the Rails testing environment, including loading RSpec configurations and any custom helpers or settings for the test suite.
+
+2. RSpec configuration:
+   - The tests use the `type: :job` metadata, which may trigger specific configurations or behaviors for job tests in the RSpec setup.
+
+3. FactoryBot:
+   - The tests use FactoryBot's `build` method, suggesting that FactoryBot is configured to work with RSpec in this project.
+   - There is a `:common_event` factory defined somewhere in the project, used to create test event objects.
+
+Here's an example of how these tests are structured:
+
+```ruby
+# spec/jobs/events/pay_in_advance_job_spec.rb
+require 'rails_helper'
+
+RSpec.describe Events::PayInAdvanceJob, type: :job do
+  let(:pay_in_advance_service) { class_double(Events::PayInAdvanceService) }
+  let(:result) { instance_double(BaseService::Result) }
+  let(:event) { build(:common_event) }
+
+  it 'calls the event pay in advance service' do
+    expect(Events::PayInAdvanceService).to receive(:call).with(event).and_return(result)
+    described_class.perform_now(event)
+  end
+end
+
+# spec/jobs/events/post_process_job_spec.rb
+require 'rails_helper'
+
+RSpec.describe Events::PostProcessJob, type: :job do
+  let(:process_service) { instance_double(Events::PostProcessService) }
+  let(:result) { instance_double(BaseService::Result) }
+  let(:event) { build(:common_event) }
+
+  it 'calls the event post process service' do
+    expect(Events::PostProcessService).to receive(:new).with(event:).and_return(process_service)
+    expect(process_service).to receive(:call).and_return(result)
+    described_class.perform_now(event:)
+  end
+end
+```
+
+These tests demonstrate good practices in testing background jobs:
+1. They focus on the job's responsibilities without testing the internals of the services they call.
+2. They use mocking to isolate the job's behavior and verify its interactions with other parts of the system.
+3. They use FactoryBot to create test data, promoting consistency and ease of maintenance.
+
+By maintaining these tests, the development team can refactor or modify the job classes with confidence, knowing that any changes that break the expected behavior will be caught by the test suite.

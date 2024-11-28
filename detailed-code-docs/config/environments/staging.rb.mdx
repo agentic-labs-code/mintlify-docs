@@ -1,0 +1,57 @@
+---
+title: "staging.rb"
+---
+
+## High-level description
+This file configures the Rails application for the staging environment. It sets up various Rails configurations, including middleware, caching, logging, active storage, and email settings. The configuration is tailored for a staging environment, which typically mimics the production environment but may include additional debugging or testing features.
+
+## Symbols
+
+### Rails.application.configure
+#### Description
+This method configures the Rails application for the staging environment. It sets up various settings and behaviors specific to the staging environment.
+
+#### Internal Logic
+1. Sets up middleware for GraphiQL, including cookies and session management.
+2. Configures caching, eager loading, and request handling.
+3. Sets up Active Storage service based on environment variables.
+4. Configures logging level and format.
+5. Sets up action mailer and internationalization.
+6. Configures database schema dumping.
+7. Sets up host matching for staging environment.
+8. Configures caching store (Memcached or Redis) based on environment variables.
+9. Sets up SMTP for email delivery if configured.
+10. Configures OpenTelemetry if enabled.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| active_support/core_ext/integer/time | Extends Integer class with time-related methods |
+| ActionDispatch::Cookies | Middleware for handling cookies |
+| ActionDispatch::Session::CookieStore | Middleware for session management using cookies |
+| Rack::MethodOverride | Middleware for HTTP method overriding |
+| ActiveSupport::Logger | Logging functionality |
+| OpenTelemetry::SDK | Telemetry and observability (if enabled) |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| RAILS_SERVE_STATIC_FILES | Environment Variable | - | Enables serving of static files |
+| LAGO_USE_AWS_S3 | Environment Variable | - | Enables AWS S3 for file storage |
+| LAGO_AWS_S3_ENDPOINT | Environment Variable | - | Custom S3 endpoint for compatible services |
+| LAGO_LOG_LEVEL | Environment Variable | :info | Sets the log level |
+| RAILS_LOG_TO_STDOUT | Environment Variable | - | Enables logging to STDOUT |
+| LAGO_MEMCACHE_SERVERS | Environment Variable | - | Configures Memcached servers |
+| LAGO_REDIS_CACHE_URL | Environment Variable | - | Configures Redis cache URL |
+| LAGO_SMTP_ADDRESS | Environment Variable | - | SMTP server address for email delivery |
+| LAGO_SMTP_PORT | Environment Variable | - | SMTP server port for email delivery |
+| OTEL_EXPORTER | Environment Variable | - | Enables OpenTelemetry configuration |
+
+## Error Handling
+The configuration includes error handling for the Redis cache store, which logs errors and reports them to Sentry.
+
+## Logging
+Logging is configured with a custom formatter and can be directed to STDOUT if the `RAILS_LOG_TO_STDOUT` environment variable is set.
+
+## TODOs
+There are no explicit TODOs in the code.

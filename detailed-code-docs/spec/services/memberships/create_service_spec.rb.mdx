@@ -1,0 +1,72 @@
+---
+title: "create_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Memberships::CreateService` class. It tests the functionality of creating memberships between users and organizations, including various edge cases and error scenarios.
+
+## Code Structure
+The test suite is organized around the `#call` method of the `Memberships::CreateService` class. It includes a main test case for successful membership creation and several context-specific test cases for different error scenarios.
+
+## Symbols
+
+### `Memberships::CreateService`
+#### Description
+This is the main service class being tested. It is responsible for creating memberships between users and organizations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| user | User | The user to be added to the organization |
+| organization | Organization | The organization to which the user will be added |
+
+#### Outputs
+The service returns a result object with the following properties:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| success | Boolean | Indicates whether the operation was successful |
+| membership | Membership | The created membership (if successful) |
+| error | Object | Error information (if unsuccessful) |
+
+### `#call`
+#### Description
+This is the main method of the `Memberships::CreateService` class that creates the membership.
+
+#### Internal Logic
+1. Validates the presence of user and organization
+2. Checks if the user already has a membership in the organization
+3. Creates a new membership if all conditions are met
+
+## Test Cases
+
+### Successful Membership Creation
+Tests that a membership is created successfully when valid user and organization are provided.
+
+### User Does Not Exist
+Tests the error case when the user is nil.
+
+### Organization Does Not Exist
+Tests the error case when the organization is nil.
+
+### User Already Has Membership
+Tests the error case when the user already has a membership in the organization.
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides the testing environment and configurations |
+| FactoryBot | Used for creating test data (users, organizations, memberships) |
+
+## Error Handling
+The service returns error results in the following cases:
+1. When the user is not found
+2. When the organization is not found
+3. When the user already has a membership in the organization
+
+These errors are tested in the corresponding test cases.
+
+## Notes
+- The tests use `aggregate_failures` to group multiple expectations together, allowing all expectations to be evaluated even if one fails.
+- The tests make use of FactoryBot to create test data, which is a common practice in Rails testing.
+- The service seems to be designed to return a result object with success/failure status and associated data or errors, which is a good practice for service objects.

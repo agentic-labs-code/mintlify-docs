@@ -1,0 +1,100 @@
+---
+title: "estimate_pay_in_advance_service.rb"
+---
+
+## High-level description
+The `EstimatePayInAdvanceService` is a service class within the `Fees` module that estimates pay-in-advance fees for a given organization and set of parameters. It validates the event creation, checks for applicable charges, and calculates the estimated fees without persisting them in the database.
+
+## Code Structure
+The main class `EstimatePayInAdvanceService` inherits from `BaseService`. It initializes with an organization and parameters, then uses various other services and models to perform its tasks. The core logic is in the `call` method, which orchestrates the estimation process.
+
+## References
+- `Events::ValidateCreationService`
+- `Fees::CreatePayInAdvanceService`
+- `Event` model
+- `Customer` model
+- `Subscription` model
+- `Charge` model
+- `BillableMetric` model
+
+## Symbols
+
+### `EstimatePayInAdvanceService`
+#### Description
+This service estimates pay-in-advance fees for a given event without actually creating the event or fees in the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization for which to estimate fees |
+| params | Hash | Parameters for the event, including code and properties |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Contains success status and estimated fees |
+
+#### Internal Logic
+1. Validates the event creation using `Events::ValidateCreationService`
+2. Checks if there are any applicable charges
+3. Creates a temporary event record
+4. Estimates fees for each applicable charge using `Fees::CreatePayInAdvanceService`
+5. Removes the temporary event ID from the estimated fees
+6. Returns the estimated fees in the result
+
+### `initialize`
+#### Description
+Initializes the service with the given organization and parameters, adding a temporary transaction ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization for which to estimate fees |
+| params | Hash | Parameters for the event |
+
+### `call`
+#### Description
+The main method that orchestrates the fee estimation process.
+
+#### Internal Logic
+1. Validates the event creation
+2. Checks for applicable charges
+3. Creates a temporary event and estimates fees within a transaction
+4. Removes the temporary event ID from the estimated fees
+5. Returns the result with estimated fees
+
+### `event`
+#### Description
+Creates a new temporary `Event` instance with the given parameters.
+
+### `customer`
+#### Description
+Finds the customer based on the provided external subscription ID or external customer ID.
+
+### `subscriptions`
+#### Description
+Retrieves active subscriptions for the customer or based on the external subscription ID.
+
+### `charges`
+#### Description
+Finds pay-in-advance charges associated with the subscription's plan and matching the event code.
+
+### `estimated_charge_fees`
+#### Description
+Estimates fees for a given charge using the `Fees::CreatePayInAdvanceService`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Charge | The charge to estimate fees for |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fees | Array&lt;Fee&gt; | Estimated fees for the charge |
+
+## Error Handling
+The service uses a `result` object to handle errors and success states. It catches `BaseService::FailedResult` exceptions and updates the result accordingly.
+
+## Performance Considerations
+The service uses a database transaction to create a temporary event and estimate fees, ensuring that no permanent changes are made to the database during the estimation process.

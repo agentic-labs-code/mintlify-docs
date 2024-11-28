@@ -1,0 +1,97 @@
+---
+title: "apply_taxes_service_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Charges::ApplyTaxesService` class. It tests the functionality of applying taxes to charges, including various scenarios such as successful application, error handling, and edge cases.
+
+## Code Structure
+The test suite is organized around the `describe` block for the `Charges::ApplyTaxesService` class. It uses `let` statements to set up test data and contains multiple `it` blocks to test different aspects of the service's behavior.
+
+## Symbols
+
+### `RSpec.describe Charges::ApplyTaxesService`
+#### Description
+This is the main describe block for the `Charges::ApplyTaxesService` test suite.
+
+### `subject(:apply_service)`
+#### Description
+Defines the subject of the test, which is an instance of `Charges::ApplyTaxesService`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Charge | The charge object to apply taxes to |
+| tax_codes | Array | An array of tax codes to be applied |
+
+### `describe 'call'`
+#### Description
+This describe block focuses on testing the `call` method of the `ApplyTaxesService`.
+
+### `it 'applies taxes to the charge'`
+#### Description
+Tests that calling the service increases the number of applied taxes on the charge.
+
+#### Internal Logic
+1. Expects the count of `applied_taxes` to change from 0 to 2 after calling the service.
+
+### `it 'unassigns existing taxes'`
+#### Description
+Verifies that existing applied taxes are removed when new taxes are applied.
+
+#### Internal Logic
+1. Creates an existing applied tax.
+2. Calls the service.
+3. Checks that the previously existing applied tax is no longer present.
+
+### `it 'returns applied taxes'`
+#### Description
+Ensures that the service returns the applied taxes after execution.
+
+#### Internal Logic
+1. Calls the service.
+2. Checks that the result contains 2 applied taxes.
+
+### `context 'when charge is not found'`
+#### Description
+Tests the error handling when the charge is nil.
+
+#### Internal Logic
+1. Sets the charge to nil.
+2. Calls the service.
+3. Checks that the result is not successful and has the correct error code.
+
+### `context 'when tax is not found'`
+#### Description
+Tests the error handling when an unknown tax code is provided.
+
+#### Internal Logic
+1. Sets the tax_codes to an unknown value.
+2. Calls the service.
+3. Checks that the result is not successful and has the correct error code.
+
+### `context 'when applied tax is already present'`
+#### Description
+Tests the behavior when one of the taxes is already applied to the charge.
+
+#### Internal Logic
+1. Creates an existing applied tax.
+2. Calls the service.
+3. Checks that only one new applied tax is added.
+
+### `context 'when trying to apply twice the same tax'`
+#### Description
+Tests that the same tax is not applied multiple times.
+
+#### Internal Logic
+1. Sets the tax_codes to contain the same tax code twice.
+2. Calls the service.
+3. Checks that only one applied tax is created.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Used for creating test data |
+
+Note: The `rails_helper` file is included in the related code snippets and sets up the testing environment, including SimpleCov for code coverage, database cleaner, and various RSpec configurations.

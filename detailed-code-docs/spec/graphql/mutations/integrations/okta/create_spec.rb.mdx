@@ -1,0 +1,114 @@
+---
+title: "create_spec.rb"
+---
+
+## High-level description
+This code defines a RSpec test suite for the `Mutations::Integrations::Okta::Create` GraphQL mutation. It verifies the behavior of creating an Okta integration, including permission checks and the correct handling of input parameters.
+
+## Code Structure
+The test suite is organized as a single RSpec describe block, containing several shared examples and a main test case. It uses helper methods and shared contexts from the Rails testing environment.
+
+## References
+- `rails_helper`: This file is required at the beginning, which sets up the testing environment.
+- `Mutations::Integrations::Okta::Create`: The GraphQL mutation being tested.
+- Various shared examples: `'requires current user'`, `'requires current organization'`, `'requires permission'`.
+
+## Symbols
+
+### RSpec.describe Mutations::Integrations::Okta::Create
+#### Description
+This is the main describe block that groups all the tests for the Okta integration creation mutation.
+
+#### Internal Logic
+1. Sets up necessary test data and configurations.
+2. Includes shared examples for common checks.
+3. Defines a test case for creating an Okta integration.
+
+### let(:required_permission)
+#### Description
+Defines the permission required to create an Okta integration.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| required_permission | String | The permission string 'organization:integrations:create' |
+
+### let(:membership)
+#### Description
+Creates a test membership using FactoryBot.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| membership | Membership | A test membership object |
+
+### let(:mutation)
+#### Description
+Defines the GraphQL mutation string for creating an Okta integration.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| mutation | String | The GraphQL mutation string |
+
+### around { |test| lago_premium!(&test) }
+#### Description
+Ensures that the test runs in a premium context.
+
+### before
+#### Description
+Sets up the test environment by updating the organization's premium integrations.
+
+### it_behaves_like 'requires current user'
+#### Description
+Includes a shared example to test if the mutation requires a current user.
+
+### it_behaves_like 'requires current organization'
+#### Description
+Includes a shared example to test if the mutation requires a current organization.
+
+### it_behaves_like 'requires permission', 'organization:integrations:create'
+#### Description
+Includes a shared example to test if the mutation requires the specified permission.
+
+### it 'creates an okta integration'
+#### Description
+The main test case that verifies the creation of an Okta integration.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with test data.
+2. Verifies the response contains the expected Okta integration details.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Sets up the Rails testing environment |
+| FactoryBot | Used for creating test data |
+| GraphQL | The query language used for the mutation |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| premium_integrations | Array | ['okta'] | Configures the organization for premium Okta integration |
+
+## Error Handling
+The test implicitly checks for error handling by expecting successful execution of the mutation. Specific error cases are not explicitly tested in this file.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| createOktaIntegration | Mutation | CreateOktaIntegrationInput | OktaIntegration | Creates a new Okta integration |
+
+The `CreateOktaIntegrationInput` includes:
+- clientId: String
+- clientSecret: String
+- domain: String
+- organizationName: String
+
+The response includes:
+- id: ID
+- name: String
+- code: String
+- clientId: String
+- clientSecret: String
+- domain: String

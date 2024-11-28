@@ -1,0 +1,70 @@
+---
+title: "development.rb"
+---
+
+## High-level description
+This file configures the Rails application for the development environment. It sets up various settings, including middleware, caching, logging, and email delivery, to facilitate development and debugging.
+
+## Code Structure
+The file uses the `Rails.application.configure` block to define environment-specific configurations. It also includes conditional logic for certain settings based on environment variables and file existence.
+
+## Symbols
+
+### `Rails.application.configure`
+#### Description
+This method configures the Rails application for the development environment. It sets various options and behaviors specific to development, such as enabling debugging tools, configuring caching, and setting up logging.
+
+#### Internal Logic
+1. Configures Bullet gem for N+1 query detection
+2. Sets up middleware for cookies, sessions, and method override
+3. Configures reloading, eager loading, and local request handling
+4. Sets up caching using Redis
+5. Configures public file server headers
+6. Sets up Active Storage service based on environment variables
+7. Configures deprecation warnings and logging
+8. Sets up database query logging
+9. Configures logger output
+10. Sets allowed hosts for the application
+11. Configures action mailer for email delivery in development
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| active_support/core_ext/integer/time | Extends Integer class with time-related methods |
+| Bullet | N+1 query detection |
+| Redis | Caching store |
+| AWS S3 | File storage (optional) |
+| Dotenv | Loading environment variables |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| enable_reloading | boolean | true | Enables code reloading |
+| eager_load | boolean | false | Disables eager loading of application code |
+| consider_all_requests_local | boolean | true | Considers all requests as local for detailed error reporting |
+| server_timing | boolean | true | Enables server timing information |
+| cache_store | symbol | :redis_cache_store | Sets the cache store to Redis |
+| active_storage.service | symbol | :local/:amazon/:amazon_compatible_endpoint | Configures Active Storage service based on environment variables |
+| hosts | array | ['api.lago.dev', 'api', 'lago.ngrok.dev'] | Allowed hosts for the application |
+| license_url | string | 'http://license:3000' | URL for license service |
+
+## Error Handling
+The configuration sets `config.active_support.disallowed_deprecation = :raise` to raise an error for disallowed deprecations, helping developers catch and address deprecated code usage.
+
+## Logging
+Logging is configured to output to STDOUT with a custom formatter. The `config.active_record.verbose_query_logs = true` setting enables verbose query logs for development debugging.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| N/A | N/A | N/A | N/A | This file configures the application and does not define API endpoints |
+
+## Side Effects
+- Enables Bullet gem for N+1 query detection
+- Sets up Redis for caching
+- Configures Active Storage for file handling
+- Sets up email delivery using SMTP (configured for MailHog in development)
+
+## Performance Considerations
+- Disables eager loading (`config.eager_load = false`) to improve startup time in development
+- Uses Redis for caching, which can improve performance for frequently accessed data

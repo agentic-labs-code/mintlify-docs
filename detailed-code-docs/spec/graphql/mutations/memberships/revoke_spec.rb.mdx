@@ -1,0 +1,70 @@
+---
+title: "revoke_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Mutations::Memberships::Revoke` GraphQL mutation. It verifies the behavior of revoking a membership, including permission checks, error handling for self-revocation, and preventing the revocation of the last admin in an organization.
+
+## Code Structure
+The test suite is organized into several test cases that cover different scenarios for the `revokeMembership` mutation. It uses shared examples for common checks and creates test data using FactoryBot.
+
+## Symbols
+
+### `RSpec.describe Mutations::Memberships::Revoke, type: :graphql`
+#### Description
+This is the main describe block for the test suite, focusing on the `Mutations::Memberships::Revoke` GraphQL mutation.
+
+### `let` blocks
+#### Description
+These blocks define common variables used across multiple tests:
+- `required_permission`: The permission required to perform the mutation
+- `membership`: A factory-created membership object
+- `organization`: The organization associated with the membership
+- `mutation`: The GraphQL mutation string for revoking a membership
+
+### `it_behaves_like` blocks
+#### Description
+These blocks include shared examples for common test scenarios:
+- 'requires current user': Ensures the mutation requires a current user
+- 'requires permission': Checks if the mutation requires the specified permission
+
+### `it 'Revokes a membership'`
+#### Description
+This test case verifies that a membership can be successfully revoked.
+
+#### Internal Logic
+1. Creates a user and an admin membership
+2. Executes the GraphQL mutation
+3. Checks if the returned data matches the expected revoked membership
+
+### `it 'Cannot Revoke my own membership'`
+#### Description
+This test case ensures that a user cannot revoke their own membership.
+
+#### Internal Logic
+1. Attempts to revoke the membership of the current user
+2. Verifies that an appropriate error is returned
+
+### `it 'cannot revoke membership if it\'s the last admin of the organization'`
+#### Description
+This test case checks that the last admin of an organization cannot have their membership revoked.
+
+#### Internal Logic
+1. Creates a non-admin user in the organization
+2. Attempts to revoke the admin's membership
+3. Verifies that an appropriate error is returned
+
+## Dependencies
+The test suite relies on the following dependencies:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides Rails-specific test configurations |
+| FactoryBot | Used for creating test data |
+| GraphQL | The query language being tested |
+
+## Error Handling
+The test suite checks for specific error messages and codes in certain scenarios:
+- When attempting to revoke one's own membership
+- When trying to revoke the last admin's membership
+
+These errors are expected to have specific messages, error codes, and HTTP status codes.

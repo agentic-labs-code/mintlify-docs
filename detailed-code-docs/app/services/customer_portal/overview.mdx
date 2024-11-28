@@ -1,0 +1,59 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines a service class `GenerateUrlService` within the `CustomerPortal` module. Its primary purpose is to generate a secure, time-limited URL for customer portal access, ensuring that only authorized premium customers can access their portal.
+
+## Code Structure
+The `GenerateUrlService` class inherits from `BaseService` and contains a single public method `call` that performs the main functionality. It uses a private attribute reader for the customer object.
+
+## References
+This service is used by the `CustomersController` in the API and the `GenerateUrl` GraphQL mutation.
+
+## Symbols
+
+### `CustomerPortal::GenerateUrlService`
+#### Description
+This service generates a secure URL for customer portal access. It checks for premium license and customer existence, then creates a time-limited, encrypted token to be used in the URL.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Customer | The customer object for whom the portal URL is being generated |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the generated URL or failure information |
+
+#### Internal Logic
+1. Check if the license is premium; if not, return a forbidden failure.
+2. Verify if the customer exists; if not, return a not found failure.
+3. Create a `MessageVerifier` using the `SECRET_KEY_BASE` environment variable.
+4. Generate an encrypted message containing the customer ID, set to expire in 12 hours.
+5. Construct the final URL using the `LAGO_FRONT_URL` environment variable and the encrypted message.
+6. Set the generated URL in the result object and return it.
+
+## Side Effects
+This service does not have any side effects as it doesn't modify any external state or resources.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveSupport::MessageVerifier | Used for generating secure, encrypted messages |
+
+## Configuration
+The service relies on two environment variables:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| SECRET_KEY_BASE | String | N/A | Used as the secret key for message encryption |
+| LAGO_FRONT_URL | String | N/A | The base URL for the customer portal frontend |
+
+## Error Handling
+The service uses the `result` object to handle and communicate errors:
+1. `forbidden_failure!` is called if the license is not premium.
+2. `not_found_failure!` is called if the customer is not found.
+
+## Performance Considerations
+The service uses `ActiveSupport::MessageVerifier` for encryption, which is generally efficient. However, for high-volume scenarios, caching of generated URLs might be considered to reduce computational overhead.

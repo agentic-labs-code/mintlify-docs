@@ -1,0 +1,71 @@
+---
+title: "update_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Mutations::Integrations::Netsuite::Update` GraphQL mutation. It verifies the functionality of updating a Netsuite integration, including permission checks and data validation.
+
+## Code Structure
+The test suite is organized as a single RSpec describe block, containing several test cases and shared examples. It sets up necessary test data, defines the GraphQL mutation, and includes various test scenarios.
+
+## References
+This code references the following:
+- `Mutations::Integrations::Netsuite::Update` (the GraphQL mutation being tested)
+- Various RSpec shared examples (e.g., 'requires current user', 'requires current organization', 'requires permission')
+- FactoryBot factories (e.g., `:netsuite_integration`, `:membership`)
+
+## Symbols
+
+### `RSpec.describe Mutations::Integrations::Netsuite::Update, type: :graphql`
+#### Description
+This is the main describe block for the test suite, focusing on the Netsuite integration update mutation.
+
+#### Internal Logic
+- Sets up test data using let statements
+- Defines the GraphQL mutation
+- Includes shared examples for common checks
+- Contains a specific test case for updating a Netsuite integration
+
+### `around { |test| lago_premium!(&test) }`
+#### Description
+This hook ensures that the tests are run in the context of a premium Lago account.
+
+### `before` block
+#### Description
+Sets up the test environment by creating an integration and updating the organization's premium integrations.
+
+### `it 'updates a netsuite integration'`
+#### Description
+This test case verifies that the mutation correctly updates a Netsuite integration.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with specific input
+2. Checks the result data for expected values (name, code, and scriptEndpointUrl)
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails and RSpec configuration |
+| FactoryBot | Creates test data |
+| Faker | Generates fake data for testing |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| type: :graphql | Symbol | N/A | Specifies the test type as GraphQL |
+
+## Error Handling
+The test implicitly checks for errors by expecting the mutation to succeed and return the updated data.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| updateNetsuiteIntegration | Mutation | UpdateNetsuiteIntegrationInput | Updated integration data | Updates a Netsuite integration |
+
+The mutation input includes:
+- id: ID of the integration to update
+- name: New name for the integration
+- code: New code for the integration
+- scriptEndpointUrl: New script endpoint URL
+
+The response includes various fields of the updated integration (id, code, name, clientId, clientSecret, syncSalesOrders, syncInvoices, syncCreditNotes, syncPayments, scriptEndpointUrl).

@@ -1,0 +1,49 @@
+---
+title: "20230926144126_fill_event_external_ids.rb"
+---
+
+## High-level description
+This migration file, `FillEventExternalIds`, is designed to update the `events` table by filling in the `external_customer_id` and `external_subscription_id` columns with data from related `customers` and `subscriptions` tables. It specifically targets events where these external IDs are currently null.
+
+## Code Structure
+The migration consists of a single `change` method that contains a reversible block with an `up` direction. The main functionality is implemented using a SQL query within the `execute` method.
+
+## Symbols
+
+### `FillEventExternalIds`
+#### Description
+This is a Rails migration class that inherits from `ActiveRecord::Migration[7.0]`. It disables DDL transactions and defines a change method to update the `events` table.
+
+#### Internal Logic
+1. The migration is marked as reversible, but only the `up` direction is defined.
+2. It uses `safety_assured` to bypass Strong Migrations checks.
+3. Executes a SQL query that:
+   a. Creates a CTE (Common Table Expression) named `events_external_ids` to select relevant data.
+   b. Updates the `events` table using the data from the CTE.
+
+### `change`
+#### Description
+This method defines the migration's behavior. It contains a reversible block with an `up` direction that executes the SQL query.
+
+#### Internal Logic
+1. Uses `reversible` to allow potential rollback (although no `down` direction is explicitly defined).
+2. In the `up` direction:
+   - Uses `safety_assured` to bypass Strong Migrations checks.
+   - Executes a SQL query using `execute`.
+
+## Side Effects
+This migration will update the `events` table, filling in `external_customer_id` and `external_subscription_id` for rows where these fields are currently null.
+
+## Performance Considerations
+The migration uses a single SQL query with a CTE, which can be more efficient than updating rows individually. However, for large datasets, this operation could potentially be time-consuming.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+
+## Error Handling
+The migration does not implement explicit error handling. It relies on the default behavior of Rails migrations and the database system.
+
+## TODOs
+There are no explicit TODOs in this migration file.

@@ -1,0 +1,60 @@
+---
+title: "prorated_graduated_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Charges::ChargeModels::ProratedGraduatedService` class. It tests various scenarios of applying prorated graduated charges, including different ranges, overflows, and negative events.
+
+## Code Structure
+The main test suite is defined using `RSpec.describe` for the `Charges::ChargeModels::ProratedGraduatedService`. It contains multiple contexts and examples to test different scenarios of the service's `apply` method.
+
+## Symbols
+
+### `described_class.apply`
+#### Description
+This is the main method being tested. It applies the prorated graduated charge model to the given charge and aggregation result.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Object | The charge object containing properties and configuration |
+| aggregation_result | BaseService::Result | The result of the aggregation process |
+| properties | Hash | The properties of the charge |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the calculated amount, unit_amount, and amount_details |
+
+#### Internal Logic
+The method calculates the charge amount based on the prorated graduated model, taking into account the aggregation result and charge properties.
+
+## Test Cases
+
+### Main test case
+Tests the basic functionality of the service with a simple graduated charge model.
+
+### Context: "with event that cannot be fully placed into the range"
+Tests the scenario where an event's value spans across multiple ranges.
+
+### Context: "with final number of units equals to zero"
+Tests the scenario where the final number of units is zero, but there are still prorated events.
+
+### Context: "with negative event that results in changing range"
+Tests scenarios with negative events that cause changes in the applied ranges.
+
+### Context: "with three ranges and one overflow"
+Tests a more complex scenario with multiple ranges and an overflow event.
+
+### Context: "when only one range is used"
+Tests the scenario where all events fall within a single range.
+
+## Side Effects
+The tests do not have any side effects as they are isolated unit tests.
+
+## Dependencies
+- Rails testing framework (RSpec)
+- FactoryBot for creating test objects
+- Various model and service classes (e.g., `BillableMetrics::ProratedAggregations::SumService`, `Events::Stores::PostgresStore`)
+
+The tests heavily rely on setting up complex scenarios using let blocks and before hooks to create the necessary objects and mock certain behaviors.

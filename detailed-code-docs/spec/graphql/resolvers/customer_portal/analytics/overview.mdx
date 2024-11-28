@@ -1,0 +1,63 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL resolvers related to analytics in the customer portal. The resolvers being tested are part of the `Resolvers::CustomerPortal::Analytics` namespace and focus on invoice collections and overdue balances.
+
+## What does it do?
+These test files ensure that the GraphQL resolvers for the customer portal's analytics features are working correctly. They verify that:
+
+1. The invoice collections resolver returns the correct data structure with accurate information about invoice collections, including month, amount, invoice count, and currency.
+2. The overdue balances resolver provides the expected list of overdue balances, including details such as month, amount, invoice IDs, and currency.
+
+Both test files simulate real-world scenarios by creating test data (organizations, memberships, customers, and invoices) and executing GraphQL queries against the resolvers. They then verify that the returned data matches the expected output.
+
+## Key Files
+
+1. `invoice_collections_resolver_spec.rb`:
+   This file tests the `InvoiceCollectionsResolver`. It verifies that the resolver correctly aggregates invoice data into collections, grouped by month. The test creates sample invoices and checks if the resolver returns the expected structure and values.
+
+2. `overdue_balances_resolver_spec.rb`:
+   This file tests the `OverdueBalancesResolver`. It ensures that the resolver accurately identifies and returns overdue balances. The test creates a mix of regular and overdue invoices, then verifies that only the overdue ones are included in the result.
+
+Both files follow a similar structure:
+- They define a GraphQL query to be used in the test.
+- They set up test data using FactoryBot, including organizations, memberships, and customers.
+- They include a shared example for customer portal user authentication.
+- They contain a main test case that creates invoices and verifies the resolver's output.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used to write and run the tests.
+2. FactoryBot: Used to create test data (organizations, memberships, customers, and invoices).
+3. GraphQL: The query language and runtime used to define and execute the test queries.
+4. Rails: The tests are part of a Rails application, as evidenced by the use of `rails_helper`.
+
+## Configuration
+While there are no explicit configuration files in this directory, the tests rely on the broader Rails and RSpec configuration. Key points include:
+
+1. Time manipulation: Both tests set a specific date (February 10, 2024) to ensure consistent results when dealing with time-sensitive data.
+2. Factory configurations: The tests use FactoryBot factories, which should be defined elsewhere in the project.
+3. Shared examples: Both tests reference a shared example "requires a customer portal user", which should be defined in a separate file.
+
+Here's an example of how the time is set in the tests:
+
+```ruby
+travel_to(Time.zone.local(2024, 2, 10))
+```
+
+This ensures that all time-based calculations within the test use this fixed point in time, making the tests more predictable and easier to reason about.
+
+The tests also make use of let statements to define reusable test data:
+
+```ruby
+let(:organization) { create(:organization, created_at: Time.zone.local(2023, 1, 1)) }
+let(:membership) { create(:membership, organization:) }
+let(:customer) { create(:customer, organization:, currency: 'USD') }
+```
+
+These statements use FactoryBot to create test instances of organizations, memberships, and customers, which are then used throughout the tests.
+
+In summary, these test files play a crucial role in ensuring the reliability and accuracy of the customer portal's analytics features, specifically for invoice collections and overdue balances. They provide a safety net for future changes and help maintain the integrity of the GraphQL API.

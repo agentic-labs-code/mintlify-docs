@@ -1,0 +1,51 @@
+---
+title: "destroy.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for destroying an integration mapping. It's part of a larger GraphQL API and handles the deletion of integration mappings while ensuring proper authentication and authorization.
+
+## Code Structure
+The `Destroy` class is nested within the `Mutations::IntegrationMappings` module. It inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. The class defines the GraphQL mutation structure and implements the `resolve` method to handle the actual deletion process.
+
+## References
+- `::IntegrationMappings::BaseMapping`
+- `::IntegrationMappings::DestroyService`
+
+## Symbols
+
+### `Mutations::IntegrationMappings::Destroy`
+#### Description
+This class defines a GraphQL mutation for destroying an integration mapping. It ensures that the user is authenticated and has the required permissions before proceeding with the deletion.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the integration mapping to be destroyed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the destroyed integration mapping (if successful) |
+
+#### Internal Logic
+1. Finds the integration mapping based on the provided ID and the current organization.
+2. Calls the `IntegrationMappings::DestroyService` to perform the actual deletion.
+3. Returns the destroyed integration mapping if successful, or an error if the operation fails.
+
+## Side Effects
+- Deletes an integration mapping from the database if the operation is successful.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures that the user is authenticated |
+| RequiredOrganization | Ensures that the user belongs to the required organization |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'organization:integrations:update' | The permission required to perform this mutation |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class) to handle and return errors from the `DestroyService`.

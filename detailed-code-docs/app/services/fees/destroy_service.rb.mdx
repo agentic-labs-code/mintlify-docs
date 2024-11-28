@@ -1,0 +1,75 @@
+---
+title: "destroy_service.rb"
+---
+
+## High-level description
+This code defines a `DestroyService` class within the `Fees` module, responsible for handling the deletion of fee records. It checks for the existence of the fee and ensures it's not already invoiced before performing the deletion operation.
+
+## Code Structure
+The `DestroyService` class inherits from `BaseService` and contains an `initialize` method and a `call` method. The `call` method performs the main logic of the service.
+
+## Symbols
+
+### `Fees::DestroyService`
+#### Description
+This class is responsible for safely deleting a fee record. It performs necessary checks before deletion and handles the actual deletion process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fee | Fee | The fee object to be deleted |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the operation result and the deleted fee |
+
+#### Internal Logic
+1. Check if the fee exists. If not, return a not found failure.
+2. Check if the fee is already invoiced. If so, return a not allowed failure.
+3. If both checks pass, discard (soft delete) the fee.
+4. Set the fee in the result object and return the result.
+
+## Side Effects
+The code has a side effect of discarding (soft deleting) the fee record in the database.
+
+___
+
+### `initialize`
+#### Description
+Initializes the service with the fee to be deleted.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fee | Fee | The fee object to be deleted |
+
+___
+
+### `call`
+#### Description
+Executes the fee deletion process with necessary checks.
+
+#### Internal Logic
+1. Check if the fee exists using `unless fee`.
+2. Check if the fee is already invoiced using `if fee.invoice_id`.
+3. If both checks pass, call `fee.discard!` to soft delete the fee.
+4. Set the fee in the result object using `result.fee = fee`.
+5. Return the result object.
+
+## Error Handling
+The service handles two main error cases:
+1. When the fee is not found, it returns a not found failure.
+2. When the fee is already invoiced, it returns a not allowed failure.
+
+## References
+This service is used in the `destroy` action of the `Api::V1::FeesController`, as seen in the related code snippet.
+
+## Dependencies
+This class depends on:
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseService | Parent class providing common functionality |
+| Fee | The model representing fees in the system |
+
+Note: The exact implementation of `BaseService` and `Fee` is not provided in the given code snippets.

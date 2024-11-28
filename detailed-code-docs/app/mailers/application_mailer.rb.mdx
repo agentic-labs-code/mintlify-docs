@@ -1,0 +1,55 @@
+---
+title: "application_mailer.rb"
+---
+
+## High-level description
+The `ApplicationMailer` class serves as the base mailer for the application, inheriting from `ActionMailer::Base`. It sets up common configurations and behaviors for all mailers in the application, including layout, delivery job, and shared variables.
+
+## Code Structure
+The `ApplicationMailer` class is the parent class for other mailers in the application. It defines a common layout, sets a custom delivery job, and establishes a before_action to set shared variables used across all mailers.
+
+## References
+- `SendEmailJob`: Referenced as the delivery job for all mailers.
+- `layout 'mailer'`: Refers to a layout template for emails.
+
+## Symbols
+
+### `ApplicationMailer`
+#### Description
+This class is the base mailer for the application, inheriting from `ActionMailer::Base`. It sets up common configurations for all mailers.
+
+#### Internal Logic
+1. Sets the layout to 'mailer' for all emails.
+2. Configures `SendEmailJob` as the delivery job for all mailers.
+3. Defines a `before_action` to set shared variables for all mailers.
+
+### `set_shared_variables`
+#### Description
+This method sets shared variables that will be available in all mailer views.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @lago_logo_url | String | URL of the Lago logo image for use in emails |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActionMailer::Base | Base class for all mailers in Rails |
+| SendEmailJob | Custom job for email delivery |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| layout | String | 'mailer' | Specifies the layout template for all emails |
+| delivery_job | Class | SendEmailJob | Sets the job class used for email delivery |
+
+## Related Information
+From the related code snippets, we can infer:
+
+1. Other mailers (e.g., `PasswordResetMailer`, `CreditNoteMailer`) inherit from `ApplicationMailer`.
+2. The `SendEmailJob` used for email delivery is a custom job that inherits from `ActionMailer::MailDeliveryJob` and includes retry logic for various errors.
+3. Child mailers can define their own actions and add additional before_actions as needed.
+4. The shared `@lago_logo_url` variable set in `set_shared_variables` is likely used in email templates to display the Lago logo consistently across all emails.
+
+This structure allows for consistent email styling, shared functionality, and centralized configuration across all mailers in the application.

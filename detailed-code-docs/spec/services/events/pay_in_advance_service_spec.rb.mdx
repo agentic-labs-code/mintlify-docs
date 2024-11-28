@@ -1,0 +1,60 @@
+---
+title: "pay_in_advance_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Events::PayInAdvanceService` class. It tests various scenarios related to processing pay-in-advance events, including creating fees, invoices, and handling different charge configurations.
+
+## Code Structure
+The test suite is organized around the `#call` method of the `Events::PayInAdvanceService` class. It uses various let statements to set up the test environment and includes multiple contexts to test different scenarios.
+
+## Symbols
+
+### `Events::PayInAdvanceService`
+#### Description
+This is the main service class being tested. It handles the processing of pay-in-advance events for subscriptions and charges.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | Event | The event to be processed |
+
+#### Internal Logic
+The service enqueues jobs to create fees or invoices based on the event and charge configuration. It handles different scenarios such as invoiceable charges, multiple charges, and negative values for sum aggregation.
+
+### `#call`
+#### Description
+This is the main method being tested in the service. It processes the pay-in-advance event and enqueues appropriate jobs.
+
+#### Internal Logic
+1. Checks if the charge is invoiceable
+2. Enqueues `Fees::CreatePayInAdvanceJob` or `Invoices::CreatePayInAdvanceChargeJob` based on the charge configuration
+3. Handles multiple charges for the same billable metric
+4. Processes events with negative values
+5. Checks for existing fees with the same transaction ID
+6. Handles events coming from Kafka
+
+## Test Cases
+1. Enqueuing jobs for non-invoiceable charges
+2. Not enqueuing jobs for invoiceable charges
+3. Handling multiple charges with the same billable metric
+4. Processing invoiceable charges and creating invoices
+5. Handling negative values for sum aggregation
+6. Checking for existing fees with the same transaction ID
+7. Processing events from Kafka
+8. Handling organizations using Clickhouse for aggregation
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides testing environment setup |
+| FactoryBot | Used for creating test data |
+
+## Error Handling
+The tests implicitly check for error handling by expecting certain jobs to be enqueued or not enqueued based on different scenarios.
+
+## Notes
+- The tests make extensive use of RSpec's `let` statements to set up the test environment.
+- The test suite uses FactoryBot to create test data.
+- The tests focus on the behavior of the `#call` method in various scenarios, including different charge configurations and event properties.
+- The test suite includes cases for both standard database storage and Clickhouse aggregation.

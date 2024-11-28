@@ -1,0 +1,68 @@
+---
+title: "20230202163249_add_organization_id_to_invoices.rb"
+---
+
+## High-level description
+This migration adds an `organization_id` column to the `invoices` table, establishes a foreign key relationship with the `organizations` table, and populates the new column with data from the associated `customers` table. It ensures that each invoice is linked to an organization.
+
+## Symbols
+
+### `AddOrganizationIdToInvoices`
+#### Description
+This class is a Rails migration that adds and populates an `organization_id` column in the `invoices` table. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0.
+
+#### Internal Logic
+1. Adds a new `organization_id` column to the `invoices` table.
+2. Populates the new column with data from the `customers` table.
+3. Makes the `organization_id` column non-nullable.
+
+The migration uses `safety_assured` to bypass Strong Migrations checks, indicating that the developer has manually verified the safety of this migration.
+
+### `change`
+#### Description
+This method defines the changes to be applied to the database schema. It encapsulates all the migration operations.
+
+#### Internal Logic
+1. Adds a reference column `organization_id` to the `invoices` table.
+2. Executes a SQL update to populate the new column.
+3. Changes the `organization_id` column to disallow null values.
+
+### `add_reference`
+#### Description
+Adds a new column `organization_id` to the `invoices` table, setting up a foreign key relationship with the `organizations` table.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| :invoices | Symbol | The table to add the reference to |
+| :organization | Symbol | The referenced table |
+| type: :uuid | Symbol | Specifies the column type as UUID |
+| foreign_key: true | Boolean | Creates a foreign key constraint |
+| index: true | Boolean | Creates an index on the new column |
+| null: true | Boolean | Initially allows null values |
+
+### `reversible`
+#### Description
+Defines operations that can be reversed when rolling back the migration. In this case, it's used to populate the new `organization_id` column.
+
+#### Internal Logic
+The `up` direction executes a SQL statement to update the `organization_id` in the `invoices` table based on the `organization_id` of the associated customer.
+
+### `change_column_null`
+#### Description
+Changes the `organization_id` column in the `invoices` table to disallow null values after populating it.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| :invoices | Symbol | The table to modify |
+| :organization_id | Symbol | The column to modify |
+| false | Boolean | Sets the column to not allow null values |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+
+## Performance Considerations
+The SQL update operation might be slow on large tables. Consider running this migration during off-peak hours if the `invoices` table is expected to be large.

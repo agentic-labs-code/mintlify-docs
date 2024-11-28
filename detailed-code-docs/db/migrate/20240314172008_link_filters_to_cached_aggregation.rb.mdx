@@ -1,0 +1,59 @@
+---
+title: "20240314172008_link_filters_to_cached_aggregation.rb"
+---
+
+## High-level description
+This migration file, `LinkFiltersToCachedAggregation`, is designed to associate cached aggregations, fees, and adjusted fees with charge filters. It updates existing records in the database to establish these associations, creating new charge filters when necessary.
+
+## Code Structure
+The migration defines several ActiveRecord models within its scope, which are used to interact with the database. The main functionality is implemented in the `up` method, which processes cached aggregations, fees, and adjusted fees. The `link_charge_filter` method is a helper function that performs the actual linking of objects to charge filters.
+
+## Symbols
+
+### `LinkFiltersToCachedAggregation`
+#### Description
+This is the main migration class that inherits from `ActiveRecord::Migration[7.0]`. It disables DDL transactions for better performance during the migration.
+
+#### Internal Logic
+1. Defines several ActiveRecord models within its scope.
+2. Implements the `up` method to process and update records.
+3. Provides a `link_charge_filter` helper method to associate objects with charge filters.
+
+### `up`
+#### Description
+This method performs the main migration logic, updating cached aggregations, fees, and adjusted fees to associate them with charge filters.
+
+#### Internal Logic
+1. Processes cached aggregations where a group is associated but no charge filter is set.
+2. Processes fees where a group is associated but no charge filter is set.
+3. Processes adjusted fees where a group is associated but no charge filter is set.
+4. For each record, it calls the `link_charge_filter` method to establish the association.
+
+### `link_charge_filter`
+#### Description
+This private method associates an object (cached aggregation, fee, or adjusted fee) with a charge filter, creating a new filter if necessary.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object | ActiveRecord::Base | The object to be linked to a charge filter |
+
+#### Internal Logic
+1. Creates a hash representation of the object's group and parent group (if exists).
+2. Searches for an active charge filter that matches the object's properties.
+3. If no active filter is found, searches for a deleted filter that matches.
+4. If no filter is found, creates a new charge filter with associated values.
+5. Updates the object with the charge filter ID.
+
+## Side Effects
+This migration modifies existing records in the database, updating `charge_filter_id` for cached aggregations, fees, and adjusted fees. It may also create new `ChargeFilter` records if necessary.
+
+## Performance Considerations
+The migration uses `find_each` to process records in batches, which is more memory-efficient for large datasets. It also disables DDL transactions, which can improve performance for large-scale migrations.
+
+## Dependencies
+This migration relies on several ActiveRecord models, including `CachedAggregation`, `Fee`, `AdjustedFee`, `ChargeFilter`, `ChargeFilterValue`, and `BillableMetricFilter`.
+
+## TODOs
+- The `down` method is empty, suggesting that this migration is not reversible. Consider implementing a reversal process if needed.
+- There are several `rubocop:disable` comments, indicating potential style violations that might need addressing in the future.

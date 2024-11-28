@@ -1,0 +1,74 @@
+---
+title: "update_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Mutations::CreditNotes::Update` GraphQL mutation. It verifies the functionality of updating a credit note, including permission checks and error handling for non-existent credit notes.
+
+## Code Structure
+The test suite is organized using RSpec and focuses on testing the GraphQL mutation for updating credit notes. It uses shared examples for common checks and defines specific test cases for successful updates and error scenarios.
+
+## Symbols
+
+### RSpec.describe Mutations::CreditNotes::Update
+#### Description
+This is the main describe block for the test suite, focusing on the `Mutations::CreditNotes::Update` GraphQL mutation.
+
+#### Internal Logic
+The test suite sets up necessary test data, defines the GraphQL mutation, and includes shared examples for common checks. It then proceeds to test specific scenarios for updating credit notes.
+
+### let blocks
+#### Description
+These blocks define the test data and setup required for the tests.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| required_permission | String | The permission required to update credit notes |
+| membership | Membership | A factory-created membership object |
+| organization | Organization | The organization associated with the membership |
+| customer | Customer | A factory-created customer associated with the organization |
+| invoice | Invoice | A factory-created invoice associated with the organization and customer |
+| credit_note | CreditNote | A factory-created credit note associated with the customer and invoice |
+
+### mutation
+#### Description
+Defines the GraphQL mutation string for updating a credit note.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| mutation | String | The GraphQL mutation string for updating a credit note |
+
+### it_behaves_like 'requires current user'
+#### Description
+Shared example that tests if the mutation requires a current user.
+
+### it_behaves_like 'requires permission', 'credit_notes:update'
+#### Description
+Shared example that tests if the mutation requires the 'credit_notes:update' permission.
+
+### 'updates the credit note' test
+#### Description
+Tests the successful updating of a credit note.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with valid input.
+2. Verifies that the returned data matches the expected updated credit note.
+
+### 'when credit note is not found' context
+#### Description
+Tests the scenario when the credit note to be updated is not found.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with an invalid credit note ID.
+2. Verifies that a "not found" error is returned.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and RSpec configuration |
+| FactoryBot | Used implicitly for creating test data (e.g., `create(:membership)`) |
+
+## Error Handling
+The test suite includes a specific test case for handling the scenario when a credit note is not found, expecting a "not found" error to be returned.

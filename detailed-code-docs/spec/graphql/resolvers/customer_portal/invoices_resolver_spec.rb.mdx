@@ -1,0 +1,65 @@
+---
+title: "invoices_resolver_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Resolvers::CustomerPortal::InvoicesResolver` GraphQL resolver. It tests the functionality of querying customer portal invoices, including filtering by status and handling unauthorized access.
+
+## Code Structure
+The test suite is organized into several contexts, testing different aspects of the invoice resolver:
+1. Basic functionality for retrieving invoices
+2. Filtering invoices by status
+3. Handling unauthorized access
+
+## Symbols
+
+### RSpec.describe Resolvers::CustomerPortal::InvoicesResolver
+#### Description
+This is the main test suite for the InvoicesResolver. It sets up the test environment and defines various test cases.
+
+#### Internal Logic
+1. Sets up test data (membership, organization, customer, draft invoice, finalized invoice)
+2. Defines GraphQL queries for testing
+3. Runs tests for different scenarios
+
+### it 'returns a list of invoices'
+#### Description
+Tests the basic functionality of retrieving invoices through the GraphQL query.
+
+#### Internal Logic
+1. Executes the GraphQL query with a customer portal user
+2. Verifies the response structure and content
+3. Checks the number of invoices, their IDs, current page, and total count
+
+### context 'with filter on status'
+#### Description
+Tests the ability to filter invoices by status.
+
+#### Internal Logic
+1. Defines a new GraphQL query with a status filter
+2. Executes the query with a 'draft' status filter
+3. Verifies that only the draft invoice is returned
+
+### context 'without customer portal user'
+#### Description
+Tests the behavior when an unauthorized user attempts to access the invoices.
+
+#### Internal Logic
+1. Executes the GraphQL query without a customer portal user
+2. Verifies that an unauthorized error is returned
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| RSpec | Testing framework |
+
+## Error Handling
+The test suite includes a specific test case for handling unauthorized access, expecting an error to be returned when a user without proper permissions attempts to access the invoices.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| customerPortalInvoices | QUERY | GraphQL query with optional status filter | List of invoices with metadata | Retrieves customer portal invoices |
+
+Note: This is a test file, so it doesn't directly expose an API, but it tests the GraphQL API endpoint for customer portal invoices.

@@ -1,0 +1,81 @@
+---
+title: "webhook_endpoint.rb"
+---
+
+## High-level description
+The `WebhookEndpoint` model represents a webhook endpoint in the application. It defines the structure and behavior of webhook endpoints, including validations, associations, and limitations. This model is crucial for managing webhook configurations for organizations within the system.
+
+## Code Structure
+The `WebhookEndpoint` class inherits from `ApplicationRecord` and defines various associations, validations, and methods related to webhook endpoints. It interacts with the `Organization` model and the `Webhook` model.
+
+## References
+- `ApplicationRecord`: The base class for all models in the application.
+- `Organization`: Associated model representing the organization that owns the webhook endpoint.
+- `Webhook`: Associated model representing individual webhooks related to this endpoint.
+
+## Symbols
+
+### `WebhookEndpoint`
+#### Description
+This class represents a webhook endpoint in the application. It defines the structure, associations, and validations for webhook endpoints.
+
+#### Inputs
+N/A (This is a model class, not a method)
+
+#### Outputs
+N/A (This is a model class, not a method)
+
+#### Internal Logic
+1. Sets a constant `LIMIT` to 5, which represents the maximum number of webhook endpoints allowed per organization.
+2. Defines `SIGNATURE_ALGOS` as an array of symbols (`:jwt` and `:hmac`) representing the available signature algorithms.
+3. Establishes associations with `Organization` and `Webhook` models.
+4. Implements validations for the `webhook_url` attribute.
+5. Defines an enum for `signature_algo` based on `SIGNATURE_ALGOS`.
+6. Implements a custom validation method `max_webhook_endpoints` to enforce the `LIMIT` on webhook endpoints per organization.
+
+### `self.ransackable_attributes`
+#### Description
+This class method defines which attributes of the `WebhookEndpoint` model can be searched using the Ransack gem.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| _auth_object | Object | (Optional) Authentication object, not used in this implementation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Array | Array of Strings | Returns an array containing the string "webhook_url" |
+
+### `max_webhook_endpoints` (private)
+#### Description
+This private method validates that an organization does not exceed the maximum number of allowed webhook endpoints.
+
+#### Inputs
+N/A (This is a validation method called internally)
+
+#### Outputs
+N/A (This method adds an error to the model if the limit is exceeded)
+
+#### Internal Logic
+1. Checks if the associated organization exists.
+2. Reloads the organization's webhook endpoints to ensure the count is up-to-date.
+3. Adds an error to the model if the count of webhook endpoints is greater than or equal to the `LIMIT`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides ORM functionality for database interactions |
+| Ransack | Used for searching webhook endpoints |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LIMIT | Integer | 5 | Maximum number of webhook endpoints allowed per organization |
+| SIGNATURE_ALGOS | Array of Symbols | [:jwt, :hmac] | Available signature algorithms for webhook endpoints |
+
+## Error Handling
+The model uses ActiveRecord's built-in error handling mechanisms. Custom errors are added in the `max_webhook_endpoints` validation method.
+
+## Schema Information
+The model includes a schema information block, detailing the database table structure, indexes, and foreign keys associated with the `webhook_endpoints` table.

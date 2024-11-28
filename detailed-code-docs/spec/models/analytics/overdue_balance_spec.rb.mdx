@@ -1,0 +1,85 @@
+---
+title: "overdue_balance_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Analytics::OverdueBalance` model, specifically focusing on its `cache_key` class method. The tests verify that the `cache_key` method generates the correct cache key string based on various input parameters.
+
+## Symbols
+
+### `RSpec.describe Analytics::OverdueBalance, type: :model`
+#### Description
+This is the main RSpec describe block for testing the `Analytics::OverdueBalance` model.
+
+### `.cache_key`
+#### Description
+This describe block focuses on testing the `cache_key` class method of the `Analytics::OverdueBalance` model.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | String (UUID) | The ID of the organization |
+| args | Hash | Optional arguments including external_customer_id, currency, and months |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cache_key | String | The generated cache key |
+
+#### Internal Logic
+The test cases cover different scenarios for generating the cache key:
+1. With no arguments
+2. With customer external ID, currency, and months
+3. With only customer external ID
+4. With only currency
+
+Each test case sets up the necessary inputs, generates the expected cache key, and compares it with the actual output of the `cache_key` method.
+
+### Test Cases
+
+#### Context: "with no arguments"
+##### Description
+Tests the `cache_key` method when called with only the organization_id and no additional arguments.
+
+##### Internal Logic
+- Arranges: Sets up organization_id and empty args hash
+- Acts: Calls `described_class.cache_key(organization_id, **args)`
+- Asserts: Expects the returned cache key to match the format "overdue-balance/{date}/{organization_id}///"
+
+#### Context: "with customer external id, currency and months"
+##### Description
+Tests the `cache_key` method when called with organization_id, external_customer_id, currency, and months.
+
+##### Internal Logic
+- Arranges: Sets up organization_id, external_customer_id, currency, and months
+- Acts: Calls `described_class.cache_key(organization_id, **args)`
+- Asserts: Expects the returned cache key to match the format "overdue-balance/{date}/{organization_id}/{external_customer_id}/{currency}/{months}"
+
+#### Context: "with customer external id"
+##### Description
+Tests the `cache_key` method when called with organization_id and external_customer_id only.
+
+##### Internal Logic
+- Arranges: Sets up organization_id and external_customer_id
+- Acts: Calls `described_class.cache_key(organization_id, **args)`
+- Asserts: Expects the returned cache key to match the format "overdue-balance/{date}/{organization_id}/{external_customer_id}//"
+
+#### Context: "with currency"
+##### Description
+Tests the `cache_key` method when called with organization_id and currency only.
+
+##### Internal Logic
+- Arranges: Sets up organization_id and currency
+- Acts: Calls `described_class.cache_key(organization_id, **args)`
+- Asserts: Expects the returned cache key to match the format "overdue-balance/{date}/{organization_id}//#{currency}/"
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and RSpec configuration |
+
+## Notes
+- The tests use `let` statements to define variables used across multiple test cases.
+- The current date is used in the cache key, formatted as "%Y-%m-%d".
+- The `described_class` refers to `Analytics::OverdueBalance`.
+- The tests cover various combinations of input parameters to ensure the `cache_key` method handles different scenarios correctly.

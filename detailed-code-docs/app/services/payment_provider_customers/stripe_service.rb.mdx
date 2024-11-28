@@ -1,0 +1,130 @@
+---
+title: "stripe_service.rb"
+---
+
+## High-level description
+This code defines a `StripeService` class within the `PaymentProviderCustomers` module. It handles various operations related to Stripe customers, including creating and updating Stripe customers, managing payment methods, and generating checkout URLs.
+
+## Code Structure
+The `StripeService` class inherits from `BaseService` and includes the `Customers::PaymentProviderFinder` module. It contains several public methods for different Stripe-related operations, as well as private helper methods.
+
+## Symbols
+
+### `initialize(stripe_customer = nil)`
+#### Description
+Initializes the service with an optional `stripe_customer` parameter.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| stripe_customer | StripeCustomer | Optional Stripe customer object |
+
+### `create`
+#### Description
+Creates a Stripe customer if one doesn't exist and updates the local record with the provider customer ID.
+
+#### Internal Logic
+1. Checks if the customer already has a provider customer ID or if there's no Stripe payment provider.
+2. Creates a Stripe customer using the Stripe API.
+3. Updates the local record with the new provider customer ID.
+4. Delivers a success webhook and enqueues a job to generate a checkout URL.
+
+### `update`
+#### Description
+Updates the Stripe customer information.
+
+#### Internal Logic
+1. Calls the Stripe API to update the customer.
+2. Handles various Stripe errors and delivers error webhooks if necessary.
+
+### `update_payment_method`
+#### Description
+Updates the payment method for a Stripe customer.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | String | ID of the organization |
+| stripe_customer_id | String | Stripe customer ID |
+| payment_method_id | String | ID of the new payment method |
+| metadata | Hash | Additional metadata |
+
+#### Internal Logic
+1. Finds the Stripe customer based on the provided IDs.
+2. Updates the payment method ID for the customer.
+3. Reprocesses any pending invoices for the customer.
+
+### `update_provider_default_payment_method`
+#### Description
+Updates the default payment method for a Stripe customer on the Stripe side.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | String | ID of the organization |
+| stripe_customer_id | String | Stripe customer ID |
+| payment_method_id | String | ID of the new default payment method |
+| metadata | Hash | Additional metadata |
+
+#### Internal Logic
+1. Finds the Stripe customer based on the provided IDs.
+2. Updates the default payment method using the Stripe API.
+
+### `delete_payment_method`
+#### Description
+Deletes a payment method for a Stripe customer.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | String | ID of the organization |
+| stripe_customer_id | String | Stripe customer ID |
+| payment_method_id | String | ID of the payment method to delete |
+| metadata | Hash | Additional metadata |
+
+#### Internal Logic
+1. Finds the Stripe customer based on the provided IDs.
+2. Removes the payment method ID if it matches the one being deleted.
+
+### `check_payment_method`
+#### Description
+Checks if a payment method is valid for a Stripe customer.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payment_method_id | String | ID of the payment method to check |
+
+#### Internal Logic
+1. Attempts to retrieve the payment method from Stripe.
+2. If successful, returns the payment method.
+3. If the payment method is invalid, updates the local record to remove the payment method ID.
+
+### `generate_checkout_url`
+#### Description
+Generates a Stripe Checkout URL for the customer.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| send_webhook | Boolean | Whether to send a webhook with the generated URL |
+
+#### Internal Logic
+1. Creates a Stripe Checkout Session.
+2. If successful and `send_webhook` is true, enqueues a job to send a webhook with the checkout URL.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Stripe | Interacting with the Stripe API |
+| SendWebhookJob | Sending webhooks for various events |
+| PaymentProviderCustomers::StripeCheckoutUrlJob | Generating checkout URLs asynchronously |
+| Invoices::Payments::StripeCreateJob | Processing payments for invoices |
+
+## Error Handling
+The service handles various Stripe errors, including `Stripe::InvalidRequestError`, `Stripe::PermissionError`, and `Stripe::AuthenticationError`. It delivers error webhooks when these errors occur.
+
+## Logging
+The service uses Rails logging to warn about duplicate payment attempts.
+
+This service is crucial for managing Stripe-related operations within the application, handling customer creation, payment method management, and checkout processes.

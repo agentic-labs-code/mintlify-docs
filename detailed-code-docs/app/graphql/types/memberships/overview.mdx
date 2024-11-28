@@ -1,0 +1,83 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions related to memberships within an organization. It includes three main components: a `Metadata` type for membership collections, a `RoleEnum` for user roles, and a `StatusEnum` for membership statuses. These types are crucial for defining the structure and possible values in GraphQL queries and mutations related to memberships.
+
+## What does it do?
+This code defines the structure and possible values for membership-related data in a GraphQL API. It allows the API to:
+
+1. Provide metadata about a collection of memberships, including the count of admin members.
+2. Define and enforce a set of valid roles that a user can have within a membership.
+3. Define and enforce a set of valid statuses that a membership can have.
+
+These definitions ensure that when developers or applications interact with the GraphQL API for membership-related operations, they have a clear understanding of the available options for roles and statuses, and can access metadata about membership collections.
+
+## Key Files
+
+1. `metadata.rb`:
+   - Defines the `Metadata` GraphQL type for membership collections.
+   - Provides an `admin_count` field that returns the number of active admin members in the current organization.
+
+2. `role_enum.rb`:
+   - Defines the `RoleEnum` GraphQL enum type.
+   - Dynamically generates enum values based on the `Membership::ROLES` constant.
+   - Represents the different roles a user can have within a membership.
+
+3. `status_enum.rb`:
+   - Defines the `StatusEnum` GraphQL enum type.
+   - Dynamically generates enum values based on the `Membership::STATUSES` constant.
+   - Represents the different possible statuses of a membership.
+
+## Dependencies
+The code in this directory relies on the following dependencies:
+
+1. GraphQL gem: This is the core dependency for defining GraphQL types and schemas in Ruby.
+
+2. GraphqlPagination gem: Used in the `Metadata` type, this gem provides pagination functionality for GraphQL APIs. It's utilized through the `GraphqlPagination::CollectionMetadataType` class.
+
+3. Base classes:
+   - `Types::BaseEnum`: A custom base class for enum types, likely defined elsewhere in the application to provide common functionality for all enum types.
+
+4. Application-specific constants:
+   - `Membership::ROLES`: Used in `role_enum.rb` to define the possible membership roles.
+   - `Membership::STATUSES`: Used in `status_enum.rb` to define the possible membership statuses.
+
+These dependencies were likely chosen to provide a robust and flexible foundation for building a GraphQL API, with the ability to easily define and maintain enum types and paginated collections.
+
+## Configuration
+While there are no explicit configuration files in this directory, the code relies on certain application-wide configurations and conventions:
+
+1. GraphQL context: The `Metadata` type assumes that a `context[:current_organization]` is available in the GraphQL context. This is likely set up in a resolver or middleware elsewhere in the application.
+
+2. Membership model: The code assumes the existence of a `Membership` model with defined `ROLES` and `STATUSES` constants. These constants are used to dynamically generate the enum values for `RoleEnum` and `StatusEnum`.
+
+3. Database schema: The `Metadata` type's `admin_count` field assumes a specific database schema where memberships have `admin` and `active` attributes, and are associated with an organization.
+
+Here's an example of how these types might be used in a GraphQL query:
+
+```graphql
+query {
+  memberships(first: 10) {
+    edges {
+      node {
+        id
+        role
+        status
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    metadata {
+      adminCount
+    }
+  }
+}
+```
+
+In this query, `role` would be of type `RoleEnum`, `status` would be of type `StatusEnum`, and the `metadata` field would use the `Metadata` type to provide the `adminCount`.
+
+The modular structure of these types allows for easy maintenance and extension of the membership-related GraphQL schema. For example, if new roles or statuses need to be added, they can be included in the respective constants, and the GraphQL types will automatically reflect these changes.

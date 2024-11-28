@@ -1,0 +1,101 @@
+---
+title: "gocardless_service_spec.rb"
+---
+
+## High-level description
+This RSpec file tests the `PaymentRequests::Payments::GocardlessService` class, which is responsible for creating and processing GoCardless payments for payment requests. It verifies the service's behavior in various scenarios, including successful payment creation, error handling, and edge cases.
+
+## Code Structure
+The test file is organized into a single `describe` block for the `#create` method of the `GocardlessService`. It uses let statements to set up test data and mock objects, and contains multiple test cases (it blocks) to cover different scenarios.
+
+## Symbols
+
+### `described_class.new(payment_request)`
+#### Description
+Creates a new instance of the `GocardlessService` with a given payment request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payment_request | PaymentRequest | The payment request to be processed |
+
+### `#create`
+#### Description
+The main method being tested, which creates a GoCardless payment for the given payment request.
+
+#### Internal Logic
+1. Checks if the payment should be processed
+2. Creates a GoCardless payment using the GoCardless API
+3. Creates a new `Payment` record in the database
+4. Updates the payment status of the payment request and associated invoices
+5. Handles errors and delivers webhooks when necessary
+
+## Test Cases
+
+### Successful payment creation
+#### Description
+Tests the happy path where a GoCardless payment is successfully created.
+
+#### Internal Logic
+1. Sets up mock objects and expectations
+2. Calls the `create` method
+3. Verifies the result, including the created payment and updated statuses
+
+### Zero amount payment
+#### Description
+Tests the behavior when the payment amount is zero.
+
+#### Internal Logic
+1. Sets up a payment request with zero amount
+2. Calls the `create` method
+3. Verifies that no GoCardless payment is created, but the payment request is marked as succeeded
+
+### Missing payment provider
+#### Description
+Tests the behavior when there is no GoCardless payment provider configured.
+
+#### Internal Logic
+1. Sets the GoCardless payment provider to nil
+2. Calls the `create` method
+3. Verifies that no payment is created
+
+### Missing provider customer ID
+#### Description
+Tests the behavior when the customer doesn't have a GoCardless provider customer ID.
+
+#### Internal Logic
+1. Sets the customer's provider customer ID to nil
+2. Calls the `create` method
+3. Verifies that no payment is created
+
+### GoCardless API error
+#### Description
+Tests error handling when the GoCardless API raises an error.
+
+#### Internal Logic
+1. Mocks the GoCardless API to raise an error
+2. Calls the `create` method
+3. Verifies that an error webhook is delivered
+
+### No mandate available
+#### Description
+Tests the behavior when the customer has no mandate to make a payment.
+
+#### Internal Logic
+1. Mocks the GoCardless API to return no mandates
+2. Calls the `create` method
+3. Verifies that an error is returned and an error webhook is delivered
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| GoCardlessPro::Client | Mocked to simulate GoCardless API interactions |
+
+## Error Handling
+The test file covers various error scenarios, including GoCardless API errors and missing mandate errors. It verifies that appropriate error messages are set and error webhooks are delivered in these cases.
+
+## Logging
+No specific logging mechanisms are implemented in this test file.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

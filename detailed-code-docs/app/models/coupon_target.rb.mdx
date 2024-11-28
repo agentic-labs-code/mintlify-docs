@@ -1,0 +1,52 @@
+---
+title: "coupon_target.rb"
+---
+
+## High-level description
+The `CouponTarget` class is an ActiveRecord model that represents the association between coupons and their applicable targets (plans or billable metrics) in a billing system. It implements soft delete functionality and version tracking for audit purposes.
+
+## Code Structure
+The `CouponTarget` class inherits from `ApplicationRecord` and includes two modules: `PaperTrailTraceable` for version tracking and `Discard::Model` for soft delete functionality. It defines associations with `Coupon`, `Plan`, and `BillableMetric` models.
+
+## Symbols
+
+### `CouponTarget`
+#### Description
+This class represents a target for a coupon, which can be either a plan or a billable metric. It allows coupons to be applied specifically to certain plans or billable metrics.
+
+#### Inputs
+No explicit inputs are defined in the class.
+
+#### Internal Logic
+- Includes `PaperTrailTraceable` module for version tracking.
+- Includes `Discard::Model` module for soft delete functionality.
+- Sets the `discard_column` to `:deleted_at` for soft deletes.
+- Defines associations with `Coupon`, `Plan`, and `BillableMetric` models.
+- Sets a default scope to only return non-deleted (kept) records.
+
+## Side Effects
+- The `PaperTrailTraceable` module will create version records when changes are made to `CouponTarget` instances.
+- The `Discard::Model` module allows for soft deletion of records, keeping them in the database but marking them as deleted.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| PaperTrailTraceable | Provides version tracking functionality |
+| Discard::Model | Implements soft delete functionality |
+
+## Schema Information
+The class includes a comment block with schema information, detailing the table structure, indexes, and foreign keys for the `coupon_targets` table.
+
+| Column | Type | Constraints | Description |
+|:-------|:-----|:------------|:------------|
+| id | uuid | not null, primary key | Unique identifier for the coupon target |
+| deleted_at | datetime | | Timestamp for soft delete |
+| created_at | datetime | not null | Record creation timestamp |
+| updated_at | datetime | not null | Record update timestamp |
+| billable_metric_id | uuid | | Foreign key to billable_metrics table |
+| coupon_id | uuid | not null | Foreign key to coupons table |
+| plan_id | uuid | | Foreign key to plans table |
+
+The table also includes indexes on `billable_metric_id`, `coupon_id`, `deleted_at`, and `plan_id` columns, as well as foreign key constraints for the associated tables.
+
+This model serves as a junction table, allowing coupons to be associated with specific plans or billable metrics, providing flexibility in coupon application within the billing system.

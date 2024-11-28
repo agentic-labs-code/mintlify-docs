@@ -1,0 +1,49 @@
+---
+title: "20230510113501_create_customers_tax_rates.rb"
+---
+
+## High-level description
+This migration file creates a new join table `customers_tax_rates` to establish a many-to-many relationship between customers and tax rates. It also adds a new boolean column `applied_by_default` to the existing `tax_rates` table.
+
+## Symbols
+
+### `CreateCustomersTaxRates`
+#### Description
+This class is an ActiveRecord migration that defines changes to the database schema. It creates a new table and modifies an existing one.
+
+#### Internal Logic
+The migration performs two main actions:
+1. Adds a new column `applied_by_default` to the `tax_rates` table.
+2. Creates a new table `customers_tax_rates` to associate customers with tax rates.
+
+Let's break down each action:
+
+1. Adding a new column:
+```ruby
+add_column :tax_rates, :applied_by_default, :boolean, null: false, default: false
+```
+This adds a boolean column named `applied_by_default` to the `tax_rates` table. It's set to not allow null values and has a default value of `false`.
+
+2. Creating a new table:
+```ruby
+create_table :customers_tax_rates, id: :uuid do |t|
+  t.references :customer, type: :uuid, foreign_key: true, null: false, index: true
+  t.references :tax_rate, type: :uuid, foreign_key: true, null: false, index: true
+
+  t.timestamps
+end
+```
+This creates a new table named `customers_tax_rates` with the following characteristics:
+- The primary key (`id`) is of type UUID.
+- It has two foreign key columns: `customer_id` and `tax_rate_id`, both of type UUID.
+- Both foreign keys are set to not allow null values and have indexes created for them.
+- It includes `created_at` and `updated_at` timestamp columns (added by `t.timestamps`).
+
+## Dependencies
+This migration relies on ActiveRecord, which is part of the Ruby on Rails framework.
+
+## Configuration
+The migration is configured to use Rails version 7.0, as indicated by `ActiveRecord::Migration[7.0]`.
+
+## Performance Considerations
+The addition of indexes on the foreign key columns in the `customers_tax_rates` table (`customer_id` and `tax_rate_id`) will improve query performance when searching or joining on these columns.

@@ -1,0 +1,65 @@
+---
+title: "create_pay_in_advance_service_spec.rb"
+---
+
+## High-level description
+This RSpec file tests the `Fees::CreatePayInAdvanceService` class, which is responsible for creating fees for pay-in-advance charges. It verifies the service's behavior in various scenarios, including handling different charge models, charge filters, and grouped properties.
+
+## Code Structure
+The test file is organized into a single `RSpec.describe` block for the `Fees::CreatePayInAdvanceService` class. Within this block, there are multiple contexts and examples testing different aspects of the service's functionality.
+
+## Symbols
+
+### `Fees::CreatePayInAdvanceService`
+#### Description
+This is the main service class being tested. It creates fees for pay-in-advance charges based on events and charge configurations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Charge | The charge object associated with the fee |
+| event | Event | The event triggering the fee creation |
+| billing_at | DateTime | The billing timestamp |
+| estimate | Boolean | Whether this is an estimate or actual fee creation |
+
+#### Internal Logic
+1. Aggregates charge data using `Charges::PayInAdvanceAggregationService`
+2. Applies the charge model using `Charges::ApplyPayInAdvanceChargeModelService`
+3. Creates a fee based on the aggregation and charge model results
+4. Handles charge filters and grouped properties if present
+5. Creates a `CachedAggregation` record if applicable
+6. Delivers a webhook for fee creation (unless in estimate mode)
+
+### `#call`
+#### Description
+This is the main method being tested. It executes the fee creation process and returns a result object.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Contains created fees and success/failure status |
+
+#### Internal Logic
+The test cases cover various scenarios:
+1. Basic fee creation
+2. Handling aggregation and charge model failures
+3. Applying charge filters
+4. Handling grouped properties
+5. Estimate mode behavior
+6. Creating cached aggregations
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Charges::PayInAdvanceAggregationService | Aggregates charge data |
+| Charges::ApplyPayInAdvanceChargeModelService | Applies the charge model to calculate fee amount |
+| SendWebhookJob | Delivers webhooks for created fees |
+
+## Error Handling
+The service returns failure results in case of aggregation or charge model application errors. These are tested in specific examples.
+
+## Logging
+No explicit logging is implemented in this service.
+
+## TODOs
+None present in the code.

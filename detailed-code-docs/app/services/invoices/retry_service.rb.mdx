@@ -1,0 +1,69 @@
+---
+title: "retry_service.rb"
+---
+
+## High-level description
+This code defines the `RetryService` class within the `Invoices` module. Its primary purpose is to retry processing a failed invoice, recalculating taxes, updating amounts, and potentially creating credits. It also handles various post-processing tasks such as sending webhooks, generating PDFs, and creating payment records.
+
+## Code Structure
+The `RetryService` class inherits from `BaseService` and contains a single public method `call`. The class is initialized with an invoice object and performs a series of operations to retry processing the invoice, including error handling and transaction management.
+
+## Symbols
+
+### `RetryService`
+#### Description
+This class encapsulates the logic for retrying a failed invoice. It recalculates taxes, updates amounts, and handles various post-processing tasks.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice object to be retried |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result object containing success status and invoice data |
+
+#### Internal Logic
+1. Validates the invoice status and existence.
+2. Recalculates taxes using the `Integrations::Aggregator::Taxes::Invoices::CreateService`.
+3. Updates invoice dates, amounts, and status within a transaction.
+4. Creates credit note credits and applied prepaid credits if necessary.
+5. Performs post-processing tasks (webhooks, PDF generation, payment creation, etc.).
+6. Handles various error scenarios.
+
+## Side Effects
+- Updates the invoice record in the database.
+- Creates credit notes and prepaid credits.
+- Enqueues background jobs for webhook sending, PDF generation, and payment processing.
+- Tracks invoice creation event using Segment.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Integrations::Aggregator::Taxes::Invoices::CreateService | Recalculates taxes for the invoice |
+| Invoices::ComputeAmountsFromFees | Computes invoice amounts based on fees |
+| Credits::CreditNoteService | Creates credit note credits |
+| Credits::AppliedPrepaidCreditService | Applies prepaid credits |
+| SendWebhookJob | Enqueues webhook sending job |
+| GeneratePdfAndNotifyJob | Enqueues PDF generation and notification job |
+| Integrations::Aggregator::Invoices::CreateJob | Enqueues invoice creation job for integration |
+| Integrations::Aggregator::SalesOrders::CreateJob | Enqueues sales order creation job for integration |
+| Invoices::Payments::CreateService | Creates payment records |
+| Utils::SegmentTrack | Tracks invoice creation event |
+
+## Error Handling
+The service handles various error scenarios:
+- Not found errors for invalid invoices
+- Validation errors for tax calculation
+- Record validation errors
+- Generic errors
+
+Each error type is captured and returned in the result object.
+
+## Performance Considerations
+The service uses database transactions to ensure data consistency when updating the invoice and creating related records. This approach helps maintain data integrity but may impact performance for large or complex invoices.
+
+---
+
+This service plays a crucial role in the invoice retry process, orchestrating various operations to recalculate and update failed invoices. It interacts with multiple other services and jobs, making it a central component in the invoice management system.

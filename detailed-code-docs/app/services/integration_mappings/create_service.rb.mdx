@@ -1,0 +1,63 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines a service class `CreateService` within the `IntegrationMappings` module. Its primary purpose is to create a new integration mapping based on the provided arguments, associating it with an existing integration and handling various mapping attributes.
+
+## Code Structure
+The `CreateService` class inherits from `BaseService` and contains a single public method `call`. It interacts with the `Integrations::BaseIntegration` model and uses the `IntegrationMappings::Factory` to create the appropriate mapping instance.
+
+## References
+- `Integrations::BaseIntegration`
+- `IntegrationMappings::Factory`
+- `BaseService`
+
+## Symbols
+
+### `CreateService#call`
+#### Description
+This method creates a new integration mapping based on the provided arguments. It first finds the associated integration, creates a new mapping instance, sets additional attributes if provided, and saves the mapping.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | A hash containing the necessary arguments for creating the integration mapping |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the operation result and the created integration mapping |
+
+#### Internal Logic
+1. Find the integration using the provided `integration_id`.
+2. Return a not found failure if the integration doesn't exist.
+3. Create a new integration mapping instance using the `IntegrationMappings::Factory`.
+4. Set additional attributes (external_id, external_account_code, external_name) if provided.
+5. Save the integration mapping.
+6. Set the created integration mapping in the result object.
+7. Handle any `ActiveRecord::RecordInvalid` errors by setting a record validation failure in the result.
+
+## Side Effects
+- Creates a new record in the database for the integration mapping.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | For database interactions and error handling |
+
+## Error Handling
+The service handles `ActiveRecord::RecordInvalid` errors by calling `result.record_validation_failure!` with the invalid record.
+
+## API/Interface Reference
+| Method | Inputs | Outputs | Description |
+|:-------|:-------|:--------|:------------|
+| call | Hash of arguments | BaseService::Result | Creates a new integration mapping and returns the result |
+
+The `call` method accepts the following arguments:
+- `integration_id`: ID of the associated integration
+- `mappable_id`: ID of the mappable object
+- `mappable_type`: Type of the mappable object
+- `external_id` (optional): External ID for the mapping
+- `external_account_code` (optional): External account code for the mapping
+- `external_name` (optional): External name for the mapping

@@ -1,0 +1,48 @@
+---
+title: "create_job.rb"
+---
+
+## High-level description
+This code defines a job class `CreateJob` within the `Integrations::Aggregator::Payments` module. The job is responsible for creating a payment in an external aggregator system using the `CreateService`. It's designed to be run asynchronously and includes error handling and retry logic for HTTP errors.
+
+## Code Structure
+The `CreateJob` class inherits from `ApplicationJob` and is nested within the `Integrations::Aggregator::Payments` module. It uses the `CreateService` to perform the actual payment creation.
+
+## Symbols
+
+### `Integrations::Aggregator::Payments::CreateJob`
+#### Description
+This job class is responsible for creating a payment in an external aggregator system. It uses the `CreateService` to perform the actual creation and includes retry logic for HTTP errors.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payment | Payment | The payment object to be created in the external system |
+
+#### Internal Logic
+1. The job is queued in the 'integrations' queue.
+2. It retries up to 5 times with a polynomial backoff strategy in case of `LagoHttpClient::HttpError`.
+3. The `perform` method calls the `CreateService` with the provided payment.
+4. If the service call results in an error, it raises an exception.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ApplicationJob | Base job class that this job inherits from |
+| LagoHttpClient::HttpError | Custom error class for handling HTTP errors |
+| Integrations::Aggregator::Payments::CreateService | Service class that performs the actual payment creation |
+
+## Error Handling
+The job uses the `retry_on` method to handle `LagoHttpClient::HttpError`. It will retry the job up to 5 times with a polynomial backoff strategy.
+
+## Performance Considerations
+The job is designed to run asynchronously, which helps in not blocking the main application thread. The retry mechanism with backoff helps in handling temporary network issues or service unavailability.
+
+## Related Code
+The `CreateService` (from `app/services/integrations/aggregator/payments/create_service.rb`) is the main service used by this job. It handles the actual logic of creating the payment in the external system.
+
+The `LagoHttpClient::HttpError` (from `lib/lago_http_client/lago_http_client/http_error.rb`) is the custom error class that this job handles for retries.
+
+The shared examples in `spec/support/shared_examples/integrations.rb` include tests for syncing payments, which likely use this job.
+
+Other payment-related services like `GocardlessService` and `AdyenService` also use this job to sync payments with the aggregator system.

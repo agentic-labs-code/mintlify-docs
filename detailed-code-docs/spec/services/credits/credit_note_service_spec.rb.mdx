@@ -1,0 +1,88 @@
+---
+title: "credit_note_service_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Credits::CreditNoteService` class. It tests the functionality of creating credits from credit notes for a given invoice, ensuring that the service correctly handles various scenarios such as different invoice amounts and credit note balances.
+
+## Symbols
+
+### `RSpec.describe Credits::CreditNoteService`
+#### Description
+This is the main test suite for the `Credits::CreditNoteService` class. It sets up the necessary test data and contains multiple test cases to verify the service's behavior.
+
+### `subject(:credit_service)`
+#### Description
+This defines the subject of the test, which is an instance of `Credits::CreditNoteService` initialized with an invoice.
+
+### `let(:invoice)`
+#### Description
+This creates a test invoice with specified attributes using FactoryBot.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Customer | The customer associated with the invoice |
+| currency | String | The currency of the invoice (set to 'EUR') |
+| total_amount_cents | Integer | The total amount of the invoice in cents |
+
+### `let(:credit_note1)` and `let(:credit_note2)`
+#### Description
+These create test credit notes with specified attributes using FactoryBot.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| total_amount_cents | Integer | The total amount of the credit note in cents |
+| balance_amount_cents | Integer | The remaining balance of the credit note in cents |
+| credit_amount_cents | Integer | The credit amount of the credit note in cents |
+| customer | Customer | The customer associated with the credit note |
+
+### `describe '.call'`
+#### Description
+This describes the test cases for the `call` method of the `Credits::CreditNoteService` class.
+
+#### Internal Logic
+1. It tests the creation of credits when there are sufficient credit notes.
+2. It checks the behavior when the invoice amount is 0.
+3. It verifies the handling of cases where the credit amount is higher than the invoice amount.
+
+## Test Cases
+
+### "creates a list of credits"
+#### Description
+This test case verifies that the service correctly creates credits from available credit notes for the given invoice.
+
+#### Internal Logic
+1. Calls the service with the prepared invoice and credit notes.
+2. Checks that the result is successful and contains the expected number of credits.
+3. Verifies the attributes of each created credit, including the associated invoice and credit note.
+4. Ensures that the credit notes' balances are updated correctly and marked as consumed.
+5. Confirms that the invoice's `credit_notes_amount_cents` is updated with the total credited amount.
+
+### "does not create a credit" (when invoice amount is 0)
+#### Description
+This test case checks that no credits are created when the invoice amount is 0.
+
+#### Internal Logic
+1. Sets the invoice amount to 0.
+2. Calls the service and verifies that the result is successful but contains no credits.
+
+### "creates a credit with partial credit note amount" (when credit amount is higher than invoice amount)
+#### Description
+This test case ensures that the service correctly handles situations where the available credit exceeds the invoice amount.
+
+#### Internal Logic
+1. Sets the invoice amount to a value lower than the available credit.
+2. Calls the service and verifies that only one credit is created with the correct amount.
+3. Checks that the credit note's balance is updated correctly and remains available.
+
+## Dependencies
+The test file relies on the following dependencies:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used for creating test data (invoice and credit notes) |
+| RSpec | The testing framework used for writing and running the tests |
+
+Note: The `rails_helper` file includes additional configuration for the test environment, such as database cleaner settings, SimpleCov for code coverage, and various helper modules.

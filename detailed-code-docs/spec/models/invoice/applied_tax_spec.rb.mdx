@@ -1,0 +1,54 @@
+---
+title: "applied_tax_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Invoice::AppliedTax` model. It tests the behavior of the `applied_on_whole_invoice?` method and ensures that the model includes the 'paper_trail traceable' shared behavior.
+
+## Symbols
+
+### `RSpec.describe Invoice::AppliedTax`
+#### Description
+This is the main describe block for the `Invoice::AppliedTax` model tests. It sets up the context for all the tests related to this model.
+
+#### Internal Logic
+- Creates a subject using the `create(:invoice_applied_tax)` factory.
+- Includes shared examples for 'paper_trail traceable'.
+- Contains nested describe blocks for specific method tests.
+
+### `describe '#applied_on_whole_invoice?'`
+#### Description
+This describe block focuses on testing the `applied_on_whole_invoice?` method of the `Invoice::AppliedTax` model.
+
+#### Internal Logic
+- Sets up a subject that calls the `applied_on_whole_invoice?` method on an `applied_tax` instance.
+- Contains two context blocks for different scenarios:
+  1. When the applied tax represents a special rule.
+  2. When it's a normal applied tax.
+
+#### Context: "when applied tax represents special rule"
+##### Description
+Tests the behavior of `applied_on_whole_invoice?` when the tax code is one of the special codes applicable to the whole invoice.
+
+##### Internal Logic
+- Creates an `applied_tax` instance with a tax code randomly selected from `Invoice::AppliedTax::TAX_CODES_APPLICABLE_ON_WHOLE_INVOICE`.
+- Expects the `applied_on_whole_invoice?` method to return `true`.
+
+#### Context: "when normal applied tax"
+##### Description
+Tests the behavior of `applied_on_whole_invoice?` for a normal applied tax.
+
+##### Internal Logic
+- Uses the default `applied_tax` instance created in the main subject.
+- Expects the `applied_on_whole_invoice?` method to return `false`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Implied by the use of `create` method for creating test objects |
+
+## References
+- `Invoice::AppliedTax::TAX_CODES_APPLICABLE_ON_WHOLE_INVOICE`: A constant defined in the `Invoice::AppliedTax` model that contains tax codes applicable to the whole invoice.
+
+This test file ensures that the `Invoice::AppliedTax` model correctly identifies taxes that should be applied to the whole invoice based on their tax code, and distinguishes them from normal applied taxes. It also verifies that the model includes paper_trail for tracking changes.

@@ -1,0 +1,76 @@
+---
+title: "recurring_fees_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for recurring non-invoiceable fees in a billing system. It tests various scenarios involving pay-in-advance and pay-in-arrears charges, with and without invoicing, and with different grouping options. The tests cover fee creation, billing cycles, and subscription termination.
+
+## Code Structure
+The test file is organized into nested contexts that represent different combinations of charge and fee settings. Each context contains one or more test cases that simulate billing cycles and verify the expected behavior of fee creation and invoicing.
+
+## Symbols
+
+### `describe 'Recurring Non Invoiceable Fees'`
+#### Description
+This is the main describe block for the test suite, focusing on recurring non-invoiceable fees.
+
+#### Internal Logic
+The tests are organized into two main contexts: "when charge is pay in advance" and "when charge is pay in arrears". Each of these contexts is further divided based on whether the charge is invoiceable or not, and whether grouping is applied.
+
+### `let` statements
+#### Description
+These statements define shared objects and variables used across multiple tests.
+
+#### Inputs
+- `organization`: An organization with a webhook URL
+- `customer`: A customer associated with the organization
+- `billable_metric`: A recurring unique count billable metric
+- `plan`: A plan with a specific amount and pay-in-advance setting
+- `external_subscription_id`: A randomly generated UUID
+- `charge`: A charge associated with the plan and billable metric
+- `subscription`: The customer's first subscription
+
+### `send_event!` method
+#### Description
+A helper method to create an event for the billable metric.
+
+#### Inputs
+- `item_id`: An identifier for the event item
+
+#### Internal Logic
+Creates an event with the given item_id and other predefined properties.
+
+### Test Cases
+Each test case simulates a billing cycle, creates events, and verifies the creation of fees and invoices. The tests cover various scenarios, including:
+1. Pay-in-advance charges with and without invoicing
+2. Pay-in-arrears charges with and without invoicing
+3. Grouped and non-grouped fee creation
+4. Subscription termination
+
+#### Internal Logic
+1. Set up the initial subscription and billing cycle
+2. Create events over time
+3. Perform billing at specific dates
+4. Verify the creation of fees and invoices
+5. Test subscription termination and its effect on fees
+
+## Dependencies
+The test file relies on the following dependencies:
+- Rails testing framework
+- RSpec
+- FactoryBot
+- WebMock
+
+## Configuration
+The tests use various configuration options, including:
+- Time travel to simulate different dates
+- WebMock to stub HTTP requests
+- Custom helper methods for creating subscriptions, events, and performing billing
+
+## Error Handling
+The tests don't explicitly cover error handling scenarios but focus on verifying the correct behavior of the fee creation and invoicing process.
+
+## Notes
+- The tests use extensive time manipulation to simulate billing cycles and events occurring over time.
+- Some tests include commented-out expectations, indicating potential future features or behaviors that are not yet implemented.
+- The file includes rubocop directives to disable certain linting rules in specific sections.

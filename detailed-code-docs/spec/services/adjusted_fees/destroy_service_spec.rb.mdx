@@ -1,0 +1,71 @@
+---
+title: "destroy_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `AdjustedFees::DestroyService` class. It verifies the behavior of the service when destroying an adjusted fee, including successful destruction, error handling, and the invocation of the `Invoices::RefreshDraftService`.
+
+## Code Structure
+The test suite is organized around the `#call` method of the `AdjustedFees::DestroyService` class. It uses RSpec's `describe` and `context` blocks to group related tests and set up different scenarios.
+
+## Symbols
+
+### RSpec.describe AdjustedFees::DestroyService
+#### Description
+This is the main describe block for the `AdjustedFees::DestroyService` test suite.
+
+### #call
+#### Description
+This describe block contains tests for the `#call` method of the `AdjustedFees::DestroyService`.
+
+#### Internal Logic
+The tests cover the following scenarios:
+1. Successful destruction of an adjusted fee
+2. Calling the `Invoices::RefreshDraftService` after destruction
+3. Handling the case when an adjusted fee is not found
+4. Handling the case when a fee is not found
+
+### let statements
+#### Description
+These statements set up the test data and dependencies used across the test suite.
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| membership | Membership | A factory-created membership |
+| organization | Organization | The organization associated with the membership |
+| invoice | Invoice | A factory-created draft invoice for the organization |
+| fee | Fee (ChargedFee) | A factory-created charge fee associated with the invoice |
+| adjusted_fee | AdjustedFee | A factory-created adjusted fee associated with the invoice and fee |
+| refresh_service | Double | A test double for the Invoices::RefreshDraftService |
+
+### before block
+#### Description
+This block sets up the test environment before each test. It creates the adjusted fee and sets up the mock for the `Invoices::RefreshDraftService`.
+
+### it blocks
+#### Description
+These blocks contain the actual test assertions for different scenarios.
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| AdjustedFees::DestroyService | The service being tested |
+| Invoices::RefreshDraftService | A service called after destroying the adjusted fee |
+
+## Error Handling
+The test suite covers error handling for two main scenarios:
+1. When the adjusted fee is not found
+2. When the fee is not found
+
+In both cases, it expects the service to return an unsuccessful result with the appropriate error code.
+
+## Notes
+- The tests use RSpec's `let` statements for lazy-loaded test data.
+- Factory methods (e.g., `create(:membership)`) are used to generate test data, likely using FactoryBot or a similar library.
+- The `Invoices::RefreshDraftService` is mocked to isolate the tests from its actual implementation.
+- The tests use RSpec's `expect` syntax for assertions and `change` matcher to verify state changes.
+- The `aggregate_failures` block is used to group multiple related assertions together.
+
+This test suite ensures that the `AdjustedFees::DestroyService` correctly handles the destruction of adjusted fees, including error cases, and properly integrates with the invoice refresh process.

@@ -1,0 +1,50 @@
+---
+title: "20220526101535_create_applied_add_ons.rb"
+---
+
+## High-level description
+This migration file creates a new table called `applied_add_ons` in the database. It establishes a relationship between add-ons and customers, storing information about the applied add-ons, including their monetary value.
+
+## Symbols
+
+### `CreateAppliedAddOns`
+#### Description
+This class is an ActiveRecord migration that defines the structure for the `applied_add_ons` table. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0.
+
+#### Internal Logic
+The migration uses the `change` method to define the table structure:
+
+1. Creates a new table named `applied_add_ons` with UUID as the primary key.
+2. Adds foreign key references to `add_ons` and `customers` tables.
+3. Includes fields for storing the monetary value of the add-on.
+4. Creates an index for faster querying on the combination of `add_on_id` and `customer_id`.
+5. Adds timestamp fields for record creation and update times.
+
+## Code Structure
+
+The migration defines the following structure for the `applied_add_ons` table:
+
+| Column Name | Data Type | Constraints | Description |
+|:------------|:----------|:------------|:------------|
+| id | uuid | primary key | Unique identifier for each applied add-on |
+| add_on_id | uuid | foreign key, not null | Reference to the add_ons table |
+| customer_id | uuid | foreign key, not null | Reference to the customers table |
+| amount_cents | integer | not null | The amount in cents |
+| amount_currency | string | not null | The currency of the amount |
+| created_at | datetime | | Timestamp of record creation |
+| updated_at | datetime | | Timestamp of last update |
+
+An index is created on the combination of `add_on_id` and `customer_id` for improved query performance.
+
+## Dependencies
+This migration relies on the ActiveRecord framework, which is part of Ruby on Rails.
+
+## Performance Considerations
+The inclusion of an index on `[add_on_id, customer_id]` suggests that queries filtering or joining on these columns are expected to be common, and the index will help optimize such queries.
+
+## References
+This migration references two other tables in the database:
+1. `add_ons` table (via the `add_on_id` foreign key)
+2. `customers` table (via the `customer_id` foreign key)
+
+These references imply that there are corresponding models (`AddOn` and `Customer`) in the application.

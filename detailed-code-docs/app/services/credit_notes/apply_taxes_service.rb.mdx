@@ -1,0 +1,68 @@
+---
+title: "apply_taxes_service.rb"
+---
+
+## High-level description
+This code defines the `ApplyTaxesService` class within the `CreditNotes` module. Its primary purpose is to calculate and apply taxes to credit note items based on the associated invoice and tax information. The service computes the tax amounts, rates, and adjustments for coupons, returning a detailed result of the applied taxes.
+
+## Code Structure
+The `ApplyTaxesService` class inherits from `BaseService` and contains a single public method `call`. It uses private methods to perform various calculations and data manipulations. The class works with the `invoice` and `items` passed to it, interacting with related models such as `CreditNote::AppliedTax` and `Tax`.
+
+## Symbols
+
+### `ApplyTaxesService`
+#### Description
+This service calculates and applies taxes to credit note items, considering the invoice and its associated taxes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice associated with the credit note |
+| items | Array | An array of credit note items |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing applied taxes, tax amounts, and rates |
+
+#### Internal Logic
+1. Initializes the result object with empty applied taxes and coupon adjustment amount.
+2. Iterates through applicable taxes for the organization.
+3. For each tax, creates a `CreditNote::AppliedTax` object and adds it to the result.
+4. Calculates the base amount and tax amount for each applied tax.
+5. Computes the total applied taxes amount and tax rate.
+6. Returns the result object with all calculated values.
+
+### Private Methods
+#### `applicable_taxes`
+Retrieves the applicable taxes for the organization based on the indexed items.
+
+#### `indexed_items`
+Creates a hash of items indexed by tax IDs.
+
+#### `items_amount_cents`
+Calculates the total amount of all items in cents.
+
+#### `coupons_adjustment_amount_cents`
+Calculates the coupon adjustment amount based on the invoice version and item fees.
+
+#### `compute_base_amount_cents(tax)`
+Computes the base amount for a specific tax, considering item amounts and coupon adjustments.
+
+#### `pro_rated_taxes_rate(tax)`
+Calculates the pro-rated tax rate based on the items associated with a specific tax.
+
+#### `find_invoice_applied_tax(tax)`
+Finds the applied tax for the invoice based on the given tax.
+
+## Dependencies
+- `BaseService`
+- `CreditNote::AppliedTax`
+- `Invoice`
+- `Tax`
+
+## Error Handling
+The service relies on the error handling mechanisms provided by the `BaseService` class. It doesn't implement any specific error handling within its methods.
+
+## Performance Considerations
+The service performs multiple calculations and database queries, which could impact performance for large numbers of items or taxes. Optimization might be needed for scaling with high volumes of data.

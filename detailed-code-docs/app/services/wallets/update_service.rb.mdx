@@ -1,0 +1,89 @@
+---
+title: "update_service.rb"
+---
+
+## High-level description
+This code defines the `Wallets::UpdateService` class, which is responsible for updating an existing wallet in the system. It handles various update operations such as changing the wallet name, expiration date, invoice requirements, and recurring transaction rules.
+
+## Code Structure
+The `UpdateService` class is part of the `Wallets` module and inherits from `BaseService`. It interacts with other services like `Wallets::RecurringTransactionRules::UpdateService` and `Wallets::Balance::RefreshOngoingService` to perform specific update operations.
+
+## References
+- `Wallets::RecurringTransactionRules::UpdateService`
+- `Wallets::Balance::RefreshOngoingService`
+- `Wallets::ValidateRecurringTransactionRulesService`
+- `Utils::Datetime`
+
+## Symbols
+
+### `Wallets::UpdateService`
+#### Description
+This service updates a wallet with the provided parameters. It handles updating the wallet's name, expiration date, invoice requirements, and recurring transaction rules. It also refreshes the wallet's ongoing balance after the update.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet | Wallet | The wallet object to be updated |
+| params | Hash | Parameters for updating the wallet |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the updated wallet and any error information |
+
+#### Internal Logic
+1. Check if the wallet exists and the expiration date is valid.
+2. Validate recurring transaction rules if present.
+3. Perform the update within a transaction:
+   - Update name, expiration date, and invoice requirements if provided.
+   - Update recurring transaction rules if provided and the license is premium.
+4. Refresh the wallet's ongoing balance.
+5. Return the result with the updated wallet.
+
+### `valid_recurring_transaction_rules?`
+#### Description
+Validates the recurring transaction rules using the `Wallets::ValidateRecurringTransactionRulesService`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | Hash | The parameters containing recurring transaction rules |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid | Boolean | Whether the recurring transaction rules are valid |
+
+### `valid_expiration_at?`
+#### Description
+Validates the expiration date provided for the wallet.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| expiration_at | String/DateTime | The expiration date to validate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid | Boolean | Whether the expiration date is valid |
+
+#### Internal Logic
+1. Return true if the expiration date is blank.
+2. Check if the expiration date has a valid format.
+3. Parse the expiration date if it's a string.
+4. Ensure the parsed date is in the future.
+5. Return false and add an error if the date is invalid.
+
+## Error Handling
+The service uses a `result` object to handle errors. It sets specific error messages for cases such as wallet not found, invalid expiration date, and invalid recurring transaction rules. It also catches `ActiveRecord::RecordInvalid` exceptions and adds them to the result.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | For database transactions and error handling |
+| ActiveModel | For boolean type casting |
+| License | To check if the premium features are available |
+
+## Performance Considerations
+The service uses a database transaction to ensure atomicity of the update operation, which can impact performance for large-scale operations.

@@ -1,0 +1,70 @@
+---
+title: "timezone.rb"
+---
+
+## High-level description
+This code defines a `Timezone` utility class within the `Utils` module. It provides methods for handling timezone-related SQL operations, specifically for converting dates and timestamps to a customer's timezone in PostgreSQL queries.
+
+## Symbols
+
+### `Utils::Timezone.date_in_customer_timezone_sql`
+#### Description
+This class method generates a SQL fragment to convert a given date or timestamp to the customer's timezone.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Object | An object representing a customer, which has an `applicable_timezone` method |
+| value | String or Object | The field name or value to be converted |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| SQL fragment | String | A SQL fragment that converts the input to the customer's timezone |
+
+#### Internal Logic
+1. Sanitizes the input field name or value.
+2. Sanitizes the customer's timezone.
+3. Constructs and returns a SQL fragment that casts the input to a timestamptz and converts it to the customer's timezone.
+
+### `Utils::Timezone.at_time_zone_sql`
+#### Description
+This class method generates a SQL fragment to convert a timestamp to a specified timezone, with fallback options.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | String | The table name for customers (default: 'customers') |
+| organization | String | The table name for organizations (default: 'organizations') |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| SQL fragment | String | A SQL fragment that converts a timestamp to the specified timezone |
+
+#### Internal Logic
+Constructs and returns a SQL fragment that:
+1. Casts an implicit timestamp to timestamptz.
+2. Converts it to a timezone specified by:
+   a. The customer's timezone
+   b. If not available, the organization's timezone
+   c. If neither is available, UTC
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Base | Used for SQL sanitization |
+
+## Performance Considerations
+The methods in this class generate SQL fragments, which allows for efficient timezone conversions directly in the database queries. This approach can be more performant than converting timezones in Ruby code, especially when dealing with large datasets.
+
+## Usage in Related Code
+The `Utils::Timezone` class is used in other parts of the application:
+
+1. In `app/services/base_service.rb`, there's a private method `at_time_zone` that calls `Utils::Timezone.at_time_zone_sql`.
+
+2. In `app/services/events/stores/postgres_store.rb`, the `date_in_customer_timezone_sql` method is used in the `sum_date_breakdown` method to ensure dates are in the customer's timezone.
+
+3. In `app/jobs/clock/terminate_ended_subscriptions_job.rb`, the `at_time_zone_sql` method is used in the SQL query to compare dates in the appropriate timezone.
+
+These usages demonstrate that the `Utils::Timezone` class plays a crucial role in ensuring consistent timezone handling across different parts of the application, particularly in database queries.

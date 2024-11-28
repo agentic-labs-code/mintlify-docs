@@ -1,0 +1,105 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various services related to tax management in the application. The services tested include auto-generation of taxes, creation of individual taxes, updating existing taxes, and destroying taxes. These tests ensure the correct functionality of tax-related operations within the system.
+
+## What does it do?
+The test suite in this directory verifies the following tax-related operations:
+
+1. Automatic generation of EU taxes for an organization
+2. Creation of individual tax records
+3. Updating existing tax records
+4. Destroying tax records
+
+The tests ensure that these operations work correctly, handle errors appropriately, and maintain data integrity. They also verify the impact of tax changes on related entities such as invoices.
+
+## Key Files
+1. `auto_generate_service_spec.rb`: Tests the automatic generation of EU taxes for an organization.
+2. `create_service_spec.rb`: Verifies the creation of individual tax records.
+3. `update_service_spec.rb`: Ensures proper updating of existing tax records.
+4. `destroy_service_spec.rb`: Checks the correct deletion of tax records and its effects on related entities.
+
+Each file focuses on a specific service and covers various scenarios, including successful operations, error handling, and side effects on related data.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data, such as organizations, memberships, and taxes.
+3. Rails testing environment: Loaded through `rails_helper`, providing necessary configurations and utilities for testing Rails applications.
+
+## Configuration
+The test files use the standard RSpec configuration, which is likely defined in the `spec/rails_helper.rb` file. This configuration sets up the testing environment, including database cleaner strategies and other RSpec-specific settings.
+
+Key aspects of the test configuration include:
+
+1. Use of `type: :service` in some describe blocks, indicating that these are service-type tests.
+2. Use of `aggregate_failures` in some tests to group multiple expectations and report all failures.
+3. Use of `let` statements to define reusable test data and dependencies.
+
+## Code Snippets and Examples
+
+Here are some key code snippets that illustrate the testing approach:
+
+1. Testing the auto-generation of EU taxes:
+
+```ruby
+it 'creates eu taxes for organization' do
+  auto_generate_service.call
+
+  aggregate_failures do
+    expect(Tax.count).to eq(46)
+  end
+end
+```
+
+2. Testing tax creation with validation:
+
+```ruby
+context 'with validation error' do
+  let(:params) { { code: code } }
+
+  it 'returns validation error' do
+    result = create_service.call
+
+    aggregate_failures do
+      expect(result).not_to be_success
+      expect(result).to be_a(BaseService::ValidationFailure)
+      expect(result.error.messages[:name]).to eq(["can't be blank"])
+    end
+  end
+end
+```
+
+3. Testing tax update and its effect on invoices:
+
+```ruby
+context 'when applied_to_organization changes' do
+  let(:params) { { applied_to_organization: true } }
+
+  it 'marks invoices as ready to be refreshed' do
+    invoice = create(:invoice, :draft, customer:)
+
+    expect { update_service.call }
+      .to change { invoice.reload.ready_to_be_refreshed }.from(false).to(true)
+  end
+end
+```
+
+4. Testing tax destruction:
+
+```ruby
+it 'destroys the tax' do
+  tax
+
+  aggregate_failures do
+    expect { destroy_service.call }.to change(Tax, :count).by(-1)
+    expect(result).to be_success
+    expect(Tax.find_by(id: tax.id)).to be_nil
+  end
+end
+```
+
+These tests demonstrate a comprehensive approach to verifying the functionality of tax-related services, covering various scenarios and edge cases to ensure robust and reliable tax management within the application.

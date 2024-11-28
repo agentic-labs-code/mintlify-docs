@@ -1,0 +1,75 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains a collection of background job classes related to event processing in a Rails application. These jobs handle various aspects of event management, including creation, validation, post-processing, and pay-in-advance scenarios. The jobs are designed to work asynchronously, leveraging ActiveJob and Sidekiq for background processing.
+
+## What does it do?
+The jobs in this directory perform several key functions in the event processing workflow:
+
+1. Event Creation: The `CreateBatchJob` (deprecated) handles the asynchronous creation of event batches for organizations.
+
+2. Pay-in-Advance Processing: The `PayInAdvanceJob` and `PayInAdvanceKafkaJob` handle the processing of pay-in-advance events, with the latter acting as a bridge between Kafka consumers and Sidekiq.
+
+3. Post-Processing: The `PostProcessJob` performs various post-creation tasks on events, such as updating customer and subscription information and expiring cached charges.
+
+4. Post-Validation: The `PostValidationJob` executes validation tasks for events related to specific organizations, checking for invalid codes, missing properties, and invalid filter values.
+
+These jobs work together to ensure that events are created, processed, and validated efficiently in the background, allowing the main application to remain responsive.
+
+## Key Files
+
+1. `create_batch_job.rb`: Contains the deprecated `Events::CreateBatchJob` class for batch event creation.
+
+2. `pay_in_advance_job.rb`: Defines the `Events::PayInAdvanceJob` class for processing pay-in-advance events.
+
+3. `pay_in_advance_kafka_job.rb`: Implements the `Events::PayInAdvanceKafkaJob` class, which acts as an intermediary between Kafka consumers and the `PayInAdvanceJob`.
+
+4. `post_process_job.rb`: Contains the `Events::PostProcessJob` class for handling post-processing tasks on events.
+
+5. `post_validation_job.rb`: Defines the `Events::PostValidationJob` class for performing post-validation tasks on events for specific organizations.
+
+## Dependencies
+The jobs in this directory rely on several external libraries and internal services:
+
+1. ActiveJob: Used as the base for all job classes, providing the foundation for background job processing.
+
+2. Sidekiq: Utilized for job queuing and processing, with features like job uniqueness being leveraged in some cases.
+
+3. ActiveModel: Used for type casting, particularly for boolean conversions of environment variables.
+
+4. Internal Services: Various service classes (e.g., `Events::CreateBatchService`, `Events::PayInAdvanceService`, `Events::PostProcessService`, `Events::PostValidationService`) are used to perform the actual business logic within the jobs.
+
+## Configuration
+The jobs in this directory use environment variables for configuration:
+
+1. `SIDEKIQ_EVENTS`: A boolean environment variable that determines which queue to use for job processing. When true, jobs are queued in the `:events` queue; otherwise, they use the `:default` queue.
+
+This configuration allows for flexible queue management based on the deployment environment.
+
+## Error Handling
+Error handling in these jobs is primarily done through the use of the `raise_if_error!` method, which is called on the result objects returned by the various service classes. This approach ensures that any errors occurring during the job execution are raised as exceptions, which can then be caught and handled by the job execution framework.
+
+For example, in the `PostProcessJob`:
+
+```ruby
+def perform(event)
+  Events::PostProcessService.call(event).raise_if_error!
+end
+```
+
+This pattern is consistent across the jobs, providing a uniform way of handling and propagating errors.
+
+## Performance Considerations
+Several performance optimizations are implemented in these jobs:
+
+1. Asynchronous Processing: By leveraging background jobs, these classes ensure that time-consuming tasks don't block the main application thread.
+
+2. Job Uniqueness: The `PayInAdvanceJob` uses Sidekiq's `unique` feature to prevent duplicate job execution, which can help avoid race conditions and unnecessary processing.
+
+3. Queue Selection: The ability to choose between different queues (`:events` or `:default`) allows for better load balancing and prioritization of job processing.
+
+4. Kafka Integration: The `PayInAdvanceKafkaJob` acts as a bridge between Kafka and Sidekiq, allowing for efficient handling of high-volume event streams.
+
+These optimizations contribute to a more scalable and efficient event processing system, capable of handling large volumes of events without impacting the main application's performance.

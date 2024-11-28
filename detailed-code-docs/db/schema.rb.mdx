@@ -1,0 +1,78 @@
+---
+title: "schema.rb"
+---
+
+## High-level description
+This schema.rb file defines the database structure for a complex billing and subscription management system. It includes tables for organizations, customers, plans, subscriptions, invoices, payments, and various other related entities. The schema uses PostgreSQL-specific features like UUID primary keys, JSON columns, and custom enum types.
+
+## Code Structure
+The schema defines numerous tables and their relationships through foreign keys. It also includes several indexes for performance optimization and unique constraints to maintain data integrity. The schema uses ActiveRecord's DSL to define tables, columns, indexes, and constraints.
+
+## Symbols
+
+### `ActiveRecord::Schema[7.1]`
+#### Description
+This symbol represents the current version of the database schema, using ActiveRecord version 7.1.
+
+### `create_table`
+#### Description
+This method is used to define tables in the database. It's called multiple times to create various tables like `active_storage_attachments`, `customers`, `invoices`, etc.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| table_name | Symbol | The name of the table to be created |
+| options | Hash | Additional options for table creation |
+
+#### Internal Logic
+- Defines columns for the table using methods like `t.string`, `t.integer`, etc.
+- Sets up indexes using `t.index`
+- Defines foreign key constraints using `t.foreign_key`
+
+### `add_foreign_key`
+#### Description
+This method is used to add foreign key constraints between tables.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| from_table | Symbol | The table containing the foreign key |
+| to_table | Symbol | The referenced table |
+| options | Hash | Additional options for the foreign key |
+
+### `create_enum`
+#### Description
+This method creates custom enum types in PostgreSQL.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| enum_name | String | The name of the enum type |
+| enum_values | Array | The possible values for the enum |
+
+### `create_view`
+#### Description
+This method creates database views, including materialized views.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| view_name | Symbol | The name of the view to be created |
+| options | Hash | Additional options for view creation |
+| sql_definition | String | The SQL query defining the view |
+
+## Dependencies
+The schema relies on several PostgreSQL extensions:
+- pgcrypto
+- plpgsql
+- unaccent
+
+These are enabled using the `enable_extension` method.
+
+## Configuration
+The schema defines several custom enum types and uses them in various tables. It also sets up numerous indexes and constraints to optimize query performance and maintain data integrity.
+
+## Error Handling
+The schema includes several check constraints to ensure data validity, such as ensuring that `invoice_grace_period` and `net_payment_term` are non-negative.
+
+This schema.rb file is crucial for setting up and maintaining the database structure for the application. It defines all the tables, relationships, and constraints necessary for the billing and subscription management system to function correctly.

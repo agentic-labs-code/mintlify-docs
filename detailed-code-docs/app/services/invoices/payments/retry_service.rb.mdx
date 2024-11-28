@@ -1,0 +1,77 @@
+---
+title: "retry_service.rb"
+---
+
+## High-level description
+This code defines the `Invoices::Payments::RetryService` class, which is responsible for retrying payments for invoices. It handles various invoice statuses and payment conditions, and triggers the appropriate webhook and payment creation process.
+
+## Code Structure
+The `RetryService` class inherits from `BaseService` and contains a single public method `call`. It uses constants, initializer, and private methods to organize its functionality.
+
+## Symbols
+
+### `Invoices::Payments::RetryService`
+#### Description
+This class provides a service to retry payments for invoices. It checks the invoice's status, ensures it's ready for payment processing, and then initiates the payment process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice object for which payment is to be retried |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Contains the success status and the invoice if successful |
+
+#### Internal Logic
+1. Validates the invoice existence and status
+2. Checks if the invoice is ready for payment processing
+3. Delivers a webhook based on the invoice type
+4. Calls the `Invoices::Payments::CreateService` to initiate the payment process
+5. Returns the result with the updated invoice
+
+### `WEBHOOK_TYPE`
+#### Description
+A constant hash that maps invoice types to corresponding webhook event types.
+
+### `initialize`
+#### Description
+Initializes the service with the given invoice.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice object for which payment is to be retried |
+
+### `call`
+#### Description
+The main method that executes the payment retry process.
+
+#### Internal Logic
+1. Checks if the invoice exists
+2. Validates the invoice status (not draft, voided, or payment succeeded)
+3. Ensures the invoice is ready for payment processing
+4. Delivers the appropriate webhook
+5. Calls the payment creation service
+6. Returns the result with the updated invoice
+
+### `deliver_webhook`
+#### Description
+A private method that enqueues a job to send a webhook based on the invoice type.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseService | Parent class providing common service functionality |
+| SendWebhookJob | Job for sending webhooks |
+| Invoices::Payments::CreateService | Service for creating payments |
+
+## Error Handling
+The service returns specific error results for various failure scenarios:
+- Invoice not found
+- Invalid invoice status
+- Invoice not ready for payment processing
+
+## Performance Considerations
+The service enqueues asynchronous jobs for webhook delivery and payment creation, which helps in maintaining performance for time-consuming operations.

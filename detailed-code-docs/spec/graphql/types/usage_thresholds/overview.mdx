@@ -1,0 +1,66 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL types related to usage thresholds in a Rails application. It includes tests for both input and object types, ensuring that the GraphQL schema is correctly defined for usage threshold-related operations.
+
+## What does it do?
+These test files verify the structure and data types of GraphQL types used for handling usage thresholds. They ensure that:
+
+1. The input type (`Types::UsageThresholds::Input`) correctly accepts specific arguments with their corresponding GraphQL types. This is crucial for validating data sent to the server when creating or updating usage thresholds.
+
+2. The object type (`Types::UsageThresholds::Object`) has the correct fields with appropriate data types. This ensures that the server responds with the expected structure when querying for usage threshold information.
+
+By maintaining these tests, developers can be confident that changes to the GraphQL schema or underlying data models don't inadvertently break the API contract for usage threshold-related operations.
+
+## Key Files
+
+1. `input_spec.rb`:
+   This file tests the `Types::UsageThresholds::Input` GraphQL input type. It verifies that the input type accepts the following arguments:
+   - `id` of type `ID`
+   - `amount_cents` of type `BigInt`
+   - `recurring` of type `Boolean`
+   - `threshold_display_name` of type `String`
+
+   Example test:
+   ```ruby
+   it { is_expected.to accept_argument(:amount_cents).of_type('BigInt') }
+   ```
+
+2. `object_spec.rb`:
+   This file tests the `Types::UsageThresholds::Object` GraphQL type. It ensures that the type has the following fields with correct data types:
+   - `id` of type `ID!`
+   - `amount_cents` of type `BigInt!`
+   - `threshold_display_name` of type `String`
+   - `recurring` of type `Boolean!`
+   - `created_at` of type `ISO8601DateTime!`
+   - `updated_at` of type `ISO8601DateTime!`
+
+   Example test:
+   ```ruby
+   it { is_expected.to have_field(:amount_cents).of_type('BigInt!') }
+   ```
+
+Both files use RSpec's `subject { described_class }` to refer to the class being tested, making the tests more concise and readable.
+
+## Dependencies
+Both test files depend on the `rails_helper`, which loads the Rails testing environment and configuration. This includes RSpec configurations, database cleaner settings, and other test-related helpers.
+
+The tests also implicitly depend on the actual implementations of `Types::UsageThresholds::Input` and `Types::UsageThresholds::Object` in the GraphQL schema, as well as any related models or database tables for usage thresholds.
+
+## Configuration
+The test files use the following RSpec configuration:
+
+```ruby
+RSpec.describe Types::UsageThresholds::Input do
+  subject { described_class }
+  # ... tests ...
+end
+```
+
+This configuration sets up the test suite for each GraphQL type and uses the `subject` to refer to the class being tested.
+
+Additionally, both files use `frozen_string_literal: true` at the top, which freezes string literals in the file to prevent unintended mutations and potentially improve performance.
+
+These tests play a crucial role in maintaining the integrity of the GraphQL API for usage thresholds. They ensure that any changes to the schema or underlying data models are reflected in the tests, helping to prevent regressions and maintain API consistency.

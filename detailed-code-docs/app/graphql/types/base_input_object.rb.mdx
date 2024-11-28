@@ -1,0 +1,44 @@
+---
+title: "base_input_object.rb"
+---
+
+## High-level description
+The `BaseInputObject` class acts as a base class for all input objects in the GraphQL schema. Its main functionality is to filter out input arguments that the user does not have permission to access. This is achieved by checking the `permissions` attribute of each argument definition against the user's permissions stored in the `context`.
+
+## Code Structure
+The `BaseInputObject` class inherits from `GraphQL::Schema::InputObject` and overrides the `initialize` method. It uses the `arguments` method from the `GraphQL::Schema::InputObject` class to iterate over the defined arguments. The `BaseArgument` class, which is used as the `argument_class` for `BaseInputObject`, is responsible for storing the `permissions` attribute.
+
+## References
+- `Types::BaseArgument`: This class defines the arguments used in the GraphQL schema and stores the `permissions` attribute.
+
+## Symbols
+
+### `BaseInputObject`
+#### Description
+This class is a subclass of `GraphQL::Schema::InputObject` and serves as the base class for all input objects in the GraphQL schema. It filters out input arguments based on the user's permissions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| arguments | Hash | A hash containing the input arguments. |
+| ruby_kwargs | Hash | A hash containing additional keyword arguments. |
+| context | Hash | The context object containing information about the current request, including the user's permissions. |
+| defaults_used | Array | An array of arguments for which default values were used. |
+
+#### Outputs
+This method doesn't explicitly return a value. It initializes the input object with the filtered arguments.
+
+#### Internal Logic
+1. **Initialization:** It creates copies of the input `arguments` and `ruby_kwargs` to avoid modifying the original objects.
+2. **Argument Iteration:** It iterates through each argument definition using `self.class.arguments(context)`.
+3. **Permission Check:** For each argument, it checks if the `permissions` attribute is defined and if the user has at least one of the required permissions using `arg_defn.permissions.none? { |p| context.dig(:permissions, p) }`.
+4. **Argument Removal:** If the user lacks the required permissions, the corresponding argument is removed from both `cleaned_arguments` and `cleaned_kwargs`.
+5. **Super Call:** Finally, it calls the `initialize` method of the parent class (`GraphQL::Schema::InputObject`) with the filtered arguments and other parameters.
+
+## Side Effects
+This class modifies the input arguments by removing those that the user does not have permission to access. This ensures that unauthorized users cannot manipulate data through the GraphQL API by providing arguments they are not allowed to use.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| graphql | Provides the GraphQL schema definition framework. | 

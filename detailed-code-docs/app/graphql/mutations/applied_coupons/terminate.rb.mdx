@@ -1,0 +1,49 @@
+---
+title: "terminate.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation called `TerminateAppliedCoupon` within the `Mutations::AppliedCoupons` module. Its purpose is to unassign a coupon from a customer by terminating the applied coupon. The mutation requires authentication and specific permissions to execute.
+
+## Code Structure
+The `Terminate` class inherits from `BaseMutation` and includes the `AuthenticableApiUser` concern. It defines the mutation's name, description, input argument, and return type. The main logic is implemented in the `resolve` method.
+
+## References
+- `Types::AppliedCoupons::Object`
+- `AppliedCoupon` model
+- `::AppliedCoupons::TerminateService`
+
+## Symbols
+
+### Terminate
+#### Description
+This class represents the GraphQL mutation for terminating an applied coupon. It authenticates the user, finds the applied coupon, and uses the `TerminateService` to perform the termination.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the applied coupon to terminate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| applied_coupon | Types::AppliedCoupons::Object | The terminated applied coupon object |
+
+#### Internal Logic
+1. Authenticate the user using the `AuthenticableApiUser` concern.
+2. Find the applied coupon by joining with the coupon and organization tables, ensuring the user has access to the organization.
+3. Call the `TerminateService` to perform the termination.
+4. Return the terminated applied coupon if successful, or an error if the operation fails.
+
+## Side Effects
+- The applied coupon's status is changed to "terminated" in the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication functionality for the mutation |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class) to handle and return errors from the `TerminateService`.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

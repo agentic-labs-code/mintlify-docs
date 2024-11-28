@@ -1,0 +1,77 @@
+---
+title: "create_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Mutations::Invites::Create` GraphQL mutation. It tests the functionality of creating invites for new users and revoked users in an organization, as well as handling error cases for existing invites and users already in the organization.
+
+## Code Structure
+The test file defines a set of shared examples and individual test cases for the `Mutations::Invites::Create` mutation. It uses FactoryBot for creating test data and RSpec's `let` statements to define reusable variables and objects.
+
+## Symbols
+
+### RSpec.describe Mutations::Invites::Create
+#### Description
+This is the main describe block for the `Mutations::Invites::Create` mutation tests. It sets up the test environment and defines the GraphQL mutation query.
+
+#### Internal Logic
+- Defines shared examples for common requirements (current user, current organization, and permissions)
+- Sets up test data using FactoryBot and Faker
+- Defines the GraphQL mutation query
+
+### it 'creates an invite for a new user'
+#### Description
+Tests the successful creation of an invite for a new user.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with valid input
+2. Verifies the returned data matches the input (email and role)
+3. Checks that a token is present in the response
+
+### it 'creates an invite for a revoked user'
+#### Description
+Tests the successful creation of an invite for a user with a revoked membership.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with the email of a revoked user
+2. Verifies the returned data matches the input email
+3. Checks that a token is present in the response
+
+### it 'returns an error if invite already exists'
+#### Description
+Tests the error handling when trying to create an invite for an email that already has an existing invite.
+
+#### Internal Logic
+1. Creates an existing invite using FactoryBot
+2. Executes the GraphQL mutation with the same email
+3. Verifies that an error is returned with the correct status, code, and details
+
+### it 'returns an error if email already attached to a user of the organization'
+#### Description
+Tests the error handling when trying to create an invite for an email that belongs to an existing user in the organization.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with the email of an existing user in the organization
+2. Verifies that an error is returned with the correct status, code, and details
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Creates test data |
+| Faker | Generates fake data for testing |
+| RSpec | Testing framework |
+
+## Configuration
+The test file uses the following configuration:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| type: :graphql | Symbol | N/A | Specifies that this is a GraphQL-related test |
+
+## Error Handling
+The test file checks for two main error scenarios:
+1. Attempting to create an invite for an email that already has an existing invite
+2. Attempting to create an invite for an email that belongs to an existing user in the organization
+
+In both cases, it verifies that the correct error status, code, and details are returned.

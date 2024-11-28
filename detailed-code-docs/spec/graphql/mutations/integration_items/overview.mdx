@@ -1,0 +1,65 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL mutations related to integration items. The tests focus on verifying the behavior of mutations that fetch various types of data (accounts, items, and tax items) from NetSuite integrations, process them, and update the local database.
+
+## What does it do?
+These tests ensure that the GraphQL mutations for fetching integration data work correctly. They verify that:
+
+1. The mutations can retrieve data from external sources (NetSuite via Nango API).
+2. The retrieved data is processed and stored correctly in the local database.
+3. The mutations return the expected data to the client.
+4. Proper authentication and authorization are enforced.
+5. The system handles different types of integration items (accounts, general items, and tax items) correctly.
+
+The tests mock external services and API calls to isolate the testing of the mutation logic.
+
+## Key Files
+1. `fetch_accounts_spec.rb`: Tests the `FetchAccounts` mutation, which retrieves integration accounts from NetSuite.
+2. `fetch_items_spec.rb`: Tests the `FetchItems` mutation, which retrieves general integration items from NetSuite.
+3. `fetch_tax_items_spec.rb`: Tests the `FetchTaxItems` mutation, which retrieves tax items from NetSuite.
+
+Each file follows a similar structure:
+- Setting up test data and mocks
+- Defining the GraphQL mutation
+- Executing the mutation and verifying the results
+- Checking database updates
+
+## Dependencies
+The tests rely on the following key dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data (memberships, organizations, integrations, etc.).
+3. WebMock: Used for stubbing HTTP requests to external APIs (Nango API in this case).
+4. Rails testing environment: Loaded via `rails_helper`.
+
+## Configuration
+The tests use fixtures and factory-created objects to set up the test environment. Key configurations include:
+
+1. Mocking the `Integrations::Aggregator::SyncService` to control its behavior during tests.
+2. Stubbing HTTP requests to the Nango API to return predefined responses.
+3. Setting up required permissions and memberships to test authorization.
+
+Here's an example of how the `Integrations::Aggregator::SyncService` is mocked:
+
+```ruby
+let(:sync_service) { instance_double(Integrations::Aggregator::SyncService) }
+
+before do
+  allow(Integrations::Aggregator::SyncService).to receive(:new).and_return(sync_service)
+  allow(sync_service).to receive(:call).and_return(true)
+end
+```
+
+And an example of stubbing the Nango API request:
+
+```ruby
+before do
+  stub_request(:get, "https://api.nango.dev/sync/#{integration.provider_name}/#{integration.external_id}/accounts")
+    .to_return(status: 200, body: accounts_response.to_json, headers: { 'Content-Type' =&gt; 'application/json' })
+end
+```
+
+These tests play a crucial role in ensuring the reliability and correctness of the integration item fetching process, which is a key part of the application's functionality for managing NetSuite integrations.

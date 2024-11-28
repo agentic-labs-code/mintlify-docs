@@ -1,0 +1,86 @@
+---
+title: "advance_charges_service_spec.rb"
+---
+
+## High-level description
+This RSpec test file is for the `Invoices::AdvanceChargesService` class. It tests the functionality of creating advance charge invoices for subscriptions, including handling of fees, taxes, and integration with external systems.
+
+## Code Structure
+The test file is organized into a single `describe` block for the `call` method of the `Invoices::AdvanceChargesService`. Within this block, there are multiple contexts testing different scenarios such as existing standalone fees, no standalone fees, and integration requirements.
+
+## Symbols
+
+### `RSpec.describe Invoices::AdvanceChargesService`
+#### Description
+This is the main describe block for the `Invoices::AdvanceChargesService` class.
+
+### `describe 'call'`
+#### Description
+This describe block focuses on testing the `call` method of the `Invoices::AdvanceChargesService`.
+
+### `subject(:invoice_service)`
+#### Description
+This is the subject of the test, an instance of `Invoices::AdvanceChargesService`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscriptions | Array | List of subscriptions to process |
+| billing_at | Time | The billing date and time |
+
+### `let` statements
+#### Description
+These statements set up the test data and dependencies, including organization, customer, tax, subscription, plan, and billable metric.
+
+### `fee_boundaries` method
+#### Description
+This helper method generates random fee boundaries for testing purposes.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Hash | Hash | Contains timestamp, charges_from_datetime, and charges_to_datetime |
+
+### `context 'with existing standalone fees'`
+#### Description
+This context tests the scenario where there are existing standalone fees for the subscription.
+
+#### Internal Logic
+1. Creates a charge and associated fees
+2. Calls the service and checks the result
+3. Verifies the created invoice properties
+4. Checks for enqueued jobs
+
+### `context 'without any standalone fees'`
+#### Description
+This context tests the scenario where there are no standalone fees for the subscription.
+
+#### Internal Logic
+1. Calls the service
+2. Verifies that no invoice is created
+
+### `context 'with integration requiring sync'`
+#### Description
+This context tests the scenario where the invoice needs to be synced with external integrations.
+
+#### Internal Logic
+1. Creates a charge and fee
+2. Mocks integration sync requirements
+3. Calls the service
+4. Verifies that integration jobs are enqueued
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| FactoryBot | Used for creating test data |
+| RSpec | Testing framework |
+
+## Error Handling
+The test file doesn't explicitly test error handling scenarios. It focuses on successful execution paths.
+
+## Logging
+No specific logging mechanisms are implemented in this test file.
+
+## TODOs
+There are no explicit TODOs in the code.

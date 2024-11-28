@@ -1,0 +1,92 @@
+---
+title: "build_default_properties_service.rb"
+---
+
+## High-level description
+This code defines a service class `BuildDefaultPropertiesService` within the `Charges` module. Its primary purpose is to generate default properties for different charge models used in a billing system. The service provides a standardized way to initialize charge properties based on the specified charge model.
+
+## Code Structure
+The `BuildDefaultPropertiesService` class inherits from `BaseService` and contains a single public method `call` that delegates to private methods based on the charge model. Each private method defines the default properties for a specific charge model.
+
+## Symbols
+
+### `BuildDefaultPropertiesService`
+#### Description
+This class is responsible for building default properties for various charge models. It takes a charge model as input and returns a hash of default properties specific to that model.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge_model | Symbol | The type of charge model (e.g., :standard, :graduated, :package, etc.) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Hash | Hash | A hash containing default properties for the specified charge model |
+
+#### Internal Logic
+The `call` method uses a case statement to determine which private method to call based on the charge model. Each private method returns a hash with default values for the respective charge model.
+
+### `default_standard_properties`
+#### Description
+Defines default properties for the standard charge model.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Hash | Hash | Contains a single key-value pair with 'amount' set to '0' |
+
+### `default_graduated_properties`
+#### Description
+Defines default properties for the graduated charge model.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Hash | Hash | Contains a 'graduated_ranges' array with a single range from 0 to nil, with per_unit_amount and flat_amount set to '0' |
+
+### `default_package_properties`
+#### Description
+Defines default properties for the package charge model.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Hash | Hash | Contains package_size, amount, and free_units with default values |
+
+### `default_percentage_properties`
+#### Description
+Defines default properties for the percentage charge model.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Hash | Hash | Contains a single key-value pair with 'rate' set to '0' |
+
+### `default_volume_properties`
+#### Description
+Defines default properties for the volume charge model.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Hash | Hash | Contains a 'volume_ranges' array with a single range from 0 to nil, with per_unit_amount and flat_amount set to '0' |
+
+### `default_graduated_percentage_properties`
+#### Description
+Defines default properties for the graduated percentage charge model.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Hash | Hash | Contains a 'graduated_percentage_ranges' array with a single range from 0 to nil, with rate, fixed_amount, and flat_amount set to '0' |
+
+## References
+This service is used in other parts of the codebase, specifically:
+1. In `Plans::CreateService`, it's used to generate default properties when creating a new charge.
+2. In `Plans::UpdateService`, it's used when updating charges to provide default properties if none are specified.
+
+## Dependencies
+This code depends on the `BaseService` class, which it inherits from. The exact implementation of `BaseService` is not provided in the given code snippets.
+
+Note: The code uses Ruby's frozen string literal pragma, indicating that string literals in this file are frozen by default, which can lead to better performance and memory usage.

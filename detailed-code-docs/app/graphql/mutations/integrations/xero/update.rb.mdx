@@ -1,0 +1,79 @@
+---
+title: "update.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for updating a Xero integration within an organization. It's part of a larger GraphQL API structure and handles the process of updating Xero integration details while ensuring proper authentication and authorization.
+
+## Code Structure
+The `Update` class is nested within the `Mutations::Integrations::Xero` module. It inherits from `BaseMutation` and includes two concerns: `AuthenticableApiUser` and `RequiredOrganization`. The class defines the GraphQL mutation structure and delegates the actual update logic to a separate service class.
+
+## References
+- `Types::Integrations::Xero::UpdateInput`
+- `Types::Integrations::Xero`
+- `::Integrations::Xero::UpdateService`
+
+## Symbols
+
+### `Update` class
+#### Description
+This class defines a GraphQL mutation for updating a Xero integration. It handles authentication, authorization, and delegates the update process to a service class.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | GraphQL input arguments for updating the Xero integration |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Types::Integrations::Xero | Updated Xero integration object |
+
+#### Internal Logic
+1. Finds the integration by ID within the current organization
+2. Calls the `::Integrations::Xero::UpdateService` with the integration and input parameters
+3. Returns the updated integration if successful, or an error result if not
+
+## Side Effects
+- Updates the Xero integration record in the database if the operation is successful
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user has access to the required organization |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'organization:integrations:update' | Permission required to perform this mutation |
+
+## Error Handling
+- If the user is not authenticated or lacks the required organization access, an error will be raised (handled by the included concerns)
+- If the update operation fails, the error result from the service class is returned
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| updateXeroIntegration | Mutation | UpdateXeroIntegrationInput | XeroIntegration | Updates a Xero integration |
+
+The `UpdateXeroIntegrationInput` includes the following arguments:
+- id: ID (optional)
+- code: String (optional)
+- name: String (optional)
+- connection_id: String (optional)
+- sync_credit_notes: Boolean (optional)
+- sync_invoices: Boolean (optional)
+- sync_payments: Boolean (optional)
+
+The `XeroIntegration` type includes fields such as:
+- code: String
+- connection_id: ID
+- has_mappings_configured: Boolean
+- id: ID
+- name: String
+- sync_credit_notes: Boolean
+- sync_invoices: Boolean
+- sync_payments: Boolean
+
+This mutation is part of the larger GraphQL schema defined in the `MutationType` class, which includes various other mutations related to different aspects of the application.

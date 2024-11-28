@@ -1,0 +1,94 @@
+---
+title: "segment_identify_job_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `SegmentIdentifyJob` class. It verifies the behavior of the job's `perform` method under various conditions, including different environment settings and edge cases.
+
+## Code Structure
+The test suite is organized around the `SegmentIdentifyJob` class, focusing on its `perform` method. It uses RSpec's `describe` and `context` blocks to group related tests and set up different scenarios.
+
+## Symbols
+
+### `SegmentIdentifyJob`
+#### Description
+This is the main class being tested. It's a job responsible for identifying users in Segment, a customer data platform.
+
+### `.perform`
+#### Description
+This is the main method being tested within the `SegmentIdentifyJob` class. It's responsible for sending user identification data to Segment.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| membership_id | String | The ID of the membership to be identified |
+
+#### Internal Logic
+1. Checks if Segment is disabled via environment variable
+2. Retrieves the membership based on the provided ID
+3. Calls Segment's `identify` method with user data if conditions are met
+
+## Test Cases
+
+### Main Functionality Test
+#### Description
+Verifies that the job correctly calls Segment's `identify` method with the expected parameters.
+
+#### Internal Logic
+1. Sets up a mock membership and environment
+2. Executes the job
+3. Asserts that `SEGMENT_CLIENT.identify` was called with the correct user ID and traits
+
+### LAGO_CLOUD Environment Variable Test
+#### Description
+Checks if the hosting type is set to 'cloud' when the `LAGO_CLOUD` environment variable is true.
+
+#### Internal Logic
+1. Sets `ENV['LAGO_CLOUD']` to 'true'
+2. Runs the job
+3. Verifies that the `identify` call includes 'cloud' as the hosting type
+
+### Nil Membership Test
+#### Description
+Ensures that no events are sent when the membership ID is nil.
+
+#### Internal Logic
+1. Calls the job with a nil membership ID
+2. Asserts that `SEGMENT_CLIENT.identify` was not called
+
+### Unidentifiable Membership Test
+#### Description
+Verifies that no events are sent for an unidentifiable membership.
+
+#### Internal Logic
+1. Calls the job with an invalid membership ID
+2. Checks that `SEGMENT_CLIENT.identify` was not called
+
+### LAGO_DISABLE_SEGMENT Environment Variable Test
+#### Description
+Confirms that the job doesn't send any events when Segment is disabled via environment variable.
+
+#### Internal Logic
+1. Sets `ENV['LAGO_DISABLE_SEGMENT']` to 'true'
+2. Executes the job
+3. Verifies that `SEGMENT_CLIENT.identify` was not called
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| FactoryBot | Used for creating test data (memberships) |
+| RSpec | Testing framework |
+
+## Configuration
+The test suite uses environment variables to control behavior:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LAGO_DISABLE_SEGMENT | String | '' | Disables Segment integration when set to 'true' |
+| LAGO_CLOUD | String | Not set | Sets hosting type to 'cloud' when 'true' |
+
+## Error Handling
+The test suite doesn't explicitly test error handling, focusing instead on the job's behavior under different conditions.
+
+## TODOs
+There are no explicit TODOs in the code.

@@ -1,0 +1,41 @@
+---
+title: "gocardless_create_job.rb"
+---
+
+## High-level description
+This code defines a job class `GocardlessCreateJob` within the `CreditNotes::Refunds` module. The job is responsible for creating a GoCardless refund for a given credit note using the `GocardlessService`.
+
+## Code Structure
+The `GocardlessCreateJob` class inherits from `ApplicationJob` and defines a single method `perform` that uses the `GocardlessService` to create a refund.
+
+## References
+- `CreditNotes::Refunds::GocardlessService`
+- `ApplicationJob`
+
+## Symbols
+
+### `CreditNotes::Refunds::GocardlessCreateJob`
+#### Description
+This class represents a background job for creating GoCardless refunds. It uses the `GocardlessService` to process the refund creation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_note | CreditNote | The credit note object for which the refund is to be created |
+
+#### Internal Logic
+1. The job is queued in the 'providers' queue.
+2. When performed, it creates a new instance of `GocardlessService` with the given credit note.
+3. It calls the `create` method on the service instance.
+4. If the result contains an error, it raises an exception.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ApplicationJob | Base class for all jobs in the application |
+
+## Error Handling
+The job uses the `raise_if_error!` method on the result object returned by the `GocardlessService`. This suggests that any errors occurring during the refund creation process will be raised as exceptions, which will likely be caught and handled by the job processing system (e.g., Sidekiq).
+
+## Performance Considerations
+As this job is queued in the 'providers' queue, it's likely designed to be run asynchronously to avoid blocking the main application thread during the potentially time-consuming process of creating a refund with an external service (GoCardless).

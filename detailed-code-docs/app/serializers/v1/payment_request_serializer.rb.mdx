@@ -1,0 +1,72 @@
+---
+title: "payment_request_serializer.rb"
+---
+
+## High-level description
+The `PaymentRequestSerializer` class is responsible for serializing `PaymentRequest` objects into a JSON representation for API responses. It includes options to include nested data for associated `customer` and `invoices`.
+
+## Code Structure
+The `PaymentRequestSerializer` defines a `serialize` method that constructs the JSON payload. It uses the `customer` and `invoices` private methods to format the nested data for those associations when requested.
+
+## References
+- `V1::CustomerSerializer`: Used to serialize the associated `customer` object.
+- `CollectionSerializer`: Used to serialize the collection of associated `invoices`.
+- `V1::InvoiceSerializer`: Used by `CollectionSerializer` to serialize individual `invoice` objects.
+
+## Symbols
+
+### `PaymentRequestSerializer`
+#### Description
+Serializes a `PaymentRequest` object into a JSON-compatible hash.
+
+#### Inputs
+This class is a serializer and does not have explicit inputs. It operates on the `model` instance variable, which is a `PaymentRequest` object.
+
+#### Outputs
+Returns a hash representing the serialized `PaymentRequest` object, optionally including nested data for `customer` and `invoices`.
+
+#### Internal Logic
+1. **Base Payload:** Creates a hash containing the basic attributes of the `PaymentRequest` object (`lago_id`, `amount_cents`, `amount_currency`, `email`, `created_at`).
+2. **Conditional Inclusions:**
+    - If `include?(:customer)` is true, it merges the output of the `customer` method into the payload.
+    - If `include?(:invoices)` is true, it merges the output of the `invoices` method into the payload.
+3. **Returns Payload:** Returns the constructed payload hash.
+
+### `customer`
+#### Description
+Serializes the associated `customer` object of the `PaymentRequest`.
+
+#### Inputs
+This method does not have explicit inputs. It accesses the `model` instance variable, which is a `PaymentRequest` object.
+
+#### Outputs
+Returns a hash with the key `customer` and the serialized representation of the associated `customer` object.
+
+#### Internal Logic
+1. **Serializes Customer:** Uses the `V1::CustomerSerializer` to serialize the `customer` associated with the `PaymentRequest`.
+2. **Returns Customer Hash:** Returns a hash with the serialized `customer` data.
+
+### `invoices`
+#### Description
+Serializes the collection of `invoices` associated with the `PaymentRequest`.
+
+#### Inputs
+This method does not have explicit inputs. It accesses the `model` instance variable, which is a `PaymentRequest` object.
+
+#### Outputs
+Returns a hash containing the serialized representation of the associated `invoices`.
+
+#### Internal Logic
+1. **Uses CollectionSerializer:** Utilizes the `CollectionSerializer` to serialize the `invoices` collection.
+2. **Specifies Serializer:** Sets `V1::InvoiceSerializer` as the serializer for individual `invoice` objects.
+3. **Sets Collection Name:** Sets the key for the serialized invoices to `invoices`.
+4. **Returns Serialized Invoices:** Returns the hash containing the serialized `invoices` data.
+
+## Dependencies
+- `ModelSerializer` (inherited)
+- `V1::CustomerSerializer`
+- `CollectionSerializer`
+- `V1::InvoiceSerializer`
+
+## Error Handling
+This code does not implement specific error handling beyond potential exceptions raised by underlying methods.

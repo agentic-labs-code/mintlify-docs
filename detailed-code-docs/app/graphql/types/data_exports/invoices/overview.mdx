@@ -1,0 +1,64 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions related to data exports for invoices. It includes input types for creating data exports, enums for specifying export types, and filter inputs for refining the data to be exported. These types are designed to work together to provide a flexible and type-safe way of requesting invoice data exports through a GraphQL API.
+
+## What does it do?
+This code enables users of the GraphQL API to request exports of invoice data with specific filters and formats. Here's a breakdown of the functionality:
+
+1. Users can create a data export job for invoices by specifying filters, the desired format, and the type of invoice data they want to export.
+2. The system allows filtering invoices based on various criteria such as currency, customer ID, invoice type, date ranges, payment status, and more.
+3. Users can choose between exporting general invoice data or specific invoice fee data.
+4. The export format can be specified, likely allowing for different file types or data structures in the exported result.
+
+This functionality allows for precise control over what invoice data is exported and how it's formatted, which can be useful for reporting, analysis, or integration with other systems.
+
+## Key Files
+
+1. `create_input.rb`:
+   - Defines the `CreateInput` class, which specifies the structure for creating a data export job.
+   - It includes fields for filters, format, and resource type.
+   - This is likely the main entry point for initiating an invoice data export through the GraphQL API.
+
+2. `export_type_enum.rb`:
+   - Defines the `ExportTypeEnum` which specifies the types of invoice data that can be exported.
+   - It offers two options: 'invoices' for general invoice data and 'invoice_fees' for fee-specific data.
+
+3. `filters_input.rb`:
+   - Defines the `FiltersInput` class, which provides a comprehensive set of filtering options for invoice data.
+   - It allows filtering by currency, customer ID, invoice type, date ranges, payment status, and various other criteria.
+   - This input type enables users to precisely specify which invoices should be included in the export.
+
+## Dependencies
+The code relies on several GraphQL-related dependencies and custom types:
+
+1. `graphql` gem: The core library for implementing GraphQL in Ruby.
+2. Custom base types:
+   - `Types::BaseInputObject`
+   - `Types::BaseEnum`
+3. Custom enum types:
+   - `Types::CurrencyEnum`
+   - `Types::Invoices::InvoiceTypeEnum`
+   - `Types::Invoices::PaymentStatusTypeEnum`
+   - `Types::Invoices::StatusTypeEnum`
+   - `Types::DataExports::FormatTypeEnum`
+4. `GraphQL::Types::ISO8601Date`: For handling date inputs in ISO 8601 format.
+
+These dependencies suggest that the project has a well-structured GraphQL schema with reusable types and enums across different parts of the API.
+
+## Configuration
+While there are no explicit configuration files in this directory, the structure and naming of the types suggest some conventions and configurations in the broader application:
+
+1. The use of nested modules (`Types::DataExports::Invoices`) indicates a organized structure for managing different areas of the GraphQL schema.
+2. The presence of various enum types suggests that there might be configuration or database-backed lists of valid values for currencies, invoice types, payment statuses, etc.
+3. The `FiltersInput` type includes a wide range of filter options, which might be aligned with database indexes or search capabilities in the backend.
+
+To use these types effectively, developers would need to ensure that:
+
+1. The corresponding GraphQL mutations and queries are implemented to use these input types.
+2. The backend logic can handle the specified filters and export types.
+3. Any changes to the available currencies, invoice types, or statuses are reflected in the respective enum types.
+
+In summary, this directory provides a well-structured set of GraphQL types for handling invoice data exports, offering flexibility in filtering and export options while maintaining type safety and clear API design.

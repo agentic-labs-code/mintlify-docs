@@ -1,0 +1,57 @@
+---
+title: "okta.rb"
+---
+
+## High-level description
+The code defines a GraphQL type called `Okta` within the `Types::Integrations` module. This type represents an Okta integration in the application and defines its structure, including fields like `client_id`, `client_secret`, `domain`, etc. It also includes a custom resolver for the `client_secret` field to obfuscate its value before sending it back to the client.
+
+## Code Structure
+The `Okta` type is defined as a subclass of `Types::BaseObject`. It defines several fields representing the attributes of an Okta integration. The `client_secret` field has a custom resolver method to obfuscate its value.
+
+## References
+This code references the `Types::BaseObject` class, indicating that it inherits from a base GraphQL object type. It also references the `object` variable within the `client_secret` resolver, which likely refers to the underlying Ruby object representing the Okta integration.
+
+## Symbols
+
+### `Okta`
+#### Description
+This class defines the GraphQL type for an Okta integration, outlining its attributes and their corresponding data types. It also includes a custom resolver for the `client_secret` field to protect sensitive information.
+
+#### Inputs
+This class does not take any direct inputs.
+
+#### Outputs
+This class does not return any direct outputs. It defines the structure and types of data for an Okta integration object in the GraphQL schema.
+
+#### Internal Logic
+The `client_secret` method overrides the default field resolver. It obfuscates the actual `client_secret` value by replacing most of it with bullet points ("•") and only revealing the last three characters. This ensures that sensitive information is not exposed in the API response.
+
+## Side Effects
+The `client_secret` method modifies the output for the `client_secret` field, preventing the actual secret from being exposed.
+
+## Dependencies
+This code depends on the `Types::BaseObject` class, indicating a dependency on a library or module that provides base GraphQL object functionality.
+
+```
+module Types
+  module Integrations
+    class Okta &lt; Types::BaseObject
+      graphql_name 'OktaIntegration'
+
+      field :client_id, String, null: true
+      field :client_secret, String, null: true
+      field :code, String, null: false
+      field :domain, String, null: false
+      field :id, ID, null: false
+      field :name, String, null: false
+      field :organization_name, String, null: false
+
+      # NOTE: Client secret is a sensitive information. It should not be sent back to the
+      #       front end application. Instead we send an obfuscated value
+      def client_secret
+        "#{"•" * 8}…#{object.client_secret[-3..]}"
+      end
+    end
+  end
+end
+```

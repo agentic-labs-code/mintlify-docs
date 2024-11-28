@@ -1,0 +1,82 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various integration models in a Rails application. The integrations include Anrok, Base, NetSuite, Okta, and Xero. These tests ensure that the integration models behave correctly in terms of validations, associations, and attribute management.
+
+## What does it do?
+The test files in this directory verify the functionality of different integration models used in the application. They check:
+
+1. Validations: Ensuring required fields are present and unique where necessary.
+2. Associations: Verifying relationships between models.
+3. Attribute management: Testing the assignment and retrieval of various attributes, including encrypted or secure attributes.
+4. Settings handling: Checking methods for managing integration-specific settings.
+5. Secret management: Testing methods for securely storing and retrieving sensitive information.
+
+These tests help maintain the integrity and security of the integration systems, ensuring that they work as expected when interacting with external services like Anrok, NetSuite, Okta, and Xero.
+
+## Key Files
+
+1. `anrok_integration_spec.rb`:
+   - Tests the `Integrations::AnrokIntegration` model.
+   - Verifies validations, associations, and methods for API key and connection ID management.
+
+2. `base_integration_spec.rb`:
+   - Tests the `Integrations::BaseIntegration` model.
+   - Focuses on methods for handling secrets and settings.
+
+3. `netsuite_integration_spec.rb`:
+   - Tests the `Integrations::NetsuiteIntegration` model.
+   - Verifies validations and attribute assignments specific to NetSuite integration.
+
+4. `okta_integration_spec.rb`:
+   - Tests the `Integrations::OktaIntegration` model.
+   - Checks presence validations and uniqueness of the domain field.
+
+5. `xero_integration_spec.rb`:
+   - Tests the `Integrations::XeroIntegration` model.
+   - Verifies validations, attribute assignments, and retrieval of Xero-specific settings.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test objects and managing test data.
+3. Shoulda Matchers: Provides additional RSpec matchers for common Rails functionality.
+4. SimpleCov: Used for code coverage reporting (configured in the `rails_helper`).
+
+## Configuration
+The test files include the `rails_helper`, which sets up the testing environment. This helper likely includes configurations for:
+
+1. Loading the Rails environment
+2. Setting up the database cleaner
+3. Configuring SimpleCov for code coverage
+4. Loading support files and custom matchers
+
+Each test file uses RSpec's `describe` and `context` blocks to organize tests, and employs various RSpec matchers to make assertions about the behavior of the integration models.
+
+Code example from `base_integration_spec.rb`:
+
+```ruby
+RSpec.describe Integrations::BaseIntegration do
+  subject(:integration) { described_class.new(attributes) }
+
+  let(:secrets) { { 'api_key' =&gt; 'secret_key', 'api_secret' =&gt; 'secret_value' } }
+  let(:attributes) { { secrets_json: secrets.to_json } }
+
+  it { is_expected.to have_many(:error_details) }
+
+  describe '.secrets_json' do
+    it 'returns the secrets hash' do
+      expect(integration.secrets_json).to eq(secrets)
+    end
+  end
+
+  # More tests...
+end
+```
+
+This structure is consistent across the test files, with each file focusing on the specific attributes and behaviors of its respective integration model.
+
+The tests in this directory play a crucial role in ensuring the reliability and correctness of the integration systems in the application, helping to maintain data integrity and security when interacting with external services.

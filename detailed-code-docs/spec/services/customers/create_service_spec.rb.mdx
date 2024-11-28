@@ -1,0 +1,94 @@
+---
+title: "create_service_spec.rb"
+---
+
+Here's a comprehensive documentation for the `Customers::CreateService` class:
+
+## High-level description
+The `Customers::CreateService` is responsible for creating and updating customer records in the system. It handles customer creation from API requests and internal calls, manages customer metadata, billing configurations, and integrates with payment providers.
+
+## Code Structure
+The service contains two main methods: `create_from_api` and `create`. Both methods handle customer creation but with different input formats and slightly different logic. The service also includes several private helper methods for various tasks such as metadata creation, billing configuration, and payment provider integration.
+
+## Symbols
+
+### `create_from_api`
+#### Description
+Creates or updates a customer based on API input parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization the customer belongs to |
+| params | Hash | Customer attributes and related data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Contains the created/updated customer or error information |
+
+#### Internal Logic
+1. Finds or initializes a customer based on the external_id
+2. Validates metadata and integration customers count
+3. Updates customer attributes
+4. Handles currency updates
+5. Applies taxes if applicable
+6. Creates or updates metadata
+7. Handles billing configuration and payment provider integration
+8. Creates or updates integration customers
+9. Tracks customer creation event
+
+### `create`
+#### Description
+Creates a new customer based on provided arguments.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | Customer attributes and related data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Contains the created customer or error information |
+
+#### Internal Logic
+1. Validates metadata count
+2. Creates a new customer with provided attributes
+3. Applies taxes if applicable
+4. Creates metadata
+5. Handles billing configuration and payment provider integration
+6. Creates integration customers
+7. Tracks customer creation event
+
+## Side Effects
+- Creates or updates customer records in the database
+- Creates or updates customer metadata
+- Integrates with payment providers (Stripe, GoCardless, Adyen)
+- Tracks customer creation events using SegmentTrackJob
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Customers::PaymentProviderFinder | Finds payment providers for customers |
+| Customers::UpdateService | Updates customer currency |
+| Customers::EuAutoTaxesService | Applies EU auto taxes |
+| Customers::ApplyTaxesService | Applies taxes to customers |
+| Customers::Metadata::UpdateService | Updates customer metadata |
+| IntegrationCustomers::CreateOrUpdateService | Creates or updates integration customers |
+| PaymentProviderCustomers::CreateService | Creates or updates payment provider customers |
+| SegmentTrackJob | Tracks customer creation events |
+
+## Error Handling
+The service uses the `BaseService::Result` object to handle and return errors. It catches and handles various exceptions, including `ActiveRecord::RecordInvalid`, `BaseService::ServiceFailure`, and `BaseService::FailedResult`.
+
+## Performance Considerations
+- The service uses database transactions to ensure data consistency when creating or updating customers and related records.
+- It performs multiple database operations and integrates with external services, which may impact performance for bulk operations.
+
+## TODOs
+- Consider refactoring the `create_from_api` and `create` methods to reduce code duplication
+- Improve error handling and provide more specific error messages
+- Consider adding more comprehensive logging for debugging purposes
+
+This documentation provides a detailed overview of the `Customers::CreateService` class, its main functionalities, and important considerations for developers working with or maintaining this code.

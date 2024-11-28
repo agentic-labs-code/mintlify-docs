@@ -1,0 +1,54 @@
+---
+title: "sanitizer.rb"
+---
+
+## High-level description
+This code defines a `Sanitizer` class within the `LagoUtils::RubySandbox` module. Its primary purpose is to sanitize Ruby code by replacing `require` statements with code that raises a `NoMethodError`, effectively preventing the use of `require` in the sanitized code.
+
+## Symbols
+
+### `LagoUtils::RubySandbox::Sanitizer`
+#### Description
+The `Sanitizer` class is responsible for sanitizing Ruby code by removing or replacing potentially dangerous operations, specifically the `require` statement.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | The Ruby code to be sanitized |
+
+### `initialize`
+#### Description
+Initializes a new instance of the `Sanitizer` class with the provided code.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | The Ruby code to be sanitized |
+
+#### Internal Logic
+- Sets the `@code` instance variable to the provided `code` or an empty string if `code` is `nil`.
+
+### `sanitize`
+#### Description
+Performs the sanitization of the Ruby code by replacing `require` statements.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sanitized_code | String | The sanitized version of the input code |
+
+#### Internal Logic
+- Uses `gsub` to replace any occurrence of `require` followed by whitespace with a statement that raises a `NoMethodError`.
+- The replacement statement is: `raise NoMethodError, "require is not allowed";`
+
+## Error Handling
+The code implements a form of error handling by replacing `require` statements with code that raises a `NoMethodError`. This prevents the execution of `require` statements in the sanitized code and informs the user that such operations are not allowed.
+
+## Performance Considerations
+The sanitization process uses a regular expression with `gsub`, which may have performance implications for very large code strings. However, for typical use cases, this should not be a significant concern.
+
+## Side Effects
+The `sanitize` method modifies the input code by replacing `require` statements. This is an intentional side effect and the primary purpose of the class.
+
+## Dependencies
+This code does not have any external dependencies beyond the Ruby standard library.

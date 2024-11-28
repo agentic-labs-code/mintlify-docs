@@ -1,0 +1,76 @@
+---
+title: "common_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Events::Common` class. It tests various methods and behaviors of the `Events::Common` class, focusing on event creation, attribute retrieval, and handling of different subscription scenarios.
+
+## Code Structure
+The test suite is organized into several `describe` blocks, each focusing on a specific method or behavior of the `Events::Common` class. The tests use FactoryBot to create test data and RSpec expectations to verify the expected outcomes.
+
+## Symbols
+
+### `Events::Common`
+#### Description
+This is the main class being tested. It represents a common event structure used in the application.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | String | The event ID (optional) |
+| organization_id | Integer | The ID of the associated organization |
+| transaction_id | String | A unique identifier for the transaction |
+| external_subscription_id | String | The external ID of the associated subscription |
+| timestamp | Time | The timestamp of the event |
+| code | String | The code of the associated billable metric |
+| properties | Hash | Additional properties of the event |
+
+### `#event_id`
+#### Description
+This method returns the event ID, which is either the `transaction_id` or the `id` if it's set.
+
+#### Internal Logic
+- If `id` is not set, it returns `transaction_id`
+- If `id` is set, it returns `id`
+
+### `#organization`
+#### Description
+This method returns the associated organization object.
+
+### `#billable_metric`
+#### Description
+This method returns the associated billable metric object.
+
+### `#subscription`
+#### Description
+This method returns the associated subscription object. It handles various scenarios, including terminated subscriptions and upgrades/downgrades.
+
+#### Internal Logic
+- Returns the subscription associated with the event
+- Handles cases where the subscription is terminated
+- Deals with scenarios where a new active subscription exists
+- Manages upgrade/downgrade situations
+
+### `#as_json`
+#### Description
+This method returns a JSON representation of the event.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON | Hash | A hash containing event details |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides RSpec configuration for Rails |
+| FactoryBot | Used for creating test data |
+
+## Error Handling
+The code doesn't explicitly implement error handling, as it's a test suite. However, it uses RSpec expectations to verify that the code behaves correctly in various scenarios.
+
+## Notes
+- The test suite uses FactoryBot to create test data, which allows for easy creation of complex object structures.
+- The tests cover various edge cases, such as terminated subscriptions and upgrade/downgrade scenarios, ensuring robust behavior of the `Events::Common` class.
+- The use of `let` statements for setting up test data promotes DRY (Don't Repeat Yourself) principles in the test suite.
+- The test suite is comprehensive, covering multiple methods and scenarios, which suggests a thorough approach to testing the `Events::Common` class.

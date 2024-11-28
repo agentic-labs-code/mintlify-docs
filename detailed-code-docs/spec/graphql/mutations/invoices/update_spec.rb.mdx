@@ -1,0 +1,68 @@
+---
+title: "update_spec.rb"
+---
+
+## High-level description
+This code defines a RSpec test suite for the `Mutations::Invoices::Update` GraphQL mutation. It verifies the mutation's behavior for updating an invoice, including permission checks and error handling for non-existent invoices.
+
+## Code Structure
+The test suite is organized into several contexts and examples, using RSpec's `describe` and `it` blocks. It utilizes shared examples for common behaviors and defines a GraphQL mutation query for testing.
+
+## Symbols
+
+### `RSpec.describe Mutations::Invoices::Update, type: :graphql`
+#### Description
+This is the main describe block that groups all tests for the `Mutations::Invoices::Update` GraphQL mutation.
+
+### `let` blocks
+#### Description
+These blocks define setup data and variables used across multiple tests.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| required_permission | String | The permission required to update invoices |
+| membership | Membership | A factory-created membership object |
+| organization | Organization | The organization associated with the membership |
+| invoice | Invoice | A factory-created invoice object |
+| mutation | String | The GraphQL mutation query for updating an invoice |
+
+### `it_behaves_like 'requires current user'`
+#### Description
+This shared example ensures that the mutation requires a current user to be present.
+
+### `it_behaves_like 'requires permission', 'invoices:update'`
+#### Description
+This shared example verifies that the mutation requires the 'invoices:update' permission.
+
+### `it 'updates a invoice'`
+#### Description
+This test case verifies that the mutation successfully updates an invoice with new data.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with valid input
+2. Checks the result data for expected updates (payment status and metadata)
+
+### `context 'when invoice does not exists'`
+#### Description
+This context block groups tests for scenarios where the invoice to be updated doesn't exist.
+
+### `it 'returns an error'`
+#### Description
+This test case verifies that the mutation returns an error when trying to update a non-existent invoice.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with an invalid invoice ID
+2. Checks for the expected GraphQL error response
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| RSpec | Testing framework used for writing and running tests |
+| FactoryBot | Used for creating test data (membership, invoice) |
+
+## Error Handling
+The test suite includes a specific test case for handling errors when an invoice doesn't exist, expecting a "Resource not found" error message.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

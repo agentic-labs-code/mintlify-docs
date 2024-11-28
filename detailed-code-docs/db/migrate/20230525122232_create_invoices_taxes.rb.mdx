@@ -1,0 +1,51 @@
+---
+title: "20230525122232_create_invoices_taxes.rb"
+---
+
+## High-level description
+This Ruby code defines an ActiveRecord migration to create a new table called `invoices_taxes`. The table is designed to store information about taxes associated with invoices, including tax details and the amount of tax applied.
+
+## Code Structure
+The code consists of a single class `CreateInvoicesTaxes` that inherits from `ActiveRecord::Migration[7.0]`. This class contains a `change` method that defines the structure of the new table.
+
+## Symbols
+
+### CreateInvoicesTaxes
+#### Description
+This class is an ActiveRecord migration that creates the `invoices_taxes` table. It defines the table's structure, including columns, data types, and constraints.
+
+#### Internal Logic
+The `change` method uses the `create_table` method to define the new table:
+
+1. Creates a table named `invoices_taxes` with UUID as the primary key.
+2. Adds foreign key references to `invoice` and `tax` tables.
+3. Defines columns for tax details (description, code, name, rate).
+4. Adds columns for the tax amount (cents and currency).
+5. Includes timestamp columns for record creation and update times.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the migration framework and database abstraction |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| id | symbol | :uuid | Sets the primary key type to UUID |
+
+## Table Structure
+| Column Name | Data Type | Constraints | Description |
+|:------------|:----------|:------------|:------------|
+| id | uuid | primary key | Unique identifier for each record |
+| invoice_id | uuid | null: false, foreign key, indexed | Reference to the associated invoice |
+| tax_id | uuid | null: false, foreign key, indexed | Reference to the associated tax |
+| tax_description | string | | Description of the tax |
+| tax_code | string | null: false | Code identifying the tax |
+| tax_name | string | null: false | Name of the tax |
+| tax_rate | float | null: false, default: 0.0 | Rate of the tax |
+| amount_cents | bigint | null: false, default: 0 | Tax amount in cents |
+| amount_currency | string | null: false | Currency of the tax amount |
+| created_at | datetime | | Timestamp of record creation |
+| updated_at | datetime | | Timestamp of last record update |
+
+This migration creates a table that allows for a many-to-many relationship between invoices and taxes, with additional information about each tax application stored in the join table. The use of UUID for the primary key and foreign keys suggests that this application likely uses UUIDs for record identification across multiple tables.

@@ -1,0 +1,61 @@
+---
+title: "integration_collection_mapping_resolver_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Resolvers::IntegrationCollectionMappingResolver` GraphQL resolver. It verifies the resolver's behavior when querying for a single integration collection mapping, including permission checks and error handling for non-existent resources.
+
+## Symbols
+
+### RSpec.describe Resolvers::IntegrationCollectionMappingResolver
+#### Description
+This is the main test suite for the `IntegrationCollectionMappingResolver`. It sets up the necessary context and defines tests for various scenarios.
+
+#### Internal Logic
+1. Sets up the required permission and GraphQL query.
+2. Creates necessary test data (membership, organization, integration, and collection mapping).
+3. Defines shared examples for common checks.
+4. Tests the successful retrieval of an integration collection mapping.
+5. Tests the error case when the mapping is not found.
+
+### let(:query)
+#### Description
+Defines the GraphQL query used in the tests to fetch an integration collection mapping.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| query | String | GraphQL query for fetching an integration collection mapping |
+
+### it 'returns a single integration collection mapping'
+#### Description
+Tests the successful retrieval of an integration collection mapping.
+
+#### Internal Logic
+1. Executes the GraphQL query with valid inputs.
+2. Verifies that the returned data matches the expected values from the created `netsuite_collection_mapping`.
+
+### context 'when integration mapping is not found'
+#### Description
+Tests the error handling when trying to fetch a non-existent integration mapping.
+
+#### Internal Logic
+1. Executes the GraphQL query with an invalid ID.
+2. Verifies that the expected GraphQL error is returned.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Used implicitly for creating test data (e.g., `create(:membership)`) |
+
+## Error Handling
+The test suite includes a specific test case for handling the scenario when the requested integration mapping is not found, expecting a "Resource not found" error.
+
+## Notes
+1. The test suite uses shared examples for common checks:
+   - `it_behaves_like 'requires current user'`
+   - `it_behaves_like 'requires current organization'`
+   - `it_behaves_like 'requires permission', 'organization:integrations:view'`
+2. The tests use `aggregate_failures` to group multiple expectations together, allowing all expectations to be evaluated even if one fails.
+3. The `execute_graphql` and `expect_graphql_error` methods are likely custom helpers defined elsewhere in the test suite to simplify GraphQL query execution and error checking.

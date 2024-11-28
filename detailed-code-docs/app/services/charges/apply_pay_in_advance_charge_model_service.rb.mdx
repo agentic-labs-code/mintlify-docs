@@ -1,0 +1,62 @@
+---
+title: "apply_pay_in_advance_charge_model_service.rb"
+---
+
+## High-level description
+This code defines the `ApplyPayInAdvanceChargeModelService` class within the `Charges` module. Its primary purpose is to calculate the charge amount for a pay-in-advance billing model based on the provided charge, aggregation result, and properties.
+
+## Code Structure
+The main class `ApplyPayInAdvanceChargeModelService` inherits from `BaseService`. It contains a constructor (`initialize`) and a main execution method (`call`). The class also includes several private methods to support the main functionality.
+
+## Symbols
+
+### ApplyPayInAdvanceChargeModelService
+#### Description
+This service calculates the charge amount for a pay-in-advance billing model. It handles different charge models and applies the appropriate calculations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Charge | The charge object containing billing information |
+| aggregation_result | Object | The result of aggregation calculations |
+| properties | Hash | Additional properties for the charge calculation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Contains the calculated charge details |
+
+#### Internal Logic
+1. Checks if the charge is pay-in-advance.
+2. Calculates the amount by subtracting the amount excluding the event from the amount including the event.
+3. Rounds the amount to the currency's decimal places and converts it to cents.
+4. Computes units and sets various result attributes (units, count, amount, unit_amount).
+
+### Private Methods
+
+#### charge_model
+Determines the appropriate charge model service based on the charge's model type.
+
+#### amount_including_event
+Calculates the amount including the current event using the selected charge model.
+
+#### amount_excluding_event
+Calculates the amount excluding the current event using the selected charge model.
+
+#### currency
+Retrieves the currency from the charge's plan.
+
+#### compute_units
+Calculates the number of units based on the aggregation result and charge properties.
+
+#### display_applied_units_for_zero_invoice?
+Determines if applied units should be displayed for a zero invoice based on aggregation results.
+
+## Dependencies
+The service relies on various charge model services (StandardService, GraduatedService, etc.) to perform specific calculations based on the charge model type.
+
+## Performance Considerations
+The service performs multiple calculations and method calls, which could impact performance for a large number of charges or complex charge models. Caching intermediate results or optimizing the calculation process might be beneficial for scaling.
+
+## Error Handling
+The service returns a failure result if the charge is not pay-in-advance. It also raises a `NotImplementedError` if an unknown charge model is encountered.

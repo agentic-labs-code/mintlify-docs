@@ -1,0 +1,54 @@
+---
+title: "create.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for creating a Xero integration within an organization. It handles user authentication, organization validation, and delegates the actual creation process to a service object.
+
+## Code Structure
+The `Create` class is nested within the `Mutations::Integrations::Xero` module. It inherits from `BaseMutation` and includes two concerns: `AuthenticableApiUser` and `RequiredOrganization`. The class defines the GraphQL mutation structure and delegates the creation logic to the `::Integrations::Xero::CreateService`.
+
+## References
+- `Types::Integrations::Xero::CreateInput`
+- `Types::Integrations::Xero`
+- `::Integrations::Xero::CreateService`
+
+## Symbols
+
+### `Mutations::Integrations::Xero::Create`
+#### Description
+This class defines a GraphQL mutation for creating a Xero integration. It ensures the user is authenticated and has the required organization permissions before processing the creation request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | Arguments passed to the mutation, including Xero integration details |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Types::Integrations::Xero | The created Xero integration object |
+
+#### Internal Logic
+1. Defines the required permission as 'organization:integrations:create'.
+2. Sets up the GraphQL mutation name and description.
+3. Specifies the input object class and return type.
+4. In the `resolve` method:
+   - Calls the `::Integrations::Xero::CreateService` with the current user and provided arguments.
+   - Returns the created integration if successful, or an error result if not.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Validates the presence of an organization and user's membership |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class) to handle and return errors from the service object.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| createXeroIntegration | POST | CreateXeroIntegrationInput | XeroIntegration | Creates a new Xero integration for the organization |
+
+Note: The actual endpoint URL would depend on the GraphQL server configuration.

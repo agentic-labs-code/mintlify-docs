@@ -1,0 +1,58 @@
+---
+title: "revoke.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation called `RevokeMembership` within the `Mutations::Memberships` module. It is responsible for revoking a membership in an organization, utilizing a service object to perform the actual revocation process.
+
+## Code Structure
+The `Revoke` class inherits from `BaseMutation` and includes the `AuthenticableApiUser` module. It defines the GraphQL mutation structure, including the required argument and return type, and delegates the revocation logic to the `::Memberships::RevokeService`.
+
+## References
+- `Types::MembershipType`
+- `::Memberships::RevokeService`
+
+## Symbols
+
+### `Mutations::Memberships::Revoke`
+#### Description
+This class defines a GraphQL mutation for revoking a membership. It requires authentication and a specific permission to execute.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the membership to be revoked |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| membership | Types::MembershipType | The revoked membership object |
+
+#### Internal Logic
+1. The `resolve` method is called with the provided `id`.
+2. It instantiates a `::Memberships::RevokeService` object with the current user from the context.
+3. The service's `call` method is invoked with the membership `id`.
+4. If successful, it returns the revoked membership; otherwise, it returns an error.
+
+## Side Effects
+The mutation revokes a membership, which likely updates the membership status in the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication functionality for the API user |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'organization:members:update' | The permission required to execute this mutation |
+
+## Error Handling
+The mutation uses a `result_error` method (likely defined in a parent class) to handle and return errors from the service object.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| RevokeMembership | Mutation | { id: ID! } | MembershipType | Revokes a membership with the given ID |
+
+This mutation is part of the larger GraphQL API, as evidenced by its inclusion in the `MutationType` in the related code snippets.

@@ -1,0 +1,68 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains service classes for managing integration mappings within the application. These services handle the creation, updating, and deletion of integration mappings, as well as provide a factory for instantiating the appropriate mapping classes based on integration types.
+
+## What does it do?
+The services in this directory facilitate the management of integration mappings, which are likely used to connect external systems or services with the application. Here's a breakdown of the main functionalities:
+
+1. Creation: The `CreateService` allows for the creation of new integration mappings, associating them with existing integrations and setting various attributes.
+
+2. Updating: The `UpdateService` handles the modification of existing integration mappings, allowing for changes to their attributes.
+
+3. Deletion: The `DestroyService` manages the removal of integration mappings from the system.
+
+4. Factory: The `Factory` class provides a centralized way to instantiate the appropriate integration mapping class based on the type of integration, supporting extensibility for different integration types.
+
+These services work together to provide a complete lifecycle management for integration mappings, from creation to deletion, while also supporting different types of integrations through the factory pattern.
+
+## Key Files
+
+1. `create_service.rb`: Contains the `CreateService` class responsible for creating new integration mappings.
+
+2. `update_service.rb`: Implements the `UpdateService` class for updating existing integration mappings.
+
+3. `destroy_service.rb`: Houses the `DestroyService` class, which handles the deletion of integration mappings.
+
+4. `factory.rb`: Defines the `Factory` class, which creates instances of specific integration mapping classes based on the integration type.
+
+Each of these files plays a crucial role in managing integration mappings:
+
+- `create_service.rb` allows the application to establish new connections between internal and external systems by creating mapping records.
+- `update_service.rb` enables the modification of existing mappings, allowing for changes in the integration setup over time.
+- `destroy_service.rb` provides the ability to remove mappings when they are no longer needed or when integrations are discontinued.
+- `factory.rb` supports the application's ability to work with different types of integrations by instantiating the appropriate mapping classes.
+
+## Dependencies
+The services in this directory rely on several key dependencies:
+
+1. ActiveRecord: Used for database interactions and error handling in the create, update, and destroy services.
+
+2. BaseService: A custom base class that these services inherit from, likely providing common functionality for service objects in the application.
+
+3. Integrations::BaseIntegration: Referenced in the create service, suggesting a relationship between integrations and their mappings.
+
+4. IntegrationMappings::Factory: Used in the create service to instantiate the appropriate mapping class.
+
+5. Specific mapping classes: The factory references `IntegrationMappings::NetsuiteMapping`, `IntegrationMappings::AnrokMapping`, and `IntegrationMappings::XeroMapping`, indicating support for these specific integration types.
+
+## Configuration
+While there are no explicit configuration files mentioned, the services use various parameters and attributes that could be considered configurable:
+
+1. In `create_service.rb`:
+   - `integration_id`: ID of the associated integration
+   - `mappable_id`: ID of the mappable object
+   - `mappable_type`: Type of the mappable object
+   - `external_id`: External ID for the mapping
+   - `external_account_code`: External account code for the mapping
+   - `external_name`: External name for the mapping
+
+2. In `factory.rb`:
+   - The supported integration types (`Integrations::NetsuiteIntegration`, `Integrations::AnrokIntegration`, `Integrations::XeroIntegration`) are hardcoded. Adding new integration types would require updating this file.
+
+3. In `update_service.rb`:
+   - The service accepts a `params` hash, which can include any updateable attributes of the integration mapping.
+
+These services provide a flexible and extensible system for managing integration mappings, allowing the application to interact with various external systems while maintaining a consistent internal structure.

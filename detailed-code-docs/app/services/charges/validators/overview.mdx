@@ -1,0 +1,64 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains a set of validator services for different types of charges in a billing or pricing system. These services are responsible for validating the properties and configurations of various charge models, ensuring that they meet specific criteria and constraints before being used in the system.
+
+## What does it do?
+The validators in this directory perform the following tasks:
+
+1. Validate the properties of different charge types, including standard, graduated, package, percentage, and volume-based charges.
+2. Check for the presence and validity of required fields for each charge type.
+3. Ensure that numerical values (e.g., amounts, rates, ranges) are within acceptable limits and formats.
+4. Validate the structure and consistency of complex charge models, such as graduated and volume-based charges with multiple ranges.
+5. Verify that the charge configurations are compatible with the associated billable metrics.
+6. Provide a standardized way to report validation errors for each charge type.
+
+These validators help maintain data integrity and prevent invalid charge configurations from being used in the billing system, which could lead to incorrect calculations or system errors.
+
+## Entry points
+The main entry point for each validator is the `valid?` method, which is defined in each service class. This method orchestrates the validation process for the specific charge type. The `BaseService` class serves as the foundation for all other validator services, providing common functionality and structure.
+
+The workflow typically follows these steps:
+1. A charge object is passed to the appropriate validator service.
+2. The `valid?` method is called, which triggers various validation checks specific to the charge type.
+3. If any validation fails, errors are added to the result object.
+4. The `valid?` method returns a boolean indicating whether the charge is valid or not.
+
+## Key Files
+1. `base_service.rb`: Defines the `BaseService` class, which serves as the foundation for all other validator services. It provides common functionality and structure for validation.
+
+2. `graduated_service.rb`: Validates graduated charges, ensuring that the graduated ranges and associated amounts are correctly defined and consistent.
+
+3. `package_service.rb`: Validates package charges, checking the amount, free units, and package size for validity.
+
+4. `percentage_service.rb`: Validates percentage-based charges, including rate, fixed amount, free units, and transaction limits.
+
+5. `standard_service.rb`: Validates standard charges, focusing on the amount and grouped_by properties.
+
+6. `volume_service.rb`: Validates volume-based charges, ensuring that the volume ranges and associated amounts are properly defined and consistent.
+
+7. `graduated_percentage_service.rb`: Validates graduated percentage charges, focusing on the graduated percentage ranges and their associated values.
+
+## Dependencies
+The validator services rely on the following dependencies:
+
+1. `Validators::DecimalAmountService`: Used across multiple validators to check the validity of decimal amounts.
+2. `Validators::RangeBoundsValidator`: Included in services that deal with ranges (e.g., graduated and volume charges) to validate range bounds.
+3. `BaseValidator`: The parent class for `BaseService`, providing foundational validation functionality.
+4. `License`: Used in the `PercentageService` to check if the current license is premium for certain validations.
+
+These dependencies help ensure consistent validation across different charge types and provide reusable validation logic for common scenarios.
+
+## Configuration
+While there are no explicit configuration files mentioned, the validators use various properties and settings from the charge objects they validate. These properties are typically accessed through the `properties` hash passed to the validator services. Some common configurable fields include:
+
+- `amount`: The charge amount for standard and package charges.
+- `rate`: The percentage rate for percentage-based charges.
+- `graduated_ranges`: An array of ranges for graduated charges.
+- `volume_ranges`: An array of ranges for volume-based charges.
+- `package_size`: The size of the package for package charges.
+- `free_units`: The number of free units for various charge types.
+
+These fields are validated according to the specific rules of each charge type, ensuring that the charge configurations are valid and consistent across the system.

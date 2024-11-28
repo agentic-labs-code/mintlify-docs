@@ -1,0 +1,75 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains services related to Okta authentication within the application. It provides functionality for accepting invitations, authorizing users, handling logins, and common base operations for Okta integration. The services work together to manage the Okta OAuth2 flow, user creation, and membership management.
+
+## What does it do?
+The services in this directory handle various aspects of Okta-based authentication:
+
+1. Accept Invite: Processes invitation acceptance using Okta OAuth, validating the invite, checking Okta integration, and performing necessary authentication steps.
+
+2. Authorize: Initiates the Okta OAuth2 authorization process by generating an authorization URL with required parameters, including a state token for security.
+
+3. Login: Manages the Okta authentication process for users, including state validation, Okta integration checks, access token retrieval, and user/membership management.
+
+4. Base Service: Provides common functionality for Okta-based authentication services, including methods for validating Okta integration, handling invites, and interacting with Okta's API.
+
+These services work together to create a seamless Okta-based authentication system for the application, handling various scenarios such as new user registration, existing user login, and invitation acceptance.
+
+## Key Files
+
+1. `accept_invite_service.rb`:
+   - Handles the process of accepting an invitation using Okta OAuth authentication.
+   - Validates the invite, checks Okta integration, and performs necessary authentication steps.
+   - Creates a new user account and accepts the invitation if successful.
+
+2. `authorize_service.rb`:
+   - Initiates the Okta OAuth2 authorization process.
+   - Generates an authorization URL with necessary parameters, including a state token for security.
+   - Handles invite token validation if provided.
+
+3. `base_service.rb`:
+   - Serves as a foundation for Okta-based authentication services.
+   - Provides methods for validating Okta integration, handling invites, and interacting with Okta's API.
+   - Contains common functionality used by other Okta authentication services.
+
+4. `login_service.rb`:
+   - Handles the Okta authentication process for users.
+   - Validates the authentication state, checks Okta integration, retrieves access tokens.
+   - Creates or finds users and memberships in the system.
+   - Generates authentication tokens for users.
+
+## Dependencies
+The services in this directory rely on several external libraries and internal components:
+
+1. Rails framework: Used for caching, HTTP requests, and general application structure.
+2. LagoHttpClient: A custom HTTP client used for making requests to Okta API endpoints.
+3. SecureRandom: Used for generating random passwords and state tokens.
+4. Redis: Used for caching state tokens and associated emails.
+5. URI: Used for building authorization URLs.
+
+Internal dependencies include:
+- Invites::AcceptService
+- Integrations::OktaIntegration model
+- User model
+- UsersService
+
+## Configuration
+The services rely on various configuration settings:
+
+1. Environment Variables:
+   - `ENV["LAGO_FRONT_URL"]`: The front-end URL used in the redirect_uri for Okta.
+
+2. Okta Integration Settings:
+   - Stored in the database, likely associated with the `Integrations::OktaIntegration` model.
+   - Include details such as Okta organization name, client ID, and client secret.
+
+3. Redis Configuration:
+   - Used for caching state tokens and associated emails with a 90-second expiration time.
+
+4. Database Configuration:
+   - Used for storing and retrieving user and membership information.
+
+The services are designed to work within a larger application that requires single sign-on capabilities using Okta. They provide a clean interface for handling various aspects of the Okta authentication flow, from initial authorization to user creation and login. The modular structure allows for easy maintenance and extension of the authentication system as needed.

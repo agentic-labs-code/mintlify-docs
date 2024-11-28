@@ -1,0 +1,54 @@
+---
+title: "update.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for updating an existing Credit Note. It's part of a larger GraphQL API and specifically handles the update operation for credit notes, focusing on updating the refund status.
+
+## Code Structure
+The `Update` class is nested within the `Mutations::CreditNotes` module and inherits from `BaseMutation`. It includes the `AuthenticableApiUser` concern for authentication. The class defines the GraphQL mutation structure, including arguments and return type, and implements the `resolve` method to handle the update operation.
+
+## References
+- `Types::CreditNotes::RefundStatusTypeEnum`
+- `Types::CreditNotes::Object`
+- `::CreditNotes::UpdateService`
+
+## Symbols
+
+### `Mutations::CreditNotes::Update`
+#### Description
+This class defines a GraphQL mutation for updating a Credit Note. It authenticates the user, validates the required permission, and uses the `CreditNotes::UpdateService` to perform the update operation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the Credit Note to update |
+| refund_status | Types::CreditNotes::RefundStatusTypeEnum | The new refund status for the Credit Note |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_note | Types::CreditNotes::Object | The updated Credit Note object |
+
+#### Internal Logic
+1. Authenticates the user using the `AuthenticableApiUser` concern.
+2. Defines the required permission as 'credit_notes:update'.
+3. In the `resolve` method:
+   - Finds the credit note by ID, scoped to the current user's credit notes.
+   - Calls the `CreditNotes::UpdateService` with the found credit note and new refund status.
+   - Returns the updated credit note if successful, or an error result if not.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication functionality for the API user |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class) to handle and return errors from the `CreditNotes::UpdateService`.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| UpdateCreditNote | Mutation | `id: ID`, `refund_status: RefundStatusTypeEnum` | CreditNote object | Updates an existing Credit Note's refund status |
+
+This mutation is part of a GraphQL API and would be accessed through a GraphQL endpoint, not a REST API endpoint.

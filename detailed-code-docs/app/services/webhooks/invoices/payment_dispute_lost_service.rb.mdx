@@ -1,0 +1,61 @@
+---
+title: "payment_dispute_lost_service.rb"
+---
+
+## High-level description
+This code defines a service class `PaymentDisputeLostService` within the `Webhooks::Invoices` module. It is responsible for handling webhook notifications when a payment dispute is lost for an invoice. The service prepares the necessary data for sending a webhook notification to the organization's webhook endpoints.
+
+## Code Structure
+The `PaymentDisputeLostService` class inherits from `Webhooks::BaseService` and overrides several methods to provide specific functionality for the payment dispute lost scenario. It works in conjunction with the `SendWebhookJob` and uses the `V1::Invoices::PaymentDisputeLostSerializer` for data serialization.
+
+## References
+- `Webhooks::BaseService`
+- `V1::Invoices::PaymentDisputeLostSerializer`
+- `SendWebhookJob`
+
+## Symbols
+
+### `PaymentDisputeLostService`
+#### Description
+This service class handles the webhook notification process when a payment dispute is lost for an invoice. It prepares the necessary data and triggers the webhook sending process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object | Invoice | The invoice object for which the payment dispute was lost |
+| options | Hash | Additional options, including provider_error information |
+
+#### Outputs
+This service doesn't have a direct output. It triggers webhook notifications as a side effect.
+
+#### Internal Logic
+The class overrides four methods from the base class:
+1. `current_organization`: Retrieves the organization associated with the invoice.
+2. `object_serializer`: Creates a new instance of `V1::Invoices::PaymentDisputeLostSerializer` with the invoice and additional options.
+3. `webhook_type`: Defines the type of webhook as 'invoice.payment_dispute_lost'.
+4. `object_type`: Defines the object type as 'payment_dispute_lost'.
+
+These methods are used by the base class to prepare and send the webhook notification.
+
+## Side Effects
+- Creates webhook records in the database for each webhook endpoint of the organization.
+- Enqueues `SendHttpWebhookJob` jobs to send HTTP requests to the webhook endpoints.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Webhooks::BaseService | Parent class providing the main webhook sending logic |
+| V1::Invoices::PaymentDisputeLostSerializer | Serializes the invoice data for the webhook payload |
+
+## Error Handling
+This class doesn't implement specific error handling. It relies on the error handling mechanisms of the parent class and the job system.
+
+## API/Interface Reference
+This service is typically called by the `SendWebhookJob` when processing a 'invoice.payment_dispute_lost' webhook type. The job system uses the following interface:
+
+| Method | Parameters | Description |
+|:-------|:-----------|:------------|
+| new | object:, options: {} | Initializes the service with an invoice object and optional additional data |
+| call | None | Triggers the webhook sending process |
+
+Note: The actual HTTP requests are handled asynchronously by the `SendHttpWebhookJob`.

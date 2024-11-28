@@ -1,0 +1,36 @@
+---
+title: "20240822142524_add_payment_retry_columns_to_payment_requests.rb"
+---
+
+## High-level description
+This migration adds two new columns to the `payment_requests` table: `payment_attempts` and `ready_for_payment_processing`. These columns are intended to support payment retry functionality and control the processing state of payment requests.
+
+## Symbols
+
+### `AddPaymentRetryColumnsToPaymentRequests`
+#### Description
+This class is an ActiveRecord migration that adds new columns to the `payment_requests` table to support payment retry functionality and processing control.
+
+#### Internal Logic
+The migration uses the `change` method to define the changes to be applied to the database schema. It employs the `safety_assured` block, which is likely a custom method to bypass certain safety checks during the migration process.
+
+Inside the `change_table` block, two new columns are added to the `payment_requests` table:
+
+1. `payment_attempts`: An integer column to track the number of payment attempts.
+2. `ready_for_payment_processing`: A boolean column to indicate whether the payment request is ready for processing.
+
+The `bulk: true` option is used with `change_table` to potentially optimize the migration by combining multiple alterations into a single SQL statement.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| payment_attempts | integer | 0 | Tracks the number of payment attempts for a payment request |
+| ready_for_payment_processing | boolean | true | Indicates whether a payment request is ready for processing |
+
+## Performance Considerations
+The use of `bulk: true` in the `change_table` method can potentially improve the performance of the migration by combining multiple column additions into a single SQL statement, reducing the number of database operations required.

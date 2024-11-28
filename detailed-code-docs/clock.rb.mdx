@@ -1,0 +1,87 @@
+---
+title: "clock.rb"
+---
+
+## High-level description
+This Ruby file defines a Clockwork module that schedules various background jobs for the Lago application. It sets up recurring tasks related to subscription management, invoice processing, wallet operations, and other maintenance activities. The jobs are scheduled to run at specific intervals or times to handle different aspects of the application's functionality.
+
+## Code Structure
+The code is structured within the `Clockwork` module, which defines a handler for job execution, an error handler, and multiple scheduled jobs using the `every` method. Each job is associated with a specific task and is scheduled to run at defined intervals or times.
+
+## References
+This code references various job classes from the `Clock` namespace, such as `ActivateSubscriptionsJob`, `RefreshDraftInvoicesJob`, etc. It also uses Rails-specific features like `Rails.logger` and environment variables.
+
+## Symbols
+
+### `Clockwork` module
+#### Description
+This module encapsulates all the scheduled jobs and their configurations using the Clockwork gem.
+
+#### Internal Logic
+1. Defines a handler for job execution logging.
+2. Sets up an error handler for logging errors and sending them to Sentry.
+3. Schedules multiple jobs using the `every` method, specifying the interval and job name.
+
+### `handler` block
+#### Description
+Defines a handler that logs the execution of each job.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| job | String | The name of the job being executed |
+| time | Time | The time at which the job is being executed |
+
+### `error_handler` block
+#### Description
+Defines an error handler that logs errors and sends them to Sentry.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| error | Exception | The error that occurred during job execution |
+
+### Scheduled Jobs
+The file defines multiple scheduled jobs using the `every` method. Each job follows a similar pattern:
+
+```ruby
+every(interval, 'job_name') do
+  JobClass
+    .set(sentry: {"slug" =&gt; 'sentry_slug', "cron" =&gt; 'cron_expression'})
+    .perform_later
+end
+```
+
+Notable jobs include:
+- `schedule:activate_subscriptions` (every 5 minutes)
+- `schedule:refresh_draft_invoices` (every 5 minutes)
+- `schedule:refresh_lifetime_usages` (configurable interval)
+- `schedule:refresh_wallets_ongoing_balance` (every 5 minutes, conditional)
+- Various hourly jobs for billing, invoice finalization, coupon termination, etc.
+- A daily job for cleaning webhooks
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| clockwork | Provides the scheduling functionality |
+| config/boot | Loads the application's boot configuration |
+| config/environment | Loads the application's environment |
+
+## Configuration
+The code uses several environment variables for configuration:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LAGO_LIFETIME_USAGE_REFRESH_INTERVAL_SECONDS | Integer | 5.minutes | Interval for refreshing lifetime usages |
+| LAGO_MEMCACHE_SERVERS | String | - | Memcache server configuration |
+| LAGO_REDIS_CACHE_URL | String | - | Redis cache URL |
+| LAGO_DISABLE_WALLET_REFRESH | Boolean | false | Flag to disable wallet refresh |
+| LAGO_DISABLE_EVENTS_VALIDATION | Boolean | false | Flag to disable events validation |
+
+## Error Handling
+Errors are logged using `Rails.logger` and sent to Sentry for monitoring and alerting.
+
+## Logging
+The code uses `puts` for basic logging of job execution and `Rails.logger` for error logging.
+
+## TODOs
+- The code includes a note: "All clocks run every hour to take customer timezones into account"

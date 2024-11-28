@@ -1,0 +1,71 @@
+---
+title: "wallets_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying wallets in a Ruby on Rails application. It allows fetching wallets for a specific customer with optional filtering by status and IDs, and includes pagination support.
+
+## Code Structure
+The `WalletsResolver` class inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines arguments for the query, specifies the return type, and implements the `resolve` method to fetch and return the requested wallets.
+
+## References
+- `Types::Wallets::Object`
+- `Types::Wallets::StatusEnum`
+- `Resolvers::BaseResolver`
+
+## Symbols
+
+### `WalletsResolver`
+#### Description
+This class is responsible for resolving GraphQL queries for wallets. It authenticates the user, ensures the presence of an organization, and fetches wallets based on the provided arguments.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer_id | ID | Unique ID of the customer (required) |
+| ids | [ID] | List of wallet IDs to fetch (optional) |
+| limit | Integer | Number of results per page (optional) |
+| page | Integer | Page number for pagination (optional) |
+| status | Types::Wallets::StatusEnum | Status of the wallets to fetch (optional) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallets | [Types::Wallets::Object] | Collection of wallet objects |
+
+#### Internal Logic
+1. Find the current customer using the provided `customer_id`.
+2. Query the customer's wallets with pagination.
+3. Apply status filter if provided.
+4. Apply ID filter if provided.
+5. Order the results by status (ascending) and creation date (descending).
+6. Return the filtered and ordered wallet collection.
+7. Handle `ActiveRecord::RecordNotFound` exception by returning a not found error.
+
+## Side Effects
+This resolver does not have any side effects as it only reads data from the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the presence of an organization |
+
+## Error Handling
+The resolver handles the `ActiveRecord::RecordNotFound` exception by calling the `not_found_error` method with the resource name 'customer'.
+
+## API/Interface Reference
+This resolver is part of the GraphQL API and can be queried using the following structure:
+```graphql
+query {
+  wallets(
+    customerId: ID!
+    ids: [ID]
+    limit: Int
+    page: Int
+    status: WalletStatusEnum
+  ) {
+    # Fields from Types::Wallets::Object
+  }
+}
+```

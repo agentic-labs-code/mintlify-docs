@@ -1,0 +1,64 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for webhook services related to payment providers, specifically Adyen and Stripe. These tests focus on verifying the functionality of chargeback and dispute handling services for different scenarios and invoice statuses.
+
+## What does it do?
+The tests in this directory ensure that the payment provider webhook services correctly handle various scenarios related to chargebacks and disputes. They verify that:
+
+1. For Adyen:
+   - The `ChargebackService` correctly updates invoice statuses when chargebacks are received.
+   - Webhooks are delivered appropriately for lost disputes on finalized invoices.
+
+2. For Stripe:
+   - The `ChargeDisputeClosedService` properly handles both won and lost disputes.
+   - Invoice statuses are updated correctly based on the dispute outcome and invoice status (draft or finalized).
+   - Webhooks are sent when required, particularly for lost disputes on finalized invoices.
+
+These tests simulate different event scenarios from payment providers and verify that the system responds correctly, updating invoice statuses and triggering necessary actions like webhook deliveries.
+
+## Key Files
+
+1. `spec/services/payment_providers/webhooks/adyen/chargeback_service_spec.rb`:
+   This file contains tests for the Adyen `ChargebackService`. It verifies the service's behavior when handling chargeback events from Adyen, covering scenarios for both won and lost disputes, and for different invoice statuses (draft and finalized).
+
+2. `spec/services/payment_providers/webhooks/stripe/charge_dispute_closed_service_spec.rb`:
+   This file tests the Stripe `ChargeDisputeClosedService`. It focuses on verifying the service's response to different charge dispute outcomes (won or lost) for both draft and finalized invoices.
+
+Both files use similar testing structures, creating test objects using FactoryBot and simulating payment provider events using JSON fixtures or mock data.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails and RSpec configuration for testing |
+| FactoryBot | Used for creating test objects (organizations, customers, invoices, payments) |
+| RSpec | The testing framework used for writing and running the tests |
+
+## Configuration
+The tests use various `let` statements to set up the test environment. Common configurations include:
+
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| organization_id | Integer | ID of the test organization |
+| organization | Organization | Test organization object |
+| customer | Customer | Test customer object |
+| payment | Payment | Test payment object |
+| invoice | Invoice | Test invoice object |
+| event_json | String | JSON representation of a payment provider event |
+
+Additionally, the Stripe tests use JSON fixture files (`charge_dispute_lost_event.json` and `charge_dispute_won_event.json`) to simulate Stripe events.
+
+Both test files focus on the `#call` method of their respective services, testing various scenarios:
+
+1. Lost dispute with a draft invoice
+2. Lost dispute with a finalized invoice
+3. Won dispute with a draft invoice
+4. Won dispute with a finalized invoice
+
+For each scenario, the tests verify:
+- Updates to the invoice's `payment_dispute_lost_at` field
+- Enqueuing of `SendWebhookJob` for certain conditions (typically lost disputes on finalized invoices)
+
+These comprehensive test suites ensure that the payment provider webhook services handle different dispute outcomes and invoice statuses correctly, maintaining the integrity of the payment and invoicing system.

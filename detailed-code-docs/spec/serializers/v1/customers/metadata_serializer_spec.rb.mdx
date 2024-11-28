@@ -1,0 +1,51 @@
+---
+title: "metadata_serializer_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `V1::Customers::MetadataSerializer` class. It verifies that the serializer correctly transforms a `CustomerMetadata` object into a JSON representation with the expected structure and values.
+
+## Symbols
+
+### `RSpec.describe ::V1::Customers::MetadataSerializer`
+#### Description
+This is the main describe block for the test suite, focusing on the `V1::Customers::MetadataSerializer` class.
+
+### `subject(:serializer)`
+#### Description
+Defines the subject of the test, which is an instance of the `V1::Customers::MetadataSerializer` with a `CustomerMetadata` object and a root name of 'metadata'.
+
+### `let(:metadata)`
+#### Description
+Creates a test `CustomerMetadata` object using FactoryBot.
+
+### `it 'serializes the object'`
+#### Description
+This test case verifies that the serializer correctly transforms the `CustomerMetadata` object into JSON format.
+
+#### Internal Logic
+1. Serializes the metadata object to JSON and parses it back to a Ruby hash.
+2. Uses `aggregate_failures` to group multiple expectations together.
+3. Checks that the serialized JSON contains the correct values for:
+   - `lago_id` (should match the metadata's id)
+   - `key`
+   - `value`
+   - `display_in_invoice`
+   - `created_at` (should be in ISO8601 format)
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used to create test data (CustomerMetadata object) |
+
+## References
+- The test relies on the existence of a `CustomerMetadata` model and a corresponding factory.
+- It assumes the presence of a `V1::Customers::MetadataSerializer` class that handles the serialization of `CustomerMetadata` objects.
+
+## Notes
+- The test uses RSpec's `aggregate_failures` to group multiple expectations, allowing all assertions to be checked even if one fails.
+- The serializer is configured with a root name of 'metadata', which is reflected in the structure of the resulting JSON.
+- The test verifies that date-time fields (like `created_at`) are correctly formatted as ISO8601 strings in the JSON output.
+
+This test ensures that the `V1::Customers::MetadataSerializer` correctly represents all important attributes of a `CustomerMetadata` object in its JSON output, which is crucial for maintaining consistent API responses.

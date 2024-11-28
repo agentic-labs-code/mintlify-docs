@@ -1,0 +1,90 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL mutation classes for managing Adyen payment providers within an organization. It includes a base class and specific mutations for creating and updating Adyen payment providers. These mutations are part of a larger GraphQL API structure and handle the integration of Adyen payment services into the application.
+
+## What does it do?
+The code in this directory enables the following functionalities:
+
+1. Adding a new Adyen payment provider to an organization
+2. Updating an existing Adyen payment provider's information
+3. Ensuring proper authentication and authorization for these operations
+4. Validating the presence and membership of the current organization
+
+These mutations allow administrators or authorized users to integrate and manage Adyen payment services within their organization's payment system. The mutations handle the creation and modification of Adyen provider details, such as API keys, merchant accounts, and success redirect URLs.
+
+## Key Files
+
+1. `base.rb`: This file contains the `Base` class, which serves as the foundation for Adyen payment provider mutations. It handles user authentication, organization validation, and interacts with the `PaymentProviders::AdyenService` to process the mutations.
+
+2. `create.rb`: This file defines the `Create` mutation class for adding a new Adyen payment provider to an organization. It specifies the required permissions, input type, and return type for the mutation.
+
+3. `update.rb`: This file contains the `Update` mutation class for modifying an existing Adyen payment provider's information. It defines the necessary permissions, input type, and return type for the update operation.
+
+## Dependencies
+The code in this directory relies on several internal dependencies:
+
+1. `BaseMutation`: A base class for all mutations in the application (not provided in the snippets).
+2. `AuthenticableApiUser`: A module that ensures the current user is authenticated.
+3. `RequiredOrganization`: A module that validates the presence and membership of the current organization.
+4. `PaymentProviders::AdyenService`: A service class that handles the creation and update of Adyen payment providers.
+5. `Types::PaymentProviders::AdyenInput`: Defines the structure of the input for the create mutation.
+6. `Types::PaymentProviders::UpdateInput`: Defines the structure of the input for the update mutation.
+7. `Types::PaymentProviders::Adyen`: Defines the structure of the return type for both mutations.
+
+## Configuration
+The mutations in this directory use the following configuration:
+
+1. Create mutation:
+   - Required permission: `'organization:integrations:create'`
+   - GraphQL name: `'AddAdyenPaymentProvider'`
+   - Description: `'Add Adyen payment provider'`
+
+2. Update mutation:
+   - Required permission: `'organization:integrations:update'`
+   - GraphQL name: `'UpdateAdyenPaymentProvider'`
+   - Description: `'Update Adyen payment provider'`
+
+Both mutations use custom input types and return an Adyen payment provider object.
+
+Example usage of the create mutation:
+
+```graphql
+mutation {
+  addAdyenPaymentProvider(input: {
+    name: "New Adyen Provider"
+    code: "adyen_code"
+    apiKey: "your_api_key"
+    hmacKey: "your_hmac_key"
+    livePrefix: "your_live_prefix"
+    merchantAccount: "your_merchant_account"
+    successRedirectUrl: "https://example.com/success"
+  }) {
+    id
+    name
+    code
+  }
+}
+```
+
+Example usage of the update mutation:
+
+```graphql
+mutation {
+  updateAdyenPaymentProvider(input: {
+    id: "adyen_provider_id"
+    name: "Updated Adyen Provider"
+    code: "updated_adyen_code"
+    successRedirectUrl: "https://example.com/new-success"
+  }) {
+    id
+    name
+    code
+    successRedirectUrl
+  }
+}
+```
+
+These mutations provide a structured and secure way to manage Adyen payment providers within the application, ensuring proper authentication and authorization before processing any changes to the payment integration.

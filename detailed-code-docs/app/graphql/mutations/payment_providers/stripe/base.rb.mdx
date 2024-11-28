@@ -1,0 +1,64 @@
+---
+title: "base.rb"
+---
+
+## High-level description
+This code defines a base class for Stripe-related GraphQL mutations in a Ruby on Rails application. It handles authentication, organization validation, and interacts with a Stripe service to create or update Stripe payment providers.
+
+## Code Structure
+The `Mutations::PaymentProviders::Stripe::Base` class inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines a `resolve` method that processes the mutation's arguments and interacts with the `PaymentProviders::StripeService`.
+
+## References
+- `BaseMutation` (not provided in the snippets)
+- `AuthenticableApiUser` module
+- `RequiredOrganization` module
+- `PaymentProviders::StripeService`
+
+## Symbols
+
+### `Mutations::PaymentProviders::Stripe::Base`
+#### Description
+This class serves as a base for Stripe-related GraphQL mutations. It ensures that the user is authenticated and belongs to a valid organization before processing the mutation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| **args | Hash | Mutation arguments |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| stripe_provider | Object | The created or updated Stripe provider |
+| GraphQL::ExecutionError | Object | Error object if the operation fails |
+
+#### Internal Logic
+1. The class includes `AuthenticableApiUser` and `RequiredOrganization` modules for authentication and organization validation.
+2. The `resolve` method:
+   - Creates a new `PaymentProviders::StripeService` instance with the current user.
+   - Calls `create_or_update` on the service, passing the mutation arguments and the current organization's ID.
+   - Returns the `stripe_provider` if successful, or an error if the operation fails.
+
+## Side Effects
+- Creates or updates a Stripe payment provider in the database.
+- May trigger background jobs for webhook registration and customer reattachment (based on the `StripeService` implementation).
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides user authentication functionality |
+| RequiredOrganization | Ensures the user belongs to a valid organization |
+| PaymentProviders::StripeService | Handles the creation or update of Stripe payment providers |
+
+## Error Handling
+- If authentication fails, an `unauthorized_error` is raised (defined in `AuthenticableApiUser`).
+- If organization validation fails, an `organization_error` is raised (defined in `RequiredOrganization`).
+- If the Stripe service operation fails, a `result_error` is returned (implementation not provided in the snippets).
+
+## API/Interface Reference
+This class is designed to be used as a base class for specific Stripe-related GraphQL mutations. Subclasses should inherit from this base class and may override or extend its functionality as needed.
+
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| N/A (GraphQL) | POST | GraphQL mutation | Stripe provider or error | Creates or updates a Stripe payment provider |
+
+Note: The specific GraphQL mutation details would be defined in subclasses or the GraphQL schema, which are not provided in the given snippets.

@@ -1,0 +1,58 @@
+---
+title: "progressive_billing_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Invoices::ProgressiveBillingService` class. It tests the functionality of creating progressive billing invoices based on usage thresholds, lifetime usage, and various scenarios including multiple thresholds and previously billed thresholds.
+
+## Code Structure
+The main test suite is defined using `RSpec.describe` for the `Invoices::ProgressiveBillingService`. It includes several test cases that cover different aspects of the service's functionality, focusing on the `#call` method of the service.
+
+## Symbols
+
+### `Invoices::ProgressiveBillingService`
+#### Description
+This is the main service being tested. It is responsible for creating progressive billing invoices based on usage thresholds and lifetime usage.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| usage_thresholds | Array | List of usage thresholds |
+| lifetime_usage | LifetimeUsage | Lifetime usage object |
+| timestamp | Time | Timestamp for the invoice |
+
+#### Internal Logic
+The service creates a progressive billing invoice based on the provided inputs. It calculates fees, taxes, and total amounts, and associates the invoice with the appropriate subscription and customer.
+
+### `#call`
+#### Description
+This is the main method being tested in the service. It creates the progressive billing invoice and returns a result object.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | Result object containing the created invoice |
+
+#### Internal Logic
+The method creates an invoice with the calculated amounts, associates it with the customer and subscription, and performs additional actions such as enqueueing jobs for webhook sending and PDF generation.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides RSpec configuration for Rails |
+| FactoryBot | Used for creating test data |
+| SegmentTrackJob | Job for tracking events |
+| SendWebhookJob | Job for sending webhooks |
+| Invoices::GeneratePdfAndNotifyJob | Job for generating PDF and notifying |
+| Invoices::Payments::CreateService | Service for creating payments |
+
+## Error Handling
+The tests do not explicitly cover error handling scenarios. They focus on successful creation of invoices under different conditions.
+
+## Logging
+No specific logging mechanisms are tested in this file.
+
+## TODOs
+There are no explicit TODOs in the code.
+
+This test file provides comprehensive coverage for the `Invoices::ProgressiveBillingService`, ensuring that it correctly creates progressive billing invoices under various scenarios, including multiple thresholds and previously billed thresholds. It also verifies that the service interacts correctly with other parts of the system, such as enqueueing jobs for webhook sending and PDF generation.

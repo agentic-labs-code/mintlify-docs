@@ -1,0 +1,76 @@
+---
+title: "newrelic.yml"
+---
+
+## High-level description
+This YAML file configures New Relic monitoring for a Ruby application. It defines settings for different environments (development, test, staging, and production) and sets up distributed tracing, logging, and application monitoring.
+
+## Code Structure
+The file uses YAML anchors and aliases to define common settings and apply them to specific environments. The `common` section defines default settings, which are then referenced in the staging and production environments.
+
+## Symbols
+
+### `common` (YAML anchor: `default_settings`)
+#### Description
+Defines the default configuration settings for New Relic monitoring.
+
+#### Internal Logic
+- Sets the license key from an environment variable
+- Configures the application name
+- Enables distributed tracing
+- Sets log level to info
+- Configures application logging settings
+
+### `development`
+#### Description
+Configures New Relic for the development environment.
+
+#### Internal Logic
+Disables monitoring mode for the development environment.
+
+### `test`
+#### Description
+Configures New Relic for the test environment.
+
+#### Internal Logic
+Disables monitoring mode for the test environment.
+
+### `staging`
+#### Description
+Configures New Relic for the staging environment.
+
+#### Internal Logic
+- Inherits all settings from `default_settings`
+- Overrides the application name to include "(Staging)"
+
+### `production`
+#### Description
+Configures New Relic for the production environment.
+
+#### Internal Logic
+Inherits all settings from `default_settings` without any modifications.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| New Relic | Application performance monitoring and observability platform |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| license_key | string | ENV['NEW_RELIC_KEY'] | New Relic license key for authentication |
+| app_name | string | "api" | Name of the application in New Relic |
+| distributed_tracing.enabled | boolean | true | Enables distributed tracing |
+| log_level | string | "info" | Sets the log level for New Relic agent |
+| application_logging.enabled | boolean | true | Enables application logging |
+| application_logging.forwarding.enabled | boolean | true | Enables log forwarding to New Relic |
+| application_logging.forwarding.max_samples_stored | integer | 10000 | Maximum number of log samples stored |
+| application_logging.metrics.enabled | boolean | true | Enables logging metrics |
+| application_logging.local_decorating.enabled | boolean | false | Disables local log decorating |
+| monitor_mode | boolean | false (dev/test), true (staging/prod) | Enables or disables New Relic monitoring |
+
+## Error Handling
+This configuration file does not explicitly define error handling mechanisms. Error handling would typically be managed by the New Relic agent and the application code.
+
+## Logging
+The configuration enables application logging and log forwarding to New Relic. It sets the log level to "info" and configures various logging-related options such as metrics and local decorating.

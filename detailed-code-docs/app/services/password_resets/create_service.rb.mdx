@@ -1,0 +1,65 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines a `CreateService` class within the `PasswordResets` module, responsible for creating a password reset token for a given user and sending a password reset email. It's part of a password reset feature in a Ruby on Rails application.
+
+## Code Structure
+The `CreateService` class inherits from `BaseService` and contains a `call` method that performs the main logic. It interacts with the `PasswordReset` model and `PasswordResetMailer` to create a reset token and send an email.
+
+## References
+- `PasswordReset` model
+- `PasswordResetMailer`
+- `BaseService` (not shown in the provided code)
+
+## Symbols
+
+### `PasswordResets::CreateService`
+#### Description
+This service class handles the creation of a password reset token for a user and initiates the sending of a password reset email.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| user | User | The user requesting a password reset |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the operation result, including success status and the created password reset ID |
+
+#### Internal Logic
+1. Check if the user exists, return a not found failure if blank.
+2. Create a new `PasswordReset` record with a secure random token and 30-minute expiration.
+3. Enqueue a password reset email to be sent asynchronously.
+4. Set the created password reset ID in the result object.
+5. Return the result object.
+
+## Side Effects
+- Creates a new `PasswordReset` record in the database.
+- Enqueues an email to be sent via `PasswordResetMailer`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| SecureRandom | Generates a secure random token for the password reset |
+
+## Error Handling
+The service uses a `result` object (likely from the `BaseService`) to handle and return errors, such as when the user is not found.
+
+## API/Interface Reference
+This service is likely called from other parts of the application, such as controllers or GraphQL mutations. An example usage can be seen in the related `Mutations::PasswordResets::Create` GraphQL mutation.
+
+| Method | Input | Output | Description |
+|:-------|:------|:-------|:------------|
+| call | user | result object | Creates a password reset token and sends an email |
+
+## Related Code Insights
+1. The `PasswordReset` model (app/models/password_reset.rb) defines the structure and validations for password reset records, including associations with the User model and validations for token uniqueness and expiration.
+
+2. The `PasswordResetMailer` (app/mailers/password_reset_mailer.rb) is responsible for sending the password reset email. It uses environment variables for configuration and includes localization support.
+
+3. The GraphQL mutation `Mutations::PasswordResets::Create` (app/graphql/mutations/password_resets/create.rb) provides a GraphQL interface for initiating a password reset, which internally uses this `CreateService`.
+
+These related components work together to provide a complete password reset feature for the application, from the database model to the email delivery and GraphQL API.

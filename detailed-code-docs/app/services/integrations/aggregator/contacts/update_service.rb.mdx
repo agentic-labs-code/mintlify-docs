@@ -1,0 +1,72 @@
+---
+title: "update_service.rb"
+---
+
+## High-level description
+This code defines the `UpdateService` class within the `Integrations::Aggregator::Contacts` module. It is responsible for updating contact information in an external integration system, handling the HTTP request, processing the response, and managing success and error scenarios.
+
+## Code Structure
+The `UpdateService` class inherits from `BaseService` and contains a single public method `call`. It interacts with an HTTP client to send update requests and processes the response. The class also handles error scenarios and triggers webhooks for both success and error cases.
+
+## References
+- `BaseService`: The parent class that `UpdateService` inherits from.
+- `LagoHttpClient::HttpError`: Used for handling HTTP errors.
+- `Integrations::Aggregator::Contacts::Payloads::Factory`: Used to generate the payload for the update request.
+
+## Symbols
+
+### `UpdateService`
+#### Description
+This class is responsible for updating contact information in an external integration system.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Object | The integration object |
+| integration_customer | Object | The integration customer object |
+
+#### Internal Logic
+1. Sends a PUT request to update contact information.
+2. Processes the response based on its type (Hash or String).
+3. Delivers a success webhook if the update is successful.
+4. Handles errors and delivers an error webhook if an exception occurs.
+
+### `call`
+#### Description
+The main method that orchestrates the update process.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result of the update operation |
+
+#### Internal Logic
+1. Sends a PUT request using the HTTP client.
+2. Parses the response body.
+3. Processes the result based on its type.
+4. Delivers a success webhook if successful.
+5. Handles errors and delivers an error webhook if an exception occurs.
+
+### `params`
+#### Description
+A private method that generates the payload for the update request.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | Hash | The payload for the update request |
+
+## Error Handling
+The service uses a `rescue` block to catch `LagoHttpClient::HttpError` exceptions. When an error occurs, it extracts the error code and message, delivers an error webhook, and marks the operation as failed in the result object.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| LagoHttpClient | Used for making HTTP requests |
+| Integrations::Aggregator::Contacts::Payloads::Factory | Used to generate the payload for the update request |
+
+## Logging
+The code doesn't implement explicit logging, but it uses webhooks to communicate success and error states, which can be considered a form of external logging or notification.
+
+## Performance Considerations
+The service makes an HTTP request to an external system, which could be a potential performance bottleneck. The response processing is relatively lightweight, with simple JSON parsing and conditional logic based on the response type.

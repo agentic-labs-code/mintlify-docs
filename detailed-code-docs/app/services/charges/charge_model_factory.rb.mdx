@@ -1,0 +1,64 @@
+---
+title: "charge_model_factory.rb"
+---
+
+## High-level description
+This code defines a `ChargeModelFactory` class within the `Charges` module. Its primary purpose is to create and return instances of specific charge model services based on the type of charge model and other properties provided.
+
+## Code Structure
+The `ChargeModelFactory` class contains two class methods: `new_instance` and `charge_model_class`. The `new_instance` method uses `charge_model_class` to determine the appropriate charge model service class and then instantiates it with the provided parameters.
+
+## Symbols
+
+### `ChargeModelFactory.new_instance`
+#### Description
+Creates and returns a new instance of the appropriate charge model service based on the charge model type and other properties.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Charge | The charge object containing the charge model information |
+| aggregation_result | Object | The result of charge aggregation |
+| properties | Hash | Additional properties for the charge model |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| instance | Object | An instance of the appropriate charge model service |
+
+#### Internal Logic
+1. Calls `charge_model_class` to determine the correct service class
+2. Instantiates the determined class with the provided parameters
+
+### `ChargeModelFactory.charge_model_class`
+#### Description
+Determines the appropriate charge model service class based on the charge model type and other properties.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Charge | The charge object containing the charge model information |
+| aggregation_result | Object | The result of charge aggregation |
+| properties | Hash | Additional properties for the charge model |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| class | Class | The appropriate charge model service class |
+
+#### Internal Logic
+Uses a case statement to determine the correct service class based on the charge model type:
+- For 'standard' model:
+  - Returns `GroupedStandardService` if grouped_by is present and aggregations are not nil
+  - Otherwise, returns `StandardService`
+- For 'graduated' model:
+  - Returns `ProratedGraduatedService` if the charge is prorated
+  - Otherwise, returns `GraduatedService`
+- For other models:
+  - Returns the corresponding service class (e.g., `GraduatedPercentageService`, `PackageService`, etc.)
+- Raises a `NotImplementedError` for unknown charge models
+
+## Dependencies
+The code relies on various charge model service classes within the `Charges::ChargeModels` module, such as `StandardService`, `GraduatedService`, `PackageService`, etc.
+
+This factory pattern allows for easy extension of charge models by adding new case statements and corresponding service classes as needed.

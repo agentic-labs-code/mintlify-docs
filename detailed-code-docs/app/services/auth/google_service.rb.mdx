@@ -1,0 +1,120 @@
+---
+title: "google_service.rb"
+---
+
+## High-level description
+The `Auth::GoogleService` class in `app/services/auth/google_service.rb` provides functionality for Google OAuth authentication in the application. It handles user authorization, login, registration, and invite acceptance using Google's authentication services.
+
+## Code Structure
+The `GoogleService` class is part of the `Auth` module and inherits from `BaseService`. It contains several public methods for different authentication scenarios and private helper methods for common tasks.
+
+## Symbols
+
+### `GoogleService`
+#### Description
+This class encapsulates the logic for Google OAuth authentication, providing methods for various authentication scenarios.
+
+#### Internal Logic
+The class uses Google's authentication libraries to handle OAuth flows and token verification. It interacts with the application's user model and other services to complete authentication processes.
+
+### `authorize_url`
+#### Description
+Generates an authorization URL for initiating the Google OAuth flow.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| request | Rack::Request | The current request object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Contains the authorization URL if successful |
+
+#### Internal Logic
+1. Ensures Google Auth is set up
+2. Creates a Google::Auth::WebUserAuthorizer
+3. Generates and returns the authorization URL
+
+### `login`
+#### Description
+Authenticates a user using a Google OAuth code.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | The OAuth code from Google |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Contains user token if successful |
+
+#### Internal Logic
+1. Verifies the Google OAuth token
+2. Finds the user by email
+3. Generates a new token for the user if found and active
+
+### `register_user`
+#### Description
+Registers a new user using Google OAuth information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | The OAuth code from Google |
+| organization_name | String | Name of the organization for the new user |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Contains the registered user information if successful |
+
+#### Internal Logic
+1. Verifies the Google OAuth token
+2. Registers a new user with the provided email and organization name
+
+### `accept_invite`
+#### Description
+Accepts a user invitation using Google OAuth information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | The OAuth code from Google |
+| invite_token | String | The invitation token |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Contains the accepted invitation result if successful |
+
+#### Internal Logic
+1. Verifies the Google OAuth token
+2. Finds the pending invitation by token
+3. Verifies that the Google email matches the invite email
+4. Accepts the invitation using the Invites::AcceptService
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Google::Auth | Provides OAuth and token verification functionality |
+| Signet | Used for handling authorization errors |
+
+## Error Handling
+The class uses a custom error handling mechanism, setting error codes on the `result` object for various failure scenarios, such as:
+- 'user_does_not_exist'
+- 'invalid_google_token'
+- 'invalid_google_code'
+- 'invite_email_mistmatch'
+- 'google_auth_missing_setup'
+
+## Configuration
+The class relies on environment variables for Google OAuth configuration:
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| GOOGLE_AUTH_CLIENT_ID | String | Google OAuth client ID |
+| GOOGLE_AUTH_CLIENT_SECRET | String | Google OAuth client secret |
+| LAGO_FRONT_URL | String | Frontend URL for callback |
+
+These environment variables are crucial for the proper functioning of the Google OAuth integration.

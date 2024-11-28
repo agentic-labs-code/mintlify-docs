@@ -1,0 +1,80 @@
+---
+title: "aggregation_factory.rb"
+---
+
+## High-level description
+This code defines an `AggregationFactory` class within the `BillableMetrics` module. Its primary purpose is to create and return appropriate aggregation service instances based on the type of billable metric and other parameters. It supports various aggregation types and handles the selection of event stores (PostgreSQL or ClickHouse) for data retrieval.
+
+## Code Structure
+The `AggregationFactory` class contains two main class methods: `supports_clickhouse?` and `new_instance`. The `new_instance` method is responsible for creating and returning the appropriate aggregation service instance based on the charge and other parameters. The `aggregator_class` method is used internally to determine the correct aggregation service class based on the billable metric's aggregation type.
+
+## Symbols
+
+### `AggregationFactory`
+#### Description
+This class is responsible for creating and returning appropriate aggregation service instances based on the type of billable metric and other parameters.
+
+#### Internal Logic
+- Checks if ClickHouse is supported using an environment variable.
+- Determines the appropriate event store (PostgreSQL or ClickHouse) based on charge and organization settings.
+- Selects the correct aggregation service class based on the billable metric's aggregation type.
+- Creates and returns an instance of the selected aggregation service with the appropriate parameters.
+
+### `supports_clickhouse?`
+#### Description
+A class method that checks if ClickHouse is supported by checking for the presence of the `LAGO_CLICKHOUSE_ENABLED` environment variable.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| supports_clickhouse | Boolean | Whether ClickHouse is supported |
+
+### `new_instance`
+#### Description
+Creates and returns an appropriate aggregation service instance based on the charge and other parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Charge | The charge object |
+| current_usage | Boolean | Whether it's for current usage calculation |
+| attributes | Hash | Additional attributes for the aggregation service |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| aggregator | AggregationService | An instance of the appropriate aggregation service |
+
+#### Internal Logic
+1. Determines the event store (PostgreSQL or ClickHouse) based on charge settings and ClickHouse support.
+2. Calls `aggregator_class` to get the appropriate aggregation service class.
+3. Creates and returns an instance of the selected aggregation service with the provided parameters.
+
+### `aggregator_class`
+#### Description
+Determines the appropriate aggregation service class based on the billable metric's aggregation type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Charge | The charge object |
+| current_usage | Boolean | Whether it's for current usage calculation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| aggregator_class | Class | The appropriate aggregation service class |
+
+#### Internal Logic
+Uses a case statement to select the correct aggregation service class based on the billable metric's aggregation type. Handles special cases for prorated aggregations and raises `NotImplementedError` for unsupported combinations of pay-in-advance charges and current usage calculations.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Events::Stores::PostgresStore | PostgreSQL event store |
+| Events::Stores::ClickhouseStore | ClickHouse event store |
+| BillableMetrics::Aggregations::* | Various aggregation service classes |
+| BillableMetrics::ProratedAggregations::* | Prorated aggregation service classes |
+
+## Error Handling
+The code raises `NotImplementedError` for unsupported combinations of pay-in-advance charges and current usage calculations for certain aggregation types.

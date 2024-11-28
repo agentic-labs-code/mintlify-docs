@@ -1,0 +1,79 @@
+---
+title: "client_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `LagoHttpClient::Client` class. It tests the `post` method of the client, covering various scenarios such as successful responses, error handling, and different URL configurations.
+
+## Code Structure
+The test suite is organized into a single `describe` block for the `LagoHttpClient::Client` class, with nested `context` blocks for different scenarios within the `#post` method.
+
+## Symbols
+
+### `LagoHttpClient::Client`
+#### Description
+This is the main class being tested. It appears to be an HTTP client for making POST requests to a specified URL.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | String | The base URL for the HTTP client |
+
+### `#post`
+#### Description
+This method sends a POST request to the specified URL.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| path | String | The path to append to the base URL |
+| payload | Hash | The data to send in the POST request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Hash or String | The parsed JSON response or raw response body |
+
+#### Internal Logic
+1. Sends a POST request to the specified URL
+2. Parses the response body as JSON if possible
+3. Returns the parsed response or raw body
+4. Raises a `LagoHttpClient::HttpError` for non-2xx status codes
+
+## Test Cases
+
+### Successful responses (2xx status codes)
+#### Description
+Tests the behavior when the server responds with a 2xx status code.
+
+#### Internal Logic
+1. Stubs the HTTP request to return a 200 status code with a JSON response
+2. Verifies that the client correctly parses and returns the JSON response
+3. Tests edge cases such as blank responses and non-JSON responses
+
+### Error responses (non-2xx status codes)
+#### Description
+Tests the error handling when the server responds with a non-2xx status code.
+
+#### Internal Logic
+1. Stubs the HTTP request to return a 422 status code with an error message
+2. Verifies that the client raises a `LagoHttpClient::HttpError`
+
+### URL handling
+#### Description
+Tests the client's behavior with different URL configurations.
+
+#### Internal Logic
+1. Tests with an empty path
+2. Tests with query parameters in the URL
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| webmock | Stubs HTTP requests for testing |
+
+## Error Handling
+The client raises a `LagoHttpClient::HttpError` when receiving a non-2xx status code response.
+
+This test suite provides comprehensive coverage for the `LagoHttpClient::Client#post` method, ensuring it correctly handles various response types, URL configurations, and error conditions.

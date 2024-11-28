@@ -1,0 +1,46 @@
+---
+title: "20240118135350_remove_credits_auto_refreshed_from_organizations.rb"
+---
+
+## High-level description
+This migration file removes the `credits_auto_refreshed` column from the `organizations` table and adds new columns to the `wallets` table. The changes are related to managing ongoing balances and usage balances for credits and monetary amounts in cents.
+
+## Symbols
+
+### `RemoveCreditsAutoRefreshedFromOrganizations`
+#### Description
+This class is a Rails migration that inherits from `ActiveRecord::Migration[7.0]`. It defines changes to be applied to the database schema.
+
+#### Internal Logic
+The migration performs two main actions:
+1. Removes the `credits_auto_refreshed` column from the `organizations` table.
+2. Adds four new columns to the `wallets` table:
+   - `ongoing_balance_cents`
+   - `ongoing_usage_balance_cents`
+   - `credits_ongoing_balance`
+   - `credits_ongoing_usage_balance`
+
+### `change`
+#### Description
+This method defines the changes to be applied to the database schema when the migration is run.
+
+#### Internal Logic
+1. Uses `safety_assured` block to bypass Strong Migrations checks.
+2. Removes the `credits_auto_refreshed` column from the `organizations` table using `remove_column`.
+3. Modifies the `wallets` table using `change_table` with `bulk: true` for performance optimization:
+   - Adds `ongoing_balance_cents` and `ongoing_usage_balance_cents` as `bigint` columns with default value 0 and not null constraint.
+   - Adds `credits_ongoing_balance` and `credits_ongoing_usage_balance` as `decimal` columns with precision 30, scale 5, default value '0.0', and not null constraint.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for defining database schema changes |
+
+## Performance Considerations
+The migration uses `bulk: true` option in `change_table` for the `wallets` table modifications, which can improve performance by combining multiple ALTER TABLE statements into a single operation.
+
+## Error Handling
+The migration uses `safety_assured` to bypass Strong Migrations checks. This should be used cautiously, ensuring that the migration is safe to run in production environments.
+
+## TODOs
+There are no explicit TODOs in the code, but it's worth noting that removing a column and adding new ones might require data migration or application code changes to handle the new schema.

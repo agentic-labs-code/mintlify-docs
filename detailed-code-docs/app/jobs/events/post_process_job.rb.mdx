@@ -1,0 +1,50 @@
+---
+title: "post_process_job.rb"
+---
+
+## High-level description
+This code defines a background job class `Events::PostProcessJob` that handles post-processing of events in a Rails application. It determines the queue for job execution based on an environment variable and uses the `Events::PostProcessService` to perform the actual post-processing.
+
+## Code Structure
+The `Events::PostProcessJob` class inherits from `ApplicationJob` and defines two main methods: `queue_as` and `perform`. The `queue_as` method determines the queue for job execution, while the `perform` method calls the `Events::PostProcessService` to process the event.
+
+## Symbols
+
+### `Events::PostProcessJob`
+#### Description
+This class represents a background job for post-processing events. It determines the queue for execution and delegates the actual processing to the `Events::PostProcessService`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | Event | The event object to be post-processed |
+
+#### Internal Logic
+1. The `queue_as` method:
+   - Checks the `SIDEKIQ_EVENTS` environment variable
+   - Returns `:events` queue if the variable is truthy, otherwise returns `:default` queue
+2. The `perform` method:
+   - Calls `Events::PostProcessService.call` with the provided event
+   - Raises an error if the service call results in an error
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveModel::Type::Boolean | Used to cast the environment variable to a boolean |
+| ApplicationJob | Base job class that this job inherits from |
+| Events::PostProcessService | Service used to perform the actual post-processing of events |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| SIDEKIQ_EVENTS | Boolean | N/A | Determines whether to use the `:events` queue or the `:default` queue |
+
+## Error Handling
+The job raises an error if the `Events::PostProcessService` call results in an error, using the `raise_if_error!` method.
+
+## Related Code Context
+1. The `Events::CreateService` and `Events::CreateBatchService` both enqueue `Events::PostProcessJob` after creating events.
+2. The `Events::PostProcessService` performs various operations on the event, including updating customer and subscription information, expiring cached charges, and handling pay-in-advance scenarios.
+3. The `ApplicationJob` class, which `Events::PostProcessJob` inherits from, sets Sidekiq options to not retry failed jobs.
+
+This job plays a crucial role in the event processing pipeline, handling important post-creation tasks that are better suited for asynchronous execution.

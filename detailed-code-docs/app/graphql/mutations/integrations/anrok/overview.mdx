@@ -1,0 +1,157 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL mutations related to the Anrok integration within an organization. The mutations handle creating, updating, and fetching draft invoice taxes for Anrok integrations. These operations are part of a larger GraphQL API and include authentication and organization validation checks.
+
+## What does it do?
+The code in this directory provides three main functionalities:
+
+1. Creating a new Anrok integration: This allows users to set up a new Anrok integration for their organization by providing necessary details such as name, code, connection ID, and API key.
+
+2. Updating an existing Anrok integration: Users can modify the details of an existing Anrok integration within their organization.
+
+3. Fetching draft invoice taxes: This functionality calculates taxes for a one-off invoice using the Anrok integration. It takes customer information, currency, and fee details as input and returns a collection of fee objects with tax information.
+
+These operations are implemented as GraphQL mutations, which are special types of queries that can modify data on the server. Each mutation ensures that the user is authenticated and has the necessary permissions within their organization before processing the request.
+
+## Key Files
+
+1. `create.rb`:
+   - Defines the `Create` mutation for creating a new Anrok integration.
+   - Validates user authentication and organization membership.
+   - Delegates the creation process to `::Integrations::Anrok::CreateService`.
+
+2. `update.rb`:
+   - Defines the `Update` mutation for modifying an existing Anrok integration.
+   - Checks user authentication and organization permissions.
+   - Uses `::Integrations::Anrok::UpdateService` for the update logic.
+
+3. `fetch_draft_invoice_taxes.rb`:
+   - Implements the `FetchDraftInvoiceTaxes` mutation for calculating taxes on draft invoices.
+   - Handles customer lookup, draft invoice creation, and fee object transformation.
+   - Utilizes `::Integrations::Aggregator::Taxes::Invoices::CreateDraftService` for tax calculations.
+
+## Dependencies
+The code in this directory relies on several external dependencies and internal services:
+
+1. GraphQL: The mutations are built using the GraphQL framework, which allows for flexible and efficient API queries.
+
+2. Authentication and Authorization:
+   - `AuthenticableApiUser`: Ensures that the user making the request is authenticated.
+   - `RequiredOrganization`: Validates that the user belongs to the required organization.
+
+3. Internal Services:
+   - `::Integrations::Anrok::CreateService`: Handles the creation of Anrok integrations.
+   - `::Integrations::Anrok::UpdateService`: Manages updates to existing Anrok integrations.
+   - `::Integrations::Aggregator::Taxes::Invoices::CreateDraftService`: Calculates taxes for draft invoices.
+
+4. Custom Types:
+   - `Types::Integrations::Anrok`: Defines the structure for Anrok integration objects.
+   - `Types::Integrations::Anrok::CreateInput`: Specifies the input format for creating integrations.
+   - `Types::Integrations::Anrok::UpdateInput`: Defines the input structure for updating integrations.
+   - `Types::Integrations::AnrokObjects::FeeObject`: Represents fee objects with tax information.
+
+## Configuration
+The mutations in this directory use the following configuration:
+
+1. Required Permissions:
+   - For creating Anrok integrations: `'organization:integrations:create'`
+   - For updating Anrok integrations: `'organization:integrations:update'`
+
+2. Error Handling:
+   - The mutations use a `result_error` method (likely defined in a parent class) to handle and return errors from the various services.
+
+## Code Examples
+
+Here's an example of how the `Create` mutation is structured:
+
+```ruby
+module Mutations
+  module Integrations
+    module Anrok
+      class Create &lt; BaseMutation
+        include AuthenticableApiUser
+        include RequiredOrganization
+
+        REQUIRED_PERMISSION = 'organization:integrations:create'.freeze
+
+        argument :input, Types::Integrations::Anrok::CreateInput, required: true
+
+        type Types::Integrations::Anrok
+
+        def resolve(**args)
+          result = ::Integrations::Anrok::CreateService.call(
+            organization_id: current_organization.id,
+            **args[:input].to_h
+          )
+
+          if result.success?
+            result.integration
+          else
+            result_error(result)
+          end
+        end
+      end
+    end
+  end
+end
+```
+
+This structure is similar for the `Update` mutation, with appropriate changes to the input type and service call.
+
+The `FetchDraftInvoiceTaxes` mutation has a more complex structure due to its need to handle customer lookup and fee transformation:
+
+```ruby
+module Mutations
+  module Integrations
+    module Anrok
+      class FetchDraftInvoiceTaxes &lt; BaseMutation
+        include AuthenticableApiUser
+        include RequiredOrganization
+
+        argument :input, Types::Invoices::CreateInvoiceInput, required: true
+
+        type Types::Integrations::AnrokObjects::FeeObject.collection_type
+
+        def resolve(**args)
+          customer = current_organization.customers.find(args[:input][:customer_id])
+
+          result = ::Integrations::Aggregator::Taxes::Invoices::CreateDraftService.call(
+            invoice: invoice(customer, args[:input]),
+            fees: fees(args[:input])
+          )
+
+          if result.success?
+            result.fees
+          else
+            result_error(result)
+          end
+        end
+
+        private
+
+        def invoice(customer, args)
+          OpenStruct.new(
+            customer: customer,
+            currency: args[:currency]
+          )
+        end
+
+        def fees(args)
+          args[:fees].map do |fee|
+            OpenStruct.new(
+              id: fee[:id],
+              amount_cents: fee[:amount_cents],
+              name: fee[:name]
+            )
+          end
+        end
+      end
+    end
+  end
+end
+```
+
+These mutations provide a structured and secure way to interact with Anrok integrations within the larger application, ensuring proper authentication, authorization, and data handling throughout the process.

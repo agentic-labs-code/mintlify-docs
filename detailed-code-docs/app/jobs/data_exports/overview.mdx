@@ -1,0 +1,50 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines a background job class `ExportResourcesJob` within the `DataExports` module. Its purpose is to asynchronously process data exports by calling the `ExportResourcesService` with a given `data_export` object.
+
+## Code Structure
+The `ExportResourcesJob` class inherits from `ApplicationJob` and defines a single `perform` method that executes the data export process.
+
+## Symbols
+
+### `ExportResourcesJob`
+#### Description
+A job class responsible for executing data exports asynchronously. It uses the `ExportResourcesService` to perform the actual export operation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data_export | DataExport | The data export object to be processed |
+
+#### Internal Logic
+1. The job is queued in the default queue.
+2. When performed, it calls the `ExportResourcesService.call` method with the provided `data_export` object.
+3. The `raise_if_error!` method is called on the result, which will raise an exception if the export process encounters any errors.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ApplicationJob | Base job class that `ExportResourcesJob` inherits from |
+| ExportResourcesService | Service class that performs the actual data export |
+
+## References
+- `ExportResourcesService`: This service is called within the `perform` method to execute the data export process.
+- `DataExport`: While not directly referenced in this file, it is the expected type of the `data_export` parameter passed to the `perform` method.
+
+## Related Code Context
+Based on the related code snippets provided:
+
+1. The `ExportResourcesJob` is enqueued by the `DataExports::CreateService` after creating a new `DataExport` record.
+
+2. The `ExportResourcesService` is responsible for:
+   - Checking if the data export is expired or already processed
+   - Updating the data export status (processing, completed, or failed)
+   - Generating the export file (CSV for invoices or invoice fees)
+   - Attaching the generated file to the data export record
+   - Sending a completion email
+   - Handling errors and updating the data export status accordingly
+
+This job serves as a bridge between the creation of a data export request and its actual processing, allowing the export to be handled asynchronously in the background.

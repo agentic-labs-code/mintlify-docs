@@ -1,0 +1,65 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various services related to lifetime usage calculations, flagging, and threshold checks in a subscription-based system. The tests cover different aspects of usage tracking, invoicing, and threshold management for subscriptions.
+
+## What does it do?
+The tests in this directory verify the functionality of several services that handle lifetime usage calculations and related operations:
+
+1. Calculation of invoiced and current usage for subscriptions
+2. Flagging lifetime usages for refresh based on invoice and subscription data
+3. Recalculating usage and checking for threshold breaches
+4. Validating usage threshold calculations under various scenarios
+
+These services work together to ensure accurate tracking of usage, proper invoicing, and timely notifications when usage thresholds are reached. They handle complex scenarios such as draft invoices, finalized invoices, terminated subscriptions, and progressive billing.
+
+## Key Files
+1. `calculate_service_spec.rb`: Tests the `LifetimeUsages::CalculateService` class, which calculates invoiced and current usage for a lifetime usage record.
+
+2. `flag_refresh_from_invoice_service_spec.rb`: Tests the `LifetimeUsages::FlagRefreshFromInvoiceService` class, which flags lifetime usages for refresh based on invoice data.
+
+3. `flag_refresh_from_subscription_service_spec.rb`: Tests the `LifetimeUsages::FlagRefreshFromSubscriptionService` class, which flags lifetime usages for refresh based on subscription status and plan details.
+
+4. `recalculate_and_check_service_spec.rb`: Tests the `LifetimeUsages::RecalculateAndCheckService` class, which recalculates usage, checks for threshold breaches, sends webhooks, and creates invoices as needed.
+
+5. `usage_thresholds/check_service_spec.rb`: Tests the `LifetimeUsages::UsageThresholds::CheckService` class, which checks usage thresholds based on lifetime usage and progressive billed amounts.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data and objects throughout the test suite.
+3. Rails.cache: Used in some services for caching (cleared in tests to ensure consistent behavior).
+
+## Configuration
+The tests use the standard RSpec configuration, which is typically loaded from a `rails_helper` file. This configuration likely includes:
+
+1. SimpleCov for code coverage reporting
+2. Database cleaner for maintaining a clean test database between examples
+3. Various RSpec configurations for behavior and output formatting
+
+## Key Concepts and Workflows
+
+1. Lifetime Usage Calculation:
+   - The `CalculateService` handles both invoiced usage and current usage calculations.
+   - It considers various factors such as draft invoices, finalized invoices, and usage events.
+   - The service updates timestamps to track when calculations were last performed.
+
+2. Flagging for Refresh:
+   - Two services (`FlagRefreshFromInvoiceService` and `FlagRefreshFromSubscriptionService`) handle flagging lifetime usages for refresh.
+   - These services consider factors like invoice status, subscription status, and plan details to determine if a refresh is needed.
+   - They can create new lifetime usage records if they don't exist for a subscription.
+
+3. Recalculation and Threshold Checking:
+   - The `RecalculateAndCheckService` combines recalculation of usage with threshold checking.
+   - It handles sending webhooks when thresholds are breached and creates invoices as needed.
+   - The service can handle multiple threshold breaches in a single operation.
+
+4. Usage Threshold Calculations:
+   - The `UsageThresholds::CheckService` performs detailed calculations of usage thresholds.
+   - It handles both fixed and recurring thresholds, considering progressive billing and historical usage amounts.
+   - The service can determine which thresholds have been passed based on current and invoiced usage.
+
+These tests ensure that the lifetime usage tracking system accurately calculates usage, properly flags records for refresh, correctly identifies threshold breaches, and handles complex billing scenarios. This comprehensive test suite provides confidence in the reliability and accuracy of the usage tracking and billing system for subscriptions.

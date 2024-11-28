@@ -1,0 +1,66 @@
+---
+title: "payment.rb"
+---
+
+## High-level description
+The `Payment` class is an ActiveRecord model that represents a payment in the application. It is associated with various other models such as `PaymentProvider`, `PaymentProviderCustomer`, and `Refund`. The class also includes functionality for tracking changes and determining if a payment should be synchronized.
+
+## Code Structure
+The `Payment` class inherits from `ApplicationRecord` and includes the `PaperTrailTraceable` module. It defines several associations and a method to determine if the payment should be synchronized.
+
+## Symbols
+
+### `Payment`
+#### Description
+This class represents a payment in the system. It is associated with a payable object (which can be of different types, but is typically an Invoice), a payment provider, and a payment provider customer. It also has associations with refunds and integration resources.
+
+#### Inputs
+N/A (This is a model class, not a method)
+
+#### Outputs
+N/A (This is a model class, not a method)
+
+#### Internal Logic
+- Includes `PaperTrailTraceable` module for change tracking
+- Defines associations with other models
+- Delegates the `customer` method to the `payable` object
+- Implements a `should_sync_payment?` method to determine if the payment should be synchronized
+
+### `should_sync_payment?`
+#### Description
+This method determines whether the payment should be synchronized based on certain conditions.
+
+#### Inputs
+N/A (This method doesn't take any parameters)
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Boolean | Whether the payment should be synchronized |
+
+#### Internal Logic
+1. Returns `false` if the `payable` is not an `Invoice`
+2. Checks if the `payable` (Invoice) is finalized
+3. Checks if any of the customer's accounting integration customers have `sync_payments` enabled
+
+## Dependencies
+The `Payment` model depends on several other models and modules:
+- `PaperTrailTraceable`
+- `PaymentProviders::BaseProvider`
+- `PaymentProviderCustomers::BaseCustomer`
+- `Refund`
+- `IntegrationResource`
+- `Invoice` (implied through the `should_sync_payment?` method)
+
+## Schema Information
+The code includes a detailed schema information section, which provides details about the database table for this model. Key points include:
+- The table name is `payments`
+- It uses UUID for primary and foreign keys
+- It stores amount in cents and currency
+- It has a polymorphic association with `payable`
+- It includes various timestamps and status fields
+
+## Indexes and Foreign Keys
+The schema information also lists the indexes and foreign keys for the `payments` table, which are important for database performance and data integrity.
+
+This `Payment` model serves as a central part of the payment processing system in the application, connecting various components such as invoices, payment providers, and refunds.

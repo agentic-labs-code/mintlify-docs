@@ -1,0 +1,40 @@
+---
+title: "20240729134020_add_index_on_payable_group_id.rb"
+---
+
+## High-level description
+This migration file adds a non-transactional, concurrent index on the `payable_group_id` column of the `invoices` table in a Ruby on Rails application. It's designed to improve query performance for lookups on this column without causing downtime.
+
+## Symbols
+
+### `AddIndexOnPayableGroupId`
+#### Description
+This class is a Rails migration that adds an index to the `invoices` table. It inherits from `ActiveRecord::Migration[7.1]`, indicating it's compatible with Rails 7.1 migration framework.
+
+#### Internal Logic
+1. The migration disables DDL (Data Definition Language) transactions using `disable_ddl_transaction!`.
+2. It defines a `change` method that adds an index to the `invoices` table on the `payable_group_id` column.
+3. The index is added concurrently and only if it doesn't already exist.
+
+## Side Effects
+- Adds a new index to the `invoices` table, which will improve query performance for searches on `payable_group_id`.
+- The operation is performed concurrently, minimizing the impact on database performance during the migration.
+
+## Performance Considerations
+- Using `algorithm: :concurrently` allows the index to be built without locking the table, which is crucial for maintaining database availability in production environments.
+- The `if_not_exists: true` option prevents errors if the index already exists, making the migration idempotent.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+
+## Error Handling
+The migration includes implicit error handling:
+- If the index already exists, the `if_not_exists: true` option will prevent the migration from failing.
+- If there's an issue during the index creation, Rails will automatically roll back the migration.
+
+## Notes
+1. The `# frozen_string_literal: true` comment at the top of the file is a Ruby optimization that freezes all string literals in the file, potentially improving performance and memory usage.
+2. This migration is designed to be run in a production environment without causing downtime, thanks to the concurrent index creation.
+3. The migration version number in the filename (20240729134020) indicates this migration was generated on July 29, 2024, at 13:40:20 UTC.

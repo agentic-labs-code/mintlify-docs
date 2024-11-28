@@ -1,0 +1,66 @@
+---
+title: "invoice_credit_notes_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying credit notes associated with a specific invoice. It's part of a larger GraphQL API and includes authentication and organization-level access control.
+
+## Code Structure
+The `InvoiceCreditNotesResolver` class inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. These modules provide authentication and organization-level access control functionality.
+
+## References
+This code references the following:
+- `Resolvers::BaseResolver`
+- `Types::CreditNotes::Object`
+- `Invoice` model
+
+## Symbols
+
+### InvoiceCreditNotesResolver
+#### Description
+This resolver handles GraphQL queries for retrieving credit notes associated with a specific invoice. It includes authentication and organization access checks, and returns a paginated list of finalized credit notes for the given invoice.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice_id | ID | Unique identifier of the invoice (required) |
+| limit | Integer | Number of items per page (optional) |
+| page | Integer | Page number for pagination (optional) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_notes | [Types::CreditNotes::Object] | A collection of credit note objects |
+
+#### Internal Logic
+1. Finds the invoice using the provided `invoice_id`.
+2. Retrieves associated credit notes that are finalized.
+3. Orders the credit notes by creation date in descending order.
+4. Applies pagination using the `page` and `limit` arguments.
+5. Returns the paginated collection of credit notes.
+6. If the invoice is not found, it raises a not found error.
+
+## Side Effects
+This resolver doesn't have any notable side effects beyond querying the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication checks |
+| RequiredOrganization | Ensures the user has access to the organization |
+
+## Error Handling
+- If the invoice is not found, it calls the `not_found_error` method with the resource name 'invoice'.
+- The included modules (`AuthenticableApiUser` and `RequiredOrganization`) may raise unauthorized or forbidden errors if the user doesn't have the necessary permissions.
+
+## API/Interface Reference
+| Argument | Type | Required | Description |
+|:---------|:-----|:---------|:------------|
+| invoice_id | ID | Yes | Unique identifier of the invoice |
+| limit | Integer | No | Number of items per page |
+| page | Integer | No | Page number for pagination |
+
+The resolver returns a collection of `Types::CreditNotes::Object`, which represents credit note data.
+
+## Performance Considerations
+The resolver uses pagination to limit the number of records returned, which can help with performance when dealing with large datasets. The `order` clause on `created_at` may benefit from an index on that column in the `credit_notes` table.

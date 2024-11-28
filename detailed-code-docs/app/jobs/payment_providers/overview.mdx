@@ -1,0 +1,78 @@
+---
+title: "Overview"
+---
+
+## High-level description
+
+This directory contains job classes related to payment provider integrations, specifically for Adyen, GoCardless, and Stripe. These jobs are designed to handle asynchronous processing of events and webhook management for these payment providers. The jobs are structured to work with a background job processing system, likely Sidekiq, to efficiently manage payment-related operations without blocking the main application thread.
+
+## What does it do?
+
+The jobs in this directory perform several key functions:
+
+1. Event Handling: For each payment provider (Adyen, GoCardless, and Stripe), there are jobs that process incoming webhook events asynchronously. These jobs take the raw event data, typically in JSON format, and delegate the processing to their respective service classes.
+
+2. Webhook Management: Specifically for Stripe, there are additional jobs for refreshing and registering webhooks. These ensure that the application's webhook configurations with Stripe are up-to-date and properly registered.
+
+3. Error Handling and Retries: The jobs implement error handling mechanisms and, in some cases, retry logic to deal with potential issues such as timing discrepancies between webhook receipt and database updates.
+
+These jobs work together to maintain robust integrations with the payment providers, ensuring that the application can handle payment-related operations efficiently and react to provider events in real-time.
+
+## Key Files
+
+1. `adyen/handle_event_job.rb`:
+   - Processes Adyen webhook events asynchronously.
+   - Uses `PaymentProviders::AdyenService` to handle the event.
+
+2. `gocardless/handle_event_job.rb`:
+   - Processes GoCardless webhook events asynchronously.
+   - Uses `PaymentProviders::GocardlessService` to handle the event.
+
+3. `stripe/handle_event_job.rb`:
+   - Processes Stripe webhook events asynchronously.
+   - Uses `PaymentProviders::StripeService` to handle the event.
+   - Implements retry logic for handling potential timing issues.
+
+4. `stripe/refresh_webhook_job.rb`:
+   - Refreshes the webhook configuration for a given Stripe payment provider.
+   - Uses `PaymentProviders::StripeService` to perform the refresh operation.
+
+5. `stripe/register_webhook_job.rb`:
+   - Registers a new webhook for a Stripe payment provider.
+   - Uses `PaymentProviders::Stripe::RegisterWebhookService` to perform the registration.
+
+## Dependencies
+
+The jobs in this directory rely on several key dependencies:
+
+1. ApplicationJob: All jobs inherit from this base class, which likely provides common functionality and configuration for background jobs in the application.
+
+2. Provider-specific Service classes:
+   - `PaymentProviders::AdyenService`
+   - `PaymentProviders::GocardlessService`
+   - `PaymentProviders::StripeService`
+   - `PaymentProviders::Stripe::RegisterWebhookService`
+
+These service classes encapsulate the logic for handling events, refreshing webhooks, and registering new webhooks for their respective payment providers.
+
+3. Sidekiq: While not explicitly mentioned in the code, the use of background jobs suggests that Sidekiq or a similar job processing system is being used to manage these asynchronous tasks.
+
+## Configuration
+
+The jobs in this directory use the following configuration:
+
+1. Queue: All jobs are configured to use the 'providers' queue. This allows for better control over job processing and potential rate limiting for provider-related tasks.
+
+2. Retry Logic: The Stripe `HandleEventJob` implements retry logic specifically for `BaseService::NotFoundFailure` exceptions. This helps handle cases where the webhook is received before the database is updated with relevant information.
+
+Example configuration in `stripe/handle_event_job.rb`:
+
+```ruby
+class HandleEventJob &lt; ApplicationJob
+  queue_as 'providers'
+  retry_on BaseService::NotFoundFailure, wait: 5.seconds, attempts: 3
+  # ...
+end
+```
+
+These jobs play a crucial role in managing payment provider integrations within the application. They ensure that provider events are processed efficiently, webhook configurations are kept up-to-date, and new webhooks can be registered as needed. The asynchronous nature of these jobs helps maintain application responsiveness while handling potentially time-consuming operations related to payment providers.

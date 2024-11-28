@@ -1,0 +1,61 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions related to Integration Collection Mappings. It includes input types for creating and updating mappings, an enum for mapping types, and an object type representing the collection mapping itself. These types are crucial for defining the structure of data used in GraphQL queries and mutations involving integration collection mappings.
+
+## What does it do?
+This set of GraphQL types facilitates the creation, updating, and querying of integration collection mappings in a GraphQL API. These mappings likely represent connections between internal collections and external system collections within integrations. The types define the structure of data that can be sent to or received from the API when working with these mappings.
+
+For example, when a user wants to create a new mapping, they would use the `CreateIntegrationCollectionMappingInput` type to structure their input data. Similarly, when querying for existing mappings, the API would return data structured according to the `CollectionMapping` object type.
+
+The `MappingTypeEnum` provides a predefined set of options for the type of mapping, ensuring consistency and validation in the API.
+
+## Key Files
+
+1. `create_input.rb`:
+   - Defines the `CreateIntegrationCollectionMappingInput` type.
+   - Specifies the structure for input data when creating a new integration collection mapping.
+   - Includes fields like `external_id`, `integration_id`, and `mapping_type`.
+
+2. `update_input.rb`:
+   - Defines the `UpdateIntegrationCollectionMappingInput` type.
+   - Specifies the structure for input data when updating an existing integration collection mapping.
+   - Similar to `create_input.rb`, but all fields except `id` are optional.
+
+3. `mapping_type_enum.rb`:
+   - Defines the `MappingTypeEnum` type.
+   - Represents the possible types of mappings for integration collections.
+   - Dynamically generates enum values based on a `MAPPING_TYPES` constant.
+
+4. `object.rb`:
+   - Defines the `CollectionMapping` object type.
+   - Represents the structure of a collection mapping when queried through the API.
+   - Includes fields like `id`, `external_id`, `integration_id`, and `mapping_type`.
+
+## Dependencies
+The code in this directory relies on the following dependencies:
+
+1. GraphQL gem: This is the core dependency for implementing GraphQL in Ruby. It provides the base classes and methods used throughout these files.
+
+2. `Types::BaseInputObject` and `Types::BaseObject`: These are likely custom base classes defined elsewhere in the application, providing common functionality for input and object types.
+
+3. `IntegrationCollectionMappings::BaseCollectionMapping`: This class is referenced in `mapping_type_enum.rb` to access the `MAPPING_TYPES` constant, which defines the possible mapping types.
+
+## Configuration
+While there are no explicit configuration files in this directory, the `MappingTypeEnum` is dynamically configured based on the `MAPPING_TYPES` constant from `IntegrationCollectionMappings::BaseCollectionMapping`. This allows for easy extension or modification of mapping types without changing the GraphQL type definition.
+
+Here's an example of how the `MappingTypeEnum` is defined:
+
+```ruby
+class MappingTypeEnum &lt; Types::BaseEnum
+  IntegrationCollectionMappings::BaseCollectionMapping::MAPPING_TYPES.each do |mapping_type|
+    value mapping_type
+  end
+end
+```
+
+This approach ensures that the GraphQL enum stays in sync with the application's internal definition of mapping types.
+
+In summary, this directory provides a comprehensive set of GraphQL types for working with integration collection mappings, enabling creation, updating, and querying of these mappings through a GraphQL API. The types are designed to be flexible and maintainable, with dynamic configuration where appropriate.
