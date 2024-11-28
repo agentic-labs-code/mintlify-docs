@@ -1,0 +1,52 @@
+---
+title: "CodeableConcept.hbs"
+---
+
+## High-level description
+This Handlebars template file, `CodeableConcept.hbs`, is designed to generate a FHIR CodeableConcept data type from CDA (Clinical Document Architecture) data. It structures the output as a JSON object containing a "text" field and a "coding" array, which includes one or more Coding objects.
+
+## Symbols
+
+### CodeableConcept Template
+#### Description
+This template creates a JSON object representing a FHIR CodeableConcept, which is used to represent coded concepts in healthcare.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | Object | The main code object containing originalText and possibly translation |
+| text | String | An alternative text representation |
+| canBeUnknown | Boolean | Flag to indicate if the concept can be marked as "unknown" |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON Object | Object | A FHIR CodeableConcept representation |
+
+#### Internal Logic
+1. Determines the "text" field:
+   - If `code.originalText` exists, use it
+   - Else if `text` exists, use it
+   - Else if `canBeUnknown` is true, set to "unknown"
+2. Creates a "coding" array:
+   - Includes the main code using the Coding.hbs partial
+   - Iterates over `code.translation` array (if it exists) and includes each translation using the Coding.hbs partial
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Handlebars | Template engine used for generating the JSON structure |
+| DataType/Coding.hbs | Partial template for generating Coding objects |
+
+## Helper Functions
+| Function | Purpose |
+|:---------|:--------|
+| parseReferenceData | Used to parse and format the text content |
+| toArray | Converts input to an array, likely used for handling single or multiple translations |
+
+## Notes
+- The template uses triple curly braces `{{{...}}}` for the `parseReferenceData` helper, which suggests that HTML escaping is disabled for these values.
+- The template is designed to handle cases where the concept can be marked as "unknown" if no other text is available.
+- The coding array can include multiple entries: the main code and any translations.
+
+This template is part of a larger system for converting CDA documents to FHIR resources, specifically handling the conversion of coded concepts.

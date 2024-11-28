@@ -1,0 +1,121 @@
+---
+title: "fitbit-auth.ts"
+---
+
+## High-level description
+This code implements a Lambda function handler for Fitbit authentication and webhook verification. It verifies incoming Fitbit webhook requests, forwards valid requests to an API server, and handles responses accordingly.
+
+## Code Structure
+The main handler function processes the incoming event, verifies the request, and forwards it to the server if valid. It uses helper functions for building responses, verifying requests, and forwarding calls to the server.
+
+## Symbols
+
+### `handler`
+#### Description
+The main Lambda function handler that processes incoming APIGatewayEvents for Fitbit authentication.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | APIGatewayEvent | The incoming API Gateway event |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Object | An object containing statusCode and optionally body |
+
+#### Internal Logic
+1. Checks if the event has a body
+2. Retrieves the Fitbit client secret from AWS Secrets Manager
+3. Verifies the request using the secret and event data
+4. If verified, forwards the call to the server
+5. Returns an appropriate response based on the verification and forwarding results
+
+### `forwardCallToServer`
+#### Description
+Forwards the verified call to the API server and processes the response.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | APIGatewayEvent | The incoming API Gateway event |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Object | An object containing statusCode and body from the server response |
+
+#### Internal Logic
+1. Logs the forwarding action
+2. Sends a POST request to the API server with the event body and headers
+3. Logs the server response
+4. Returns a response object with the server's status and data
+
+### `verifyRequest`
+#### Description
+Verifies the authenticity of the webhook notification by comparing a hashed value of the client secret to the Fitbit signature provided in the request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | APIGatewayEvent | The incoming API Gateway event |
+| body | string | The body of the APIGatewayEvent |
+| secret | string | The Fitbit client secret |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | boolean | True if the request is verified, false otherwise |
+
+#### Internal Logic
+1. Creates a signing key by appending '&' to the secret
+2. Generates a hash using HMAC-SHA1 with the signing key and request body
+3. Encodes the hash to base64
+4. Compares the encoded hash with the X-Fitbit-Signature header
+5. Returns true if they match, false otherwise
+
+### `buildResponse`
+#### Description
+Builds a response object with the given status code and optional body.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | number | The HTTP status code |
+| body | unknown | Optional response body |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Object | An object containing statusCode and optionally body |
+
+### `defaultResponse`
+#### Description
+Returns a default response with a NO_CONTENT status code.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Object | An object with statusCode set to NO_CONTENT |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @aws-lambda-powertools/parameters/secrets | For retrieving secrets from AWS Secrets Manager |
+| aws-lambda | For type definitions related to AWS Lambda functions |
+| axios | For making HTTP requests to the API server |
+| crypto | For creating HMAC hashes for request verification |
+| http-status | For HTTP status code constants |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| API_URL | string | N/A | The URL of the API server |
+| FITBIT_CLIENT_SECRET | string | N/A | The name of the secret containing the Fitbit client secret |
+| FITBIT_TIMEOUT_MS | number | N/A | The timeout for Fitbit API requests in milliseconds |
+
+## TODOs
+- Use core's base64 functions instead of Buffer.from().toString("base64")
+
+## References
+This code references the `getEnvOrFail` function from the `./shared/env` module, which is a wrapper around a core function for retrieving environment variables.

@@ -1,0 +1,60 @@
+---
+title: "create-outbound-patient-discovery-req.ts"
+---
+
+## High-level description
+The `createOutboundPatientDiscoveryReq` function constructs an `OutboundPatientDiscoveryReq` object, which is used to initiate a patient discovery request to external gateways (e.g., Carequality). This request includes patient demographics, the requesting organization's information, and the target gateways.
+
+## References
+- `OutboundPatientDiscoveryReq`: Type definition from `@metriport/ihe-gateway-sdk` representing the structure of an outbound patient discovery request.
+- `XCPDGateway`: Type definition from `@metriport/ihe-gateway-sdk` representing a gateway in the context of cross-community patient discovery (XCPD).
+- `PatientResource`: Type definition from `@metriport/ihe-gateway-sdk` representing patient demographic information.
+- `HieInitiator`: Type definition representing the healthcare organization initiating the HIE request.
+- `createPurposeOfUse`: Function (defined in `./shared.ts`) that determines and formats the purpose of use for the request.
+- `getSystemUserName`: Function (defined in `./shared.ts`) that generates a system user name based on the organization name.
+
+## Symbols
+### `createOutboundPatientDiscoveryReq`
+#### Description
+This function creates an `OutboundPatientDiscoveryReq` object populated with data from the provided parameters. This object is used to initiate a patient discovery request to external gateways.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientResource | `PatientResource` | Patient demographic information to include in the request. |
+| cxId | `string` | Unique identifier of the customer. |
+| patientId | `string` | Unique identifier of the patient. |
+| xcpdGateways | `XCPDGateway[]` | Array of target gateways for the patient discovery request. |
+| initiator | `HieInitiator` | Information about the healthcare organization initiating the request. |
+| requestId | `string` | Unique identifier for the request. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | `OutboundPatientDiscoveryReq` | An object representing the outbound patient discovery request. |
+
+#### Internal Logic
+1. **Generate system user name:** Calls `getSystemUserName` to create a user name string based on the initiator's organization name.
+2. **Construct request object:** Creates an `OutboundPatientDiscoveryReq` object and populates its properties:
+    - `id`: Set to the provided `requestId`.
+    - `cxId`: Set to the provided `cxId`.
+    - `patientId`: Set to the provided `patientId`.
+    - `timestamp`: Set to the current timestamp using `dayjs().toISOString()`.
+    - `gateways`: Set to the provided `xcpdGateways` array.
+    - `principalCareProviderIds`: Set to an array containing the initiator's NPI (National Provider Identifier).
+    - `samlAttributes`: An object containing SAML attributes for the request:
+        - `subjectId`: Set to the generated system user name.
+        - `subjectRole`: Hardcoded to "Administrative AND/OR managerial worker" with code "106331006".
+        - `organization`: Set to the initiator's name.
+        - `organizationId`: Set to the initiator's OID (Organization Identifier).
+        - `homeCommunityId`: Set to the initiator's OID.
+        - `purposeOfUse`: Set by calling `createPurposeOfUse` to determine and format the purpose of use.
+    - `patientResource`: Set to the provided `patientResource` object.
+3. **Return request object:** Returns the constructed `OutboundPatientDiscoveryReq` object.
+
+## Dependencies
+- `@metriport/ihe-gateway-sdk`: Provides types and potentially functionality related to IHE (Integrating the Healthcare Enterprise) gateways.
+- `dayjs`: Used for handling dates and times, specifically for generating the timestamp.
+
+## Error Handling
+This function does not implement specific error handling beyond potential exceptions thrown by dependencies.

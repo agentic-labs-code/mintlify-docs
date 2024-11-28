@@ -1,0 +1,60 @@
+---
+title: "Advance_Directives.hbs"
+---
+
+## High-level description
+This Handlebars template file is responsible for generating FHIR Consent resources from CDA (Clinical Document Architecture) Advance Directives section data. It processes the input CDA data and creates corresponding FHIR Consent resources, along with associated Patient and Practitioner resources.
+
+## Code Structure
+The template uses conditional statements and loops to iterate through the CDA data, extracting relevant information to create FHIR resources. It utilizes helper functions and partial templates to generate unique identifiers and create related resources.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template processes the CDA Advance Directives section and generates FHIR Consent resources.
+
+#### Internal Logic
+1. Checks if the input message contains the Advance Directives section template ID.
+2. Iterates through each entry in the Advance Directives section.
+3. Processes both organizer and observation entries.
+4. Generates Consent resources, Patient references, and Practitioner resources as needed.
+
+### Helper Functions
+#### `generateUUID`
+Generates a unique identifier for FHIR resources.
+
+#### `evaluate`
+Evaluates other Handlebars templates, used for generating Patient and Practitioner IDs.
+
+### Partial Templates
+#### `Resources/Consent.hbs`
+Creates a FHIR Consent resource.
+
+#### `References/Consent/patient.hbs`
+Generates a patient reference for the Consent resource.
+
+#### `Resources/Practitioner.hbs`
+Creates a FHIR Practitioner resource.
+
+#### `References/Consent/performer.hbs`
+Generates a performer reference for the Consent resource.
+
+## Dependencies
+This template relies on several helper functions and partial templates, which are not directly visible in the provided code but are referenced throughout the template.
+
+## Configuration
+The template uses specific template IDs and FHIR resource types, which can be considered as configuration settings:
+
+| Option | Value | Description |
+|:-------|:------|:------------|
+| Advance Directives Template ID | 2.16.840.1.113883.10.20.22.2.21 | Identifies the CDA Advance Directives section |
+| Consent Scope | 'adr' | Specifies the scope for the FHIR Consent resource |
+
+## Error Handling
+The template does not implement explicit error handling. It relies on the underlying Handlebars engine to handle any errors that may occur during template processing.
+
+## Notes
+- The template assumes the existence of a `@metriportPatientId` context variable for generating Patient references.
+- The code uses both `organizer` and `observation` structures from the CDA data, suggesting it can handle different formats of Advance Directives entries.
+- The template generates multiple FHIR resources (Consent, Patient references, and Practitioners) from a single CDA entry, demonstrating the complexity of the CDA to FHIR transformation process.

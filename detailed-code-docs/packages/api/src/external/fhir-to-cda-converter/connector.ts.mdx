@@ -1,0 +1,54 @@
+---
+title: "connector.ts"
+---
+
+## High-level description
+This code defines the interface and request structure for a FHIR (Fast Healthcare Interoperability Resources) to CDA (Clinical Document Architecture) converter. It provides a type definition for the converter request and an interface for the converter itself, which is designed to handle the conversion process asynchronously.
+
+## Symbols
+
+### `FhirToCdaConverterRequest`
+#### Description
+This type defines the structure of a request to convert FHIR data to CDA format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Likely a customer or context identifier |
+| splitCompositions | boolean | Indicates whether to split the bundle based on Compositions |
+| bundle | Bundle | The FHIR bundle to be converted |
+
+#### Internal Logic
+The `splitCompositions` field is particularly noteworthy as it determines whether the bundle should be split based on Compositions prior to conversion. This is explicitly set to `false` for CCD (Continuity of Care Document) generation.
+
+### `FhirToCdaConverter`
+#### Description
+This interface defines the contract for a FHIR to CDA converter implementation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req | FhirToCdaConverterRequest | The request object containing the FHIR bundle and conversion options |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;string[]&gt; | Promise&lt;string[]&gt; | A promise that resolves to an array of strings, likely representing the converted CDA documents |
+
+#### Internal Logic
+The `requestConvert` method is asynchronous, indicating that the conversion process may take some time and is handled in a non-blocking manner.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Imports the `Bundle` type from the FHIR schemas |
+
+## References
+The code references the `Bundle` type from `"../../routes/medical/schemas/fhir"`, which is defined in one of the related code snippets. This `Bundle` type represents a FHIR bundle, which is a collection of resources that are used as input for the conversion process.
+
+## Related Code Context
+1. The `fhir.ts` file defines the `Bundle` type used in this converter interface. It includes schemas for validating FHIR bundle structures.
+
+2. The `connector-lambda.ts` file provides an implementation of the `FhirToCdaConverter` interface using AWS Lambda. It demonstrates how the converter might be used in practice, invoking a Lambda function to perform the actual conversion.
+
+This modular design allows for different implementations of the FHIR to CDA conversion process while maintaining a consistent interface, which promotes flexibility and easier testing of the conversion functionality.

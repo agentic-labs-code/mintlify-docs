@@ -1,0 +1,50 @@
+---
+title: "get-cq-directory-entry.ts"
+---
+
+## High-level description
+The `get-cq-directory-entry.ts` file provides functions to retrieve entries from the CQDirectory, which likely stores information about CareQuality gateways. It offers two main functions: `getCQDirectoryEntry` for optionally retrieving an entry and `getCQDirectoryEntryOrFail` for retrieving an entry or throwing an error if not found.
+
+## References
+- `CQDirectoryEntry` (type): Represents the structure of a CareQuality directory entry.
+- `CQDirectoryEntryModel` (class): Sequelize model for interacting with the `CQDirectoryEntry` table.
+- `NotFoundError` (class): Custom error class for signaling a resource not found condition.
+
+## Symbols
+
+### `getCQDirectoryEntry`
+#### Description
+This function attempts to retrieve a CQDirectoryEntryModel from the database based on the provided ID. It returns the model if found, otherwise `undefined`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | `CQDirectoryEntry["id"]` | The ID of the CQ directory entry to retrieve. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | `Promise&lt;CQDirectoryEntryModel | undefined&gt;` | A promise that resolves to the CQDirectoryEntryModel if found, otherwise `undefined`. |
+
+#### Internal Logic
+1. Queries the database using the `CQDirectoryEntryModel.findOne` method with the provided ID.
+2. Returns the result of the query or `undefined` if no matching entry is found.
+
+### `getCQDirectoryEntryOrFail`
+#### Description
+This function retrieves a CQDirectoryEntryModel from the database based on the provided ID. It throws a `NotFoundError` if no matching entry is found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | `CQDirectoryEntry["id"]` | The ID of the CQ directory entry to retrieve. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | `Promise&lt;CQDirectoryEntryModel&gt;` | A promise that resolves to the CQDirectoryEntryModel. |
+
+#### Internal Logic
+1. Calls `getCQDirectoryEntry` to attempt to retrieve the entry by ID.
+2. If an entry is found, returns it.
+3. If no entry is found, throws a `NotFoundError` with a message indicating the organization could not be found.

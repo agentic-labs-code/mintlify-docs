@@ -1,0 +1,59 @@
+---
+title: "2024-02-22_00_alter-cq-directory-add-gateway.ts"
+---
+
+## High-level description
+This code defines a database migration script that alters the `cq_directory_entry` table. Specifically, it adds four new columns (`gateway`, `managing_organization`, `managing_organization_id`, and `active`) and modifies the existing `url_xcpd` column to allow null values.
+
+## Symbols
+
+### `up`
+#### Description
+This function defines the steps to apply the migration to the database. It adds four new columns (`gateway`, `managing_organization`, `managing_organization_id`, and `active`) to the `cq_directory_entry` table and modifies the existing `url_xcpd` column to allow null values. All operations are executed within a transaction to ensure atomicity.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | object | An object containing the `queryInterface` object, which provides methods for interacting with the database schema. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. Starts a database transaction.
+2. Adds the `gateway` column to the `cq_directory_entry` table as a boolean with a default value of `false` and not allowing null values.
+3. Adds the `managing_organization` column as a string that allows null values.
+4. Adds the `managing_organization_id` column as a string that allows null values.
+5. Adds the `active` column as a boolean that does not allow null values.
+6. Modifies the `url_xcpd` column to allow null values.
+7. Commits the transaction.
+
+### `down`
+#### Description
+This function defines the steps to revert the migration, effectively undoing the changes made by the `up` function. It removes the four columns added by `up` and changes the `url_xcpd` column back to not allowing null values.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | object | An object containing the `queryInterface` object, which provides methods for interacting with the database schema. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise | A promise that resolves when the migration rollback is complete. |
+
+#### Internal Logic
+1. Starts a database transaction.
+2. Removes the `gateway` column from the `cq_directory_entry` table.
+3. Removes the `managing_organization` column from the `cq_directory_entry` table.
+4. Removes the `managing_organization_id` column from the `cq_directory_entry` table.
+5. Removes the `active` column from the `cq_directory_entry` table.
+6. Modifies the `url_xcpd` column to disallow null values.
+7. Commits the transaction.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Provides the database interface and data types used for defining the migration steps. |

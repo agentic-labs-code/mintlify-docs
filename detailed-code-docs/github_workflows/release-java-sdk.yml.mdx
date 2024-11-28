@@ -1,0 +1,70 @@
+---
+title: "release-java-sdk.yml"
+---
+
+## High-level description
+This GitHub Actions workflow, named "Release Java SDK", is designed to automate the release process for Java and Python SDKs. It can be manually triggered and requires a version input. The workflow checks out the repository, sets up Node.js, installs Fern CLI, and uses it to generate and release the SDKs.
+
+## Code Structure
+The workflow consists of a single job named "release" with several steps that execute sequentially to perform the SDK release process.
+
+## Symbols
+
+### Workflow: Release Java SDK
+#### Description
+This GitHub Actions workflow automates the release process for Java and Python SDKs using Fern.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| version | string | The version of the Java SDK to be released |
+
+#### Internal Logic
+1. Checks out the repository
+2. Sets up Node.js environment
+3. Installs Fern CLI globally using npm
+4. Generates and releases Java SDK using Fern
+5. Generates and releases Python SDK using Fern
+
+### Job: release
+#### Description
+Defines the main job that runs on the latest Ubuntu runner and contains all the steps for the release process.
+
+#### Steps
+1. **Checkout repo**: Uses `actions/checkout@v3` to clone the repository
+2. **Setup node**: Uses `actions/setup-node@v3` to set up Node.js environment
+3. **Download Fern**: Installs Fern CLI globally using npm
+4. **Release SDKs**: Runs Fern commands to generate and release Java and Python SDKs
+
+### Step: Release SDKs
+#### Description
+This step uses Fern CLI to generate and release both Java and Python SDKs.
+
+#### Environment Variables
+| Name | Description |
+|:-----|:------------|
+| FERN_TOKEN | Secret token for Fern authentication |
+| MAVEN_USERNAME | Username for Maven repository |
+| MAVEN_PASSWORD | Password for Maven repository |
+
+#### Internal Logic
+1. Runs `fern generate` command for Java SDK with specified version and debug logging
+2. Runs `fern generate` command for Python SDK with specified version and debug logging
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| actions/checkout@v3 | To check out the repository |
+| actions/setup-node@v3 | To set up Node.js environment |
+| fern-api | CLI tool for generating and releasing SDKs |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| runs-on | string | ubuntu-latest | Specifies the runner environment |
+
+## Error Handling
+The workflow does not implement explicit error handling. It relies on GitHub Actions' default behavior of stopping the workflow if any step fails.
+
+## Logging
+The workflow uses debug-level logging for the Fern generate commands, which can be useful for troubleshooting if issues arise during the SDK generation process.

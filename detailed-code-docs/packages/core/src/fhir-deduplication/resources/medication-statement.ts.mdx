@@ -1,0 +1,85 @@
+---
+title: "medication-statement.ts"
+---
+
+## High-level description
+This code defines functions and types for deduplicating MedicationStatement resources in a FHIR (Fast Healthcare Interoperability Resources) context. It provides functionality to group and combine similar MedicationStatement resources based on specific criteria, and to select the most descriptive status among duplicate entries.
+
+## Code Structure
+The code defines types and constants related to MedicationStatement status, exports functions for deduplication, and implements the grouping logic for MedicationStatements. The main functions, `deduplicateMedStatements` and `groupSameMedStatements`, work together to process an array of MedicationStatement resources and return deduplicated results.
+
+## References
+This code references types and functions from "@medplum/fhirtypes" and "../shared", indicating it's part of a larger FHIR processing system.
+
+## Symbols
+
+### `MedicationStatementStatus`
+#### Description
+A type representing the possible status values for a MedicationStatement resource.
+
+#### Inputs
+N/A (Type definition)
+
+#### Outputs
+N/A (Type definition)
+
+### `statusRanking`
+#### Description
+An object that assigns numerical rankings to each MedicationStatementStatus, used for determining the most descriptive status.
+
+#### Inputs
+N/A (Constant object)
+
+#### Outputs
+N/A (Constant object)
+
+### `deduplicateMedStatements`
+#### Description
+This function deduplicates an array of MedicationStatement resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| medications | MedicationStatement[] | An array of MedicationStatement resources to deduplicate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| combinedMedStatements | MedicationStatement[] | An array of deduplicated MedicationStatement resources |
+| refReplacementMap | Map&lt;string, string[]&gt; | A map of reference replacements for updating related resources |
+
+#### Internal Logic
+1. Calls `groupSameMedStatements` to group similar MedicationStatements
+2. Uses `combineResources` from the shared module to combine the grouped MedicationStatements
+
+### `groupSameMedStatements`
+#### Description
+This function groups similar MedicationStatement resources based on medication reference, date, and dosage.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| medStatements | MedicationStatement[] | An array of MedicationStatement resources to group |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| medStatementsMap | Map&lt;string, MedicationStatement&gt; | A map of grouped MedicationStatements |
+| refReplacementMap | Map&lt;string, string[]&gt; | A map of reference replacements for updating related resources |
+
+#### Internal Logic
+1. Iterates through the input MedicationStatements
+2. Creates a key based on medication reference, date, and dosage
+3. Uses `fillMaps` from the shared module to populate the output maps
+4. Implements `assignMostDescriptiveStatus` to select the most descriptive status when combining duplicates
+
+## Performance Considerations
+The grouping algorithm has a time complexity of O(n), where n is the number of input MedicationStatements. The use of Map data structures for storing grouped results provides efficient lookup and insertion operations.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides TypeScript types for FHIR resources |
+| ../shared | Contains utility functions for resource combination and status selection |
+
+This code is part of a larger FHIR processing system and relies on shared utilities for its core functionality. It's designed to efficiently deduplicate MedicationStatement resources while preserving the most descriptive status information.

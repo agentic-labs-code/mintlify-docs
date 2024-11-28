@@ -1,0 +1,89 @@
+---
+title: "organization.ts"
+---
+
+## High-level description
+This code defines Zod schemas for validating and structuring organization-related data in a medical API. It includes schemas for creating and updating organizations, as well as for internal organization details, utilizing enums and address schemas from related files.
+
+## Code Structure
+The code defines several Zod schemas that are related to each other. The `organizationCreateSchema` and `organizationUpdateSchema` are identical and use the `orgTypeSchema` and `AddressStrictSchema`. The `organiationInternalDetailsSchema` extends the `AddressStrictSchema` with additional fields.
+
+## References
+This code references types and schemas from other parts of the codebase, including:
+- `OrgType` and `OrganizationBizType` from `@metriport/core/domain/organization`
+- `AddressStrictSchema` from `./address`
+
+## Symbols
+
+### `orgTypeSchema`
+#### Description
+Defines a Zod schema for validating organization types using the `OrgType` enum.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | N/A | This schema doesn't take direct inputs |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | z.ZodEnum&lt;OrgType&gt; | A Zod schema that validates against the `OrgType` enum |
+
+### `organizationBizTypeSchema`
+#### Description
+Defines a Zod schema for validating organization business types using the `OrganizationBizType` enum.
+
+#### Inputs/Outputs
+Similar to `orgTypeSchema`, but uses `OrganizationBizType` enum.
+
+### `organizationCreateSchema`
+#### Description
+Defines a Zod schema for validating data when creating an organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | string | The name of the organization |
+| type | OrgType | The type of the organization |
+| location | AddressStrictSchema | The address of the organization |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | z.ZodObject | A Zod schema that validates the input object against the defined structure |
+
+### `organizationUpdateSchema`
+#### Description
+Identical to `organizationCreateSchema`, used for updating an organization.
+
+### `organiationInternalDetailsSchema`
+#### Description
+Defines a Zod schema for validating internal organization details, extending the `AddressStrictSchema`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string (optional) | The organization's ID |
+| nameInMetriport | string | The organization's name in Metriport |
+| businessType | OrganizationBizType | The business type of the organization |
+| type | OrgType | The type of the organization |
+| cqApproved | boolean (optional) | Whether the organization is approved for CQ |
+| cqActive | boolean (optional) | Whether the organization is active for CQ |
+| cwApproved | boolean (optional) | Whether the organization is approved for CW |
+| cwActive | boolean (optional) | Whether the organization is active for CW |
+| ... | ... | Additional fields from AddressStrictSchema |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | z.ZodObject | A Zod schema that validates the input object against the defined structure |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| zod | Used for creating and composing schemas |
+| @metriport/core/domain/organization | Imports enums for organization types |
+| ./address | Imports the AddressStrictSchema |
+
+## TODOs
+There are no explicit TODOs in this file. However, the related `organization.ts` file contains a TODO to update all instances of `OrgType` to `TreatmentType`, which may affect this file in the future.

@@ -1,0 +1,56 @@
+---
+title: "document-uploader.ts"
+---
+
+## High-level description
+This code defines an AWS Lambda function handler for processing S3 events related to document uploads. It uses the `documentUploaderHandler` from the core package to handle the upload process, including copying the file to a destination bucket and updating document references.
+
+## Code Structure
+The main handler function processes S3 events, extracting relevant information and calling the `documentUploaderHandler` for each record. It also includes error handling and logging using a capture utility.
+
+## References
+- `@metriport/core/external/aws/lambda-logic/document-uploader`: Imports the `documentUploaderHandler` function.
+- `./shared/capture`: Imports the `capture` utility for error logging and monitoring.
+- `./shared/env`: Imports the `getEnvOrFail` function for retrieving environment variables.
+
+## Symbols
+
+### `handler`
+#### Description
+This is the main Lambda function handler that processes S3 events for document uploads.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | S3Event | The S3 event triggered by file uploads |
+
+#### Internal Logic
+1. Initializes the capture utility for error logging.
+2. Retrieves necessary environment variables.
+3. Iterates through each record in the S3 event.
+4. Extracts source bucket and key information.
+5. Constructs the API endpoint URL.
+6. Calls the `documentUploaderHandler` with the extracted information.
+7. Handles and logs any errors or messages returned by the handler.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/external/aws/lambda-logic/document-uploader | Provides the main document upload handling logic |
+| aws-lambda | Provides the S3Event type for the Lambda function |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| API_URL | string | N/A | The base URL for the API endpoint |
+| MEDICAL_DOCUMENTS_DESTINATION_BUCKET | string | N/A | The destination S3 bucket for medical documents |
+| AWS_REGION | string | N/A | The AWS region where the Lambda function is running |
+
+## Error Handling
+The code implements try-catch blocks to handle errors during the document upload process. Errors are logged using the `capture.error` method, which likely sends the error information to a monitoring service like Sentry.
+
+## Logging
+The code uses `console.log` for basic logging and the `capture` utility for more detailed error logging and monitoring.
+
+## TODOs
+There are no explicit TODOs in this file, but there is a comment to keep the capture initialization as early in the file as possible.

@@ -1,0 +1,91 @@
+---
+title: "validate-fhir-bundles.ts"
+---
+
+## High-level description
+This code defines a function `bundleToHtmlADHD` that converts a FHIR Bundle to an HTML representation, focusing on ADHD-related medical information. It processes various FHIR resources, organizes them into sections, and generates a structured HTML document summarizing the patient's medical record.
+
+## Code Structure
+The main function `bundleToHtmlADHD` orchestrates the conversion process. It extracts FHIR resources from the bundle, processes them into different sections (e.g., encounters, medications, conditions), and then generates HTML for each section. Helper functions are used to create specific sections and handle different resource types.
+
+## Symbols
+
+### `bundleToHtmlADHD`
+#### Description
+This is the main function that converts a FHIR Bundle to an HTML representation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fhirBundle | Bundle | The FHIR Bundle to be converted |
+| brief | Brief | Optional. A brief summary to be included in the HTML |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| htmlPage | string | The generated HTML page as a string |
+
+#### Internal Logic
+1. Extracts FHIR resources from the bundle
+2. Checks if the bundle contains clinically relevant data
+3. Generates HTML sections for different types of medical information (e.g., encounters, medications, conditions)
+4. Combines all sections into a complete HTML page
+
+### `extractFhirTypesFromBundle`
+#### Description
+Extracts different FHIR resource types from the given bundle and organizes them into a structured object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | Bundle | The FHIR Bundle to extract resources from |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| FhirTypes | object | An object containing arrays of different FHIR resource types |
+
+### `createMRHeader`
+#### Description
+Generates the HTML for the medical record header, including patient information and table of contents.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient FHIR resource |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string | string | HTML string for the medical record header |
+
+### `createDiagnosticReportsSection`
+#### Description
+Generates the HTML for the diagnostic reports section, including visit notes and labs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| diagnosticReports | DiagnosticReport[] | Array of diagnostic reports |
+| practitioners | Practitioner[] | Array of practitioners |
+| locations | Location[] | Array of locations |
+| aweAndADHDVisits | Condition[] | Array of AWE and ADHD visit conditions |
+| encounters | Encounter[] | Array of encounters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string | string | HTML string for the diagnostic reports section |
+
+## Dependencies
+The code relies on several external libraries and modules:
+- @medplum/fhirtypes: For FHIR resource type definitions
+- @metriport/shared: For utility functions
+- dayjs: For date manipulation
+- lodash: For utility functions
+
+## Error Handling
+The code includes basic error handling, such as checking for the presence of a patient resource in the bundle. However, more comprehensive error handling could be implemented for robustness.
+
+## Performance Considerations
+The code processes potentially large amounts of data and generates HTML strings. For very large bundles, memory usage and processing time could become significant. Consider implementing pagination or lazy loading for large datasets if performance becomes an issue.

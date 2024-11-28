@@ -1,0 +1,69 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains test files for the FHIR (Fast Healthcare Interoperability Resources) shared functionality in the API. It includes tests for date-related utilities and error mapping functions used in FHIR operations.
+
+## What does it do?
+The tests in this directory ensure the correct functioning of two main components:
+
+1. Date Utilities: It tests a function that creates FHIR Period objects with random or specified start and end dates. This is useful for generating mock data in FHIR-related tests.
+
+2. Error Mapping: It verifies the functionality of error parsing and grouping for FHIR-related errors. This includes testing various error scenarios such as FHIR-specific errors, timeout errors, and unknown errors.
+
+These tests help maintain the reliability and correctness of FHIR-related operations in the API, particularly in handling dates and managing errors.
+
+## Key Files
+
+### date.ts
+This file contains utility functions for creating FHIR Period objects. The main function, `makePeriod`, generates Period objects with random or specified start and end dates. It's primarily used for creating mock data in tests.
+
+Key features:
+- Uses the Faker library to generate random dates
+- Allows partial override of Period object properties
+- Ensures start date is before end date
+- Converts dates to ISO string format
+
+Example usage:
+```typescript
+const period = makePeriod({ start: '2023-01-01' });
+// Returns a Period object with the specified start date and a random end date
+```
+
+### error-mapping.test.ts
+This file contains unit tests for FHIR error mapping functionality. It tests two main functions: `tryDetermineFhirError` and `groupFHIRErrors`.
+
+Key test scenarios:
+- FHIR-related errors with single and multiple issues
+- Timeout errors
+- Unknown errors
+- Grouping of FHIR error mappings based on resource type and element
+
+Example test:
+```typescript
+it("should return a FhirErrorMapping for a FHIR-related error", () =&gt; {
+  const error = new OperationOutcomeError(toOperationOutcome([
+    {
+      severity: "error",
+      code: "invalid",
+      diagnostics: "Invalid resource",
+    },
+  ]));
+  const result = tryDetermineFhirError(error);
+  expect(result).toBeDefined();
+  expect(result?.message).toBe("Invalid resource");
+});
+```
+
+## Dependencies
+- @faker-js/faker: Used for generating random dates in the `makePeriod` function.
+- @medplum/fhirtypes: Provides FHIR-related type definitions.
+- @medplum/core: Provides `OperationOutcomeError` for error handling.
+- uuid: Used for generating unique identifiers in tests.
+- @metriport/core/external/fhir/shared/index: Provides utility functions for FHIR operations.
+
+## Configuration
+There are no specific configuration files or environment variables used in these test files. The tests rely on the configuration of the larger project and the Jest testing framework.
+
+These tests play a crucial role in ensuring the reliability and correctness of FHIR-related functionality in the API, particularly in handling dates and managing errors. They cover a wide range of scenarios and edge cases, helping to maintain the robustness of the FHIR implementation.

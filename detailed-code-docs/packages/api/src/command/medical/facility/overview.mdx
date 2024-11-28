@@ -1,0 +1,109 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the implementation of medical facility-related functionality for the API. It includes functions for creating, updating, deleting, and retrieving facilities, as well as verifying access permissions for different types of organizations.
+
+## What does it do?
+The code in this directory manages the lifecycle of medical facilities within the system. It provides the following key functionalities:
+
+1. Creating new facilities: Validates input data, generates unique identifiers, and persists facility information to the database.
+2. Updating existing facilities: Allows modification of facility details while ensuring data integrity and performing necessary validations.
+3. Deleting facilities: Removes facilities from the system, but only if they have no associated patients.
+4. Retrieving facility information: Provides various methods to fetch facility data based on different criteria such as ID, OID, or NPI.
+5. Access control: Verifies whether an organization has the necessary permissions to perform actions on facilities based on their type (healthcare provider or healthcare IT vendor).
+
+These functions work together to provide a comprehensive facility management system, ensuring data consistency, proper access control, and adherence to business rules specific to medical facilities.
+
+## Entry points
+The main entry points for this functionality are:
+
+1. `create-facility.ts`: Contains the `createFacility` function for adding new facilities to the system.
+2. `update-facility.ts`: Provides the `updateFacility` function for modifying existing facility records.
+3. `delete-facility.ts`: Implements the `deleteFacility` function for removing facilities from the system.
+4. `get-facility.ts`: Offers various functions for retrieving facility information, such as `getFacilities`, `getFacilityOrFail`, and `getFacilityByNpi`.
+5. `verify-access.ts`: Implements access control checks with `verifyCxItVendorAccess` and `verifyCxProviderAccess` functions.
+
+The data flow typically starts with access verification, followed by the creation, retrieval, update, or deletion of facility records. These operations interact with the `FacilityModel` to persist and retrieve data from the database.
+
+## Key Files
+
+1. `create-facility.ts`:
+   - Implements the `createFacility` function for adding new facilities.
+   - Includes validation logic for OBO (Organization Based Onboarding) data and NPI (National Provider Identifier).
+   - Generates unique identifiers for new facilities.
+
+2. `update-facility.ts`:
+   - Contains the `updateFacility` function for modifying existing facility records.
+   - Performs validation checks before updating the database, including version control and OBO validation.
+
+3. `delete-facility.ts`:
+   - Implements the `deleteFacility` function for removing facilities.
+   - Checks for associated patients before allowing deletion.
+
+4. `get-facility.ts`:
+   - Provides various functions for retrieving facility data, including `getFacilities`, `getFacilityOrFail`, `getFaciltiyByOidOrFail`, and `getFacilityByNpi`.
+   - Handles different query parameters and error scenarios.
+
+5. `verify-access.ts`:
+   - Implements access control checks with `verifyCxItVendorAccess` and `verifyCxProviderAccess` functions.
+   - Determines if an organization has the necessary permissions based on its type.
+
+## Dependencies
+The code in this directory relies on several external libraries and internal modules:
+
+1. @metriport/core: Provides domain-specific types, errors, and utilities.
+2. @metriport/shared: Offers shared utilities and error types.
+3. Sequelize: Used indirectly through the `FacilityModel` for database interactions.
+
+Internal dependencies include:
+- Various models (e.g., `FacilityModel`, `PatientModel`)
+- Domain objects and types related to facilities and organizations
+- Utility functions for error handling and data validation
+
+## Configuration
+While there are no specific configuration files in this directory, the code uses several environment-specific settings and constants:
+
+1. Facility types (e.g., `FacilityType.initiatorAndResponder`)
+2. Organization business types (e.g., `OrganizationBizType.healthcareProvider`)
+3. Default values for Carequality and Commonwell settings (e.g., `cqApproved`, `cwActive`)
+
+These configurations are likely defined in separate configuration files or environment variables for the entire project.
+
+Here's an example of how these components work together:
+
+```typescript
+// Creating a new facility
+const newFacility = await createFacility({
+  cxId: "customer123",
+  data: {
+    name: "Example Hospital",
+    npi: "1234567890",
+    // ... other facility data
+  },
+  cqApproved: true,
+  cwApproved: false,
+});
+
+// Updating an existing facility
+const updatedFacility = await updateFacility({
+  id: newFacility.id,
+  cxId: "customer123",
+  eTag: newFacility.eTag,
+  data: {
+    name: "Updated Hospital Name",
+  },
+});
+
+// Retrieving facility information
+const facility = await getFacilityOrFail("customer123", newFacility.id);
+
+// Deleting a facility
+await deleteFacility({ cxId: "customer123", id: newFacility.id });
+
+// Verifying access for a healthcare provider
+const hasAccess = await verifyCxProviderAccess("customer123");
+```
+
+This code demonstrates the typical flow of creating, updating, retrieving, and deleting a facility, along with access verification. Each operation includes necessary validations and error handling to ensure data integrity and proper access control.

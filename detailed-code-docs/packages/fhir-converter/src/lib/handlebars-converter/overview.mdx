@@ -1,0 +1,73 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the core functionality for the handlebars-converter module of the FHIR Converter. It includes the main converter logic, a collection of custom Handlebars helpers, and a comprehensive test suite. The module is designed to facilitate the conversion of health data between different formats, particularly from C-CDA to FHIR R4, using Handlebars templates.
+
+## What does it do?
+The handlebars-converter module performs the following key functions:
+
+1. Creates and manages Handlebars instances for different data types in the FHIR conversion process.
+2. Provides a rich set of custom Handlebars helper functions that assist in data manipulation, formatting, and conditional logic during the conversion process.
+3. Handles template evaluation, including partial resolution and custom helper registration.
+4. Processes various date-time formats, reference ranges, and presented form entries.
+5. Performs unit conversions and handles null flavor concepts from HL7 standards.
+6. Ensures the reliability and accuracy of the conversion process through comprehensive unit testing.
+
+## Entry points
+The main entry point for this module is the `handlebars-converter.js` file, which exports the `instance` function. This function is responsible for creating or retrieving Handlebars instances for specific data types.
+
+The flow of control typically follows this pattern:
+1. The `instance` function is called with specific parameters (data type, template location, etc.).
+2. A Handlebars instance is created or retrieved from the cache.
+3. Custom helpers from `handlebars-helpers.js` are registered with the instance.
+4. The instance is used to process templates, utilizing the custom helpers as needed.
+
+## Key Files
+
+### handlebars-converter.js
+This file contains the core logic for creating and managing Handlebars instances. It exports the `instance` function, which is the main entry point for the module. Key features include:
+- Caching of Handlebars instances for different data types
+- Custom partial resolution logic
+- Integration of custom helpers
+
+### handlebars-helpers.js
+This file provides a comprehensive set of custom Handlebars helper functions. It exports two objects:
+- `internal`: Helper functions used internally within the module
+- `external`: An array of helper functions exposed for use in Handlebars templates
+
+Key helper functions include:
+- `evaluateTemplate`: Processes Handlebars templates and returns JSON objects
+- `getDateTime`: Converts various date-time string formats to a standardized ISO format
+- `allValuesInObjAreNullFlavor`: Checks for null flavor values in JSON objects
+
+### __tests__ directory
+This directory contains the test suite for the handlebars-converter module. Key test files include:
+- `handlebars-helpers.test.js`: The main test file for Handlebars helper functions
+- `build-presented-form-templates.js`: Provides test data for building presented form entries
+- `extract-range-templates.js`: Contains test data for extracting reference ranges
+
+## Dependencies
+The handlebars-converter module relies on several external libraries:
+
+| Dependency | Purpose | Version |
+|:-----------|:--------|:--------|
+| Handlebars | Template processing engine | Not specified |
+| uuid/v3 | UUID generation | Not specified |
+| crypto | Hash generation | Node.js built-in |
+| zlib | Compression and decompression | Node.js built-in |
+| he | HTML entity decoding | Not specified |
+| convert-units | Unit conversions | Not specified |
+
+These dependencies were chosen to provide robust functionality for template processing, data manipulation, and various utility operations required in the health data conversion process.
+
+## Configuration
+The module does not use explicit configuration files or environment variables. Instead, configuration is typically passed as parameters to the `instance` function in `handlebars-converter.js`. Key configurable aspects include:
+
+- `createNew`: Boolean flag to create a new Handlebars instance
+- `dataHandler`: Object containing information about the data type being processed
+- `templateFilesLocation`: Path to the template files
+- `currentContextTemplatesMap`: Map of template names to their content
+
+In summary, the handlebars-converter module provides a flexible and powerful system for converting health data between different formats using Handlebars templates. It offers a rich set of custom helpers, efficient instance management, and comprehensive testing to ensure reliable and accurate data conversion.

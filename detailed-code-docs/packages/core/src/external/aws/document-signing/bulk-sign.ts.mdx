@@ -1,0 +1,83 @@
+---
+title: "bulk-sign.ts"
+---
+
+## High-level description
+This code implements a bulk document signing process for AWS S3, including searching for documents, generating signed URLs, and sending the results to an API. It's designed to handle document retrieval and processing for a specific patient and customer.
+
+## Code Structure
+The main function `searchDocumentsSignUrlsAndSendToApi` orchestrates the process of searching for documents, generating signed URLs, and sending the results to an API. It uses helper functions and classes like `S3Utils`, `searchDocuments`, and `apiClientBulkDownloadWebhook` to accomplish its tasks.
+
+## Symbols
+
+### `searchDocumentsSignUrlsAndSendToApi`
+#### Description
+This function searches for documents, generates signed URLs for each document, and sends the results to an API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+| requestId | string | Request ID |
+| bucketName | string | S3 bucket name |
+| region | string | AWS region |
+| apiURL | string | API URL for sending results |
+
+#### Internal Logic
+1. Initializes S3Utils and searches for documents using `searchDocuments`.
+2. Generates signed URLs for each document using S3Utils.
+3. Prepares a response with document details and signed URLs.
+4. Sends the response to the API using `apiClientBulkDownloadWebhook`.
+5. Handles errors and sends a failure status to the API if an error occurs.
+
+### `apiClientBulkDownloadWebhook`
+#### Description
+This function creates an API client for sending bulk download webhook notifications.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| apiURL | string | Base URL for the API |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| client | object | An object with a `callInternalEndpoint` method |
+
+#### Internal Logic
+- Creates an axios instance for making API calls.
+- Returns an object with a `callInternalEndpoint` method that sends a POST request to the API with document information and status.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/shared | Provides utility functions for error handling and network retries |
+| axios | HTTP client for making API requests |
+| dayjs | Date and time manipulation library |
+
+## Error Handling
+The code implements error handling in the main function `searchDocumentsSignUrlsAndSendToApi`. If an error occurs during the process, it logs the error, captures it for monitoring, and sends a failure status to the API.
+
+## Logging
+The code uses a custom `out` function for logging, which is likely defined elsewhere in the project. It logs errors and important information throughout the process.
+
+## API/Interface Reference
+The code defines two main types for API interactions:
+
+1. `DocumentBulkSignerLambdaRequest`:
+   - patientId: string
+   - cxId: string
+   - requestId: string
+
+2. `BulkDownloadWebhookParams`:
+   - cxId: string
+   - patientId: string
+   - requestId: string
+   - docs: DocumentBulkSignerLambdaResponse[]
+   - status: string
+
+The `apiClientBulkDownloadWebhook` function creates a client that sends POST requests to the `/internal/docs/triggerBulkDownloadWebhook` endpoint with these parameters.
+
+## Performance Considerations
+The code uses `Promise.all` for parallel processing of document URLs, which can improve performance when dealing with multiple documents. However, for very large numbers of documents, this approach might need to be optimized to avoid overwhelming the system.

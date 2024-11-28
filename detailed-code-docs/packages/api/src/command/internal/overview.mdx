@@ -1,0 +1,95 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains internal command-related functionality for managing Health Information Exchange (HIE) feature flags in a software system. It includes two main files that handle retrieving and updating the status of various HIE features for specific customers using AWS AppConfig.
+
+## What does it do?
+The code in this directory performs two primary functions:
+
+1. Retrieves the current status of HIE feature flags for a given customer. This includes checking whether features like CommonWell, CareQuality, Epic integration, or Demo Augmentation are enabled for a specific customer.
+
+2. Updates the status of HIE feature flags for a specific customer. This allows the system to enable or disable various HIE integrations (CommonWell, CareQuality, Epic, and Demo Aug) for individual customers.
+
+These functions are crucial for managing customer-specific configurations in a Health Information Exchange system, allowing for granular control over which features and integrations are available to each customer.
+
+## Key Files
+
+1. `get-hie-enabled-feature-flags-status.ts`:
+   This file contains the `getCxFFStatus` function, which retrieves the current status of HIE feature flags for a specific customer from AWS AppConfig. It uses the customer's ID to fetch their specific configuration.
+
+2. `update-hie-enabled-feature-flags.ts`:
+   This file includes the `updateCxHieEnabledFFs` function, which updates the HIE feature flag status for a given customer. It can enable or disable CommonWell, CareQuality, Epic, and Demo Aug integrations based on the provided input.
+
+Both files interact with AWS AppConfig to manage feature flag configurations, ensuring that customer-specific settings are properly stored and retrieved.
+
+## Dependencies
+The code in this directory relies on the following external libraries and internal modules:
+
+1. `@metriport/core/external/aws/app-config`:
+   This module provides functions to interact with AWS AppConfig, such as `getFeatureFlagValueCxValues`, `getFeatureFlags`, and `createAndDeployConfigurationContent`. It's used to fetch and update feature flag configurations.
+
+2. `../../shared/config`:
+   This internal module provides access to configuration settings and environment variables through the `Config` class. It's used to retrieve AWS-related configuration details.
+
+## Configuration
+The code uses several configuration parameters, which are retrieved from the `Config` class:
+
+- AWS region
+- AppConfig application ID
+- AppConfig configuration ID
+- Environment type (for retrieving feature flags)
+- Environment name and ID (for updating feature flags)
+- Deployment strategy ID (for updating feature flags)
+
+These configuration parameters are essential for interacting with AWS AppConfig and managing feature flags correctly.
+
+## Code Examples
+
+Here's an example of how the `getCxFFStatus` function is implemented:
+
+```typescript
+export const getCxFFStatus = async (cxId: string): Promise&lt;CxFeatureFlagStatus&gt; =&gt; {
+  const region = Config.getAWSRegion();
+  const appId = Config.getAppConfigAppId();
+  const configId = Config.getAppConfigConfigId();
+  const envType = Config.getEnvType();
+
+  return getFeatureFlagValueCxValues(region, appId, configId, envType, cxId);
+};
+```
+
+And here's a simplified example of how the `updateCxHieEnabledFFs` function updates feature flags:
+
+```typescript
+export const updateCxHieEnabledFFs = async (
+  cxId: string,
+  cwEnabled?: boolean,
+  cqEnabled?: boolean,
+  epicEnabled?: boolean,
+  demoAugEnabled?: boolean
+): Promise&lt;CxFeatureFlagStatus&gt; =&gt; {
+  // Retrieve current configuration
+  const featureFlags = await getFeatureFlags(/* ... */);
+
+  // Update feature flags based on input
+  if (cwEnabled !== undefined) {
+    updateFeatureFlag(featureFlags, "cw-enabled", cxId, cwEnabled);
+  }
+  // Similar updates for other feature flags...
+
+  // Deploy updated configuration
+  await createAndDeployConfigurationContent(/* ... */);
+
+  // Return updated status
+  return {
+    cwEnabled: featureFlags["cw-enabled"].includes(cxId),
+    cqEnabled: featureFlags["cq-enabled"].includes(cxId),
+    epicEnabled: featureFlags["epic-enabled"].includes(cxId),
+    demoAugEnabled: featureFlags["demo-aug-enabled"].includes(cxId),
+  };
+};
+```
+
+These functions demonstrate how the code interacts with AWS AppConfig to manage feature flags for specific customers, providing a flexible way to control HIE integrations on a per-customer basis.

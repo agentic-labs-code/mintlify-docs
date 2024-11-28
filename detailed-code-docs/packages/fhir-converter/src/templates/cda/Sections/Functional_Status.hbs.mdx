@@ -1,0 +1,75 @@
+---
+title: "Functional_Status.hbs"
+---
+
+## High-level description
+This Handlebars template is designed to process and transform Functional Status data from a CDA (Clinical Document Architecture) document into FHIR (Fast Healthcare Interoperability Resources) format. It specifically handles the Functional Status section, converting relevant observations and conditions into FHIR resources.
+
+## Code Structure
+The template uses conditional statements and loops to iterate through entries in the Functional Status section, creating appropriate FHIR resources (Condition or Observation) based on the entry type. It also generates references to the patient for each resource.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template checks for the presence of the Functional Status section in the CDA document and processes its entries.
+
+#### Internal Logic
+1. Checks if the message contains the Functional Status section template ID.
+2. If present, it retrieves the first section with that template ID.
+3. Iterates through each entry in the section.
+4. For each entry, it checks the template ID to determine whether to create a Condition or Observation resource.
+5. Generates a unique ID for each resource.
+6. Creates a reference to the patient for each resource.
+
+### Condition Resource
+#### Description
+Creates a FHIR Condition resource from a CDA observation entry.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| conditionEntry | Object | The CDA observation entry containing condition data |
+| ID | String | A generated UUID for the condition |
+
+#### Internal Logic
+Calls the Condition.hbs partial template to create the Condition resource.
+
+### Observation Resource
+#### Description
+Creates a FHIR Observation resource from a CDA observation entry.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| observationEntry | Object | The CDA observation entry containing observation data |
+| ID | String | A generated UUID for the observation |
+
+#### Internal Logic
+Calls the Observation.hbs partial template to create the Observation resource.
+
+### Patient Reference
+#### Description
+Generates a reference to the patient for each Condition or Observation resource.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ID | String | The generated UUID for the resource |
+| REF | String | The reference to the patient, constructed using the patient ID |
+
+#### Internal Logic
+1. Evaluates the GeneratePatientId.hbs template to get the patient ID.
+2. Calls the appropriate reference partial template (Condition/subject.hbs or Observation/subject.hbs) to create the reference.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Handlebars | Template engine used for generating the FHIR resources |
+
+## Configuration
+The template uses several helper functions and partial templates:
+- `contains`, `toString`, `toJsonString`, `getFirstCdaSectionsByTemplateId`, `toArray`, `eq`, `generateUUID`, `evaluate`, `concat`
+- Partial templates: `Resources/Condition.hbs`, `References/Condition/subject.hbs`, `Resources/Observation.hbs`, `References/Observation/subject.hbs`, `Utils/GeneratePatientId.hbs`
+
+These helpers and partials are likely defined in separate files or configurations.

@@ -1,0 +1,57 @@
+---
+title: "reset-scheduled-doc-query-request-id.ts"
+---
+
+## High-level description
+This code defines a function `resetPatientScheduledDocQueryRequestId` that resets specific fields related to scheduled document query requests for a given patient and medical data source. It updates the patient's data in the database within a transaction, ensuring data consistency.
+
+## Code Structure
+The main function `resetPatientScheduledDocQueryRequestId` uses helper functions and models to perform its task. It relies on the `PatientModel` for database operations and `getPatientOrFail` to retrieve the patient data.
+
+## References
+- `MedicalDataSource` from "@metriport/core/external/index"
+- `getPatientOrFail` from "../../command/medical/patient/get-patient"
+- `Patient` from "@metriport/core/domain/patient"
+- `PatientModel` from "../../models/medical/patient"
+- `executeOnDBTx` from "../../models/transaction-wrapper"
+
+## Symbols
+
+### `resetPatientScheduledDocQueryRequestId`
+#### Description
+This function resets the `scheduledDocQueryRequestId` and `scheduledDocQueryRequestTriggerConsolidated` fields for a specific patient and medical data source.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId"&gt; | Object containing patient's id and cxId |
+| source | MedicalDataSource | The medical data source to reset |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| updatedPatient | Patient | The updated patient object |
+
+#### Internal Logic
+1. Define a filter object with patient id and cxId.
+2. Execute a database transaction using `executeOnDBTx`.
+3. Within the transaction:
+   a. Retrieve the existing patient data using `getPatientOrFail`.
+   b. Update the `externalData` object, resetting specific fields for the given source.
+   c. Create an updated patient object with the modified data.
+   d. Update the patient record in the database.
+   e. Return the updated patient object.
+
+## Side Effects
+This function modifies the patient record in the database, specifically updating the `externalData` field for the given medical data source.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/external/index | Importing MedicalDataSource enum |
+| @metriport/core/domain/patient | Importing Patient type |
+
+## Error Handling
+The function relies on the error handling mechanisms of the underlying functions and database operations. If any errors occur during the transaction, they will be propagated up the call stack.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

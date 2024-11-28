@@ -1,0 +1,71 @@
+---
+title: "pull-request_carequality-cert-runner.yml"
+---
+
+## High-level description
+This GitHub Actions workflow file defines a CI/CD process for the "carequality-cert-runner" package. It is triggered on pull requests that modify files within the specified package, when a merge group is created, or manually via workflow dispatch. The workflow performs commit checks and runs a build process for the package.
+
+## Code Structure
+The workflow consists of two main jobs: `check-commits` and `check-pr`. These jobs are defined using reusable workflows, which are referenced using the `uses` keyword.
+
+## Symbols
+
+### `name`
+#### Description
+Specifies the name of the GitHub Actions workflow.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | string | The name of the workflow |
+
+### `on`
+#### Description
+Defines the events that trigger the workflow.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| pull_request | object | Configures the workflow to run on pull request events |
+| merge_group | null | Triggers the workflow when a merge group is created |
+| workflow_dispatch | null | Allows manual triggering of the workflow |
+
+### `jobs`
+#### Description
+Defines the jobs to be executed as part of the workflow.
+
+#### Internal Logic
+The `jobs` section contains two job definitions:
+
+1. `check-commits`: Uses a reusable workflow defined in `./.github/workflows/_check-commits.yml`
+2. `check-pr`: Uses a reusable workflow defined in `./.github/workflows/_build.yml`
+
+Both jobs inherit secrets from the calling workflow.
+
+### `check-commits` (job)
+#### Description
+Runs a commit checking process using a reusable workflow.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| uses | string | Path to the reusable workflow file |
+| secrets | string | Specifies that secrets should be inherited |
+
+### `check-pr` (job)
+#### Description
+Runs a build process for the "carequality-cert-runner" package using a reusable workflow.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| uses | string | Path to the reusable workflow file |
+| with | object | Input parameters for the reusable workflow |
+| secrets | string | Specifies that secrets should be inherited |
+
+## Dependencies
+This workflow depends on two other workflow files:
+| Dependency | Purpose |
+|:-----------|:--------|
+| ./.github/workflows/_check-commits.yml | Performs commit checks |
+| ./.github/workflows/_build.yml | Runs the build process for the package |

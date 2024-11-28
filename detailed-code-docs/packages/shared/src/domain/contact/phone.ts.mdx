@@ -1,0 +1,119 @@
+---
+title: "phone.ts"
+---
+
+## High-level description
+This code defines a module for handling phone number operations in a shared package. It provides functions for validating, normalizing, and manipulating US phone numbers, ensuring consistency and proper formatting across the application.
+
+## Code Structure
+The code consists of several exported constants and functions that work together to handle phone number operations. The main functions are `isPhoneValid`, `normalizeUsPhoneWithPlusOne`, `normalizePhoneNumber`, and `normalizePhoneNumberStrict`.
+
+## Symbols
+
+### `phoneLength`
+#### Description
+A constant that defines the expected length of a valid phone number.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| phoneLength | number | The expected length of a valid phone number (10) |
+
+### `examplePhoneNumber`
+#### Description
+A constant that provides an example of a valid phone number.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| examplePhoneNumber | string | An example of a valid phone number ("1231231234") |
+
+### `isPhoneValid`
+#### Description
+A function that checks if a given phone number is valid based on length and content.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| phone | string | The phone number to validate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| isValid | boolean | True if the phone number is valid, false otherwise |
+
+#### Internal Logic
+1. Check if the phone number is not empty
+2. Check if the phone number length matches the expected length
+3. Check if the phone number contains only digits
+
+### `normalizeUsPhoneWithPlusOne`
+#### Description
+A function that normalizes a US phone number, removing non-numeric characters and handling country code.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| telephone | string | The phone number to normalize |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| normalizedPhone | string | The normalized phone number |
+
+#### Internal Logic
+1. Remove all non-numeric characters from the input
+2. Check if the number starts with "1" and has 11 digits
+3. If so, remove the leading "1"
+4. Return the resulting string
+
+### `normalizePhoneNumber`
+#### Description
+A function that normalizes a phone number, ensuring it has 10 digits and handling country code.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| telephone | string | The phone number to normalize |
+| normalizeBase | function | Optional. A function to use for initial normalization (defaults to normalizeUsPhoneWithPlusOne) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| normalizedPhone | string | The normalized phone number |
+
+#### Internal Logic
+1. Apply the base normalization function
+2. If the result is longer than 10 digits:
+   a. Check if it starts with "1"
+   b. Remove the first digit if it starts with "1", or start from the beginning
+   c. Take the first 10 digits
+3. Return the resulting string
+
+### `normalizePhoneNumberStrict`
+#### Description
+A function that strictly normalizes a phone number and throws an error if the result is invalid.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| telephone | string | The phone number to normalize |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| normalizedPhone | string | The normalized phone number |
+
+#### Internal Logic
+1. Normalize the phone number using `normalizePhoneNumber`
+2. Validate the result using `isPhoneValid`
+3. If invalid, throw an error
+4. Otherwise, return the normalized phone number
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/shared | Imports the `stripNonNumericChars` function for removing non-numeric characters from strings |
+
+## Error Handling
+The `normalizePhoneNumberStrict` function throws an error if the normalized phone number is invalid.

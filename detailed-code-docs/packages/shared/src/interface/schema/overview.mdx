@@ -1,0 +1,98 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains schema definitions for a feedback system, likely used across different parts of a larger application. It defines Zod schemas for creating feedback and feedback entries, along with their corresponding TypeScript types. The directory uses an index file to export these schemas and types, making them easily accessible to other parts of the application.
+
+## What does it do?
+The code in this directory provides a structured way to define and validate data related to feedback in the application. It does this by:
+
+1. Defining schemas for creating feedback and feedback entries using the Zod library.
+2. Creating TypeScript types based on these schemas for type checking and autocompletion in development.
+3. Exporting these schemas and types through an index file for easy access from other parts of the application.
+
+This setup ensures that when other parts of the application work with feedback data (e.g., when creating new feedback or feedback entries), they can easily validate the data structure and benefit from TypeScript's type checking. This helps maintain consistency in the data structure across the application and reduces the likelihood of errors due to incorrect data formats.
+
+## Key Files
+
+### feedback.ts
+This file contains the core schema definitions and types for the feedback system. It defines two main schemas:
+
+1. `createFeedbackSchema`: This schema defines the structure for creating feedback. It includes fields such as:
+   - `cxId`: A required string representing the customer ID.
+   - `entityId`: A required string representing the entity associated with the feedback.
+   - `content`: A required string containing the feedback content.
+   - `version`: An optional string for version information.
+   - `location`: An optional string for location information.
+
+   The corresponding TypeScript type `CreateFeedback` is inferred from this schema.
+
+2. `createFeedbackEntrySchema`: This schema defines the structure for creating a feedback entry. It includes fields such as:
+   - `feedbackId`: A required string representing the ID of the associated feedback.
+   - `comment`: A required string containing the content of the feedback entry.
+   - `name`: An optional string for the name of the person providing the feedback entry.
+
+   The corresponding TypeScript type `CreateFeedbackEntry` is inferred from this schema.
+
+Here's an example of how the `createFeedbackSchema` is defined:
+
+```typescript
+export const createFeedbackSchema = z.object({
+  cxId: z.string(),
+  entityId: z.string(),
+  content: z.string(),
+  version: z.string().nullable().optional(),
+  location: z.string().nullable().optional(),
+});
+```
+
+### index.ts
+This file serves as the entry point for the schema directory. It re-exports all symbols from the feedback.ts file, making them easily accessible to other parts of the application. The file contains a single line:
+
+```typescript
+export * from "./feedback";
+```
+
+This means that other parts of the application can import the schemas and types like this:
+
+```typescript
+import { createFeedbackSchema, CreateFeedback } from 'path/to/schema';
+```
+
+Without needing to know the exact file structure within the schema directory.
+
+## Dependencies
+The main external dependency for this directory is the Zod library. Zod is used for defining the schemas, which provide both runtime validation and TypeScript type inference. The choice of Zod likely stems from its ability to create both runtime validators and TypeScript types from the same schema definition, reducing duplication and potential inconsistencies between validation and typing.
+
+## Configuration
+This directory does not appear to use any specific configuration files or environment variables. The schemas are defined statically in the code.
+
+## References and Usage
+The schemas and types defined in this directory are used in other parts of the application:
+
+1. The `CreateFeedback` type is used in the `apiClient` function in `packages/lambdas/src/shared/oss-api.ts`, specifically in the `createFeedback` function. This suggests that the schema is used for validating and typing the data sent to create feedback through an API.
+
+2. The `createFeedbackSchema` is used in `packages/api/src/routes/medical/internal-feedback.ts` to parse and validate the request body in the PUT route for creating or updating feedback.
+
+These references indicate that the schemas defined in this directory play a central role in the feedback creation process across different parts of the application, ensuring consistency in data structure and validation.
+
+For example, in an API route, the schema might be used like this:
+
+```typescript
+import { createFeedbackSchema } from 'path/to/schema';
+
+app.put('/feedback', (req, res) =&gt; {
+  const result = createFeedbackSchema.safeParse(req.body);
+  if (result.success) {
+    // Process the validated feedback data
+    const feedback = result.data;
+    // ...
+  } else {
+    // Handle validation errors
+    res.status(400).json({ errors: result.error.errors });
+  }
+});
+```
+
+This setup ensures that the feedback data is properly validated before being processed, maintaining data integrity throughout the application.

@@ -1,0 +1,112 @@
+---
+title: "observation-shared.ts"
+---
+
+## High-level description
+This code provides utility functions for handling FHIR Observation resources, specifically focusing on code extraction, value retrieval, and status management. It also includes functions for identifying unknown codings and handling various types of observation values.
+
+## Code Structure
+The code defines several constants, types, and functions that work together to process FHIR Observation resources. The main symbols are interconnected through their focus on different aspects of Observation handling, such as status, codes, and values.
+
+## References
+This code references FHIR types from "@medplum/fhirtypes" and constants from "../../util/constants".
+
+## Symbols
+
+### `observationStatus`
+#### Description
+A constant array that defines the possible status values for an Observation resource.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| observationStatus | readonly string[] | Array of possible Observation status values |
+
+### `ObservationStatus`
+#### Description
+A type alias representing the possible status values for an Observation.
+
+### `statusRanking`
+#### Description
+An object that assigns numerical rankings to each Observation status, allowing for comparison and sorting.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| statusRanking | Record&lt;ObservationStatus, number&gt; | Object mapping status to numerical rank |
+
+### `extractCodes`
+#### Description
+Extracts LOINC, SNOMED, and other codes from a CodeableConcept.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| concept | CodeableConcept \| undefined | The CodeableConcept to extract codes from |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object | \{ loincCode: string \| undefined; snomedCode: string \| undefined; otherCode: string \| undefined \} | Extracted codes |
+
+#### Internal Logic
+1. Initialize variables for LOINC, SNOMED, and other codes.
+2. If concept is undefined, return empty result.
+3. Iterate through codings in the concept.
+4. Identify and extract LOINC, SNOMED, or other codes based on the coding system.
+5. Ignore unknown codings.
+
+### `retrieveCode`
+#### Description
+Retrieves a single code from the extracted codes, prioritizing LOINC, then SNOMED, then other codes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object | \{ loincCode: string \| undefined; snomedCode: string \| undefined; otherCode: string \| undefined \} | Extracted codes |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | string \| undefined | The retrieved code |
+
+### `extractValueFromObservation`
+#### Description
+Extracts the value from an Observation resource, handling various value types.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| observation | Observation | The Observation resource to extract value from |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| value | string \| number \| true \| CodeableConcept \| Quantity \| Range \| Ratio \| SampledData \| Period \| undefined | The extracted value |
+
+### `unknownCoding` and `unknownCode`
+#### Description
+Constants representing unknown coding and code in FHIR.
+
+### `isUnknownCoding`
+#### Description
+Determines if a given Coding represents an unknown code.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| coding | Coding | The Coding to check |
+| text | string \| undefined | Optional text to compare |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| isUnknown | boolean | Whether the coding represents an unknown code |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides FHIR resource type definitions |
+| lodash | Used for object comparison |
+
+This code is crucial for processing and standardizing FHIR Observation resources, particularly in the context of code systems and value extraction. It provides a foundation for more complex operations on Observation resources, such as deduplication or analysis.

@@ -1,0 +1,127 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `PatientLoaderLocal` class is a local implementation of the `PatientLoader` interface, responsible for handling patient-related data retrieval operations within the API. It provides methods for retrieving patient data, finding patients based on similarity criteria, and managing patient states.
+
+## Code Structure
+The `PatientLoaderLocal` class implements the `PatientLoader` interface and provides concrete implementations for its methods. It utilizes the `PatientModel` for database interactions and leverages Sequelize operators for querying. The class also interacts with other modules like `getPatientOrFail` and `getPatientStates` for specific patient retrieval and state management.
+
+## References
+- `@metriport/core/domain/patient`: Defines the `Patient` and `PatientData` interfaces.
+- `@metriport/core/command/patient-loader`: Defines the `FindBySimilarity`, `GetOne`, and `PatientLoader` interfaces.
+- `sequelize`: Provides database interaction utilities like `Op`, `WhereOptions`, and `json`.
+- `../../command/medical/patient/get-patient`: Imports `getPatientOrFail` and `getPatientStates` functions.
+- `../medical/patient`: Imports the `PatientModel`.
+
+## Symbols
+
+### `PatientLoaderLocal`
+#### Description
+This class implements the `PatientLoader` interface, providing local handling of patient data retrieval and manipulation.
+
+#### Inputs
+This class does not have explicit inputs.
+
+#### Outputs
+This class does not have explicit outputs.
+
+#### Internal Logic
+The class implements the following methods:
+- `getStatesFromPatientIds`: Retrieves a list of unique US states from the addresses of patients with the given IDs.
+- `getOneOrFail`: Retrieves a patient by ID and customer ID, throwing an error if not found.
+- `findBySimilarityAcrossAllCxs`: Finds patients matching the given criteria across all customers. This method is intended for MPI searches and ignores the customer ID.
+- `findBySimilarity`: Finds patients matching the given criteria within a specific customer.
+- `findBySimilarityInternal`: A private helper method that performs the actual database query for finding similar patients based on provided criteria. It constructs a Sequelize `where` clause based on the input parameters and queries the `PatientModel`.
+
+## Dependencies
+- `@metriport/core/domain/patient`
+- `@metriport/core/command/patient-loader`
+- `sequelize`
+
+### `getStatesFromPatientIds`
+#### Description
+Retrieves a list of unique US states from the addresses of patients with the given IDs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer ID. |
+| patientIds | string[] | An array of patient IDs. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| states | string[] | An array of unique US states. |
+
+#### Internal Logic
+The method retrieves patients matching the provided `cxId` and `patientIds` using `getPatients`. It then extracts the states from each patient's addresses using `getStatesFromAddresses`, filters out undefined states, and returns a unique list of states.
+
+### `getOneOrFail`
+#### Description
+Retrieves a patient by ID and customer ID, throwing an error if not found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | GetOne | An object containing the patient ID and customer ID. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The retrieved patient object. |
+
+#### Internal Logic
+The method calls `getPatientOrFail` with the provided parameters to retrieve the patient.
+
+### `findBySimilarityAcrossAllCxs`
+#### Description
+Finds patients matching the given criteria across all customers. This method is intended for MPI searches and ignores the customer ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Omit&lt;FindBySimilarity, "cxId"&gt; | An object containing patient data for similarity search. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patients | Patient[] | An array of patients matching the criteria. |
+
+#### Internal Logic
+The method calls the private `findBySimilarityInternal` method, passing the provided patient data.
+
+### `findBySimilarity`
+#### Description
+Finds patients matching the given criteria within a specific customer.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | FindBySimilarity | An object containing patient data for similarity search and the customer ID. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patients | Patient[] | An array of patients matching the criteria. |
+
+#### Internal Logic
+The method calls the private `findBySimilarityInternal` method, passing the provided patient data.
+
+### `findBySimilarityInternal`
+#### Description
+A private helper method that performs the actual database query for finding similar patients based on provided criteria.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Partial&lt;Pick&lt;FindBySimilarity, "cxId"&gt;&gt; & Omit&lt;FindBySimilarity, "cxId"&gt; | An object containing patient data for similarity search and an optional customer ID. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patients | Patient[] | An array of patients matching the criteria. |
+
+#### Internal Logic
+The method constructs a Sequelize `where` clause based on the input parameters. It checks for `firstNameInitial`, `lastNameInitial`, `dob`, and `genderAtBirth` properties in the `patient.data` object and builds corresponding query conditions using Sequelize operators like `Op.like` and `Op.and`. If a `cxId` is provided, it's also included in the `where` clause. The method then queries the `PatientModel` using the constructed `where` clause and returns the found patients. If no search criteria are provided, it throws an error.

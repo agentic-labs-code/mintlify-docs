@@ -1,0 +1,61 @@
+---
+title: "api-factory.ts"
+---
+
+## High-level description
+This code defines a factory function `makeApi` that creates an instance of `CommonWellManagementAPI` based on the current environment. It uses the `Config` utility to determine whether to return a mock implementation or a real implementation of the API.
+
+## Code Structure
+The `makeApi` function is the main symbol in this file. It uses the `Config` utility to decide which implementation of `CommonWellManagementAPI` to instantiate and return.
+
+## References
+- `CookieManager` from "../../../domain/auth/cookie-management/cookie-manager"
+- `Config` from "../../../util/config"
+- `CommonWellManagementAPI` from "./api"
+- `CommonWellManagementAPIImpl` from "./api-impl"
+- `CommonWellManagementAPIMock` from "./api-mock"
+
+## Symbols
+
+### `makeApi`
+#### Description
+This function creates and returns an instance of `CommonWellManagementAPI`. It uses the `Config.isDev()` method to determine whether to return a mock implementation or a real implementation of the API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cookieManager | CookieManager | An instance of CookieManager for handling cookies |
+| baseUrl | string | The base URL for the API |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | CommonWellManagementAPI | An instance of CommonWellManagementAPI |
+
+#### Internal Logic
+1. Check if the current environment is development using `Config.isDev()`.
+2. If it's a development environment, return a new instance of `CommonWellManagementAPIMock` with the provided `baseUrl`.
+3. If it's not a development environment, return a new instance of `CommonWellManagementAPIImpl` with the provided `cookieManager` and `baseUrl`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| CookieManager | Manages cookies for API requests |
+| Config | Provides environment-specific configuration |
+| CommonWellManagementAPI | Defines the interface for the API |
+| CommonWellManagementAPIImpl | Implements the real API |
+| CommonWellManagementAPIMock | Implements a mock version of the API for development |
+
+## Error Handling
+This code does not implement any specific error handling. Any errors that occur during the instantiation of the API implementations will propagate up to the caller.
+
+## API/Interface Reference
+The `makeApi` function serves as a factory for creating instances of `CommonWellManagementAPI`. The returned object will have the following interface:
+
+| Method | Description |
+|:-------|:------------|
+| getMember | Retrieves member information |
+| getIncludeList | Retrieves the include list for a given organization |
+| updateIncludeList | Updates the include list for a given organization |
+
+Note: The exact method signatures and behaviors may differ between the mock and real implementations.

@@ -1,0 +1,87 @@
+---
+title: "parser.ts"
+---
+
+## High-level description
+This code provides functionality for parsing MTOM (Message Transmission Optimization Mechanism) responses in the context of healthcare data exchange. It includes utilities for extracting parts from MTOM messages, handling boundaries, and converting SOAP responses to MTOM format.
+
+## Symbols
+
+### `MtomPart`
+#### Description
+An interface representing a part of an MTOM message, containing the body and headers.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| body | Buffer | The content of the MTOM part |
+| headers | Record&lt;string, string&gt; | Headers associated with the MTOM part |
+
+### `MtomAttachments`
+#### Description
+An interface representing the structure of MTOM attachments, containing an array of `MtomPart`s.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| parts | MtomPart[] | An array of MTOM parts |
+
+### `parseMtomResponse`
+#### Description
+An asynchronous function that parses an MTOM response given a payload and boundary.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payload | Buffer | The MTOM payload to parse |
+| boundary | string | The boundary string used in the MTOM message |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;MtomAttachments&gt; | Promise&lt;MtomAttachments&gt; | A promise that resolves to the parsed MTOM attachments |
+
+#### Internal Logic
+1. Creates a new `MultipartParser` instance.
+2. Sets up event listeners for various parsing stages (partBegin, headerField, headerValue, etc.).
+3. Processes the payload and constructs the `MtomAttachments` object.
+4. Resolves the promise with the parsed attachments when parsing is complete.
+
+### `getBoundaryFromMtomResponse`
+#### Description
+A function that extracts the boundary string from the content type of an MTOM response.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| contentType | any | The content type header of the MTOM response |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string \| undefined | string \| undefined | The extracted boundary string, or undefined if not found |
+
+### `convertSoapResponseToMtomResponse`
+#### Description
+A function that converts a SOAP response buffer to an MTOM response format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| buffer | Buffer | The SOAP response buffer |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| MtomAttachments | MtomAttachments | The converted MTOM attachments |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| MIMEType from "whatwg-mimetype" | Used for parsing MIME types |
+| MultipartParser from "formidable" | Used for parsing multipart messages |
+
+## Error Handling
+The code includes basic error handling, such as throwing errors when parsing fails or when parts are not found during processing.
+
+This code is part of a larger system for handling healthcare data exchange, specifically dealing with MTOM responses in the context of IHE (Integrating the Healthcare Enterprise) gateways and document retrieval processes.

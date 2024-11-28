@@ -1,0 +1,77 @@
+---
+title: "medications.ts"
+---
+
+## High-level description
+This code defines a function `buildMedications` that transforms FHIR medication data into a CDA (Clinical Document Architecture) format for medications. It processes MedicationStatement resources from a FHIR Bundle, creates a structured table of medication information, and generates corresponding CDA entries.
+
+## Code Structure
+The main function `buildMedications` orchestrates the transformation process. It uses helper functions to create table rows and entries from MedicationStatement resources. The `AugmentedMedicationStatement` class is used to combine MedicationStatement and Medication resources. The code also includes utility functions for extracting and formatting specific medication details.
+
+## Symbols
+
+### `buildMedications`
+#### Description
+Builds a CDA-compliant MedicationSection from a FHIR Bundle containing MedicationStatement resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fhirBundle | Bundle | FHIR Bundle containing MedicationStatement resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| medicationsSection | MedicationSection | CDA-compliant medication section |
+
+#### Internal Logic
+1. Initializes a MedicationSection structure
+2. Extracts MedicationStatement resources from the FHIR Bundle
+3. Creates AugmentedMedicationStatements by combining MedicationStatement and Medication resources
+4. Generates table rows and entries using helper functions
+5. Assembles the final MedicationSection with table and entries
+
+### `createTableRowsFromMedicationStatement`
+#### Description
+Creates table rows for a single MedicationStatement.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| statement | AugmentedMedicationStatement | Combined MedicationStatement and Medication data |
+| referenceId | string | Unique identifier for the table row |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| rows | ObservationTableRow[] | Array of table rows representing the medication |
+
+### `createEntryFromStatement`
+#### Description
+Creates a CDA-compliant SubstanceAdministationEntry from an AugmentedMedicationStatement.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| statement | AugmentedMedicationStatement | Combined MedicationStatement and Medication data |
+| referenceId | string | Unique identifier for the entry |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| entry | SubstanceAdministationEntry | CDA-compliant substance administration entry |
+
+### Helper Functions
+- `getDosageFromMedicationStatement`: Extracts dosage information
+- `getFrequencyFromMedicationStatement`: Extracts frequency information
+- `buildDoseQuantity`: Builds a dose quantity object for CDA
+
+## Dependencies
+- @medplum/fhirtypes: For FHIR type definitions
+- Various utility functions from other files in the project
+
+## Error Handling
+The code uses a `BadRequestError` when a MedicationStatement doesn't reference an existing Medication.
+
+## Performance Considerations
+The code processes each MedicationStatement individually, which may be inefficient for large datasets. Consider batch processing or streaming for better performance with large inputs.

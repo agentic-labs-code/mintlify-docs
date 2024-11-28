@@ -1,0 +1,117 @@
+---
+title: "notes-and-results.ts"
+---
+
+## High-level description
+This code is part of a system that converts FHIR (Fast Healthcare Interoperability Resources) data to CDA (Clinical Document Architecture) format. It specifically handles the conversion of diagnostic reports, observations, and related data into a structured "Results" section in a CDA document.
+
+## Code Structure
+The main function `buildVariousNotesAndResults` processes a FHIR Bundle to create assembled notes, which are then used to build CDA sections. The `buildResultsSection` function is responsible for creating the Results section of the CDA document. Other functions support these main operations by handling specific conversions and data transformations.
+
+## Symbols
+
+### `buildVariousNotesAndResults`
+#### Description
+This function processes a FHIR Bundle to create assembled notes and build CDA sections from them.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fhirBundle | Bundle | A FHIR Bundle containing resources to be processed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sections | unknown[] | An array of CDA sections |
+
+#### Internal Logic
+1. Calls `buildAssembledNotes` to process the FHIR Bundle
+2. Calls `buildSectionsFromAssembledNotes` to create CDA sections from the assembled notes
+
+### `buildResultsSection`
+#### Description
+Creates a Results section for a CDA document based on assembled notes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| assembledNotes | AssembledNote[] | Array of assembled notes |
+| sectionDetails | SectionDetails | Details about the section |
+| sectionCode | string | LOINC code for the section |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resultsSection | ResultsSection | A CDA Results section |
+
+#### Internal Logic
+1. Initializes the Results section with template IDs and codes
+2. Processes each assembled note to create text and entries for the section
+3. Combines text and entries into the final Results section
+
+### `getTextItemsFromDiagnosticReport`
+#### Description
+Extracts text items from a DiagnosticReport and its associated Observations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| report | DiagnosticReport | The diagnostic report to process |
+| observations | Observation[] | Associated observations |
+| referenceId | string | A reference ID for the report |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| combinedText | any[] | An array of text items for the CDA document |
+
+#### Internal Logic
+1. Processes the presentedForm of the report, if available
+2. Creates a table from the observations
+3. Combines the processed text and table into a single array
+
+### `createTableRowFromObservation`
+#### Description
+Creates a table row for an Observation in the CDA document.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| observation | Observation | The FHIR Observation to process |
+| referenceId | string | A reference ID for the observation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| row | ObservationTableRow | A table row representing the observation |
+
+#### Internal Logic
+1. Extracts relevant data from the Observation (measurement, value, score, date)
+2. Formats the data into a table row structure
+
+### `buildEntriesFromAssembledNote`
+#### Description
+Creates CDA entries from an assembled note.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| note | AssembledNote | The assembled note to process |
+| referenceId | string | A reference ID for the note |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| entry | object | A CDA entry object |
+
+#### Internal Logic
+1. Creates an organizer object with details from the diagnostic report
+2. Adds components for each observation in the note
+3. Returns the entry object with the organizer
+
+## Dependencies
+The code relies on several external libraries and modules, including:
+- @medplum/fhirtypes for FHIR type definitions
+- Various utility functions from other files in the project for building CDA structures and handling data conversions
+
+This code is a crucial part of the FHIR to CDA conversion process, specifically handling the creation of the Results section in the CDA document. It demonstrates complex data transformation and structuring to meet the requirements of the CDA format while preserving the information from the original FHIR resources.

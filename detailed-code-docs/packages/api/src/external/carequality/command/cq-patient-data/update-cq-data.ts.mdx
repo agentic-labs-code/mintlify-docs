@@ -1,0 +1,73 @@
+---
+title: "update-cq-data.ts"
+---
+
+## High-level description
+The `updateCQPatientData` function updates CareQuality (CQ) patient data in the database. It retrieves existing CQ data for a patient, merges the provided updates, and persists the changes within a database transaction to ensure data integrity.
+
+## Code Structure
+The code defines two functions: `updateCQPatientData` and `updateCQPatientDataWithinDBTx`. The `updateCQPatientData` function acts as an orchestrator, handling the retrieval of existing data and invoking `updateCQPatientDataWithinDBTx` to perform the actual update within a database transaction.
+
+## References
+- `getCQPatientDataOrFail`: Retrieves existing CQ patient data from the database or throws an error if not found.
+- `executeOnDBTx`: Executes a provided function within a database transaction.
+
+## Symbols
+
+### `updateCQPatientData`
+#### Description
+Updates CQ patient data in the database. It retrieves existing CQ data, merges the provided updates, and persists the changes within a database transaction.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { id, cxId, cqLinks, requestLinksDemographics } | `{ id: string; cxId: string; cqLinks?: CQLink[]; requestLinksDemographics?: { requestId: string; linksDemographics: LinkDemographics[]; }; }` | An object containing the patient ID (`id`), customer ID (`cxId`), optional CQ links (`cqLinks`), and optional request-specific link demographics (`requestLinksDemographics`). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `Promise&lt;CQPatientData&gt;` | A promise that resolves to the updated CQ patient data. |
+
+#### Internal Logic
+1. Constructs a `CQPatientDataUpdate` object containing the provided updates.
+2. Calls `executeOnDBTx` to execute the update within a database transaction.
+3. Within the transaction:
+    - Retrieves existing CQ patient data using `getCQPatientDataOrFail`.
+    - Calls `updateCQPatientDataWithinDBTx` to perform the actual update.
+4. Returns the updated CQ patient data.
+
+### `updateCQPatientDataWithinDBTx`
+#### Description
+Updates CQ patient data within a database transaction. It merges the provided updates with the existing data, ensuring uniqueness of CQ links.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| update | `CQPatientDataUpdate` | An object containing the CQ patient data updates. |
+| existing | `CQPatientDataModel` | The existing CQ patient data retrieved from the database. |
+| transaction | `Transaction` | The database transaction object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `Promise&lt;CQPatientDataModel&gt;` | A promise that resolves to the updated CQ patient data model. |
+
+#### Internal Logic
+1. Merges the provided CQ links with the existing links, ensuring uniqueness based on the `oid` property.
+2. Merges the provided link demographics history with the existing history.
+3. Updates the existing CQ patient data model with the merged data using Sequelize's `update` method within the provided transaction.
+4. Returns the updated CQ patient data model.
+
+## Side Effects
+- Modifies the CQ patient data record in the database.
+
+## Dependencies
+- `lodash`: Used for the `uniqBy` function to deduplicate CQ links.
+- `sequelize`: Used for database transactions and model operations.
+- `@metriport/core/domain/patient-demographics`: Used for the `LinkDemographics` type.
+- `../../../../command/medical/base-update-command`: Used for the `BaseUpdateCmdWithCustomer` type.
+- `../../../../models/transaction-wrapper`: Used for the `executeOnDBTx` function.
+- `../../cq-patient-data`: Used for various CQ data types.
+- `../../models/cq-patient-data`: Used for the `CQPatientDataModel`.
+- `./get-cq-data`: Used for the `getCQPatientDataOrFail` function.
+

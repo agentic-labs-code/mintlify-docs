@@ -1,0 +1,46 @@
+---
+title: "cq.run-or-schedule-patient-discovery.test.ts"
+---
+
+## High-level description
+The `runOrScheduleCqPatientDiscovery` function determines whether to immediately run or schedule a Carequality patient discovery process. It checks the current patient discovery status and schedules the process if a discovery is already in progress, otherwise, it initiates the discovery process.
+
+## Code Structure
+The `runOrScheduleCqPatientDiscovery` function is the main function in this file. It utilizes several other functions from different modules: `getCQData` to retrieve Carequality data, `schedulePatientDiscovery` to schedule the discovery process, and `discover` to initiate the process. The function also interacts with the `PatientModel` to retrieve patient data.
+
+## References
+- `getCQData` from `../patient`
+- `schedulePatientDiscovery` from `../../hie/schedule-patient-discovery`
+- `discover` from `../patient`
+- `PatientModel` from `../../../models/medical/patient`
+
+## Symbols
+
+### `runOrScheduleCqPatientDiscovery`
+#### Description
+This function determines whether to run or schedule a Carequality patient discovery process based on the current discovery status of the patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `Patient` | The patient object. |
+| facilityId | `string` | The ID of the facility. |
+| requestId | `string` | The ID of the request. |
+| rerunPdOnNewDemographics | `boolean` | Flag to indicate if patient discovery should be rerun on new demographics. |
+| forceCarequality | `boolean` | Flag to force Carequality as the data source. |
+
+#### Outputs
+This function does not return any value.
+
+#### Internal Logic
+1. Retrieves the existing patient data using `getPatientOrFail`.
+2. Extracts Carequality data from the patient's external data using `getCQData`.
+3. Checks the Carequality discovery status and the existence of a scheduled patient discovery request.
+4. If a discovery is already in progress (`discoveryStatusCq` is "processing") and there is no scheduled request (`scheduledPdRequestCq` is falsy), it schedules a new patient discovery using `schedulePatientDiscovery`.
+5. If the discovery is not in progress, it initiates the Carequality patient discovery process using `discover`.
+
+## Error Handling
+The `discover` function call is wrapped in a `.catch` block that utilizes `processAsyncError` to handle any asynchronous errors during the Carequality discovery process.
+
+## Logging
+The code uses the `out` function from `@metriport/core/util/log` to log messages related to the Carequality patient discovery process.

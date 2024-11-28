@@ -1,0 +1,65 @@
+---
+title: "coverate-enhancer.test.ts"
+---
+
+## High-level description
+This file contains unit tests for the `CoverageEnhancer` class, specifically testing the `getOrgsBy` and `getOrgsForPatients` methods. The tests ensure that the class correctly filters and retrieves organizations based on various criteria such as priority, state, and gateway.
+
+## Code Structure
+The file defines a `CoverageEnhancerLocal` class that extends `CoverageEnhancer` for testing purposes. It then contains two main test suites: one for `getOrgsBy` and another for `getOrgsForPatients`. Each suite includes multiple test cases to cover different scenarios and edge cases.
+
+## References
+- `CoverageEnhancer` from "../coverage-enhancer"
+- `CQOrgHydrated`, `isLowPrio`, `isMediumPrio`, `OrgPrio` from "../get-orgs"
+- `makeSimpleOrg` from "./cq-orgs"
+- `PatientLoaderMetriportAPI` from "../../../../command/patient-loader-metriport-api"
+- `USState` from "@metriport/shared"
+
+## Symbols
+
+### `CoverageEnhancerLocal`
+#### Description
+A local extension of the `CoverageEnhancer` class for testing purposes. It overrides some methods to allow for easier testing.
+
+#### Internal Logic
+- Overrides `enhanceCoverage` to throw an error (not implemented)
+- Overrides `getOrgsForPatients` and `getOrgsBy` to call the super methods
+
+### `describe("getOrgsBy", ...)`
+#### Description
+A test suite for the `getOrgsBy` method of `CoverageEnhancer`.
+
+#### Internal Logic
+- Sets up test data with various organizations
+- Tests different scenarios:
+  - Getting all organizations
+  - Filtering by gateway
+  - Filtering by state
+  - Filtering by both gateway and state
+  - Excluding already included organizations
+
+### `describe("getOrgsForPatients", ...)`
+#### Description
+A test suite for the `getOrgsForPatients` method of `CoverageEnhancer`.
+
+#### Internal Logic
+- Mocks the `getStatesFromPatientIds` method of `PatientLoaderMetriportAPI`
+- Tests various scenarios:
+  - Getting all medium priority organizations
+  - Handling cases where there are more organizations than the allowed limit
+  - Getting low priority organizations by state
+  - Combining medium and low priority organizations within the limit
+  - Handling cases with fewer matching low priority organizations than available spots
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @faker-js/faker | Generating fake data for tests |
+| @metriport/shared | Importing USState enum |
+| jest | Testing framework |
+
+## Error Handling
+The tests use Jest's assertion methods to check for expected outcomes. Errors are implicitly handled by the testing framework.
+
+## Performance Considerations
+The tests use a `defaultMaxOrgsToProcess` constant to limit the number of organizations processed, which is important for performance in the actual implementation.

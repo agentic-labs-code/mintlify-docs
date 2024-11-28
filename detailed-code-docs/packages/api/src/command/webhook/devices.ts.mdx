@@ -1,0 +1,237 @@
+---
+title: "devices.ts"
+---
+
+## High-level description
+The `devices.ts` file handles webhook events related to user devices and health data. It includes functions for sending notifications to the CX (customer) about provider connections and disconnections, processing incoming device data from various providers (Withings, Garmin, Tenovi, Fitbit), and reporting device usage.
+
+## Code Structure
+The code defines several types and functions related to handling device data and webhooks. It uses functions like `sendProviderConnected` and `sendProviderDisconnected` to notify the CX about changes in user-provider connections. Functions like `processData` (for Garmin, Fitbit) and `processMeasurementData` (for Tenovi) handle incoming data from different providers, while `mapData` maps the provider-specific data to a standardized format. The `reportDevicesUsage` function is used to track device usage.
+
+## References
+- `@metriport/api-sdk`: Provides data models and utility functions for interacting with different health data providers.
+- `WebhookMetadata`: Type defining the metadata for a webhook request.
+- `Product`: Enum representing different product categories for usage reporting.
+- `ConnectedUser`: Model representing a user connected to a health data provider.
+- `ProviderOptions`: Enum representing different health data providers.
+- `getSettingsOrFail`: Function to retrieve customer settings.
+- `reportUsageCmd`: Function to report usage events.
+- `processRequest`: Function to process a webhook request and send it to the CX.
+- `buildWebhookRequestData`: Function to build a webhook request data object.
+
+## Symbols
+
+### `reportDevicesUsage`
+#### Description
+Reports device usage for a list of users to the usage tracking system.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer ID. |
+| cxUserIds | string[] | An array of user IDs. |
+
+#### Internal Logic
+- Iterates through the list of user IDs.
+- Calls `reportUsageCmd` for each user ID, specifying the product as `Product.devices`.
+
+### `sendProviderConnected`
+#### Description
+Sends a webhook notification to the CX when a user connects to a provider.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object. |
+| provider | ProviderOptions | The provider the user connected to. |
+| deviceIds | string[] | (Optional) An array of device IDs connected to the provider. |
+
+#### Internal Logic
+- Builds the webhook payload with user ID, connected provider, list of all connected providers, connected device IDs, and a list of all connected devices.
+- Retrieves the customer settings using `getSettingsOrFail`.
+- Builds the webhook request data using `buildWebhookRequestData`.
+- Sends the webhook request using `processRequest`.
+- Logs any errors encountered during the process.
+
+### `sendProviderDisconnected`
+#### Description
+Sends a webhook notification to the CX when a user disconnects from a provider.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object. |
+| disconnectedProviders | string[] | An array of providers the user disconnected from. |
+
+#### Internal Logic
+- Builds the webhook payload with user ID, disconnected providers, and a list of all currently connected providers.
+- Retrieves the customer settings using `getSettingsOrFail`.
+- Builds the webhook request data using `buildWebhookRequestData`.
+- Sends the webhook request using `processRequest`.
+- Logs any errors encountered during the process.
+
+### `getConnectedDevices`
+#### Description
+Retrieves a list of all connected devices for a user, grouped by provider.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedDevices | \{ [provider: string]: string[] \}[] | An array of objects, where each object represents a provider and its associated connected device IDs. |
+
+#### Internal Logic
+- Iterates through the user's `providerMap`.
+- For each provider with connected device IDs, adds an entry to the `connectedDevices` array with the provider name as the key and the list of device IDs as the value.
+
+### `processData` (Garmin)
+#### Description
+Processes incoming Garmin webhook data, maps it to the Metriport format, groups it by customer and user, and sends it to the CX.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | UserData[] | An array of Garmin user data objects. |
+
+#### Internal Logic
+1. **Group data by customer and user:**
+    - Iterates through each data object and retrieves the associated customer and user IDs using the user access token.
+    - Groups the data by customer ID and then by user ID within each customer.
+2. **Process data for each customer:**
+    - Iterates through each customer and their associated data.
+    - Splits the data into chunks of 10 data points.
+    - For each chunk:
+        - Groups the data by user ID.
+        - For each user, groups the data by data type (e.g., activity, sleep).
+        - Creates a webhook payload with the grouped data.
+    - Sends the webhook payloads to the customer using `processOneCustomer`.
+    - Reports device usage for all users in the customer's data.
+3. **Error handling:**
+    - Logs any errors encountered during data processing.
+
+### `processOneCustomer` (Garmin)
+#### Description
+Processes and sends webhook payloads for a single customer.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer ID. |
+| settings | Settings | The customer's settings. |
+| payloads | WebhookDataPayloadWithoutMessageId[] | An array of webhook payloads for the customer. |
+
+#### Internal Logic
+- Iterates through each payload.
+- Creates a webhook request data object using `buildWebhookRequestData`.
+- Sends the webhook request to the customer using `processRequest`.
+- Sleeps for a random duration between 0 and 200 milliseconds to avoid flooding the customer's system.
+
+### `processMeasurementData` (Tenovi)
+#### Description
+Processes incoming Tenovi measurement webhook data, maps it to the Metriport format, and sends it to the CX.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | TenoviMeasurement | The Tenovi measurement data. |
+
+#### Internal Logic
+- Retrieves the connected users associated with the device ID from the Tenovi measurement data.
+- Maps the Tenovi measurement data to the Metriport format using `mapData`.
+- If the mapping is successful, creates and sends a webhook payload for each connected user using `createAndSendPayload`.
+- Logs any errors encountered during the process.
+
+### `mapData` (Tenovi)
+#### Description
+Maps Tenovi measurement data to the Metriport format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | TenoviMeasurement | The Tenovi measurement data. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payload | WebhookUserDataPayload \| undefined | The mapped webhook user data payload, or undefined if the mapping failed. |
+
+#### Internal Logic
+- Extracts relevant data from the Tenovi measurement object.
+- Creates a `Biometrics` object with metadata and populates it with the mapped Tenovi data.
+- If the measurement is "weight", creates a `Body` object with metadata and weight in kilograms.
+- If the measurement is not a recognized Tenovi metric type, logs a message and returns undefined.
+- Returns the `payload` object containing the mapped biometrics and/or body data.
+
+### `createAndSendPayload` (Tenovi)
+#### Description
+Creates and sends a webhook payload for each connected user associated with a Tenovi measurement.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| users | ConnectedUser[] | An array of connected users. |
+| data | WebhookUserDataPayload | The mapped webhook user data payload. |
+
+#### Internal Logic
+- Iterates through each connected user.
+- Creates a webhook payload with the user ID and mapped data.
+- Retrieves the customer settings using `getSettingsOrFail`.
+- Builds the webhook request data using `buildWebhookRequestData`.
+- Sends the webhook request using `processRequest`.
+- Reports device usage for the user.
+- Logs any errors encountered during the process.
+
+### `processData` (Fitbit)
+#### Description
+Processes incoming Fitbit webhook data, groups it by user, maps it to the Metriport format, and sends it to the CX.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | FitbitWebhook | The Fitbit webhook data. |
+
+#### Internal Logic
+1. **Group notifications by user:**
+    - Groups the individual webhook notifications by Fitbit user ID.
+2. **Map data by connected user:**
+    - For each Fitbit user ID:
+        - Retrieves the connected user and their access token.
+        - Maps the data for each notification using `mapData`.
+        - Stores the mapped data along with the customer ID and user ID.
+3. **Group data by customer:**
+    - Groups the mapped data by customer ID.
+4. **Create and send customer payloads:**
+    - For each customer:
+        - Creates a webhook payload with the mapped data for all users associated with the customer.
+        - Sends the webhook payload to the customer.
+        - Reports device usage for all users in the customer's data.
+5. **Error handling:**
+    - Logs any errors encountered during data processing.
+
+### `mapData` (Fitbit)
+#### Description
+Maps Fitbit data to the Metriport format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The connected user object. |
+| collectionType | FitbitCollectionTypes | The Fitbit data collection type (e.g., "activities", "sleep"). |
+| startdate | string | The start date of the data. |
+| accessToken | string | The user's access token. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payload | WebhookUserDataPayload | The mapped webhook user data payload. |
+
+#### Internal Logic
+- Initializes an empty `payload` object.
+- Based on the `collectionType`:
+    - Fetches and maps the corresponding data from the Fitbit API using the provided `connectedUser`, `startdate`, and `accessToken`.
+    - Adds the mapped data to the `payload` object under the appropriate key (e.g., "activity", "sleep").
+- Returns the `payload` object.

@@ -1,0 +1,85 @@
+---
+title: "coverage-enhancer-local.ts"
+---
+
+## High-level description
+This code implements a `CoverageEnhancerLocal` class, which is responsible for enhancing coverage for patients in CommonWell Health Alliance. It links patients to organizations and updates their information in the system.
+
+## Code Structure
+The `CoverageEnhancerLocal` class extends the `CoverageEnhancer` base class and uses several other classes and interfaces to perform its operations, such as `LinkPatients`, `CommonWellManagementAPI`, `PatientLoader`, `PatientUpdater`, and `ECUpdater`.
+
+## Symbols
+
+### `CoverageEnhancerLocal`
+#### Description
+This class implements the Enhanced Coverage flow with logic running in a local environment. It handles the process of linking patients to organizations and updating their information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cwManagementApi | CommonWellManagementAPI | API for CommonWell management operations |
+| patientLoader | PatientLoader | Loader for patient data |
+| patientUpdater | PatientUpdater | Updater for patient data |
+| ecUpdater | ECUpdater | Updater for Enhanced Coverage data |
+| capture | Capture | Optional capture mechanism for errors and messages |
+| prefix | string | Optional prefix for logging |
+
+#### Internal Logic
+1. Initializes the `LinkPatients` instance with the provided dependencies.
+2. Implements the `enhanceCoverage` method, which:
+   - Generates or uses a provided Enhanced Coverage ID (ecId).
+   - Retrieves Carequality organizations.
+   - Logs information about the process.
+   - Retrieves the original include list for the organization.
+   - Processes organizations in chunks, linking patients to each chunk.
+   - Handles errors during the process, optionally stopping on errors.
+   - Reverts the include list to the original one after processing.
+   - Logs the duration of the patient linking process.
+
+#### Performance Considerations
+- The code processes organizations in chunks to handle API limitations (50 orgs per request).
+- Error handling allows for continuing the process even if some chunks fail, unless `stopOnErrors` is set to true.
+
+### `enhanceCoverage`
+#### Description
+This method performs the main Enhanced Coverage flow, linking patients to organizations and updating their information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ecId | string | Optional Enhanced Coverage ID |
+| cxId | string | Customer ID |
+| orgOID | string | Organization OID |
+| patientIds | string[] | Array of patient IDs |
+| fromOrgChunkPos | number | Starting position for org chunks |
+| stopOnErrors | boolean | Whether to stop on errors |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ecId | string | The Enhanced Coverage ID used or generated |
+
+#### Internal Logic
+1. Retrieves Carequality organizations.
+2. Processes organizations in chunks.
+3. Links patients to organizations using the `LinkPatients` instance.
+4. Handles errors during the process.
+5. Reverts the include list to the original one after processing.
+6. Logs the duration of the patient linking process.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dayjs | Date and time manipulation |
+| PatientLoader | Loading patient data |
+| PatientUpdater | Updating patient data |
+| Capture | Error and message capturing |
+| CommonWellManagementAPI | Interacting with CommonWell API |
+| LinkPatients | Linking patients to organizations |
+| ECUpdater | Updating Enhanced Coverage data |
+
+## Error Handling
+The code implements error handling within the `enhanceCoverage` method. It captures errors during the processing of each organization chunk and can either continue or stop the process based on the `stopOnErrors` parameter.
+
+## Logging
+The code uses a custom logging mechanism with a configurable prefix. It logs information about the process, including the number of organizations, patient IDs, and duration of the operation.

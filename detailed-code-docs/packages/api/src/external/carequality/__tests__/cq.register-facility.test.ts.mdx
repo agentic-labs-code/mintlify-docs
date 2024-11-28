@@ -1,0 +1,82 @@
+---
+title: "cq.register-facility.test.ts"
+---
+
+## High-level description
+The code in `cq.register-facility.test.ts` provides unit tests for the `createOrUpdateFacilityInCq` function, which is responsible for creating or updating a facility's representation in the Carequality directory. It covers scenarios for both non-OBO (Organization Behalf Of) and OBO facilities.
+
+## Code Structure
+The code defines a suite of tests using Jest. It mocks external dependencies like `CarequalityManagementAPIImpl` and `getAddressWithCoordinates`. The tests then call `createOrUpdateFacilityInCq` with different inputs and verify that the `createOrUpdateCQOrganization` function is called with the expected parameters.
+
+## Symbols
+### `describe`
+#### Description
+This block defines a test suite named "registerFacility" using Jest.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+- It sets up mocks for external dependencies before each test using `beforeEach`.
+- It clears mocks after each test using `afterEach`.
+- It defines two test cases within the suite.
+
+### `it` (first occurrence)
+#### Description
+This test case verifies the behavior of `createOrUpdateFacilityInCq` for non-OBO facilities.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+- **Arrange:**
+  - Creates a mock facility object (`mockedFacility`) representing a non-OBO facility.
+  - Mocks the `getAddressWithCoordinates` function to return a predefined address with coordinates.
+- **Act:**
+  - Calls the `createOrUpdateFacilityInCq` function with the mock facility and other relevant parameters.
+- **Assert:**
+  - Verifies that the `createOrUpdateCQOrganizationMock` (a spy on `createOrUpdateCQOrganization`) is called once.
+  - Asserts that the call to `createOrUpdateCQOrganizationMock` includes the expected parameters derived from the mock facility and input values.
+
+### `it` (second occurrence)
+#### Description
+This test case verifies the behavior of `createOrUpdateFacilityInCq` for OBO facilities.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+- **Arrange:**
+  - Creates a mock facility object (`mockedOboFacility`) representing an OBO facility.
+  - Mocks the `getAddressWithCoordinates` function to return a predefined address with coordinates.
+- **Act:**
+  - Calls the `createOrUpdateFacilityInCq` function with the mock OBO facility and other relevant parameters.
+- **Assert:**
+  - Verifies that the `createOrUpdateCQOrganizationMock` is called once.
+  - Asserts that the call to `createOrUpdateCQOrganizationMock` includes the expected parameters derived from the mock OBO facility and input values, including the correct parent organization OID (`metriportIntermediaryOid`).
+
+## Dependencies
+- **Jest:** Used for testing framework.
+- **@faker-js/faker:** Used for generating fake data.
+- **@metriport/core/util/uuid-v7:** Used for generating UUIDs.
+- **@metriport/core/domain/organization:** Provides the `OrganizationBizType` enum.
+- **@metriport/carequality-sdk/client/carequality:** Provides the `CarequalityManagementAPIImpl` class.
+- **@metriport/shared:** Provides the `metriportCompanyDetails` object.
+- **../../../domain/medical/facility:** Provides the `FacilityType` enum and `makeFacility` function.
+- **../../../domain/medical/address:** Provides the `getAddressWithCoordinates` function.
+- **../command/cq-directory/create-or-update-cq-facility:** Provides the `createOrUpdateFacilityInCq` function being tested.
+- **../../../domain/medical/__tests__/location-address:** Provides the `makeAddressWithCoordinates` function.
+- **../shared:** Provides the `buildCqOrgNameForFacility` function.
+- **../command/cq-directory/create-or-update-cq-organization:** Provides the `createOrUpdateCQOrganization` function.
+
+## Error Handling
+The code does not implement specific error handling within the tests. It relies on Jest's built-in assertion mechanisms to catch and report errors during test execution.

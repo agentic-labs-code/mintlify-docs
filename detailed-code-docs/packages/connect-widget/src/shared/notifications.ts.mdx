@@ -1,0 +1,93 @@
+---
+title: "notifications.ts"
+---
+
+## High-level description
+This code provides a wrapper for Sentry error and message capturing functionality. It exports methods to capture errors and messages, along with a utility function to stringify extra context data for better readability in Sentry logs.
+
+## Symbols
+
+### `capture`
+#### Description
+An object containing two methods for capturing errors and messages using Sentry.
+
+#### Inputs
+N/A (This is an object containing methods)
+
+#### Outputs
+N/A (This is an object containing methods)
+
+___
+
+### `capture.error`
+#### Description
+Captures an exception event and sends it to Sentry.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| error | any | An Error object or any value representing the error |
+| captureContext | Partial&lt;ScopeContext&gt; (optional) | Additional scope data to apply to the exception event |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| eventId | string | The generated event ID from Sentry |
+
+#### Internal Logic
+1. Stringifies the extra context data if provided.
+2. Calls Sentry.captureException with the error and context data.
+
+___
+
+### `capture.message`
+#### Description
+Captures a message event and sends it to Sentry.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| message | string | The message to send to Sentry |
+| captureContext | Partial&lt;ScopeContext&gt; (optional) | Additional scope data to apply to the message event |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| eventId | string | The generated event ID from Sentry |
+
+#### Internal Logic
+1. Stringifies the extra context data if provided.
+2. Calls Sentry.captureMessage with the message and context data.
+
+___
+
+### `stringifyExtra`
+#### Description
+A utility function that stringifies the extra context data for better readability in Sentry logs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| captureContext | Partial&lt;ScopeContext&gt; | The capture context containing extra data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| stringifiedExtras | Extras | An object with stringified values of the extra context data |
+
+#### Internal Logic
+1. Extracts the 'extra' property from the captureContext.
+2. Uses Object.entries and reduce to create a new object.
+3. Stringifies each value in the extra object using JSON.stringify with indentation.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @sentry/react | Provides Sentry integration for React applications |
+| @sentry/types | Provides TypeScript types for Sentry |
+
+## Error Handling
+This module is primarily focused on error reporting rather than error handling. It provides a way to capture and send errors to Sentry for monitoring and debugging purposes.
+
+## Performance Considerations
+The `stringifyExtra` function uses `JSON.stringify` with indentation, which may have a performance impact for large objects. However, this is generally acceptable for error reporting scenarios where the additional readability in logs is valuable.

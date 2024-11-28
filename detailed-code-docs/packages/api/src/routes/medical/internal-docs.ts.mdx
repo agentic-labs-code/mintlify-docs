@@ -1,0 +1,224 @@
+---
+title: "internal-docs.ts"
+---
+
+Here's a comprehensive documentation for the target file `packages/api/src/routes/medical/internal-docs.ts`:
+
+## High-level description
+This file defines a router for handling internal document-related operations in a medical API. It includes endpoints for document conversion, querying, uploading, and managing document references. The router uses Express.js and implements various asynchronous handlers for different HTTP methods.
+
+## Code Structure
+The file exports a router object that defines multiple endpoints. Each endpoint is associated with a specific path and HTTP method. The endpoints use middleware functions like `requestLogger` and `asyncHandler` for logging and error handling. Many endpoints interact with other parts of the system, such as document conversion, patient management, and external services like S3 and FHIR servers.
+
+## Symbols
+
+### `router`
+#### Description
+An Express Router instance that defines the routes for internal document operations.
+
+### `/re-convert`
+#### Description
+POST endpoint to re-convert documents for a customer.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer's ID (from query) |
+| patientIds | string[] | Optional comma-separated list of Patient IDs (from query) |
+| documentIds | string[] | Optional comma-separated list of document IDs (from query) |
+| dateFrom | string | Start date for filtering document references (from query) |
+| dateTo | string | Optional end date for filtering document references (from query) |
+| logConsolidatedCountBefore | boolean | Optional flag to log consolidated data count before re-conversion (from query) |
+| isDisableWH | boolean | Optional flag to disable sending webhook notifications (from query) |
+| dryRun | boolean | Optional flag to simulate execution without making changes (from query) |
+
+#### Internal Logic
+1. Extracts and validates input parameters from the request query.
+2. Calls `reConvertDocuments` function with the provided parameters.
+3. Returns a 200 OK response with processing details.
+
+### `/conversion-status`
+#### Description
+POST endpoint to update the status of a document conversion job.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The patient's ID (from query) |
+| cxId | string | The customer's ID (from query) |
+| status | string | The conversion status (from query) |
+| source | string | Optional source of the conversion (from query) |
+| details | string | Optional details about the conversion (from query) |
+| jobId | string | Optional job ID (from query) |
+
+#### Internal Logic
+1. Extracts and validates input parameters from the request query.
+2. Parses the job ID to extract request ID and document ID.
+3. Calls `calculateDocumentConversionStatus` function with the provided parameters.
+4. Returns a 200 OK response.
+
+### `/override-progress`
+#### Description
+POST endpoint to override the document query progress for a patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer's ID (from query) |
+| patientId | string | The patient's ID (from query) |
+| hie | string | Optional HIE identifier (from query) |
+| docQueryProgress | object | Document query progress data (from request body) |
+
+#### Internal Logic
+1. Extracts and validates input parameters from the request query and body.
+2. Calls `appendDocQueryProgress` function to update the progress.
+3. If an HIE is specified, calls `setDocQueryProgress` to update HIE-specific progress.
+4. Returns the updated document query progress as JSON.
+
+### `/check-doc-queries`
+#### Description
+POST endpoint to trigger a check of document queries for specified patient IDs or all patients.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientIds | string[] | Optional comma-separated list of Patient IDs (from query) |
+
+#### Internal Logic
+1. Extracts patient IDs from the request query.
+2. Calls `checkDocumentQueries` function with the provided patient IDs.
+3. Returns a 202 Accepted response.
+
+### `/upload`
+#### Description
+POST endpoint to upload a document for a patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer's ID (from query) |
+| patientId | string | The patient's ID (from query) |
+| file | File | The file to be uploaded (from request) |
+| description | string | Optional description of the file (from request body) |
+| orgName | string | Optional name of the contained Organization (from request body) |
+| practitionerName | string | Optional name of the contained Practitioner (from request body) |
+
+#### Internal Logic
+1. Extracts and validates input parameters from the request query, body, and file.
+2. Generates a new document reference ID.
+3. Uploads the file to S3.
+4. Creates and uploads a document reference to the FHIR server.
+5. Returns the created document reference as JSON with a 200 OK status.
+
+### `/doc-ref`
+#### Description
+POST endpoint to update the document reference for a customer-uploaded medical document.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer's ID (from query) |
+| fileData | object | File metadata and document reference ID (from request body) |
+
+#### Internal Logic
+1. Extracts and validates input parameters from the request query and body.
+2. Calls `updateDocumentReference` function with the provided parameters.
+3. Returns the updated document reference as JSON with a 200 OK status.
+
+### `/query`
+#### Description
+GET endpoint to retrieve the document query status for a specified patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer's ID (from query) |
+| patientId | string | The patient's ID (from query) |
+
+#### Internal Logic
+1. Extracts and validates input parameters from the request query.
+2. Retrieves the patient using `getPatientOrFail` function.
+3. Returns the patient's document query progress as JSON with a 200 OK status.
+
+### `/query` (POST)
+#### Description
+POST endpoint to start a new document query for a patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer's ID (from query) |
+| patientId | string | The patient's ID (from query) |
+| facilityId | string | Optional facility ID (from query) |
+| forcePatientDiscovery | boolean | Optional flag to force patient discovery (from query) |
+| cqManagingOrgName | string | Optional CQ managing organization name (from query) |
+| metadata | object | Optional metadata for webhook (from request body) |
+
+#### Internal Logic
+1. Extracts and validates input parameters from the request query and body.
+2. Calls `queryDocumentsAcrossHIEs` function with the provided parameters.
+3. Returns the updated document query progress as JSON with a 200 OK status.
+
+### `/triggerBulkDownloadWebhook`
+#### Description
+POST endpoint to trigger a webhook for bulk document download.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer's ID (from query) |
+| patientId | string | The patient's ID (from query) |
+| requestId | string | The request ID (from query) |
+| status | string | The status of the bulk download (from query) |
+| docs | object[] | Array of DocumentBulkSignerLambdaResponse objects (from request body) |
+
+#### Internal Logic
+1. Extracts and validates input parameters from the request query and body.
+2. Updates the bulk get documents URL progress using `appendBulkGetDocUrlProgress` function.
+3. Triggers a webhook using `processPatientDocumentRequest` function.
+4. Returns the updated bulk get documents URL progress as JSON with a 200 OK status.
+
+### `/ccd`
+#### Description
+POST endpoint to generate and upload a CCD (Continuity of Care Document) for a specified patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer's ID (from query) |
+| patientId | string | The patient's ID (from query) |
+
+#### Internal Logic
+1. Extracts and validates input parameters from the request query.
+2. Retrieves the patient and organization data.
+3. Generates a CCD using `processCcdRequest` function.
+4. Returns the generated CCD as XML with a 200 OK status.
+
+### `/empty-ccd`
+#### Description
+POST endpoint to generate and upload an empty CCD for a specified patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer's ID (from query) |
+| patientId | string | The patient's ID (from query) |
+
+#### Internal Logic
+1. Extracts and validates input parameters from the request query.
+2. Retrieves the patient and organization data.
+3. Generates an empty CCD using `processEmptyCcdRequest` function.
+4. Returns the generated empty CCD as XML with a 200 OK status.
+
+## Dependencies
+- Express.js
+- @metriport/core
+- multer
+- zod
+- Various internal modules and utilities
+
+## Error Handling
+The code uses the `asyncHandler` wrapper for all route handlers, which catches and forwards any errors to Express.js error handling middleware. Specific error types like `BadRequestError` are used for invalid inputs.
+
+## Logging
+The code uses a `requestLogger` middleware for logging incoming requests and their processing time. Additional logging is done within individual functions called by the route handlers.

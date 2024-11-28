@@ -1,0 +1,61 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for generating partial FHIR (Fast Healthcare Interoperability Resources) Flag resources. These templates are part of a larger FHIR conversion system, specifically designed to handle different aspects of a Flag resource such as author, encounter, and subject references.
+
+## What does it do?
+These templates work together to create JSON structures representing different parts of a FHIR Flag resource. A Flag resource in FHIR is used to draw attention to a particular issue or state for a patient. The templates in this directory allow for the creation of Flag resources with specific references:
+
+1. The author template creates a Flag resource with an author reference, indicating who created or last modified the flag.
+2. The encounter template links a Flag resource to a specific healthcare encounter.
+3. The subject template associates a Flag resource with a particular patient or group.
+
+These templates can be used individually or combined to create a complete Flag resource, depending on the needs of the FHIR document being generated.
+
+## Key Files
+1. author.hbs: This template creates a partial Flag resource with an author reference. It takes an ID and a REF as inputs and generates a JSON structure with the author information.
+
+2. encounter.hbs: This template generates a Flag resource linked to a specific encounter. It also takes an ID and a REF as inputs, creating a JSON structure that includes the encounter reference.
+
+3. subject.hbs: This template produces a Flag resource with a subject reference. Like the others, it uses ID and REF inputs to create a JSON structure, this time focusing on the subject of the flag.
+
+Each of these templates follows a similar structure, creating a nested JSON object with the "resourceType" set to "Flag" and including the specific reference (author, encounter, or subject) based on the template's purpose.
+
+## Dependencies
+These templates are part of the FHIR Converter project and rely on the Handlebars templating engine for processing. They are designed to work within a larger system for converting between different healthcare data formats.
+
+## Configuration
+While these templates don't have explicit configuration files, they do use input variables that act as configuration options:
+
+| Variable | Description |
+|:---------|:------------|
+| ID | The unique identifier for the Flag resource |
+| REF | The reference to the author, encounter, or subject (depending on the template) |
+
+These variables are used within the templates to populate the appropriate fields in the generated JSON structures.
+
+Here's an example of how the author.hbs template might be used:
+
+```handlebars
+{{&gt; References/Flag/author ID="flag123" REF="Practitioner/practitioner456"}}
+```
+
+This would generate a JSON structure like:
+
+```json
+{
+  "resource": {
+    "resourceType": "Flag",
+    "id": "flag123",
+    "author": {
+      "reference": "Practitioner/practitioner456"
+    },
+  }
+}
+```
+
+The other templates (encounter.hbs and subject.hbs) would be used similarly, with the appropriate reference field being populated based on the template.
+
+These templates are designed to be flexible and reusable, allowing for easy integration into a larger FHIR document conversion process. They provide a standardized way to create partial Flag resources, ensuring consistency across the conversion system.

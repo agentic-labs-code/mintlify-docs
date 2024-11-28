@@ -1,0 +1,44 @@
+---
+title: "document-bulk-signer.ts"
+---
+
+## High-level description
+This code defines an AWS Lambda function handler for bulk signing documents. It searches for documents, signs their URLs, and sends the signed URLs to an API. The function is wrapped with Sentry for error tracking and logging.
+
+## Symbols
+
+### `handler`
+#### Description
+This is the main Lambda function handler, wrapped with Sentry for error tracking. It processes a `DocumentBulkSignerLambdaRequest` and calls the `searchDocumentsSignUrlsAndSendToApi` function with the necessary parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req | DocumentBulkSignerLambdaRequest | The Lambda request object containing patientId, cxId, and requestId |
+
+#### Internal Logic
+1. Sets extra information for Sentry capture.
+2. Logs environment information and request details.
+3. Calls `searchDocumentsSignUrlsAndSendToApi` with the required parameters.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/external/aws/document-signing/bulk-sign | Provides the `searchDocumentsSignUrlsAndSendToApi` function |
+| @metriport/core/util/env-var | Provides the `getEnvType` function |
+| @metriport/shared | Provides `getEnvVar` and `getEnvVarOrFail` functions |
+| @sentry/serverless | Provides error tracking and monitoring |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| AWS_LAMBDA_FUNCTION_NAME | string | N/A | Automatically set by AWS, represents the Lambda function name |
+| AWS_REGION | string | N/A | The AWS region where the Lambda is running |
+| API_URL | string | N/A | The URL of the API to send signed URLs to |
+| MEDICAL_DOCUMENTS_BUCKET_NAME | string | N/A | The name of the S3 bucket containing medical documents |
+
+## Error Handling
+The Lambda function is wrapped with Sentry's `AWSLambda.wrapHandler`, which automatically captures and reports errors to Sentry.
+
+## Logging
+The code logs environment information and request details using `console.log`. Additional context is added to Sentry captures using `capture.setExtra`.

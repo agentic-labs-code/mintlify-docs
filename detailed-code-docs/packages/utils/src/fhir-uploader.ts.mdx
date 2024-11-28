@@ -1,0 +1,62 @@
+---
+title: "fhir-uploader.ts"
+---
+
+## High-level description
+This code implements a command-line interface (CLI) tool called "fhir-uploader" that uploads synthetic data from Synthea into a FHIR server. It reads JSON files from a specified folder and posts them to a FHIR server using HTTP requests.
+
+## Code Structure
+The main functionality is implemented in the `main` function, which is called at the end of the file. The CLI is set up using the Commander library, and HTTP requests are made using Axios.
+
+## Symbols
+
+### `program`
+#### Description
+This symbol represents the Command object from the Commander library, used to set up the CLI interface.
+
+#### Internal Logic
+- Sets the name and description of the CLI tool
+- Defines required and optional command-line options
+- Adds custom help text with ASCII art
+- Sets the version number
+
+### `main`
+#### Description
+This asynchronous function is the entry point of the script, handling the file reading and uploading process.
+
+#### Internal Logic
+1. Sets up Axios defaults and headers for FHIR server communication
+2. Reads JSON files from the specified folder
+3. Iterates through each file:
+   - Reads and parses the file contents
+   - Posts the data to the FHIR server
+   - Logs the response status and time taken
+4. Logs the total number of files processed and total time taken
+
+#### Performance Considerations
+The function processes files sequentially, which may not be optimal for large numbers of files. Consider implementing parallel processing for improved performance.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| axios | Making HTTP requests to the FHIR server |
+| commander | Creating the command-line interface |
+| fs | Reading files from the local filesystem |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| --folder | string | (required) | Absolute path to the folder containing the Synthea files |
+| --server | string | (required) | Address of the FHIR server |
+| --path | string | "/" | The URI/path within the server to post data to |
+
+## Error Handling
+The code does not implement specific error handling mechanisms. It relies on default error handling from Axios and Node.js.
+
+## Logging
+The code uses `console.log` for basic logging of progress and results.
+
+## TODOs
+- Implement error handling for file reading and HTTP request errors
+- Consider adding support for authentication with the FHIR server
+- Optimize performance for large numbers of files by implementing parallel processing

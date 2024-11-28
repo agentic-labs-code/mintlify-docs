@@ -1,0 +1,72 @@
+---
+title: "sqs.ts"
+---
+
+## High-level description
+This code defines a utility class `SQSUtils` for interacting with Amazon Simple Queue Service (SQS). It provides methods for creating SQS instances, handling message attributes, and converting attributes to a format suitable for sending messages.
+
+## Code Structure
+The main class `SQSUtils` contains methods for interacting with SQS. It has a constructor that initializes an SQS instance and provides static methods for handling message attributes.
+
+## Symbols
+
+### `SQSUtils`
+#### Description
+A utility class for working with Amazon SQS. It provides methods for creating SQS instances and handling message attributes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| region | string | AWS region for SQS |
+| sourceQueueURL | string | URL of the source SQS queue |
+| dlqURL | string (optional) | URL of the Dead Letter Queue |
+| delayWhenRetryingSeconds | number (optional) | Delay in seconds when retrying messages |
+
+#### Internal Logic
+- Initializes an SQS instance using the provided region
+- Provides getter for the SQS instance
+- Includes static methods for handling message attributes
+
+### `SQSUtils.attributesToSend`
+#### Description
+Static method that converts inbound message attributes to a format suitable for sending.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| inboundMessageAttribs | SQSMessageAttributes | Inbound message attributes |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res | MessageBodyAttributeMap | Converted message attributes |
+
+#### Internal Logic
+Iterates through the input attributes, converting each to the correct format using `singleAttributeToSend`.
+
+### `SQSUtils.singleAttributeToSend`
+#### Description
+Static method that converts a single attribute to the correct format for sending.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| key | string | Attribute key |
+| value | string \| undefined | Attribute value |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| attribute | MessageBodyAttributeMap | Converted single attribute |
+
+#### Internal Logic
+Creates a MessageBodyAttributeMap object with the provided key and value, setting the DataType to "String".
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-lambda | For SQSMessageAttributes type |
+| aws-sdk | For AWS SDK functionality, including SQS |
+
+## Notes
+This utility class seems to be part of a larger system for handling SQS operations in an AWS Lambda environment. It provides a convenient way to interact with SQS and handle message attributes, which is commonly needed when working with SQS in serverless applications.

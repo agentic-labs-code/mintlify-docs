@@ -1,0 +1,77 @@
+---
+title: "schema.ts"
+---
+
+## High-level description
+This code defines Zod schemas for validating and parsing XCPD (Cross-Community Patient Discovery) requests in the IHE (Integrating the Healthcare Enterprise) Gateway. It specifically focuses on the ITI-55 request structure, which is used for patient discovery across different healthcare communities.
+
+## Code Structure
+The code defines several interconnected schemas using Zod, a TypeScript-first schema declaration and validation library. These schemas are used to validate the structure of XCPD requests, including patient demographics, addresses, and other identifying information.
+
+## Symbols
+
+### `nameSchema`
+#### Description
+Defines the structure for a person's name in the XCPD request.
+
+#### Internal Logic
+- `family`: A required text field for the family name.
+- `given`: An array of text fields or a single text field for given names.
+
+### `idSchema`
+#### Description
+Defines the structure for identification numbers in the XCPD request.
+
+#### Internal Logic
+- `_extension`: A string representing the ID value.
+- `_root`: A string representing the ID system or authority.
+
+### `QueryByParameterSchema`
+#### Description
+Defines the main structure for query parameters in the XCPD request.
+
+#### Internal Logic
+Contains various optional fields for patient demographics:
+- `livingSubjectAdministrativeGender`: Patient's gender.
+- `livingSubjectBirthTime`: Patient's birth date/time.
+- `livingSubjectId`: Patient's identification numbers.
+- `livingSubjectName`: Patient's name(s).
+- `patientAddress`: Patient's address(es).
+- `patientTelecom`: Patient's contact information.
+- `principalCareProviderId`: Patient's care provider identification.
+
+### `iti55RequestBody`
+#### Description
+Defines the structure for the body of an ITI-55 request.
+
+#### Internal Logic
+Contains a `PRPA_IN201305UV02` object with a `controlActProcess` that includes the `QueryByParameterSchema`.
+
+### `iti55RequestSchema`
+#### Description
+Defines the overall structure of an ITI-55 request.
+
+#### Internal Logic
+Contains an `Envelope` object with:
+- `Header`: Uses the `samlHeaderSchema` for SAML authentication.
+- `Body`: Uses the `iti55RequestBody` schema.
+
+### `Iti55Request` (type)
+#### Description
+A TypeScript type inferred from the `iti55RequestSchema`, representing a complete ITI-55 request.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| zod | Schema declaration and validation |
+
+## References
+This code references several imported schemas and utility functions:
+- `schemaOrArray`, `textSchema`, `addressSchema`, `samlHeaderSchema`, `genderCodeSchema`, `schemaOrArrayOrEmpty`, `schemaOrEmpty` from "../../../schema"
+
+These imported schemas are used to build the more complex schemas defined in this file.
+
+## Notes
+1. The code makes extensive use of optional fields, allowing for flexibility in the request structure.
+2. The schemas are designed to handle both single values and arrays for many fields, using utility functions like `schemaOrArray` and `schemaOrArrayOrEmpty`.
+3. The code doesn't implement the actual parsing or validation logic; it only defines the schemas. The actual use of these schemas for parsing and validating XCPD requests would be implemented elsewhere in the application.

@@ -1,0 +1,55 @@
+---
+title: "consolidated-webhook.ts"
+---
+
+## High-level description
+The `processConsolidatedDataWebhook` function is responsible for sending a patient's consolidated medical data to a customer-defined webhook URL. It handles both successful and failed data consolidation attempts, logging errors and updating the webhook request status accordingly. This function ensures reliable delivery of consolidated data while providing error tracking and status updates.
+
+## References
+- `@metriport/core/domain/patient`: Uses the `Patient` interface.
+- `@metriport/shared/medical`: Uses the `ConsolidatedWebhookRequest` and `SearchSetBundle` interfaces.
+- `../../../shared/log`: Uses the `errorToString` function.
+- `../../../shared/notifications`: Uses the `capture` object.
+- `../../../shared/util`: Uses the `Util` class.
+- `../../settings/getSettings`: Uses the `getSettingsOrFail` function.
+- `../../webhook/webhook`: Uses the `isWebhookDisabled` and `processRequest` functions.
+- `../../webhook/webhook-request`: Uses the `createWebhookRequest` function.
+- `./append-consolidated-query-progress`: Uses the `updateConsolidatedQueryProgress` function.
+- `./get-patient`: Uses the `getPatientOrFail` function.
+
+## Symbols
+
+### `processConsolidatedDataWebhook`
+#### Description
+This asynchronous function sends a patient's consolidated medical data to a webhook URL, handles errors, and updates the webhook request status.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `{ patient, status, requestId, bundle, filters }` | object | An object containing the patient information, webhook request status, request ID, consolidated data bundle (optional), and filters used for data retrieval (optional). |
+
+#### Internal Logic
+1. **Retrieves patient and settings:** Fetches the patient's data and the customer's settings based on the provided patient and context IDs.
+2. **Constructs webhook payload:** Creates a payload object containing the patient ID, external ID (if available), webhook request status, consolidated data bundle, and filters used.
+3. **Checks for webhook disablement:** Determines if the webhook is disabled for the patient based on their configuration.
+4. **Processes webhook request:**
+   - If the webhook is enabled:
+     - Creates a new webhook request entry in the database.
+     - Sends the webhook request to the customer's URL using the `processRequest` function.
+   - If the webhook is disabled:
+     - Creates a new webhook request entry with a "success" status, indicating that the request was not sent due to the webhook being disabled.
+5. **Updates consolidated query progress:** Updates the patient's consolidated query progress with the current status.
+6. **Error handling:**
+   - Logs any errors encountered during the process.
+   - Captures errors using Sentry for monitoring and debugging.
+   - Updates the consolidated query progress to "failed" in case of an error.
+
+#### Side Effects
+- Creates or updates entries in the `WebhookRequest` and `Patient` database tables.
+- Sends an HTTP request to the customer's webhook URL (if enabled).
+- Logs information and errors to the application logs.
+- Sends error reports to Sentry.
+
+#### Performance Considerations
+- The function performs multiple asynchronous operations concurrently to improve performance.
+- It avoids unnecessary processing if the webhook is disabled for the patient.

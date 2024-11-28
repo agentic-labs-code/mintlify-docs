@@ -1,0 +1,108 @@
+---
+title: "cda.js"
+---
+
+## High-level description
+This code defines a `cda` class that extends `dataHandler` to handle Clinical Document Architecture (CDA) data. It provides functionality for parsing, preprocessing, and manipulating CDA XML data, including handling references, converting to JSON, and managing special cases like time values and ampersands.
+
+## Code Structure
+The `cda` class extends `dataHandler` and implements several methods for processing CDA data. It uses external libraries like `xml2js`, `minify-xml`, and `fast-xml-parser` for XML parsing and manipulation. The class maintains internal maps (`idToValueMap` and `idToB64ValueMap`) to handle references within the CDA document.
+
+## References
+This code references the `dataHandler` class, which it extends. It also uses several external libraries for XML processing.
+
+## Symbols
+
+### `cda` (class)
+#### Description
+A class that extends `dataHandler` to process CDA (Clinical Document Architecture) data. It provides methods for parsing, preprocessing, and manipulating CDA XML data.
+
+#### Inputs
+N/A (constructor doesn't take any parameters)
+
+#### Outputs
+N/A (class definition)
+
+#### Internal Logic
+- Initializes `idToValueMap` and `idToB64ValueMap` for handling references
+- Implements methods for populating ID-value maps, finding and replacing references, preprocessing data, and parsing source data
+
+### `populateIDValueMap(obj)`
+#### Description
+Recursively populates `idToValueMap` and `idToB64ValueMap` with ID-value pairs from the given object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| obj | Object | The object to process |
+
+#### Internal Logic
+- Recursively traverses the object
+- When an 'id' key is found, stores its value and associated data in the appropriate map
+
+### `findAndReplacePropsWithIdValue(obj, propNames)`
+#### Description
+Finds and replaces specified properties with their referenced values from the ID-value maps.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| obj | Object | The object to process |
+| propNames | Array | Array of property names to look for |
+
+#### Internal Logic
+- Recursively traverses the object
+- When a specified property is found, replaces its value with the referenced text or base64 encoded value
+
+### `preProcessData(data)`
+#### Description
+Preprocesses the input data by replacing certain strings and handling special cases.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | String | The input data to preprocess |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res | String | The preprocessed data |
+
+#### Internal Logic
+- Replaces `&lt;br&gt;` tags with newlines
+- Handles special time value cases
+- Escapes ampersands
+
+### `parseSrcData(data)`
+#### Description
+Parses the source CDA data into a JSON object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | String | The CDA XML data to parse |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise | Promise | A promise that resolves with the parsed JSON object |
+
+#### Internal Logic
+- Minifies the XML data
+- Attempts to parse using `xml2js`
+- If parsing fails, tries parsing with `fast-xml-parser` as a fallback
+- Calls `findAndReplaceAllReferencesWithTextValues` on the parsed result
+- Stores the original data in the result object
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| xml2js | XML parsing and building |
+| minify-xml | XML minification |
+| fast-xml-parser | Alternative XML parsing |
+
+## Error Handling
+The code includes error handling in the `parseSrcData` method, where it attempts different parsing strategies if the initial parse fails. It also rejects the promise with an error if it encounters an unstructured CDA with `nonXMLBody`.
+
+## Performance Considerations
+The code uses XML minification and attempts different parsing strategies to handle potentially large CDA documents efficiently. It also uses regular expressions for certain string replacements, which can be more efficient for large strings.

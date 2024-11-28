@@ -1,0 +1,71 @@
+---
+title: "docker-compose.dev.yml"
+---
+
+## High-level description
+This Docker Compose file defines the development environment for a Node.js application with PostgreSQL database and DynamoDB. It sets up three services: the main application, a DynamoDB instance, and a PostgreSQL database, all connected through a custom network.
+
+## Code Structure
+The file defines a Docker Compose configuration with version 3.8. It creates a custom network and three services: app, dynamodb, and postgres.
+
+## Symbols
+
+### `networks`
+#### Description
+Defines a custom bridge network named "metriportNetwork" for the services to communicate.
+
+### `services`
+#### Description
+Defines the three main services of the application: app, dynamodb, and postgres.
+
+### `app`
+#### Description
+Configures the main Node.js application service.
+
+#### Internal Logic
+- Builds the app using a Dockerfile in the parent directory
+- Sets up environment variables for database connection and application settings
+- Maps ports for the application and debugging
+- Mounts volumes for live code updates
+- Depends on the postgres service
+- Connects to the custom network
+
+### `dynamodb`
+#### Description
+Sets up a local DynamoDB instance for development.
+
+#### Internal Logic
+- Uses the amazon/dynamodb-local image
+- Exposes port 8000
+- Connects to the custom network
+
+### `postgres`
+#### Description
+Configures the PostgreSQL database service.
+
+#### Internal Logic
+- Uses PostgreSQL 14.4 Alpine image
+- Sets environment variables for database credentials
+- Exposes port 5432
+- Implements a health check
+- Connects to the custom network
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Node.js | Main application runtime |
+| PostgreSQL | Primary database |
+| DynamoDB | Authentication token management |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| DB_CREDS | JSON | \{"password":"admin","dbname":"db","engine":"postgres","port":5432,"host":"postgres","username":"admin"\} | Database credentials |
+| NODE_ENV | String | development | Node.js environment |
+| ENV_TYPE | String | dev | Environment type |
+| POSTGRES_USER | String | admin | PostgreSQL username |
+| POSTGRES_PASSWORD | String | admin | PostgreSQL password |
+| POSTGRES_DB | String | db | PostgreSQL database name |
+
+## Performance Considerations
+The PostgreSQL service is configured with a maximum of 350 connections, which may need adjustment based on the application's requirements and expected load.

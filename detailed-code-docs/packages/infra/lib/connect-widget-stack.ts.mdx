@@ -1,0 +1,64 @@
+---
+title: "connect-widget-stack.ts"
+---
+
+## High-level description
+This code defines a `ConnectWidgetStack` class that extends the AWS CDK `Stack` class. It creates an infrastructure stack for hosting a static website (Connect Widget) on AWS, including an S3 bucket for content storage, CloudFront distribution for content delivery, and Route53 for DNS management.
+
+## Code Structure
+The `ConnectWidgetStack` class contains a constructor that sets up various AWS resources. These resources are interconnected to create a complete infrastructure for hosting a static website securely and efficiently.
+
+## Symbols
+
+### ConnectWidgetStack
+#### Description
+This class represents the main infrastructure stack for the Connect Widget. It sets up all necessary AWS resources for hosting a static website.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | Construct | The parent construct |
+| id | string | The stack's unique identifier |
+| props | ConnectWidgetStackProps | Configuration properties for the stack |
+
+#### Internal Logic
+1. Sets up variables and constants based on the provided configuration.
+2. Creates an S3 bucket for storing website content.
+3. Sets up a CloudFront distribution with an Origin Access Identity for secure content delivery.
+4. Creates an ACM certificate for HTTPS support.
+5. Sets up Route53 DNS records to point to the CloudFront distribution.
+
+### Symbol: CfnOutput
+#### Description
+This symbol is used multiple times to create stack outputs for important resource information.
+
+### Symbol: cloudfront.OriginAccessIdentity
+#### Description
+Creates an Origin Access Identity for CloudFront to securely access the S3 bucket.
+
+### Symbol: s3.Bucket
+#### Description
+Creates an S3 bucket for storing the website content with specific security settings.
+
+### Symbol: acm.DnsValidatedCertificate
+#### Description
+Creates an ACM certificate for HTTPS support, validated using DNS.
+
+### Symbol: cloudfront.Distribution
+#### Description
+Sets up a CloudFront distribution for content delivery with specific behaviors and error responses.
+
+### Symbol: route53.ARecord
+#### Description
+Creates a Route53 A record to point the domain to the CloudFront distribution.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-cdk-lib | Provides core CDK constructs and classes |
+| constructs | Provides the base Construct class |
+| ../config/env-config | Imports configuration types |
+| ./shared/lambda | Imports a utility function for Lambda error alarms |
+
+## Performance Considerations
+The use of CloudFront as a CDN ensures efficient content delivery with low latency. The S3 bucket is configured with appropriate security settings to prevent public access and ensure encryption.

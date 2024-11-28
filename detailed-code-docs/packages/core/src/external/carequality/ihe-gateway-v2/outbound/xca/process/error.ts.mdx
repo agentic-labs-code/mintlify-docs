@@ -1,0 +1,131 @@
+---
+title: "error.ts"
+---
+
+## High-level description
+This code file contains error handling functions for processing responses from an external healthcare gateway in the context of Cross-Community Access (XCA) operations. It provides utility functions to handle various types of errors and responses, including registry errors, HTTP errors, empty responses, and schema errors.
+
+## Code Structure
+The file exports several functions that handle different types of responses and errors. These functions are used to process and format the responses from external healthcare gateways into a standardized format for the application.
+
+## Symbols
+
+### `processRegistryErrorList`
+#### Description
+Processes a list of registry errors and converts them into an OperationOutcome object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| registryErrorList | RegistryErrorList | List of registry errors |
+| outboundRequest | OutboundDocumentQueryReq \| OutboundDocumentRetrievalReq | The original outbound request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| operationOutcome | OperationOutcome \| undefined | Processed operation outcome or undefined if no issues |
+
+#### Internal Logic
+- Iterates through the registry errors
+- Converts each error into an issue in the OperationOutcome
+- Handles potential errors during processing
+
+### `handleRegistryErrorResponse`
+#### Description
+Handles a registry error response and creates a standardized response object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| registryErrorList | RegistryErrorList | List of registry errors |
+| outboundRequest | OutboundDocumentQueryReq \| OutboundDocumentRetrievalReq | The original outbound request |
+| gateway | XCAGateway | The gateway information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | OutboundDocumentQueryResp \| OutboundDocumentRetrievalResp | Standardized response object |
+
+### `handleHttpErrorResponse`
+#### Description
+Handles an HTTP error response and creates a standardized response object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| httpError | string | The HTTP error message |
+| outboundRequest | OutboundDocumentQueryReq \| OutboundDocumentRetrievalReq | The original outbound request |
+| gateway | XCAGateway | The gateway information |
+| attempt | number \| undefined | The attempt number (optional) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | OutboundDocumentQueryResp \| OutboundDocumentRetrievalResp | Standardized response object |
+
+### `handleEmptyResponse`
+#### Description
+Handles an empty response and creates a standardized response object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| outboundRequest | OutboundDocumentQueryReq \| OutboundDocumentRetrievalReq | The original outbound request |
+| gateway | XCAGateway | The gateway information |
+| text | string | Optional custom message (default: "No documents found") |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | OutboundDocumentQueryResp \| OutboundDocumentRetrievalResp | Standardized response object |
+
+### `handleSchemaErrorResponse`
+#### Description
+Handles a schema error response and creates a standardized response object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| outboundRequest | OutboundDocumentQueryReq \| OutboundDocumentRetrievalReq | The original outbound request |
+| gateway | XCAGateway | The gateway information |
+| text | string | Optional custom message (default: "Schema Error") |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | OutboundDocumentQueryResp \| OutboundDocumentRetrievalResp | Standardized response object |
+
+### `isRetryable`
+#### Description
+Determines if a response is retryable based on its error content.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| outboundResponse | OutboundDocumentRetrievalResp \| OutboundDocumentQueryResp \| undefined | The response to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| isRetryable | boolean | Whether the response is retryable |
+
+#### Internal Logic
+- Checks if the response has an error that is not in the known non-retryable errors list
+- Returns false for successful responses or undefined responses
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/ihe-gateway-sdk | Provides types and interfaces for IHE Gateway operations |
+| @metriport/shared | Utility functions |
+| dayjs | Date manipulation library |
+| ../../../../../../util/log | Logging utility |
+| ../../../../../../util/notifications | Error capturing and notification utility |
+| ../../../../shared | Shared constants and types |
+| ../../../../error | Error code constants |
+
+## Error Handling
+The file is primarily focused on error handling, providing functions to process and standardize various types of errors that may occur during XCA operations.
+
+## Logging
+The file uses a custom logging utility to log error messages and capture errors for further analysis.

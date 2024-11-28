@@ -1,0 +1,58 @@
+---
+title: "create-and-upload-extrinsic-object.ts"
+---
+
+## High-level description
+This code defines a function `createAndUploadDocumentMetadataFile` that creates and uploads metadata for a document to an S3 bucket. It generates an XML representation of the document's metadata using the `createExtrinsicObjectXml` function and then uploads this XML file to the specified S3 bucket.
+
+## Code Structure
+The main function `createAndUploadDocumentMetadataFile` uses the `createExtrinsicObjectXml` function to generate the metadata XML, and then uses the `S3Utils` class to upload the file to S3. It also imports various constants and utility functions from other modules.
+
+## References
+- `S3Utils` from "../external/aws/s3"
+- `createExtrinsicObjectXml` from "../external/carequality/dq/create-metadata-xml"
+- `createPatientUniqueId` from "../external/carequality/shared"
+- `isOrganization` from "../external/fhir/shared"
+- `out` from "../util/log"
+- `XML_APP_MIME_TYPE` from "../util/mime"
+
+## Symbols
+
+### `createAndUploadDocumentMetadataFile`
+#### Description
+This asynchronous function creates metadata for a document and uploads it to an S3 bucket.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| s3Utils | S3Utils | Utility for S3 operations |
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+| docId | string | Document ID |
+| size | number | Size of the document |
+| docRef | DocumentReference \| undefined | Document reference |
+| organization | Organization \| undefined | Organization information |
+| metadataFileName | string | Name of the metadata file |
+| destinationBucket | string | S3 bucket to upload to |
+| mimeType | string | MIME type of the document |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Promise&lt;void&gt; | Resolves when upload is complete |
+
+#### Internal Logic
+1. Creates a unique patient ID using `createPatientUniqueId`
+2. Extracts relevant information from `docRef` if available
+3. Generates XML metadata using `createExtrinsicObjectXml`
+4. Uploads the XML metadata to S3 using `s3Utils.uploadFile`
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides FHIR type definitions |
+
+## Logging
+The function uses the `out` utility to create a logger with the prefix "Core Create and Upload Extrinsic Object".
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

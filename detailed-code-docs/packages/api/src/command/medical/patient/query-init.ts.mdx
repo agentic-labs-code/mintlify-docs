@@ -1,0 +1,39 @@
+---
+title: "query-init.ts"
+---
+
+## High-level description
+The `storeQueryInit` function in `query-init.ts` is responsible for storing the initial parameters of a document query or a consolidated query within a patient's data in the database. This function updates the patient's data with the provided query information, which can be either for retrieving individual documents or a consolidated set of medical records.
+
+## Symbols
+
+### `storeQueryInit`
+#### Description
+This function updates a patient's data in the database with the initial parameters of a document query or a consolidated query. It retrieves the patient, updates their data with the provided query information, and saves the changes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { id, cxId, cmd } | `StoreQueryParams` | An object containing the patient's ID (`id`), the context ID (`cxId`), and the command object (`cmd`) containing the query initialization parameters. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `Promise&lt;Patient&gt;` | `Promise&lt;Patient&gt;` | A promise that resolves to the updated `Patient` object. |
+
+#### Internal Logic
+1. **Retrieve the patient:** The function first retrieves the patient from the database using the provided `id` and `cxId`. It acquires a lock on the patient record to prevent concurrent modifications.
+2. **Update patient data:** It then updates the patient's data with the provided `cmd` object, which contains the query initialization parameters. This could be either `InitConsolidatedQueryCmd` or `InitDocumentQueryCmd`.
+3. **Save changes:** Finally, the function saves the updated patient data back to the database.
+
+## Side Effects
+- Modifies the patient's data in the database.
+
+## References
+- `executeOnDBTx`: A helper function for executing database transactions.
+- `getPatientOrFail`: A function to retrieve a patient by ID or throw an error if not found.
+- `PatientModel`: The Sequelize model for the `patient` table.
+- `Patient`: The interface representing a patient object.
+- `InitConsolidatedQueryCmd`: Type representing the initial parameters for a consolidated query.
+- `InitDocumentQueryCmd`: Type representing the initial parameters for a document query.
+- `StoreQueryParams`: Type representing the input parameters for the `storeQueryInit` function. 

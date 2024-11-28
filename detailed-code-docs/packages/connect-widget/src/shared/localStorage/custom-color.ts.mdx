@@ -1,0 +1,76 @@
+---
+title: "custom-color.ts"
+---
+
+## High-level description
+This TypeScript file provides functionality for managing and validating custom colors in a web application. It allows for retrieving, validating, and storing custom colors using both URL parameters and local storage, with considerations for demo mode.
+
+## Symbols
+
+### `getCustomColor`
+#### Description
+This function retrieves and validates a custom color from either a parameter or local storage, with the option to save it to local storage if not in demo mode.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| paramColor | string \| null | The color parameter passed to the function |
+| isDemo | boolean | Flag indicating whether the application is in demo mode |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| color | string \| null | The validated custom color or null if no valid color is found |
+
+#### Internal Logic
+1. Validate the input `paramColor` using the `validateColor` function.
+2. If a valid color is returned:
+   - Save it to local storage if not in demo mode and localStorage is available.
+   - Return the validated color.
+3. If no valid color is found from the parameter, attempt to retrieve a color from local storage.
+4. Return the local storage color if found, otherwise return null.
+
+### `validateColor`
+#### Description
+This function validates a given color string by attempting to set it as a CSS color property.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| paramColor | string \| null | The color string to validate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| color | string \| null | The validated color string or null if invalid |
+
+#### Internal Logic
+1. If `paramColor` is truthy:
+   - Create a new `Option` element and access its `style` property.
+   - Attempt to set the `color` property of the style to `paramColor`.
+   - Return `paramColor` if successful (the browser accepts it as a valid color).
+2. Return null if `paramColor` is falsy or invalid.
+
+### `getLocalStorageColor`
+#### Description
+This function retrieves the custom color from local storage if available.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| color | string \| null | The color retrieved from local storage or null if not found or localStorage is unavailable |
+
+#### Internal Logic
+Check if `localStorage` is available, and if so, retrieve the item with the key `colorLocalStorageKey`. Return null if localStorage is unavailable.
+
+## Dependencies
+This code relies on the browser's `localStorage` API for persistent storage of the custom color.
+
+## Side Effects
+The `getCustomColor` function may modify the browser's local storage by setting an item with the key "custom-color" when a valid color is provided and the application is not in demo mode.
+
+## Performance Considerations
+The code uses minimal operations and should have negligible performance impact. However, frequent access to localStorage might cause slight delays in browsers with slower I/O operations.
+
+## Error Handling
+The code does not implement explicit error handling. It uses null checks and returns null for invalid inputs or when localStorage is unavailable, allowing the calling code to handle these cases as needed.

@@ -1,0 +1,70 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains utility functions for working with Amazon Simple Queue Service (SQS), specifically focusing on Dead Letter Queues (DLQs) and message redriving. The code provides functionality for peeking into DLQs, populating SQS queues with messages from a file, and redriving messages from a DLQ to a regular SQS queue.
+
+## What does it do?
+The utilities in this directory are designed to help manage and manipulate SQS queues, particularly in scenarios involving Dead Letter Queues. Here's a breakdown of the main functionalities:
+
+1. Peeking into Dead Letter Queues: Although currently commented out, there's code for inspecting messages in a DLQ without removing them. This can be useful for debugging and monitoring purposes.
+
+2. Populating SQS queues: There's a script that reads messages from a JSON file and sends them to an SQS queue. This is particularly useful for resending messages that failed to be delivered to their destination queue.
+
+3. Redriving messages from DLQ: While also commented out, there's functionality to move messages from a DLQ back to a regular SQS queue, with the ability to deduplicate messages in the process.
+
+These utilities can be valuable for developers and operations teams working with SQS, especially when dealing with failed message processing and queue management.
+
+## Key Files
+
+1. `peek-dlq.ts`:
+   - Purpose: To provide functionality for peeking into an SQS Dead Letter Queue without removing messages.
+   - Current state: The implementation is commented out, and the file exports an empty object.
+   - Potential functionality: If implemented, it would retrieve message counts, peek at messages, parse message bodies and attributes, and generate signed URLs for associated S3 files.
+
+2. `populate-sqs.ts`:
+   - Purpose: A script to populate an SQS queue with messages from a JSON file.
+   - Key features:
+     - Reads messages from a file
+     - Filters messages based on specific criteria
+     - Sends messages to SQS in batches
+     - Supports dry-run mode for testing
+   - Uses AWS SDK for SQS interactions and Commander for CLI argument parsing
+
+3. `redrive-dlq.ts`:
+   - Purpose: To redrive messages from a Dead Letter Queue to a regular SQS queue.
+   - Current state: The main functionality is commented out, and the file exports an empty object.
+   - Potential functionality: If implemented, it would retrieve messages from a DLQ, deduplicate them, and send unique messages to a destination queue.
+
+## Dependencies
+The code in this directory relies on several external libraries and AWS services:
+
+1. AWS SDK (aws-sdk): Used for interacting with Amazon SQS. This is crucial for all SQS-related operations.
+
+2. Commander: Utilized in `populate-sqs.ts` for parsing command-line arguments, making the script more flexible and user-friendly.
+
+3. Lodash: Used for utility functions like `chunk` and `uniq`, which help in processing and deduplicating messages.
+
+4. UUID: A custom UUID (v7) implementation is used for generating unique identifiers.
+
+5. Amazon SQS: The primary AWS service these utilities interact with.
+
+6. Amazon S3: Referenced in the commented-out code, suggesting integration with S3 for file-related operations.
+
+## Configuration
+Configuration for these utilities is primarily handled through command-line arguments and environment variables. Key configurable aspects include:
+
+1. SQS Queue URLs: Both source (often a DLQ) and destination queue URLs are configurable.
+
+2. AWS Region: The AWS region for SQS operations can be specified.
+
+3. Batch Size: In `populate-sqs.ts`, the maximum number of items to send in each batch is configurable.
+
+4. File Path: For `populate-sqs.ts`, the path to the JSON file containing messages is a required input.
+
+5. Dry Run Mode: `populate-sqs.ts` supports a dry run mode for testing without actually sending messages.
+
+It's worth noting that proper AWS credentials and permissions are required for these utilities to function correctly.
+
+In conclusion, this directory provides a set of utilities for advanced SQS queue management, particularly focused on handling Dead Letter Queues and message reprocessing. While some functionality is currently commented out, the code structure suggests a comprehensive approach to queue management, including peeking, populating, and redriving messages.

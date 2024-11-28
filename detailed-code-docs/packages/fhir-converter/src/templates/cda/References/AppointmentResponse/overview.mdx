@@ -1,0 +1,69 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for generating AppointmentResponse resources in FHIR format. These templates are part of a larger system designed to convert Clinical Document Architecture (CDA) documents to FHIR resources. The templates focus on specific aspects of the AppointmentResponse resource, namely the 'actor' and 'appointment' fields.
+
+## What does it do?
+The templates in this directory are used to create structured JSON representations of AppointmentResponse resources. These resources are part of the FHIR standard and are typically used in healthcare systems to represent responses to scheduled appointments. The templates allow for the dynamic generation of these resources by providing placeholders for unique identifiers and references to related entities (such as the actor involved in the response or the appointment itself).
+
+## Key Files
+1. actor.hbs:
+   This template generates the 'actor' field of an AppointmentResponse resource. It creates a JSON structure that includes the resource type, an ID, and a reference to the actor involved in the appointment response.
+
+2. appointment.hbs:
+   This template generates the 'appointment' field of an AppointmentResponse resource. It creates a JSON structure that includes the resource type, an ID, and a reference to the associated appointment.
+
+Both templates follow a similar structure but focus on different aspects of the AppointmentResponse resource.
+
+## Dependencies
+These templates rely on the Handlebars templating engine to process the dynamic content. Handlebars is used to replace placeholders (e.g., {{ID}} and {{REF}}) with actual values when the templates are rendered.
+
+## Configuration
+No specific configuration options are defined in these templates. However, they are designed to be part of a larger FHIR conversion system, specifically for converting CDA data to FHIR format. The system using these templates would need to provide the necessary input values (ID and REF) when rendering the templates.
+
+## Example Usage
+Here's an example of how the 'actor.hbs' template might be used:
+
+```handlebars
+{
+  "resource": {
+    "resourceType": "AppointmentResponse",
+    "id": "{{ID}}",
+    "actor": {
+      "reference": "{{REF}}"
+    }
+  }
+}
+```
+
+When rendered with appropriate values, it would produce a JSON structure like this:
+
+```json
+{
+  "resource": {
+    "resourceType": "AppointmentResponse",
+    "id": "response123",
+    "actor": {
+      "reference": "Practitioner/dr-smith"
+    }
+  }
+}
+```
+
+Similarly, the 'appointment.hbs' template would produce a structure focusing on the appointment reference:
+
+```json
+{
+  "resource": {
+    "resourceType": "AppointmentResponse",
+    "id": "response123",
+    "appointment": {
+      "reference": "Appointment/appt456"
+    }
+  }
+}
+```
+
+These templates are designed to be flexible and reusable, allowing for the creation of consistent FHIR AppointmentResponse resources across different parts of the conversion system. They encapsulate the structure of specific parts of the AppointmentResponse resource, making it easier to maintain and update the FHIR conversion logic as needed.

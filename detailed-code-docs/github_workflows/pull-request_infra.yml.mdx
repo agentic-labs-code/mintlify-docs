@@ -1,0 +1,57 @@
+---
+title: "pull-request_infra.yml"
+---
+
+## High-level description
+This GitHub Actions workflow, named "PR Check - Infra," is designed to run checks on pull requests that modify files in the "packages/infra" directory. It also triggers on merge group events and can be manually dispatched. The workflow performs commit checks and runs a build process for the infrastructure package.
+
+## Code Structure
+The workflow consists of two jobs: `check-commits` and `check-pr`. Both jobs reuse existing workflow files, passing along necessary secrets and parameters.
+
+## Symbols
+
+### `name`
+#### Description
+Defines the name of the GitHub Actions workflow as "PR Check - Infra".
+
+### `on`
+#### Description
+Specifies the events that trigger this workflow.
+
+#### Internal Logic
+- Triggers on pull requests that modify files in the "packages/infra" directory
+- Triggers on merge group events
+- Allows manual triggering through workflow dispatch
+
+### `jobs`
+#### Description
+Defines the jobs to be executed as part of this workflow.
+
+#### Internal Logic
+1. `check-commits`: Reuses the `.github/workflows/_check-commits.yml` workflow
+2. `check-pr`: Reuses the `.github/workflows/_build.yml` workflow with specific parameters
+
+### `check-commits`
+#### Description
+A job that runs commit checks using a reusable workflow.
+
+#### Internal Logic
+- Uses the `./.github/workflows/_check-commits.yml` workflow
+- Passes along inherited secrets
+
+### `check-pr`
+#### Description
+A job that runs the build process for the infrastructure package using a reusable workflow.
+
+#### Internal Logic
+- Uses the `./.github/workflows/_build.yml` workflow
+- Specifies the `path` input as "packages/infra"
+- Passes along inherited secrets
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ./.github/workflows/_check-commits.yml | Reusable workflow for checking commits |
+| ./.github/workflows/_build.yml | Reusable workflow for building the infrastructure package |
+
+Note: This workflow relies on two other workflow files within the repository, which are not provided in the given context. The exact functionality of these workflows is not visible in the current file.

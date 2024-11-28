@@ -1,0 +1,61 @@
+---
+title: "body.ts"
+---
+
+## High-level description
+The `mapToBody` function in `packages/api/src/mappings/fitbit/body.ts` maps Fitbit user and weight data to a standardized `Body` object as defined in the `@metriport/api-sdk`. This involves converting units (e.g., stones to kilograms, inches to centimeters) and formatting timestamps according to the user's timezone.
+
+## References
+This code references the following symbols from other files:
+- `Body` (from `@metriport/api-sdk`): Defines the structure of the standardized body data.
+- `SourceType` (from `@metriport/api-sdk`):  Used to categorize the source of weight data as manual or device.
+- `PROVIDER_FITBIT` (from `../../shared/constants`):  A constant representing the Fitbit provider.
+- `FitbitUser` (from `./models/user`): Represents Fitbit user profile information.
+- `FitbitWeight` (from `./models/weight`): Represents Fitbit weight log entries.
+
+## Symbols
+### `mapToBody`
+#### Description
+This function maps Fitbit user and weight data to a standardized `Body` object. It handles unit conversions, timestamp formatting, and data source categorization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `date` | string | The date for which the data is being mapped, in YYYY-MM-DD format. |
+| `fitbitUser` | `FitbitUser` | (Optional) The Fitbit user profile data. |
+| `fitbitWeight` | `FitbitWeight` | (Optional) The Fitbit weight log data for the given date. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `body` | `Body` | The standardized body data object. |
+
+#### Internal Logic
+1. **Initialize metadata:** Creates a metadata object with the date and source (PROVIDER_FITBIT).
+2. **Process `fitbitUser` data:**
+   - If `fitbitUser` is provided:
+     - **Height:** Converts height to centimeters (`height_cm`) based on the user's unit preference (`heightUnit`).
+     - **Weight:** Converts the user's weight to kilograms (`weight_kg`).
+3. **Process `fitbitWeight` data:**
+   - If `fitbitWeight` is provided:
+     - **Weight Samples:** Iterates through each weight entry in `fitbitWeight`:
+       - Formats the timestamp (`time`) to UTC, considering the user's timezone.
+       - Converts the weight to kilograms (`value`).
+       - Determines the data source type (`data_source`) based on the `source` field (manual or device).
+4. **Return:** Returns the populated `body` object.
+
+## Side Effects
+This function has no significant side effects. It does not modify any global state or external resources.
+
+## Dependencies
+This code depends on the following external libraries:
+| Dependency | Purpose |
+|:-----------|:--------|
+| `@metriport/api-sdk` | Provides the `Body` interface and `SourceType` enum. |
+| `convert-units` | Used for unit conversions (stones to kilograms, inches to centimeters). |
+| `dayjs` | Used for date and time manipulation, including timezone handling. |
+| `dayjs/plugin/utc` | Plugin for `dayjs` to handle UTC time. |
+| `dayjs/plugin/timezone` | Plugin for `dayjs` to handle timezones. |
+
+## Error Handling
+This code does not implement specific error handling beyond potential errors thrown by the external libraries used.

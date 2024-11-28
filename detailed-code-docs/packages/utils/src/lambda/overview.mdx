@@ -1,0 +1,72 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code is a script to execute the CdaToVisualization AWS Lambda function. It sets up the necessary parameters, invokes the Lambda function, and handles the response, including error cases. The script is designed to convert CDA (Clinical Document Architecture) files to either HTML or PDF format.
+
+## Code Structure
+The main functionality is encapsulated in the `main()` function, which invokes the Lambda function and processes its response. The script uses various utility functions imported from other modules to handle AWS Lambda interactions, environment variables, and error handling.
+
+## References
+- `@metriport/core/domain/conversion/cda-to-html-pdf`: Imports types for conversion input and output.
+- `@metriport/core/external/aws/lambda`: Imports utility functions for AWS Lambda interactions.
+- `@metriport/core/util/env-var`: Imports function to retrieve environment variables.
+- `@metriport/core/util/error/metriport-error`: Imports custom error class.
+
+## Symbols
+
+### `main()`
+#### Description
+This asynchronous function is the entry point of the script. It invokes the Lambda function and processes its response.
+
+#### Internal Logic
+1. Invokes the Lambda function with the specified parameters.
+2. Checks the status code of the Lambda invocation.
+3. Handles potential errors, including undefined payload and Lambda execution errors.
+4. Parses the response and logs the resulting URL.
+
+### Constants
+- `s3Key`: The filename of the document to be converted (to be updated by the user).
+- `conversionType`: The type of conversion to perform (HTML or PDF).
+- `bucketName`: The name of the S3 bucket containing the medical documents.
+- `region`: The AWS region where the Lambda function is deployed.
+- `lambdaName`: The name of the Lambda function to be invoked.
+
+### `payload`
+#### Description
+An object containing the input parameters for the Lambda function.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The name of the file to be converted |
+| bucketName | string | The name of the S3 bucket containing the file |
+| conversionType | ConversionType | The type of conversion to perform (HTML or PDF) |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | To load environment variables from a .env file |
+| @metriport/core | Various utility functions and types |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| MEDICAL_DOCUMENTS_BUCKET_NAME | string | N/A | The name of the S3 bucket containing medical documents |
+| AWS_REGION | string | N/A | The AWS region where the Lambda function is deployed |
+
+## Error Handling
+The script implements error handling for various scenarios:
+- Lambda invocation failure (non-200 status code)
+- Undefined payload
+- Lambda execution errors
+
+Errors are thrown as `MetriportError` instances with detailed information about the failure.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| CdaToVisualizationLambda | Invoke | Input object | \{ url: string \} | Converts CDA to HTML or PDF |
+
+Note: This is not a traditional API endpoint but an AWS Lambda function invocation.

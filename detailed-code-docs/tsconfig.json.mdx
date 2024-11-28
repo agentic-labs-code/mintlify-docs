@@ -1,0 +1,67 @@
+---
+title: "tsconfig.json"
+---
+
+## High-level description
+This `tsconfig.json` file is the root TypeScript configuration for a monorepo project. It sets up global compiler options and references multiple sub-projects within the repository, enabling TypeScript's project references feature for better build performance and code organization.
+
+## Code Structure
+The configuration is divided into three main sections: `compilerOptions`, `exclude`, and `references`. The `compilerOptions` section defines global settings, while the `references` section lists the sub-projects within the monorepo.
+
+## Symbols
+
+### compilerOptions
+#### Description
+Specifies the compiler options to be used for the TypeScript project.
+
+#### Internal Logic
+- Sets up Jest types for testing
+- Defines type roots for custom type definitions and @types
+- Enables full error messages and skips type checking of declaration files
+
+| Option | Type | Value | Description |
+|:-------|:-----|:------|:------------|
+| types | array | ["jest"] | Includes Jest types for testing support |
+| typeRoots | array | ["./types", "./node_modules/@types"] | Specifies locations for type definitions |
+| noErrorTruncation | boolean | true | Prevents truncation of error messages |
+| skipLibCheck | boolean | true | Skips type checking of declaration files |
+
+### exclude
+#### Description
+Specifies which directories should be excluded from the TypeScript compilation process.
+
+#### Internal Logic
+Excludes the `node_modules` directory to prevent compilation of external dependencies.
+
+### files
+#### Description
+An empty array that doesn't include any specific files for compilation in the root configuration.
+
+### references
+#### Description
+Defines the project references for the monorepo, enabling TypeScript's project references feature.
+
+#### Internal Logic
+Lists the paths to the `tsconfig.ref.json` files of various packages within the monorepo. Each reference points to a separate TypeScript project, allowing for better build performance and code organization.
+
+| Package | Path |
+|:--------|:-----|
+| api | ./packages/api/tsconfig.ref.json |
+| api-sdk | ./packages/api-sdk/tsconfig.ref.json |
+| commonwell-cert-runner | ./packages/commonwell-cert-runner/tsconfig.ref.json |
+| commonwell-jwt-maker | ./packages/commonwell-jwt-maker/tsconfig.ref.json |
+| commonwell-sdk | ./packages/commonwell-sdk/tsconfig.ref.json |
+| carequality-cert-runner | ./packages/carequality-cert-runner/tsconfig.ref.json |
+| core | ./packages/core/tsconfig.ref.json |
+| infra | ./packages/infra/tsconfig.ref.json |
+| react-native-sdk | ./packages/react-native-sdk/tsconfig.ref.json |
+| utils | ./packages/utils/tsconfig.ref.json |
+
+## Dependencies
+This configuration file doesn't directly depend on external libraries, but it sets up the project to use TypeScript and Jest for testing.
+
+## Configuration
+The main configuration options are defined in the `compilerOptions` section, as described above.
+
+## Performance Considerations
+The use of project references (`references` section) can significantly improve build performance in large monorepo projects by enabling incremental compilation and allowing TypeScript to only rebuild affected projects.

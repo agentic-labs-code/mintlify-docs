@@ -1,0 +1,80 @@
+---
+title: "resource-filter.ts"
+---
+
+## High-level description
+This code defines functions for filtering and processing FHIR (Fast Healthcare Interoperability Resources) patient data. It provides utilities to generate filters for patient resources, handle date queries, and perform name-based searches on FHIR data.
+
+## Code Structure
+The main function `getPatientFilter` generates filters for different types of FHIR resources based on input parameters. The `fullDateQueryForResource` function applies date filters to specific resource types. The `nameContains` function provides a utility for searching within FHIR HumanName objects.
+
+## Symbols
+
+### `getPatientFilter`
+#### Description
+This function generates filters for FHIR resources based on the input parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resources | medical.ResourceTypeForConsolidation[] | Array of resource types to filter |
+| dateFrom | string \| undefined | Start date for filtering |
+| dateTo | string \| undefined | End date for filtering |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object | Object | Contains filtered resources and date filter string |
+
+#### Internal Logic
+1. Filters resources searchable by patient and subject using `intersection` with predefined arrays.
+2. Generates a FHIR date filter string using `isoDateRangeToFHIRDateQuery`.
+3. Returns an object with filtered resources and the date filter string.
+
+### `fullDateQueryForResource`
+#### Description
+Applies a date query to a specific FHIR resource type if it supports date queries.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fullDateQuery | string | The full date query string |
+| resource | ResourceType | The FHIR resource type |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string | string | The date query if supported, or an empty string |
+
+### `nameContains`
+#### Description
+Creates a function to search within FHIR HumanName objects for a given value.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| value | string | The search value |
+| options | Object | Optional parameters (caseSensitive) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| function | Function | A function that takes a HumanName and returns a boolean |
+
+#### Internal Logic
+1. Returns a function that searches within the family, given, and text fields of a HumanName object.
+2. Performs case-insensitive search by default, with an option for case-sensitive search.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides FHIR type definitions |
+| @metriport/shared | Provides medical-related utilities |
+| lodash | Used for the `intersection` function |
+
+## References
+This code references other parts of the codebase:
+- `isoDateRangeToFHIRDateQuery` and `resourceSupportsDateQuery` from "../shared/index"
+- `medical` from "@metriport/shared"
+
+The code is part of a larger system for handling FHIR data, particularly for patient-related resources and filtering operations.

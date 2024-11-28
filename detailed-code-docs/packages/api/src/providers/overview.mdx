@@ -1,0 +1,55 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains provider implementations for various health and fitness data platforms. Each provider class extends a base `Provider` class and implements specific authentication methods (OAuth1, OAuth2, or NoAuth) to interact with their respective APIs. The providers handle authentication, token management, and data retrieval for different types of health data such as activity, biometrics, body measurements, nutrition, sleep, and user information.
+
+## What does it do?
+The providers in this directory enable the Metriport API to:
+
+1. Authenticate users with various health data platforms (e.g., Apple Health, Fitbit, Garmin, Google Fit, Oura, Whoop, Withings).
+2. Manage OAuth tokens for authenticated users.
+3. Retrieve different types of health data from these platforms.
+4. Map the retrieved data to standardized formats used by the Metriport API.
+5. Handle provider-specific operations like revoking access or managing device connections.
+
+These provider implementations allow the Metriport API to aggregate health data from multiple sources into a unified format, making it easier for developers to work with diverse health data platforms.
+
+## Entry points
+The main entry point for each provider is its respective class (e.g., `Apple`, `Fitbit`, `Garmin`, etc.). These classes typically extend the `Provider` base class and implement one of the authentication interfaces (`OAuth1`, `OAuth2`, or `NoAuth`) defined in the `shared` directory.
+
+The flow of data and control typically follows this pattern:
+1. Authentication: Methods like `getAuthUri`, `getTokenFromAuthCode`, and `getAccessToken` handle the authentication process.
+2. Data Retrieval: Methods like `getActivityData`, `getBiometricsData`, `getBodyData`, etc., fetch specific types of health data from the provider's API.
+3. Data Mapping: The retrieved data is mapped to standardized formats using provider-specific mapping functions.
+4. Token Management: Methods like `checkRefreshToken` handle token refreshing when necessary.
+5. Access Management: Methods like `revokeProviderAccess` handle revoking user access to the provider.
+
+## Key Files
+- `provider.ts`: Defines the base `Provider` class and common types used across all providers.
+- `shared/`: Contains shared utilities for authentication (OAuth1, OAuth2, NoAuth), HTTP requests, and analytics.
+- Individual provider files (e.g., `apple.ts`, `fitbit.ts`, `garmin.ts`): Implement provider-specific logic for authentication and data retrieval.
+
+## Dependencies
+The providers rely on several external libraries and internal modules:
+
+- `@metriport/api-sdk`: Provides data models and types for health data.
+- `axios`: Used for making HTTP requests to provider APIs.
+- `dayjs`: Used for date manipulation and formatting.
+- `simple-oauth2`: Handles OAuth2 authentication flows.
+- `zod`: Used for runtime type checking and validation of API responses.
+- Various internal modules for configuration, error handling, and data mapping.
+
+## Configuration
+Each provider typically requires configuration settings such as client IDs, client secrets, and API endpoints. These are usually retrieved from environment variables using a `Config` class.
+
+Key configuration areas include:
+- OAuth credentials (client IDs and secrets)
+- API endpoints and base URLs
+- Supported data types for each provider
+- Scopes for OAuth authentication
+
+The `shared` directory contains default implementations for OAuth1 and OAuth2 flows, which can be customized for each provider's specific requirements.
+
+This directory forms the core of Metriport's ability to integrate with various health data platforms, providing a unified interface for authentication and data retrieval across different providers.

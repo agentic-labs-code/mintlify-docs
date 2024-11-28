@@ -1,0 +1,98 @@
+---
+title: "coverage-assessment.ts"
+---
+
+## High-level description
+This code provides a utility for running a coverage assessment for a subset of a customer's patients in the CommonWell Health Alliance network. It performs coverage checks, optionally downloads documents, and generates a CSV report containing coverage information for each patient.
+
+## Code Structure
+The main function `main()` orchestrates the coverage assessment process. It uses helper functions like `assessCoverageForPatient()` to perform individual patient assessments. The code interacts with the CommonWell API using the `CommonWell` class from the `@metriport/commonwell-sdk` package.
+
+## Symbols
+
+### `main()`
+#### Description
+The main function that orchestrates the coverage assessment process.
+
+#### Internal Logic
+1. Retrieves customer data using `getCxData()`.
+2. Initializes the CommonWell API client.
+3. Creates a directory for storing assessment results.
+4. Processes patients in chunks, calling `assessCoverageForPatient()` for each patient.
+5. Implements a sleep mechanism between chunks to avoid rate limiting.
+
+### `assessCoverageForPatient()`
+#### Description
+Performs a coverage assessment for a single patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| orgName | string | Organization name |
+| orgOID | string | Organization OID |
+| patientId | string | Patient ID |
+| queryMeta | RequestMetadata | Metadata for API requests |
+| cwApi | CommonWell | CommonWell API client instance |
+| resultsCsvFileName | string | File name for the CSV results |
+
+#### Internal Logic
+1. Creates a directory for the patient's assessment results.
+2. Retrieves patient demographics and network links.
+3. Performs document queries and optionally downloads documents.
+4. Collects coverage statistics and writes them to the CSV file.
+
+### `buildCWPatientId()`
+#### Description
+Builds a CommonWell patient ID string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| orgOID | string | Organization OID |
+| patientId | string | Patient ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cwPatientId | string | CommonWell patient ID |
+
+### `sanitizeName()`
+#### Description
+Sanitizes a name by removing commas and joining name parts.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | string[] | Array of name parts |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sanitizedName | string | Sanitized name string |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | Load environment variables |
+| @metriport/commonwell-sdk | Interact with CommonWell API |
+| @metriport/shared | Shared utilities |
+| @metriport/core | Core utilities |
+| fs | File system operations |
+| mime-types | MIME type handling |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| ORG_CERTS_FOLDER | string | - | Path to organization certificates |
+| CX_ID | string | - | Customer ID |
+| patientIds | string[] | [] | List of patient IDs to check |
+| cwApiMode | APIMode | APIMode.production | CommonWell API mode |
+| downloadDocs | boolean | false | Whether to download documents |
+| patientChunkSize | number | 5 | Number of patients to process in each chunk |
+| intraChunkSleepMs | number | 3000 | Sleep time between chunks in milliseconds |
+
+## TODOs
+1. Review the logic for processing patient chunks, as there might be a concurrency issue when updating the CSV file.
+2. Consider using a function from the OSS library to run tasks in parallel/chunks.
+
+This utility provides a comprehensive way to assess CommonWell coverage for a set of patients, including document availability and network links. It's designed to be run as a script and outputs detailed results for further analysis.

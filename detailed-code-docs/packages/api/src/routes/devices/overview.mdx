@@ -1,0 +1,82 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines an Express router for internal user-related operations in a devices API. It includes two main endpoints: one for refreshing user tokens and another for resubscribing Fitbit webhooks. These endpoints are designed to manage connected users and their provider connections.
+
+## Code Structure
+The code exports a router with two POST routes: "/refresh-tokens" and "/resubscribe-fitbit-webhooks". Both routes use the asyncHandler wrapper for error handling. They interact with connected users, their providers, and perform operations like token refreshing and webhook resubscription.
+
+## References
+- `getAllConnectedUsers`, `getConnectedUserOrFail` from "../../command/connected-user/get-connected-user"
+- `updateProviderData` from "../../command/connected-user/save-connected-user"
+- `sendProviderDisconnected` from "../../command/webhook/devices"
+- `Constants`, `providerOAuth2OptionsSchema` from "../../shared/constants"
+- `getUUIDFrom` from "../schemas/uuid"
+- `asyncHandler` from "../util"
+
+## Symbols
+
+### Router
+#### Description
+An Express router instance that defines the routes for internal user operations.
+
+### POST /refresh-tokens
+#### Description
+This endpoint attempts to refresh all users' tokens for each of their connected providers. If the refresh fails, it revokes the token locally and sends a webhook to notify the customer of the disconnect.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | UUID (optional) | The customer/account's ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| usersProcessed | number | Count of users processed |
+| usersWithDisconnectedProviders | number | Count of users with disconnected providers |
+
+#### Internal Logic
+1. Retrieve connected users (filtered by cxId if provided)
+2. For each user and provider:
+   - Attempt to refresh the token
+   - If refresh fails, update provider data and mark as disconnected
+3. Send webhook for disconnected providers
+4. Return counts of processed and disconnected users
+
+### POST /resubscribe-fitbit-webhooks
+#### Description
+This endpoint finds all existing users connected to Fitbit and recreates their webhook subscriptions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | UUID (optional) | The customer/account's ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| usersProcessed | number | Count of users processed |
+| usersAffected | number | Count of users affected |
+| errorsCaught | object | Count and details of errors encountered |
+
+#### Internal Logic
+1. Retrieve connected users (filtered by cxId if provided)
+2. For each user with a Fitbit provider:
+   - Attempt to resubscribe to Fitbit webhooks
+   - Track successful resubscriptions and errors
+3. Return counts of processed users, affected users, and errors
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| express | Web application framework |
+| express-promise-router | Router for handling async routes |
+| http-status | HTTP status codes |
+
+## Error Handling
+The code uses the `asyncHandler` wrapper for error handling in the routes. Specific error handling is implemented within the route handlers, particularly for the Fitbit webhook resubscription process.
+
+## Logging
+The code includes console.log statements for error logging, particularly in the Fitbit webhook resubscription process.

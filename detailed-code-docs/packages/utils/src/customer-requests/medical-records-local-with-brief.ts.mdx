@@ -1,0 +1,65 @@
+---
+title: "medical-records-local-with-brief.ts"
+---
+
+## High-level description
+This code implements a script to generate a Medical Record (MR) Summary with an AI-generated Brief from a FHIR payload locally. It processes FHIR data, generates an HTML summary, and optionally stores the summary and brief in S3.
+
+## Code Structure
+The main function `main()` orchestrates the process of reading FHIR data, generating a brief, creating an HTML summary, and optionally storing the results in S3. It utilizes various imported functions and classes to handle FHIR data processing, AI brief generation, and S3 interactions.
+
+## Symbols
+
+### `main()`
+#### Description
+The main function that orchestrates the process of generating a Medical Record Summary with an AI-generated Brief.
+
+#### Internal Logic
+1. Reads FHIR data from a local file
+2. Generates an AI brief using `bundleToBrief()`
+3. Creates an HTML summary using `bundleToHtml()`
+4. Optionally stores the summary and brief in S3 using `storeMrSummaryAndBriefInS3()`
+5. Writes the HTML summary to a local file
+
+### `storeMrSummaryAndBriefInS3()`
+#### Description
+Stores the Medical Record Summary and Brief in S3.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bucketName | string | The S3 bucket name |
+| htmlFileName | string | The filename for the HTML summary |
+| briefFileName | string | The filename for the brief |
+| html | string | The HTML content of the summary |
+| brief | string \| undefined | The content of the brief |
+
+#### Internal Logic
+1. Uploads the HTML summary to S3
+2. Uploads the brief to S3 if it exists
+3. Handles errors and logs the results
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides FHIR type definitions |
+| @metriport/core | Provides core functionality for medical record processing |
+| @metriport/shared | Provides shared utilities and error handling |
+| fs | File system operations |
+| dotenv | Environment variable management |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| BEDROCK_REGION | string | undefined | AWS Bedrock region |
+| BEDROCK_VERSION | string | undefined | AWS Bedrock version |
+| MR_BRIEF_MODEL_ID | string | undefined | Model ID for MR Brief generation |
+
+## Error Handling
+The code uses `MetriportError` for custom error handling, particularly in the `storeMrSummaryAndBriefInS3` function.
+
+## Logging
+The code uses console.log for logging operations and results.
+
+## TODOs
+- Condense the functionality under a single function and put it on `@metriport/core`, so it can be used both here and on the Lambda.

@@ -1,0 +1,51 @@
+---
+title: "_check-commits.yml"
+---
+
+## High-level description
+This GitHub Actions workflow file, named "_check-commits.yml", is designed to check commit messages on non-shared branches. It runs when called by another workflow and performs a check to ensure that commit messages follow the Conventional Commits standard.
+
+## Code Structure
+The workflow consists of a single job named "check-commit-messages" with several steps that set up the environment, log in to Docker Hub, checkout the repository, and run the commit message check.
+
+## Symbols
+
+### Workflow
+#### Description
+This GitHub Actions workflow is triggered by a workflow call and requires two secrets: DOCKERHUB_USERNAME and DOCKERHUB_TOKEN.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| DOCKERHUB_USERNAME | secret | Docker Hub username for authentication |
+| DOCKERHUB_TOKEN | secret | Docker Hub token for authentication |
+
+### Job: check-commit-messages
+#### Description
+This job runs on Ubuntu and checks commit messages on non-shared branches (excluding 'master' and 'develop').
+
+#### Internal Logic
+1. Logs the environment variables
+2. Logs in to Docker Hub using provided credentials
+3. Checks out the repository with a fetch depth of 100 commits
+4. Runs the commitlint-github-action to check commit messages against Conventional Commits standard
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| docker/login-action@v2 | To log in to Docker Hub |
+| actions/checkout@v3 | To check out the repository |
+| wagoid/commitlint-github-action@v5 | To check commit messages against Conventional Commits standard |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| runs-on | string | ubuntu-latest | Specifies the runner environment |
+| if | expression | $\{\{ github.event.pull_request.head.ref != 'master' && github.event.pull_request.head.ref != 'develop' \}\} | Condition to run the job only on non-shared branches |
+| fetch-depth | number | 100 | Number of commits to fetch when checking out the repository |
+
+## Error Handling
+The workflow does not implement explicit error handling. It relies on GitHub Actions' default behavior of stopping the workflow if any step fails.
+
+## Logging
+The workflow includes a step to log environment variables, which can be useful for debugging purposes.

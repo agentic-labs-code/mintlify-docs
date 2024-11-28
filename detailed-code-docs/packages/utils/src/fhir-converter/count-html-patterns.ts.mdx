@@ -1,0 +1,144 @@
+---
+title: "count-html-patterns.ts"
+---
+
+## High-level description
+This TypeScript code is a utility script designed to analyze and count different patterns in HTML sections within FHIR resources. It reads a JSON file line by line, identifies various structural patterns (such as tables, content-footnotes, simple content, paragraphs, and content), and provides a count for each pattern type.
+
+## Code Structure
+The code defines several interfaces to represent different data structures, implements functions to check for specific patterns, and includes a main function `countMatchingPatterns` that processes the input file and counts occurrences of each pattern.
+
+## Symbols
+
+### `countMatchingPatterns`
+#### Description
+This asynchronous function reads a file line by line, parses each line as JSON, and counts occurrences of different structural patterns.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filePath | string | Path to the input file |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object | \{ tableCount: number, contentFootnoteCount: number, simpleCount: number, paragraphCount: number, contentCount: number \} | Counts of different pattern occurrences |
+
+#### Internal Logic
+1. Initializes counters for each pattern type.
+2. Creates a read stream for the input file.
+3. Iterates through each line of the file.
+4. Parses each line as JSON.
+5. Checks the JSON against different patterns using helper functions.
+6. Increments the appropriate counter based on the matched pattern.
+7. Returns an object with the final counts.
+
+### `checkContentFootnotePattern`
+#### Description
+Checks if a JSON object matches the content-footnote pattern.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| json | ContentFootnoteStructure | JSON object to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| boolean | boolean | True if the pattern matches, false otherwise |
+
+### `checkSimplePattern`
+#### Description
+Checks if a JSON object matches the simple pattern (only contains an "_" property).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| json | any | JSON object to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| boolean | boolean | True if the pattern matches, false otherwise |
+
+### `checkParagraphPattern`
+#### Description
+Checks if a JSON object matches the paragraph pattern.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| json | any | JSON object to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| boolean | boolean | True if the pattern matches, false otherwise |
+
+### `checkContentPattern`
+#### Description
+Checks if a JSON object matches the content pattern.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| json | any | JSON object to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| boolean | boolean | True if the pattern matches, false otherwise |
+
+### `checkTablePattern`
+#### Description
+Checks if a JSON object matches the table pattern.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| json | TableStructure | JSON object to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| boolean | boolean | True if the pattern matches, false otherwise |
+
+### `extractAndMapTableData`
+#### Description
+Extracts and maps data from a table structure to a more readable format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| json | TableStructure | JSON object representing a table |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| array | any[] | Array of mapped table data |
+
+### `concatenateTextValues`
+#### Description
+Concatenates text values from a content object or array.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| content | \{ _: string \}[] \| \{ _: string \} \| undefined | Content to concatenate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string | string | Concatenated text values |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| fs | File system operations |
+| readline | Reading file line by line |
+
+## Error Handling
+The script includes basic error handling, such as checking for the presence of a file path argument and catching errors during file processing. It uses try-catch blocks in pattern checking functions to handle potential errors in JSON structure.
+
+## Logging
+The script uses `console.log` for outputting results and `console.error` for logging errors.

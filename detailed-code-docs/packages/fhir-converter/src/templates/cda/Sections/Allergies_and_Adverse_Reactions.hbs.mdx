@@ -1,0 +1,58 @@
+---
+title: "Allergies_and_Adverse_Reactions.hbs"
+---
+
+## High-level description
+This Handlebars template is designed to generate FHIR-compliant AllergyIntolerance resources from CDA (Clinical Document Architecture) data. It processes allergy and adverse reaction information from specific CDA sections and transforms it into the FHIR AllergyIntolerance format.
+
+## Code Structure
+The template uses conditional statements to check for the presence of specific CDA sections and then iterates through the allergy entries to create corresponding FHIR resources. It also generates associated references to Patient and Practitioner resources.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template processes the CDA allergies section and generates FHIR AllergyIntolerance resources along with related references.
+
+#### Internal Logic
+1. Checks for the presence of the allergies section using a specific template ID.
+2. Iterates through allergy entries in the CDA document.
+3. For each allergy entry, it generates:
+   - An AllergyIntolerance resource
+   - A reference to the Patient
+   - A Practitioner resource and a reference to it (if author information is available)
+
+### Partial Templates
+The main template uses several partial templates:
+
+1. `Resources/AllergyIntolerance.hbs`: Generates the AllergyIntolerance resource
+2. `References/AllergyIntolerance/patient.hbs`: Creates a reference to the Patient
+3. `Resources/Practitioner.hbs`: Generates a Practitioner resource
+4. `References/AllergyIntolerance/recorder.hbs`: Creates a reference to the Practitioner as the recorder
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| msg | object | The CDA document object |
+| @metriportPatientId | string | The Metriport patient ID |
+
+#### Outputs
+The template generates JSON objects representing FHIR resources and references.
+
+## Dependencies
+This template relies on several helper functions and partial templates:
+
+| Dependency | Purpose |
+|:-----------|:--------|
+| getFirstCdaSectionsByTemplateId | Retrieves specific CDA sections by template ID |
+| multipleToArray | Converts multiple entries to an array |
+| generateUUID | Generates a unique identifier |
+| evaluate | Evaluates another template |
+
+## Notes
+- The template uses specific CDA template IDs (e.g., '2.16.840.1.113883.10.20.22.2.6.1') to identify relevant sections.
+- It handles both the allergies section and its entries, creating separate resources for each allergy.
+- The allergy status is derived from the Act, not the Observation.
+- Patient and Practitioner references are created to link the AllergyIntolerance resource to these entities.
+
+This template is part of a larger system for converting CDA documents to FHIR resources, focusing specifically on allergies and adverse reactions.

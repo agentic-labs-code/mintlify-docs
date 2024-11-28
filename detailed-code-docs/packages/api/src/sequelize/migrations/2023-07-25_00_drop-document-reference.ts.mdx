@@ -1,0 +1,52 @@
+---
+title: "2023-07-25_00_drop-document-reference.ts"
+---
+
+## High-level description
+This migration script drops the `document-reference` table from the database during the migration up process. It also defines the down migration to recreate the table with its original structure and constraints.
+
+## References
+- `shared.createTable`: This function is referenced from `migrations-shared.ts` and is used to recreate the table in the down migration.
+
+## Symbols
+
+### `up`
+#### Description
+This asynchronous function defines the actions to perform during the database migration. It drops the `document-reference` table.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | \{ context: QueryInterface \} | An object containing the queryInterface, which provides access to Sequelize's query building methods. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise&lt;void&gt; | A promise that resolves when the table is dropped. |
+
+#### Internal Logic
+1. Starts a database transaction to ensure atomicity.
+2. Drops the `document-reference` table using the provided `queryInterface`.
+3. Commits the transaction if the drop operation is successful.
+
+### `down`
+#### Description
+This asynchronous function defines the actions to perform when rolling back the migration. It recreates the `document-reference` table with its original structure, including columns, data types, constraints, and triggers.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | \{ context: QueryInterface \} | An object containing the queryInterface, which provides access to Sequelize's query building methods. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise&lt;void&gt; | A promise that resolves when the table is created. |
+
+#### Internal Logic
+1. Starts a database transaction to ensure atomicity.
+2. Calls the `createTable` function from the `shared` module to recreate the `document-reference` table.
+3. Defines the table structure with columns for `id`, `cxId`, `patientId`, `source`, `externalId`, and `data`.
+4. Specifies data types and constraints for each column, including primary key, unique key, and foreign key constraints.
+5. Adds a trigger to automatically update the `updatedAt` column on each update.
+6. Commits the transaction if the table creation is successful.

@@ -1,0 +1,72 @@
+---
+title: "Hospital_Discharge_Diagnosis.hbs"
+---
+
+## High-level description
+This Handlebars template is designed to process and transform Clinical Document Architecture (CDA) data related to hospital discharge diagnoses into FHIR (Fast Healthcare Interoperability Resources) Condition resources. It extracts relevant information from the CDA structure and generates corresponding FHIR Condition resources along with their subject references.
+
+## Code Structure
+The template uses nested Handlebars helpers to navigate through the CDA structure, extract diagnosis information, and generate FHIR resources. It primarily uses the `getFirstCdaSectionsByTemplateId`, `toArray`, and `generateUUID` helpers to process the data.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template iterates through the CDA structure to find and process hospital discharge diagnoses.
+
+#### Internal Logic
+1. Uses `getFirstCdaSectionsByTemplateId` to locate the relevant CDA section.
+2. Iterates through entries in the section.
+3. For each entry, processes observation data to create Condition resources.
+4. Generates a subject reference for each Condition resource.
+
+### Partial Templates
+#### Description
+The template uses two partial templates: `Resources/Condition.hbs` and `References/Condition/subject.hbs`.
+
+#### Inputs
+- `Resources/Condition.hbs`:
+  | Name | Type | Description |
+  |:-----|:-----|:------------|
+  | conditionEntry | Object | Observation data from CDA |
+  | ID | String | Generated UUID for the Condition resource |
+
+- `References/Condition/subject.hbs`:
+  | Name | Type | Description |
+  |:-----|:-----|:------------|
+  | ID | String | Generated UUID for the Condition resource |
+  | REF | String | Reference to the Patient resource |
+
+#### Internal Logic
+- `Resources/Condition.hbs`: Likely creates a FHIR Condition resource based on the CDA observation data.
+- `References/Condition/subject.hbs`: Likely creates a reference to the Patient resource for the Condition.
+
+### Helper Functions
+#### Description
+The template uses several helper functions to process data and generate identifiers.
+
+#### Inputs and Outputs
+| Name | Input | Output | Description |
+|:-----|:------|:-------|:------------|
+| getFirstCdaSectionsByTemplateId | msg, templateId | Object | Retrieves the first CDA section matching the given template ID |
+| toArray | Object | Array | Converts an object to an array |
+| generateUUID | String | String | Generates a UUID based on the input string |
+| evaluate | String, Object | Object | Evaluates another template with the given object |
+
+## Dependencies
+The template relies on several external helper functions and partial templates:
+| Dependency | Purpose |
+|:-----------|:--------|
+| getFirstCdaSectionsByTemplateId | Retrieve specific CDA sections |
+| toArray | Convert objects to arrays |
+| generateUUID | Generate unique identifiers |
+| evaluate | Evaluate other templates |
+| Resources/Condition.hbs | Generate Condition resources |
+| References/Condition/subject.hbs | Generate subject references for Conditions |
+| Utils/GeneratePatientId.hbs | Generate patient identifiers |
+
+## Notes
+- The template is part of a larger system for converting CDA documents to FHIR resources.
+- It specifically handles the conversion of hospital discharge diagnoses to FHIR Condition resources.
+- The template uses a mix of CDA-specific identifiers (like `2.16.840.1.113883.10.20.22.4.33`) and FHIR resource types.
+- There's a custom `metriportPatientId` context variable used in generating patient references.

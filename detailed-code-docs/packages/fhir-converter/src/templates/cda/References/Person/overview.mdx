@@ -1,0 +1,70 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for creating FHIR Person resources with specific references. These templates are part of a larger FHIR converter system, specifically designed to transform Clinical Document Architecture (CDA) data into FHIR format. The templates focus on creating partial FHIR Person resources with different types of references, such as links to other resources and managing organization references.
+
+## What does it do?
+The templates in this directory are used to generate JSON structures representing parts of FHIR Person resources. They provide a standardized way to create these resources with specific references, which is crucial in the process of converting CDA data to FHIR format. 
+
+The templates use placeholders (like `{{ID}}` and `{{REF}}`) that are filled in during the conversion process, allowing for dynamic creation of FHIR resources based on the input data. This approach enables the FHIR converter to maintain consistency and accuracy when transforming complex medical data from CDA to FHIR format.
+
+## Key Files
+
+1. `link.target.hbs`:
+   This template creates a Person resource with a link to another resource. It generates a JSON structure with a `link` array containing a single `target` object. This is useful for establishing relationships between a Person and other resources in the FHIR ecosystem.
+
+   Example output structure:
+   ```json
+   {
+     "resource": {
+       "resourceType": "Person",
+       "id": "{{ID}}",
+       "link": [
+         {
+           "target": {
+             "reference": "{{REF}}"
+           }
+         }
+       ]
+     }
+   }
+   ```
+
+2. `managingOrganization.hbs`:
+   This template creates a Person resource with a reference to a managing organization. It generates a JSON structure with a `managingOrganization` object containing a reference to the organization responsible for managing the person's record.
+
+   Example output structure:
+   ```json
+   {
+     "resource": {
+       "resourceType": "Person",
+       "id": "{{ID}}",
+       "managingOrganization": {
+         "reference": "{{REF}}"
+       }
+     }
+   }
+   ```
+
+Both templates are designed to be part of a larger FHIR bundle or response, providing flexibility in how Person resources are constructed and linked within the FHIR data model.
+
+## Dependencies
+These templates are designed to be used with the Handlebars templating engine, which processes the `{{}}` placeholders. They are part of a larger FHIR converter system, likely integrated with other components that handle the actual data transformation and template rendering.
+
+## Configuration
+There are no explicit configuration options in these templates. The behavior is determined by the values provided for the `ID` and `REF` placeholders when the templates are rendered. This design allows for flexibility in how the templates are used within the larger FHIR conversion process.
+
+It's important to note that these templates produce partial FHIR resource structures. They are likely meant to be combined with other templates or data to form complete FHIR resources or bundles. The system using these templates would need to ensure that the appropriate values are provided for the placeholders and that the resulting JSON structures are properly integrated into the final FHIR output.
+
+## Notes
+1. Both templates include a comprehensive copyright and license notice, indicating they are based on work by Microsoft but are now licensed under AGPLv3 by Metriport Inc. This licensing information is crucial for understanding the terms under which these templates can be used, modified, and distributed.
+
+2. The JSON structures in the templates include trailing commas, which might need to be handled by the JSON parser used to process the output. Some JSON parsers are strict and do not allow trailing commas, so this should be considered in the implementation of the FHIR converter system.
+
+3. These templates demonstrate a modular approach to FHIR resource creation, allowing for flexible and reusable components in the CDA to FHIR conversion process. This modular design likely extends to other resource types and references in the larger FHIR converter system.
+
+4. The templates do not include any error handling or validation logic. It's assumed that the system using these templates will handle input validation and error management. Implementers should ensure that proper error handling and data validation are in place when using these templates in a production environment.
+
+5. While these templates focus on specific aspects of Person resources (links and managing organizations), a complete FHIR Person resource might require additional fields and structures. The system using these templates should be designed to combine multiple partial resources or add additional data as needed to create fully compliant FHIR Person resources.

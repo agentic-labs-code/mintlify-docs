@@ -1,0 +1,61 @@
+---
+title: "deduplicate-fhir.test.ts"
+---
+
+## High-level description
+This file contains unit tests for the `deduplicateFhir` function, which is responsible for deduplicating FHIR resources in a bundle. The tests focus on verifying the correct deduplication of medication-related resources and the replacement of references after deduplication.
+
+## Code Structure
+The test file imports necessary dependencies and defines helper functions to create test data. It uses Jest's testing framework to structure and run the tests. The main test case is defined in the `describe` block for the `deduplicateFhir` function.
+
+## Symbols
+
+### `beforeAll`
+#### Description
+This function is used to set up initial test data that will be used across all tests. It creates unique IDs and medication resources.
+
+#### Internal Logic
+- Generates unique IDs using `faker.string.uuid()`
+- Creates medication resources using the `makeMedication` function
+
+### `beforeEach`
+#### Description
+This function is called before each test to reset the bundle to an empty state.
+
+#### Internal Logic
+- Creates an empty bundle using the `makeBundle` function
+- Sets the bundle type to "searchset"
+
+### `describe("deduplicateFhir")`
+#### Description
+This block contains the test case for the `deduplicateFhir` function.
+
+### `it("correctly deduplicates medication-related resources following medication deduplication and ref replacement")`
+#### Description
+This test case verifies that the `deduplicateFhir` function correctly deduplicates medication-related resources and updates references accordingly.
+
+#### Internal Logic
+1. Arrange: 
+   - Sets up test data including medications, medication administrations, medication requests, and medication statements
+   - Creates a bundle with these resources
+2. Act:
+   - Calls the `deduplicateFhir` function with the test bundle
+3. Assert:
+   - Checks that the resulting bundle has the correct number of entries
+   - Verifies that each type of resource (medications, administrations, requests, statements) has been deduplicated to a single instance
+   - Ensures that the remaining resources are the ones with the original IDs
+   - Checks that the extensions of the deduplicated resources contain references to the consumed resources
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @faker-js/faker | Generating test data |
+| @medplum/fhirtypes | FHIR type definitions |
+| makeBundle | Creating test bundles |
+| findMedicationAdministrationResources, findMedicationRequestResources, findMedicationResources, findMedicationStatementResources | Helper functions to find specific resource types in a bundle |
+| makeMedication | Creating test medication resources |
+| deduplicateFhir | The function being tested |
+| rxnormCodeAm | Example medication code |
+| makeMedicationAdministration, makeMedicationRequest, makeMedicationStatement | Creating test medication-related resources |
+
+This test file is crucial for ensuring the correct functionality of the FHIR deduplication process, particularly for medication-related resources. It verifies that the deduplication process not only reduces duplicate resources but also correctly updates references to maintain data integrity.

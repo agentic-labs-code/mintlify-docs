@@ -1,0 +1,104 @@
+---
+title: "api-impl.ts"
+---
+
+## High-level description
+This code implements the `CommonWellManagementAPIImpl` class, which provides methods for interacting with the CommonWell Management API. It handles authentication, cookie management, and API requests for retrieving and updating member information and include lists.
+
+## Code Structure
+The `CommonWellManagementAPIImpl` class implements the `CommonWellManagementAPI` interface. It uses a `CookieManager` for handling authentication cookies and makes HTTP requests to the CommonWell Management API using axios.
+
+## Symbols
+
+### `CommonWellManagementAPIImpl`
+#### Description
+This class implements the CommonWell Management API, providing methods to interact with the API endpoints.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | object | Configuration object |
+| params.cookieManager | CookieManager | Manages authentication cookies |
+| params.baseUrl | string | Base URL for the CommonWell Management API |
+
+#### Internal Logic
+- Initializes with a `CookieManager` and base URL for API requests
+- Implements methods for getting member information and managing include lists
+- Handles cookie updates from API responses
+
+### `getMember`
+#### Description
+Retrieves member information from the CommonWell Management API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| options | object | Optional parameters |
+| options.timeout | number | Request timeout in milliseconds |
+| options.log | function | Logging function |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| member | Member \| undefined | Member information if available |
+
+#### Internal Logic
+- Makes a GET request to `/Organization/GetMembers`
+- Handles cookie updates from the response
+- Returns the first member from the response data if available
+
+### `getIncludeList`
+#### Description
+Retrieves the include list for a specific organization from the CommonWell Management API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| oid | string | Organization ID |
+| options | object | Optional parameters |
+| options.timeout | number | Request timeout in milliseconds |
+| options.log | function | Logging function |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string[] | Array of included organization IDs |
+
+#### Internal Logic
+- Makes a GET request to `/Organization/{oid}/IncludeList`
+- Handles cookie updates from the response
+- Returns the `IncludedOrganizationIdList` from the response data
+
+### `updateIncludeList`
+#### Description
+Updates the include list for a specific organization in the CommonWell Management API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| oid | string | Organization ID |
+| careQualityOrgIds | string[] | Array of Care Quality organization IDs to include |
+| options | object | Optional parameters |
+| options.timeout | number | Request timeout in milliseconds |
+| options.log | function | Logging function |
+| options.debug | function | Debug logging function |
+
+#### Internal Logic
+- Makes a POST request to `/Organization/{oid}/IncludeList`
+- Sends the local organization ID and included organization IDs in the request body
+- Handles cookie updates from the response
+- Logs the response data for debugging purposes
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| axios | Making HTTP requests to the CommonWell Management API |
+| dayjs | Date and time manipulation |
+| @metriport/shared | Utility functions |
+| MetriportError | Custom error handling |
+
+## Error Handling
+The code uses `MetriportError` for custom error handling, particularly in cases where the API response is unexpected or invalid.
+
+## Performance Considerations
+The code uses configurable timeouts for API requests, which can be adjusted based on performance requirements. Default timeouts are set for different operations (e.g., `DEFAULT_TIMEOUT_GET_MEMBER` and `DEFAULT_TIMEOUT_INCLUDE_LIST`).

@@ -1,0 +1,56 @@
+---
+title: "file-info.ts"
+---
+
+## High-level description
+This code defines a function `getFileInfoFromS3` that retrieves metadata about a file stored in Amazon S3. It uses the AWS SDK to interact with S3 and returns information about the file's existence, size, and content type.
+
+## Code Structure
+The code imports necessary dependencies, sets up an S3 client, and exports a single function `getFileInfoFromS3`.
+
+## References
+- `makeS3Client` from "@metriport/core/external/aws/s3"
+- `getEnvOrFail` from "./env"
+
+## Symbols
+
+### `getFileInfoFromS3`
+#### Description
+This function retrieves metadata about a file in an S3 bucket. It attempts to get the file's head object and returns information about its existence, size, and content type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| key | string | The key (path) of the file in the S3 bucket |
+| bucket | string | The name of the S3 bucket |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing file information |
+
+The result object has two possible structures:
+1. If the file exists: `{ exists: true, size: number, contentType: string }`
+2. If the file doesn't exist: `{ exists: false }`
+
+#### Internal Logic
+1. The function uses the S3 client to call the `headObject` method with the provided bucket and key.
+2. If successful, it returns an object indicating the file exists, along with its size and content type.
+3. If an error occurs (likely because the file doesn't exist), it catches the error and returns an object indicating the file doesn't exist.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/external/aws/s3 | Provides the `makeS3Client` function to create an S3 client |
+| ./env | Provides the `getEnvOrFail` function to retrieve environment variables |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| AWS_REGION | string | N/A | The AWS region for the S3 client, retrieved from environment variables |
+
+## Error Handling
+The function uses a try-catch block to handle potential errors when calling `headObject`. If an error occurs, it assumes the file doesn't exist and returns `{ exists: false }` instead of throwing an error.
+
+## Performance Considerations
+The function makes a single API call to S3, which should be relatively quick for retrieving metadata. However, in high-volume scenarios, consider implementing caching or batching requests to improve performance.

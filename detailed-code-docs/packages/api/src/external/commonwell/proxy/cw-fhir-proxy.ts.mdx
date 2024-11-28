@@ -1,0 +1,57 @@
+---
+title: "cw-fhir-proxy.ts"
+---
+
+## High-level description
+This code defines a router for handling CommonWell (CW) Document Query (DQ) requests. It sets up endpoints to process these requests, specifically for the `/DocumentReference` path. The router also includes error handling for undefined routes and provides a dummy router when the FHIR server for CW is disabled.
+
+## Code Structure
+The main router (`fhirRouter`) is created using `express-promise-router`. It defines a GET route for `/DocumentReference` that processes the request using the `processRequest` function. A catch-all route is also defined to handle undefined paths. A `dummyRouter` is created to return a "Not Found" error when the FHIR server is disabled. The final `router` export is determined based on whether the `fhirServerUrl` is defined.
+
+## Symbols
+
+### `fhirRouter`
+#### Description
+An Express router that handles the `/DocumentReference` GET request and a catch-all route for undefined paths.
+
+#### Internal Logic
+- For the `/DocumentReference` GET route:
+  1. Uses `requestLogger` middleware.
+  2. Processes the request using `processRequest` function.
+  3. Returns the resulting bundle with a 200 status code.
+- For all other routes, it throws a `NotFoundError`.
+
+### `dummyRouter`
+#### Description
+A router that returns a "Not Found" error for all routes when the FHIR server for CW is disabled.
+
+#### Internal Logic
+- Uses `requestLogger` middleware.
+- Throws a `NotFoundError` with the message "FHIR server for CW is disabled".
+
+### `router`
+#### Description
+The main router exported by this module. It is either `fhirRouter` or `dummyRouter` depending on whether `fhirServerUrl` is defined.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/util/error/not-found | Provides the `NotFoundError` class for handling 404 errors |
+| express-promise-router | Creates an Express router that allows the use of async route handlers |
+| ../../../routes/util | Provides the `asyncHandler` function for wrapping async route handlers |
+| ./cw-process-request | Provides the `processRequest` function for handling CW requests |
+| ./shared | Provides the `fhirServerUrl` configuration |
+| ../../../routes/helpers/request-logger | Provides the `requestLogger` middleware for logging requests |
+
+## Error Handling
+The code implements error handling by:
+1. Using `asyncHandler` to wrap route handlers, which catches and forwards any errors to Express's error handling middleware.
+2. Throwing `NotFoundError` for undefined routes or when the FHIR server is disabled.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /DocumentReference | GET | Query parameters for Document Query | JSON bundle of DocumentReference resources | Processes a CW Document Query request |
+| /* | ALL | Any | 404 Not Found | Handles undefined routes |
+
+Note: The actual processing of the Document Query request is handled by the `processRequest` function, which is imported from `./cw-process-request`.

@@ -1,0 +1,47 @@
+---
+title: "docker-compose.yml"
+---
+
+## High-level description
+This Docker Compose file defines the configuration for running the FHIR Converter application in a Docker container. It sets up a single service named "fhir-converter" with specific build, deployment, environment, networking, and volume settings for development purposes.
+
+## Symbols
+
+### `fhir-converter` (service)
+#### Description
+This service configuration defines how the FHIR Converter application should be built and run within a Docker container.
+
+#### Internal Logic
+1. Builds the container using the Dockerfile in the current directory.
+2. Sets a restart policy to restart the container on failure.
+3. Configures environment variables for development.
+4. Maps container ports to host ports.
+5. Mounts the local `src` directory to `/app/src` in the container.
+6. Adds a host entry for Docker host access.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Docker Compose | Orchestration tool for defining and running multi-container Docker applications |
+| Docker | Containerization platform |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| NODE_ENV | string | development | Sets the Node.js environment |
+| ENV_TYPE | string | development | Sets the environment type for the application |
+
+## Performance Considerations
+- The use of volume mounting (`./src:/app/src`) allows for real-time code changes without rebuilding the container, which is beneficial for development but may have a slight performance impact.
+- Port mapping is configured for both the application (8777:8080) and debugging (9277:9229), which allows for easy access and debugging from the host machine.
+
+## Error Handling
+The `restart_policy` is set to `on-failure`, ensuring that the container will automatically restart if it crashes or stops unexpectedly.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| http://localhost:8777 | N/A | N/A | N/A | Main application access point |
+| http://localhost:9277 | N/A | N/A | N/A | Debug port for Node.js inspector |
+
+This Docker Compose configuration provides a development-ready setup for the FHIR Converter application, allowing for easy development, debugging, and testing within a containerized environment.

@@ -1,0 +1,64 @@
+---
+title: "fitbit-subscriber-verification.ts"
+---
+
+## High-level description
+This code implements a Lambda function handler for Fitbit subscriber verification. It verifies the incoming verification code against a stored secret and responds accordingly, ensuring secure communication with the Fitbit API.
+
+## Symbols
+
+### `buildResponse`
+#### Description
+A utility function that constructs a standardized response object for the API Gateway.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | number | HTTP status code for the response |
+| body | unknown (optional) | Response body content |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | object | An object containing statusCode and optional body |
+
+### `handler`
+#### Description
+The main Lambda function handler that processes the API Gateway event for Fitbit subscriber verification.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | APIGatewayEvent | The API Gateway event object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | object | The response object with appropriate status code |
+
+#### Internal Logic
+1. Retrieves the Fitbit subscriber verification code from AWS Secrets Manager.
+2. Checks if the verification code exists, throwing an error if it doesn't.
+3. Checks if the event contains a 'verify' query parameter.
+4. If present, compares the 'verify' parameter with the stored verification code.
+5. Returns a NO_CONTENT response if the codes match, or a NOT_FOUND response otherwise.
+6. If no 'verify' parameter is present, returns a NOT_FOUND response.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @aws-lambda-powertools/parameters/secrets | For retrieving secrets from AWS Secrets Manager |
+| aws-lambda | For type definitions related to AWS Lambda functions |
+| http-status | For HTTP status code constants |
+| ./shared/env | For retrieving environment variables |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| FITBIT_SUBSCRIBER_VERIFICATION_CODE | string | N/A | Environment variable for the secret name containing the Fitbit verification code |
+
+## Error Handling
+The code throws an error if the FITBIT_SUBSCRIBER_VERIFICATION_CODE secret is not found, indicating a configuration issue.
+
+## Logging
+The code uses console.log for logging verification attempts and results, which is useful for debugging and monitoring the verification process.

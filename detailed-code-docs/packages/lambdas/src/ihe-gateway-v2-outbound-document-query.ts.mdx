@@ -1,0 +1,57 @@
+---
+title: "ihe-gateway-v2-outbound-document-query.ts"
+---
+
+## High-level description
+This code defines an AWS Lambda function handler for processing outbound document queries in an IHE (Integrating the Healthcare Enterprise) Gateway V2 system. It initializes error capturing, retrieves necessary certificates and keys, and executes the document query process using the provided patient and request information.
+
+## Code Structure
+The main handler function is wrapped with Sentry for error tracking. It uses various imported functions and types from the Metriport core library and other local modules to perform its tasks.
+
+## References
+- `@metriport/core/external/carequality/ihe-gateway-v2/outbound/ihe-gateway-v2`
+- `@metriport/core/external/carequality/ihe-gateway-v2/outbound/ihe-gateway-v2-logic`
+- `@metriport/core/util/env-var`
+- `@metriport/core/util/log`
+- `./shared/secrets`
+- `./shared/capture`
+
+## Symbols
+
+### `handler`
+#### Description
+An AWS Lambda function handler that processes outbound document queries for the IHE Gateway V2 system.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient |
+| cxId | string | The customer ID |
+| requestId | string | The ID of the request |
+| dqRequestsGatewayV2 | array | An array of document query requests for Gateway V2 |
+
+#### Internal Logic
+1. Initializes error capturing.
+2. Logs the environment type, request ID, number of gateways, customer ID, and patient ID.
+3. Retrieves SAML certificates and keys.
+4. Calls `createSignSendProcessDqRequests` with the necessary parameters to process the document queries.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @sentry/serverless | For error tracking and monitoring |
+| @metriport/core | Core functionality for the Metriport system |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| API_URL | string | N/A | The URL of the API, used to construct the document query response URL |
+
+## Error Handling
+The handler is wrapped with `Sentry.AWSLambda.wrapHandler`, which captures and reports any unhandled errors to Sentry.
+
+## Logging
+The code uses a custom logging utility (`out`) from `@metriport/core/util/log` to log information about the Lambda execution.
+
+## API/Interface Reference
+This Lambda function is designed to be triggered by AWS, not directly called as an API. It processes the input event containing patient and request information to perform document queries.

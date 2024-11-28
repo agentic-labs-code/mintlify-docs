@@ -1,0 +1,64 @@
+---
+title: "assessment.hbs"
+---
+
+## High-level description
+This Handlebars template file defines the structure for creating a FHIR DiagnosticReport resource. It generates a JSON object representing a DiagnosticReport with specific attributes such as code, status, and presented form, using data from a CDA (Clinical Document Architecture) input.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template generates a JSON object representing a FHIR DiagnosticReport resource.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ID | string | Unique identifier for the DiagnosticReport |
+| diagReport | object | Contains code, title, and statusCode information |
+| text | string | The content of the diagnostic report |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON object | object | A FHIR-compliant DiagnosticReport resource |
+
+#### Internal Logic
+1. Creates a `fullUrl` using the provided `ID`.
+2. Defines the `resourceType` as "DiagnosticReport".
+3. Sets the `id` using the provided `ID`.
+4. Uses a partial template to generate the `code` attribute.
+5. Uses a partial template to set the `status` attribute.
+6. Creates a `presentedForm` array with a single object containing the report's content.
+7. Defines a `request` object for PUT method.
+
+### Partial Templates
+#### Description
+The template uses several partial templates to populate specific attributes:
+
+1. `DataType/CodeableConcept.hbs`: Used to generate the `code` attribute.
+2. `ValueSet/DiagnosticReportStatus.hbs`: Used to set the `status` attribute.
+
+These partial templates are not provided in the given code, but they are referenced and likely define the structure for CodeableConcept and DiagnosticReportStatus respectively.
+
+#### Internal Logic
+- The `CodeableConcept.hbs` partial is called with `code`, `text`, and `canBeUnknown` parameters.
+- The `DiagnosticReportStatus.hbs` partial is called with the `code` parameter from `diagReport.statusCode.code`.
+
+## Helper Functions
+#### Description
+The template uses a custom Handlebars helper function:
+
+- `base64Encode`: Encodes the provided text into base64 format.
+
+This helper function is not defined in the given code but is used to encode the report's content.
+
+## Dependencies
+The template relies on the FHIR standard for the structure of the DiagnosticReport resource.
+
+## Notes
+1. The template includes a comprehensive copyright notice at the beginning, indicating its origins and usage permissions.
+2. The generated JSON structure follows the FHIR DiagnosticReport resource specifications.
+3. The template uses double curly braces `{{}}` for most Handlebars expressions, but triple curly braces `{{{}}}`for the `base64Encode` helper to prevent HTML escaping.
+
+This template is part of a larger system for converting CDA documents to FHIR resources, specifically focusing on creating DiagnosticReport resources from assessment data in the CDA format.

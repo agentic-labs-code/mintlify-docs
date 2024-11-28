@@ -1,0 +1,278 @@
+---
+title: "consolidated-get.ts"
+---
+
+## High-level description
+The code in `consolidated-get.ts` defines functions related to retrieving and processing consolidated patient data from a FHIR server. It includes functionality for starting a consolidated query, retrieving data synchronously and asynchronously, sending data to an external system, and handling different conversion types (e.g., JSON, PDF).
+
+## Code Structure
+The code defines several functions related to consolidated patient data retrieval and processing. `startConsolidatedQuery` initiates a query and stores its progress. `getConsolidated` retrieves data and handles conversion based on the requested type. `getConsolidatedPatientData` fetches data using a connector that adapts to different environments. `getConsolidatedPatientDataAsync` triggers asynchronous data retrieval. Other functions handle filtering, progress tracking, and data upload.
+
+## References
+- `@metriport/api-sdk`: Provides types and schemas for consolidated queries and filters.
+- `@metriport/core/command/consolidated`: Contains modules for handling consolidated data connectors and retrieval from S3.
+- `@metriport/core/domain/medical-record-summary`: Provides functions for generating file names for medical record summaries.
+- `@metriport/core/domain/patient`: Defines the `Patient` type.
+- `@metriport/core/external/analytics/posthog`: Provides analytics tracking functionality.
+- `@metriport/shared/medical`: Defines the `SearchSetBundle` type.
+- `@metriport/shared`: Provides utility functions.
+- `../../../errors`: Contains error handling functions.
+- `../../../shared/config`: Provides configuration settings.
+- `../../../shared/util`: Provides utility functions.
+- `../document/document-download`: Provides functions for getting signed URLs for document downloads.
+- `./check-ai-brief-enabled`: Provides functionality for checking if AI brief generation is enabled.
+- `./consolidated-webhook`: Provides functions for processing consolidated data webhooks.
+- `./convert-fhir-bundle`: Provides functions for converting FHIR bundles to medical records and uploading them to S3.
+- `./get-patient`: Provides functions for retrieving patient data.
+- `./query-init`: Provides functions for storing query initialization data.
+
+## Symbols
+
+### `startConsolidatedQuery`
+#### Description
+Initiates a consolidated query for a patient's data, stores the query progress in the patient's data, and triggers asynchronous data retrieval.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The ID of the customer. |
+| patientId | string | The ID of the patient. |
+| resources | ResourceTypeForConsolidation[] | (Optional) List of resources to filter by. |
+| dateFrom | string | (Optional) Start date for filtering resources. |
+| dateTo | string | (Optional) End date for filtering resources. |
+| conversionType | ConsolidationConversionType | (Optional) The desired conversion type for the consolidated data. |
+| cxConsolidatedRequestMetadata | unknown | (Optional) Metadata to be associated with the consolidated request. |
+| generateAiBrief | boolean | (Optional) Flag to indicate if an AI brief should be generated. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ConsolidatedQuery | object | An object representing the progress of the consolidated query. |
+
+#### Internal Logic
+1. Checks if AI brief generation is enabled.
+2. Retrieves the patient data.
+3. Checks if a consolidated query with the same parameters is already in progress. If so, returns the existing progress.
+4. Creates a new `ConsolidatedQuery` object with the provided parameters and a unique request ID.
+5. Stores the query progress in the patient's data.
+6. Triggers asynchronous data retrieval using `getConsolidatedPatientDataAsync`.
+
+### `getCurrentConsolidatedProgress`
+#### Description
+Checks if a consolidated query with the given parameters is already in progress for a patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| consolidatedQueriesProgress | ConsolidatedQuery[] | (Optional) An array of consolidated query progress objects. |
+| queryParams | GetConsolidatedFilters | An object containing the parameters of the query to check for. |
+| progressStatus | string | (Optional) The status of the query to check for (defaults to "processing"). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ConsolidatedQuery | object | The consolidated query progress object if a matching query is found, otherwise undefined. |
+
+#### Internal Logic
+1. Iterates through the `consolidatedQueriesProgress` array.
+2. For each query progress object, checks if the resources, date range, conversion type, and status match the provided `queryParams` and `progressStatus`.
+3. If a matching query is found, returns the query progress object.
+
+### `getIsSameResources`
+#### Description
+Compares two arrays of resource types to determine if they represent the same set of resources, considering special cases for empty arrays and the full list of searchable resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queryResources | ResourceTypeForConsolidation[] | (Optional) The first array of resource types. |
+| currentResources | ResourceTypeForConsolidation[] | (Optional) The second array of resource types. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| boolean | boolean | True if the arrays represent the same set of resources, otherwise false. |
+
+#### Internal Logic
+1. Checks if both arrays have the same length and if the intersection of the arrays contains all elements from the `queryResources` array.
+2. Checks if either array is empty and the other contains all resources searchable by patient.
+3. Returns true if any of the above conditions are met, otherwise false.
+
+### `getConsolidatedAndSendToCx`
+#### Description
+Retrieves consolidated patient data, handles conversion based on the requested type, and triggers a webhook to send the data to an external system.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | GetConsolidatedSendToCxParams | An object containing the parameters for retrieving and sending consolidated data. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| void | void | This function does not return a value. |
+
+#### Internal Logic
+1. Retrieves consolidated patient data using `getConsolidated`.
+2. Triggers a webhook to send the data to an external system using `processConsolidatedDataWebhook`.
+3. Handles errors by sending a failure webhook with relevant information.
+
+### `getConsolidated`
+#### Description
+Retrieves consolidated patient data, handles conversion based on the requested type, and returns the data along with the applied filters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId" \| "data"&gt; | An object containing the patient's ID, customer ID, and data. |
+| documentIds | string[] | (Optional) List of document reference IDs to filter by. |
+| resources | ResourceTypeForConsolidation[] | (Optional) List of resources to filter by. |
+| dateFrom | string | (Optional) Start date for filtering resources. |
+| dateTo | string | (Optional) End date for filtering resources. |
+| generateAiBrief | boolean | (Optional) Flag to indicate if an AI brief should be generated. |
+| requestId | string | (Optional) The ID of the request. |
+| conversionType | ConsolidationConversionType | (Optional) The desired conversion type for the consolidated data. |
+| bundle | SearchSetBundle&lt;Resource&gt; | (Optional) A pre-existing FHIR bundle. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ConsolidatedData | object | An object containing the consolidated data bundle and the applied filters. |
+
+#### Internal Logic
+1. Retrieves consolidated patient data using `getConsolidatedPatientData` if a bundle is not provided.
+2. Filters out preliminary document references from the bundle.
+3. Checks if the bundle contains resources and if conversion to a medical record is required.
+4. Handles conversion to a medical record using `handleBundleToMedicalRecord` if necessary.
+5. Uploads the consolidated data as a JSON file to S3 and returns the signed URL if the conversion type is "json".
+6. Returns the consolidated data bundle and the applied filters.
+
+### `filterOutPrelimDocRefs`
+#### Description
+Filters out preliminary document references from a FHIR bundle entry array.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| entries | BundleEntry&lt;Resource&gt;[] | (Optional) An array of FHIR bundle entries. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| BundleEntry&lt;Resource&gt;[] | array | The filtered array of FHIR bundle entries. |
+
+#### Internal Logic
+1. Iterates through the `entries` array.
+2. For each entry, checks if it is a DocumentReference resource and if its `docStatus` is not "preliminary".
+3. Returns the filtered array of entries.
+
+### `uploadConsolidatedJsonAndReturnUrl`
+#### Description
+Uploads a consolidated FHIR bundle as a JSON file to S3 and returns a new bundle containing a DocumentReference resource with a signed URL to the uploaded file.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId"&gt; | An object containing the patient's ID and customer ID. |
+| bundle | Bundle&lt;Resource&gt; | The FHIR bundle to upload. |
+| filters | Record&lt;string, string \| undefined&gt; | An object containing the applied filters. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ bundle: SearchSetBundle&lt;Resource&gt;; filters: Record&lt;string, string \| undefined&gt;; \} | object | An object containing the new bundle with the DocumentReference resource and the applied filters. |
+
+#### Internal Logic
+1. Generates a file name for the JSON file.
+2. Uploads the bundle to S3 using `uploadJsonBundleToS3`.
+3. Retrieves a signed URL for the uploaded file using `getSignedURL`.
+4. Creates a new bundle containing a DocumentReference resource with the signed URL using `buildDocRefBundleWithAttachment`.
+5. Returns the new bundle and the applied filters.
+
+### `getConsolidatedPatientData`
+#### Description
+Retrieves consolidated patient data from a FHIR server using a `ConsolidatedDataConnector`, which adapts to different environments.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId" \| "data"&gt; | An object containing the patient's ID, customer ID, and data. |
+| documentIds | string[] | (Optional) List of document reference IDs to filter by. |
+| resources | ResourceTypeForConsolidation[] | (Optional) List of resources to filter by. |
+| dateFrom | string | (Optional) Start date for filtering resources. |
+| dateTo | string | (Optional) End date for filtering resources. |
+| generateAiBrief | boolean | (Optional) Flag to indicate if an AI brief should be generated. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| SearchSetBundle&lt;Resource&gt; | object | A FHIR bundle containing the consolidated patient data. |
+
+#### Internal Logic
+1. Creates a `ConsolidatedDataRequestSync` payload with the provided parameters.
+2. Builds a `ConsolidatedDataConnector` using `buildConsolidatedDataConnector`.
+3. Executes the connector with the payload to retrieve the bundle location and file name.
+4. Retrieves the consolidated bundle from S3 using `getConsolidatedBundleFromS3`.
+5. Returns the retrieved bundle.
+
+### `getConsolidatedPatientDataAsync`
+#### Description
+Triggers asynchronous retrieval of consolidated patient data using a `ConsolidatedDataConnector`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId" \| "data"&gt; | An object containing the patient's ID, customer ID, and data. |
+| documentIds | string[] | (Optional) List of document reference IDs to filter by. |
+| resources | ResourceTypeForConsolidation[] | (Optional) List of resources to filter by. |
+| dateFrom | string | (Optional) Start date for filtering resources. |
+| dateTo | string | (Optional) End date for filtering resources. |
+| requestId | string | The ID of the request. |
+| conversionType | ConsolidationConversionType | (Optional) The desired conversion type for the consolidated data. |
+| generateAiBrief | boolean | (Optional) Flag to indicate if an AI brief should be generated. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| void | void | This function does not return a value. |
+
+#### Internal Logic
+1. Creates a `ConsolidatedDataRequestAsync` payload with the provided parameters.
+2. Builds a `ConsolidatedDataConnector` using `buildConsolidatedDataConnector`.
+3. Executes the connector with the payload asynchronously, handling errors using `processAsyncError`.
+
+## Side Effects
+- Modifies patient data by storing consolidated query progress.
+- Uploads data to S3.
+- Triggers webhooks to send data to external systems.
+- Sends analytics events.
+
+## Error Handling
+- Uses `processAsyncError` to handle errors during asynchronous data retrieval.
+- Captures errors using `capture.error()` for logging and monitoring purposes.
+- Sends failure webhooks with error information when data retrieval or processing fails.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides FHIR resource type definitions |
+| @metriport/api-sdk | Provides types and schemas for consolidated queries and filters |
+| @metriport/core | Provides various utility functions and domain-specific logic |
+| @metriport/shared | Provides utility functions and common types |
+| dayjs | Date manipulation library |
+| lodash | Utility library for various operations |
+
+## Configuration
+The code uses the following configuration options:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| Config.getMedicalDocumentsBucketName() | string | N/A | The name of the S3 bucket for storing medical documents |
+
+## Logging
+The code uses a custom logging utility (`Util.out()`) to log information about the consolidated query process, including when queries are started, skipped, or completed.
+
+## API/Interface Reference
+This file doesn't expose a public API directly, but it provides several functions that are likely used by other parts of the application to handle consolidated patient data retrieval and processing.
+
+## TODOs
+There are no explicit TODOs in the code.

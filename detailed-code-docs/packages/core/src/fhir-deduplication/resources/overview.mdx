@@ -1,0 +1,97 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for deduplicating various FHIR (Fast Healthcare Interoperability Resources) resources. It implements functions to group and combine similar resources, reducing redundancy and improving data quality across different types of medical information such as allergies, conditions, medications, observations, and more.
+
+## What does it do?
+The code in this directory performs the following main tasks:
+
+1. Deduplicates different types of FHIR resources (e.g., AllergyIntolerance, Condition, DiagnosticReport, Encounter, Immunization, Medication, Observation, Organization, Practitioner, Procedure).
+2. Groups similar resources based on specific criteria relevant to each resource type (e.g., substance for allergies, codes for conditions, dates for encounters).
+3. Combines duplicate or similar resources into a single, more comprehensive record.
+4. Manages reference replacements to ensure consistency across the dataset after deduplication.
+5. Handles special cases and edge conditions specific to each resource type.
+
+The deduplication process helps to clean and consolidate medical data, making it more consistent and easier to work with in healthcare information systems.
+
+## Key Files
+
+### allergy-intolerance.ts
+Deduplicates AllergyIntolerance resources by grouping allergies based on their substance and combining similar entries.
+
+### condition.ts
+Deduplicates Condition resources by grouping conditions based on their medical codes (ICD-10 or SNOMED) and dates.
+
+### diagnostic-report.ts
+Deduplicates DiagnosticReport resources, handling different statuses and combining similar reports.
+
+### encounter.ts
+Deduplicates Encounter resources based on their date and status.
+
+### immunization.ts
+Deduplicates Immunization resources using CVX (Vaccine Administered) or NDC (National Drug Code) coding systems.
+
+### medication-administration.ts
+Deduplicates MedicationAdministration resources, grouping them based on specific criteria and handling status information.
+
+### medication-request.ts
+Deduplicates MedicationRequest resources, grouping similar requests based on medication reference and authored date.
+
+### medication-statement.ts
+Deduplicates MedicationStatement resources, combining similar statements and managing status information.
+
+### medication.ts
+Deduplicates Medication resources based on their RxNorm, NDC, or SNOMED codes.
+
+### observation-shared.ts
+Provides utility functions for handling Observation resources, including code extraction and value retrieval.
+
+### observation-social.ts
+Deduplicates social observations, focusing on combining similar observations based on their code and value.
+
+### observation.ts
+Deduplicates general Observation resources, grouping them based on date, code, and value.
+
+### organization.ts
+Deduplicates Organization resources based on their name and normalized address.
+
+### practitioner.ts
+Deduplicates Practitioner resources, grouping similar practitioners based on their names and addresses.
+
+### procedure.ts
+Deduplicates Procedure resources, grouping them based on their codes (CPT, LOINC, or SNOMED) and dates.
+
+## Dependencies
+The code in this directory relies on the following main dependencies:
+
+1. @medplum/fhirtypes: Provides TypeScript types for FHIR resources.
+2. dayjs: Used for date manipulation in some files.
+3. lodash: Utilized for various utility functions, particularly in observation-shared.ts.
+
+Additionally, the code imports utility functions from other parts of the project, such as:
+
+- ../../mpi/normalize-address: For normalizing addresses in organization.ts and practitioner.ts.
+- ../../util/constants: For accessing constants related to coding systems.
+- ../shared: For shared utility functions used across multiple resource types.
+
+## Configuration
+The code doesn't use explicit configuration files. However, it does define and use constants and types specific to each resource type, such as status rankings and code systems. These are typically defined at the top of each file or imported from shared utility modules.
+
+For example, in medication-statement.ts:
+
+```typescript
+const statusRanking: Record&lt;MedicationStatementStatus, number&gt; = {
+  'entered-in-error': 0,
+  stopped: 1,
+  'on-hold': 2,
+  completed: 3,
+  'not-taken': 4,
+  active: 5,
+  intended: 6,
+  unknown: 7,
+};
+```
+
+These configurations help in determining the most descriptive status when combining resources and in handling specific aspects of each resource type during the deduplication process.

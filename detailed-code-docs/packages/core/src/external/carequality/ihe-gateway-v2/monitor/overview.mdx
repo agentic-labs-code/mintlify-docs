@@ -1,0 +1,66 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for monitoring and storing IHE (Integrating the Healthcare Enterprise) requests and responses in AWS S3 buckets. It provides functionality for handling different types of IHE transactions, including XCPD (Cross-Community Patient Discovery), DQ (Document Query), and DR (Document Retrieval), for both inbound and outbound requests. The code is part of a larger system that integrates healthcare data using the Carequality framework and IHE protocols.
+
+## What does it do?
+The code in this directory performs several key functions:
+
+1. Stores outbound IHE responses (XCPD, DQ, DR) in an S3 bucket:
+   - When the system receives responses from external healthcare providers, it saves these responses in a designated S3 bucket.
+   - Each response is stored with a unique key that includes information like customer ID, patient ID, request type, and timestamp.
+
+2. Stores inbound IHE requests (XCPD, DQ, DR) in an S3 bucket:
+   - When the system receives requests from external healthcare providers, it saves these requests in a designated S3 bucket.
+   - Similar to responses, each request is stored with a unique key containing relevant information.
+
+3. Stores both inbound XCPD requests and responses together as a JSON object:
+   - For XCPD transactions, the system can store both the incoming request and the corresponding response in a single JSON object in the S3 bucket.
+
+4. Generates unique S3 keys for storing requests and responses:
+   - The system creates structured file paths (S3 keys) for each stored item, ensuring organized and easily retrievable data.
+
+5. Provides error handling and logging:
+   - The code includes basic error handling for S3 operations and uses a custom logging utility to record errors and other important information.
+
+This functionality allows the system to maintain a comprehensive record of all IHE transactions, which can be useful for auditing, debugging, and data analysis purposes.
+
+## Key Files
+
+### store.ts
+This is the main file in the directory, containing all the core functionality for storing IHE requests and responses. Key features include:
+
+- Functions for storing outbound responses: `storeXcpdResponses`, `storeDqResponse`, `storeDrResponse`
+- Functions for storing inbound requests: `storeXcpdRequest`, `storeDqRequest`, `storeDrRequest`
+- A function for storing both XCPD request and response: `storeXcpdReqRespJson`
+- Utility functions for generating S3 keys: `buildIheResponseKey`, `buildIheRequestKey`
+- Configuration management for S3 bucket names
+- Error handling and logging
+
+### __tests__/store.test.ts
+This file contains unit tests for the `buildIheResponseKey` function from the store.ts file. The tests ensure that:
+
+- The function correctly constructs file paths for XCPD responses
+- The function correctly constructs file paths for DR responses, including the optional `requestChunkId`
+
+These tests are crucial for maintaining the integrity of the S3 key generation process, which is essential for proper storage and retrieval of IHE responses.
+
+## Dependencies
+The code relies on several external libraries and internal modules:
+
+1. dayjs: Used for date manipulation and formatting in generating S3 keys.
+2. @metriport/ihe-gateway-sdk: Provides types for IHE gateway requests and responses.
+3. S3Utils: An internal utility class for performing S3 operations.
+4. Config: An internal configuration management class.
+
+## Configuration
+The code uses two main configuration options:
+
+1. bucketOutbound: The S3 bucket name for storing outbound responses.
+2. bucketInbound: The S3 bucket name for storing inbound requests.
+
+These options are retrieved from the Config class, allowing for flexible configuration of S3 storage locations.
+
+In summary, this directory provides a robust solution for monitoring and storing IHE-related data in AWS S3, supporting various types of IHE transactions and handling both inbound and outbound communications. It plays a crucial role in maintaining a comprehensive record of healthcare data exchanges within the larger Carequality and IHE integration system.

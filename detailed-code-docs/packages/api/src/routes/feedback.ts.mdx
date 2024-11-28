@@ -1,0 +1,80 @@
+---
+title: "feedback.ts"
+---
+
+## High-level description
+This code defines an Express router for handling feedback-related API endpoints. It provides two routes: one for retrieving feedback information by ID and another for creating a new feedback entry. The router uses Zod for request body validation and implements error handling and logging.
+
+## Code Structure
+The code exports a router object with two defined routes. It imports necessary dependencies and utility functions from other modules. The main symbols are the router object and the two route handlers.
+
+## References
+This code references several external modules and internal utility functions:
+- `getFeedbackOrFail` and `createFeedbackEntry` from the feedback command module
+- `requestLogger`, `asyncHandler`, and `getFromParamsOrFail` from utility modules
+
+## Symbols
+
+### Router
+#### Description
+An Express router instance created using `express-promise-router`.
+
+### GET /:id route
+#### Description
+Retrieves feedback information by ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | Feedback ID (from URL params) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | JSON | Object containing the feedback ID |
+
+#### Internal Logic
+1. Extracts the `id` from request parameters
+2. Calls `getFeedbackOrFail` to validate the feedback exists
+3. Returns a JSON response with the feedback ID
+
+### POST /entry route
+#### Description
+Creates a new feedback entry.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| feedbackId | string | ID of the feedback to associate the entry with |
+| comment | string | The feedback comment |
+| name | string \| null \| undefined | Optional name of the feedback author |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | JSON | Object with a status indicating creation success |
+
+#### Internal Logic
+1. Validates the request body using `feedbackSubmissionSchema`
+2. Calls `createFeedbackEntry` with the provided data
+3. Returns a JSON response indicating successful creation
+
+### feedbackSubmissionSchema
+#### Description
+A Zod schema for validating the feedback submission request body.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| express | Web framework for handling HTTP requests |
+| express-promise-router | Router that allows use of async handlers |
+| http-status | HTTP status codes |
+| zod | Runtime type checking and validation |
+
+## Error Handling
+The code uses `asyncHandler` to wrap route handlers, which likely provides centralized error handling. The `getFromParamsOrFail` function is used to safely extract and validate URL parameters.
+
+## Logging
+The `requestLogger` middleware is applied to both routes, suggesting that incoming requests are logged for monitoring and debugging purposes.
+
+This documentation provides a comprehensive overview of the feedback routes implementation, covering its main functionality, structure, and key components without exceeding the specified length limits.

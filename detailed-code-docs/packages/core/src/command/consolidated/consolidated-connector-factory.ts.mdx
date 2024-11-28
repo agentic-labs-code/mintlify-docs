@@ -1,0 +1,45 @@
+---
+title: "consolidated-connector-factory.ts"
+---
+
+## High-level description
+This code defines a factory function `buildConsolidatedDataConnector()` that creates and returns an instance of a `ConsolidatedDataConnector` based on the current environment (development or production). It uses the `Config` utility to determine the environment and create the appropriate connector implementation.
+
+## Code Structure
+The main function `buildConsolidatedDataConnector()` uses the `Config` utility to check the environment and create either a `ConsolidatedDataConnectorLocal` or `ConsolidatedDataConnectorLambda` instance. These classes implement the `ConsolidatedDataConnector` interface.
+
+## References
+- `Config` from "../../util/config"
+- `ConsolidatedDataConnector` from "./consolidated-connector"
+- `ConsolidatedDataConnectorLambda` from "./consolidated-connector-lambda"
+- `ConsolidatedDataConnectorLocal` from "./consolidated-connector-local"
+
+## Symbols
+
+### `buildConsolidatedDataConnector()`
+#### Description
+This function creates and returns an instance of `ConsolidatedDataConnector` based on the current environment.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | ConsolidatedDataConnector | An instance of either ConsolidatedDataConnectorLocal or ConsolidatedDataConnectorLambda |
+
+#### Internal Logic
+1. Checks if the environment is development using `Config.isDev()`.
+2. If in development:
+   - Gets the medical documents bucket name using `Config.getMedicalDocumentsBucketName()`.
+   - Gets the API URL using `Config.getApiUrl()`.
+   - Creates and returns a new `ConsolidatedDataConnectorLocal` instance with the bucket name and API URL.
+3. If not in development (i.e., production):
+   - Creates and returns a new `ConsolidatedDataConnectorLambda` instance.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/util/config | Provides configuration utilities through the `Config` class |
+| ./consolidated-connector | Defines the `ConsolidatedDataConnector` interface |
+| ./consolidated-connector-lambda | Implements `ConsolidatedDataConnector` for Lambda environments |
+| ./consolidated-connector-local | Implements `ConsolidatedDataConnector` for local development |
+
+This code is part of a larger system for handling consolidated data connectors, providing a factory method to create the appropriate connector based on the environment. It abstracts the environment-specific implementation details from the rest of the application, allowing for easier switching between local development and production Lambda-based setups.

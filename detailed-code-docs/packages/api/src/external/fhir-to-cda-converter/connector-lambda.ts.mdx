@@ -1,0 +1,66 @@
+---
+title: "connector-lambda.ts"
+---
+
+## High-level description
+This code defines a `FhirToCdaConverterLambda` class that implements the `FhirToCdaConverter` interface. It's responsible for converting FHIR (Fast Healthcare Interoperability Resources) data to CDA (Clinical Document Architecture) format using an AWS Lambda function.
+
+## Code Structure
+The main class `FhirToCdaConverterLambda` implements the `FhirToCdaConverter` interface. It uses AWS Lambda to perform the conversion, with configuration and utility functions imported from other modules.
+
+## References
+- `@metriport/core/domain/conversion/fhir-to-cda`: Provides the `Input` type.
+- `@metriport/core/external/aws/lambda`: Provides Lambda-related utility functions.
+- `../../command/medical/organization/get-organization`: Provides the `getOrganizationOrFail` function.
+- `../../shared/config`: Provides configuration values.
+- `./connector`: Provides the `FhirToCdaConverter` interface and `FhirToCdaConverterRequest` type.
+
+## Symbols
+
+### FhirToCdaConverterLambda
+#### Description
+A class that implements the `FhirToCdaConverter` interface, using AWS Lambda to convert FHIR data to CDA format.
+
+#### Methods
+
+### requestConvert
+#### Description
+Sends a request to the AWS Lambda function to convert FHIR data to CDA format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| bundle | Bundle | FHIR bundle to be converted |
+| splitCompositions | boolean | Whether to split compositions |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string[] | Array of converted CDA documents |
+
+#### Internal Logic
+1. Checks if the Lambda function name is defined.
+2. Retrieves the organization information using `getOrganizationOrFail`.
+3. Prepares the Lambda input with customer ID, bundle, split compositions flag, and organization OID.
+4. Invokes the Lambda function using the AWS Lambda client.
+5. Retrieves and parses the Lambda result payload.
+6. Returns the parsed result as an array of strings.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core | Provides domain types and AWS utility functions |
+| aws-sdk | AWS SDK for invoking Lambda functions |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| FHIR_TO_CDA_CONVERTER_LAMBDA_NAME | string | undefined | Name of the Lambda function for FHIR to CDA conversion |
+
+## Error Handling
+- Throws an error if the FHIR to CDA Converter Lambda Name is undefined.
+- Uses `getLambdaResultPayload` function to handle Lambda invocation errors.
+
+## TODOs
+- TODO: Check that this works on Staging

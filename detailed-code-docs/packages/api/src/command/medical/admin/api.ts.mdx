@@ -1,0 +1,80 @@
+---
+title: "api.ts"
+---
+
+## High-level description
+The `api.ts` file defines a function `checkApiQuota` that checks the API Gateway usage quota for each API key associated with a customer. It sends a notification if the remaining quota is below a defined threshold. This helps in proactively monitoring and managing API usage to prevent service disruptions.
+
+## Code Structure
+The code defines two main functions: `checkApiQuota` and `getUsage`. `checkApiQuota` orchestrates the process of fetching usage data, filtering keys with low quota, retrieving organization information, and sending notifications. `getUsage` interacts with the AWS API Gateway to retrieve and process usage data for each API key.
+
+## References
+- `Config`: Used to retrieve configuration values like AWS region and API Gateway usage plan ID.
+- `capture`: Used for sending notifications and logging messages.
+- `getOrganizationOrFail`: Used to retrieve organization details based on cxId.
+- `MetriportError`: Custom error class used for throwing errors with specific details.
+
+## Symbols
+
+### `checkApiQuota`
+#### Description
+This function retrieves API Gateway usage data, identifies API keys with low remaining quota, and sends notifications with details of customers who are approaching their limits.
+
+#### Inputs
+None
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `Promise&lt;CustomersWithLowQuota[]&gt;` | `Promise&lt;CustomersWithLowQuota[]&gt;` | A promise that resolves to an array of `CustomersWithLowQuota` objects, each representing a customer with low remaining API quota. |
+
+#### Internal Logic
+1. Retrieves API Gateway usage data using `getUsage`.
+2. Filters the usage data to identify keys with remaining quota below the defined threshold (`MIN_QUOTA_TO_NOTIFY`).
+3. Retrieves organization details for each identified key using `getOrgs`.
+4. Constructs `CustomersWithLowQuota` objects containing usage details and organization name.
+5. Logs a message and sends a notification with details of customers with low quota using `capture.message`.
+6. Returns the array of `CustomersWithLowQuota` objects.
+
+### `getUsage`
+#### Description
+This function retrieves API Gateway usage data for all API keys associated with the configured usage plan.
+
+#### Inputs
+None
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `Promise&lt;Usage[]&gt;` | `Promise&lt;Usage[]&gt;` | A promise that resolves to an array of `Usage` objects, each representing the usage data for an API key. |
+
+#### Internal Logic
+1. Retrieves the API Gateway usage plan ID from `Config`.
+2. Fetches usage data for the current day from AWS API Gateway using `apiGw.getUsage`.
+3. Processes the usage data for each API key:
+    - Retrieves API key details using `apiGw.getApiKey`.
+    - Extracts quota used, remaining, and total values.
+    - Extracts the `cxId` from the API key name.
+    - Constructs a `Usage` object with the extracted data.
+4. Handles any errors during the process, logs them, and reports them using `capture.message`.
+5. Returns the array of `Usage` objects.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| `@metriport/core/util/error/metriport-error` | Provides a custom error class `MetriportError` for throwing errors with specific details. |
+| `@metriport/shared/common/date` | Provides a constant `ISO_DATE` for formatting dates. |
+| `aws-sdk` | Used to interact with AWS API Gateway. |
+| `dayjs` | Used for date manipulation and formatting. |
+| `lodash` | Used for array manipulation (uniq function). |
+| `@metriport/core/domain/organization` | Provides the `Organization` interface. |
+| `../../../shared/config` | Provides access to configuration values. |
+| `../../../shared/log` | Provides utility functions for logging. |
+| `../../../shared/notifications` | Provides functions for sending notifications. |
+| `../organization/get-organization` | Provides the `getOrganizationOrFail` function for retrieving organization details. |
+
+## Error Handling
+The code uses the custom `MetriportError` class to throw errors with specific messages and additional information. Errors encountered during API Gateway interactions and organization retrieval are logged and reported using `capture.error` and `capture.message`.
+
+## Logging
+The code uses `console.log` for logging informational messages and `capture.message` for logging messages and sending notifications.

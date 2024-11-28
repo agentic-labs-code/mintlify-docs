@@ -1,0 +1,58 @@
+---
+title: "2023-12-05_00_alter-change-log-remove-pk.ts"
+---
+
+## High-level description
+This migration script removes the primary key column `id` from the `change_log` table. It provides both `up` and `down` functions to apply and revert the migration, respectively.
+
+## Symbols
+
+### `up`
+#### Description
+This asynchronous function defines the steps to apply the migration, which involves removing the `id` column from the `change_log` table. It uses a transaction to ensure atomicity.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | \{ context: QueryInterface \} | An object containing the `queryInterface` object, which provides methods for interacting with the database schema. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise\&lt;void\&gt; | A promise that resolves when the migration is applied successfully. |
+
+#### Internal Logic
+1. Starts a database transaction using `queryInterface.sequelize.transaction`.
+2. Removes the `id` column from the `change_log` table using `queryInterface.removeColumn` within the transaction.
+3. Implicitly commits the transaction if all operations succeed.
+
+### `down`
+#### Description
+This asynchronous function defines the steps to revert the migration, which involves adding back the `id` column to the `change_log` table. It also uses a transaction for atomicity.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | \{ context: QueryInterface \} | An object containing the `queryInterface` object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise\&lt;void\&gt; | A promise that resolves when the migration is reverted successfully. |
+
+#### Internal Logic
+1. Starts a database transaction.
+2. Adds the `id` column back to the `change_log` table using `queryInterface.addColumn` within the transaction. The column is defined as a `BIGINT` primary key with auto-increment.
+3. Implicitly commits the transaction if all operations succeed.
+
+## References
+- `DataTypes` from `sequelize`: Used to specify the data type of the `id` column.
+- `Migration` from "..": This likely refers to a type definition for migration functions, probably imported from a local module.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Provides the ORM and database interaction methods. |
+| umzug     | Manages the execution of migrations. |
+
+

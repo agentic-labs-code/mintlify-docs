@@ -1,0 +1,77 @@
+---
+title: "retry.ts"
+---
+
+## High-level description
+This code implements a retry mechanism with exponential backoff and jitter for executing asynchronous functions. It provides flexibility in configuring retry attempts, delays, and conditions for retrying, making it suitable for handling various types of operations that may fail temporarily.
+
+## Code Structure
+The main function `executeWithRetries` is the core of this module. It uses helper functions and types like `defaultShouldRetry`, `defaultGetTimeToWait`, and `ExecuteWithRetriesOptions` to customize its behavior. The `executeWithRetriesSafe` function is a wrapper around `executeWithRetries` that provides a safe execution option.
+
+## Symbols
+
+### `executeWithRetries`
+#### Description
+This function executes an asynchronous operation with configurable retry logic, including exponential backoff and jitter.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fn | `(attempt: number) =&gt; Promise&lt;T&gt;` | The function to be executed |
+| options | `ExecuteWithRetriesOptions&lt;T&gt;` | Configuration options for the retry mechanism |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `Promise&lt;T&gt;` | The result of the successful execution |
+
+#### Internal Logic
+1. Initialize options by merging defaults with provided options
+2. Enter a loop that continues until max attempts are reached
+3. Try to execute the function
+4. If successful and `shouldRetry` returns false, return the result
+5. If an error occurs or `shouldRetry` returns true, wait and retry
+6. If max attempts are reached, throw the last error or return the last result
+
+### `defaultGetTimeToWait`
+#### Description
+Calculates the time to wait before the next retry attempt, implementing exponential backoff with jitter.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | `GetTimeToWaitParams` | Parameters for calculating wait time |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| timeToWait | `number` | The calculated time to wait in milliseconds |
+
+### `executeWithRetriesSafe`
+#### Description
+A wrapper around `executeWithRetries` that catches any thrown errors and returns `undefined` instead.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fn | `() =&gt; Promise&lt;T&gt;` | The function to be executed |
+| options | `Partial&lt;ExecuteWithRetriesOptions&lt;T&gt;&gt;` | Configuration options for the retry mechanism |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `Promise&lt;T \| undefined&gt;` | The result of the successful execution or `undefined` if an error occurred |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| lodash | Used for the `random` function in `defaultGetTimeToWait` |
+| MetriportError | Custom error type used in the code |
+| errorToString | Utility function for converting errors to strings |
+| sleep | Utility function for introducing delays |
+
+## Error Handling
+The code implements robust error handling through the retry mechanism. It catches errors thrown by the executed function and decides whether to retry based on the `shouldRetry` function. If the maximum number of attempts is reached, it throws the last encountered error.
+
+## Performance Considerations
+The exponential backoff with jitter implemented in `defaultGetTimeToWait` helps to distribute retry attempts over time, reducing the likelihood of overwhelming the system being called and improving overall performance in distributed systems.

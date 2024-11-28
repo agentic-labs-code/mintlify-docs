@@ -1,0 +1,82 @@
+---
+title: "oauth1.ts"
+---
+
+## High-level description
+This code implements OAuth1 authentication middleware for handling provider authentication, specifically for Garmin. It processes OAuth1 tokens, verifies them, and updates the connected user's provider data. It also includes a function for deregistering users from the Garmin provider.
+
+## Code Structure
+The main functions in this code are `processOAuth1` and `deregister`. These functions interact with other parts of the codebase, such as user token retrieval, connected user updates, and provider-specific operations.
+
+## References
+- `getUserToken` from "../../command/cx-user/get-user-token"
+- `updateProviderData` from "../../command/connected-user/save-connected-user"
+- `ConnectedUser` model from "../../models/connected-user"
+- Constants and provider-specific data from "../../shared/constants"
+
+## Symbols
+
+### `processOAuth1`
+#### Description
+This function processes OAuth1 authentication for a given provider. It verifies the OAuth tokens, retrieves access tokens, and updates the connected user's provider data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| provider | ProviderOAuth1Options | The OAuth1 provider (e.g., Garmin) |
+| state | string | The state token used for verification |
+| oauth_token | string \| undefined | The OAuth token received from the provider |
+| oauth_verifier | string \| undefined | The OAuth verifier received from the provider |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The updated connected user object |
+
+#### Internal Logic
+1. Retrieves the user token using the provided state
+2. Verifies the OAuth token and verifier
+3. Processes step 2 of OAuth1 to get access token and secret
+4. Updates the provider data for the connected user
+5. Returns the updated connected user object
+
+### `deregister`
+#### Description
+This function deregisters users from the Garmin provider.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| users | DeregisterUsers | An array of user objects containing userAccessToken |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Promise&lt;void&gt; | A promise that resolves when deregistration is complete |
+
+#### Internal Logic
+1. Extracts user access tokens from the input array
+2. Calls the Garmin provider's deregister function with the list of access tokens
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| zod | Schema validation for deregister users |
+| ../../command/connected-user/save-connected-user | Updating connected user data |
+| ../../command/cx-user/get-user-token | Retrieving user tokens |
+| ../../errors/unauthorized | Handling unauthorized errors |
+| ../../models/connected-user | ConnectedUser model |
+| ../../shared/constants | Constants and provider-specific data |
+
+## Error Handling
+The code uses `UnauthorizedError` for handling unauthorized access attempts. It throws this error when the OAuth token doesn't match or when the OAuth verifier is missing.
+
+## API/Interface Reference
+This code doesn't directly expose an API but provides functions that can be used in API routes:
+
+| Function | Description |
+|:---------|:------------|
+| processOAuth1 | Processes OAuth1 authentication for a provider |
+| deregister | Deregisters users from the Garmin provider |
+
+These functions are likely used in API routes handling OAuth callbacks and user deregistration.

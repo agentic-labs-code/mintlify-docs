@@ -1,0 +1,75 @@
+---
+title: "patient-demographics.ts"
+---
+
+## High-level description
+This code provides functionality to transform patient network link data from CommonWell Health Alliance into a normalized format for link demographics. It also includes a utility function to extract patient network links from link results.
+
+## Code Structure
+The main functions in this file are `patientNetworkLinkToNormalizedLinkDemographics` and `getPatientNetworkLinks`. These functions work with data structures from the CommonWell SDK and transform them into standardized formats used within the application.
+
+## Symbols
+
+### `patientNetworkLinkToNormalizedLinkDemographics`
+#### Description
+This function takes a `PatientNetworkLink` object from the CommonWell SDK and transforms it into a normalized `LinkDemographics` object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientNetworkLink | PatientNetworkLink | Patient network link data from CommonWell |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| LinkDemographics | object | Normalized patient demographics data |
+
+#### Internal Logic
+1. Normalizes date of birth
+2. Maps gender to FHIR standard
+3. Normalizes and stringifies names
+4. Normalizes and stringifies addresses
+5. Normalizes telephone numbers
+6. Normalizes email addresses
+7. Removes invalid array values from the final object
+
+#### Performance Considerations
+The function uses multiple `map` and `flatMap` operations, which could impact performance for large datasets.
+
+### `getPatientNetworkLinks`
+#### Description
+Extracts `PatientNetworkLink` objects from an array of `CwLink` results.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| linkResults | CwLink[] | Array of CommonWell link results |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| PatientNetworkLink[] | array | Array of extracted patient network links |
+
+#### Internal Logic
+Uses `flatMap` to extract and filter valid `PatientNetworkLink` objects from the input array.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/patient-demographics | Importing LinkDemographics type |
+| @metriport/core/external/fhir/patient/index | Mapping gender to FHIR standard |
+| @metriport/commonwell-sdk | Importing PatientNetworkLink type |
+| ../../domain/medical/patient-demographics | Various normalization functions |
+| ./cw-patient-data | Importing CwLink type |
+
+## TODOs
+There is a TODO comment indicating that driver's licenses and SSNs are not currently being processed:
+```typescript
+/* TODO
+const driversLicenses = (patientNetworkLink.details.identifiers ?? []).flatMap(p =&gt; { 
+});
+const ssns = (patientNetworkLink.details.identifiers ?? []).flatMap(p =&gt; { 
+});
+*/
+```
+This suggests that future work may include handling these additional identifiers.

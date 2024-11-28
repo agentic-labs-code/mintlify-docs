@@ -1,0 +1,66 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains modules responsible for handling outbound responses in the Carequality integration within the API. It includes functions for creating and retrieving various types of responses, such as document queries, document retrievals, and patient discoveries. These modules interact with the database to persist and fetch response data.
+
+## What does it do?
+The code in this directory manages the lifecycle of outbound responses in the Carequality integration process. Here's a breakdown of the main functionalities:
+
+1. Creating Document Query Responses: When a document query is made to an external gateway, the response is captured and stored in the database using the `createOutboundDocumentQueryResp` function.
+
+2. Creating Document Retrieval Responses: After requesting document retrieval from an external system, the response is saved to the database using the `createOutboundDocumentRetrievalResp` function.
+
+3. Creating Patient Discovery Responses: When a patient discovery request is made to an external gateway, the response is persisted in the database using the `createOutboundPatientDiscoveryResp` function.
+
+4. Retrieving Patient Discovery Responses: The `getOutboundPatientDiscoveryResp` function allows fetching all patient discovery responses associated with a specific request ID.
+
+5. Standardizing Payload Structure: The `DefaultPayload` type ensures consistency in the basic structure of response payloads across different types of requests.
+
+These functions work together to maintain a record of interactions with external systems, allowing for tracking, auditing, and further processing of the received data.
+
+## Key Files
+
+1. `create-outbound-document-query-resp.ts`:
+   - Contains the `createOutboundDocumentQueryResp` function.
+   - Responsible for persisting document query responses in the database.
+
+2. `create-outbound-document-retrieval-resp.ts`:
+   - Contains the `createOutboundDocumentRetrievalResp` function.
+   - Handles the storage of document retrieval responses in the database.
+
+3. `create-outbound-patient-discovery-resp.ts`:
+   - Contains the `createOutboundPatientDiscoveryResp` function.
+   - Manages the persistence of patient discovery responses in the database.
+
+4. `get-outbound-patient-discovery-resp.ts`:
+   - Contains the `getOutboundPatientDiscoveryResp` function.
+   - Retrieves patient discovery responses from the database based on a request ID.
+
+5. `shared.ts`:
+   - Defines the `DefaultPayload` type.
+   - Provides a common structure for response payloads across different types of requests.
+
+## Dependencies
+The code in this directory relies on the following main dependencies:
+
+1. `@metriport/ihe-gateway-sdk`: This package provides types and potentially functionality related to interacting with an IHE gateway. It's used for defining the structure of responses from external gateways.
+
+2. `sequelize`: This ORM (Object-Relational Mapping) library is used for database interactions. It's employed to create and retrieve records in the database tables corresponding to different types of responses.
+
+## Configuration
+While there are no explicit configuration files mentioned in the provided summaries, the code likely relies on database configuration set up elsewhere in the project. This would include details such as database connection strings, credentials, and other Sequelize-related configurations.
+
+The models used in these files (e.g., `OutboundDocumentQueryRespModel`, `OutboundDocumentRetrievalRespModel`, `OutboundPatientDiscoveryRespModel`) are likely defined in separate files and may contain additional configuration related to table structures and relationships.
+
+## Error Handling
+The code summaries don't mention specific error handling mechanisms. However, it's worth noting that:
+
+1. Database operations are typically asynchronous and return promises. Any errors occurring during these operations would be propagated as rejected promises.
+
+2. It's advisable to implement try-catch blocks or .catch() methods when using these functions to handle potential database errors or network issues gracefully.
+
+3. The calling code should be prepared to handle scenarios where the database operations might fail, such as connection issues or constraint violations.
+
+In a production environment, it would be beneficial to add more robust error handling and logging to these functions to facilitate debugging and improve system reliability.

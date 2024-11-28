@@ -1,0 +1,107 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines functions and types for creating and processing XCPD (Cross-Community Patient Discovery) responses in a healthcare interoperability context. It handles the creation of SOAP XML responses for patient discovery queries, including patient demographic information and query acknowledgments.
+
+## Code Structure
+The main function `createInboundXcpdResponse` orchestrates the creation of the XCPD response. It uses helper functions to create different parts of the response, such as the security header, query parameters, and patient information. The code also includes utility functions for mapping between different data formats and creating specific XML structures.
+
+## Symbols
+
+### `createInboundXcpdResponse`
+#### Description
+Creates an XCPD response in XML format based on the provided request and response data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| request | InboundPatientDiscoveryReq | The original patient discovery request |
+| response | InboundPatientDiscoveryResp | The response data for the patient discovery |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| xmlContent | string | The XCPD response in XML format |
+
+#### Internal Logic
+1. Creates a security header using `createSecurityHeader`
+2. Generates the SOAP body using `createIti55SoapBody`
+3. Constructs the full SOAP envelope
+4. Uses `XMLBuilder` to convert the JavaScript object to XML
+
+### `createQueryByParameter`
+#### Description
+Creates the query parameters section of the XCPD response based on the original request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| request | InboundPatientDiscoveryReq | The original patient discovery request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queryByParameter | object | The query parameters in object format |
+
+### `createSubjectAndRegistrationEvent`
+#### Description
+Creates the subject and registration event section of the XCPD response, containing patient demographic information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | InboundPatientDiscoveryResp | The response data for the patient discovery |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subject | object | The subject and registration event data in object format |
+
+### `createAckAndQueryResponseCode`
+#### Description
+Determines the acknowledgment and query response codes based on the patient match result.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | InboundPatientDiscoveryResp | The response data for the patient discovery |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ack | string | The acknowledgment code |
+| queryResponseCode | string | The query response code |
+
+### `createIti55SoapBody`
+#### Description
+Creates the main SOAP body for the XCPD response, including all necessary sections.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| request | InboundPatientDiscoveryReq | The original patient discovery request |
+| response | InboundPatientDiscoveryResp | The response data for the patient discovery |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| soapBody | object | The SOAP body in object format |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| fast-xml-parser | Used for XML building |
+| uuid | Generates unique identifiers |
+| @metriport/ihe-gateway-sdk | Provides types and utilities for IHE gateway operations |
+
+## Error Handling
+The code includes error checking for missing patient resource and external gateway patient information. It throws errors if these required elements are not present in the response.
+
+## Performance Considerations
+The code uses object-based XML construction, which is generally efficient. However, for very large patient datasets, memory usage could be a concern due to the creation of large JavaScript objects before XML conversion.
+
+---
+
+This code is part of a larger system for handling healthcare interoperability messages, specifically for patient discovery across different healthcare communities. It follows the IHE (Integrating the Healthcare Enterprise) XCPD profile specifications for message formatting and content.

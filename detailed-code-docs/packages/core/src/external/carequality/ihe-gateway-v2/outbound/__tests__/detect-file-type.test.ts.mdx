@@ -1,0 +1,73 @@
+---
+title: "detect-file-type.test.ts"
+---
+
+## High-level description
+This code is a test suite for the `detectFileType` function, focusing on its ability to correctly identify various file types within a non-XML body flow. It tests the function's accuracy in detecting file types from raw content, base64-encoded content, and when embedded within an XML structure.
+
+## Code Structure
+The test suite is organized using Jest's `describe` and `it` blocks. It iterates over a set of test files, each with different file types, and performs multiple assertions for each file type.
+
+## References
+- `detectFileType` function from "../../../../../util/file-type"
+- `parseFileFromString` function from "../xca/process/parse-file-from-string"
+- `testFiles` constant from "./constants"
+
+## Symbols
+
+### `describe("detectFileType for all file types with non-xml body flow", ...)`
+#### Description
+This is the main test suite that encompasses all the tests for different file types.
+
+#### Internal Logic
+1. Reads a non-XML body template file.
+2. Iterates over each test file defined in `testFiles`.
+3. For each file type, it runs three separate tests.
+
+### `testFiles.forEach(...)`
+#### Description
+This loop iterates over each test file, creating a nested `describe` block for each file type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| testFiles | Array | An array of objects containing file information (name, mimeType, fileExtension) |
+
+#### Internal Logic
+1. Reads the content of each test file.
+2. Prepares the file content in various formats (raw, base64-encoded, embedded in XML).
+3. Runs three separate test cases for each file type.
+
+### `it("should correctly identify the ${fileExtension} file from raw content", ...)`
+#### Description
+This test case checks if `detectFileType` correctly identifies the file type from raw content.
+
+#### Internal Logic
+1. Calls `detectFileType` with the raw file content.
+2. Asserts that the returned object matches the expected MIME type and file extension.
+
+### `it("should correctly identify the ${fileExtension} file after converting to b64 and then decoding", ...)`
+#### Description
+This test case verifies if `detectFileType` correctly identifies the file type from base64-encoded content after decoding.
+
+#### Internal Logic
+1. Decodes the base64-encoded file content.
+2. Calls `detectFileType` with the decoded content.
+3. Asserts that the returned object matches the expected MIME type and file extension.
+
+### `it("should correctly extract and parse the embedded file from base64 encoded non-xml-body for ${fileExtension}", ...)`
+#### Description
+This test case checks if the file can be correctly extracted and parsed when embedded in a base64-encoded non-XML body.
+
+#### Internal Logic
+1. Calls `parseFileFromString` with the modified non-XML body (containing the embedded file).
+2. Asserts that the parsed file's MIME type matches the expected MIME type.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| fs | For reading files from the file system |
+| path | For handling file paths |
+| detectFileType | The main function being tested |
+| parseFileFromString | For parsing files from string content |
+| testFiles | Constant containing test file information |

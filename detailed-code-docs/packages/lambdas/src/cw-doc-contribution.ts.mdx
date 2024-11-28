@@ -1,0 +1,86 @@
+---
+title: "cw-doc-contribution.ts"
+---
+
+## High-level description
+This Lambda function is designed to handle document retrieval requests from CommonWell. It generates a signed URL for a file stored in an S3 bucket and returns a redirect to that URL. This function is part of the document retrieval process and should be protected by API Gateway's OAuth authorizer.
+
+## Code Structure
+The main handler function processes the incoming request, extracts the file name from query parameters, generates a signed URL for the file in S3, and returns a redirect response. It uses utility functions from other modules for S3 operations, error handling, and environment variable management.
+
+## References
+- `@metriport/core/external/aws/s3`: S3Utils class for S3 operations
+- `@metriport/core/external/commonwell/document/document-contribution`: docContributionFileParam constant
+- `@metriport/shared`: errorToString function
+- `@sentry/serverless`: Sentry for error tracking
+- `./shared/capture`: Capture utility for error logging
+- `./shared/env`: Environment variable utility functions
+
+## Symbols
+
+### `handler`
+#### Description
+The main Lambda function handler that processes the incoming request and returns a response.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | lambda.APIGatewayRequestAuthorizerEvent | The incoming API Gateway event |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | lambda.APIGatewayProxyResult | The response object containing status code, headers, and body |
+
+#### Internal Logic
+1. Extracts the file name from query parameters
+2. Validates the file name
+3. Generates a signed URL for the file in S3
+4. Returns a redirect response to the signed URL
+5. Handles errors and returns appropriate error responses
+
+### `sendResponse`
+#### Description
+A helper function to send the API Gateway response.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | lambda.APIGatewayProxyResult | The response object to be sent |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | lambda.APIGatewayProxyResult | The same response object that was input |
+
+## Side Effects
+- Logs information and errors to the console
+- Captures errors using Sentry
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/external/aws/s3 | S3 utility functions |
+| @metriport/core/external/commonwell/document/document-contribution | Constants for document contribution |
+| @metriport/shared | Error handling utility |
+| @sentry/serverless | Error tracking and monitoring |
+| aws-lambda | AWS Lambda types |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| MEDICAL_DOCUMENTS_BUCKET_NAME | string | N/A | The name of the S3 bucket containing medical documents |
+| SIGNED_URL_DURATION_SECONDS | number | 60 | The duration in seconds for which the signed URL is valid |
+
+## Error Handling
+The function uses a try-catch block to handle errors. If an error occurs, it logs the error, captures it with Sentry, and returns a 500 Internal Server Error response.
+
+## Logging
+The function logs incoming requests, file names, and any errors that occur during processing.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| / | GET | Query parameter: fileName | 301 Redirect or error response | Generates a signed URL for the requested file and returns a redirect |
+
+This Lambda function is designed to be part of a larger system for handling document retrieval requests from CommonWell. It should be used in conjunction with API Gateway and other AWS services to provide secure access to medical documents stored in S3.

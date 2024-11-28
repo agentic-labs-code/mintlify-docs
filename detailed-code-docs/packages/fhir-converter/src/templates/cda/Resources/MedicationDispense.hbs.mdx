@@ -1,0 +1,51 @@
+---
+title: "MedicationDispense.hbs"
+---
+
+## High-level description
+This Handlebars template file generates a FHIR MedicationDispense resource in JSON format. It's designed to convert data from a CDA (Clinical Document Architecture) format to FHIR, specifically for medication dispense information.
+
+## Symbols
+
+### MedicationDispense Resource
+#### Description
+This template creates a MedicationDispense resource, which represents the dispensing of a medication to a patient for use.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ID | String | Unique identifier for the MedicationDispense resource |
+| medDispense | Object | Contains medication dispense information from the CDA document |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON | Object | A FHIR MedicationDispense resource in JSON format |
+
+#### Internal Logic
+1. Creates a `fullUrl` using the provided `ID`.
+2. Sets the `resourceType` to "MedicationDispense".
+3. Assigns the `id` using the provided `ID`.
+4. Generates `identifier` array using the `toArray` helper function on `medDispense.id`.
+5. Sets the `status` using `medDispense.statusCode.code`.
+6. Sets `whenPrepared` using `medDispense.effectiveTime.value`, formatted as a date-time.
+7. Sets `quantity` using `medDispense.quantity.value`.
+8. Includes a `request` object with `method` "PUT" and `url` for the resource.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| DataType/Identifier.hbs | Partial template for generating Identifier data type |
+
+## Helper Functions
+The template uses several custom helper functions:
+1. `toArray`: Converts input to an array.
+2. `formatAsDateTime`: Formats input as a date-time string.
+
+Note: These helper functions are not defined in this file and are likely provided by the templating engine or a custom helper library.
+
+## Configuration
+The template includes a copyright notice and license information at the top, indicating it's based on work by Microsoft Corporation and modified by Metriport Inc.
+
+## Error Handling
+This template does not include explicit error handling. It assumes that all required data is present in the input object.

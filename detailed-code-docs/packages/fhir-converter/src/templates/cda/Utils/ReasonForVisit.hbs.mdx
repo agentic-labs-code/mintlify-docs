@@ -1,0 +1,45 @@
+---
+title: "ReasonForVisit.hbs"
+---
+
+## High-level description
+This Handlebars template file, `ReasonForVisit.hbs`, is designed to extract and format the "Reason for Visit" information from a Clinical Document Architecture (CDA) document. It transforms the CDA data into a JSON structure containing an array of reasons, each represented as a CodeableConcept.
+
+## Code Structure
+The template uses Handlebars helpers and partials to process the CDA data. It focuses on extracting information from a specific section of the CDA document identified by the template ID '2.16.840.1.113883.10.20.22.2.12'.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template extracts the "Reason for Visit" section from the CDA document and formats it into a JSON structure.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| msg | object | The CDA document object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON | object | A JSON object containing an array of reasons |
+
+#### Internal Logic
+1. Uses the `getFirstCdaSectionsByTemplateId` helper to find the "Reason for Visit" section in the CDA document.
+2. Iterates over the entries in the section using `toArray` helper.
+3. For each entry, it calls the `CodeableConcept.hbs` partial to format the reason as a CodeableConcept.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| CodeableConcept.hbs | Partial template for formatting CodeableConcept data |
+
+## References
+The template references the `CodeableConcept` structure, which is defined in the related file `packages/api/src/domain/medical/codeable-concept.ts`. This structure consists of:
+- An optional array of `Coding` objects, each containing:
+  - `system`: An optional string representing the coding system
+  - `code`: An optional string representing the code
+  - `display`: An optional string representing the human-readable display text
+- An optional `text` field for additional textual information
+
+This structure is used to represent each reason for visit in a standardized format.

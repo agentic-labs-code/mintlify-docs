@@ -1,0 +1,96 @@
+---
+title: "get.ts"
+---
+
+Here's a detailed documentation of the provided code:
+
+## High-level description
+This code defines functions for managing patient links in the CommonWell Health Alliance system. It includes operations for creating, getting, and resetting patient links, as well as finding potential links and current links for a patient.
+
+## Code Structure
+The main functions exported from this module are `get`, `findCurrentLink`, and `findAllPotentialLinks`. These functions interact with the CommonWell API to retrieve and manage patient link information. The code also includes helper functions and types to support these operations.
+
+## Symbols
+
+### `get`
+#### Description
+Retrieves current and potential links for a patient in the CommonWell system.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient |
+| cxId | string | The customer ID |
+| facilityId | string | The ID of the facility |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| CWPersonLinks | object | Contains current links, potential links, and network links for the patient |
+
+#### Internal Logic
+1. Checks if CommonWell is enabled for the customer.
+2. Retrieves the patient data.
+3. Finds the current link for the patient.
+4. Finds all potential links for the patient.
+5. Finds network links for the patient.
+6. Returns the combined link information.
+
+### `findCurrentLink`
+#### Description
+Finds the current link for a patient in the CommonWell system.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId"&gt; | Patient object with id and cxId |
+| patientCWData | PatientDataCommonwell \| undefined | CommonWell data for the patient |
+| commonWell | CommonWellAPI | CommonWell API instance |
+| queryMeta | RequestMetadata | Query metadata |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Person \| undefined | object \| undefined | The current link for the patient, if found |
+
+#### Internal Logic
+1. Checks if CommonWell data exists for the patient.
+2. Retrieves the patient link from CommonWell.
+3. Verifies the link's assurance level.
+4. If the assurance level is high enough, retrieves and returns the person data.
+
+### `findAllPotentialLinks`
+#### Description
+Finds all potential links for a patient in the CommonWell system.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient object |
+| commonWell | CommonWellAPI | CommonWell API instance |
+| queryMeta | RequestMetadata | Query metadata |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Person[] | array | Array of potential person links |
+
+#### Internal Logic
+1. Searches for persons using strong IDs.
+2. Searches for persons using demographic data.
+3. Combines and deduplicates the results.
+
+## Dependencies
+The code relies on several external libraries and modules:
+- @metriport/commonwell-sdk
+- @metriport/core
+- lodash
+
+## Error Handling
+The code includes error handling for API calls and unexpected responses. Errors are logged and captured using a notification system.
+
+## Logging
+The code uses a custom logging system (`out`) for debugging and error reporting.
+
+## Performance Considerations
+The code makes multiple API calls to the CommonWell system, which could impact performance for large numbers of patients or frequent requests. Caching or batching strategies might be considered for optimization.

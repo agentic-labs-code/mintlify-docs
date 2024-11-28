@@ -1,0 +1,85 @@
+---
+title: "set-doc-retrieve-start.test.ts"
+---
+
+## High-level description
+This file contains unit tests for the `setDocRetrieveStartAt` function, which is responsible for setting the document retrieval start time for a patient in the context of medical data retrieval from external sources, specifically Carequality.
+
+## Code Structure
+The test file imports necessary dependencies and sets up mock data and functions. It then defines two test cases within the `describe` block for the `setDocRetrieveStartAt` function.
+
+## Symbols
+
+### `setDocRetrieveStartAt`
+#### Description
+This is the main function being tested. It sets the document retrieval start time for a patient's external data source.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient object |
+| source | MedicalDataSource | The external data source (e.g., CAREQUALITY) |
+| startedAt | Date | The start time for document retrieval |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Patient | The updated patient object |
+
+#### Internal Logic
+The function updates the patient's external data with the new document retrieval start time while preserving existing data.
+
+### `beforeEach`
+#### Description
+Sets up the test environment before each test case.
+
+#### Internal Logic
+1. Initializes `externalData` with mock document query progress.
+2. Creates a mock patient using `makePatient` function.
+3. Mocks the database transaction and PatientModel methods.
+
+### `afterEach`
+#### Description
+Cleans up the test environment after each test case.
+
+#### Internal Logic
+Restores all mocked functions to their original implementation.
+
+### Test: "sets documentRetrievalStartTime when startedAt is new Date"
+#### Description
+Verifies that the function correctly sets the `documentRetrievalStartTime` for the specified source.
+
+#### Internal Logic
+1. Calls `setDocRetrieveStartAt` with mock data.
+2. Retrieves the updated source data using `getCQData`.
+3. Asserts that the `documentRetrievalStartTime` matches the input `startedAt`.
+
+### Test: "preserves existing documentQueryProgress when setting new documentRetrievalStartTime"
+#### Description
+Ensures that the existing `documentQueryProgress` is preserved when updating the `documentRetrievalStartTime`.
+
+#### Internal Logic
+1. Calls `setDocRetrieveStartAt` with mock data.
+2. Retrieves the updated source data.
+3. Asserts that the `documentQueryProgress` in the result matches the original mock data.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/patient | Provides Patient and PatientExternalData types |
+| @metriport/core/external/index | Provides MedicalDataSource enum |
+| makePatient, makePatientData | Helper functions for creating mock patient data |
+| PatientModel | Database model for Patient |
+| mockStartTransaction | Mocks database transaction |
+| setDocRetrieveStartAt | The function being tested |
+| makeProgress | Helper function for creating mock progress data |
+| getCQData | Helper function to retrieve Carequality-specific data from patient's external data |
+
+## Error Handling
+The tests do not explicitly cover error handling scenarios. Error handling might be implemented in the actual `setDocRetrieveStartAt` function, which is not visible in this test file.
+
+## Notes
+- The tests use Jest as the testing framework.
+- The code uses TypeScript, as evidenced by the type annotations and imports.
+- The tests focus on verifying the correct updating of the patient's external data, specifically for the Carequality source.
+- The use of `mockStartTransaction` and mocking of `PatientModel` methods suggests that the actual function interacts with a database, but these interactions are mocked for the tests.

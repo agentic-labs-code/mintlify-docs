@@ -1,0 +1,86 @@
+---
+title: "concurrency.ts"
+---
+
+## High-level description
+This file defines utility functions for executing asynchronous operations concurrently. The main function, `executeAsynchronously`, allows processing an array of items asynchronously with configurable parallelism, delay, and error handling options.
+
+## Code Structure
+The file exports two main types: `ExecuteInChunksOptions` for configuration options and `FunctionType` for the function to be executed asynchronously. The core functionality is provided by the `executeAsynchronously` function, which uses `executeSynchronously` internally to process items in parallel.
+
+## Symbols
+
+### `ExecuteInChunksOptions`
+#### Description
+An interface defining options for the `executeAsynchronously` function.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| numberOfParallelExecutions | number | Optional. How many promises should execute at the same time. |
+| delay | number | Optional. Explicit delay between runs in milliseconds. |
+| maxJitterMillis | number | Optional. Maximum jitter in milliseconds before each run. |
+| minJitterMillis | number | Optional. Minimum jitter in milliseconds before each run. |
+| keepExecutingOnError | boolean | Optional. Whether to keep executing when an error occurs. |
+| log | function | Optional. Where to log. |
+
+### `FunctionType&lt;T&gt;`
+#### Description
+A type definition for the function to be executed asynchronously.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| item | T | The item to be processed. |
+| itemIndex | number | The index of the item in the array. |
+| promiseIndex | number | The index of the promise processing the item. |
+| promiseCount | number | The total amount of promises running in parallel. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Promise&lt;void&gt; | A promise that resolves when the processing is done. |
+
+### `executeAsynchronously&lt;T&gt;`
+#### Description
+The main function that processes an array of items asynchronously.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| collection | T[] | Array of elements to be processed. |
+| fn | FunctionType&lt;T&gt; | The function to be executed asynchronously. |
+| options | ExecuteInChunksOptions | Additional settings (optional). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Promise&lt;PromiseSettledResult&lt;void&gt;[]&gt; | A promise that resolves with the results of all executions. |
+
+#### Internal Logic
+1. Validates input parameters.
+2. Creates a copy of the input array.
+3. Determines the number of parallel promises to run.
+4. Creates an array of promises, each processing items from the collection.
+5. Executes the promises in parallel, with optional error handling.
+6. Returns the results of all executions.
+
+### `executeSynchronously&lt;T&gt;`
+#### Description
+An internal function that processes items synchronously for a single promise.
+
+#### Internal Logic
+1. Processes items from the shared array one by one.
+2. Calls the provided function for each item.
+3. Handles errors based on the `keepExecutingOnError` option.
+4. Updates the shared index control.
+
+## Dependencies
+- `errorToString` from "./error/shared"
+- `sleep` from "./sleep"
+
+## Error Handling
+The code includes error handling mechanisms, allowing for continued execution on errors if specified in the options. Errors are logged if a logging function is provided.
+
+## Performance Considerations
+The code allows for parallel execution of tasks, which can significantly improve performance for I/O-bound operations. The use of jitter can help prevent thundering herd problems in distributed systems.

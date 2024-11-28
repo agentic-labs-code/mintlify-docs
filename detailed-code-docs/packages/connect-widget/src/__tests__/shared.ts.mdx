@@ -1,0 +1,71 @@
+---
+title: "shared.ts"
+---
+
+## High-level description
+This code provides utility functions for managing environment variables and configuration settings in a test environment. It's designed to work across different environments (development and Checkly) and provides a consistent way to access environment-specific variables for testing purposes.
+
+## Code Structure
+The code defines three main functions: `buildEnvVarName`, `envVarForTest`, and `getTestConfig`. These functions work together to retrieve and manage environment variables for testing, with `getTestConfig` utilizing `envVarForTest` to construct a configuration object.
+
+## Symbols
+
+### `buildEnvVarName`
+#### Description
+This function constructs an environment variable name by combining a key and an environment type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| key | string | The base name of the environment variable |
+| envType | string | The type of environment (e.g., 'staging', 'production') |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string | The constructed environment variable name |
+
+#### Internal Logic
+The function concatenates the `key` and uppercase `envType` with an underscore separator.
+
+### `envVarForTest`
+#### Description
+This function retrieves the value of an environment variable for testing purposes, handling different environments (development and Checkly).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| key | string | The name of the environment variable to retrieve |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| envKey | string | The value of the requested environment variable |
+
+#### Internal Logic
+1. Attempts to get the environment variable using `getEnvVar(key)`.
+2. If not found, tries to get it from `process.env` using the constructed name from `buildEnvVarName`.
+3. Throws an error if the variable is not found.
+
+### `getTestConfig`
+#### Description
+This function returns a configuration object with essential URLs and API key for testing.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | object | An object containing apiUrl, widgetUrl, and testApiKey |
+
+#### Internal Logic
+Uses `envVarForTest` to retrieve values for "API_URL", "WIDGET_URL", and "WIDGET_TEST_API_KEY".
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| "../shared/util" | Imports `getEnvType` and `getEnvVar` functions |
+
+## Error Handling
+The `envVarForTest` function throws an error if the requested environment variable is not found, providing a clear message about which variable is missing.
+
+## References
+This code is referenced in the `connect.test.e2e.ts` file, which uses the `getTestConfig` function to set up the test environment with the necessary URLs and API key.

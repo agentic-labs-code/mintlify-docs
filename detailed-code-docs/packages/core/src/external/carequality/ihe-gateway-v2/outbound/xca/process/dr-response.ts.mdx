@@ -1,0 +1,97 @@
+---
+title: "dr-response.ts"
+---
+
+## High-level description
+This code processes document retrieval responses from an external healthcare gateway. It handles MTOM (Message Transmission Optimization Mechanism) responses, extracts document content, stores it in S3, and creates a structured response with document metadata and references.
+
+## Code Structure
+The main function `processDrResponse` orchestrates the processing of document retrieval responses. It uses helper functions to parse MTOM responses, extract document content, store files in S3, and create structured document references. The code interacts with AWS S3 for file storage and uses various utility functions for error handling and logging.
+
+## Symbols
+
+### `processDrResponse`
+#### Description
+This function processes document retrieval responses from an external healthcare gateway.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | DrSamlClientResponse | Contains the response data from the external gateway |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Promise&lt;OutboundDocumentRetrievalResp&gt; | Processed document retrieval response |
+
+#### Internal Logic
+1. Checks for error responses and handles them accordingly.
+2. Parses the SOAP response from the MTOM data.
+3. Processes successful responses by extracting document content and metadata.
+4. Handles registry errors and empty responses.
+5. Creates a structured response with document references and metadata.
+
+### `handleSuccessResponse`
+#### Description
+Processes successful document retrieval responses.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documentResponses | DocumentResponse[] | Array of document responses |
+| outboundRequest | OutboundDocumentRetrievalReq | Original outbound request |
+| gateway | XCAGateway | Gateway information |
+| mtomResponse | MtomAttachments | MTOM response data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Promise&lt;OutboundDocumentRetrievalResp&gt; | Processed document retrieval response |
+
+#### Internal Logic
+1. Generates ID mapping for document references.
+2. Processes each document response to create document references.
+3. Constructs the final response object with processed document references.
+
+### `processDocumentReference`
+#### Description
+Processes a single document response and creates a document reference.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documentResponse | DocumentResponse | Single document response |
+| outboundRequest | OutboundDocumentRetrievalReq | Original outbound request |
+| idMapping | Record&lt;string, string&gt; | Mapping of document IDs |
+| mtomResponse | MtomAttachments | MTOM response data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Promise&lt;DocumentReference&gt; | Processed document reference |
+
+#### Internal Logic
+1. Extracts document content and metadata from the MTOM response.
+2. Uploads the document to S3 if it doesn't exist.
+3. Creates a document reference with metadata and S3 location information.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| fast-xml-parser | Parsing XML responses |
+| dayjs | Date and time manipulation |
+| @metriport/ihe-gateway-sdk | Types and schemas for IHE gateway interactions |
+| @metriport/shared | Utility functions |
+
+## Error Handling
+The code implements various error handling mechanisms:
+- Handles HTTP errors from the gateway response
+- Processes registry errors in the SOAP response
+- Handles empty responses
+- Captures and logs errors during document processing
+
+## Logging
+The code uses a custom logging utility (`out`) for logging messages and errors throughout the processing flow.
+
+## API/Interface Reference
+This code is part of a larger system for interacting with healthcare gateways. It specifically handles the processing of document retrieval responses and doesn't expose a public API directly.

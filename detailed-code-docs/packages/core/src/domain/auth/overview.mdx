@@ -1,0 +1,84 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code related to authentication mechanisms within the Metriport system. It includes two main components: a code challenge system and a cookie management system. These components are designed to handle various aspects of user authentication and session management.
+
+## What does it do?
+The code in this directory implements two key functionalities:
+
+1. Code Challenge System:
+   - Generates and manages code challenges for authentication purposes.
+   - Retrieves initial codes from AWS Secrets Manager.
+   - Notifies a Slack channel about code challenge initiation.
+   - Waits for code updates within a specified time limit.
+   - Returns updated codes for use in the authentication process.
+
+2. Cookie Management System:
+   - Provides a flexible framework for handling authentication cookies.
+   - Offers two storage options: in-memory (for development/testing) and AWS Secrets Manager (for production).
+   - Allows storing, retrieving, and updating cookies.
+   - Converts cookies between object and string representations.
+
+These systems work together to create a robust authentication framework, enabling secure user sessions and interactions with external services like CommonWell Health Alliance.
+
+## Key Files
+
+1. Code Challenge:
+   - `index.ts`: Defines the `CodeChallenge` interface.
+   - `code-challenge-on-secrets.ts`: Implements `CodeChallengeFromSecretManager` class.
+
+2. Cookie Management:
+   - `cookie-manager.ts`: Defines the abstract `CookieManager` class and utility functions.
+   - `cookie-manager-in-memory.ts`: Implements `CookieManagerInMemory` for local storage.
+   - `cookie-manager-on-secrets.ts`: Implements `CookieManagerOnSecrets` for AWS Secrets Manager storage.
+
+## Dependencies
+The code relies on several external libraries and internal utilities:
+
+1. `aws-sdk`: Used for interacting with AWS Secrets Manager.
+2. `dayjs`: Employed for date and time manipulation in the code challenge system.
+3. Internal utilities from `@metriport/core` for Slack notifications, error handling, and sleep functions.
+
+## Configuration
+Both systems require configuration for AWS Secrets Manager:
+
+- Code Challenge:
+  - `secretArn`: ARN of the secret in AWS Secrets Manager.
+  - `region`: AWS region where the secret is stored.
+  - `notificationUrl`: URL for sending Slack notifications.
+
+- Cookie Management (for `CookieManagerOnSecrets`):
+  - `secretArn`: ARN of the secret in AWS Secrets Manager.
+  - `region`: AWS region where the secret is stored.
+
+These parameters allow for flexible configuration based on the deployment environment.
+
+## Code Examples
+
+1. Code Challenge:
+
+```typescript
+const codeChallenge = new CodeChallengeFromSecretManager(secretArn, region, notificationUrl);
+const updatedCode = await codeChallenge.getCode();
+```
+
+2. Cookie Management:
+
+```typescript
+// In-memory storage
+const inMemoryCookieManager = new CookieManagerInMemory();
+const cookies = await inMemoryCookieManager.getCookies();
+
+// AWS Secrets Manager storage
+const secretsCookieManager = new CookieManagerOnSecrets(secretArn, region);
+await secretsCookieManager.updateCookies(newCookies);
+
+// Converting cookies to string
+const cookieString = cookiesToString(cookies);
+```
+
+These examples demonstrate the usage of both systems, showcasing their flexibility and ease of use in different scenarios.
+
+In conclusion, this directory provides a comprehensive authentication framework, combining secure code challenge mechanisms with flexible cookie management. The modular design allows for easy adaptation to different environments and security requirements, making it suitable for both development and production use within the Metriport system.

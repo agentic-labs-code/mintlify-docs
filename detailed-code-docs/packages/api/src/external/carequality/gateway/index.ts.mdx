@@ -1,0 +1,101 @@
+---
+title: "index.ts"
+---
+
+## High-level description
+The `gatherXCPDGateways` function retrieves a list of XCPD (Cross-Community Patient Discovery) gateways for a given patient. It determines the appropriate gateways based on environment (E2E testing or production) and patient address proximity to organizations with XCPD capabilities.
+
+## Code Structure
+The `gatherXCPDGateways` function is the main entry point. It calls several helper functions: `isE2eCx`, `isEpicEnabledForCx`, `searchCQDirectoriesAroundPatientAddresses`, `getOrganizationsForXCPD`, `facilitiesWithEpicFilter`, `toBasicOrgAttributes`, `filterCQOrgsToSearch`, and `cqOrgsToXCPDGateways`. The `facilitiesWithEpicFilter` function filters out facilities based on whether Epic is enabled. The `getE2eGateways` function retrieves gateways for E2E testing.
+
+## References
+- `@metriport/core/domain/patient`: Provides the `Patient` interface.
+- `@metriport/ihe-gateway-sdk`: Provides the `XCPDGateway` interface.
+- `@metriport/shared`: Provides the `MetriportError` class.
+- `../cq-directory`: Provides the `CQDirectoryEntry` interface.
+- `../../../shared/config`: Provides access to configuration settings.
+- `../../aws/app-config`: Provides functions for checking feature flags.
+- `../command/cq-directory/get-cq-directory-entry`: Provides the `getCQDirectoryEntryOrFail` function.
+- `../command/cq-directory/get-organizations-for-xcpd`: Provides the `getOrganizationsForXCPD` function.
+- `../command/cq-directory/search-cq-directory`: Provides the `filterCQOrgsToSearch`, `searchCQDirectoriesAroundPatientAddresses`, and `toBasicOrgAttributes` functions.
+- `../organization-conversion`: Provides the `buildXcpdGateway` and `cqOrgsToXCPDGateways` functions.
+
+## Symbols
+
+### `gatherXCPDGateways`
+#### Description
+This function retrieves a list of XCPD gateways for a given patient. It first checks if the environment is E2E testing and returns a limited set of gateways if so. Otherwise, it searches for nearby organizations with XCPD links, retrieves their details, filters them based on Epic enablement, and converts them to XCPD gateway objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `Patient` | The patient for whom to retrieve XCPD gateways. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;XCPDGateway[]&gt; | `Promise&lt;XCPDGateway[]&gt;` | A promise that resolves to an array of XCPD gateways. |
+
+#### Internal Logic
+1. Logs the start of the function execution.
+2. Checks if the environment is E2E testing using `isE2eCx`.
+3. If in E2E testing, retrieves E2E gateways using `getE2eGateways`.
+4. Checks if Epic is enabled for the patient's context using `isEpicEnabledForCx`.
+5. Searches for nearby organizations with XCPD links using `searchCQDirectoriesAroundPatientAddresses`.
+6. Creates a map of organization IDs to their order in the search results.
+7. Retrieves details for all organizations using `getOrganizationsForXCPD`.
+8. Filters organizations based on Epic enablement using `facilitiesWithEpicFilter`.
+9. Extracts basic attributes from the filtered organizations using `toBasicOrgAttributes`.
+10. Filters organizations to search for XCPD gateways using `filterCQOrgsToSearch`.
+11. Converts the filtered organizations to XCPD gateway objects using `cqOrgsToXCPDGateways`.
+12. Returns the array of XCPD gateways.
+
+### `facilitiesWithEpicFilter`
+#### Description
+This function filters a list of CQDirectoryEntry objects based on whether Epic is enabled. If Epic is enabled, it returns the original list. Otherwise, it filters out entries where the managing organization is "Epic".
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cqDirectoryEntries | `CQDirectoryEntry[]` | The list of CQDirectoryEntry objects to filter. |
+| isEpicEnabled | `boolean` | Whether Epic is enabled. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `CQDirectoryEntry[]` | `CQDirectoryEntry[]` | The filtered list of CQDirectoryEntry objects. |
+
+### `getE2eGateways`
+#### Description
+This function retrieves the E2E gateways from the configuration. It throws an error if the E2E gateway configuration is missing.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| None | | |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;XCPDGateway[]&gt; | `Promise&lt;XCPDGateway[]&gt;` | A promise that resolves to an array of XCPD gateways. |
+
+#### Internal Logic
+1. Retrieves the E2E CQ Directory entry using `getCQDirectoryEntryOrFail`.
+2. Throws an error if the entry is missing the XCPD URL.
+3. Builds an XCPD gateway object using `buildXcpdGateway`.
+4. Returns an array containing the E2E gateway.
+
+## Dependencies
+- `@metriport/core`
+- `@metriport/ihe-gateway-sdk`
+- `@metriport/shared`
+- `@metriport/carequality-sdk`
+
+## Error Handling
+- Uses `MetriportError` to throw errors with specific messages and additional information.
+
+## Logging
+- Uses the `out` function from `@metriport/core/util/log` for logging.
+- Logs the start of the `gatherXCPDGateways` function execution.
+- Logs a message when limiting to E2E gateways.
+- Logs an error message if the E2E CQ Directory entry is missing the XCPD URL.

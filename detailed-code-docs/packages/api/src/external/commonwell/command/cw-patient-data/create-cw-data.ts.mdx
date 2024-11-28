@@ -1,0 +1,52 @@
+---
+title: "create-cw-data.ts"
+---
+
+## High-level description
+This code defines a function `createOrUpdateCwPatientData` that creates or updates CommonWell (CW) patient data in a database. It handles the creation of new patient data or updates existing data with new information, including CommonWell links and link demographics history.
+
+## Code Structure
+The main function `createOrUpdateCwPatientData` uses helper functions and models to perform its operations. It interacts with the database using the `CwPatientDataModel` and utilizes transaction management for data consistency.
+
+## References
+- `CwPatientDataModel` from "../../models/cw-patient-data"
+- `getCwPatientData` from "./get-cw-data"
+- `updateCwPatientDataWithinDBTx` from "./update-cw-data"
+
+## Symbols
+
+### `createOrUpdateCwPatientData`
+#### Description
+This function creates or updates CommonWell patient data in the database. It first attempts to update existing data within a transaction, and if no existing data is found, it creates a new entry.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The patient's identifier |
+| cxId | string | The customer's identifier |
+| cwLinks | CwLink[] | An array of CommonWell links |
+| requestLinksDemographics | object (optional) | Contains request ID and link demographics |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| CwPatientData | object | The created or updated CommonWell patient data |
+
+#### Internal Logic
+1. Constructs a `CwPatientDataCreate` object with the provided inputs.
+2. Attempts to update existing patient data within a database transaction:
+   - Retrieves existing patient data using `getCwPatientData` with a lock.
+   - If existing data is found, updates it using `updateCwPatientDataWithinDBTx`.
+3. If the update is successful, returns the updated data.
+4. If no existing data is found or update fails, creates a new entry using `CwPatientDataModel.create`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/patient-demographics | Imports `LinkDemographics` type |
+
+## Error Handling
+The function doesn't explicitly handle errors but relies on the underlying functions and database operations to throw errors if something goes wrong.
+
+## Performance Considerations
+The function uses a database transaction to ensure data consistency when updating existing records. This approach prevents race conditions but may impact performance under high concurrency scenarios.

@@ -1,0 +1,107 @@
+---
+title: "generate-ccd.ts"
+---
+
+## High-level description
+This code generates a Continuity of Care Document (CCD) in XML format for a given patient. It retrieves patient and organization data, constructs the CCD structure, and includes various sections such as allergies, medications, and problems. If no patient data is available, it generates an empty CCD with placeholder content.
+
+## Code Structure
+The main function `generateCcd` orchestrates the CCD generation process. It checks for existing FHIR data, retrieves consolidated patient data, converts it to CDA format, and returns the resulting CCD. If no data is available, it calls `generateEmptyCcd` to create a minimal CCD structure.
+
+## Symbols
+
+### `generateCcd`
+#### Description
+This function generates a Continuity of Care Document (CCD) for a given patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | Patient object containing patient information |
+| requestId | string | Unique identifier for the request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ccd | string | The generated CCD in XML format |
+
+#### Internal Logic
+1. Checks if FHIR bundle uploads exist for the patient
+2. If no uploads exist, generates an empty CCD
+3. Retrieves FHIR resources for the patient
+4. If no resources are found, generates an empty CCD
+5. Retrieves the organization information
+6. Creates a FHIR bundle with patient resources and organization data
+7. Uploads the FHIR bundle to S3
+8. Validates the FHIR bundle
+9. Converts the FHIR bundle to CDA format
+10. Returns the first CCD in the converted array
+
+### `getFhirResourcesForCcd`
+#### Description
+Retrieves FHIR resources for a given patient, filtering out specific resource types and including only Metriport-generated resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | Patient object containing patient information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resources | BundleEntry&lt;Resource&gt;[] | Array of FHIR resource entries |
+
+#### Internal Logic
+1. Retrieves consolidated patient data
+2. Filters out Composition resources
+3. Includes resources with Metriport data source extension or without any extension
+
+### `uploadCcdFhirDataToS3`
+#### Description
+Uploads the FHIR bundle data for a CCD to S3.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | Patient object containing patient information |
+| data | Bundle | FHIR bundle to be uploaded |
+| requestId | string | Unique identifier for the request |
+
+#### Internal Logic
+1. Constructs the S3 key for the file
+2. Uploads the JSON-stringified bundle to S3
+3. Logs any errors that occur during the upload process
+
+### `generateEmptyCcd`
+#### Description
+Generates an empty CCD with minimal patient information when no data is available.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | Patient object containing basic information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ccd | string | The generated empty CCD in XML format |
+
+#### Internal Logic
+1. Retrieves organization information
+2. Builds various sections of the CCD (patient info, author, custodian, etc.)
+3. Constructs an XML string representing the empty CCD
+
+## Dependencies
+- @medplum/fhirtypes
+- @metriport/core
+- AWS S3
+- Various utility functions and configurations from the project
+
+## Error Handling
+The code includes error handling for S3 upload failures and CCD conversion errors. Errors are logged and captured for monitoring.
+
+## Logging
+The code uses a custom logging utility (`out`) to log important events and errors during the CCD generation process.
+
+## Configuration
+The code relies on various configuration settings, including AWS region, S3 bucket names, and organization information, which are retrieved from the `Config` class.

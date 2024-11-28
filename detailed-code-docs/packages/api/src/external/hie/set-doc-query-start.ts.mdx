@@ -1,0 +1,50 @@
+---
+title: "set-doc-query-start.ts"
+---
+
+## High-level description
+This code defines a function `setDocQueryStartAt` that updates the document query progress for a patient in a specific medical data source. It sets the start time for the document query process and returns the updated patient information.
+
+## Code Structure
+The main function `setDocQueryStartAt` uses a database transaction to update the patient's external data with the new start time for the document query progress. It relies on other imported functions and models to perform the database operations.
+
+## Symbols
+
+### `setDocQueryStartAt`
+#### Description
+This function updates the document query progress for a patient by setting the start time for a specific medical data source.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId"&gt; | Patient identifier information |
+| source | MedicalDataSource | The medical data source for which the query is being started |
+| startedAt | Date | The start time of the document query |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Promise&lt;Patient&gt; | The updated patient information |
+
+#### Internal Logic
+1. Creates a patient filter based on the input patient's id and cxId.
+2. Executes a database transaction using `executeOnDBTx`.
+3. Retrieves the existing patient data using `getPatientOrFail`.
+4. Updates the external data for the specified source with the new start time.
+5. Updates the patient record in the database.
+6. Returns the updated patient information.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain//patient | Importing types related to patient data |
+| @metriport/core/domain/patient | Importing the Patient type |
+| ../../models/medical/patient | Importing the PatientModel |
+| ../../models/transaction-wrapper | Importing the executeOnDBTx function for database transactions |
+| ../../command/medical/patient/get-patient | Importing the getPatientOrFail function |
+
+## Error Handling
+The function doesn't implement explicit error handling. Errors that occur during the database transaction or patient retrieval will be propagated to the caller.
+
+## Performance Considerations
+The function uses a database transaction, which can impact performance if called frequently. It's important to use this function judiciously and consider batching updates if possible.

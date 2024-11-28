@@ -1,0 +1,76 @@
+---
+title: "medical-record-summary.ts"
+---
+
+## High-level description
+This code defines functions for creating file names and paths for medical record summaries and briefs. It provides utility functions to generate standardized file names based on customer ID, patient ID, and other parameters.
+
+## Symbols
+
+### `MEDICAL_RECORD_KEY`
+#### Description
+A constant string representing the key for medical records.
+
+#### Inputs
+None
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| MEDICAL_RECORD_KEY | string | The constant value "MR" |
+
+### `createMRSummaryFileName`
+#### Description
+Creates a file name for a medical record summary based on the provided parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+| extension | ConsolidationConversionType | File extension type |
+| dedupEnabled | boolean | Optional flag indicating if deduplication is enabled |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The generated file name |
+
+#### Internal Logic
+1. If the extension is "pdf", it creates a file name with ".html.pdf" extension.
+2. For other extensions, it creates a file name with the provided extension.
+3. If dedupEnabled is true, it adds "_deduped" to the file name.
+4. Uses the `createFilePath` function to generate the full file path.
+
+### `createMRSummaryBriefFileName`
+#### Description
+Creates a file name for a medical record summary brief.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+| dedupEnabled | boolean | Optional flag indicating if deduplication is enabled |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The generated file name for the brief |
+
+#### Internal Logic
+1. Uses the `createFilePath` function to generate the full file path.
+2. Adds "_brief.txt" to the file name.
+3. If dedupEnabled is true, it adds "_deduped" to the file name.
+
+## References
+- `ConsolidationConversionType` from "./conversion/fhir-to-medical-record"
+- `createFilePath` from "./filename"
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/conversion/fhir-to-medical-record | Importing ConsolidationConversionType |
+| @metriport/core/domain/filename | Importing createFilePath function |
+
+This code is part of a larger system for handling medical records and provides consistent naming conventions for files related to medical record summaries and briefs. It allows for flexibility in file types and includes options for deduplication, which is likely used in processing or storing these medical records.

@@ -1,0 +1,66 @@
+---
+title: "garmin.ts"
+---
+
+## High-level description
+This code defines a webhook route for handling Garmin data. It processes incoming webhook data from Garmin, maps it to Metriport's internal data format, and sends it to customers. The code handles various types of Garmin data, including activities, sleep, body composition, and biometrics.
+
+## Code Structure
+The main function is the POST route handler, which processes the incoming webhook data. It uses several helper functions to map different types of Garmin data to Metriport's format. The `mapData` function orchestrates the mapping of various data types, and the `processData` function handles the processing and sending of data to customers.
+
+## Symbols
+
+### POST route handler
+#### Description
+Handles incoming webhook calls from Garmin, processes the data, and sends it to customers.
+
+#### Internal Logic
+1. Logs the incoming request
+2. Handles user deregistrations if present
+3. Maps the incoming data to Metriport's format
+4. Asynchronously processes the mapped data
+5. Responds with a 200 status code
+
+### `mapData` function
+#### Description
+Maps various types of Garmin data to Metriport's internal format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| body | any | The request body containing Garmin data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| results | UserData&lt;MetriportData&gt;[] | Mapped data in Metriport's format |
+
+#### Internal Logic
+- Checks for different types of Garmin data (activities, sleep, body composition, etc.)
+- Calls specific mapping functions for each data type
+- Combines all mapped data into a single array
+
+### `logRequest` function
+#### Description
+Logs the headers, query parameters, and body of the incoming request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req | Request | The incoming request object |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides MetriportData type |
+| express | Web framework for handling HTTP requests |
+| express-promise-router | Router for handling asynchronous routes |
+| zod | Schema validation library |
+
+## Error Handling
+The code uses a custom `asyncHandler` function to wrap the route handler, which catches and logs any errors that occur during processing. Errors are passed to the next middleware for further handling.
+
+## Logging
+The code uses a custom logging utility (`Util.out`) to log debug information and requests. It logs the full request details in debug mode and any processing errors.
+
+This webhook handler serves as a crucial integration point between Garmin's data and Metriport's system, enabling the processing and forwarding of various types of health and fitness data to Metriport's customers.

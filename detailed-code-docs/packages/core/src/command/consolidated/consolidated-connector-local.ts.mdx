@@ -1,0 +1,84 @@
+---
+title: "consolidated-connector-local.ts"
+---
+
+## High-level description
+This code defines a `ConsolidatedDataConnectorLocal` class that implements the `ConsolidatedDataConnector` interface. It's responsible for executing consolidated data requests, either synchronously or asynchronously, by generating a FHIR bundle, uploading it to S3, and optionally notifying an API endpoint for async requests.
+
+## Code Structure
+The main class `ConsolidatedDataConnectorLocal` uses helper functions `getConsolidatedFhirBundle`, `uploadConsolidatedBundleToS3`, and `postConsolidated` to perform its operations. The `execute` method orchestrates the process of handling consolidated data requests.
+
+## References
+- `getConsolidatedFhirBundle` from "../../external/fhir/consolidated/consolidated"
+- `uploadConsolidatedBundleToS3` from "./consolidated-on-s3"
+- `executeWithNetworkRetries` from "@metriport/shared"
+
+## Symbols
+
+### ConsolidatedDataConnectorLocal
+#### Description
+A class that implements the `ConsolidatedDataConnector` interface for local execution of consolidated data requests.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bucketName | string | The name of the S3 bucket to store consolidated bundles |
+| apiURL | string | The URL of the API for async notifications |
+
+#### Internal Logic
+1. Constructor initializes the class with `bucketName` and `apiURL`.
+2. The `execute` method:
+   - Generates a consolidated FHIR bundle
+   - Uploads the bundle to S3
+   - For async requests, notifies the API endpoint
+
+### execute
+#### Description
+Executes a consolidated data request, either synchronously or asynchronously.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | ConsolidatedDataRequestSync \| ConsolidatedDataRequestAsync | The request parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| info | ConsolidatedDataResponse | The response containing bundle location and filename |
+
+#### Internal Logic
+1. Generate the consolidated FHIR bundle using `getConsolidatedFhirBundle`
+2. Upload the bundle to S3 using `uploadConsolidatedBundleToS3`
+3. If the request is async, notify the API using `postConsolidated`
+4. Return the bundle location information
+
+### postConsolidated
+#### Description
+A helper function to send a POST request to the API for async consolidated data requests.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| apiURL | string | The API URL |
+| cxId | string | The customer ID |
+| patientId | string | The patient ID |
+| payload | InternalSendConsolidated | The payload for the API request |
+
+#### Internal Logic
+1. Construct the API endpoint URL
+2. Add the `cxId` as a query parameter
+3. Use `executeWithNetworkRetries` to send the POST request with retry logic
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/shared | Provides `executeWithNetworkRetries` and `InternalSendConsolidated` |
+| axios | Used for making HTTP requests |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| MAX_API_NOTIFICATION_ATTEMPTS | number | 5 | Maximum number of attempts for API notifications |
+
+## Error Handling
+The code uses `executeWithNetworkRetries` for handling network errors and retries when notifying the API for async requests.

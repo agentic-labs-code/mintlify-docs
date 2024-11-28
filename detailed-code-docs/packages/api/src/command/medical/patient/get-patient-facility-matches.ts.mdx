@@ -1,0 +1,92 @@
+---
+title: "get-patient-facility-matches.ts"
+---
+
+## High-level description
+The code defines a function `getPatientFacilityMatches` that retrieves and aggregates facility matches for a given patient from both Carequality (CQ) and Commonwell (CW) data sources. It processes patient data links, retrieves facility details, and normalizes patient demographics to return a list of matched facilities with their associated information.
+
+## Code Structure
+The code defines a main function `getPatientFacilityMatches` that orchestrates the retrieval of facility matches. It calls two helper functions, `getCqFacilityMatches` and `getCwFacilityMatches`, to handle data retrieval and processing for Carequality and Commonwell respectively. These helper functions utilize external data models and utility functions to fetch and normalize data.
+
+## References
+- `CQPatientDataModel`: Data model for accessing Carequality patient data.
+- `CwPatientDataModel`: Data model for accessing Commonwell patient data.
+- `CQDirectoryEntryModel`: Data model for accessing Carequality directory entries.
+- `orgDirectory`: Directory of organizations from Commonwell.
+- `cqPatientResourceToNormalizedLinkDemographics`: Utility function to normalize patient demographics from Carequality patient resources.
+- `cwPatientResourceToNormalizedLinkDemographics`: Utility function to normalize patient demographics from Commonwell patient network links.
+
+## Symbols
+
+### `getPatientFacilityMatches`
+#### Description
+This function retrieves and aggregates facility matches for a given patient from both Carequality (CQ) and Commonwell (CW) data sources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | `string` | The ID of the patient. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;PatientFacilityMatch[]&gt; | `Promise&lt;PatientFacilityMatch[]&gt;` | A promise that resolves to an array of `PatientFacilityMatch` objects, each representing a matched facility. |
+
+#### Internal Logic
+1. Retrieves patient data from CQ and CW data sources concurrently using `Promise.all`.
+2. Extracts patient data links from the retrieved data.
+3. Calls `getCqFacilityMatches` and `getCwFacilityMatches` concurrently to retrieve facility matches from CQ and CW respectively.
+4. Combines the results from both sources and returns the aggregated list of facility matches.
+
+### `getCqFacilityMatches`
+#### Description
+This function retrieves facility matches for a given patient from Carequality data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cqLinks | `CQLink[]` | An array of `CQLink` objects representing patient data links from Carequality. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;PatientFacilityMatch[]&gt; | `Promise&lt;PatientFacilityMatch[]&gt;` | A promise that resolves to an array of `PatientFacilityMatch` objects, each representing a matched facility from Carequality. |
+
+#### Internal Logic
+1. Iterates through each `CQLink` in the input array.
+2. For each link, retrieves the corresponding facility details from `CQDirectoryEntryModel` using the link's `oid`.
+3. If a facility is found, normalizes the patient demographics from the link's `patientResource` using `cqPatientResourceToNormalizedLinkDemographics`.
+4. Constructs a `PatientFacilityMatch` object with the facility details and normalized patient demographics.
+5. Returns the array of `PatientFacilityMatch` objects.
+
+### `getCwFacilityMatches`
+#### Description
+This function retrieves facility matches for a given patient from Commonwell data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cwLinks | `CwLink[]` | An array of `CwLink` objects representing patient data links from Commonwell. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;PatientFacilityMatch[]&gt; | `Promise&lt;PatientFacilityMatch[]&gt;` | A promise that resolves to an array of `PatientFacilityMatch` objects, each representing a matched facility from Commonwell. |
+
+#### Internal Logic
+1. Uses `reduce` to iterate through each `CwLink` in the input array and accumulate facility matches.
+2. For each link, extracts patient and provider information.
+3. Retrieves the organization details from `orgDirectory` using the provider's `oid`.
+4. Normalizes the patient demographics from the link's `patient` object using `cwPatientResourceToNormalizedLinkDemographics`.
+5. Constructs a `PatientFacilityMatch` object with the organization details and normalized patient demographics.
+6. Returns the array of `PatientFacilityMatch` objects.
+
+## Dependencies
+- `@metriport/shared`: Provides the `USState` enum.
+- `@metriport/core/domain/address`: Provides the `Address` interface.
+- `@metriport/core/domain/patient-demographics`: Provides the `LinkDemographics` interface.
+- `@metriport/ihe-gateway-sdk`: Provides the `PatientResource` interface.
+- `@metriport/commonwell-sdk`: Provides the `NetworkLink` and `PatientNetworkLink` interfaces.
+
+## Error Handling
+The code does not implement specific error handling beyond basic exception raising. Any errors encountered during data retrieval or processing will propagate up the call stack.

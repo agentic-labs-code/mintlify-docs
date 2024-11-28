@@ -1,0 +1,50 @@
+---
+title: "body.ts"
+---
+
+## High-level description
+The `mapToBody` function transforms raw Tenovi weight measurement data into a structured `Body` object as defined in the Metriport API. This involves extracting relevant fields, converting units, and formatting the data into a standardized structure for consumption by the API.
+
+## References
+- `Body`: Definition of the Body object from "@metriport/api-sdk".
+- `SourceType`: Enum for data source types from "@metriport/api-sdk/devices/models/common/sample".
+- `PROVIDER_TENOVI`: Constant representing the Tenovi provider from "../../shared/constants".
+- `TenoviMeasurementData`: Type definition for Tenovi measurement data from ".".
+- `Sample`: Type definition for a data sample from "@metriport/api-sdk/devices/models/common/sample".
+- `getFloatValue`, `formatNumber`: Utility functions for number handling from "@metriport/shared/common/numbers".
+- `convert`: Library for unit conversion from "convert-units".
+
+## Symbols
+
+### `mapToBody`
+#### Description
+This function takes raw Tenovi weight measurement data and a date string as input, and returns a `Body` object containing the processed weight data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| date | string | Date string representing the day of the data. |
+| tenoviWeight | `TenoviMeasurementData` | Array of Tenovi measurement data objects containing weight readings. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| body | `Body` | A `Body` object populated with the processed weight data from the input. |
+
+#### Internal Logic
+1. **Initialize Body object:** Creates a `Body` object with basic metadata like date and source (Tenovi).
+2. **Extract source information:** If weight data is present, extracts device ID, name, and sensor code from the first measurement. This information is used to populate the `data_source` field in the `metadata`.
+3. **Process weight samples:**
+    - Iterates through each weight reading in `tenoviWeight`.
+    - Converts the weight value from pounds to kilograms using the `convert` library.
+    - Formats the converted weight value to two decimal places using `formatNumber`.
+    - Creates a `Sample` object with the reading's timestamp and formatted weight value.
+    - Appends the `Sample` object to the `weight_samples_kg` array in the `Body` object.
+4. **Return Body object:** Returns the populated `Body` object.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides data models and types for the Metriport API. |
+| convert-units | Enables conversion between different units of measurement. |
+| @metriport/shared/common/numbers | Offers utility functions for number formatting and parsing. | 

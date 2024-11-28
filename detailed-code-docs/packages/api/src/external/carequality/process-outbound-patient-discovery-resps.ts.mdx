@@ -1,0 +1,176 @@
+---
+title: "process-outbound-patient-discovery-resps.ts"
+---
+
+## High-level description
+The `processOutboundPatientDiscoveryResps` function is responsible for handling the results of outbound patient discovery requests made to the Carequality network. It processes the responses, updates patient data, triggers analytics events, and initiates subsequent actions like document queries or scheduled patient discovery requests.
+
+## Code Structure
+The `processOutboundPatientDiscoveryResps` function is the main entry point. It calls `createCQLinks` to process the results and then updates the patient's status and analytics. It also handles errors and triggers document queries if scheduled. The `createCQLinks` function calls `buildCQLinks` to format the data and then updates the database.
+
+## References
+- `getCQData`: Retrieves Carequality-specific data from patient external data.
+- `discover`: Initiates a new patient discovery request.
+- `getPatientResources`: Extracts patient resources from Carequality links.
+- `patientResourceToNormalizedLinkDemographics`: Converts a patient resource to normalized link demographics.
+- `getOutboundPatientDiscoverySuccessFailureCount`: Calculates the count of successful and failed patient discovery responses.
+- `processAsyncError`: Handles asynchronous errors.
+
+## Symbols
+
+### `processOutboundPatientDiscoveryResps`
+#### Description
+This function processes the responses received from outbound patient discovery requests made to the Carequality network. It performs the following actions:
+- Retrieves patient information.
+- Processes the patient discovery results and creates Carequality links.
+- Triggers analytics events based on the results.
+- Initiates subsequent actions like document queries or scheduled patient discovery requests.
+- Handles errors during the process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| requestId | string | The ID of the original patient discovery request. |
+| patientId | string | The ID of the patient for whom the discovery was performed. |
+| cxId | string | The ID of the customer organization. |
+| results | OutboundPatientDiscoveryResp[] | An array of responses from the Carequality network. |
+
+#### Outputs
+This function does not return any value.
+
+#### Internal Logic
+1. **Retrieve patient information:** Fetches the patient's data using `getPatientOrFail`.
+2. **Handle empty results:** If no results are found, logs a message, checks for scheduled patient discovery requests, and updates the patient discovery status.
+3. **Create Carequality links:** Calls `createCQLinks` to process the results and create links to external patient records.
+4. **Retrieve discovery parameters:** Fetches the discovery parameters from the patient's Carequality data.
+5. **Handle rerun on new demographics:** If enabled, checks for new demographics and triggers a new patient discovery request if found.
+6. **Trigger analytics events:** Sends analytics data to PostHog, including the number of links found, duration, and success/failure counts.
+7. **Handle scheduled patient discovery:** Checks for any scheduled patient discovery requests and initiates them if found.
+8. **Update patient discovery status:** Updates the patient's discovery status to "completed".
+9. **Trigger scheduled document queries:** Initiates any scheduled document queries for the patient.
+10. **Error handling:**
+    - Resets any scheduled patient discovery requests.
+    - Updates the patient's discovery status to "failed".
+    - Triggers scheduled document queries, marking them as failed.
+    - Logs the error and sends a notification.
+
+### `createCQLinks`
+#### Description
+This function processes the patient discovery responses and creates Carequality links to external patient records.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" | "cxId"&gt; | An object containing the patient's ID and customer organization ID. |
+| pdResults | OutboundPatientDiscoveryResp[] | An array of responses from the Carequality network. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cqLinks | CQLink[] | An array of Carequality links created from the responses. |
+
+#### Internal Logic
+1. **Build Carequality links:** Calls `buildCQLinks` to format the data from the responses into `CQLink` objects.
+2. **Update patient data:** If any links are created, updates the patient's Carequality data in the database with the new links.
+
+### `buildCQLinks`
+#### Description
+This function iterates through the patient discovery responses and extracts relevant information to build `CQLink` objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| pdResults | OutboundPatientDiscoveryResp[] | An array of responses from the Carequality network. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cqLinks | CQLink[] | An array of Carequality links built from the responses. |
+
+#### Internal Logic
+1. **Iterate through responses:** Loops through each response in `pdResults`.
+2. **Extract link information:** Extracts the external patient ID, system ID, gateway URL, OID, and patient resource (if available).
+3. **Create `CQLink` object:** Creates a `CQLink` object with the extracted information.
+4. **Return links:** Returns an array of `CQLink` objects.
+
+### `runNextPdOnNewDemographics`
+#### Description
+This function checks for new demographics in the patient discovery responses and triggers a new patient discovery request if found and enabled.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient object. |
+| facilityId | string | The ID of the facility. |
+| requestId | string | The ID of the original patient discovery request. |
+| cqLinks | CQLink[] | An array of Carequality links. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| boolean | boolean | Returns `true` if a new patient discovery request was triggered, otherwise `false`. |
+
+#### Internal Logic
+1. **Get updated patient data:** Fetches the latest patient data using `getPatientOrFail`.
+2. **Extract link demographics:** Extracts demographics information from the `cqLinks`.
+3. **Check for new demographics:** Compares the extracted demographics with the patient's existing demographics to identify any new information.
+4. **Check for new demographics across HIEs:** Calls `checkLinkDemographicsAcrossHies` to check for new demographics across other connected health information exchanges.
+5. **Trigger new patient discovery:** If new demographics are found and the feature is enabled:
+    - Updates the patient's Carequality data with the new demographics.
+    - Updates the patient's link demographics.
+    - Triggers a new patient discovery request using `discover`.
+    - Sends analytics data to PostHog.
+6. **Return value:** Returns `true` if a new patient discovery request was triggered, otherwise `false`.
+
+### `runNexPdIfScheduled`
+#### Description
+This function checks for any scheduled patient discovery requests and initiates them if found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient object. |
+| requestId | string | The ID of the original patient discovery request. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| boolean | boolean | Returns `true` if a scheduled patient discovery request was found and initiated, otherwise `false`. |
+
+#### Internal Logic
+1. **Get updated patient data:** Fetches the latest patient data using `getPatientOrFail`.
+2. **Check for scheduled requests:** Checks if there are any scheduled patient discovery requests in the patient's Carequality data.
+3. **Initiate scheduled request:** If a scheduled request is found:
+    - Resets the scheduled patient discovery request in the database.
+    - Triggers a new patient discovery request using `discover` with the parameters from the scheduled request.
+    - Sends analytics data to PostHog.
+4. **Return value:** Returns `true` if a scheduled patient discovery request was found and initiated, otherwise `false`.
+
+### `queryDocsIfScheduled`
+#### Description
+This function checks for any scheduled document queries and initiates them.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientIds | Pick&lt;Patient, "id" | "cxId"&gt; | An object containing the patient's ID and customer organization ID. |
+| isFailed | boolean | Optional. Indicates whether the patient discovery process failed. Defaults to `false`. |
+
+#### Outputs
+This function does not return any value.
+
+#### Internal Logic
+1. **Get updated patient data:** Fetches the latest patient data using `getPatientOrFail`.
+2. **Check for scheduled queries:** Checks if there are any scheduled document queries in the patient's Carequality data.
+3. **Initiate scheduled query:** If a scheduled query is found:
+    - Resets the scheduled document query request ID in the database.
+    - If the patient discovery process failed (`isFailed` is true), marks the document query progress as failed.
+    - Otherwise, initiates the document query using `getDocumentsFromCQ`.
+
+## Side Effects
+- Updates patient data in the database, including Carequality links, discovery status, and scheduled request information.
+- Sends analytics events to PostHog.
+- Initiates new patient discovery requests or document queries.
+
+## Error Handling
+The `processOutboundPatientDiscoveryResps` function includes a try-catch block to handle errors during the process. If an error occurs, it logs the error, sends a notification, and updates the patient's discovery status to "failed". It also resets any scheduled patient discovery requests and triggers scheduled document queries, marking them as failed.

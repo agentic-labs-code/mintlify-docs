@@ -1,0 +1,43 @@
+---
+title: "body.ts"
+---
+
+## High-level description
+The code defines a function `mapToBody` that transforms body data retrieved from the Whoop API into a standardized `Body` object as defined in the `@metriport/api-sdk`. This transformation includes converting height from meters to centimeters and adding metadata like the data source and date.
+
+## References
+- `Body`: This type is referenced from the `@metriport/api-sdk` package and defines the structure of the standardized body data.
+- `PROVIDER_WHOOP`: A constant imported from `../../shared/constants` representing the "WHOOP" data source.
+- `WhoopBody`: A type imported from `./models/body` representing the structure of body data returned by the Whoop API.
+
+## Symbols
+
+### `mapToBody`
+#### Description
+This function converts raw body data from the Whoop API (`WhoopBody` type) into a standardized `Body` object. It performs unit conversions (meters to centimeters for height) and adds metadata.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `whoopBody` | `WhoopBody` | Raw body data retrieved from the Whoop API. |
+| `date` | `string` | Date string representing when the data was collected. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | `Body` | Standardized body data object conforming to the `Body` type. |
+
+#### Internal Logic
+1. **Creates a new `Body` object:** This object will hold the transformed data.
+2. **Populates metadata:** Sets the `date` and `source` properties within the `metadata` field of the `Body` object. The source is set to `PROVIDER_WHOOP`.
+3. **Converts height:** Uses the `convert-units` library to convert `whoopBody.height_meter` from meters to centimeters and assigns the result to `height_cm`.
+4. **Copies weight:** Directly assigns `whoopBody.weight_kilogram` to `weight_kg`.
+5. **Copies max heart rate:** Directly assigns `whoopBody.max_heart_rate` to `max_possible_heart_rate_bpm`.
+6. **Returns the transformed `Body` object.**
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| `@metriport/api-sdk` | Provides the `Body` type definition for standardized body data. |
+| `convert-units` | Used for converting height from meters to centimeters. |
+

@@ -1,0 +1,60 @@
+---
+title: "normalize-address.ts"
+---
+
+## High-level description
+This code defines a function `normalizeAddress` that takes an `Address` object as input and returns a normalized version of the address. The normalization process includes trimming whitespace, converting text to lowercase, standardizing abbreviations, and formatting specific fields like postal code and country.
+
+## Symbols
+
+### `normalizeAddress`
+#### Description
+This function normalizes an address by standardizing its components. It processes each part of the address (line, city, state, postalCode, and country) to create a consistent format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { line, city, state, postalCode, country } | Address | An object containing address components |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| normalizedAddress | Address | An object containing the normalized address components |
+
+#### Internal Logic
+1. **Line**: 
+   - Filters out empty strings
+   - Trims whitespace
+   - Converts to lowercase
+   - Replaces common street type words with abbreviations
+   - Removes hyphens
+2. **City**: 
+   - Trims whitespace
+   - Converts to lowercase
+   - Removes hyphens
+3. **State**: 
+   - Trims whitespace
+   - Converts to lowercase
+   - Takes only the first two characters
+4. **Postal Code**: 
+   - Removes non-numeric characters
+   - Trims whitespace
+   - Takes only the first five characters
+5. **Country**: 
+   - Trims whitespace
+   - Converts to lowercase
+   - Replaces "us" and "united" with "usa"
+   - Takes only the first three characters
+   - Defaults to "usa" if not provided
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/shared | Provides the `stripNonNumericChars` function used for postal code normalization |
+| @medplum/fhirtypes | Provides the `Address` type definition |
+
+## Performance Considerations
+The function uses multiple string operations and regular expressions, which could impact performance for large datasets. However, for individual address normalization, the performance impact should be negligible.
+
+## Error Handling
+The function uses optional chaining (`?.`) to handle potentially undefined input fields, defaulting to empty strings or arrays when necessary. This prevents errors when processing incomplete address data.

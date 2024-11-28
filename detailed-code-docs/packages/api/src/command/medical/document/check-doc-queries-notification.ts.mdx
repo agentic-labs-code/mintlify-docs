@@ -1,0 +1,96 @@
+---
+title: "check-doc-queries-notification.ts"
+---
+
+## High-level description
+This code defines the logic for sending webhook notifications related to medical document download and conversion status updates. It filters patients who need notifications based on the validation results of their document download and conversion processes and sends notifications for each type.
+
+## Code Structure
+The `sendWHNotifications` function orchestrates the notification process. It leverages `shouldNotifyAboutStatus` and `toNotify` helper functions to determine which patients require notifications and formats the notification data. The `notify` function then sends the actual webhook notifications using the `processPatientDocumentRequest` function.
+
+## References
+- `processPatientDocumentRequest`: This function, defined in `./document-webhook`, is responsible for sending the actual webhook notifications.
+- `MAPIWebhookType`: An enum from `../../../domain/webhook` defining the types of webhooks.
+- `MAPIWebhookStatus`: An enum from `./document-webhook` defining the status of a webhook.
+
+## Symbols
+
+### `sendWHNotifications`
+#### Description
+This function is responsible for sending webhook notifications for document download and conversion status updates. It filters patients who need notifications and sends separate notifications for download and conversion events.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientsToUpdate | `PatientsWithValidationResult` | An object containing patients and their corresponding document download and conversion validation results. |
+
+#### Outputs
+This function does not return any value.
+
+#### Internal Logic
+1. **Filter patients for download notifications:**
+   - Iterates through the `patientsToUpdate` object.
+   - Uses the `shouldNotifyAboutStatus` function to check if a notification is required based on the download validation result.
+   - Maps the filtered entries to an array of `PatientToNotify` objects using the `toNotify` function.
+2. **Send download notifications:**
+   - Calls the `notify` function with the filtered patient list and the `medical.document-download` webhook type.
+3. **Filter patients for conversion notifications:**
+   - Similar to download notifications, filters patients based on the conversion validation result.
+4. **Send conversion notifications:**
+   - Calls the `notify` function with the filtered patient list and the `medical.document-conversion` webhook type.
+
+### `notify`
+#### Description
+This function sends webhook notifications for a specific event type to a list of patients.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientsToNofify | `PatientToNotify[]` | An array of patient objects containing `cxId` and `id`. |
+| whType | `MAPIWebhookType` | The type of webhook event. |
+
+#### Outputs
+This function does not return any value.
+
+#### Internal Logic
+1. **Deduplicate patients:**
+   - Uses `lodash.uniqBy` to ensure only unique patient notifications are sent based on their `cxId` and `id`.
+2. **Send notifications:**
+   - Iterates through the unique patient list.
+   - Calls `processPatientDocumentRequest` for each patient with the provided `cxId`, `patientId`, `whType`, `MAPIWebhookStatus.completed`, and `undefined` for document information.
+
+### `shouldNotifyAboutStatus`
+#### Description
+This function determines whether a webhook notification should be sent based on the validation result.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| validationResult | `SingleValidationResult` | The validation result for either download or conversion. |
+
+#### Outputs
+| Type | Description |
+|:-----|:------------|
+| `boolean` | Returns `true` if a notification should be sent, otherwise `false`. |
+
+#### Internal Logic
+- Returns `true` if `validationResult` is either `"both"` or `"status"`, indicating a notification is required.
+- Returns `false` otherwise.
+
+### `toNotify`
+#### Description
+This function maps a patient entry from the `patientsToUpdate` object to a `PatientToNotify` object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `[string, GroupedValidationResult]` | A tuple containing the patient ID and their grouped validation results. |
+
+#### Outputs
+| Type | Description |
+|:-----|:------------|
+| `PatientToNotify` | An object containing the patient's `id` and `cxId`. |
+
+#### Internal Logic
+- Extracts the `patientId` and `cxId` from the input tuple.
+- Returns a new object with the extracted `id` and `cxId`.

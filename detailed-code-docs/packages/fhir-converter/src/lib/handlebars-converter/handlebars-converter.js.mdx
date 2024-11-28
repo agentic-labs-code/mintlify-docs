@@ -1,0 +1,48 @@
+---
+title: "handlebars-converter.js"
+---
+
+## High-level description
+This code defines a module for creating and managing Handlebars instances for different data types in a FHIR converter. It provides functionality to create, cache, and retrieve Handlebars instances with custom helpers and partial resolution capabilities.
+
+## Code Structure
+The main export of this module is the `instance` function, which creates or retrieves a Handlebars instance for a given data type. The code also maintains a cache of Handlebars instances (`handlebarsInstances`) and modifies the partial resolution behavior of each instance.
+
+## Symbols
+
+### `instance`
+#### Description
+This function creates or retrieves a Handlebars instance for a specific data type, with custom partial resolution and helper registration.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| createNew | boolean | If true, creates a new Handlebars instance |
+| dataHandler | object | Contains information about the data type being processed |
+| templateFilesLocation | string | Path to the template files |
+| currentContextTemplatesMap | object | Map of template names to their content |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| handlebarsInstance | object | The Handlebars instance for the specified data type |
+
+#### Internal Logic
+1. If `createNew` is true, it clears the `handlebarsInstances` cache.
+2. If an instance for the given data type doesn't exist, it creates a new one.
+3. It overrides the `resolvePartial` method to handle partial resolution from files or the provided template map.
+4. It registers custom helpers for the Handlebars instance.
+5. Returns the Handlebars instance for the specified data type.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| fs | File system operations for reading template files |
+| Handlebars | Template engine for processing Handlebars templates |
+| handlebars-helpers | Custom helpers for Handlebars |
+
+## Error Handling
+The code implements error handling in the `resolvePartial` function, throwing an error if a referenced partial template is not found on disk.
+
+## Performance Considerations
+The code uses caching (`handlebarsInstances`) to store Handlebars instances for different data types, which can improve performance by avoiding unnecessary instance creation.

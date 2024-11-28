@@ -1,0 +1,66 @@
+---
+title: "mock-webhook.ts"
+---
+
+## High-level description
+This code implements a mock webhook server for testing and simulating webhook interactions with the Metriport Medical API. It sets up an Express.js server that listens for incoming webhook requests, verifies their signatures, and processes different types of webhook payloads.
+
+## Code Structure
+The main components of the code are:
+1. Server setup using Express.js
+2. Webhook endpoint handling
+3. Signature verification using the Metriport Medical API SDK
+4. Processing of different webhook payload types
+5. Mock download functionality
+
+## Symbols
+
+### `app`
+#### Description
+An Express.js application instance that handles the server setup and routing.
+
+### `mockDownload(name: string)`
+#### Description
+A function that simulates downloading a file by logging the file name.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | string | The name of the file to be "downloaded" |
+
+#### Internal Logic
+Logs a message indicating that the file has been downloaded.
+
+### POST "/"
+#### Description
+The main webhook endpoint that handles incoming POST requests.
+
+#### Internal Logic
+1. Logs the request body
+2. Verifies the webhook signature using the Metriport Medical API SDK
+3. Processes different types of webhook payloads:
+   - For "medical.document-bulk-download-urls" type, it calls `mockDownload` for each document
+   - For ping requests, it responds with a "pong" message
+4. Sends a 200 OK response for all other cases
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | Loading environment variables |
+| @metriport/api-sdk | Metriport Medical API SDK for signature verification |
+| @metriport/core/util/env-var | Utility for getting environment variables |
+| express | Web server framework |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| WH_KEY | string | N/A | Webhook key for signature verification |
+| PORT | number | 8088 | Port number for the server to listen on |
+
+## Error Handling
+The code does not implement specific error handling beyond basic exception raising.
+
+## Logging
+The code uses `console.log` for logging various events and information.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

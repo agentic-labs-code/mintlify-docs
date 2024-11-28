@@ -1,0 +1,96 @@
+---
+title: "file-ingestor-direct.ts"
+---
+
+## High-level description
+This code defines an `OpenSearchFileIngestorDirect` class that extends `OpenSearchFileIngestor`. It's responsible for ingesting files directly into OpenSearch, cleaning up file contents, and managing the OpenSearch index. The class handles authentication, content processing, and interaction with AWS S3 for file retrieval.
+
+## Code Structure
+The main class `OpenSearchFileIngestorDirect` extends `OpenSearchFileIngestor`. It contains methods for ingesting files, cleaning up contents, and interacting with OpenSearch. The class uses various utility functions and regular expressions for content processing.
+
+## References
+- `OpenSearchFileIngestor` (parent class)
+- `IngestRequest` (type)
+- `IndexFields` (type)
+- AWS S3 client
+- Various utility functions from external modules
+
+## Symbols
+
+### `OpenSearchFileIngestorDirect`
+#### Description
+A class that handles direct ingestion of files into OpenSearch, including content cleanup and index management.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | OpenSearchFileIngestorDirectConfig | Configuration object for the ingestor |
+
+#### Internal Logic
+1. Initializes the ingestor with the provided configuration
+2. Implements methods for ingesting files, cleaning up contents, and interacting with OpenSearch
+3. Uses regular expressions for content processing
+4. Handles authentication and connection to OpenSearch
+
+### `ingest`
+#### Description
+Ingests a file into OpenSearch by retrieving its contents from S3, cleaning it up, and sending it to OpenSearch.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | IngestRequest | Object containing file and patient information |
+
+#### Internal Logic
+1. Retrieves file contents from S3
+2. Cleans up the contents
+3. Sends the processed contents to OpenSearch
+
+### `cleanUpContents`
+#### Description
+Cleans up the contents of a file by applying various regular expressions to remove unwanted elements and format the text.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| contents | string | Raw file contents |
+| log | function | Logging function |
+| isTracing | boolean | Flag to enable tracing |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cleanedContents | string | Processed and cleaned file contents |
+
+#### Internal Logic
+1. Applies a series of regular expressions to remove HTML tags, formatting, and unwanted elements
+2. Processes the content in steps, with optional tracing for debugging
+
+### `sendToOpenSearch`
+#### Description
+Sends the processed content to OpenSearch, creating or updating the index as necessary.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | object | Object containing file and patient information, and processed content |
+| log | function | Logging function |
+
+#### Internal Logic
+1. Ensures the OpenSearch index exists
+2. Creates or updates a document in the index with the provided content
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @opensearch-project/opensearch | OpenSearch client library |
+| dayjs | Date and time manipulation |
+| @metriport/shared | Utility functions |
+| aws-sdk | AWS SDK for S3 interactions |
+
+## Error Handling
+The class uses try-catch blocks and logging to handle errors during file retrieval, content processing, and OpenSearch interactions.
+
+## Performance Considerations
+- The class uses regular expressions for content cleanup, which may impact performance for very large files
+- Retries are implemented for OpenSearch interactions to handle potential network issues or temporary failures

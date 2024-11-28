@@ -1,0 +1,71 @@
+---
+title: "get-organization.ts"
+---
+
+## High-level description
+The `get-organization.ts` file provides functions for retrieving organization data from the database. It includes functions to get an organization by its CX ID and/or database ID, with options to throw an error if the organization is not found or if the provided OID doesn't match.
+
+## Symbols
+
+### `getOrganization`
+#### Description
+Retrieves an organization from the database based on the provided filter.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| { cxId, id } | `Filter` | An object containing the CX ID and optional database ID of the organization. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `Promise&lt;OrganizationModel \| undefined&gt;` | A promise that resolves to the organization if found, otherwise undefined. |
+
+#### Internal Logic
+- Queries the `OrganizationModel` using Sequelize's `findOne` method with the provided filter.
+- Returns the found organization or undefined if not found.
+
+### `getOrganizationOrFail`
+#### Description
+Retrieves an organization from the database based on the provided filter, throwing an error if not found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filter | `Filter` | An object containing the CX ID and optional database ID of the organization. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `Promise&lt;OrganizationModel&gt;` | A promise that resolves to the organization if found, otherwise throws a `NotFoundError`. |
+
+#### Internal Logic
+- Calls `getOrganization` to retrieve the organization.
+- If the organization is not found, throws a `NotFoundError`.
+- Otherwise, returns the found organization.
+
+### `getOrganizationByOidOrFail`
+#### Description
+Retrieves an organization from the database based on the provided filter, ensuring the OID matches and throwing an error if not found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filter | `Filter & { oid: string }` | An object containing the CX ID, optional database ID, and the OID of the organization. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `Promise&lt;OrganizationModel&gt;` | A promise that resolves to the organization if found and the OID matches, otherwise throws a `NotFoundError`. |
+
+#### Internal Logic
+- Calls `getOrganizationOrFail` to retrieve the organization.
+- If the retrieved organization's OID doesn't match the provided OID, throws a `NotFoundError`.
+- Otherwise, returns the found organization.
+
+## References
+- `OrganizationModel`: Represents the organization data model.
+- `NotFoundError`: Custom error class for indicating a not found organization.
+
+## Error Handling
+- Throws a `NotFoundError` if the organization is not found or if the provided OID doesn't match. 

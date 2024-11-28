@@ -1,0 +1,77 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains configuration files for an infrastructure project, likely built using AWS CDK (Cloud Development Kit). It defines various configuration types and interfaces for different AWS services, environment-specific settings, and third-party integrations. The configurations are structured to support multiple environments (sandbox, staging, production) and various components of a health application infrastructure.
+
+## What does it do?
+The code in this directory provides a comprehensive configuration framework for setting up and managing a complex cloud infrastructure, specifically tailored for a health application. It accomplishes the following:
+
+1. Defines configuration types for AWS services like ECS (Elastic Container Service), RDS (Relational Database Service), and OpenSearch.
+2. Specifies environment-specific configurations for different deployment stages (sandbox, staging, production).
+3. Sets up configurations for third-party integrations such as PropelAuth, Carequality, and CommonWell.
+4. Provides structures for managing secrets, API endpoints, and various S3 buckets.
+5. Configures IHE (Integrating the Healthcare Enterprise) Gateway properties.
+6. Sets up Lambda function configurations for various purposes, including OpenSearch connectors.
+
+This configuration framework allows developers and infrastructure managers to:
+- Consistently set up and manage infrastructure across different environments.
+- Easily adjust resource allocations and service configurations.
+- Manage security settings and secret names.
+- Configure integrations with health-specific services and standards.
+
+## Key Files
+
+1. `env-config.ts`:
+   This file is the cornerstone of the configuration structure. It defines the main `EnvConfig` type, which is a union of `EnvConfigSandbox` and `EnvConfigNonSandbox`. These types extend from `EnvConfigBase`, providing a flexible structure for environment-specific configurations.
+
+2. `aws/ecs.ts` and `aws/rds.ts`:
+   These files define configurations specific to AWS ECS and RDS services. They provide type definitions for valid memory and CPU configurations for ECS tasks, and alarm thresholds for RDS instances.
+
+3. `ihe-gateway-config.ts`:
+   This file defines configuration types for an IHE Gateway service, including ECS task properties, Java runtime properties, and general IHE Gateway properties.
+
+4. `open-search-config.ts`:
+   This file provides configuration types for OpenSearch clusters and associated Lambda functions.
+
+5. `example.ts`:
+   This file demonstrates how to use the configuration types by providing a sample production environment configuration.
+
+## Dependencies
+The main dependencies used across these configuration files are:
+
+1. AWS CDK Library (`aws-cdk-lib`): Used for defining AWS resource configurations and importing types like `Duration`.
+2. AWS CDK EC2 Library (`aws-cdk-lib/aws-ec2`): Used for EC2-specific configurations.
+
+These dependencies are crucial for defining infrastructure as code using AWS CDK.
+
+## Configuration
+The configuration structure is highly modular and extensible. Key configuration areas include:
+
+1. Environment settings (sandbox, staging, production)
+2. AWS service configurations (ECS, RDS, OpenSearch)
+3. API and database settings
+4. Authentication and security configurations
+5. Third-party service integrations
+6. S3 bucket configurations
+7. Secret management
+
+The `EnvConfigBase` interface in `env-config.ts` provides a comprehensive view of the configurable options, including database settings, API endpoints, secret names, and various service-specific configurations.
+
+For example, the RDS configuration allows setting alarm thresholds:
+
+```typescript
+const alarmThresholds: RDSAlarmThresholds = {
+  acuUtilizationPct: 80,
+  cpuUtilizationPct: 70,
+  freeableMemoryMb: 1024,
+  volumeReadIops: 1000,
+  volumeWriteIops: 500,
+  freeLocalStorageMb: 5120 // 5 GB
+};
+```
+
+The configuration structure is designed to be flexible and allow for easy additions or modifications as the infrastructure requirements evolve.
+
+In conclusion, this configuration directory provides a robust and flexible framework for managing complex cloud infrastructure for a health application, allowing for consistent deployment across different environments and easy management of various AWS services and third-party integrations.

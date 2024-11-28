@@ -1,0 +1,61 @@
+---
+title: "set-doc-retrieve-start.ts"
+---
+
+## High-level description
+This code defines a function `setDocRetrieveStartAt` that updates a patient's record with the start time of a document retrieval process for a specific medical data source. It uses a database transaction to ensure data consistency when updating the patient's information.
+
+## Code Structure
+The main function `setDocRetrieveStartAt` uses the `executeOnDBTx` function to perform database operations within a transaction. It retrieves the existing patient data, updates it with the new document retrieval start time, and then saves the updated information back to the database.
+
+## References
+- `PatientExternalData` and `Patient` from "@metriport/core/domain/patient"
+- `PatientModel` from "../../models/medical/patient"
+- `executeOnDBTx` from "../../models/transaction-wrapper"
+- `getPatientOrFail` from "../../command/medical/patient/get-patient"
+- `setDocQueryStartAt` from "./set-doc-query-start"
+
+## Symbols
+
+### `setDocRetrieveStartAt`
+#### Description
+This function updates a patient's record with the start time of a document retrieval process for a specific medical data source.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId"&gt; | Object containing patient's id and cxId |
+| source | MedicalDataSource | The medical data source |
+| startedAt | Date | The start time of the document retrieval process |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Promise&lt;Patient&gt; | The updated patient object |
+
+#### Internal Logic
+1. Create a patient filter object with id and cxId.
+2. Use `executeOnDBTx` to perform database operations within a transaction:
+   a. Retrieve the existing patient using `getPatientOrFail`.
+   b. Update the patient's external data with the new document retrieval start time.
+   c. Create an updated patient object with the new external data.
+   d. Update the patient record in the database using `PatientModel.update`.
+3. Return the updated patient object.
+
+## Side Effects
+This function modifies the patient's record in the database by updating the `documentRetrievalStartTime` for the specified medical data source.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/patient | Importing types for Patient and PatientExternalData |
+| ../../models/medical/patient | Importing PatientModel for database operations |
+| ../../models/transaction-wrapper | Importing executeOnDBTx for transaction management |
+| ../../command/medical/patient/get-patient | Importing getPatientOrFail to retrieve patient data |
+| ./set-doc-query-start | Importing setDocQueryStartAt type |
+
+## Error Handling
+The function relies on the error handling mechanisms of the underlying functions it calls, such as `executeOnDBTx` and `getPatientOrFail`. Any errors thrown by these functions will be propagated up the call stack.
+
+## Logging
+There is no explicit logging implemented in this code.

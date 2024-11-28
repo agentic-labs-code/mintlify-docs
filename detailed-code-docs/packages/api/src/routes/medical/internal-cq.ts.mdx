@@ -1,0 +1,189 @@
+---
+title: "internal-cq.ts"
+---
+
+## High-level description
+This file contains various route handlers and utility functions for the Carequality integration in the Metriport API. It includes endpoints for managing the Carequality directory, handling patient discovery, document queries, and document retrievals. The code interacts with external Carequality services and internal Metriport systems to facilitate health information exchange.
+
+## Code Structure
+The file defines several Express.js route handlers for different Carequality-related operations. It also includes utility functions for processing responses, managing patient data, and interacting with the Carequality directory. The code relies on various imported functions and models from other parts of the Metriport system.
+
+## Symbols
+
+### Router
+#### Description
+An Express.js router instance used to define the routes for Carequality operations.
+
+### POST /directory/rebuild
+#### Description
+Retrieves organizations from the Carequality Directory and uploads them into the Metriport database.
+
+#### Internal Logic
+1. Checks if the environment is sandbox, returning a 501 Not Implemented status if true.
+2. Calls the `rebuildCQDirectory` function to update the Carequality directory data.
+3. Returns a 200 OK status on success.
+
+### POST /directory/insert
+#### Description
+Inserts organizations from a Carequality Directory bundle into the Metriport database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| file | File | The Carequality Directory to insert, in JSON format |
+
+#### Internal Logic
+1. Parses the uploaded file and extracts organization data.
+2. Processes and deduplicates the organization data.
+3. Inserts the processed data into the database using `bulkInsertCQDirectoryEntries`.
+
+### GET /directory/organization/:oid
+#### Description
+Retrieves the organization with the specified OID from the Carequality Directory.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| oid | string | The OID of the organization to retrieve |
+| getInactive | boolean | Optional, indicates whether to get inactive organization(s) |
+
+#### Internal Logic
+1. Calls the Carequality Management API to list organizations with the given OID.
+2. Parses the response and returns the matching organization.
+
+### GET /ops/directory/organization/:oid
+#### Description
+Retrieves the organization with the specified OID from the Carequality Directory, with additional checks for customer and facility access.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| oid | string | The OID of the organization to retrieve |
+| cxId | string | The customer ID |
+| facilityId | string | Optional, the facility ID |
+
+#### Internal Logic
+1. Verifies customer access and retrieves the organization or facility.
+2. Calls the Carequality Management API to get the organization data.
+3. Returns the parsed Carequality organization data.
+
+### PUT /ops/directory/organization/:oid
+#### Description
+Updates the organization in the Carequality Directory.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| oid | string | The OID of the organization to update |
+| cxId | string | The customer ID |
+| active | boolean | The new active status for the organization |
+
+#### Internal Logic
+1. Verifies customer provider access.
+2. Retrieves the organization and checks if it's approved for Carequality.
+3. Updates the organization's active status in both Carequality and Metriport systems.
+
+### PUT /ops/directory/facility/:oid
+#### Description
+Updates the facility in the Carequality Directory.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| oid | string | The OID of the facility to update |
+| cxId | string | The customer ID |
+| facilityId | string | The facility ID |
+| active | boolean | The new active status for the facility |
+
+#### Internal Logic
+1. Verifies customer IT vendor access.
+2. Retrieves the organization and facility, checking if the facility is approved for Carequality.
+3. Updates the facility's active status in both Carequality and Metriport systems.
+
+### GET /directory/nearby-organizations
+#### Description
+Retrieves the organizations with XCPD URLs within a specified radius from the patient's address.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer ID |
+| patientId | string | The patient ID |
+| radius | number | Optional, the radius in miles within which to search for organizations |
+
+#### Internal Logic
+1. Retrieves the patient data.
+2. Searches for Carequality organizations within the specified radius of the patient's addresses.
+3. Returns the basic details of the found organizations.
+
+### POST /patient-discovery/response
+#### Description
+Receives a Patient Discovery response from the IHE Gateway.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | OutboundPatientDiscoveryResp | The patient discovery response data |
+
+#### Internal Logic
+1. Processes the patient discovery response.
+2. Creates or updates the patient discovery response record.
+3. Triggers post-response processing if applicable.
+
+### POST /patient-discovery/results
+#### Description
+Receives Patient Discovery results from the patient discovery results lambda.
+
+#### Internal Logic
+Calls `processOutboundPatientDiscoveryResps` to handle the patient discovery results.
+
+### POST /document-query/response
+#### Description
+Receives a Document Query response from the IHE Gateway.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | OutboundDocumentQueryResp | The document query response data |
+
+#### Internal Logic
+1. Processes the document query response.
+2. Creates a document query response record.
+
+### POST /document-query/results
+#### Description
+Receives Document Query results from the doc query results lambda.
+
+#### Internal Logic
+Calls `processOutboundDocumentQueryResps` to handle the document query results.
+
+### POST /document-retrieval/response
+#### Description
+Receives a Document Retrieval response from the IHE Gateway.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | OutboundDocumentRetrievalResp | The document retrieval response data |
+
+#### Internal Logic
+1. Processes the document retrieval response.
+2. Creates a document retrieval response record.
+
+### POST /document-retrieval/results
+#### Description
+Receives Document Retrieval results from the doc retrieval results lambda.
+
+#### Internal Logic
+Calls `processOutboundDocumentRetrievalResps` to handle the document retrieval results.
+
+## Dependencies
+- Express.js
+- Sequelize
+- Various internal Metriport modules and utilities
+
+## Error Handling
+The code uses try-catch blocks and custom error types (e.g., `BadRequestError`, `NotFoundError`) to handle and report errors. It also uses the `capture` utility to log errors and send notifications.
+
+## Logging
+The code uses a custom logging utility (`out`) to log information and errors throughout the execution of various operations.

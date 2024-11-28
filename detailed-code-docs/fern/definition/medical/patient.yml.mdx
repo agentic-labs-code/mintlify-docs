@@ -1,0 +1,172 @@
+---
+title: "patient.yml"
+---
+
+## High-level description
+This YAML file defines the API specification for patient-related operations in a medical system. It outlines various endpoints for creating, retrieving, updating, and deleting patient records, as well as managing medical record summaries and patient matching.
+
+## Code Structure
+The file is structured into two main sections: `service` and `types`. The `service` section defines the API endpoints and their properties, while the `types` section defines the data structures used in the API.
+
+## Symbols
+
+### service
+#### Description
+Defines the base path, authentication requirement, and endpoints for the patient-related API.
+
+#### Internal Logic
+- Sets the base path to `/medical/v1/patient`
+- Requires authentication for all endpoints
+- Defines several endpoints: create, get, update, list, delete, getMedicalRecordSummary, getMedicalRecordSummaryStatus, and match
+
+### create
+#### Description
+Creates a Patient record in Metriport for a specified Facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facilityId | string | The ID of the Facility where the Patient is receiving care |
+| body | BasePatient | Patient information to be created |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Patient | Created Patient record |
+
+### get
+#### Description
+Retrieves a Patient record by ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The ID of the Patient |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Patient | Retrieved Patient record |
+
+### update
+#### Description
+Updates an existing Patient record.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The ID of the Patient to update |
+| facilityId | string | The ID of the Facility where the patient is receiving care |
+| body | BasePatient | Updated Patient information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Patient | Updated Patient record |
+
+### list
+#### Description
+Lists all Patients receiving care at a specified Facility or all Patients if no Facility is specified.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facilityId | optional&lt;string&gt; | The ID of the Facility where the patient is receiving care |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | ListPatientsResponse | List of Patient records |
+
+### delete
+#### Description
+Removes a specified Patient record.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The ID of the Patient to delete |
+| facilityId | optional&lt;string&gt; | The ID of the Facility where the patient is receiving care |
+
+### getMedicalRecordSummary
+#### Description
+Returns the URL for a medical record summary.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the Patient |
+| conversionType | string | The type of conversion to perform ('html' or 'pdf') |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | string | The URL for the medical record summary |
+
+### getMedicalRecordSummaryStatus
+#### Description
+Returns the status of a medical record summary.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the Patient |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | MedicalRecordStatus | The status of the medical record summary |
+
+### match
+#### Description
+Searches for a Patient previously created in Metriport based on demographic data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| body | Demographics | Demographic information for patient matching |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Patient | Matched Patient record |
+
+### types
+#### Description
+Defines various data structures used in the API.
+
+#### Internal Logic
+Defines the following types:
+- MedicalRecordStatus
+- RecordStatus
+- PersonalIdentifier
+- DriversLicense
+- SSN
+- Contact
+- FacilityId
+- Demographics
+- BasePatient
+- Patient
+- ListPatientsResponse
+
+Each type has its own set of properties and, in some cases, examples.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| commons | Imports common definitions from ../commons.yml |
+| fhir | Imports FHIR-related definitions from ../fhir/__package__.yml |
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /medical/v1/patient | POST | PatientCreate | Patient | Creates a Patient record |
+| /medical/v1/patient/{id} | GET | - | Patient | Retrieves a Patient record |
+| /medical/v1/patient/{id} | PUT | PatientUpdate | Patient | Updates a Patient record |
+| /medical/v1/patient | GET | PatientList | ListPatientsResponse | Lists Patient records |
+| /medical/v1/patient/{id} | DELETE | PatientDelete | - | Deletes a Patient record |
+| /medical/v1/patient/{patientId}/medical-record | GET | MedicalRecordSummaryRequest | string | Gets medical record summary URL |
+| /medical/v1/patient/{patientId}/medical-record-status | GET | - | MedicalRecordStatus | Gets medical record summary status |
+| /medical/v1/patient/match | POST | Demographics | Patient | Matches a Patient based on demographics |
+
+Note: All endpoints require authentication.

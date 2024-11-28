@@ -1,0 +1,114 @@
+---
+title: "consolidated-data-count.mdx"
+---
+
+---
+title: "Count Patient Data"
+description: "Get a count of a Patient's data per resource."
+api: "GET /medical/v1/patient/{id}/consolidated/count"
+---
+
+Returns the amount of resources for each resource type, for a given Patient.
+
+## Path Params
+
+&lt;ParamField path="id" type="string" required&gt;
+  The ID of the Patient.
+&lt;/ParamField&gt;
+
+## Query Params
+
+&lt;ParamField query="resources" type="string" optional&gt;
+    A comma separated, case sensitive list of resources to be counted. If none are provided all
+    resources will be included.
+
+    &lt;Info&gt;
+    [List of available resources](/medical-api/api-reference/fhir/consolidated-data-query-post#available-fhir-resources).
+    &lt;/Info&gt;
+
+&lt;/ParamField&gt;
+
+&lt;ParamField query="dateFrom" type="string" optional&gt;
+  The start date (inclusive) for which to filter resources to count - formatted `YYYY-MM-DD` as per
+  ISO 8601. If not provided, no start date filter will be applied.
+&lt;/ParamField&gt;
+
+&lt;ParamField query="dateTo" type="string" optional&gt;
+  The end date (inclusive) for which to filter resources to count - formatted `YYYY-MM-DD` as per
+  ISO 8601. If not provided, no end date filter will be applied.
+&lt;/ParamField&gt;
+
+## Response
+
+The amount of resources for each resource type, for a given Patient. It also includes
+the filters used to perform the query.
+
+&lt;ResponseExample&gt;
+
+```typescript Metriport SDK
+import { MetriportMedicalApi } from "@metriport/api-sdk";
+
+const metriport = new MetriportMedicalApi(apiToken);
+
+const count = await metriport.countPatientConsolidated(
+  patientId,
+  ["AllergyIntolerance", "Appointment"] as const,
+  "2023-03-01",
+  "2023-04-01"
+);
+```
+
+&lt;/ResponseExample&gt;
+
+&lt;ResponseField name="total" type="number" required&gt;
+  The sum of all resource type count.
+&lt;/ResponseField&gt;
+
+&lt;ResponseField name="resources" type="Record" required&gt;
+  Object containing resource types as properties and the amount of entries for the resource as the
+  value (number). Only resource types with amount of entries higher than one are included.
+&lt;/ResponseField&gt;
+
+&lt;ResponseField name="filter" type="Filter" required&gt;
+  The filters used to perform this operation.
+  &lt;Expandable title="Filter properties"&gt;
+    &lt;ResponseField name="resources" type="string"&gt;
+      Comma-separated list of resource types. If not specified on the request, this will be `all`.
+    &lt;/ResponseField&gt;
+    &lt;ResponseField name="dateFrom" type="string" optional&gt;
+      The start date (inclusive) for which to filter resources to count - formatted `YYYY-MM-DD` as
+      per ISO 8601. If not provided, no start date filter will be applied.
+    &lt;/ResponseField&gt;
+    &lt;ResponseField name="dateFrom" type="string" optional&gt;
+      The end date (inclusive) for which to filter resources to count - formatted `YYYY-MM-DD` as
+      per ISO 8601. If not provided, no end date filter will be applied.
+    &lt;/ResponseField&gt;
+  &lt;/Expandable&gt;
+&lt;/ResponseField&gt;
+
+```json
+{
+  "total": 8714,
+  "resources": {
+    "AllergyIntolerance": 11,
+    "Condition": 467,
+    "Coverage": 11,
+    "DiagnosticReport": 560,
+    "DocumentReference": 140,
+    "Encounter": 175,
+    "FamilyMemberHistory": 6,
+    "Immunization": 40,
+    "MedicationAdministration": 48,
+    "MedicationRequest": 1226,
+    "Observation": 5821,
+    "Procedure": 158,
+    "RelatedPerson": 17,
+    "Task": 34
+  },
+  "filter": {
+    "resources": "all",
+    "dateFrom": "2021-01-02",
+    "dateTo": "2022-01-02"
+  }
+}
+```

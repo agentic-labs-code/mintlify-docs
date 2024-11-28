@@ -1,0 +1,57 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for creating and signing SOAP envelopes for IHE (Integrating the Healthcare Enterprise) transactions, specifically ITI-38 (Cross-Gateway Query) and ITI-39 (Cross-Gateway Retrieve) requests. These are part of the XCA (Cross-Community Access) profile, which enables healthcare information exchange across different communities. The code is designed to work with the IHE Gateway SDK and implements the necessary security measures for these healthcare data exchange protocols.
+
+## What does it do?
+The code in this directory performs several crucial functions in the context of healthcare information exchange:
+
+1. It creates SOAP envelopes for document queries (ITI-38) and document retrievals (ITI-39). These envelopes are XML-based messages that conform to the IHE standards for requesting patient information across different healthcare communities.
+
+2. It generates security headers for these SOAP messages, including SAML (Security Assertion Markup Language) assertions. This ensures that the requests are authenticated and secure.
+
+3. It signs the SOAP envelopes using digital certificates and keys, adding an extra layer of security and non-repudiation to the healthcare data exchange process.
+
+4. It provides functionality for both individual and bulk processing of requests, allowing for efficient handling of multiple document queries or retrievals.
+
+In simpler terms, this code acts as a secure messenger for healthcare systems. When a healthcare provider needs to request patient information from another provider or community, this code prepares the request in a standardized, secure format that other healthcare systems can understand and trust. It's like creating a sealed, certified letter asking for specific medical records, then signing and stamping it to prove it's legitimate before sending it off.
+
+## Key Files
+
+1. `iti38-envelope.ts`:
+   This file handles the creation and signing of SOAP envelopes for ITI-38 (Cross-Gateway Query) requests. It contains functions to create the envelope structure, add security headers, and sign the complete message. The main functions are:
+   - `createITI38SoapEnvelope`: Creates the basic SOAP envelope structure.
+   - `createAndSignDQRequest`: Creates and signs a single document query request.
+   - `createAndSignBulkDQRequests`: Processes multiple document query requests in bulk.
+
+2. `iti39-envelope.ts`:
+   This file is similar to `iti38-envelope.ts` but focuses on ITI-39 (Cross-Gateway Retrieve) transactions. It provides functions to create and sign SOAP envelopes for document retrieval requests. The main functions are:
+   - `createITI39SoapEnvelope`: Creates the SOAP envelope for document retrieval.
+   - `createAndSignDRRequest`: Creates and signs a single document retrieval request.
+   - `createAndSignBulkDRRequests`: Processes multiple document retrieval requests in bulk.
+
+Both files work together to provide a comprehensive solution for creating secure, standards-compliant messages for healthcare information exchange. They share similar structures and utilize common utility functions and constants from other parts of the codebase.
+
+## Dependencies
+The code relies on several external libraries and internal modules:
+
+1. dayjs: Used for date and time manipulation, crucial for generating timestamps in the SOAP messages.
+2. fast-xml-parser: Employed for XML parsing and building, essential for constructing the SOAP envelopes.
+3. @metriport/ihe-gateway-sdk: Provides type definitions, schemas, and constants specific to the IHE Gateway.
+
+Internal dependencies include various utility functions for security operations, constant definitions, and helper functions for SOAP and SAML processing.
+
+The choice of these dependencies reflects the need for efficient date handling, XML processing, and adherence to IHE standards in healthcare data exchange.
+
+## Configuration
+While there are no explicit configuration files mentioned, the code does use several environment-specific values and constants. These include:
+
+1. SAML certificates and keys: Used for signing the SOAP envelopes and SAML assertions.
+2. Gateway-specific information: Different gateways may require specific configurations, such as the use of SHA-1 for signing.
+3. Message IDs and timestamps: Generated dynamically for each request.
+
+These configurations are typically passed into the functions as parameters, allowing for flexibility and security in managing sensitive information like certificates and keys.
+
+In conclusion, this directory contains critical code for enabling secure, standardized healthcare information exchange across different communities. It implements complex protocols and security measures to ensure that patient data can be requested and retrieved safely and efficiently in compliance with IHE standards.

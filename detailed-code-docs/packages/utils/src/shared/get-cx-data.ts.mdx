@@ -1,0 +1,84 @@
+---
+title: "get-cx-data.ts"
+---
+
+Here's the documentation for the target file `packages/utils/src/shared/get-cx-data.ts`:
+
+## High-level description
+This utility function `getCxData` retrieves customer data from an API endpoint using the provided customer ID. It returns essential information about the organization and facility associated with the customer.
+
+## Code Structure
+The main symbol in this code is the `getCxData` function, which uses axios to make an API call and processes the response to return the required data.
+
+## References
+This code references the following external symbols:
+- `Facility` and `Organization` from "@metriport/api-sdk"
+- `getEnvVarOrFail` from "@metriport/core/util/env-var"
+- `axios` for making HTTP requests
+
+## Symbols
+
+### `getCxData`
+#### Description
+This asynchronous function retrieves customer data from an API endpoint and returns specific information about the organization and facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer ID |
+| facilityId | string \| undefined | Optional facility ID |
+| includeFacility | boolean | Whether to include facility data (default: true) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object | \{ facilityId: string \| undefined; npi: string \| undefined; orgName: string; orgOID: string; \} | An object containing the retrieved customer data |
+
+#### Internal Logic
+1. Logs the start of the data retrieval process.
+2. Makes a GET request to the API endpoint with the customer ID as a parameter.
+3. Logs the retrieved customer data.
+4. Extracts organization and facilities data from the response.
+5. Validates the presence of organization and facilities data.
+6. If `includeFacility` is true, it calls `getFacility()` to retrieve a specific facility or the only facility if there's just one.
+7. Constructs and returns an object with the required data.
+
+### `getFacility`
+#### Description
+An internal asynchronous function that retrieves a specific facility based on the provided facility ID or returns the only facility if there's just one.
+
+#### Inputs
+(No explicit inputs, uses closure variables)
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facility | Facility | The retrieved facility object |
+
+#### Internal Logic
+1. Checks if facilities exist and throws an error if not.
+2. If a facility ID is provided, it finds the matching facility.
+3. If no facility ID is provided and there's more than one facility, it throws an error.
+4. Returns the found facility or the only facility if there's just one.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | For loading environment variables |
+| @metriport/api-sdk | For Facility and Organization types |
+| @metriport/core/util/env-var | For retrieving environment variables |
+| axios | For making HTTP requests |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| API_URL | string | N/A | The URL of the API endpoint, retrieved from environment variables |
+
+## Error Handling
+The function throws errors in the following cases:
+- If no organization is found in the API response
+- If no facilities are found in the API response
+- If no facility is found matching the provided ID
+- If multiple facilities exist but no specific facility ID is provided
+
+This documentation provides a comprehensive overview of the `getCxData` function and its internal workings. It should help engineers and technical PMs understand the purpose, inputs, outputs, and behavior of this utility function.

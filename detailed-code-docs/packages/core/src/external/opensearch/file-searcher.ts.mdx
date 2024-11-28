@@ -1,0 +1,98 @@
+---
+title: "file-searcher.ts"
+---
+
+## High-level description
+This code defines types and interfaces for an OpenSearch-based file searching system. It outlines the structure for search requests, results, and the OpenSearch response, as well as the configuration and interface for an OpenSearch file searcher.
+
+## Symbols
+
+### `IndexFields`
+#### Description
+Defines the structure of the fields used for indexing in OpenSearch.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+| s3FileName | string | Name of the file in S3 |
+| content | string | Content of the file |
+
+### `SearchRequest`
+#### Description
+Defines the structure of a search request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+| query | string | Search query string |
+
+### `SearchResult`
+#### Description
+Defines the structure of a search result, omitting the 'content' field from IndexFields and adding an 'entryId'.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| entryId | string | Unique identifier for the search result entry |
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+| s3FileName | string | Name of the file in S3 |
+
+### `OpenSearchResponseHit`
+#### Description
+Defines the structure of a single hit in the OpenSearch response.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| _index | string | Index name |
+| _id | string | Document ID |
+| _score | number | Relevance score |
+| _source | Omit&lt;IndexFields, "content"&gt; | Source fields excluding content |
+
+### `OpenSearchResponse`
+#### Description
+Defines the structure of the OpenSearch response.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| hits | \{ hits?: OpenSearchResponseHit[] \} | Array of search hits |
+
+### `OpenSearchFileSearcherConfig`
+#### Description
+Defines the configuration for the OpenSearch file searcher.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| region | string | AWS region |
+| indexName | string | Name of the OpenSearch index |
+
+### `OpenSearchFileSearcher`
+#### Description
+Defines the interface for the OpenSearch file searcher.
+
+#### Methods
+| Name | Inputs | Outputs | Description |
+|:-----|:-------|:--------|:------------|
+| search | SearchRequest | Promise&lt;SearchResult[]&gt; | Performs a search based on the given request |
+
+## References
+This code is referenced by:
+- `packages/core/src/external/opensearch/file-search-connector-factory.ts`
+- `packages/api/src/external/opensearch/file-search-connector-factory.ts`
+- `packages/core/src/external/opensearch/file-searcher-direct.ts`
+
+These files use the types and interfaces defined in this file to implement the actual search functionality and create instances of the searcher.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @opensearch-project/opensearch | Referenced in comments for type definitions |
+
+Note: The actual OpenSearch client is not imported in this file but is used in the implementation (`file-searcher-direct.ts`).

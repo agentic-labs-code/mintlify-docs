@@ -1,0 +1,54 @@
+---
+title: "update-patient-discovery-status.ts"
+---
+
+## High-level description
+The `updatePatientDiscoveryStatus` function updates the CareQuality (CQ) integration status for a given patient in the Metriport system. This includes updating the status itself (e.g., "processing", "failed") and optionally storing associated discovery parameters.
+
+## Symbols
+
+### `updatePatientDiscoveryStatus`
+#### Description
+This function updates the CareQuality (CQ) integration status and optional discovery parameters for a given patient in the database. It retrieves the existing patient data, modifies the `externalData.CAREQUALITY` field with the new status and parameters, and then persists the changes back to the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `{ id: string, cxId: string }` | An object containing the Metriport patient ID and external system ID. |
+| status | `LinkStatus` | The new CareQuality integration status to set for the patient. |
+| params | `DiscoveryParams` | Optional parameters related to the patient discovery process. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| updatedPatient | `Patient` | The updated patient object with the new CareQuality integration status and parameters. |
+
+#### Internal Logic
+1. **Retrieve existing patient data:** Fetches the existing patient record from the database using the provided `patient.id` and `patient.cxId`, acquiring a lock on the row to prevent concurrent modifications.
+2. **Validate discovery parameters:** If `params` is not provided, ensures that existing discovery parameters exist in the database for the patient.
+3. **Update patient data:**
+    - Creates an updated `externalData` object, merging existing external data with the new CareQuality status and parameters.
+    - Constructs an updated `updatedPatient` object, incorporating the modified `externalData`.
+4. **Persist changes:** Updates the patient record in the database with the modified data.
+5. **Return updated patient:** Returns the updated patient object.
+
+## References
+- `Patient`: Represents a patient in the Metriport system.
+- `LinkStatus`: An enum representing the possible statuses of the CareQuality integration.
+- `DiscoveryParams`: An interface defining the structure of parameters related to patient discovery.
+- `executeOnDBTx`: A helper function for executing database operations within a transaction.
+- `PatientModel`: Sequelize model representing the `patients` table in the database.
+- `getPatientOrFail`: A function to retrieve a patient by ID or throw an error if not found.
+
+## Side Effects
+- Modifies the `externalData.CAREQUALITY` field of the patient record in the database.
+
+## Dependencies
+- `@metriport/core/domain/patient`: Provides the `Patient` interface.
+- `@metriport/core/domain/patient-discovery`: Provides the `DiscoveryParams` interface.
+- `sequelize`: Used for database interactions.
+
+## Error Handling
+- Throws an error if `params` is not provided and no existing discovery parameters are found for the patient.
+- Relies on the `getPatientOrFail` function to throw an error if the patient is not found.
+- Utilizes the `executeOnDBTx` helper to manage database transactions and potential errors during the update process.

@@ -1,0 +1,84 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for generating FHIR FamilyMemberHistory resources as part of a FHIR converter system, specifically for transforming Clinical Document Architecture (CDA) data to FHIR format. The templates define JSON structures for different aspects of the FamilyMemberHistory resource, including patient references and reason references.
+
+## What does it do?
+These templates are used to create standardized JSON representations of family medical history information in the FHIR format. They allow for the conversion of CDA documents, which might contain family history data, into FHIR-compliant resources. This conversion process helps in maintaining interoperability between different healthcare systems and ensures that family medical history data can be easily shared and understood across various platforms that support the FHIR standard.
+
+## Key Files
+1. patient.hbs: This template generates a FamilyMemberHistory resource with a patient reference. It creates a basic structure including the resource type, an ID, and a reference to the associated patient.
+
+2. reasonReference.hbs: This template creates a FamilyMemberHistory resource with a reasonReference field. It includes an ID and an array of reason references, which could indicate why the family history was recorded or is relevant.
+
+Both templates use a similar structure, creating a JSON object with a "resource" key at the top level, which might be a requirement of the specific FHIR converter implementation these templates are used in.
+
+## Dependencies
+These templates are part of a larger FHIR converter system and primarily depend on:
+
+| Dependency | Purpose | Version |
+|:-----------|:--------|:--------|
+| Handlebars | Template engine for generating the JSON structures | Not specified |
+
+Handlebars was likely chosen for its simplicity and flexibility in creating dynamic content based on input data. It allows for easy insertion of variable data into predefined structures, which is ideal for generating FHIR resources from various input formats.
+
+## Configuration
+These templates don't include specific configuration options. They rely on input variables to be provided when the templates are rendered:
+
+1. patient.hbs:
+   - ID: The unique identifier for the FamilyMemberHistory resource
+   - REF: The reference to the patient associated with this family member history
+
+2. reasonReference.hbs:
+   - ID: The identifier for the FamilyMemberHistory resource
+   - REF: The reference value for the reasonReference field
+
+These variables should be supplied by the FHIR converter system when it processes CDA documents and generates the corresponding FHIR resources.
+
+Here's an example of how the patient.hbs template might be used:
+
+```handlebars
+{{&gt; FamilyMemberHistory/patient.hbs ID="12345" REF="Patient/67890"}}
+```
+
+This would generate a JSON structure like:
+
+```json
+{
+  "resource": {
+    "resourceType": "FamilyMemberHistory",
+    "id": "12345",
+    "patient": {
+      "reference": "Patient/67890"
+    }
+  }
+}
+```
+
+Similarly, for the reasonReference.hbs template:
+
+```handlebars
+{{&gt; FamilyMemberHistory/reasonReference.hbs ID="54321" REF="Condition/98765"}}
+```
+
+This would produce:
+
+```json
+{
+  "resource": {
+    "resourceType": "FamilyMemberHistory",
+    "id": "54321",
+    "reasonReference": [
+      {
+        "reference": "Condition/98765"
+      }
+    ]
+  }
+}
+```
+
+These templates provide a foundation for creating FHIR FamilyMemberHistory resources, but they only include basic fields. In a complete FHIR conversion process, additional templates or logic would likely be used to populate other fields of the FamilyMemberHistory resource, such as the relationship to the patient, the status of the history, and any specific health conditions or genetic markers relevant to the family history.
+
+It's worth noting that these templates are part of a larger project that has incorporated work from Microsoft Corporation and is now maintained by Metriport Inc. The templates are licensed under AGPLv3, which is important for anyone intending to use or modify this code in their own projects.

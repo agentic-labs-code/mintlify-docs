@@ -1,0 +1,54 @@
+---
+title: "outbound-result-poller-factory.ts"
+---
+
+## High-level description
+This code defines a factory function `makeOutboundResultPoller` that creates and returns an instance of `OutboundResultPoller`. The function determines which implementation of `OutboundResultPoller` to use based on the current environment configuration.
+
+## Code Structure
+The main function `makeOutboundResultPoller` uses the `Config` class to determine the environment and create the appropriate `OutboundResultPoller` instance. It either returns an `OutboundResultPollerLambda` for cloud environments or an `OutboundResultPollerDirect` for non-cloud environments.
+
+## References
+- `OutboundResultPoller` (imported from core package)
+- `OutboundResultPollerDirect` (imported from core package)
+- `OutboundResultPollerLambda` (imported from core package)
+- `Config` (imported from local shared directory)
+
+## Symbols
+
+### `makeOutboundResultPoller`
+#### Description
+This function creates and returns an instance of `OutboundResultPoller` based on the current environment configuration.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | OutboundResultPoller | An instance of either OutboundResultPollerLambda or OutboundResultPollerDirect |
+
+#### Internal Logic
+1. Check if the current environment is a cloud environment using `Config.isCloudEnv()`.
+2. If it's a cloud environment:
+   - Retrieve Lambda function names for patient discovery, document query, and document retrieval using Config methods.
+   - Create and return a new instance of `OutboundResultPollerLambda` with the retrieved Lambda function names.
+3. If it's not a cloud environment:
+   - Create and return a new instance of `OutboundResultPollerDirect` with the API URL and database credentials.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core | Provides OutboundResultPoller and its implementations |
+| ../../shared/config | Provides the Config class for environment and configuration management |
+
+## Configuration
+The function relies on several configuration options provided by the `Config` class:
+
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| isCloudEnv | function | Determines if the current environment is a cloud environment |
+| getOutboundPatientDiscoveryLambdaName | function | Retrieves the name of the patient discovery Lambda function |
+| getOutboundDocumentQueryLambdaName | function | Retrieves the name of the document query Lambda function |
+| getOutboundDocumentRetrievalLambdaName | function | Retrieves the name of the document retrieval Lambda function |
+| getApiUrl | function | Retrieves the API URL for non-cloud environments |
+| getDBCreds | function | Retrieves the database credentials for non-cloud environments |
+
+This factory function provides a flexible way to create the appropriate `OutboundResultPoller` instance based on the current environment, allowing for different implementations in cloud and non-cloud settings.

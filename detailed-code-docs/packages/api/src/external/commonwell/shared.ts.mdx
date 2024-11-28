@@ -1,0 +1,88 @@
+---
+title: "shared.ts"
+---
+
+## High-level description
+This code defines shared functionality for interacting with CommonWell Health Alliance services. It includes functions for retrieving CommonWell initiator information, checking if a facility is enabled for CommonWell queries, and building organization names for facilities.
+
+## Code Structure
+The main symbols in this code are independent functions that work together to provide CommonWell-related functionality. They rely on imported types and functions from other modules.
+
+## Symbols
+
+### `getCwInitiator`
+#### Description
+Retrieves the CommonWell initiator information for a given patient and facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId"&gt; | Patient object with id and cxId |
+| facilityId | string \| undefined | Optional facility ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| HieInitiator | object | CommonWell initiator information |
+
+#### Internal Logic
+1. Calls `getHieInitiator` function to retrieve the initiator information.
+2. Returns the result.
+
+### `isFacilityEnabledToQueryCW`
+#### Description
+Checks if a facility is enabled to query CommonWell for a given patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facilityId | string \| undefined | Optional facility ID |
+| patient | Pick&lt;Patient, "id" \| "cxId"&gt; | Patient object with id and cxId |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| boolean | Promise&lt;boolean&gt; | Whether the facility is enabled to query CommonWell |
+
+#### Internal Logic
+1. Calls `isHieEnabledToQuery` function with the provided parameters and `MedicalDataSource.COMMONWELL`.
+2. Returns the result.
+
+### `buildCwOrgNameForFacility`
+#### Description
+Builds a CommonWell organization name for a facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| vendorName | string | Vendor name |
+| orgName | string | Organization name |
+| oboOid | string \| undefined | Optional OBO (On Behalf Of) OID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string | string | Constructed organization name |
+
+#### Internal Logic
+1. If `oboOid` is provided, returns `${vendorName} - ${orgName} -OBO- ${oboOid}`.
+2. Otherwise, returns `${vendorName} - ${orgName}`.
+
+### `cwOrgActiveSchema`
+#### Description
+Zod schema for validating CommonWell organization active status.
+
+## Dependencies
+- @metriport/core/domain/patient
+- @metriport/core/external/index
+- zod
+- ../hie/get-hie-initiator
+
+## Configuration
+This code doesn't define any specific configuration options.
+
+## Error Handling
+This code doesn't implement specific error handling mechanisms beyond basic exception raising.
+
+## Logging
+This code doesn't implement any logging mechanisms.

@@ -1,0 +1,60 @@
+---
+title: "pull-request_api-sdk.yml"
+---
+
+## High-level description
+This GitHub Actions workflow file defines a set of checks to be run on pull requests that affect the "api-sdk" package. It ensures that commits are properly formatted and that the package builds successfully before allowing the pull request to be merged.
+
+## Code Structure
+The workflow consists of two main jobs: `check-commits` and `check-pr`, both of which use reusable workflows defined in separate files.
+
+## Symbols
+
+### Workflow
+#### Description
+This GitHub Actions workflow is triggered on pull requests that modify files in the "packages/api-sdk" directory, when a merge group is created, or manually via workflow dispatch.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| pull_request | event | Pull request event data |
+| merge_group | event | Merge group event data |
+| workflow_dispatch | event | Manual workflow trigger event data |
+
+#### Internal Logic
+1. Defines the trigger events for the workflow.
+2. Specifies two jobs to be run: `check-commits` and `check-pr`.
+3. Uses reusable workflows for each job, passing necessary parameters and secrets.
+
+### Job: check-commits
+#### Description
+This job uses a reusable workflow to check the format and content of commits in the pull request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ./.github/workflows/_check-commits.yml | workflow | Reusable workflow file for checking commits |
+
+#### Internal Logic
+Calls the `_check-commits.yml` workflow, passing along inherited secrets.
+
+### Job: check-pr
+#### Description
+This job uses a reusable workflow to build and check the "api-sdk" package.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ./.github/workflows/_build.yml | workflow | Reusable workflow file for building and checking the package |
+| path | string | The path to the package to be built ("packages/api-sdk") |
+
+#### Internal Logic
+Calls the `_build.yml` workflow, passing the package path as a parameter and inherited secrets.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ./.github/workflows/_check-commits.yml | Reusable workflow for checking commits |
+| ./.github/workflows/_build.yml | Reusable workflow for building and checking packages |
+
+Note: The actual implementation of these dependent workflows is not provided in the given code snippet.

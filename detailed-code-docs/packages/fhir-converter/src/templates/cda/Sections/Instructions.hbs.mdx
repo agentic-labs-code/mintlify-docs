@@ -1,0 +1,123 @@
+---
+title: "Instructions.hbs"
+---
+
+## High-level description
+This Handlebars template is designed to process and convert Clinical Document Architecture (CDA) instructions sections into FHIR Communication resources. It extracts information from specific CDA sections and generates corresponding FHIR Communication resources with appropriate references.
+
+## Code Structure
+The template uses nested Handlebars helpers to iterate through CDA sections, extract relevant data, and generate FHIR resources. It also includes a reference to the patient resource.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template iterates through CDA sections with a specific template ID and generates FHIR Communication resources for each entry.
+
+#### Internal Logic
+1. Uses `getFirstCdaSectionsByTemplateId` to find the relevant CDA section.
+2. Iterates through entries in the section using `toArray`.
+3. For each entry, generates a Communication resource and a patient reference.
+
+### Helpers
+
+#### `getFirstCdaSectionsByTemplateId`
+#### Description
+Retrieves the first CDA section matching the specified template ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| msg | object | The CDA message object |
+| templateId | string | The template ID to match |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| section | object | The matched CDA section |
+
+#### `toArray`
+#### Description
+Converts the input to an array if it's not already one.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| input | any | The input to convert to an array |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| array | array | The input converted to an array |
+
+#### `generateUUID`
+#### Description
+Generates a UUID based on the input string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| input | string | The input string to generate a UUID from |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| uuid | string | The generated UUID |
+
+#### `toJsonString`
+#### Description
+Converts the input to a JSON string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| input | any | The input to convert to a JSON string |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| jsonString | string | The input converted to a JSON string |
+
+#### `evaluate`
+#### Description
+Evaluates a Handlebars template with the given object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| template | string | The Handlebars template to evaluate |
+| obj | object | The object to use for evaluation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | any | The result of evaluating the template |
+
+#### `concat`
+#### Description
+Concatenates two strings.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string1 | string | The first string to concatenate |
+| string2 | string | The second string to concatenate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string | The concatenated string |
+
+## Dependencies
+This template relies on several partial templates and helper functions:
+| Dependency | Purpose |
+|:-----------|:--------|
+| Resources/Communication.hbs | Generates the FHIR Communication resource |
+| Utils/GeneratePatientId.hbs | Generates a patient ID |
+| References/Communication/subject.hbs | Generates the subject reference for the Communication resource |
+
+## Configuration
+The template uses a specific template ID for identifying the relevant CDA section:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| TEMPLATE_ID | string | 2.16.840.1.113883.10.20.22.2.45 | The template ID for the Instructions section in CDA |

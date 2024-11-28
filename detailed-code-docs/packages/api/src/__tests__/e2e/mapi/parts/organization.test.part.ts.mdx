@@ -1,0 +1,48 @@
+---
+title: "organization.test.part.ts"
+---
+
+## High-level description
+This test suite verifies the functionality of the `getOrganization` and `updateOrganization` endpoints in the medical API. It performs end-to-end testing by interacting with the API and validating the responses, including comparing them against corresponding FHIR resources.
+
+## Code Structure
+The code defines a test suite using Jest (`it` blocks). It utilizes helper functions (`getOrg`, `getFhirOrg`) to interact with the API and retrieve organization data. Validation functions (`validateLocalOrg`, `validateFhirOrg`) are imported to ensure data integrity.
+
+## References
+- `@metriport/api-sdk`: Provides the `Organization` type definition.
+- `@metriport/shared`: Offers utility functions like `sleep`.
+- `./organization`: Exports validation functions `validateFhirOrg` and `validateLocalOrg`.
+- `../shared`: Exports API clients `fhirApi` and `medicalApi`, and `fhirHeaders`.
+
+## Symbols
+
+### `runOrganizationTests`
+#### Description
+This function defines a suite of tests to validate the organization-related functionality of the medical API.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+The function includes two test cases:
+
+1. **"gets an organization"**:
+    - **Arrange:** Invokes `medicalApi.getOrganization()` to retrieve organization data.
+    - **Act:** Validates the retrieved organization data using `validateLocalOrg`. Fetches the corresponding FHIR organization resource using `getFhirOrg` and validates it against the local organization data using `validateFhirOrg`.
+    - **Assert:** Ensures the organization exists and the data is consistent between the API response and the FHIR resource.
+
+2. **"updates an organization"**:
+    - **Arrange:** Fetches the organization data using `medicalApi.getOrganization()`. Generates a new name for the organization.
+    - **Act:** Updates the organization's name via `medicalApi.updateOrganization()`. Waits for a short period to allow for data synchronization. Retrieves the updated organization data using both `getOrg` and `getFhirOrg`.
+    - **Assert:** Confirms the successful update by comparing the new name with the name in the updated organization data from both the API and the FHIR resource.
+
+## Dependencies
+- `@faker-js/faker`: Used for generating realistic test data.
+- `@metriport/api-sdk`: Provides types and potentially API client functionality.
+- `@metriport/shared`: Offers utility functions.
+
+## Error Handling
+The tests utilize basic exception handling (`throw new Error`) to explicitly fail in case of unexpected results, such as not finding the organization.

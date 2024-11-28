@@ -1,0 +1,46 @@
+---
+title: "biometrics.ts"
+---
+
+## High-level description
+The `mapDataToBiometrics` function transforms Apple Health data into an array of `Biometrics` objects, suitable for use with the Metriport API. It handles various biometrics data types, including heart rate, blood pressure, temperature, and respiration, and organizes them by date.
+
+## Code Structure
+The function primarily uses a series of helper functions (`addToBiometrics`, `addToHRV`, `addToTemp`, `addToBloodPressure`, `addToSpo2`) to process different types of biometrics data from the input `AppleHealth` object. These helper functions populate a `biometrics` array, which is returned as the result. A `dateToIndex` map is used to efficiently group data points by date.
+
+## References
+- `Biometrics`: This type is defined in the `@metriport/api-sdk` package and represents a collection of biometric data.
+- `AppleHealth`, `AppleHealthItem`, `createMetadata`: These symbols are defined in the local file and represent the structure of the input Apple Health data.
+
+## Symbols
+### `mapDataToBiometrics`
+#### Description
+This function processes raw Apple Health data and maps it to the `Biometrics` type defined in the Metriport API SDK. It iterates through various biometric data types within the input data, converting them into the appropriate format and grouping them by date.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | `AppleHealth` | An object containing raw health data from Apple Health. |
+| hourly | `boolean` | A flag indicating whether the data should be grouped hourly. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| biometrics | `Biometrics[]` | An array of `Biometrics` objects, each representing a day's worth of biometric data. |
+
+#### Internal Logic
+1. Initializes an empty `biometrics` array and a `dateToIndex` map to store the processed data and date indices, respectively.
+2. Defines several helper functions (`addToBiometrics`, `addToHRV`, `addToTemp`, `addToBloodPressure`, `addToSpo2`) to handle the mapping of specific biometric data types.
+3. Iterates through the input `data` object, calling the appropriate helper function for each data type.
+4. Each helper function extracts the relevant data points from the input `AppleHealthItem`, formats them according to the `Biometrics` structure, and adds them to the `biometrics` array.
+5. The `dateToIndex` map is used to efficiently group data points by date, ensuring that all data for a given date is stored in the same `Biometrics` object.
+6. Returns the populated `biometrics` array.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides the `Biometrics` type and other related types for representing health data. |
+| dayjs | Used for date manipulation and formatting. |
+
+## Error Handling
+The code does not implement specific error handling beyond basic exception raising. Any errors encountered during data processing will likely result in exceptions being thrown.

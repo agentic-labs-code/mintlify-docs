@@ -1,0 +1,83 @@
+---
+title: "count-bundle-refs.ts"
+---
+
+## High-level description
+This code is a script that analyzes FHIR (Fast Healthcare Interoperability Resources) bundles stored in JSON files. It counts the number of resources and references within these bundles, including missing references, and provides a summary of the analysis. The script is designed to process multiple files in a specified folder and can be run with a verbose option for more detailed output.
+
+## Code Structure
+The main function `main()` orchestrates the overall execution of the script. It uses helper functions like `executeForFile()` and `getResources()` to process individual files and extract resources. The script also utilizes external functions from imported modules for specific tasks such as getting references from resources and file operations.
+
+## Symbols
+
+### `main()`
+#### Description
+The main function that orchestrates the execution of the script. It processes all JSON files in a specified folder, excluding those with "error" in their name.
+
+#### Internal Logic
+1. Validates the folder name
+2. Gets a list of JSON files in the specified folder
+3. Processes each file using `executeForFile()`
+4. Calculates and logs summary statistics
+
+### `executeForFile(fileName: string, verbose: boolean)`
+#### Description
+Processes a single JSON file, extracting resources and references, and updating global counters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The name of the file to process |
+| verbose | boolean | Whether to log detailed information about missing references |
+
+#### Internal Logic
+1. Extracts resources from the file
+2. Gets references and missing references from the resources
+3. Updates global counters
+4. Logs summary information for the file
+5. If verbose, logs detailed information about missing references
+
+### `getResources(fileName: string)`
+#### Description
+Reads a JSON file and extracts FHIR resources from it.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The name of the file to read |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resources | Resource[] | Array of FHIR resources extracted from the file |
+| raw | string | Raw contents of the file |
+
+#### Internal Logic
+1. Reads the file contents
+2. Parses the JSON content
+3. Extracts and returns the resources from the FHIR bundle
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | For loading environment variables |
+| @medplum/fhirtypes | For FHIR type definitions |
+| @metriport/core/external/fhir/shared/bundle | For getting references from resources |
+| @metriport/shared | For utility functions like sleep and number formatting |
+| commander | For parsing command-line arguments |
+| dayjs | For date and duration calculations |
+| lodash | For utility functions like uniqBy |
+| ../shared/fs | For file system operations |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| folderName | string | "" | The folder containing JSON files to process |
+| referencesToInclude | ResourceType[] | [] | Types of references to include in the analysis |
+| verbose | boolean | undefined | Whether to log detailed information about missing references |
+
+## Error Handling
+The script includes basic error handling, such as checking for a valid folder name and handling invalid bundles. It uses console.log for error reporting.
+
+## Performance Considerations
+The script processes files sequentially, which may not be optimal for large numbers of files. Consider implementing parallel processing for improved performance with large datasets.

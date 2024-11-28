@@ -1,0 +1,43 @@
+---
+title: "oauth-routes.ts"
+---
+
+## High-level description
+This code defines an Express router for OAuth-related routes in an API. It specifically sets up a route for FHIR (Fast Healthcare Interoperability Resources) requests, which are proxied through a CommonWell Health Alliance FHIR proxy.
+
+## Code Structure
+The code is relatively simple, consisting of a single router that uses the FHIR proxy middleware for all requests to the "/fhir" path.
+
+## References
+- `fhirProxy` from "../external/commonwell/proxy/cw-fhir-proxy"
+
+## Symbols
+
+### `router`
+#### Description
+An Express Router instance that handles OAuth-related routes, specifically for FHIR requests.
+
+#### Internal Logic
+1. Creates a new Express Router instance.
+2. Applies the `fhirProxy` middleware to all requests under the "/fhir" path.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| express | Used to create the router |
+| ../external/commonwell/proxy/cw-fhir-proxy | Provides the FHIR proxy middleware |
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /oauth/fhir/* | ANY | Any FHIR-related request | Proxied FHIR response | Proxies FHIR requests through the CommonWell Health Alliance FHIR proxy |
+
+This router is likely used as part of a larger Express application to handle OAuth-related FHIR requests. The actual processing of these requests is delegated to the `fhirProxy` middleware, which is imported from an external module.
+
+Based on the related code snippets, we can see that this router is used in the main application setup (in `packages/api/src/routes/index.ts`) under the "/oauth" path with client error reporting:
+
+```javascript
+app.use("/oauth", reportClientErrors, oauthRoutes);
+```
+
+The `fhirProxy` (imported as `cw-fhir-proxy.ts`) handles specific FHIR-related requests, particularly Document Query (DQ) requests for CommonWell Health Alliance. It includes error handling and request logging, and can fall back to a dummy router if the FHIR server URL is not configured.

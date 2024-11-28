@@ -1,0 +1,69 @@
+---
+title: "group-same-diag-reports.test.ts"
+---
+
+## High-level description
+This file contains unit tests for the `groupSameDiagnosticReports` function, which is responsible for grouping duplicate diagnostic reports based on certain criteria. The tests verify the function's behavior in various scenarios, including different combinations of report attributes and edge cases.
+
+## Symbols
+
+### `describe("groupSameDiagnosticReports", () =&gt; {...})`
+#### Description
+This is the main test suite for the `groupSameDiagnosticReports` function. It contains multiple test cases to verify the function's behavior under different conditions.
+
+### `beforeEach(() =&gt; {...})`
+#### Description
+This function runs before each test case, setting up the necessary test data. It creates two diagnostic reports with unique IDs using the `makeDiagnosticReport` function.
+
+### `it("correctly groups duplicate diagReports based on effectiveDateTime and data presence", () =&gt; {...})`
+#### Description
+This test case verifies that the function correctly groups duplicate diagnostic reports when they have the same `effectiveDateTime` and contain different data (`result` and `presentedForm`).
+
+#### Internal Logic
+1. Set the same `effectiveDateTime` for both reports
+2. Add `result` to one report and `presentedForm` to the other
+3. Call `groupSameDiagnosticReports` with both reports
+4. Assert that the resulting `diagReportsMap` has a size of 1, indicating the reports were grouped
+
+### `it("does not group duplicate diagReports if effectiveDateTime is not present", () =&gt; {...})`
+#### Description
+This test case checks that the function does not group reports when `effectiveDateTime` is missing, even if other data is present.
+
+#### Internal Logic
+1. Add `presentedForm` to both reports (without setting `effectiveDateTime`)
+2. Call `groupSameDiagnosticReports` with both reports
+3. Assert that the resulting `diagReportsMap` has a size of 0, indicating no grouping occurred
+
+### `it("does not group duplicate diagReports if effectiveDateTime are different", () =&gt; {...})`
+#### Description
+This test case verifies that the function does not group reports when they have different `effectiveDateTime` values, even if they contain different types of data.
+
+#### Internal Logic
+1. Set different `effectiveDateTime` values for each report
+2. Add `presentedForm` to one report and `result` to the other
+3. Call `groupSameDiagnosticReports` with both reports
+4. Assert that the resulting `diagReportsMap` has a size of 2, indicating no grouping occurred
+
+### `it("discards codes that don't come from loinc", () =&gt; {...})`
+#### Description
+This test case checks that the function discards coding systems that are not from LOINC when grouping reports.
+
+#### Internal Logic
+1. Set the same `effectiveDateTime` for both reports
+2. Add `presentedForm` to both reports
+3. Set `code` for one report with multiple codings, including non-LOINC codes
+4. Call `groupSameDiagnosticReports` with both reports
+5. Assert that the resulting `diagReportsMap` has a size of 1
+6. Verify that the grouped report only contains LOINC codes in its `code.coding` array
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @faker-js/faker | Used to generate random UUIDs for test data |
+| @medplum/fhirtypes | Provides TypeScript types for FHIR resources |
+| ../../fhir-to-cda/cda-templates/components/__tests__/make-diagnostic-report | Imports utility functions for creating test diagnostic reports |
+| ../resources/diagnostic-report | Imports the `groupSameDiagnosticReports` function being tested |
+| ./examples/condition-examples | Imports example date-time values for testing |
+
+## Error Handling
+This test file does not implement specific error handling mechanisms, as it relies on Jest's built-in assertion and error reporting capabilities.

@@ -1,0 +1,110 @@
+---
+title: "document-query_calculateAndUpdateDocQuery.test.ts"
+---
+
+## High-level description
+The `document-query_calculateAndUpdateDocQuery.test.ts` file contains unit tests for the `updateConversionProgress` function, which updates the conversion progress of documents for a patient in the system. It also tests the `calculateConversionProgress` function, which determines the status and progress of document conversion.
+
+## Code Structure
+The code consists of two main test suites: `describe("updateConversionProgress", ...)` and `describe("getDocQueryProgress", ...)`. The first suite focuses on testing the `updateConversionProgress` function, while the second suite tests the `calculateConversionProgress` function. Both suites use Jest's testing framework and mocking to isolate the functions and simulate different scenarios.
+
+## References
+- `PatientModel` from "../../../../models/medical/patient"
+- `calculateConversionProgress` from "../../../../domain/medical/conversion-progress"
+- `makeDocumentQueryProgress`, `makePatient`, `makePatientData` from "../../../../domain/medical/__tests__/patient"
+- `mockStartTransaction` from "../../../../models/__tests__/transaction"
+
+## Symbols
+
+### `describe("docQuery-conversionProgress", ...)`
+#### Description
+This suite contains tests related to document query conversion progress.
+
+#### Internal Logic
+This suite contains two nested `describe` blocks: one for `updateConversionProgress` and another for `calculateConversionProgress`.
+
+### `describe("updateConversionProgress", ...)`
+#### Description
+This suite tests the `updateConversionProgress` function, which updates the conversion progress of documents for a patient.
+
+#### Internal Logic
+This suite uses Jest's mocking capabilities to simulate database interactions and verify the behavior of the `updateConversionProgress` function. It checks if the function correctly updates the patient's data in the database and returns the expected result.
+
+### `it("calculateAndUpdateDocQuery send a modified object to Sequelize", ...)`
+#### Description
+This test case verifies that the `updateConversionProgress` function sends a modified object to Sequelize (the ORM used) for updating the patient's data.
+
+#### Internal Logic
+- It calls the `updateConversionProgress` function with a sample patient ID and a "failed" conversion result.
+- It then checks if the `patientModel_update` mock function was called with a modified `PatientModel` object.
+- The test asserts that the object sent to Sequelize is not the same as the original `patientModel` object and that its `data` property is also modified.
+
+### `it("updates 13 successul to 14 when success", ...)`
+#### Description
+This test case checks if the `updateConversionProgress` function correctly increments the successful conversion count when a conversion is successful.
+
+#### Internal Logic
+- It creates a mock patient object with an initial document query progress.
+- It sets up the `patientModel_findOne` mock to return the mock patient object.
+- It calls the `updateConversionProgress` function with a sample patient ID and a "success" conversion result.
+- It then verifies that the `patientModel_update` mock function was called with the expected updated patient data, including the incremented successful conversion count.
+
+### `describe("getDocQueryProgress", ...)`
+#### Description
+This suite tests the `calculateConversionProgress` function, which calculates and returns the document query progress for a patient.
+
+#### Internal Logic
+This suite defines a helper function `testIt` that takes various parameters representing the conversion result, total documents, errors, successful conversions, original status, and expected status. The `testIt` function creates a mock patient object with the provided data and calls the `calculateConversionProgress` function. It then asserts that the returned document query progress matches the expected values.
+
+### `testIt(...)`
+#### Description
+This helper function tests the `calculateConversionProgress` function with different input parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | ConvertResult | The result of the document conversion ("success" or "failed"). |
+| total | number | The total number of documents to convert. |
+| errors | number (optional) | The number of failed conversions. |
+| successful | number (optional) | The number of successful conversions. |
+| originalStatus | DocumentQueryStatus | The original status of the document query. |
+| expectedStatus | DocumentQueryStatus | The expected status of the document query after calculation. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| DocumentQueryProgress | `DocumentQueryProgress` | The calculated document query progress. |
+
+#### Internal Logic
+- Creates a mock patient object with the provided data.
+- Calls the `calculateConversionProgress` function with the mock patient and conversion result.
+- Asserts that the returned document query progress has the expected status, total count, successful count, and error count.
+
+### `describe("success", ...)`
+#### Description
+This suite tests the `calculateConversionProgress` function when the conversion result is "success".
+
+#### Internal Logic
+It defines several test cases with different combinations of total documents, errors, and successful conversions, verifying that the function correctly updates the status and counts based on the input.
+
+### `describe("failed", ...)`
+#### Description
+This suite tests the `calculateConversionProgress` function when the conversion result is "failed".
+
+#### Internal Logic
+Similar to the "success" suite, it defines test cases with different input combinations to ensure the function handles failed conversions correctly.
+
+### `describe("from the wild", ...)`
+#### Description
+This suite contains test cases based on real-world scenarios encountered during development.
+
+#### Internal Logic
+It includes a test case that simulates a scenario where the number of successful conversions matches the total number of documents, and there are no errors.
+
+### `it("13 success and gets success", ...)`
+#### Description
+This test case specifically checks the behavior when there are 13 successful conversions, and a new successful conversion is added.
+
+#### Internal Logic
+- It calls the `testIt` helper function with the appropriate parameters.
+- It asserts that the returned document query progress has a successful count of 14.

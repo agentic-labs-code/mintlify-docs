@@ -1,0 +1,79 @@
+---
+title: "pre-processing.test.js"
+---
+
+## High-level description
+This file contains unit tests for the `preProcessData` method of the `cda` class. The tests verify the method's behavior in handling ampersands and other special characters in XML-like data, ensuring proper escaping and preservation of existing escape sequences.
+
+## Symbols
+
+### `describe("preProcessData", function () { ... })`
+#### Description
+This is the main test suite for the `preProcessData` method. It contains multiple test cases to verify different aspects of the method's functionality.
+
+#### Internal Logic
+The test suite creates instances of the `cda` class and calls the `preProcessData` method with various input strings. It then compares the output with expected results using Jest's `expect` assertions.
+
+### `it("returns the same data if no ampersands present", function (done) { ... })`
+#### Description
+This test case verifies that the `preProcessData` method returns the input unchanged when there are no ampersands present.
+
+#### Internal Logic
+1. Arrange: Create a `cda` instance and define input data without ampersands.
+2. Act: Call `preProcessData` with the input data.
+3. Assert: Check if the processed data is equal to the original input.
+
+### `it("replaces unescaped ampersands with &amp;", function (done) { ... })`
+#### Description
+This test case checks if the `preProcessData` method correctly replaces unescaped ampersands with the `&amp;` entity.
+
+#### Internal Logic
+1. Arrange: Create a `cda` instance and define input data with an unescaped ampersand.
+2. Act: Call `preProcessData` with the input data.
+3. Assert: Verify that the processed data has the ampersand replaced with `&amp;`.
+
+### `it("does not replace already escaped ampersands", function (done) { ... })`
+#### Description
+This test ensures that the `preProcessData` method does not modify already escaped ampersands.
+
+#### Internal Logic
+1. Arrange: Create a `cda` instance and define input data with an already escaped ampersand (`&amp;`).
+2. Act: Call `preProcessData` with the input data.
+3. Assert: Check if the processed data is identical to the input, confirming that the escaped ampersand was not modified.
+
+### `it("does not replace numeric character references", function (done) { ... })`
+#### Description
+This test verifies that the `preProcessData` method preserves numeric character references for ampersands.
+
+#### Internal Logic
+1. Arrange: Create a `cda` instance and define input data with a numeric character reference for an ampersand (`&#38;`).
+2. Act: Call `preProcessData` with the input data.
+3. Assert: Confirm that the processed data is identical to the input, ensuring the numeric character reference was not changed.
+
+### `it("does not replace hexadecimal character references", function (done) { ... })`
+#### Description
+This test checks if the `preProcessData` method maintains hexadecimal character references for ampersands.
+
+#### Internal Logic
+1. Arrange: Create a `cda` instance and define input data with a hexadecimal character reference for an ampersand (`&#x26;`).
+2. Act: Call `preProcessData` with the input data.
+3. Assert: Verify that the processed data matches the input, confirming that the hexadecimal character reference was preserved.
+
+### `it("does not replace other named character references", function (done) { ... })`
+#### Description
+This test ensures that the `preProcessData` method does not modify other common named character references.
+
+#### Internal Logic
+1. Arrange: Create a `cda` instance and define input data with various named character references (`&lt;`, `&gt;`, `&quot;`, `&apos;`).
+2. Act: Call `preProcessData` with the input data.
+3. Assert: Check if the processed data is identical to the input, confirming that all named character references remain unchanged.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| cda | The module being tested, which contains the `preProcessData` method |
+
+## Notes
+1. The tests use Jest's testing framework, as evidenced by the use of `describe`, `it`, and `expect` functions.
+2. Each test case uses the `done` callback, which is typically used for asynchronous tests. However, since the `preProcessData` method appears to be synchronous, the use of `done` might be unnecessary and could be removed to simplify the tests.
+3. The tests cover various scenarios for handling ampersands and other special characters in XML-like data, ensuring robust preprocessing of input data.

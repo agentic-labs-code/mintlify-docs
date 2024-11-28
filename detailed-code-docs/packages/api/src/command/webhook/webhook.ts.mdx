@@ -1,0 +1,225 @@
+---
+title: "webhook.ts"
+---
+
+## High-level description
+The `webhook.ts` file contains the logic for processing and sending webhook requests. It handles sending payloads to customer-defined webhook URLs, verifying signatures, managing timeouts, and updating webhook request statuses in the database. It also includes functionality for sending test payloads to verify webhook connectivity and managing webhook settings.
+
+## Code Structure
+The code defines several functions related to webhook processing. The `processRequest` function orchestrates the entire process, from retrieving webhook settings to sending the payload and updating the request status. The `sendPayload` function handles the actual HTTP request, while `sendTestPayload` is used for testing webhook connectivity. Helper functions like `missingWHSettings`, `getProductFromWebhookRequest`, `updateWhRequestWithError`, `updateWhStatusWithError`, `errorToWhStatusDetails`, and `isWebhookDisabled` provide specific functionalities for managing webhook settings, errors, and disabled webhooks.
+
+## References
+- `@metriport/core/domain/webhook/index`: Imports the `webhookDisableFlagName` constant.
+- `@metriport/core/external/analytics/posthog`: Imports analytics functions for tracking webhook events.
+- `@metriport/core/util/log`: Imports logging utilities.
+- `@metriport/core/util/notifications`: Imports notification utilities for error reporting.
+- `@metriport/shared`: Imports utility functions like `errorToString` and `isTrue`.
+- `@metriport/shared/medical`: Imports webhook request types and metadata definitions.
+- `axios`: Used for making HTTP requests.
+- `crypto`: Used for generating HMAC signatures.
+- `dayjs`: Used for date and time manipulation.
+- `nanoid`: Used for generating unique identifiers.
+- `uuid`: Used for generating UUIDs.
+- `zod`: Used for data validation.
+- `../../domain/product`: Imports the `Product` enum.
+- `../../domain/webhook`: Imports webhook request status definitions.
+- `../../errors/webhook`: Imports the `WebhookError` class.
+- `../../external/aws/app-config`: Imports functions for checking feature flags.
+- `../../models/settings`: Imports the `Settings` model.
+- `../../models/webhook-request`: Imports the `WebhookRequest` model.
+- `../../shared/http`: Imports utility functions for HTTP requests.
+- `../settings/updateSettings`: Imports the `updateWebhookStatus` function.
+- `./devices-util`: Imports the `isDAPIWebhookRequest` function.
+- `./webhook-request`: Imports functions for managing webhook requests.
+
+## Symbols
+
+### `processRequest`
+#### Description
+This function orchestrates the entire webhook request processing flow. It retrieves webhook settings, prepares the payload, sends the payload to the customer's webhook URL, and updates the webhook request status in the database. It also handles analytics tracking and error reporting.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhookRequest | `WebhookRequest` \| `WebhookRequestData` | The webhook request object containing payload and metadata. |
+| settings | `Settings` | The customer's settings, including webhook URL and key. |
+| additionalWHRequestMeta | `Record&lt;string, string&gt;` | Optional additional metadata for analytics tracking. |
+| cxWHRequestMeta | `unknown` | Optional customer-specific metadata. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `boolean` | Indicates whether the webhook request was processed successfully. |
+
+#### Internal Logic
+1. **Retrieve webhook settings:** Get the webhook URL, key, and enabled status from the customer's settings.
+2. **Check for missing settings:** If the URL or key is missing, log an error, mark the request as failed, and return false.
+3. **Prepare payload:** Construct the full payload with metadata and customer-specific data.
+4. **Send payload:** Call the `sendPayload` function to send the payload to the customer's webhook URL.
+5. **Update request status:** If the payload is sent successfully, update the webhook request status in the database to "success" and update the webhook status in the customer's settings if it was previously disabled.
+6. **Handle errors:** If an error occurs during payload sending, log the error, update the webhook request status to "failure", update the webhook status in the customer's settings, and report the error to Sentry.
+7. **Track analytics:** Send analytics events for both success and failure scenarios.
+
+### `sendPayload`
+#### Description
+This function sends the webhook payload to the customer's webhook URL using an HTTP POST request. It also handles signature generation and timeout management.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payload | `unknown` | The webhook payload to be sent. |
+| url | `string` | The customer's webhook URL. |
+| apiKey | `string` | The customer's webhook API key. |
+| timeout | `number` | Optional timeout in milliseconds for the HTTP request (defaults to 5000). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | `{ status: number; webhookResponse: WebhookResponse; url: string; durationMillis: number; }` | An object containing the HTTP status code, parsed webhook response, request URL, and request duration. |
+
+#### Internal Logic
+1. **Generate signature:** Create an HMAC signature of the payload using the API key.
+2. **Send HTTP request:** Send a POST request to the webhook URL with the payload, signature, and user agent.
+3. **Handle response:** Parse the response data using the `webhookResponseSchema` and return the response object.
+4. **Handle errors:** If an error occurs during the request, throw a `WebhookError` with details about the error.
+
+### `sendTestPayload`
+#### Description
+This function sends a test payload to the customer's webhook URL to verify connectivity. It uses a "ping" payload and checks for a matching "pong" response.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | `string` | The customer's webhook URL. |
+| key | `string` | The customer's webhook API key. |
+| cxId | `string` | The customer's ID. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `boolean` | Indicates whether the test payload was sent and received successfully. |
+
+#### Internal Logic
+1. **Prepare test payload:** Create a "ping" payload with a unique identifier and timestamp.
+2. **Send payload:** Call the `sendPayload` function with the test payload and a shorter timeout.
+3. **Check for pong response:** If the response contains a matching "pong" value, return true. Otherwise, return false.
+
+### `missingWHSettings`
+#### Description
+This function checks if the webhook settings are missing and logs an error message if they are. It also updates the webhook request status to "failure".
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhookRequest | `WebhookRequest` \| `WebhookRequestData` | The webhook request object. |
+| webhookUrl | `string` \| `null` | The customer's webhook URL. |
+| webhookKey | `string` \| `null` | The customer's webhook API key. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `boolean` | Always returns false, indicating missing settings. |
+
+#### Internal Logic
+1. **Check for missing settings:** If either the URL or key is missing, log an error message with details about the missing settings.
+2. **Update request status:** Update the webhook request status to "failure".
+3. **Return false:** Always return false to indicate missing settings.
+
+### `getProductFromWebhookRequest`
+#### Description
+This function determines the product type (medical or devices) based on the webhook request type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhookRequest | `WebhookRequest` \| `WebhookRequestData` | The webhook request object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| product | `Product` | The product type (medical or devices). |
+
+#### Internal Logic
+1. **Check for DAPI request:** If the request type starts with the DAPI prefix, return `Product.devices`.
+2. **Return medical product:** Otherwise, return `Product.medical`.
+
+### `updateWhRequestWithError`
+#### Description
+This function updates the webhook request status in the database with error details.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| error | `unknown` | The error object. |
+| webhookRequestId | `string` | The ID of the webhook request. |
+| webhookUrl | `string` | The customer's webhook URL. |
+| status | `WebhookRequestStatus` | The webhook request status to be set. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| None | | |
+
+#### Internal Logic
+1. **Extract error details:** Get the error message and HTTP status code from the error object.
+2. **Update request status:** Update the webhook request in the database with the error details, status, and request URL.
+3. **Handle errors:** If an error occurs during the update, log the error and report it to Sentry.
+
+### `updateWhStatusWithError`
+#### Description
+This function updates the customer's webhook status in the settings table with error details.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| error | `unknown` | The error object. |
+| webhookRequestId | `string` | The ID of the webhook request. |
+| webhookUrl | `string` | The customer's webhook URL. |
+| settingsId | `string` | The ID of the customer's settings. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| None | | |
+
+#### Internal Logic
+1. **Extract error details:** Get the error message from the error object.
+2. **Update webhook status:** Update the customer's webhook status in the settings table to "disabled" and set the status detail to the error message.
+3. **Handle errors:** If an error occurs during the update, log the error and report it to Sentry.
+
+### `errorToWhStatusDetails`
+#### Description
+This function converts a `WebhookError` to a string suitable for use as a webhook status detail.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| error | `WebhookError` | The webhook error object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| detail | `string` | The error message or "Invalid response payload" if the error is a ZodError. |
+
+#### Internal Logic
+1. **Check for ZodError:** If the error is a ZodError, return "Invalid response payload".
+2. **Return error message:** Otherwise, return the error message.
+
+### `isWebhookDisabled`
+#### Description
+This function checks if the webhook is disabled based on the provided metadata.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| meta | `unknown` | The webhook metadata. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `boolean` | Indicates whether the webhook is disabled. |
+
+#### Internal Logic
+1. **Check for metadata:** If metadata is not provided, return false.
+2. **Extract disable flag:** Get the value of the `webhookDisableFlagName` from the metadata.
+3. **Return flag value:** Return the boolean value of the disable flag.

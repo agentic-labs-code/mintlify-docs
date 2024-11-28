@@ -1,0 +1,62 @@
+---
+title: "http.ts"
+---
+
+## High-level description
+This TypeScript file provides utility functions for handling specific types of HTTP errors in the context of Axios, a popular HTTP client for JavaScript. The functions help identify timeout-related errors and bad gateway errors, which are common in network communications.
+
+## Symbols
+
+### `isAxiosTimeout`
+#### Description
+This function determines if an Axios error can be considered a timeout or related error.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| err | AxiosError | An instance of AxiosError representing the error to be checked |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | boolean | True if the error is considered a timeout error, false otherwise |
+
+#### Internal Logic
+The function checks various error codes and HTTP status codes that are commonly associated with timeout scenarios:
+- "ETIMEDOUT": A generic timeout error
+- "ERR_BAD_RESPONSE": Axios code for 502 Bad Gateway
+- "ECONNRESET": Connection reset error
+- "ESOCKETTIMEDOUT": Socket timeout error
+- 503 status code: Service Unavailable
+- 504 status code: Gateway Timeout
+
+If any of these conditions are met, the function returns true, indicating a timeout-related error.
+
+### `isAxiosBadGateway`
+#### Description
+This function determines if an Axios error can be considered a bad gateway error.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| err | AxiosError | An instance of AxiosError representing the error to be checked |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | boolean | True if the error is considered a bad gateway error, false otherwise |
+
+#### Internal Logic
+The function checks for two specific conditions that indicate a bad gateway error:
+- The error code is "ERR_BAD_RESPONSE", which Axios uses for 502 Bad Gateway errors
+- The HTTP status code is 502 (Bad Gateway)
+
+If either of these conditions is met, the function returns true, indicating a bad gateway error.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| axios | The `AxiosError` type is imported from this library to type-check the error parameter |
+
+## Error Handling
+This file doesn't directly handle errors but provides utility functions to identify specific types of errors. These functions can be used in other parts of the application to implement appropriate error handling strategies for timeout and bad gateway scenarios.

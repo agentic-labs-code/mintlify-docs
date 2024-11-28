@@ -1,0 +1,116 @@
+---
+title: "ihe-result.ts"
+---
+
+## High-level description
+This code defines types and functions related to IHE (Integrating the Healthcare Enterprise) results in the context of Carequality interoperability. It includes types for representing result status and functions for determining the status of Patient Discovery (PD), Document Query (DQ), and Document Retrieval (DR) operations.
+
+## Code Structure
+The code defines a `BaseResultDomain` interface that seems intended to be a base for representing IHE result entities. It also defines an enum-like type `IHEResultStatus` for possible result statuses. The functions `getPDResultStatus`, `getDQResultStatus`, and `getDRResultStatus` determine the result status based on operation-specific parameters. 
+
+## Symbols
+
+### `BaseResultDomain`
+#### Description
+An interface defining the base structure for a domain object representing an IHE result. It extends the `BaseDomainCreate` interface from "@metriport/core/domain/base-domain".
+
+#### Inputs
+N/A - This is an interface, not a function.
+
+#### Outputs
+N/A - This is an interface, not a function.
+
+#### Internal Logic
+This interface defines the following properties:
+- `requestId`: A string representing the ID of the original request.
+- `status`: A string representing the status of the IHE operation.
+- `createdAt`: A Date object representing the time the result was created.
+
+### `IHEResultStatus`
+#### Description
+A type alias representing the possible statuses of an IHE operation.
+
+#### Inputs
+N/A - This is a type alias, not a function.
+
+#### Outputs
+N/A - This is a type alias, not a function.
+
+#### Internal Logic
+The type alias defines two possible string values:
+- `"success"`: Indicates that the IHE operation was successful.
+- `"failure"`: Indicates that the IHE operation failed.
+
+### `getPDResultStatus`
+#### Description
+Determines the status of a Patient Discovery (PD) operation based on whether a patient match was found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ patientMatch \} | \{ patientMatch?: boolean \| null \} | An object containing a `patientMatch` property, which is a boolean indicating whether a patient match was found. The property is optional and nullable. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | `IHEResultStatus` | Returns `"success"` if `patientMatch` is true, otherwise returns `"failure"`. |
+
+#### Internal Logic
+The function checks the value of the `patientMatch` property. If it's true, it returns `"success"`, otherwise it returns `"failure"`.
+
+### `getDQResultStatus`
+#### Description
+This function acts as a wrapper for the `getDocumentResultStatus` function, specifically for Document Query (DQ) operations. It simply calls `getDocumentResultStatus` with the provided parameters and returns its result.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `params` | `Parameters&lt;typeof getDocumentResultStatus&gt;[0]` | The parameters expected by the `getDocumentResultStatus` function. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | `IHEResultStatus` | Returns the result of calling `getDocumentResultStatus` with the provided parameters. |
+
+#### Internal Logic
+The function directly calls and returns the result of `getDocumentResultStatus`.
+
+### `getDRResultStatus`
+#### Description
+This function is identical to `getDQResultStatus`, acting as a wrapper for `getDocumentResultStatus`, but intended for Document Retrieval (DR) operations. It calls `getDocumentResultStatus` with the provided parameters and returns its result.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `params` | `Parameters&lt;typeof getDocumentResultStatus&gt;[0]` | The parameters expected by the `getDocumentResultStatus` function. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | `IHEResultStatus` | Returns the result of calling `getDocumentResultStatus` with the provided parameters. |
+
+#### Internal Logic
+The function directly calls and returns the result of `getDocumentResultStatus`.
+
+### `getDocumentResultStatus`
+#### Description
+Determines the status of a Document Query (DQ) or Document Retrieval (DR) operation based on the number of document references found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ docRefLength \} | \{ docRefLength?: number \} | An object containing a `docRefLength` property, which is a number representing the number of document references found. The property is optional. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | `IHEResultStatus` | Returns `"success"` if `docRefLength` is defined and greater than or equal to 1, otherwise returns `"failure"`. |
+
+#### Internal Logic
+The function checks if `docRefLength` is defined and if it's greater than or equal to 1. If both conditions are true, it returns `"success"`, otherwise it returns `"failure"`.
+
+## References
+- `BaseDomainCreate`: This interface is imported from "@metriport/core/domain/base-domain" and is extended by `BaseResultDomain`.
+
+## Dependencies
+- `@metriport/core/domain/base-domain`: Provides the `BaseDomainCreate` interface. 

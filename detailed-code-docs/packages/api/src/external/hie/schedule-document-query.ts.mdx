@@ -1,0 +1,46 @@
+---
+title: "schedule-document-query.ts"
+---
+
+## High-level description
+This code implements functionality to schedule and manage document queries for patients in the Metriport system, specifically for the CommonWell Health Alliance (CW) data source. It handles the process of scheduling document queries, updating query progress, and managing the query execution based on patient data and system configurations.
+
+## Code Structure
+The main function `scheduleDocQuery` is responsible for storing the request ID for a scheduled document query. It interacts with the `PatientModel` to update the patient's external data with the scheduled query information. The function uses a database transaction to ensure data consistency when updating the patient record.
+
+## Symbols
+
+### `scheduleDocQuery`
+#### Description
+This function stores the request ID for a scheduled document query to be executed when the patient discovery is completed. It updates the patient's external data in the database with the query information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| requestId | string | The ID of the document query request |
+| patient | Pick&lt;Patient, "id" \| "cxId"&gt; | Object containing patient ID and customer ID |
+| source | MedicalDataSource | The source of the medical data (e.g., COMMONWELL) |
+| triggerConsolidated | boolean \| undefined | Optional flag to trigger consolidated query |
+
+#### Internal Logic
+1. Logs the scheduling of the document query
+2. Creates a patient filter object with ID and customer ID
+3. Executes a database transaction to update the patient record:
+   - Retrieves the existing patient data
+   - Updates the external data for the specified source with the new query information
+   - Saves the updated patient record
+
+## Side Effects
+- Updates the patient record in the database with new external data information
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/external/index | Imports MedicalDataSource type |
+| @metriport/core/domain/patient | Imports Patient type |
+| @metriport/core/util/log | Imports logging utility |
+| ../../command/medical/patient/get-patient | Imports getPatientOrFail function |
+| ../../models/medical/patient | Imports PatientModel |
+| ../../models/transaction-wrapper | Imports executeOnDBTx function |
+
+This code is part of a larger system for managing patient data and document queries in a medical context. It specifically handles the scheduling of document queries for the CommonWell Health Alliance data source, updating patient records with the necessary information to execute these queries later.

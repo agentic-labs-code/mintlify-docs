@@ -1,0 +1,65 @@
+---
+title: "DocumentReference.hbs"
+---
+
+## High-level description
+This Handlebars template generates a FHIR DocumentReference resource in JSON format. It encapsulates the content of a Clinical Document Architecture (CDA) document, including its metadata and the document itself encoded as base64 data.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template creates a FHIR DocumentReference resource structure with a fullUrl, resource details, and a request object for RESTful operations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docref | Object | The input CDA document object containing the clinical document data |
+| ID | String | A unique identifier for the DocumentReference resource |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON | Object | A FHIR-compliant DocumentReference resource in JSON format |
+
+#### Internal Logic
+1. Generates a fullUrl using the provided ID.
+2. Creates the DocumentReference resource with the following key elements:
+   - resourceType: Set to "DocumentReference"
+   - id: Set to the provided ID
+   - type: Uses the ClinicalDocument.code from the input, converted to a CodeableConcept
+   - date: Set to the current date-time
+   - status: Set to "current"
+   - content: An array containing the document as an attachment
+3. The content.attachment includes:
+   - contentType: Set to "text/plain"
+   - data: The original document data, gzipped and base64 encoded
+   - hash: SHA1 hash of the gzipped and base64 encoded data
+4. Includes a request object for RESTful operations (PUT method)
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| DataType/CodeableConcept.hbs | Used to format the 'type' field of the DocumentReference |
+
+## TODOs
+The template includes several comments indicating missing mappings or fields:
+- Missing status mapping
+- Missing contentType mapping
+- Missing docStatus
+- Missing type
+- Missing category
+- Missing subject reference
+- Missing author
+- Missing authenticator
+- Missing custodian
+- Missing description
+- Missing context
+
+These TODOs suggest that the template might be incomplete or that these fields are expected to be added in future iterations.
+
+## Side Effects
+The template uses helper functions like `gzip`, `base64Encode`, and `sha1Hash`, which process the original document data. These operations may have performance implications for large documents.
+
+## Performance Considerations
+The gzipping, base64 encoding, and SHA1 hashing of the original document data may be computationally expensive for large documents. Consider the impact on performance when dealing with large or numerous documents.

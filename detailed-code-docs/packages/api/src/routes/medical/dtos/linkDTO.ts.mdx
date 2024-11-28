@@ -1,0 +1,120 @@
+---
+title: "linkDTO.ts"
+---
+
+## High-level description
+This code defines a LinkDTO interface and related types for representing patient links in a medical data system. It also provides functions to convert data from CommonWell (CW) to the LinkDTO format, handling potential and current links.
+
+## Code Structure
+The main symbols in this code are:
+1. `LinkDTO`: Defines the structure of a patient link.
+2. `PatientOnLinkDTO`: Represents patient information within a link.
+3. `PatientLinksDTO`: Contains arrays of potential and current links.
+4. `dtoFromCW`: Converts CommonWell data to PatientLinksDTO format.
+5. `convertFromCWPersonToLink`: Converts a CommonWell Person to LinkDTO format.
+6. `personToPatient`: Converts a CommonWell Person to PatientOnLinkDTO format.
+7. `genderToDTO`: Converts CommonWell gender to GenderDTO format.
+
+These symbols work together to transform CommonWell data into a standardized link format for the application.
+
+## References
+This code references:
+- `@metriport/commonwell-sdk`: For CommonWell-specific types and functions.
+- `@metriport/core/domain/patient`: For patient-related utilities.
+- `@metriport/core/external/index`: For MedicalDataSource enum.
+- `./demographicsDTO`: For DemographicsDTO and GenderDTO types.
+
+## Symbols
+
+### LinkDTO
+#### Description
+Defines the structure of a patient link, including source information and patient data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string \| null \| undefined | Optional identifier for the link |
+| entityId | string | Identifier for the linked entity |
+| potential | boolean | Indicates if the link is potential or confirmed |
+| source | MedicalDataSource | The source of the medical data |
+| patient | PatientOnLinkDTO | Patient information associated with the link |
+
+### PatientLinksDTO
+#### Description
+Contains arrays of potential and current patient links.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| potentialLinks | LinkDTO[] | Array of potential patient links |
+| currentLinks | LinkDTO[] | Array of current (confirmed) patient links |
+
+### dtoFromCW
+#### Description
+Converts CommonWell data to PatientLinksDTO format, handling both potential and current links.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cwPotentialPersons | Person[] | Array of potential persons from CommonWell |
+| cwCurrentPersons | Person[] | Array of current persons from CommonWell |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | PatientLinksDTO | Converted patient links data |
+
+#### Internal Logic
+1. Converts potential and current persons to LinkDTO format.
+2. Removes duplicate potential links that are already in current links.
+3. Returns a PatientLinksDTO object with potential and current links.
+
+### convertFromCWPersonToLink
+#### Description
+Converts a CommonWell Person to LinkDTO format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| person | Person | CommonWell Person object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | LinkDTO \| null | Converted LinkDTO or null if conversion fails |
+
+### personToPatient
+#### Description
+Converts a CommonWell Person to PatientOnLinkDTO format, extracting relevant demographic information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| person | \{ id: string \} & Person | CommonWell Person object with an id |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | PatientOnLinkDTO | Converted patient information |
+
+### genderToDTO
+#### Description
+Converts CommonWell gender to GenderDTO format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| person | Person | CommonWell Person object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | GenderDTO | Converted gender in GenderDTO format |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/commonwell-sdk | Provides CommonWell-specific types and functions |
+| lodash | Used for utility functions (differenceBy) |
+| @metriport/core/domain/patient | Provides patient-related utilities |
+| @metriport/core/external/index | Provides MedicalDataSource enum |

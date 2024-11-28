@@ -1,0 +1,50 @@
+---
+title: "count-resources.ts"
+---
+
+## High-level description
+This code is a utility script that counts the number of resources in a FHIR (Fast Healthcare Interoperability Resources) bundle. It can process either a single JSON file containing a FHIR bundle or recursively search through a directory of such files, providing a consolidated count of resources by type.
+
+## Code Structure
+The main function `main()` serves as the entry point, which processes command-line arguments to determine whether to count resources in a single file or a directory. It then calls appropriate helper functions from the `shared.ts` file to perform the counting and display the results.
+
+## References
+This code references functions from:
+- `../shared/fs`: `isDirectory`
+- `./shared`: `countResourcesPerDirectory`, `getResourceCountByFile`
+
+## Symbols
+
+### `main()`
+#### Description
+The main function that orchestrates the resource counting process based on the provided command-line argument.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| process.argv[2] | string | The path to a JSON file or directory |
+
+#### Internal Logic
+1. Checks if a file/directory name is provided as an argument.
+2. If the argument is a directory, it calls `countResourcesPerDirectory()` to process all files recursively.
+3. If the argument is a file, it calls `getResourceCountByFile()` to process a single file.
+4. Outputs the results (resource counts by type and total) to the console.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | For loading environment variables |
+| ../shared/fs | For file system operations |
+| ./shared | For FHIR resource counting functions |
+
+## Error Handling
+The script exits with a status code of 1 if no filename is provided as an argument, displaying a usage message.
+
+## API/Interface Reference
+This script is intended to be run from the command line with the following usage:
+```
+ts-node src/fhir-converter/count-resources.ts &lt;file/folder.json&gt;
+```
+
+## Performance Considerations
+For large directories with many FHIR bundle files, this script may take a considerable amount of time to process all files recursively. The script processes files sequentially, which could be optimized for parallel processing in future iterations if performance becomes a concern.

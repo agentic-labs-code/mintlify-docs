@@ -1,0 +1,101 @@
+---
+title: "count-resources.ts"
+---
+
+Here's the documentation for the target file:
+
+## High-level description
+This file contains functions for counting FHIR resources associated with a patient. It provides functionality to count resources by patient or by customer, with options to filter by resource types and date range.
+
+## Code Structure
+The main function `countResources` calls either `getResourceCountByPatient` or `getResourceCountByCustomer` depending on whether a patient ID is provided. These functions use the FHIR API to search for resources and count them.
+
+## Symbols
+
+### `countResources`
+#### Description
+This function counts FHIR resources for a given patient or customer, optionally filtered by resource types and date range.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "cxId"&gt; & Partial&lt;Pick&lt;Patient, "id" | "cxId"&gt;&gt; | Patient information |
+| resources | ResourceTypeForConsolidation[] | Optional array of resource types to count |
+| dateFrom | string | Optional start date for filtering |
+| dateTo | string | Optional end date for filtering |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ResourceCount | object | Contains total count and count per resource type |
+
+#### Internal Logic
+1. Determines whether to count by patient or customer based on the presence of a patient ID.
+2. Calls the appropriate function to get resource counts.
+3. Processes the results, handling both successful and failed counts.
+4. Calculates the total count and count per resource type.
+5. Logs any failures and captures error messages.
+
+### `getResourceCountByPatient`
+#### Description
+Counts resources for a specific patient using the FHIR API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "cxId"&gt; & Partial&lt;Pick&lt;Patient, "id" | "cxId"&gt;&gt; | Patient information |
+| resources | ResourceTypeForConsolidation[] | Optional array of resource types to count |
+| dateFrom | string | Optional start date for filtering |
+| dateTo | string | Optional end date for filtering |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;PromiseSettledResult&lt;\{ resourceType: string; count: number \}&gt;[]&gt; | Array of promise results for each resource count |
+
+#### Internal Logic
+1. Creates a FHIR API instance for the customer.
+2. Gets patient filters and date filters.
+3. Searches for resources using the FHIR API, filtering by patient and date.
+4. Returns an array of promise results for each resource count.
+
+### `getResourceCountByCustomer`
+#### Description
+Counts resources for a customer across all patients using the FHIR API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| resources | ResourceTypeForConsolidation[] | Optional array of resource types to count |
+| dateFrom | string | Optional start date for filtering |
+| dateTo | string | Optional end date for filtering |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;PromiseSettledResult&lt;\{ resourceType: string; count: number \}&gt;[]&gt; | Array of promise results for each resource count |
+
+#### Internal Logic
+1. Creates a FHIR API instance for the customer.
+2. Gets patient filters and date filters.
+3. Searches for resources using the FHIR API, filtering by date.
+4. Returns an array of promise results for each resource count.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Importing ResourceTypeForConsolidation type |
+| @metriport/core/domain/patient | Importing Patient type |
+| @metriport/core/external/fhir/patient/resource-filter | Importing functions for creating FHIR filters |
+| ../../../shared/notifications | Importing capture function for error reporting |
+| ../../../shared/util | Importing Util for logging |
+| ../api/api-factory | Importing makeFhirApi function to create FHIR API instances |
+
+## Error Handling
+The code uses a Promise.allSettled approach to handle potential errors when counting resources. Failed counts are logged and reported using the capture.message function.
+
+## Logging
+The code uses a custom logging utility (Util.out) to log information about the counting process, including the total number of resources counted and any failures encountered.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

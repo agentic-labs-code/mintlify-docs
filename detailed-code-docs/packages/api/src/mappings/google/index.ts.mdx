@@ -1,0 +1,73 @@
+---
+title: "index.ts"
+---
+
+## High-level description
+The `packages/api/src/mappings/google/index.ts` file provides utility functions for extracting and transforming data from Google Fit API responses. These functions are used to map Google Fit data points to Metriport's data models.
+
+## Code Structure
+The code defines two functions: `getSamples` and `getValues`, both of which operate on arrays of `GooglePoint` objects. The `ValueKey` enum is used to specify the type of value to extract from a `GooglePoint`.
+
+## References
+- `GooglePoint` from "./models"
+
+## Symbols
+
+### `getSamples`
+#### Description
+This function extracts an array of `Sample` objects from an array of `GooglePoint` objects. Each `Sample` represents a single data point with a value and a timestamp.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| arr | `GooglePoint`[] | An array of `GooglePoint` objects representing data points from Google Fit. |
+| valueIndex | `number` | Optional. The index of the value to extract from the `value` array within each `GooglePoint`. Defaults to 0. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| samples | `Sample`[] | An array of `Sample` objects, each containing a value and a timestamp. |
+
+#### Internal Logic
+1. Iterates through the input array of `GooglePoint` objects.
+2. For each `GooglePoint`, it extracts the value at the specified `valueIndex` from the `value` array.
+3. Converts the `startTimeNanos` property of the `GooglePoint` to a timestamp in milliseconds and formats it as an ISO string.
+4. Creates a new `Sample` object with the extracted value and timestamp.
+5. Returns an array of the created `Sample` objects.
+
+### `ValueKey`
+#### Description
+An enum defining the keys for accessing different types of values within a `GooglePoint` object.
+
+#### Inputs
+N/A
+
+#### Outputs
+N/A
+
+#### Internal Logic
+Defines the following keys:
+- `fpVal`: Represents a floating-point value.
+- `intVal`: Represents an integer value.
+
+### `getValues`
+#### Description
+This function extracts an array of numerical values from an array of `GooglePoint` objects. The type of value to extract is specified by the `key` parameter.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| arr | `GooglePoint`[] | An array of `GooglePoint` objects representing data points from Google Fit. |
+| key | `ValueKey` |  The key specifying the type of value to extract from each `GooglePoint`. Defaults to `ValueKey.fpVal`. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| values | `number`[] | An array of numerical values extracted from the `GooglePoint` objects. |
+
+#### Internal Logic
+1. Iterates through the input array of `GooglePoint` objects.
+2. For each `GooglePoint`, it iterates through its `value` array.
+3. Accesses the value corresponding to the provided `key` within each element of the `value` array.
+4. If the value exists, it is added to the accumulator array.
+5. Returns the accumulator array containing all extracted values.

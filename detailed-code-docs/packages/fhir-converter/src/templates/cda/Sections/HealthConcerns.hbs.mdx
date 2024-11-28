@@ -1,0 +1,46 @@
+---
+title: "HealthConcerns.hbs"
+---
+
+## High-level description
+This Handlebars template file is designed to process and transform health concerns data from a Clinical Document Architecture (CDA) format into FHIR (Fast Healthcare Interoperability Resources) Condition resources. It extracts health concern information from specific sections of the CDA document and generates corresponding FHIR Condition resources along with their subject references.
+
+## Code Structure
+The template uses nested Handlebars helpers to iterate through the CDA document structure, extract relevant health concern data, and generate FHIR resources. It utilizes partial templates for creating Condition resources and subject references.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template iterates through health concern entries in the CDA document and generates FHIR Condition resources for each valid entry.
+
+#### Internal Logic
+1. Retrieves the first CDA section with the template ID '2.16.840.1.113883.10.20.22.2.58'.
+2. Iterates through each entry in the retrieved section.
+3. For each entry, iterates through its act.entryRelationship array.
+4. Checks if each health entry has a valid observation value code.
+5. If valid, generates a Condition resource and a subject reference.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Resources/Condition.hbs | Partial template for generating Condition resources |
+| References/Condition/subject.hbs | Partial template for generating subject references |
+| Utils/GeneratePatientId.hbs | Utility template for generating patient IDs |
+
+## Helpers and Functions
+The template uses several custom Handlebars helpers and functions:
+
+1. `getFirstCdaSectionsByTemplateId`: Retrieves CDA sections by template ID.
+2. `toArray`: Converts an object or value to an array.
+3. `generateUUID`: Generates a UUID based on the input string.
+4. `toJsonString`: Converts an object to a JSON string.
+5. `evaluate`: Evaluates another Handlebars template.
+6. `concat`: Concatenates strings.
+
+These helpers and functions are likely defined in a separate file and registered with the Handlebars instance used to process this template.
+
+## Notes
+- The template includes a copyright notice and license information at the beginning, indicating that it incorporates work from Microsoft Corporation and is licensed under AGPLv3.
+- The template is designed to work with a specific CDA document structure and may need to be adjusted if the input document structure changes.
+- The generated FHIR resources are formatted as comma-separated JSON objects, suggesting that this template is part of a larger FHIR bundle generation process.

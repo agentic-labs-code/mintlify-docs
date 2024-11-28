@@ -1,0 +1,104 @@
+---
+title: "ihe-gateway-v2-direct.ts"
+---
+
+## High-level description
+The `IHEGatewayV2Direct` class is responsible for initiating and managing outbound IHE transactions (Patient Discovery, Document Query, Document Retrieval) directly with external systems. It extends the `IHEGatewayV2` abstract class and implements its abstract methods.
+
+## Code Structure
+The `IHEGatewayV2Direct` class extends the `IHEGatewayV2` abstract class, providing concrete implementations for its abstract methods. It utilizes several helper functions from `ihe-gateway-v2-logic.ts` to create, sign, send, and process IHE requests and responses. It also interacts with the `Config` class to retrieve configuration settings.
+
+## References
+- `IHEGatewayV2` from `@metriport/core/external/carequality/ihe-gateway-v2/outbound/ihe-gateway-v2`
+- `createSignSendProcessXCPDRequest`, `createSignSendProcessDqRequests`, `createSignSendProcessDrRequests` from `@metriport/core/external/carequality/ihe-gateway-v2/outbound/ihe-gateway-v2-logic`
+- `SamlCertsAndKeys` from `@metriport/core/external/carequality/ihe-gateway-v2/saml/security/types`
+- `Config` from `../../shared/config`
+
+## Symbols
+
+### `IHEGatewayV2Direct`
+#### Description
+This class extends the `IHEGatewayV2` abstract class and implements its methods for starting Patient Discovery, Document Query, and Document Retrieval transactions. It handles the construction and signing of IHE requests, sends them to external gateways, and processes the responses.
+
+#### Inputs
+- Constructor: None
+
+#### Outputs
+- `startPatientDiscovery`: Promise\&lt;void&gt;
+- `startDocumentQueryGatewayV2`: Promise\&lt;void&gt;
+- `startDocumentRetrievalGatewayV2`: Promise\&lt;void&gt;
+
+#### Internal Logic
+The class constructor initializes the SAML certificates and keys required for signing requests and sets up the response URLs for each transaction type. The `startPatientDiscovery`, `startDocumentQueryGatewayV2`, and `startDocumentRetrievalGatewayV2` methods utilize helper functions from `ihe-gateway-v2-logic.ts` to:
+1. Create and sign the respective IHE requests.
+2. Send the signed requests to the external gateways.
+3. Process the responses received from the gateways.
+4. Send the processed responses to the internal Carequality endpoints.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| `@metriport/ihe-gateway-sdk` | Provides types and schemas for IHE transactions. |
+| `@metriport/core` | Offers core functionalities like logging, retries, and SAML handling. |
+| `axios` | Used for making HTTP requests to internal and external endpoints. |
+
+### `startPatientDiscovery`
+#### Description
+This method initiates a Patient Discovery transaction by creating, signing, and sending an XCPD request to the external gateway.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| pdRequestGatewayV2 | `OutboundPatientDiscoveryReq` | The Patient Discovery request object. |
+| patientId | `string` | The ID of the patient. |
+| cxId | `string` | The ID of the connection. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `Promise&lt;void&gt;` | A promise that resolves when the request has been sent and processed. |
+
+#### Internal Logic
+1. Calls `createSignSendProcessXCPDRequest` to handle the request creation, signing, sending, and processing.
+2. If a patient match is found, sends the processed response to the internal Carequality endpoint.
+3. Optionally, uploads the processed response to an S3 bucket for logging and analysis.
+
+### `startDocumentQueryGatewayV2`
+#### Description
+This method initiates a Document Query transaction by creating, signing, and sending a batch of XCA Document Query requests to the external gateway.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dqRequestsGatewayV2 | `OutboundDocumentQueryReq[]` | An array of Document Query request objects. |
+| patientId | `string` | The ID of the patient. |
+| cxId | `string` | The ID of the connection. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `Promise&lt;void&gt;` | A promise that resolves when all requests have been sent and processed. |
+
+#### Internal Logic
+1. Calls `createSignSendProcessDqRequests` to handle the request creation, signing, sending, and processing.
+2. Sends the processed responses to the internal Carequality endpoint.
+
+### `startDocumentRetrievalGatewayV2`
+#### Description
+This method initiates a Document Retrieval transaction by creating, signing, and sending a batch of XCA Document Retrieval requests to the external gateway.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| drRequestsGatewayV2 | `OutboundDocumentRetrievalReq[]` | An array of Document Retrieval request objects. |
+| patientId | `string` | The ID of the patient. |
+| cxId | `string` | The ID of the connection. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `Promise&lt;void&gt;` | A promise that resolves when all requests have been sent and processed. |
+
+#### Internal Logic
+1. Calls `createSignSendProcessDrRequests` to handle the request creation, signing, sending, and processing.
+2. Sends the processed responses to the internal Carequality endpoint.

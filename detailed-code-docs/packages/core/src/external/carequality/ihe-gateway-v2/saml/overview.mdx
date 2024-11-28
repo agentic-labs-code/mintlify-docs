@@ -1,0 +1,91 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains modules for implementing SAML (Security Assertion Markup Language) functionality in the context of an IHE (Integrating the Healthcare Enterprise) Gateway, specifically for Carequality-compliant systems. The code provides essential security operations for healthcare information exchange, including creating and signing SAML assertions, verifying signatures, and sending signed XML requests.
+
+## What does it do?
+The code in this directory enables secure communication for healthcare information exchange using SAML. Key functionalities include:
+
+1. Creating SAML security headers with healthcare-specific attributes (e.g., subject role, organization, purpose of use).
+2. Handling X.509 certificates and key information.
+3. Signing SAML XML documents, including timestamps and assertions.
+4. Verifying SAML signatures.
+5. Sending signed XML requests to Carequality-compliant gateways using HTTPS with mutual TLS authentication.
+6. Implementing MTOM (Message Transmission Optimization Mechanism) for efficient handling of large payloads in document retrieval operations.
+
+These operations ensure that healthcare data exchanges are authenticated, authorized, and maintain integrity during transmission.
+
+## Key Files
+
+1. `saml-client.ts`: Implements the main client functionality for sending signed XML requests. It includes `sendSignedXml` and `sendSignedXmlMtom` functions for different types of requests.
+
+2. `security/security-header.ts`: Central to creating SAML security headers with healthcare-specific attributes.
+
+3. `security/sign.ts`: Provides functionality for signing SAML XML documents, including timestamps and full envelopes.
+
+4. `security/insert-key-info.ts`: Modifies XML structures to include RSA key values and X509 certificate data in SAML assertions and SOAP security headers.
+
+5. `security/verify.ts`: Contains the `verifySaml` function for verifying digital signatures of SAML XML documents.
+
+6. `security/types.ts`: Defines the `SamlCertsAndKeys` type used across the codebase.
+
+## Dependencies
+The code relies on several external libraries:
+
+| Dependency | Purpose | Version |
+|:-----------|:--------|:--------|
+| @metriport/shared | Utility functions for network retries | Not specified |
+| @metriport/ihe-gateway-sdk | Types and functions for IHE gateway interactions | Not specified |
+| aws-sdk | Interacting with AWS services (S3) | Not specified |
+| axios | HTTP client for making requests | Not specified |
+| crypto | SSL/TLS configurations and cryptographic operations | Not specified |
+| dayjs | Date and time manipulation | Not specified |
+| fast-xml-parser | XML parsing and manipulation | Not specified |
+| uuid | Generating UUIDs | Not specified |
+| pkijs | Handling X.509 certificates and public key operations | Not specified |
+| asn1js | ASN.1 parsing in certificate processing | Not specified |
+| pvutils | Array buffer and base64 conversions | Not specified |
+| xml-crypto | XML digital signature creation, manipulation, and verification | Not specified |
+| xmldom | Parsing XML strings into DOM documents | Not specified |
+| xpath | Querying XML documents | Not specified |
+
+## Configuration
+The code relies on various environment variables and configuration settings, including:
+
+- AWS region
+- Carequality trust bundle bucket name
+- SSL/TLS certificate and key configurations
+- HTTP timeout settings
+
+Key configuration elements also include:
+
+- SAML assertion attributes (e.g., subject role, organization, purpose of use)
+- XML namespaces for SAML and related standards
+- Regular expressions for certificate processing
+
+The `SamlCertsAndKeys` type defines the structure for storing SAML-related security information, including certificate chain, public certificate, private key, and private key password.
+
+In summary, this directory provides a comprehensive set of tools for implementing SAML-based security in healthcare information exchange, ensuring proper authentication, authorization, and data integrity in compliance with IHE standards and Carequality requirements. The code handles complex security operations while also managing network communications and error handling for robust healthcare data exchange.
+
+## Code snippets
+
+Here's an example of how the `sendSignedXml` function is used:
+
+```typescript
+const response = await sendSignedXml(
+  signedXml,
+  url,
+  samlCertsAndKeys,
+  isDq
+);
+```
+
+And here's a snippet showing how SAML verification is performed:
+
+```typescript
+const isValid = verifySaml(xmlString, publicCert);
+```
+
+These snippets illustrate the high-level API provided by this module for secure healthcare data exchange.

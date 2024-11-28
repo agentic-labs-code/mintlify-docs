@@ -1,0 +1,91 @@
+---
+title: "handlebars-helpers.js"
+---
+
+## High-level description
+This file contains a collection of custom Handlebars helper functions used in the FHIR Converter project. These helpers facilitate the conversion of health data between different formats, particularly from C-CDA to FHIR R4. The helpers provide various utility functions for data manipulation, formatting, and conditional logic.
+
+## Code Structure
+The code is structured as a Node.js module that exports two objects: `internal` and `external`. The `internal` object contains helper functions that are used internally within the module, while the `external` object is an array of helper functions that are exposed for use in Handlebars templates.
+
+## Symbols
+
+### `evaluateTemplate`
+#### Description
+This function evaluates a Handlebars template and returns the processed result as a JSON object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| templatePath | string | Path to the Handlebars template |
+| inObj | object | Input object containing data for the template |
+| returnEmptyObject | boolean | Flag to determine if an empty object should be returned when the result is undefined |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | object | Processed result of the template evaluation |
+
+#### Internal Logic
+1. Retrieves the Handlebars instance from the current session.
+2. Compiles and registers the template if it's not already registered.
+3. Evaluates the template with the provided input object.
+4. Processes the result using a JSON processor.
+5. Returns the processed result, or undefined if the result is empty and `returnEmptyObject` is false.
+
+### `getDateTime`
+#### Description
+Converts a date-time string to a standardized ISO format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dateTimeStringRaw | string | Raw date-time string to be converted |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string | Converted date-time string in ISO format |
+
+#### Internal Logic
+1. Trims the input string and checks if it's already in a valid format.
+2. If not, it processes the string to extract year, month, day, hours, minutes, seconds, and milliseconds.
+3. Handles various edge cases and time zone information.
+4. Constructs and returns a new Date object in ISO format.
+
+### `allValuesInObjAreNullFlavor`
+#### Description
+Checks if all values in a JSON object are null flavor (a concept in HL7 standards indicating missing or unknown data).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| obj | object | JSON object to be checked |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | boolean | True if all values are null flavor, false otherwise |
+
+#### Internal Logic
+Uses a queue-based approach to traverse the object and check if all values are either null or have a `nullFlavor` property.
+
+## Dependencies
+The code relies on several external libraries:
+| Dependency | Purpose |
+|:-----------|:--------|
+| uuid/v3 | For generating UUIDs |
+| handlebars | For template processing |
+| crypto | For hash generation |
+| zlib | For compression and decompression |
+| he | For HTML entity decoding |
+| convert-units | For unit conversions |
+
+## Error Handling
+Most helper functions include try-catch blocks to handle potential errors. When an error occurs, it's typically thrown with a message indicating which helper function caused the error.
+
+## API/Interface Reference
+The module exports an array of helper functions through the `external` property. Each helper function is defined with a name, description, and implementation. These functions can be used in Handlebars templates for various data manipulation and conversion tasks.
+
+## TODOs
+There are no explicit TODOs in the code, but ongoing maintenance and updates may be required to support new data formats or conversion requirements.

@@ -1,0 +1,64 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for mapping Garmin health and fitness data to the Metriport API's standardized data models. It includes functions and schemas for processing various types of data such as activities, blood pressure, body composition, heart rate variability (HRV), respiration, sleep, and user metrics.
+
+## What does it do?
+The code in this directory performs the following main tasks:
+
+1. Defines Zod schemas for validating and parsing raw Garmin data.
+2. Provides mapping functions that transform Garmin-specific data structures into Metriport's standardized data models.
+3. Handles unit conversions and data normalization where necessary.
+4. Groups data by user and date to create coherent data sets for each user.
+5. Extracts relevant information from complex Garmin data structures and organizes it into more accessible formats.
+
+These functions allow the Metriport API to ingest Garmin data and convert it into a consistent format that can be used alongside data from other providers.
+
+## Entry points
+The main entry points for this directory are the mapping functions defined in each file:
+
+- `activity.ts`: `mapToActivity` for mapping activity data
+- `bloodPressure.ts`: `mapToBiometricsFromBloodPressure` for blood pressure data
+- `body-composition.ts`: `mapToBody` for body composition data
+- `hrv.ts`: `mapToBiometricsFromHRV` for heart rate variability data
+- `respiration.ts`: `mapToBiometricsFromRespiration` for respiration data
+- `sleep.ts`: `mapToSleep` for sleep data
+- `user.ts`: `mapToBiometricsFromUser` for user metrics data
+
+These functions typically take arrays of Garmin-specific data structures and return arrays of `UserData&lt;T&gt;` objects, where `T` is the appropriate Metriport data model (e.g., `Activity`, `Biometrics`, `Sleep`, etc.).
+
+The data flow generally follows this pattern:
+1. Raw Garmin data is received and validated using Zod schemas.
+2. The data is grouped by user access token.
+3. Each group of data is processed and mapped to the corresponding Metriport data model.
+4. The mapped data is associated with user information and returned as `UserData&lt;T&gt;` objects.
+
+## Key Files
+1. `index.ts`: Defines common types, schemas, and utility functions used across the other files in the directory.
+2. `activity-types.ts`: Provides a mapping between Garmin activity type codes and human-readable activity names.
+3. `activity.ts`: Handles mapping of Garmin activity data to Metriport's `Activity` model.
+4. `bloodPressure.ts`: Maps Garmin blood pressure data to Metriport's `Biometrics` model.
+5. `body-composition.ts`: Converts Garmin body composition data to Metriport's `Body` model.
+6. `hrv.ts`: Processes Garmin heart rate variability data and maps it to the `Biometrics` model.
+7. `respiration.ts`: Handles Garmin respiration data and maps it to the `Biometrics` model.
+8. `sleep.ts`: Maps Garmin sleep data to Metriport's `Sleep` model.
+9. `user.ts`: Processes Garmin user metrics (specifically VO2 Max) and maps them to the `Biometrics` model.
+
+## Dependencies
+- `@metriport/api-sdk`: Provides the Metriport data models and types.
+- `lodash`: Used for utility functions like `groupBy`.
+- `zod`: Used for data validation and schema definition.
+- `dayjs`: Used for date and time manipulation.
+- `convert-units`: Used for unit conversions in some files.
+
+## Configuration
+The code uses the following configuration constants:
+- `PROVIDER_GARMIN`: A constant representing the Garmin data source, likely defined in `../../shared/constants`.
+
+The code also relies on utility functions for date conversion, such as `secondsToISODate` and `secondsToISODateTime`, which are likely defined in `../../shared/date`.
+
+No specific environment variables are used directly in this directory, but the overall system may require configuration for API keys or endpoints to interact with the Garmin API.
+
+In summary, this directory contains the core logic for integrating Garmin data into the Metriport ecosystem, ensuring that data from Garmin devices and services can be standardized and used alongside data from other health and fitness providers.

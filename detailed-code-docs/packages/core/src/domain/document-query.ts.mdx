@@ -1,0 +1,157 @@
+---
+title: "document-query.ts"
+---
+
+## High-level description
+This code defines and manages document query progress for medical data retrieval operations. It includes types, functions, and utilities for tracking the status of document downloads and conversions across different healthcare information exchanges (HIEs).
+
+## Code Structure
+The main symbols in the code are types and functions related to document query progress. The `DocumentQueryProgress` type is central, with related types like `Progress` and `DocumentQueryStatus`. Functions like `getStatusFromProgress`, `isProcessingStatus`, and `isFinalStatus` operate on these types. The code also includes utilities for aggregating progress across different HIEs and updating patient records with progress information.
+
+## Symbols
+
+### `documentQueryStatus`
+#### Description
+An array of possible document query statuses.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documentQueryStatus | readonly ["processing", "completed", "failed"] | Array of possible document query statuses |
+
+### `DocumentQueryStatus`
+#### Description
+A type representing the possible statuses of a document query.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| DocumentQueryStatus | "processing" \| "completed" \| "failed" | Type for document query status |
+
+### `Progress`
+#### Description
+A type representing the progress of a document query operation.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Progress | \{ status: DocumentQueryStatus; total?: number; successful?: number; errors?: number; webhookSent?: boolean; \} | Type for document query progress |
+
+### `ProgressIntKeys`
+#### Description
+A type representing the keys of the `Progress` type that are numbers.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ProgressIntKeys | "total" \| "successful" \| "errors" | Type for numeric keys of Progress |
+
+### `progressTypes`
+#### Description
+An array of possible progress types.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| progressTypes | readonly ["convert", "download"] | Array of possible progress types |
+
+### `ProgressType`
+#### Description
+A type representing the possible progress types.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ProgressType | "convert" \| "download" | Type for progress types |
+
+### `DocumentQueryProgress`
+#### Description
+A type representing the overall progress of a document query, including both download and conversion progress.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| DocumentQueryProgress | Partial&lt;Record&lt;ProgressType, Progress&gt; & \{ requestId: string; startedAt: Date; triggerConsolidated: boolean; \}&gt; | Type for overall document query progress |
+
+### `convertResult`
+#### Description
+An array of possible conversion results.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| convertResult | readonly ["success", "failed"] | Array of possible conversion results |
+
+### `ConvertResult`
+#### Description
+A type representing the possible conversion results.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ConvertResult | "success" \| "failed" | Type for conversion results |
+
+### `getStatusFromProgress`
+#### Description
+Calculates the status of a document query based on the progress counts.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| progress | Pick&lt;Progress, "errors" \| "successful" \| "total"&gt; | Progress object with count information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | DocumentQueryStatus | Calculated status based on progress |
+
+### `isProcessingStatus`
+#### Description
+Checks if a given status is "processing".
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | DocumentQueryStatus \| undefined | Status to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| isProcessing | boolean | Whether the status is "processing" |
+
+### `isFinalStatus`
+#### Description
+Checks if a given status is final (not "processing").
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | DocumentQueryStatus \| undefined | Status to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| isFinal | boolean | Whether the status is final |
+
+### `isProcessing`
+#### Description
+Checks if a given progress object has a "processing" status.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| progress | Progress \| undefined | Progress object to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| isProcessing | boolean | Whether the progress status is "processing" |
+
+## Dependencies
+- @metriport/core/domain/document-query
+- @metriport/core/domain/patient
+- @metriport/core/external/index
+- @metriport/core/util/uuid-v7
+- @metriport/shared/common/date
+
+This code is part of a larger system for managing medical data queries and processing. It provides the foundational types and utilities for tracking and updating the progress of document queries across different healthcare information exchanges.

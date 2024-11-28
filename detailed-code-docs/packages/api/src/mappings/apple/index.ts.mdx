@@ -1,0 +1,90 @@
+---
+title: "index.ts"
+---
+
+## High-level description
+The `packages/api/src/mappings/apple/index.ts` file defines functions and schemas for mapping Apple Health data to the Metriport API data model. It includes functions to transform data for activity, body, biometrics, nutrition, and sleep, as well as helper functions to check for the presence of specific data types and create metadata objects.
+
+## Code Structure
+The code defines several helper functions like `mapData`, `createMetadata`, `hasActivity`, `hasBody`, etc., which are used to process and structure the incoming Apple Health data. These functions utilize various mapping functions like `mapDataToActivity`, `mapDataToBody`, etc., defined in separate files, to transform specific data types. The code also defines Zod schemas to validate and type the incoming Apple Health data and intermediate data structures.
+
+## References
+- `@metriport/api-sdk`: This module provides the data models for Activity, Body, Biometrics, Nutrition, Sleep, and Metadata.
+- `./activity`, `./body`, `./biometrics`, `./nutrition`, `./sleep`: These modules contain the specific mapping logic for each data type.
+- `../../shared/constants`: This module likely defines the `PROVIDER_APPLE` constant.
+- `../../shared/date`: This module likely defines the `ISO_DATE` constant.
+
+## Symbols
+
+### `mapData`
+#### Description
+This function maps raw Apple Health data to the Metriport API payload structure. It uses helper functions to map individual data types and returns a payload object containing activity, body, biometrics, nutrition, and sleep data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | `AppleHealth` | Raw Apple Health data. |
+| hourly | `boolean` | Flag indicating if hourly data is being processed. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payload | `AppleWebhookPayload` | Mapped data in Metriport API payload structure. |
+
+#### Internal Logic
+1. Initializes an empty `AppleWebhookPayload` object.
+2. Calls mapping functions for each data type (activity, body, biometrics, nutrition, sleep) and populates the payload object if data exists.
+3. Returns the populated payload object.
+
+### `createMetadata`
+#### Description
+This function creates a metadata object for a given date and source information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| date | `string` | Date string. |
+| hourly | `boolean` | Flag indicating if hourly data is being processed. |
+| sourceName | `string \| null` | Optional source name. |
+| sourceId | `string \| null` | Optional source ID. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| metadata | `Metadata` | Metadata object for the given data point. |
+
+#### Internal Logic
+1. Creates a `Metadata` object with the date, source (`PROVIDER_APPLE`), and optional hour (if `hourly` is true).
+2. If `sourceName` or `sourceId` is provided, adds a `data_source` object to the metadata with the respective information.
+3. Returns the created `Metadata` object.
+
+### `hasActivity`, `hasBody`, `hasNutrition`, `hasBiometrics`
+#### Description
+These functions check if the provided Apple Health data contains specific data types.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | `AppleHealth` | Raw Apple Health data. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `boolean` | True if the data contains the specific data type, false otherwise. |
+
+#### Internal Logic
+These functions check for the presence of specific keys in the `AppleHealth` object to determine if the corresponding data type is present.
+
+### `appleItem`, `appleSleepItem`, `appleWorkoutItem`, `appleSchema`
+#### Description
+These are Zod schemas used for validating and typing the incoming Apple Health data and intermediate data structures.
+
+### `SleepType`, `appleSleepType`
+#### Description
+`SleepType` is an enum defining different sleep stages. `appleSleepType` is a Zod schema based on the `SleepType` enum, used for validating the sleep type in `appleSleepItem`.
+
+## Dependencies
+- `zod`: Used for schema validation and type inference.
+- `@metriport/api-sdk`: Provides data models for Metriport API.
+- `dayjs`: Used for date manipulation.
+

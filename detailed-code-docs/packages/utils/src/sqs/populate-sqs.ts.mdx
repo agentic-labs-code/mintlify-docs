@@ -1,0 +1,73 @@
+---
+title: "populate-sqs.ts"
+---
+
+## High-level description
+This code is a script to populate an Amazon SQS (Simple Queue Service) queue with messages from a JSON file. It was originally created to resend messages that failed to be sent to a destination queue from a Dead Letter Queue (DLQ). The script reads messages from a file, processes them, and sends them in batches to the specified SQS queue.
+
+## Code Structure
+The main functionality is implemented in the `main` function, which orchestrates the process of reading the file, parsing its contents, filtering messages, and sending them to the SQS queue. The script uses the AWS SDK for JavaScript to interact with SQS and the Commander library for parsing command-line arguments.
+
+## References
+- The script imports the `uuidv4` function from "../shared/uuid-v7".
+- It uses the AWS SDK's SQS client.
+- The Commander library is used for handling command-line arguments.
+
+## Symbols
+
+### `main`
+#### Description
+The main function that orchestrates the entire process of reading messages from a file and sending them to an SQS queue.
+
+#### Inputs
+This function doesn't take any direct inputs but uses command-line arguments parsed by Commander.
+
+#### Internal Logic
+1. Parses command-line arguments.
+2. Reads and parses the JSON file containing messages.
+3. Filters out messages with ".pdf" in the s3FileName.
+4. Chunks the filtered messages into batches.
+5. Sends the batches to the SQS queue in parallel (if not in dry-run mode).
+6. Handles and reports any errors that occur during the process.
+
+### `singleAttributeToSend`
+#### Description
+A helper function that creates a message attribute for SQS messages.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| key | string | The key for the message attribute |
+| value | string \| undefined | The value for the message attribute |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| attribute | SQS.MessageBodyAttributeMap | An object representing the message attribute |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-sdk | To interact with Amazon SQS |
+| commander | For parsing command-line arguments |
+| fs | For reading the JSON file |
+| lodash | For utility functions like `chunk` and `uniq` |
+| path | For resolving file paths |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| fileName | string | - | Path to the JSON file containing messages |
+| destinationQueueUrl | string | "" | URL of the destination SQS queue |
+| awsRegion | string | "" | AWS region for the SQS queue |
+| maxItemsPerBatch | number | 10 | Maximum number of items to send in each batch |
+
+## Error Handling
+The script includes error handling for file reading, JSON parsing, and SQS message sending. It logs any errors that occur during the process and provides a summary of failed and successful operations.
+
+## Command-line Interface
+The script uses Commander to provide a CLI with the following option:
+- `--dryrun`: Runs the script without actually sending messages to SQS, useful for testing and preparation.
+
+## Performance Considerations
+The script uses parallel processing to send message batches to SQS, which can improve performance when dealing with a large number of messages. The `maxItemsPerBatch` configuration option allows for tuning the batch size to optimize performance and stay within SQS limits.

@@ -1,0 +1,116 @@
+---
+title: "create-patient-consolidated.mdx"
+---
+
+---
+title: "Create Patient's Consolidated Data"
+description: "Create Patient's Consolidated Data with a FHIR Bundle."
+api: "PUT /medical/v1/patient/{id}/consolidated"
+---
+
+## Path Params
+
+&lt;ParamField path="id" type="string" required&gt;
+  The ID of the Patient.
+&lt;/ParamField&gt;
+
+## Body
+
+&lt;ParamField body="resourceType" type="string" required&gt;
+  The resource needs to be "Bundle"
+&lt;/ParamField&gt;
+
+&lt;ParamField body="type" type="string" required&gt;
+  The type needs to be "collection"
+&lt;/ParamField&gt;
+
+&lt;ParamField body="entry" type="array" required&gt;
+  The entry needs to be an array of [FHIR resources](/medical-api/fhir/resources).
+&lt;/ParamField&gt;
+
+&lt;Info&gt;
+  At the moment there is a limit to how much data you can send in a single request. The
+  content-length must not exceed 1MB (and 50 resources when in `sandbox`).
+&lt;/Info&gt;
+
+## Response
+
+Returns a [Bundle](/medical-api/fhir/resources/bundle) of type "transaction-response" with the 
+entry being the outcome of the query.
+
+&lt;ResponseExample&gt;
+
+```javascript Metriport SDK
+import { MetriportMedicalApi } from "@metriport/api-sdk";
+
+const metriport = new MetriportMedicalApi("YOUR_API_KEY");
+
+await metriport.createPatientConsolidated(patientId, {
+  resourceType: "Bundle",
+  type: "collection",
+  entry: [
+    {
+      resource: {
+        resourceType: "Appointment",
+        status: "booked",
+        participant: [
+          {
+            actor: {
+              reference: `Patient/${patientId}`,
+              display: "John Doe",
+            },
+            status: "accepted",
+            period: {
+              start: "2021-05-24T13:21:28.527Z",
+              end: "2021-05-24T13:21:28.527Z",
+            },
+          },
+        ],
+        meta: {
+          versionId: "12345",
+          lastUpdated: "2023-05-24T13:21:28.527Z",
+        },
+      },
+    },
+  ],
+});
+```
+
+&lt;/ResponseExample&gt;
+
+```json
+{
+  "resourceType": "Bundle",
+  "id": "bc0fcad0-6457-4b9e-93b3-44212e386138",
+  "type": "transaction-response",
+  "entry": [
+    {
+      "response": {
+        "status": "201 Created",
+        "location": "Appointment/3/_history/1",
+        "etag": "1",
+        "lastModified": "2023-07-27T21:29:31.491+00:00",
+        "outcome": {
+          "resourceType": "OperationOutcome",
+          "issue": [
+            {
+              "severity": "information",
+              "code": "informational",
+              "details": {
+                "coding": [
+                  {
+                    "system": "https://public.metriport.com/fhir/StructureDefinition/operation-outcome",
+                    "code": "SUCCESSFUL_CREATE",
+                    "display": "Create succeeded."
+                  }
+                ]
+              },
+              "diagnostics": "Successfully created resource \"Appointment/3/_history/1\". Took 7ms."
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
+```

@@ -1,0 +1,93 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `packages/api-sdk/src` directory contains the core implementation of the Metriport API SDK, which provides interfaces and functionality for interacting with both the Metriport Devices API and Medical API. It includes client implementations, data models, utility functions, and test setups for both API types.
+
+## What does it do?
+This directory enables developers to:
+
+1. Interact with the Metriport Devices API to manage users and retrieve various types of health data, including activity, body measurements, biometrics, nutrition, and sleep information.
+2. Interact with the Metriport Medical API to manage account settings, webhooks, organizations, facilities, patients, and medical documents.
+3. Ensure data integrity by validating inputs and using strongly-typed API response models.
+4. Work with standardized health and medical data structures, facilitating integration with various health devices, apps, and medical systems.
+5. Handle webhook responses and verify webhook signatures for secure data exchange.
+6. Utilize FHIR (Fast Healthcare Interoperability Resources) data models and query structures for medical data operations.
+
+The workflow typically involves:
+1. Creating an instance of either `MetriportDevicesApi` or `MetriportMedicalApi` with an API key.
+2. Using these instances to make API calls for various operations.
+3. Utilizing utility functions to validate inputs and handle responses.
+4. Parsing API responses into appropriate model types defined in the SDK.
+
+## Entry points
+The main entry points for developers using this SDK are:
+
+1. `index.ts`: This file exports all the necessary types, interfaces, and classes for both the Devices API and Medical API, making them easily accessible to SDK users.
+
+2. `devices/client/metriport.ts`: Contains the `MetriportDevicesApi` class, which is the main client for interacting with the Devices API.
+
+3. `medical/client/metriport.ts`: Contains the `MetriportMedicalApi` class, which is the main client for interacting with the Medical API.
+
+The data flow typically follows this pattern:
+1. An instance of the appropriate API client is created with an API key.
+2. Methods on this instance are called to interact with the API.
+3. These methods use utility functions to validate inputs and format requests.
+4. API responses are parsed into the appropriate model types defined in the SDK.
+
+## Key Files
+1. `index.ts`: The main export file for the entire SDK.
+2. `devices/client/metriport.ts`: The main client for the Devices API.
+3. `medical/client/metriport.ts`: The main client for the Medical API.
+4. `devices/models/*.ts`: Define TypeScript interfaces for various Devices API response structures and health data models.
+5. `medical/models/*.ts`: Define schemas and types for Medical API operations, including patient, organization, and facility data.
+6. `shared.ts`: Contains shared constants, utility functions, and Zod schemas used across the SDK.
+
+## Dependencies
+The main external dependencies are:
+
+1. axios: Used for making HTTP requests to the Metriport APIs.
+2. zod: Used extensively for schema definition and validation.
+3. dayjs: Used for date and timezone operations.
+4. @medplum/fhirtypes: Used for FHIR-related type definitions in the Medical API.
+5. @metriport/commonwell-sdk: Utilized for interactions with the CommonWell Health Alliance network in the Medical API.
+6. crypto: Used for cryptographic operations, particularly in webhook signature verification.
+
+These libraries were chosen for their reliability, wide adoption, and feature sets that align well with the needs of the SDK.
+
+## Configuration
+The SDK doesn't use explicit configuration files, but it does accept configuration options when initializing the API client classes. Key configurable elements include:
+
+- API key (required)
+- Base URL (optional, defaults to predefined values)
+- Axios instance options (optional)
+
+Example initialization for the Devices API:
+
+```typescript
+const devicesApi = new MetriportDevicesApi("your-api-key", {
+  baseURL: "https://custom-api-url.com",
+  axiosOptions: { timeout: 5000 }
+});
+```
+
+Example initialization for the Medical API:
+
+```typescript
+const medicalApi = new MetriportMedicalApi("your-api-key", {
+  baseURL: "https://api.metriport.com",
+  timeout: 5000,
+  maxBodyLength: 10000000
+});
+```
+
+The `shared.ts` file defines several constants and utility functions that are used across the SDK, including:
+
+- Base URLs for production and sandbox environments
+- API header names
+- Default timeout values
+- Date formats
+- Utility functions for string manipulation and environment variable retrieval
+
+In summary, the `packages/api-sdk/src` directory provides a comprehensive SDK for interacting with both the Metriport Devices API and Medical API. It offers type-safe interactions, input validation, and clear structures for making API requests and handling responses. The SDK also defines robust sets of data models for standardizing and handling various types of health, fitness, and medical data, ensuring data integrity and facilitating easier integration with various health devices, apps, and medical systems.

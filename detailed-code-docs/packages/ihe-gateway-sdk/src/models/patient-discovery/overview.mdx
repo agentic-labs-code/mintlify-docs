@@ -1,0 +1,69 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains models and schemas for patient discovery operations within an IHE (Integrating the Healthcare Enterprise) gateway SDK. It defines structures for both inbound and outbound patient discovery requests and responses, as well as a comprehensive patient resource model. The code utilizes Zod for schema validation and TypeScript for type definitions.
+
+## What does it do?
+The code in this directory facilitates patient discovery processes in healthcare systems. It provides structured ways to:
+
+1. Create and validate patient discovery requests, both for outbound queries to other systems and inbound queries from external systems.
+2. Handle and validate patient discovery responses, including successful matches, no-match scenarios, and error cases.
+3. Define and validate patient information, including personal details like names, addresses, contact information, and identifiers.
+
+These models enable healthcare systems to exchange patient information securely and in a standardized format, supporting interoperability between different healthcare providers and systems.
+
+## Key Files
+
+### patient-discovery-requests.ts
+This file defines schemas and types for patient discovery requests. It includes:
+- `outboundPatientDiscoveryReqSchema`: For requests sent to other systems.
+- `inboundPatientDiscoveryReqSchema`: For requests received from external systems.
+- Corresponding TypeScript types for these schemas.
+
+### patient-discovery-responses.ts
+This file handles patient discovery responses, including:
+- Schemas for successful and unsuccessful responses for both inbound and outbound scenarios.
+- Utility functions for type checking responses.
+- TypeScript types derived from the response schemas.
+
+### patient.ts
+This file defines the core patient data model, including:
+- Schemas for patient attributes like names, addresses, telecom information, and identifiers.
+- A comprehensive `patientResourceSchema` that combines all patient-related information.
+- Corresponding TypeScript types for patient data.
+
+## Dependencies
+The code relies on the following external libraries:
+- Zod (version not specified): Used for schema definition and validation. Zod provides a way to define complex schemas with TypeScript integration, ensuring type safety and runtime validation.
+
+Internal dependencies include:
+- Shared schemas and types from the parent directory, likely providing common structures used across the SDK.
+
+## Configuration
+While there are no explicit configuration files mentioned, the schemas themselves act as a form of configuration, defining the structure and constraints for patient discovery data. Key configurable aspects include:
+
+- Patient attributes: The `patientResourceSchema` in `patient.ts` defines what information can be included for a patient.
+- Request and response structures: The schemas in `patient-discovery-requests.ts` and `patient-discovery-responses.ts` define the expected format for patient discovery communications.
+
+Developers using this SDK would need to ensure their data conforms to these schemas when making requests or handling responses.
+
+Here's an example of how the `patientResourceSchema` is structured:
+
+```typescript
+const patientResourceSchema = z.object({
+  resourceType: z.literal("Patient").optional(),
+  id: z.string().optional(),
+  name: z.array(nameSchema),
+  gender: genderSchema,
+  birthDate: z.string(),
+  address: z.array(addressSchema).optional(),
+  telecom: z.array(telecomSchema).optional(),
+  identifier: z.array(personalIdentifierSchema).optional(),
+});
+```
+
+This schema defines the structure of a patient resource, including optional and required fields. Developers would need to provide data that matches this structure when working with patient information in the context of this SDK.
+
+The patient discovery request and response schemas similarly define the expected structure for these operations, ensuring consistency and validation in patient discovery processes across different healthcare systems integrated through this IHE gateway SDK.

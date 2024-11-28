@@ -1,0 +1,90 @@
+---
+title: "app-config.ts"
+---
+
+## High-level description
+This file, `packages/api/src/external/aws/app-config.ts`, contains functions and types related to feature flags management using AWS AppConfig. It provides utilities to retrieve, parse, and manage feature flags for different aspects of the application, including customer-specific features and boolean flags.
+
+## Code Structure
+The code defines several types and schemas using Zod for feature flag data structures. It then provides functions to interact with AWS AppConfig to retrieve and manage these feature flags. The main functions include `getFeatureFlags`, `getFeatureFlagValueCxValues`, `getFeatureFlagValueStringArray`, `getFeatureFlagValueBoolean`, and several utility functions to check specific feature flags for customers.
+
+## Symbols
+
+### `getFeatureFlags`
+#### Description
+Retrieves feature flags from AWS AppConfig for a given application, configuration, and environment.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| region | string | AWS region |
+| appId | string | AppConfig application ID |
+| configId | string | AppConfig configuration ID |
+| envName | string | Environment name |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| FeatureFlagDatastore | object | Parsed feature flag data |
+
+#### Internal Logic
+1. Creates an AppConfig client
+2. Retrieves configuration from AppConfig
+3. Parses and validates the configuration content
+4. Returns the parsed feature flags
+
+### `getFeatureFlagValueCxValues`
+#### Description
+Retrieves feature flag values for specific customer IDs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| region | string | AWS region |
+| appId | string | AppConfig application ID |
+| configId | string | AppConfig configuration ID |
+| envName | string | Environment name |
+| cxId | string | Customer ID |
+| featureFlagNames | string[] | Optional array of feature flag names |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| CxFeatureFlagStatus | object | Status of feature flags for the customer |
+
+#### Internal Logic
+1. Retrieves feature flags using `getFeatureFlags`
+2. Filters and processes the flags based on the provided names and customer ID
+3. Returns an object with the status of each flag for the customer
+
+### `getCxsWithFeatureFlagEnabled`
+#### Description
+Returns a list of customers that have a specific feature flag enabled.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| featureFlagName | string | Name of the feature flag |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string[] | array | List of customer IDs with the feature flag enabled |
+
+#### Internal Logic
+1. Retrieves the feature flag value using `getFeatureFlagValueStringArray`
+2. If the flag is enabled, returns the list of customer IDs
+3. Returns an empty array if the flag is not enabled or an error occurs
+
+## Dependencies
+- AWS SDK (AppConfig)
+- Zod (for schema validation)
+- @metriport/core and @metriport/shared utilities
+
+## Error Handling
+The code uses try-catch blocks to handle errors in most functions. Errors are logged and, in some cases, reported to an error capturing system (likely Sentry) using the `capture.error` function.
+
+## Logging
+The code uses a custom logging utility (`out`) for consistent logging across the application.
+
+This file is crucial for managing feature flags across the application, allowing for dynamic configuration and customer-specific feature enablement.

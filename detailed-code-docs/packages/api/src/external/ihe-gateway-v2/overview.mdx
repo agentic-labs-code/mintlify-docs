@@ -1,0 +1,74 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the implementation of an IHE (Integrating the Healthcare Enterprise) Gateway V2, which is responsible for handling outbound IHE transactions such as Patient Discovery, Document Query, and Document Retrieval. The code is designed to interact with external healthcare systems, following IHE standards and protocols.
+
+## What does it do?
+The IHE Gateway V2 facilitates the exchange of healthcare information between different systems. It performs three main functions:
+
+1. Patient Discovery: It searches for patient records in external systems based on provided patient information.
+2. Document Query: Once a patient is identified, it queries for available medical documents related to that patient.
+3. Document Retrieval: After identifying relevant documents, it retrieves the actual content of those documents.
+
+These processes involve creating standardized requests, signing them for security, sending them to external gateways, processing the responses, and forwarding the results to internal systems for further handling.
+
+## Key Files
+
+### ihe-gateway-v2-direct.ts
+This file contains the `IHEGatewayV2Direct` class, which implements the direct communication method for IHE transactions. It's responsible for:
+
+- Initiating Patient Discovery transactions
+- Starting Document Query processes
+- Handling Document Retrieval requests
+
+The class uses helper functions to create, sign, send, and process IHE requests and responses. It interacts with external systems directly and handles the entire workflow of each transaction type.
+
+Example of starting a Patient Discovery transaction:
+
+```typescript
+async startPatientDiscovery(
+  pdRequestGatewayV2: OutboundPatientDiscoveryReq,
+  patientId: string,
+  cxId: string
+): Promise&lt;void&gt; {
+  const processedResponse = await createSignSendProcessXCPDRequest({
+    pdRequestGatewayV2,
+    patientId,
+    cxId,
+    samlCertsAndKeys: this.samlCertsAndKeys,
+    responseUrl: this.xcpdResponseUrl,
+  });
+  // ... handle the processed response
+}
+```
+
+### ihe-gateway-v2-factory.ts
+This file contains the `makeIHEGatewayV2` factory function, which determines whether to use a direct or asynchronous implementation of the IHE Gateway V2 based on the current environment. It's a crucial part of the system's flexibility, allowing for different behaviors in development and production environments.
+
+```typescript
+export function makeIHEGatewayV2(): IHEGatewayV2 {
+  return Config.isDev() ? new IHEGatewayV2Direct() : new IHEGatewayV2Async();
+}
+```
+
+## Dependencies
+The codebase relies on several external libraries and internal modules:
+
+1. @metriport/ihe-gateway-sdk: Provides types and schemas for IHE transactions.
+2. @metriport/core: Offers core functionalities like logging, retries, and SAML handling.
+3. axios: Used for making HTTP requests to internal and external endpoints.
+
+These dependencies are crucial for handling the complex workflows of IHE transactions, ensuring secure communication, and managing the asynchronous nature of these operations.
+
+## Configuration
+The system uses configuration settings from the `Config` class, which likely includes:
+
+- Environment variables for determining the runtime environment (development or production)
+- URLs for internal Carequality endpoints
+- SAML certificate and key configurations for secure signing of requests
+
+The `IHEGatewayV2Direct` class initializes SAML certificates and keys and sets up response URLs for each transaction type based on these configurations.
+
+In conclusion, this directory implements a crucial component for healthcare data interoperability, enabling secure and standardized communication between different healthcare systems. It provides a flexible architecture that can adapt to different environments and transaction types, ensuring robust and efficient healthcare data exchange.

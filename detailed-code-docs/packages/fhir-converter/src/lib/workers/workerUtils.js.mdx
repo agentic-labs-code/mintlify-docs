@@ -1,0 +1,40 @@
+---
+title: "workerUtils.js"
+---
+
+## High-level description
+This code defines a utility function for worker thread task processing in a Node.js environment. It sets up a message listener on the parent port and handles the processing of tasks, sending the results or errors back through a channel worker port.
+
+## Symbols
+
+### `workerTaskProcessor`
+#### Description
+This function sets up a message listener for worker threads and processes tasks using a provided task processor function. It handles both successful task completion and error scenarios.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| taskProcessor | Function | A function that processes the task and returns a Promise |
+
+#### Internal Logic
+1. Sets up a message listener on the `parentPort`.
+2. When a message is received, it calls the `taskProcessor` function with the message content.
+3. If the task is successful, it sends the result back through the `channelWorkerPort`.
+4. If an error occurs, it sends the error message back through the `channelWorkerPort`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| worker_threads | Used to access the `parentPort` for communication between the main thread and worker threads |
+
+## Error Handling
+The function includes basic error handling:
+- If the `taskProcessor` function throws an error or returns a rejected promise, the error is caught.
+- If the error is an instance of `Error`, its message is sent back. Otherwise, the error itself is sent.
+
+## Side Effects
+- The function sets up a persistent message listener on the `parentPort`, which will continue to process messages until the worker is terminated.
+- Messages are sent back through the `channelWorkerPort`, which affects the state of the communication channel.
+
+## Performance Considerations
+This utility is designed for use with worker threads, which can improve performance by offloading tasks to separate threads. However, the actual performance impact depends on the implementation of the `taskProcessor` function and the nature of the tasks being processed.

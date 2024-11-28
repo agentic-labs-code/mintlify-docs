@@ -1,0 +1,106 @@
+---
+title: "patient-shared.ts"
+---
+
+## High-level description
+This code defines functions and types related to managing patient data in the CommonWell Health Alliance system, specifically for handling patient linking, coverage enhancement, and data synchronization between Metriport and CommonWell.
+
+## Code Structure
+The main symbols in this code are interconnected as follows:
+- `PatientDataCommonwell` extends `PatientExternalDataEntry` and represents CommonWell-specific patient data.
+- `findOrCreatePerson` is a key function that interacts with the CommonWell API to find or create a person record.
+- `getCWData`, `getLinkStatusCW`, and `getLinkStatusCQ` are utility functions for retrieving CommonWell-related data from a patient record.
+- `create`, `update`, `get`, and `remove` functions handle CRUD operations for patient data in CommonWell.
+- `updateCommonwellIdsAndStatus` and `updatePatientDiscoveryStatus` update patient records with CommonWell-related information.
+
+## Symbols
+
+### `PatientDataCommonwell`
+#### Description
+Extends `PatientExternalDataEntry` to represent CommonWell-specific patient data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The patient's ID |
+| personId | string \| undefined | The person's ID in CommonWell |
+| status | LinkStatus \| undefined | The link status |
+| cqLinkStatus | CQLinkStatus | The CareQuality link status |
+| scheduledDocQueryRequestId | string \| undefined | ID for scheduled document query |
+| scheduledDocQueryRequestTriggerConsolidated | boolean \| undefined | Flag for triggering consolidated query |
+
+### `findOrCreatePerson`
+#### Description
+Finds or creates a person record in CommonWell.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| commonWell | CommonWellAPI | CommonWell API instance |
+| queryMeta | RequestMetadata | Metadata for the request |
+| commonwellPatient | CommonwellPatient | Patient data for CommonWell |
+| commonwellPatientId | string | Patient ID in CommonWell |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | FindOrCreatePersonResponse | The found or created person data |
+
+### `getCWData`
+#### Description
+Retrieves CommonWell data from a patient's external data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | PatientExternalData \| undefined | The patient's external data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | PatientDataCommonwell \| undefined | The CommonWell-specific patient data |
+
+### `create`
+#### Description
+Creates a new patient record in CommonWell.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient data |
+| facilityId | string | The facility ID |
+| getOrgIdExcludeList | () =&gt; Promise&lt;string[]&gt; | Function to get organization IDs to exclude |
+| requestId | string \| undefined | Optional request ID |
+| forceCWCreate | boolean | Flag to force creation in CommonWell |
+| rerunPdOnNewDemographics | boolean | Flag to rerun patient discovery on new demographics |
+| initiator | HieInitiator \| undefined | Optional HIE initiator |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | \{ commonwellPatientId: string; personId: string \} \| void | The created patient and person IDs, if successful |
+
+### `updateCommonwellIdsAndStatus`
+#### Description
+Updates CommonWell IDs and integration status for a patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId"&gt; | The patient to update |
+| commonwellPatientId | string \| undefined | The CommonWell patient ID |
+| commonwellPersonId | string \| undefined | The CommonWell person ID |
+| cqLinkStatus | CQLinkStatus \| undefined | The CareQuality link status |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Patient | The updated patient record |
+
+## Dependencies
+- @metriport/commonwell-sdk
+- @metriport/core
+- lodash
+- dayjs
+
+This code is part of a larger system for managing patient data and integrating with the CommonWell Health Alliance. It provides functionality for creating, updating, and retrieving patient records, as well as managing the linking process between Metriport and CommonWell systems.

@@ -1,0 +1,136 @@
+---
+title: "document-download.ts"
+---
+
+## High-level description
+The `document-download.ts` module provides functionality to download medical documents. It handles both direct downloads and conversions to HTML or PDF formats. The module interacts with AWS S3 for storage and AWS Lambda for document conversions.
+
+## Code Structure
+The `downloadDocument` function orchestrates the download process. It first checks if the requested file exists and if a conversion is needed. Depending on the request, it either generates a signed URL for direct download or invokes a Lambda function for conversion and then provides the converted file's URL.
+
+## References
+- `@metriport/core/domain/conversion/cda-to-html-pdf`: Defines types and constants related to document conversion.
+- `@metriport/core/external/aws/lambda`: Provides utilities for interacting with AWS Lambda.
+- `@metriport/core/external/aws/s3`: Provides utilities for interacting with AWS S3.
+- `../../../shared/config`: Provides access to configuration settings.
+
+## Symbols
+
+### `downloadDocument`
+#### Description
+This function orchestrates the process of downloading a medical document, optionally converting it to a different format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The name of the file to download. |
+| conversionType | `ConversionType` | (Optional) The desired format to convert the document to. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | A pre-signed URL to download the document. |
+
+#### Internal Logic
+1. Checks if the requested file exists in S3.
+2. If a `conversionType` is provided, it validates if the source file is in XML format.
+3. If conversion is required, it checks if the converted file already exists.
+    - If the converted file exists, it generates a signed URL for the converted file.
+    - If the converted file doesn't exist, it invokes the `convertDoc` function to initiate the conversion process.
+4. If no conversion is needed, it generates a signed URL for the original file.
+
+### `getConversionUrl`
+#### Description
+This function handles the logic for retrieving the URL of a converted document.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The name of the original file. |
+| conversionType | `ConversionType` | The desired format for conversion. |
+| bucketName | string | The name of the S3 bucket containing the file. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | A pre-signed URL to download the converted document. |
+
+#### Internal Logic
+1. Constructs the name of the converted file based on the original file name and conversion type.
+2. Checks if the converted file already exists in S3.
+    - If it exists, it generates a signed URL for the existing converted file.
+    - If it doesn't exist, it calls the `convertDoc` function to initiate the conversion process.
+
+### `convertDoc`
+#### Description
+This function invokes a Lambda function to convert a document to the specified format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The name of the file to convert. |
+| conversionType | `ConversionType` | The desired format for conversion. |
+| bucketName | string | The name of the S3 bucket containing the file. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | A pre-signed URL to download the converted document. |
+
+#### Internal Logic
+1. Invokes the Lambda function specified by `conversionLambdaName` with the file information.
+2. Parses the Lambda function's response to extract the URL of the converted document.
+
+### `doesObjExist`
+#### Description
+This function checks if a given object (file) exists in the configured S3 bucket.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The name of the file to check for. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | object | An object indicating whether the file exists and its content type if it does. |
+
+#### Internal Logic
+1. If running in a sandbox environment, it first checks a designated sandbox bucket for the file.
+2. If the file is not found in the sandbox bucket (or not in a sandbox environment), it checks the main medical documents bucket.
+3. Returns an object indicating whether the file exists and its content type if found.
+
+### `getSignedURL`
+#### Description
+This function generates a pre-signed URL for a given file in S3, allowing temporary access to download it.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The name of the file. |
+| bucketName | string | (Optional) The name of the S3 bucket. If not provided, it defaults to either the sandbox bucket (in sandbox environment) or the main medical documents bucket. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | A pre-signed URL for the file. |
+
+#### Internal Logic
+1. Determines the appropriate S3 bucket based on the environment and provided `bucketName`.
+2. Generates a pre-signed URL for the file with a 5-minute expiration time.
+3. Removes any single or double quotes from the generated URL.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/conversion/cda-to-html-pdf | Provides types and constants for document conversion. |
+| @metriport/core/external/aws/lambda | Offers utilities for interacting with AWS Lambda. |
+| @metriport/core/external/aws/s3 | Offers utilities for interacting with AWS S3. |
+| dayjs | Used for handling dates and durations. |
+| ../../../errors/bad-request | Provides a custom error class for bad requests. |
+| ../../../errors/not-found | Provides a custom error class for not found errors. |
+| ../../../shared/config | Provides access to configuration settings. |
+
+## TODOs
+- TODO try to remove this, moved here b/c this was being done upstream
+

@@ -1,0 +1,54 @@
+---
+title: "iso-datetime.ts"
+---
+
+## High-level description
+This code defines a regular expression for ISO 8601 datetime format and creates a Zod schema for validating ISO datetime strings. It provides a reusable component for ensuring datetime strings conform to the ISO 8601 standard in the CommonWell SDK.
+
+## Symbols
+
+### `ISO_DATETIME_REGEX`
+#### Description
+A regular expression constant that matches ISO 8601 datetime strings.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ISO_DATETIME_REGEX | RegExp | A regular expression for validating ISO 8601 datetime strings |
+
+#### Internal Logic
+The regular expression is complex and covers various cases of valid ISO 8601 datetime strings, including:
+- Year (4 digits)
+- Month (01-12)
+- Day (01-31, accounting for different month lengths)
+- Hours (00-23)
+- Minutes (00-59)
+- Seconds (00-59)
+- Optional timezone offset (Z for UTC, or +/- hours:minutes)
+
+It also handles leap years correctly.
+
+### `isoDateTimeSchema`
+#### Description
+A Zod schema for validating ISO 8601 datetime strings.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| isoDateTimeSchema | z.ZodString | A Zod schema for validating ISO 8601 datetime strings |
+
+#### Internal Logic
+The schema is created using Zod's `z.string()` method and then applying the `regex()` method with the `ISO_DATETIME_REGEX`. If the string doesn't match the regex, it will produce an error message stating "dateTime must be a valid ISO dateTime".
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| zod | Used for creating and defining the schema for ISO datetime validation |
+
+## References
+This module is referenced in other parts of the CommonWell SDK:
+
+1. In `demographics.ts`, `isoDateTimeSchema` is used as part of the `demographicsSchema` to validate the `birthDate` field.
+2. In `period.ts`, `isoDateTimeSchema` is used in the `periodSchema` to validate both `start` and `end` fields.
+
+These references indicate that the ISO datetime validation is a crucial component in ensuring data integrity across different parts of the CommonWell SDK, particularly for date and time-related fields in demographic and period data structures.

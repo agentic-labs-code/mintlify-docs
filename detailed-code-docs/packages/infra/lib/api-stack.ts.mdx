@@ -1,0 +1,101 @@
+---
+title: "api-stack.ts"
+---
+
+Here's a high-level description and documentation of the provided code:
+
+## High-level description
+This code defines an `APIStack` class that sets up the infrastructure for a serverless API using AWS CDK. It creates various AWS resources such as VPC, RDS database, DynamoDB tables, S3 buckets, Lambda functions, ECS services, and API Gateway. The stack also includes configurations for monitoring, logging, and security.
+
+## Code Structure
+The `APIStack` class extends the `Stack` class from AWS CDK. It contains methods to set up different components of the infrastructure, such as databases, queues, lambdas, and API endpoints. The class uses various imported functions and constructs from other files to create and configure AWS resources.
+
+## Symbols
+
+### APIStack
+#### Description
+The main class that defines the API infrastructure stack.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | Construct | The parent construct |
+| id | string | The construct's id |
+| props | APIStackProps | Configuration properties for the stack |
+
+#### Internal Logic
+1. Sets up VPC and networking
+2. Creates RDS database cluster
+3. Sets up DynamoDB tables
+4. Creates S3 buckets
+5. Sets up Lambda functions
+6. Creates ECS services for the API
+7. Sets up API Gateway
+8. Configures security and monitoring
+
+### createAPIService
+#### Description
+Creates the main API service using ECS Fargate.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| stack | Construct | The parent construct |
+| props | ApiProps | Configuration properties for the API service |
+| secrets | Secrets | Secrets manager for storing sensitive information |
+| vpc | ec2.IVpc | The VPC to deploy the service in |
+| dbCredsSecret | secret.ISecret | Database credentials secret |
+| dbReadReplicaEndpoint | rds.Endpoint | Database read replica endpoint |
+| dynamoDBTokenTable | dynamodb.Table | DynamoDB table for token management |
+| alarmAction | SnsAction | SNS action for alarms |
+| dnsZones | DnsZones | DNS zones for the API |
+| fhirServerUrl | string | URL of the FHIR server |
+| fhirServerQueueUrl | string | URL of the FHIR server queue |
+| fhirConverterQueueUrl | string | URL of the FHIR converter queue |
+| cdaToVisualizationLambda | ILambda | Lambda for CDA to visualization conversion |
+| documentDownloaderLambda | ILambda | Lambda for document downloading |
+| generalBucket | s3.Bucket | General S3 bucket |
+| medicalDocumentsUploadBucket | s3.Bucket | S3 bucket for medical document uploads |
+| searchIngestionQueue | IQueue | Queue for search ingestion |
+| searchEndpoint | string | Endpoint for search service |
+| searchAuth | object | Authentication for search service |
+| searchIndexName | string | Name of the search index |
+| appConfigEnvVars | object | Environment variables for AppConfig |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cluster | ecs.Cluster | The ECS cluster |
+| service | ecs_patterns.ApplicationLoadBalancedFargateService | The Fargate service |
+| serverAddress | string | The address of the API server |
+| loadBalancer | NetworkLoadBalancer | The network load balancer |
+| loadBalancerAddress | string | The address of the load balancer |
+
+## Dependencies
+The code relies on various AWS CDK modules and custom modules for creating different parts of the infrastructure. Key dependencies include:
+
+- aws-cdk-lib: For core CDK constructs
+- aws-cdk-lib/aws-ec2: For VPC and networking
+- aws-cdk-lib/aws-rds: For RDS database
+- aws-cdk-lib/aws-dynamodb: For DynamoDB tables
+- aws-cdk-lib/aws-s3: For S3 buckets
+- aws-cdk-lib/aws-lambda: For Lambda functions
+- aws-cdk-lib/aws-ecs: For ECS services
+- aws-cdk-lib/aws-apigateway: For API Gateway
+
+## Configuration
+The stack uses an `EnvConfig` object to configure various aspects of the infrastructure, such as database settings, bucket names, and environment-specific variables.
+
+## Error Handling
+The code includes error handling for missing AWS account information and invalid configuration settings. It also sets up CloudWatch alarms for monitoring the health and performance of various components.
+
+## Logging
+CloudWatch Logs are set up for the API service and other components to facilitate monitoring and debugging.
+
+## API/Interface Reference
+The API Gateway is set up with various routes and integrations, including:
+- /token: For token-based authentication
+- /oauth: For OAuth-based authentication
+- /webhook: For various webhook integrations (Garmin, Withings, Fitbit, etc.)
+
+The code also sets up usage plans and API keys for rate limiting and access control.

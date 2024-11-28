@@ -1,0 +1,55 @@
+---
+title: "FamilyMemberHistory.hbs"
+---
+
+## High-level description
+This Handlebars template file defines the structure for generating a FHIR FamilyMemberHistory resource. It transforms data from a CDA (Clinical Document Architecture) format into the FHIR JSON structure, capturing information about a patient's family member's medical history.
+
+## Code Structure
+The template creates a JSON object representing a FHIR FamilyMemberHistory resource. It includes various fields such as identifier, status, relationship, sex, birth date, and conditions. The structure follows the FHIR specification for FamilyMemberHistory resources.
+
+## Symbols
+
+### Main Template
+#### Description
+This is the main Handlebars template that generates the FamilyMemberHistory resource.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ID | string | Unique identifier for the resource |
+| familyEntry | object | Contains family member information from the CDA document |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON | object | A FHIR-compliant FamilyMemberHistory resource |
+
+#### Internal Logic
+1. Creates a FHIR FamilyMemberHistory resource with a unique ID.
+2. Populates the resource with data from the `familyEntry` object.
+3. Sets the status to "completed".
+4. Maps the family relationship and sex using CodeableConcept helpers.
+5. Includes the birth date as a string.
+6. Iterates through conditions, mapping them to the FHIR structure.
+7. Checks for specific templateIds to determine if a condition contributed to death or to set the onset age.
+
+## Side Effects
+This template doesn't have direct side effects as it's a pure transformation of data.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| DataType/Identifier.hbs | Helper template for generating FHIR Identifier data type |
+| DataType/CodeableConcept.hbs | Helper template for generating FHIR CodeableConcept data type |
+| DataType/Age.hbs | Helper template for generating FHIR Age data type |
+
+## TODOs
+- Add date from effectiveTime (commented out in the template)
+
+## Notes
+1. The template uses custom Handlebars helpers like `toArray` to handle potential single or multiple entries.
+2. The template includes a copyright notice indicating it's based on work by Microsoft but is now maintained by Metriport Inc.
+3. The generated resource includes a `request` object, suggesting this might be used in a FHIR transaction or batch operation.
+4. Some fields (like `contributedToDeath` and `onsetAge`) are conditionally included based on specific templateIds in the CDA data.
+5. The template doesn't handle all possible fields of a FamilyMemberHistory resource, focusing on a subset of commonly used fields.

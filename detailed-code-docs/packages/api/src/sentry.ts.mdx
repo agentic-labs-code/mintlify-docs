@@ -1,0 +1,78 @@
+---
+title: "sentry.ts"
+---
+
+## High-level description
+This code initializes and configures Sentry for error tracking and performance monitoring in a Node.js application. It sets up Sentry with various options, including environment-specific settings, HTTP tracing, and sampling rates for errors and transactions.
+
+## Code Structure
+The main function `initSentry` sets up Sentry with the application. It uses configuration values from the `Config` class and defines sampling rules. The `isSentryEnabled` function checks if Sentry is enabled based on the presence of a Sentry DSN. The `isTracingDisabledForTx` function determines whether tracing should be disabled for specific transactions.
+
+## References
+- `Config` class from "./shared/config"
+- Express `Application` type
+
+## Symbols
+
+### `isSentryEnabled`
+#### Description
+Checks if Sentry is enabled by verifying the presence of a Sentry DSN.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | boolean | True if Sentry is enabled, false otherwise |
+
+### `initSentry`
+#### Description
+Initializes Sentry with the provided Express application and configures various options.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| app | Application | The Express application instance |
+
+#### Internal Logic
+1. Initializes Sentry with configuration options:
+   - Enables/disables based on `isSentryEnabled()`
+   - Sets DSN, environment, release version
+   - Configures integrations for HTTP and Express tracing
+   - Sets sampling rates for errors and transactions
+2. If Sentry is enabled, adds Sentry request handler and tracing handler to the Express app
+
+### `isTracingDisabledForTx`
+#### Description
+Determines whether tracing should be disabled for specific transactions based on their names.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tx | TransactionContext | The transaction context |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | boolean | True if tracing should be disabled, false otherwise |
+
+#### Internal Logic
+- Disables tracing for health check endpoint ("GET /")
+- Disables tracing for IHE GW response endpoints
+- Samples 1% of OPTIONS requests
+- Enables tracing for all other transactions
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @sentry/node | Sentry SDK for Node.js |
+| @sentry/tracing | Sentry tracing functionality |
+| @sentry/types | TypeScript types for Sentry |
+| express | Express web framework |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| sampleRate | number | 1.0 | Error sample rate (0.0 to 1.0) |
+| tracesSampler | function | - | Custom sampling function for traces |
+
+## TODOs
+- TODO #499: Review the traces sample rate based on the load on the app and Sentry's quotas

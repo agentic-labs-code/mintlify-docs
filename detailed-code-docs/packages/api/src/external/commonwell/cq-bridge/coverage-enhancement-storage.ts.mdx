@@ -1,0 +1,60 @@
+---
+title: "coverage-enhancement-storage.ts"
+---
+
+## High-level description
+This code defines a function `createOrUpdateCoverageEnhancements` that creates or updates multiple coverage enhancement records in a database using Sequelize ORM. It's designed to handle bulk operations efficiently, allowing for transaction support to ensure data consistency.
+
+## Code Structure
+The main function `createOrUpdateCoverageEnhancements` uses the `CoverageEnhancementModel` to perform bulk create or update operations. The `CreateOrUpdateCmd` type is defined as an array of `CoverageEnhancementUpdate` objects.
+
+## References
+- `CoverageEnhancementUpdate` from "../../../domain/medical/coverage-enhancement"
+- `CoverageEnhancementModel` from "../../../models/medical/coverage-enhancement"
+
+## Symbols
+
+### `CreateOrUpdateCmd`
+#### Description
+A type alias for an array of `CoverageEnhancementUpdate` objects, representing the command structure for creating or updating coverage enhancements.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | `CoverageEnhancementUpdate[]` | An array of coverage enhancement update objects |
+
+### `createOrUpdateCoverageEnhancements`
+#### Description
+An asynchronous function that creates or updates multiple coverage enhancement records in the database using a bulk operation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ecList | `CreateOrUpdateCmd` | An array of coverage enhancement objects to create or update |
+| transaction | `Transaction` (optional) | A Sequelize transaction object for ensuring data consistency |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | `Promise&lt;void&gt;` | A promise that resolves when the operation is complete |
+
+#### Internal Logic
+1. The function uses `CoverageEnhancementModel.bulkCreate()` to perform a bulk insert or update operation.
+2. It sets `returning: false` to improve performance by not returning the created objects.
+3. The `updateOnDuplicate: ["data"]` option specifies that only the "data" field should be updated if a duplicate record is found.
+4. If a transaction is provided, it's used to ensure data consistency across multiple database operations.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | For database operations and transaction management |
+
+## Performance Considerations
+The use of `bulkCreate` with `updateOnDuplicate` option optimizes the database operation by handling both inserts and updates in a single query, which is more efficient than individual inserts or updates, especially for large datasets.
+
+## Related Code Context
+The `CoverageEnhancementModel` referenced in this file is defined in `packages/api/src/models/medical/coverage-enhancement.ts`. It extends `BaseModelNoId` and implements the `CoverageEnhancement` interface. The model includes fields such as `ecId`, `patientId`, `cxId`, and `data`, with `ecId` and `patientId` serving as composite primary keys.
+
+The `CoverageEnhancementUpdate` type used in `CreateOrUpdateCmd` is defined in `packages/api/src/domain/medical/coverage-enhancement.ts`. It extends `CoverageEnhancementCreate`, which includes fields like `ecId`, `cxId`, `patientId`, and `data` (of type `CoverageEnhancementData`).
+
+This context helps understand the structure of the data being created or updated by the `createOrUpdateCoverageEnhancements` function.

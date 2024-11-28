@@ -1,0 +1,113 @@
+---
+title: "ihe-gateway-v2-async.ts"
+---
+
+## High-level description
+This code defines an `IHEGatewayV2Async` class that extends `IHEGatewayV2` to handle asynchronous operations for patient discovery, document query, and document retrieval in a healthcare interoperability context. It uses AWS Lambda functions to process these operations in chunks, allowing for efficient handling of large datasets.
+
+## Code Structure
+The `IHEGatewayV2Async` class contains three main methods: `startPatientDiscovery`, `startDocumentQueryGatewayV2`, and `startDocumentRetrievalGatewayV2`. Each method chunks the input data and invokes corresponding Lambda functions asynchronously. The class uses utility functions from AWS SDK and other imported modules to manage Lambda invocations and error handling.
+
+## References
+- `IHEGatewayV2` (parent class, not shown in the provided code)
+- `Config` from "../../../../util/config"
+- `processAsyncError` from "../../../../util/error/shared"
+- `defaultLambdaInvocationResponseHandler`, `makeLambdaClient` from "../../../aws/lambda"
+
+## Symbols
+
+### `IHEGatewayV2Async`
+#### Description
+A class that extends `IHEGatewayV2` to provide asynchronous operations for patient discovery, document query, and document retrieval using AWS Lambda functions.
+
+#### Methods
+
+### `startPatientDiscovery`
+#### Description
+Initiates patient discovery by chunking gateway requests and invoking Lambda functions asynchronously.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| pdRequestGatewayV2 | OutboundPatientDiscoveryReq | Patient discovery request object |
+| patientId | string | Patient identifier |
+| cxId | string | Context identifier |
+
+#### Internal Logic
+1. Creates a Lambda client
+2. Chunks the gateways from the request
+3. For each chunk, creates a new request and invokes the Lambda function asynchronously
+4. Handles the Lambda invocation response and any errors
+
+### `startDocumentQueryGatewayV2`
+#### Description
+Initiates document queries by chunking requests and invoking Lambda functions asynchronously.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dqRequestsGatewayV2 | OutboundDocumentQueryReq[] | Array of document query requests |
+| patientId | string | Patient identifier |
+| cxId | string | Context identifier |
+| requestId | string | Request identifier |
+
+#### Internal Logic
+1. Creates a Lambda client
+2. Chunks the document query requests
+3. For each chunk, invokes the Lambda function asynchronously
+4. Handles the Lambda invocation response and any errors
+
+### `startDocumentRetrievalGatewayV2`
+#### Description
+Initiates document retrievals by chunking requests and invoking Lambda functions asynchronously.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| drRequestsGatewayV2 | OutboundDocumentRetrievalReq[] | Array of document retrieval requests |
+| patientId | string | Patient identifier |
+| cxId | string | Context identifier |
+| requestId | string | Request identifier |
+
+#### Internal Logic
+1. Creates a Lambda client
+2. Chunks the document retrieval requests
+3. For each chunk, invokes the Lambda function asynchronously with a sleep interval between chunks
+4. Handles the Lambda invocation response and any errors
+
+### `chunkRequests`
+#### Description
+A utility function that chunks an array of requests into smaller arrays based on a maximum number of requests per invocation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| requests | T[] | Array of requests to be chunked |
+| maxRequestsPerInvocation | number | Maximum number of requests per chunk |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| chunks | T[][] | Array of chunked request arrays |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/ihe-gateway-sdk | Provides types for outbound requests |
+| @metriport/shared | Provides utility functions like `sleep` |
+| dayjs | Date and time manipulation library |
+| lodash/chunk | Used for chunking arrays |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| SLEEP_IN_BETWEEN_DOCUMENT_RETRIEVAL_REQUESTS | Duration | 1 second | Sleep duration between document retrieval requests |
+| MAX_GATEWAYS_BEFORE_CHUNK | number | 1000 | Maximum number of gateways before chunking |
+| MAX_DOCUMENT_QUERY_REQUESTS_PER_INVOCATION | number | 20 | Maximum number of document query requests per Lambda invocation |
+| MAX_DOCUMENT_RETRIEVAL_REQUESTS_PER_INVOCATION | number | 10 | Maximum number of document retrieval requests per Lambda invocation |
+
+## Error Handling
+The code uses the `processAsyncError` function to handle errors that occur during Lambda invocations. This function logs the error message and captures the error for further analysis.
+
+## Performance Considerations
+The code implements chunking mechanisms to handle large numbers of requests efficiently. It also introduces a sleep interval between document retrieval requests to prevent overwhelming the system.

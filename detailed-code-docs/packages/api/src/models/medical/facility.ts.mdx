@@ -1,0 +1,55 @@
+---
+title: "facility.ts"
+---
+
+## High-level description
+This code defines the `FacilityModel` class, which represents a facility in a medical context. It extends the `BaseModel` class and implements the `Facility` interface. The model includes various attributes related to the facility, such as its identifier, OID, active status, and type. It also includes a setup method for initializing the model with Sequelize.
+
+## Code Structure
+The main symbol in this code is the `FacilityModel` class. It extends `BaseModel` and implements the `Facility` interface. The class defines various attributes and a static `setup` method for initializing the model with Sequelize.
+
+## Symbols
+
+### `FacilityModel`
+#### Description
+This class represents a facility in the system. It extends `BaseModel` and implements the `Facility` interface, providing a structure for storing and managing facility data in the database.
+
+#### Attributes
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID associated with the facility |
+| oid | string | Object Identifier for the facility |
+| facilityNumber | number | Unique number assigned to the facility |
+| data | FacilityData | JSON object containing facility details |
+| cqActive | boolean | Indicates if the facility is active in Carequality |
+| cwActive | boolean | Indicates if the facility is active in CommonWell |
+| cqOboOid | string \| null | Carequality On-Behalf-Of OID |
+| cwOboOid | string \| null | CommonWell On-Behalf-Of OID |
+| cwType | FacilityType | Type of the facility in CommonWell |
+| cqType | FacilityType | Type of the facility in Carequality |
+| cqApproved | boolean | Indicates if the facility is approved in Carequality |
+| cwApproved | boolean | Indicates if the facility is approved in CommonWell |
+
+#### Internal Logic
+The `setup` method initializes the model with Sequelize, defining the schema and options for the database table. It includes a `beforeCreate` hook that generates and sets the facility's OID and facility number before creation.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/oid | Imports OID-related constants |
+| sequelize | Used for defining the model schema and interacting with the database |
+| ../../command/medical/organization/get-organization | Imports function to retrieve organization data |
+| ../../domain/medical/facility | Imports facility-related types and functions |
+| ../../models/_default | Imports base model class and utility functions |
+| ../transaction-wrapper | Imports function for executing database transactions |
+
+## Error Handling
+The code doesn't implement specific error handling mechanisms. However, it relies on Sequelize's built-in error handling for database operations.
+
+## Performance Considerations
+The `beforeCreate` hook performs additional database operations (getting the maximum facility number and creating a new OID) before creating a new facility. This could potentially impact performance for high-volume facility creation scenarios.
+
+## TODOs
+There are no explicit TODOs in the code.
+
+This code provides a robust structure for managing facility data in the system, integrating with both Carequality and CommonWell health information exchanges. It includes fields for managing the facility's status, type, and identifiers in both systems, allowing for flexible integration with these health information networks.

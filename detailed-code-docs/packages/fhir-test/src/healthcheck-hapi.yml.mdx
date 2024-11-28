@@ -1,0 +1,49 @@
+---
+title: "healthcheck-hapi.yml"
+---
+
+## High-level description
+This YAML file defines a load testing configuration for Artillery, targeting a HAPI FHIR server. It specifies a series of HTTP GET requests to the server's root endpoint to perform a health check, with a gradually increasing load over time.
+
+## Code Structure
+The configuration is divided into three main sections: `config`, `phases`, and `scenarios`, which define the test environment, load patterns, and specific actions to be performed during the test.
+
+## Symbols
+
+### config
+#### Description
+Configures the overall test environment and plugins.
+
+#### Internal Logic
+- Sets the target URL from an environment variable `HAPI_URL`.
+- Configures the CloudWatch plugin for publishing metrics.
+
+### phases
+#### Description
+Defines the load testing phases with varying durations and request rates.
+
+#### Internal Logic
+1. Warm-up phase: 10 seconds duration with 10 requests per second.
+2. Ramp-up phase: 60 seconds duration, starting at 50 requests per second and increasing to 200 requests per second.
+
+### scenarios
+#### Description
+Specifies the actions to be performed during the load test.
+
+#### Internal Logic
+- Defines a single scenario named "Healthcheck HAPI".
+- Loops 10 times, sending a GET request to the root URL ('/') in each iteration.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Artillery | Load testing framework used to execute this configuration |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| HAPI_URL | string | N/A | The URL of the HAPI FHIR server to be tested |
+| REGION | string | N/A | AWS region for CloudWatch metrics publishing |
+
+## Performance Considerations
+This configuration is designed to test the performance and scalability of the HAPI FHIR server. It starts with a low load (warm-up phase) and then gradually increases the load (ramp-up phase) to observe how the server handles increasing traffic. The use of CloudWatch for metrics publishing allows for monitoring and analysis of the server's performance during the test.

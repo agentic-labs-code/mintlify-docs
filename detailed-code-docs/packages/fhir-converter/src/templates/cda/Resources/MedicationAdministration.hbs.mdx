@@ -1,0 +1,60 @@
+---
+title: "MedicationAdministration.hbs"
+---
+
+## High-level description
+This Handlebars template is used to generate a FHIR MedicationAdministration resource from CDA (Clinical Document Architecture) data. It creates a JSON structure that represents a medication administration event, including details such as identifier, status, effective time period, and dosage information.
+
+## Symbols
+
+### MedicationAdministration Resource
+#### Description
+This template generates a FHIR MedicationAdministration resource, which represents the event of a patient consuming or otherwise being administered a medication.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| medicationAdministration | Object | CDA data containing medication administration details |
+| ID | String | Unique identifier for the resource |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| MedicationAdministration | Object | FHIR MedicationAdministration resource |
+
+#### Internal Logic
+1. Creates a unique URI for the resource using the provided ID.
+2. Sets the resource type to "MedicationAdministration".
+3. Generates identifiers from the CDA data.
+4. Sets the status of the medication administration.
+5. Determines the effective time period of the administration.
+6. Creates a dosage object with route, dose, and rate information.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| DataType/Identifier.hbs | Generates FHIR Identifier datatype |
+| ValueSet/MedicationAdministrationStatus.hbs | Maps CDA status codes to FHIR MedicationAdministration status |
+| Utils/PeriodOrDefaultPeriod.hbs | Generates FHIR Period datatype |
+| DataType/CodeableConcept.hbs | Generates FHIR CodeableConcept datatype |
+| DataType/SimpleQuantity.hbs | Generates FHIR Quantity datatype |
+
+## Error Handling
+The template includes basic error handling for missing dose quantity values. If the dose quantity value is not present, it sets a null flavor system instead.
+
+```handlebars
+{{#if medicationAdministration.doseQuantity.value}}
+  {{&gt;DataType/SimpleQuantity.hbs quantity=medicationAdministration.doseQuantity}},
+{{else}}
+  {
+    "system": "http://terminology.hl7.org/CodeSystem/v3-NullFlavor"
+  }
+{{/if}}
+```
+
+This ensures that even if the dose quantity is missing, the resource can still be created with a standardized null flavor indication.
+
+## Notes
+1. The template uses conditional logic to handle different structures of the effectiveTime property in the CDA data.
+2. The resource is set up to be created or updated using a PUT HTTP method, as indicated by the "request" object at the end of the template.
+3. The template makes use of several partial templates (indicated by `{{&gt;PartialName}}`) to generate specific FHIR datatypes, which helps in maintaining consistency and reusability across different resource templates.

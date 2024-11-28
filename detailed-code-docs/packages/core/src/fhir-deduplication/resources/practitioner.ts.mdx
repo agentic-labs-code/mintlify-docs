@@ -1,0 +1,72 @@
+---
+title: "practitioner.ts"
+---
+
+## High-level description
+This code implements a deduplication process for Practitioner resources in a FHIR (Fast Healthcare Interoperability Resources) system. It groups similar practitioners based on their names and addresses, and combines them into a single resource, creating a map for reference replacements.
+
+## Code Structure
+The file contains two main functions: `deduplicatePractitioners` and `groupSamePractitioners`. The `deduplicatePractitioners` function uses `groupSamePractitioners` to perform the actual grouping and then combines the resources using a shared `combineResources` function.
+
+## References
+- `@medplum/fhirtypes`: Provides the `Practitioner` type definition.
+- `../../mpi/normalize-address`: Provides the `normalizeAddress` function.
+- `../shared`: Provides the `combineResources` and `fillMaps` functions.
+
+## Symbols
+
+### `deduplicatePractitioners`
+#### Description
+This function takes an array of Practitioner resources and returns deduplicated practitioners along with a reference replacement map.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| practitioners | Practitioner[] | An array of Practitioner resources to be deduplicated |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| combinedPractitioners | Practitioner[] | An array of deduplicated Practitioner resources |
+| refReplacementMap | Map&lt;string, string[]&gt; | A map for replacing references to deduplicated practitioners |
+
+#### Internal Logic
+1. Calls `groupSamePractitioners` to group similar practitioners.
+2. Uses `combineResources` to merge the grouped practitioners.
+3. Returns the combined practitioners and the reference replacement map.
+
+### `groupSamePractitioners`
+#### Description
+This function groups similar practitioners based on their names and normalized addresses.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| practitioners | Practitioner[] | An array of Practitioner resources to be grouped |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| practitionersMap | Map&lt;string, Practitioner&gt; | A map of grouped practitioners |
+| refReplacementMap | Map&lt;string, string[]&gt; | A map for replacing references to grouped practitioners |
+
+#### Internal Logic
+1. Iterates through each practitioner in the input array.
+2. For each practitioner with a name and address:
+   a. Normalizes the addresses using `normalizeAddress`.
+   b. Creates a key using the name and first normalized address.
+   c. Uses `fillMaps` to add the practitioner to the maps.
+3. Returns the practitionersMap and refReplacementMap.
+
+## TODOs
+- Fix the issue with multiple different doctor names on the same Practitioner resource on the FHIR converter prior to going into more depth here.
+
+## Performance Considerations
+The code uses `Map` data structures for efficient lookup and storage of grouped practitioners. The normalization of addresses may have some performance impact, especially for large datasets.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides FHIR type definitions |
+| ../../mpi/normalize-address | Provides address normalization functionality |
+| ../shared | Provides shared utility functions for resource combination and map filling |

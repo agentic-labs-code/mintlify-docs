@@ -1,0 +1,53 @@
+---
+title: "version-mismatch.ts"
+---
+
+## High-level description
+This code defines a custom error class `VersionMismatchError` that extends the `MetriportError` class. It is designed to be thrown when there's a version mismatch in the application, typically when attempting to update data that has been modified since it was last retrieved.
+
+## Symbols
+
+### VersionMismatchError
+#### Description
+`VersionMismatchError` is a custom error class that extends `MetriportError`. It is used to represent errors related to version mismatches in the application, particularly when dealing with concurrent updates or stale data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| message | string | Optional error message. Defaults to "Version mismatch - reload the data and try again" |
+
+#### Internal Logic
+1. The constructor calls the parent class constructor with the provided or default message.
+2. Sets the `status` property to `httpStatus.PRECONDITION_FAILED` (412).
+3. Sets the `name` property to the name of the constructor (i.e., "VersionMismatchError").
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| httpStatus | Provides HTTP status codes, used to set the error status |
+| MetriportError | Base error class that VersionMismatchError extends |
+
+## References
+This error class is referenced in the related file `packages/api/src/models/_default.ts`:
+
+1. It is imported at the top of the file:
+   ```typescript
+   import VersionMismatchError from "../errors/version-mismatch";
+   ```
+
+2. It is used in the `validateVersionForUpdate` function:
+   ```typescript
+   export function validateVersionForUpdate(
+     entity: Pick&lt;BaseDomain, "id" | "eTag"&gt;,
+     eTag: string | undefined
+   ) {
+     if (eTag != null && eTag !== entity.eTag) {
+       throw new VersionMismatchError(`eTag mismatch - reload the data and try again`);
+     }
+   }
+   ```
+
+This function is likely used to check if the version of an entity being updated matches the expected version, throwing a `VersionMismatchError` if there's a mismatch.
+
+## Error Handling
+This class is part of the error handling mechanism in the application. It provides a specific error type for version mismatch scenarios, allowing for more precise error handling and appropriate HTTP status code (412 Precondition Failed) to be sent to the client.

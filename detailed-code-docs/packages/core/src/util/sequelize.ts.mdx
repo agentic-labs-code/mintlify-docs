@@ -1,0 +1,121 @@
+---
+title: "sequelize.ts"
+---
+
+## High-level description
+This code defines utility functions for interacting with a Sequelize database, including initializing database pools, defining database credential schemas, and creating read-only database pools. It provides a flexible and type-safe way to manage database connections in a TypeScript environment.
+
+## Code Structure
+The code defines several schemas using Zod for database credentials and read replica endpoints. It then exports functions to initialize database pools, including a special function for read-only pools. These functions use the defined schemas to validate input and create Sequelize instances.
+
+## Symbols
+
+### `dbCredsSchema`
+#### Description
+A Zod schema that defines the structure for database credentials.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dbCredsSchema | z.ZodObject | A Zod schema for database credentials |
+
+### `DbCreds`
+#### Description
+A TypeScript type inferred from the `dbCredsSchema`.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| DbCreds | Type | A TypeScript type for database credentials |
+
+### `dbReadReplicaEndpointSchema`
+#### Description
+A Zod schema that defines the structure for database read replica endpoints.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dbReadReplicaEndpointSchema | z.ZodObject | A Zod schema for read replica endpoints |
+
+### `DbReadReplicaEndpoint`
+#### Description
+A TypeScript type inferred from the `dbReadReplicaEndpointSchema`.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| DbReadReplicaEndpoint | Type | A TypeScript type for read replica endpoints |
+
+### `initReadonlyDbPool`
+#### Description
+Initializes a read-only database pool for queries that require a read replica.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dbCreds | string | JSON string of database credentials |
+| dbReadReplicaEndpoint | string | JSON string of read replica endpoint |
+| poolOptions | PoolOptions (optional) | Sequelize pool options |
+| logging | boolean (optional) | Enable/disable logging |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sequelize | Sequelize | A Sequelize instance for the read-only pool |
+
+#### Internal Logic
+1. Parses and validates the input strings using the defined schemas.
+2. Overrides the host and port from the database credentials with the read replica endpoint.
+3. Calls `initDbPoolFromCreds` with the modified credentials.
+
+### `initDbPool`
+#### Description
+Initializes a database pool for raw queries that can't rely on Models.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dbCreds | string | JSON string of database credentials |
+| poolOptions | PoolOptions (optional) | Sequelize pool options |
+| logging | boolean (optional) | Enable/disable logging |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sequelize | Sequelize | A Sequelize instance for the database pool |
+
+#### Internal Logic
+1. Parses and validates the input string using the defined schema.
+2. Calls `initDbPoolFromCreds` with the parsed credentials.
+
+### `initDbPoolFromCreds`
+#### Description
+A private function that initializes a database pool from parsed credentials.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dbCreds | DbCreds | Parsed database credentials |
+| poolOptions | PoolOptions (optional) | Sequelize pool options |
+| logging | boolean (optional) | Enable/disable logging |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sequelize | Sequelize | A Sequelize instance for the database pool |
+
+#### Internal Logic
+1. Creates a new Sequelize instance with the provided credentials and options.
+2. Returns the Sequelize instance.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | ORM for database operations |
+| zod | Runtime type checking and schema declaration |
+
+## Error Handling
+The code relies on Zod for input validation, which will throw errors if the input doesn't match the defined schemas. These errors should be handled by the calling code.
+
+## Performance Considerations
+The code allows for customization of pool options, which can be used to optimize database connection performance based on the specific use case.

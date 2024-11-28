@@ -1,0 +1,82 @@
+---
+title: "webhook-server.ts"
+---
+
+## High-level description
+The `webhook-server.ts` file sets up a local webhook server using Express.js and exposes it to the internet using ngrok. This server is intended for end-to-end (E2E) testing of webhook functionality. It receives webhook requests, processes them with a dedicated handler (`webhook-handler`), and provides utility functions for managing the server lifecycle and webhook key.
+
+## Code Structure
+The code defines several functions related to the webhook server:
+- `getWebhookServerUrl`: Returns the public URL of the running webhook server.
+- `initWebhookServer`: Initializes the server, starts listening for requests, and exposes it via ngrok.
+- `tearDownWebhookServer`: Stops the server and closes all connections.
+- `storeWebhookKey`: Stores the webhook key for use in request validation.
+
+The `app` object (an Express.js application) defines a single POST route (`/`) that handles incoming webhook requests using the `whHandler`.
+
+## References
+- `whHandler`: This symbol, imported from `./webhook-handler`, is responsible for processing incoming webhook requests.
+- `getEnvVar`, `getEnvVarOrFail`: These utility functions, imported from `@metriport/shared`, are used to retrieve environment variables.
+
+## Symbols
+
+### `getWebhookServerUrl`
+#### Description
+This function retrieves the public URL of the running webhook server. It throws an error if the server is not initialized.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | `string` | The public URL of the webhook server. |
+
+#### Internal Logic
+The function checks if the `webhookServerUrl` variable is set. If not, it throws an error indicating the server is not initialized. Otherwise, it returns the `webhookServerUrl`.
+
+### `initWebhookServer`
+#### Description
+This asynchronous function initializes the webhook server, starts listening for requests, and exposes it to the internet using ngrok.
+
+#### Internal Logic
+1. Retrieves the ngrok authentication token and optional custom domain from environment variables.
+2. Starts the Express.js server and logs a message indicating it's listening on the specified port.
+3. Connects to ngrok using the provided authentication token.
+4. Creates an HTTP endpoint on the ngrok session, optionally using a custom domain.
+5. Forwards traffic from the ngrok endpoint to the local server.
+6. Stores the public ngrok URL in the `webhookServerUrl` variable.
+7. Logs a message with the webhook server's external address.
+
+### `tearDownWebhookServer`
+#### Description
+This asynchronous function stops the webhook server, disconnects from ngrok, and closes all connections.
+
+#### Internal Logic
+1. Logs a message indicating the server is being torn down.
+2. Disconnects and kills the ngrok session.
+3. Closes all connections to the Express.js server.
+4. Closes the server and resolves a promise once the server has closed.
+
+### `storeWebhookKey`
+#### Description
+This function stores the webhook key for use in request validation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| key | `string \| undefined \| null` | The webhook key to store. |
+
+#### Internal Logic
+The function calls the `storeWebhookKey` method of the `whHandler` object, passing the provided key.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | Loads environment variables from a `.env` file. |
+| @metriport/shared | Provides utility functions like `getEnvVar` and `sleep`. |
+| @ngrok/ngrok | Exposes local servers to the internet. |
+| express | Web framework for Node.js. |
+
+## Error Handling
+The code uses the `asyncHandler` function (imported from `../../../../routes/util`) to handle errors within asynchronous route handlers. This function logs error details and passes the error to the next middleware function.
+
+## Logging
+The code uses `console.log` to log messages about the server's status, including when it starts listening, its external address, and when it's being torn down.

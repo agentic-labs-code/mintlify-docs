@@ -1,0 +1,61 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains internal interfaces and schemas for the shared package, focusing on consolidated medical records. It provides a centralized location for defining and exporting data structures and validation rules used in processing and sending consolidated medical data within the application.
+
+## What does it do?
+The code in this directory defines the structure and validation rules for sending consolidated medical records internally. It uses Zod, a TypeScript-first schema declaration and validation library, to create a schema that ensures the data sent for consolidated medical records is in the correct format and contains all necessary information. This includes details such as the location and filename of the bundle, request ID, conversion type, and optional parameters like date ranges and specific resources to include.
+
+The directory also provides a TypeScript type derived from this schema, which can be used throughout the application to ensure type safety when working with consolidated medical record data. By centralizing these definitions, the code promotes consistency and reduces the likelihood of errors when handling this type of data across different parts of the application.
+
+## Key Files
+
+1. `consolidated.ts`
+   - Defines the `internalSendConsolidatedSchema` using Zod, which specifies the structure and validation rules for consolidated medical record data.
+   - Exports the `InternalSendConsolidated` TypeScript type, derived from the Zod schema.
+   - Utilizes enums from the medical module for specific fields like conversion type and resource types.
+
+2. `index.ts`
+   - Serves as the entry point for the directory, re-exporting all symbols from the `consolidated.ts` file.
+   - Simplifies imports for other parts of the application by providing a single point of access to the consolidated medical record interfaces and schemas.
+
+## Dependencies
+The code in this directory relies on the following external libraries and internal modules:
+
+1. Zod (version not specified)
+   - Purpose: Used for creating and validating schemas
+   - Chosen for its TypeScript-first approach and powerful schema definition capabilities
+
+2. @metriport/shared/medical (internal module)
+   - Purpose: Provides enums for `consolidationConversionType` and `resourceTypeForConsolidation`
+   - Used to ensure consistency in the types of conversion and resource types across the application
+
+## Configuration
+While there are no explicit configuration files in this directory, the `internalSendConsolidatedSchema` in `consolidated.ts` acts as a configuration for the structure of consolidated medical record data. It defines the following fields:
+
+- `bundleLocation` (required): String representing the location of the bundle
+- `bundleFilename` (required): String representing the filename of the bundle
+- `requestId` (required): String representing the ID of the request
+- `conversionType` (optional): Enum value from `consolidationConversionType`
+- `generateAiBrief` (optional): Boolean indicating whether to generate an AI brief
+- `resources` (optional): Array of enum values from `resourceTypeForConsolidation`
+- `dateFrom` (optional): String representing the start date of the data range
+- `dateTo` (optional): String representing the end date of the data range
+
+These fields can be adjusted to modify the structure and validation rules for consolidated medical record data throughout the application.
+
+Example usage of the `InternalSendConsolidated` type:
+
+```typescript
+import { InternalSendConsolidated } from '@metriport/shared/src/interface/internal';
+
+function processConsolidatedRecord(data: InternalSendConsolidated) {
+  // Process the consolidated record data
+  console.log(`Processing bundle: ${data.bundleFilename}`);
+  // ... rest of the processing logic
+}
+```
+
+This structure allows for easy modification of the consolidated medical record data format and ensures type safety and consistency across the application when working with this data.

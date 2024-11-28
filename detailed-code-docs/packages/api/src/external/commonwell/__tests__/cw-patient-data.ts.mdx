@@ -1,0 +1,85 @@
+---
+title: "cw-patient-data.ts"
+---
+
+## High-level description
+This file contains test utility functions for creating mock data related to CommonWell patient data. It provides functions to generate fake CwLink, LinkDemographicsHistory, CwData, and CwPatientData objects for testing purposes.
+
+## Code Structure
+The file exports several functions that create mock data objects. These functions use the Faker library to generate random data, and they also import and use utility functions from other parts of the codebase for data normalization and formatting.
+
+## Symbols
+
+### `makeCwDataLink()`
+#### Description
+Creates a mock CwLink object with randomly generated patient details.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | CwLink | A mock CwLink object |
+
+#### Internal Logic
+- Generates a random address using `makeAddressStrict()`
+- Creates a random assurance level
+- Generates patient details including name, birth date, gender, address, and contact information
+- Creates provider and identifier information
+
+### `makeLinksHistory()`
+#### Description
+Creates a mock LinkDemographicsHistory object with randomly generated patient demographics.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | LinkDemographicsHistory | A mock LinkDemographicsHistory object |
+
+#### Internal Logic
+- Generates random patient demographics including date of birth, gender, name, address, phone number, email, and SSN
+- Uses utility functions to normalize and stringify the generated data
+
+### `makeCwData()`
+#### Description
+Creates a mock CwData object, optionally with custom parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | Partial&lt;CwData&gt; | Optional partial CwData object to override default values |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | CwData | A mock CwData object |
+
+#### Internal Logic
+- Uses `makeCwDataLink()` to create a default link if not provided
+- Uses `makeLinksHistory()` to create a default link demographics history if not provided
+
+### `makeCwPatientData()`
+#### Description
+Creates a mock CwPatientData object, optionally with custom parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | Partial&lt;Omit&lt;CwPatientData, "data"&gt; & \{ data: Partial&lt;CwData&gt; \}&gt; | Optional partial CwPatientData object to override default values |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | CwPatientData | A mock CwPatientData object |
+
+#### Internal Logic
+- Uses `makeBaseDomain()` to create base domain properties
+- Generates a random cxId if not provided
+- Uses `makeCwData()` to create the data property
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @faker-js/faker | Generating random mock data |
+| dayjs | Date manipulation and formatting |
+| @metriport/core | Importing domain types and utilities |
+
+This file is crucial for testing CommonWell-related functionality in the Metriport API, providing a way to generate realistic mock data for various test scenarios.

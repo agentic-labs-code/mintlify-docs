@@ -1,0 +1,101 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for sending outbound Document Query (DQ) and Document Retrieval (DR) requests to Carequality gateways using SAML authentication in the context of an IHE (Integrating the Healthcare Enterprise) gateway implementation. The code is part of a larger healthcare interoperability system, specifically handling the XCA (Cross-Community Access) profile for querying and retrieving patient documents across different healthcare communities.
+
+## What does it do?
+The code in this directory enables secure communication with Carequality gateways to perform two main operations:
+
+1. Document Query (DQ): It sends signed requests to search for patient documents across different healthcare communities. This allows healthcare providers to discover available patient information from various sources.
+
+2. Document Retrieval (DR): Once documents are identified through the query process, this code handles the retrieval of those documents. It uses MTOM (Message Transmission Optimization Mechanism) for efficient transfer of potentially large medical documents.
+
+Both operations use SAML (Security Assertion Markup Language) for authentication, ensuring that the requests are secure and come from authorized sources. The code also handles error scenarios, logs important information for troubleshooting, and stores responses for further processing or auditing.
+
+## Key Files
+
+### dq-requests.ts
+This file contains the `sendSignedDqRequest` function, which is responsible for sending Document Query requests. It performs the following tasks:
+- Sends a signed XML request to the specified gateway
+- Logs the request details
+- Stores the DQ response
+- Handles errors and captures them for monitoring
+- Returns a structured response object (`DQSamlClientResponse`)
+
+Example usage:
+```typescript
+const response = await sendSignedDqRequest(
+  signedRequest,
+  samlCertsAndKeys,
+  patientId,
+  contextId,
+  requestIndex
+);
+```
+
+### dr-requests.ts
+This file contains the `sendSignedDrRequest` function, which handles Document Retrieval requests. Its main responsibilities include:
+- Sending a signed XML request using MTOM for efficient document transfer
+- Logging request details
+- Storing the DR response
+- Error handling and formatting
+- Returning a structured response object (`DrSamlClientResponse`)
+
+Example usage:
+```typescript
+const response = await sendSignedDrRequest(
+  signedRequest,
+  samlCertsAndKeys,
+  patientId,
+  contextId,
+  requestIndex
+);
+```
+
+## Dependencies
+The code relies on several external libraries and internal modules:
+
+1. @metriport/ihe-gateway-sdk: Provides types and utilities for IHE gateway interactions.
+2. Internal utility modules:
+   - error handling utilities
+   - logging functionality
+   - SAML client functionality
+   - monitoring and storage utilities
+
+## Configuration
+While there are no explicit configuration files in this directory, the code depends on properly configured SAML certificates and keys (`SamlCertsAndKeys`) for authentication. These are passed as parameters to the main functions.
+
+The code also uses environment-specific logging and error capturing mechanisms, which may be configured elsewhere in the application.
+
+## Error Handling
+Both main functions (`sendSignedDqRequest` and `sendSignedDrRequest`) implement comprehensive error handling:
+- They use try-catch blocks to capture any errors during the request sending process.
+- Errors are logged with detailed information, including HTTP/SSL failures and any additional error response data.
+- Errors are captured for monitoring purposes using a `capture.error` function.
+- In case of errors, the functions return response objects with failure status and error information, allowing the calling code to handle the errors appropriately.
+
+Example error handling:
+```typescript
+try {
+  // Send request and process response
+} catch (error) {
+  log.error(`Error sending signed DR request`, {
+    error: errorToString(error),
+    gateway: request.gateway,
+    patientId,
+    cxId,
+    index,
+  });
+  return {
+    gateway: request.gateway,
+    errorResponse: formatErrorResponse(error),
+    outboundRequest: request.outboundRequest,
+  };
+}
+```
+
+This error handling approach ensures that the calling code can gracefully handle failures and provide appropriate feedback or take alternative actions when document queries or retrievals fail.
+
+In summary, this directory contains critical functionality for securely querying and retrieving patient documents across healthcare communities, forming an essential part of a larger healthcare interoperability system.

@@ -1,0 +1,86 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains TypeScript models that define the structure and types for data returned by the Cronometer API. These models are used to ensure type safety and data validation when working with Cronometer's API responses. The directory includes definitions for diary summaries, macronutrient data, and meal information.
+
+## What does it do?
+The code in this directory provides a structured way to handle and validate data from the Cronometer API. It defines the expected shape of the data, including specific fields and their types. This helps developers work with the API responses more confidently, as they can rely on these models to ensure the data they're working with is in the correct format. The models cover various aspects of a user's dietary information, such as daily summaries, macronutrient breakdowns, and individual meal details.
+
+## Key Files
+
+### diary-summary.ts
+This file defines the structure of a diary summary response from the Cronometer API. It includes information such as whether the diary is completed, the date, total food grams consumed, individual meals, macronutrient breakdown, and detailed nutrient information.
+
+### macros.ts
+This file defines the structure for macronutrient data returned by the Cronometer API. It provides a typed representation of various macronutrients (like protein, carbohydrates, and fats) and their corresponding values.
+
+### meal.ts
+This file defines the structure for meal data returned by the Cronometer API. It includes information about the meal name, individual food items within the meal (including their names and serving sizes), and the macronutrient breakdown for the entire meal.
+
+## Dependencies
+The primary dependency used across these models is the `zod` library. Zod is used for schema validation and type inference, providing a robust way to define and validate the structure of API responses.
+
+| Dependency | Version | Purpose |
+|------------|---------|---------|
+| zod        | Not specified | Schema validation and type inference for API responses |
+
+Zod was likely chosen for its ability to provide both runtime type checking and static type inference, which is particularly useful when working with external API responses that may not always conform to expected structures.
+
+## Configuration
+This directory does not appear to use any specific configuration files or environment variables. The models are defined using TypeScript and Zod, and their structure is based on the expected responses from the Cronometer API.
+
+## Code Examples
+
+Here's an example of how the `CronometerDiarySummary` type is defined in `diary-summary.ts`:
+
+```typescript
+export const cronometerDiarySummaryResp = z.object({
+  completed: z.boolean(),
+  day: z.string(),
+  food_grams: z.number(),
+  foods: z.array(cronometerMealResp).optional(),
+  macros: cronometerMacrosResp,
+  metrics: z.array(z.object({})),
+  nutrients: z.object({
+    // ... various nutrient fields
+  }),
+});
+
+export type CronometerDiarySummary = z.infer&lt;typeof cronometerDiarySummaryResp&gt;;
+```
+
+This structure allows for both runtime validation of API responses and static type checking in TypeScript code that uses this model.
+
+Similarly, the `CronometerMacros` type in `macros.ts` is defined as:
+
+```typescript
+export const cronometerMacrosResp = z.object({
+  alcohol: z.number(),
+  carbs: z.number(),
+  fat: z.number(),
+  protein: z.number(),
+});
+
+export type CronometerMacros = z.infer&lt;typeof cronometerMacrosResp&gt;;
+```
+
+And the `CronometerMeal` type in `meal.ts`:
+
+```typescript
+export const cronometerMealResp = z.object({
+  name: z.string(),
+  foods: z.array(
+    z.object({
+      name: z.string(),
+      serving: z.string(),
+    })
+  ),
+  macros: cronometerMacrosResp,
+});
+
+export type CronometerMeal = z.infer&lt;typeof cronometerMealResp&gt;;
+```
+
+These models work together to provide a comprehensive type-safe representation of the data returned by the Cronometer API. Developers can use these types when working with API responses, ensuring that they're accessing valid data structures and reducing the likelihood of runtime errors due to unexpected data formats.

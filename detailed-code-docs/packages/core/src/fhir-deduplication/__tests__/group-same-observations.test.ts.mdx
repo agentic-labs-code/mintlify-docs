@@ -1,0 +1,78 @@
+---
+title: "group-same-observations.test.ts"
+---
+
+## High-level description
+This file contains unit tests for two functions: `groupSameObservationsSocial` and `groupSameObservations`. These functions are responsible for grouping and deduplicating FHIR Observation resources based on various criteria such as codes, values, and dates.
+
+## Code Structure
+The test file is organized into two main describe blocks, one for each function being tested. Each describe block contains multiple test cases (it blocks) that check different aspects of the grouping logic.
+
+## Symbols
+
+### `groupSameObservationsSocial`
+#### Description
+This function groups similar social observations based on their codes and values, without considering dates.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| observations | Observation[] | An array of FHIR Observation resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| observationsMap | Map&lt;string, Observation&gt; | A map of grouped observations |
+| refReplacementMap | Map&lt;string, string[]&gt; | A map for reference replacements |
+
+#### Internal Logic
+The tests check various scenarios:
+1. Grouping observations with the same LOINC or SNOMED codes and values
+2. Handling observations with multiple coding systems
+3. Building effective periods for grouped observations
+4. Not grouping observations with different codes or values
+5. Removing observations with unknown codes
+6. Handling observations with mixed known and unknown codes
+
+### `groupSameObservations`
+#### Description
+This function groups similar observations based on their codes, values, and dates.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| observations | Observation[] | An array of FHIR Observation resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| observationsMap | Map&lt;string, Observation&gt; | A map of grouped observations |
+| refReplacementMap | Map&lt;string, string[]&gt; | A map for reference replacements |
+
+#### Internal Logic
+The tests check various scenarios:
+1. Grouping observations with the same codes, values, and dates
+2. Removing observations without dates, values, or codes
+3. Not grouping observations with different dates, codes, or values
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @faker-js/faker | Generating random UUIDs for test data |
+| @medplum/fhirtypes | TypeScript types for FHIR resources |
+| makeObservation | Helper function to create test Observation resources |
+| unknownCoding, unknownCode | Constants for unknown coding and code values |
+| groupSameObservationsSocial | Function being tested for social observations |
+| groupSameObservations | Function being tested for general observations |
+| dateTime, dateTime2 | Example date-time values for testing |
+| loincCodeTobacco, snomedCodeTobacco, valueConceptTobacco | Example coding and value concepts for tobacco use |
+
+## Error Handling
+The tests do not explicitly check for error handling. They focus on verifying the correct grouping behavior and output of the functions under various input scenarios.
+
+## Performance Considerations
+The tests do not directly address performance. However, the grouping functions are designed to efficiently handle multiple observations, which could impact performance with large datasets.
+
+___
+
+This test file provides comprehensive coverage for the `groupSameObservationsSocial` and `groupSameObservations` functions, ensuring they correctly group and deduplicate FHIR Observation resources based on their intended criteria. The tests cover various edge cases and scenarios, helping to validate the robustness of these functions in handling different types of observation data.

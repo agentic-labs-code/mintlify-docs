@@ -1,0 +1,85 @@
+---
+title: "shared.ts"
+---
+
+## High-level description
+This file defines shared schemas and utility functions for handling and validating query parameters and request bodies in the API routes. It primarily uses the Zod library for schema validation and transformation of input data.
+
+## Symbols
+
+### `stringListSchema`
+#### Description
+Defines a schema for an array of strings.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | N/A | This is a schema definition, not a function |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | Zod Schema | A schema that validates an array of strings |
+
+### `stringListFromQuerySchema`
+#### Description
+Defines a schema for handling query parameters that can be either a single string or an array of strings. It transforms the input into an array of strings.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | N/A | This is a schema definition, not a function |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | Zod Schema | A schema that validates and transforms input into an array of strings |
+
+#### Internal Logic
+1. Accepts either a string or an array of strings.
+2. If it's a string, splits it by commas and trims each resulting string.
+3. If it's already an array, returns it as-is.
+
+### `nonEmptyStringListFromQuerySchema`
+#### Description
+Similar to `stringListFromQuerySchema`, but additionally ensures that no empty strings are present in the resulting array.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | N/A | This is a schema definition, not a function |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | Zod Schema | A schema that validates and transforms input into an array of non-empty strings |
+
+#### Internal Logic
+1. Performs the same transformation as `stringListFromQuerySchema`.
+2. Additionally checks each item in the resulting array, throwing a `BadRequestError` if any empty strings are found.
+
+### `stringIntegerSchema`
+#### Description
+Defines a schema for validating and transforming string inputs into integers.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | N/A | This is a schema definition, not a function |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | Zod Schema | A schema that validates string inputs as integers and transforms them to numbers |
+
+#### Internal Logic
+1. Validates that the input string matches a regex for integers (only digits).
+2. Transforms the validated string into a number.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/util/error/bad-request | Importing BadRequestError for error handling |
+| zod | Schema validation and transformation |
+
+This file provides reusable schemas for common input validation and transformation tasks in the API routes. It helps ensure consistent handling of query parameters and request bodies across different endpoints.

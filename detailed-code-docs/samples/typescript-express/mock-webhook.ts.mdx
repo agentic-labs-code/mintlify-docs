@@ -1,0 +1,70 @@
+---
+title: "mock-webhook.ts"
+---
+
+## High-level description
+This code implements a mock webhook server for the Metriport Medical API. It handles various types of webhook events, including document downloads, document conversions, and consolidated data queries. The server processes incoming webhook requests, verifies signatures, and performs corresponding actions based on the event type.
+
+## Code Structure
+The main functionality is implemented in an Express.js application. It sets up a POST route to handle incoming webhook requests. The code uses the Metriport API SDK to interact with the Metriport API and process different types of webhook events.
+
+## Symbols
+
+### `app`
+#### Description
+An Express.js application instance that handles the webhook requests.
+
+#### Internal Logic
+- Sets up middleware for JSON parsing and URL-encoded data
+- Configures a POST route to handle incoming webhook requests
+- Processes different types of webhook events (document download, document conversion, consolidated data)
+- Verifies webhook signatures
+- Sends appropriate responses
+
+### `metriportApi`
+#### Description
+An instance of the MetriportMedicalApi class from the Metriport API SDK.
+
+#### Internal Logic
+- Initialized with API key and configuration options
+- Used to interact with the Metriport API for various operations (e.g., getting document URLs, starting consolidated queries)
+
+### `downloadFile`
+#### Description
+An asynchronous function that downloads a file from a given URL.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | The URL of the file to download |
+| fileName | string | The name to save the file as |
+| conversionType | string | The file extension/type |
+
+#### Internal Logic
+- Uses the `https` module to download the file
+- Saves the file to the local filesystem
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | Load environment variables |
+| fs | File system operations |
+| https | Make HTTPS requests |
+| @metriport/api-sdk | Interact with Metriport API |
+| express | Web server framework |
+| @metriport/shared | Utility functions |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| METRIPORT_WH_KEY | string | N/A | Webhook key for signature verification |
+| METRIPORT_API_KEY | string | N/A | API key for Metriport API |
+| IS_PROD | string | N/A | Production environment flag |
+
+## Error Handling
+The code includes basic error handling, logging errors to the console when they occur during webhook processing or API interactions.
+
+## Logging
+The code uses `console.log` statements to log various events and information, such as received webhook bodies, signature verification results, and download status.
+
+This mock webhook server provides a way to test and develop integrations with the Metriport Medical API by simulating webhook events and processing them accordingly.

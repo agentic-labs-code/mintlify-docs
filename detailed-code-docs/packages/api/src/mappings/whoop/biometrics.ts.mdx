@@ -1,0 +1,49 @@
+---
+title: "biometrics.ts"
+---
+
+## High-level description
+The code defines a function `mapToBiometrics` that transforms data from Whoop Recovery and Cycle objects into a Biometrics object as defined in the `@metriport/api-sdk`. This transformation extracts relevant metrics like heart rate, HRV, respiration, and temperature, and structures them according to the Biometrics schema.
+
+## Code Structure
+The `mapToBiometrics` function is the main component, taking a date string and optional WhoopRecovery and WhoopCycle objects as input. It uses the `PROVIDER_WHOOP` constant and the `Util.addDataToObject` utility function. The function outputs a Biometrics object.
+
+## References
+- `Biometrics` type from `@metriport/api-sdk`
+- `PROVIDER_WHOOP` constant
+- `WhoopRecovery` and `WhoopCycle` types
+- `Util.addDataToObject` function
+
+## Symbols
+
+### `mapToBiometrics`
+#### Description
+This function maps data from Whoop API responses related to recovery and cycle information into a standardized Biometrics object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| date | string | Date string representing the day for which the biometrics data is collected. |
+| whoopRecovery | WhoopRecovery | (Optional) Object containing Whoop recovery data. |
+| whoopCycle | WhoopCycle | (Optional) Object containing Whoop cycle data. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| biometrics | Biometrics | An object containing various biometric data points mapped from the input Whoop data. |
+
+#### Internal Logic
+1. Initializes an empty `biometrics` object with metadata (date and source as `PROVIDER_WHOOP`).
+2. Checks if `whoopRecovery` exists and has a 'SCORED' `score_state`.
+   - If true, extracts relevant metrics like resting heart rate, HRV, SpO2, and skin temperature from `whoopRecovery.score` and populates the `biometrics` object.
+3. Checks if `whoopCycle` exists and has a 'SCORED' `score_state`.
+   - If true, extracts average and maximum heart rate from `whoopCycle.score` and updates the `biometrics` object.
+4. Returns the populated `biometrics` object.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides the Biometrics type definition. |
+
+## Error Handling
+The function throws an error if `whoopRecovery.score` or `whoopCycle.score` is missing when their respective `score_state` is "SCORED". This ensures that the required data is present for a scored recovery or cycle. 

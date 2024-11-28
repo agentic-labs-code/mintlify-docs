@@ -1,0 +1,191 @@
+---
+title: "get-patient.ts"
+---
+
+## High-level description
+The code in `get-patient.ts` defines functions for retrieving and matching patient data. It includes functions for retrieving patients by ID, demographic information, and facility association. It also provides functionality for matching patients based on demographic data and retrieving patient states from their addresses.
+
+## Code Structure
+The code consists of several exported functions that handle different aspects of patient data retrieval and matching. The `matchPatient` function utilizes the `getPatientByDemo` function, which in turn relies on the `getPatientByDemoMPI` function from the MPI core module. The `getPatients` function is used by `getPatientIds` and `getPatientStates`. The `getPatientWithDependencies` function retrieves a patient along with their associated facilities and organization.
+
+## References
+- `@metriport/core/mpi/get-patient-by-demo`: Used for matching patients based on demographic information.
+- `PatientLoaderLocal`: Used for loading patient data from the local database.
+- `PatientModel`: Sequelize model representing the patient table.
+- `getFacilities`: Function for retrieving facilities.
+- `getOrganizationOrFail`: Function for retrieving an organization.
+
+## Symbols
+
+### `matchPatient`
+#### Description
+Matches a patient based on provided demographic information. It sanitizes and validates the input data, then calls the `getPatientByDemo` function to perform the matching.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `PatientMatchCmd` | An object containing patient demographic data and the cxId. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `Promise&lt;Patient \| undefined&gt;` | The matched patient object if found, otherwise undefined. |
+
+#### Internal Logic
+1. Sanitizes and validates the input patient data.
+2. Extracts demographic information from the sanitized data.
+3. Calls the `getPatientByDemo` function with the cxId and demographic data.
+
+### `getPatients`
+#### Description
+Retrieves a list of patients based on the provided filters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facilityId | `string` | Optional. The ID of the facility to filter patients by. |
+| cxId | `string` | The ID of the customer organization. |
+| patientIds | `string[]` | Optional. A list of patient IDs to retrieve. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `Promise&lt;PatientModel[]&gt;` | A list of patient objects matching the filters. |
+
+#### Internal Logic
+1. Queries the `PatientModel` table using Sequelize's `findAll` method.
+2. Applies filters based on `facilityId`, `cxId`, and `patientIds`.
+3. Orders the results by `id` in ascending order.
+
+### `getPatientIds`
+#### Description
+Retrieves a list of patient IDs based on the provided filters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facilityId | `string` | Optional. The ID of the facility to filter patients by. |
+| cxId | `string` | The ID of the customer organization. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `Promise&lt;string[]&gt;` | A list of patient IDs matching the filters. |
+
+#### Internal Logic
+1. Queries the `PatientModel` table using Sequelize's `findAll` method, retrieving only the `id` attribute.
+2. Applies filters based on `facilityId` and `cxId`.
+3. Maps the results to an array of patient IDs.
+
+### `getPatientByDemo`
+#### Description
+Retrieves a patient based on their demographic information. Utilizes the `getPatientByDemoMPI` function from the MPI core module.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | `string` | The ID of the customer organization. |
+| demo | `PatientDemoData` | The demographic information of the patient. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `Promise&lt;Patient \| undefined&gt;` | The matched patient object if found, otherwise undefined. |
+
+#### Internal Logic
+1. Creates a new `PatientLoaderLocal` instance.
+2. Calls the `getPatientByDemoMPI` function with the cxId, demographic data, and patient loader.
+
+### `getPatient`
+#### Description
+Retrieves a patient by ID and customer organization ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | `string` | The ID of the patient. |
+| cxId | `string` | The ID of the customer organization. |
+| transaction | `Transaction` | Optional. A Sequelize transaction object. |
+| lock | `boolean` | Optional. Whether to acquire a lock on the retrieved row. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `Promise&lt;PatientModel \| undefined&gt;` | The patient object if found, otherwise undefined. |
+
+#### Internal Logic
+1. Queries the `PatientModel` table using Sequelize's `findOne` method.
+2. Applies filters based on `id` and `cxId`.
+3. Optionally uses the provided transaction and lock parameters.
+
+### `getPatientOrFail`
+#### Description
+Retrieves a patient by ID and customer organization ID, throwing an error if not found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | `GetPatient` | An object containing the patient ID, customer organization ID, and optional transaction and lock parameters. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `Promise&lt;PatientModel&gt;` | The patient object. |
+
+#### Internal Logic
+1. Calls the `getPatient` function with the provided parameters.
+2. Throws a `NotFoundError` if the patient is not found.
+
+### `getPatientWithDependencies`
+#### Description
+Retrieves a patient along with their associated facilities and organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | `string` | The ID of the patient. |
+| cxId | `string` | The ID of the customer organization. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `Promise&lt;{ patient: PatientModel; facilities: Facility[]; organization: Organization; }&gt;` | An object containing the patient, their associated facilities, and their organization. |
+
+#### Internal Logic
+1. Retrieves the patient using `getPatientOrFail`.
+2. Retrieves the facilities associated with the patient using `getFacilities`.
+3. Retrieves the organization associated with the patient using `getOrganizationOrFail`.
+
+### `getPatientStates`
+#### Description
+Retrieves a list of unique US states from the addresses of the specified patients.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | `string` | The ID of the customer organization. |
+| patientIds | `string[]` | A list of patient IDs. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | `Promise&lt;USState[]&gt;` | A list of unique US states. |
+
+#### Internal Logic
+1. If no patient IDs are provided, returns an empty array.
+2. Retrieves the patients using `getPatients`.
+3. Extracts the states from the patients' addresses using `getStatesFromAddresses`.
+4. Filters out any undefined states.
+5. Returns a list of unique states using `uniq`.
+
+## Dependencies
+- `@metriport/shared`: Provides the `USState` enum.
+- `@metriport/core`: Provides domain objects like `Organization`, `Patient`, and `PatientDemoData`.
+- `lodash`: Provides the `uniq` function for removing duplicate elements from an array.
+- `sequelize`: Provides database interaction functionality.
+
+## Error Handling
+The `getPatientOrFail` function throws a `NotFoundError` if the patient is not found.
+
+## Logging
+No specific logging mechanisms are implemented in this code.

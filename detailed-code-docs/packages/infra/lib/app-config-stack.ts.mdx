@@ -1,0 +1,97 @@
+---
+title: "app-config-stack.ts"
+---
+
+## High-level description
+This code defines an `APIStack` class that sets up the infrastructure for a serverless API using AWS CDK. It creates various AWS resources including VPC, RDS database, S3 buckets, Lambda functions, API Gateway, and more. The stack is designed to support different environment types (sandbox, staging, production) with appropriate configurations.
+
+## Code Structure
+The `APIStack` class extends the `Stack` class from AWS CDK. It contains multiple methods for setting up different components of the infrastructure. The constructor initializes the main resources, and other methods are called to set up specific features like authentication, webhooks, and API routes.
+
+## Symbols
+
+### APIStack
+#### Description
+The main class that defines the API infrastructure stack.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | Construct | The parent construct |
+| id | string | The construct ID |
+| props | APIStackProps | Configuration properties for the stack |
+
+#### Internal Logic
+1. Sets up VPC and networking
+2. Creates RDS Aurora database cluster
+3. Sets up S3 buckets for various purposes
+4. Creates Lambda functions for different functionalities
+5. Sets up API Gateway with routes and integrations
+6. Configures authentication and authorization
+7. Sets up webhooks for various services
+8. Configures backups for critical resources
+
+### createFeedbackRoutes
+#### Description
+Creates API routes for feedback functionality.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| apiGateway | apig.RestApi | The API Gateway instance |
+| link | apig.VpcLink | The VPC link for API Gateway |
+| apiAddress | string | The address of the API |
+| config | EnvConfig | Environment configuration |
+
+### setupTestLambda
+#### Description
+Sets up a Lambda function for testing purposes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lambdaLayers | LambdaLayers | Lambda layers to be used |
+| envType | EnvType | Environment type |
+| apiAddress | string | The address of the API |
+| sentryDsn | string \| undefined | Sentry DSN for error tracking |
+
+### setupGarminWebhookAuth
+#### Description
+Sets up authentication for Garmin webhooks.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lambdaLayers | LambdaLayers | Lambda layers to be used |
+| baseResource | apig.Resource | Base API Gateway resource |
+| vpc | ec2.IVpc | VPC instance |
+| fargateService | ecs_patterns.ApplicationLoadBalancedFargateService | Fargate service |
+| dynamoDBTokenTable | dynamodb.Table | DynamoDB table for tokens |
+| envType | EnvType | Environment type |
+| sentryDsn | string \| undefined | Sentry DSN for error tracking |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| aws-cdk-lib | Core CDK library for defining cloud infrastructure |
+| constructs | Library for defining cloud components |
+| aws-cdk-lib/aws-apigateway | API Gateway constructs |
+| aws-cdk-lib/aws-rds | RDS database constructs |
+| aws-cdk-lib/aws-s3 | S3 bucket constructs |
+| aws-cdk-lib/aws-lambda | Lambda function constructs |
+
+## Configuration
+The stack uses an `EnvConfig` object to configure various aspects of the infrastructure based on the environment type (sandbox, staging, production).
+
+## Error Handling
+Error handling is primarily managed through the use of Sentry for error tracking in Lambda functions and other components.
+
+## Logging
+CloudWatch Logs are used for API Gateway access logs and other components.
+
+## Performance Considerations
+- RDS Aurora Serverless v2 is used for the database, allowing for automatic scaling.
+- API Gateway usage plans are configured to manage throttling and quotas.
+- Lambda functions are configured with appropriate memory and timeout settings.
+
+This code sets up a comprehensive serverless API infrastructure with various integrations and security measures. It's designed to be flexible for different environment types and includes features like authentication, webhooks, and data storage solutions.

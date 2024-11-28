@@ -1,0 +1,128 @@
+---
+title: "webhook-request.ts"
+---
+
+## High-level description
+This code defines functions for creating, updating, and retrieving webhook requests. It also includes types and functions for building webhook request data, specifically for devices-related webhooks.
+
+## Code Structure
+The code defines several types and functions related to webhook requests. The `createWebhookRequest` function creates a new webhook request, while `updateWebhookRequest` updates an existing one. The `getAllWebhookRequestByRequestId` function retrieves all webhook requests with a given request ID. The `buildWebhookRequestData` function is used to construct the data payload for a webhook request.
+
+## References
+- `WebhookRequest`: This symbol is referenced from the `metriport/shared` package and represents a webhook request entity.
+- `NotFoundError`: This symbol is referenced from the `metriport/shared` package and represents an error thrown when a resource is not found.
+
+## Symbols
+
+### `CreateWebhookRequestCommand`
+#### Description
+Defines the structure of a command to create a new webhook request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The ID of the customer the webhook request belongs to. |
+| type | WebhookType | The type of the webhook request. |
+| payload | object | The payload of the webhook request. |
+| requestId | string (optional) | The ID of the request that triggered the webhook. |
+| status | WebhookRequestStatus (optional) | The status of the webhook request. Defaults to "processing". |
+
+### `createWebhookRequest`
+#### Description
+Creates a new webhook request in the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| create | CreateWebhookRequestCommand | The command object containing the data for the new webhook request. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;WebhookRequest\&gt; | Promise\&lt;WebhookRequest\&gt; | A promise that resolves to the created WebhookRequest object. |
+
+#### Internal Logic
+1. Calls the `WebhookRequest.create` method to create a new webhook request with the provided data.
+2. Sets the status to "processing" if not provided in the command.
+3. Returns the created WebhookRequest object.
+
+### `WebhookRequestData`
+#### Description
+Defines the structure of the data for a webhook request. This type is marked as deprecated and should be removed when DAPI is fully discontinued.
+
+#### Inputs
+N/A
+
+### `buildWebhookRequestData`
+#### Description
+Builds the data for a webhook request. This function is marked as deprecated and should be removed when DAPI is fully discontinued.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| create | CreateWebhookRequestCommand | The command object containing the data for the webhook request. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| WebhookRequestData | WebhookRequestData | The constructed WebhookRequestData object. |
+
+### `UpdateWebhookRequestCommand`
+#### Description
+Defines the structure of a command to update an existing webhook request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The ID of the webhook request to update. |
+| status | WebhookRequestStatus | The new status of the webhook request. |
+| statusDetail | string (optional) | Additional details about the status of the webhook request. |
+| requestUrl | string (optional) | The URL the webhook request was sent to. |
+| httpStatus | number (optional) | The HTTP status code of the webhook request. |
+| durationMillis | number (optional) | The duration of the webhook request in milliseconds. |
+
+### `updateWebhookRequest`
+#### Description
+Updates an existing webhook request in the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The ID of the webhook request to update. |
+| status | WebhookRequestStatus | The new status of the webhook request. |
+| statusDetail | string (optional) | Additional details about the status of the webhook request. |
+| requestUrl | string (optional) | The URL the webhook request was sent to. |
+| httpStatus | number (optional) | The HTTP status code of the webhook request. |
+| durationMillis | number (optional) | The duration of the webhook request in milliseconds. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise\&lt;void\&gt; | A promise that resolves when the webhook request has been updated. |
+
+#### Internal Logic
+1. Retrieves the webhook request from the database using the provided ID.
+2. Throws a `NotFoundError` if the webhook request is not found.
+3. Limits the length of the status detail and request URL using the `limitStringLength` function.
+4. Updates the webhook request with the provided data.
+
+### `getAllWebhookRequestByRequestId`
+#### Description
+Retrieves all webhook requests with a given request ID from the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| requestId | string | The ID of the request to retrieve webhook requests for. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;WebhookRequest[]\&gt; | Promise\&lt;WebhookRequest[]\&gt; | A promise that resolves to an array of WebhookRequest objects. |
+
+#### Internal Logic
+1. Calls the `WebhookRequest.findAll` method to retrieve all webhook requests with the provided request ID.
+2. Returns the retrieved array of WebhookRequest objects.
+
+## TODOs
+- 1411 - remove `WebhookRequestData` type and `buildWebhookRequestData` function when DAPI is fully discontinued.

@@ -1,0 +1,79 @@
+---
+title: "Header.hbs"
+---
+
+## High-level description
+This Handlebars template file is part of a FHIR converter system. It processes the header section of a Clinical Document Architecture (CDA) document, transforming various elements into corresponding FHIR resources such as Composition, Patient, Practitioner, Encounter, and Organization.
+
+## Code Structure
+The template is structured around the `ClinicalDocument` object from the input message. It uses multiple partial templates (referenced with `&gt;`) to generate different FHIR resources and their references. The code makes extensive use of Handlebars helpers and custom utility functions for ID generation and data manipulation.
+
+## Symbols
+
+### ClinicalDocument Processing
+#### Description
+The main block of the template that processes the ClinicalDocument object and generates various FHIR resources.
+
+#### Internal Logic
+1. Generates a Composition resource from the document
+2. Creates a Patient resource and links it to the Composition
+3. Processes legalAuthenticator to create a Practitioner resource if present
+4. Handles encompassingEncounter to create Encounter, Practitioner, and Location resources
+5. Processes custodian information to create an Organization resource
+6. Handles participants to create RelatedPerson resources
+7. Processes author information to create Device or Practitioner resources
+8. Creates a Patient resource from the recordTarget information
+
+### Partial Templates
+The template uses several partial templates to generate specific FHIR resources:
+
+1. `Resources/Composition.hbs`
+2. `References/Composition/subject.hbs`
+3. `Resources/Practitioner.hbs`
+4. `Resources/Encounter.hbs`
+5. `References/Encounter/participant.individual.hbs`
+6. `References/Composition/encounter.hbs`
+7. `Resources/LocationForHeader.hbs`
+8. `References/Encounter/location.location.hbs`
+9. `Resources/Organization.hbs`
+10. `References/Composition/custodian.hbs`
+11. `Resources/RelatedPerson.hbs`
+12. `References/Patient/link.other.hbs`
+13. `References/RelatedPerson/patient.hbs`
+14. `Resources/Device.hbs`
+15. `References/Composition/author.hbs`
+16. `References/Device/owner.hbs`
+17. `Resources/Patient.hbs`
+
+### Utility Templates
+The template uses utility templates for generating IDs:
+
+1. `Utils/GeneratePatientId.hbs`
+2. `Utils/GeneratePractitionerId.hbs`
+3. `Utils/GenerateLocationId.hbs`
+4. `Utils/GenerateOrganizationId.hbs`
+5. `Utils/GenerateId.hbs`
+
+### Helper Functions
+The template uses several helper functions:
+
+1. `generateUUID`: Generates a UUID based on input string
+2. `toJsonString`: Converts an object to a JSON string
+3. `concat`: Concatenates strings
+4. `toArray`: Converts an object to an array
+
+## Dependencies
+This template depends on various partial templates and utility functions, which are likely defined in separate files within the project structure.
+
+## Configuration
+The template uses a custom configuration variable `@metriportPatientId` for patient identification.
+
+## Error Handling
+There is no explicit error handling in this template. It relies on the Handlebars templating engine's built-in error handling mechanisms.
+
+## TODOs
+There is one TODO comment in the code:
+```handlebars
+{{!-- do we want to include this? Kinda a duplicate of more rich data later in encounter section --}}
+```
+This comment questions whether to include the encompassingEncounter data, as it might be duplicative of more detailed information in a later encounter section.

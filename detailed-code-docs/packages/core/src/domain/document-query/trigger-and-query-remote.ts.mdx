@@ -1,0 +1,75 @@
+---
+title: "trigger-and-query-remote.ts"
+---
+
+## High-level description
+This code defines a class `TriggerAndQueryDocRefsRemote` that extends `TriggerAndQueryDocRefs`. It implements remote API calls to trigger document queries and retrieve their status for a given customer and patient.
+
+## Code Structure
+The `TriggerAndQueryDocRefsRemote` class extends `TriggerAndQueryDocRefs` and overrides two methods: `triggerDocQuery` and `getDocQueryStatus`. These methods use an Axios instance to make HTTP requests to a specified API endpoint.
+
+## Symbols
+
+### `TriggerAndQueryDocRefsRemote`
+#### Description
+This class implements the `TriggerAndQueryDocRefs` interface by making remote API calls to trigger document queries and retrieve their status.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| apiUrl | string | The base URL for the API endpoints |
+
+#### Internal Logic
+- Creates an Axios instance with the provided `apiUrl` as the base URL.
+- Overrides `triggerDocQuery` and `getDocQueryStatus` methods to make HTTP requests to specific endpoints.
+
+### `TriggerAndQueryDocRefsRemote.triggerDocQuery`
+#### Description
+Triggers a document query for a specific customer and patient by making a POST request to the API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+| triggerWHNotifs | boolean | Whether to trigger webhook notifications |
+
+#### Internal Logic
+- Constructs the payload based on the `triggerWHNotifs` flag.
+- Makes a POST request to `/internal/docs/query` endpoint with the customer and patient IDs as query parameters.
+
+### `TriggerAndQueryDocRefsRemote.getDocQueryStatus`
+#### Description
+Retrieves the status of a document query for a specific customer and patient by making a GET request to the API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documentQueryProgress | DocumentQuery \| undefined | The status of the document query |
+
+#### Internal Logic
+- Makes a GET request to `/internal/docs/query` endpoint with the customer and patient IDs as query parameters.
+- Returns the `documentQueryProgress` from the response data, or `undefined` if not present.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides the `DocumentQuery` type |
+| axios | Used for making HTTP requests |
+
+## Error Handling
+The code relies on the default error handling provided by Axios. Any network errors or non-2xx responses will result in thrown exceptions, which should be handled by the caller of these methods.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /internal/docs/query | POST | Query params: cxId, patientId; Body: \{\} or \{ metadata: disableWHMetadata \} | void | Triggers a document query |
+| /internal/docs/query | GET | Query params: cxId, patientId | \{ documentQueryProgress?: DocumentQuery \} | Retrieves the status of a document query |
+
+This implementation provides a remote interface for triggering and querying document references, which can be used in a distributed system where the actual processing occurs on a separate server or service.

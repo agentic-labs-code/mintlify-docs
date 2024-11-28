@@ -1,0 +1,56 @@
+---
+title: "update-facility.ts"
+---
+
+## High-level description
+The `updateFacility` function updates an existing facility in the system. It takes a `FacilityUpdateCmd` object containing the updated facility data and performs validation checks before updating the facility record in the database.
+
+## References
+- `FacilityCreate` (type): Defines the structure of facility data.
+- `FacilityModel` (class): Represents the facility data model.
+- `validateVersionForUpdate`: Checks for version mismatch errors.
+- `validateObo`: Validates OBO (on-behalf-of) related fields.
+- `validateNPI`: Validates the NPI (National Provider Identifier).
+- `getFacilityOrFail`: Retrieves a facility by ID or throws an error if not found.
+
+## Symbols
+
+### `updateFacility`
+#### Description
+Updates an existing facility with the provided data, performing validation checks before updating the database record.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The ID of the facility to update. |
+| eTag | string | The eTag (entity tag) of the facility, used for optimistic concurrency control. |
+| cxId | string | The ID of the customer that the facility belongs to. |
+| data | Partial&lt;FacilityData&gt; | The updated facility data. |
+| cqApproved | boolean | Flag indicating if the facility is approved for CareQuality. |
+| cqActive | boolean | Flag indicating if the facility is active for CareQuality. |
+| cqType | FacilityType | The CareQuality facility type. |
+| cqOboOid | string \| null | The CareQuality OBO OID. |
+| cwApproved | boolean | Flag indicating if the facility is approved for CommonWell. |
+| cwActive | boolean | Flag indicating if the facility is active for CommonWell. |
+| cwType | FacilityType | The CommonWell facility type. |
+| cwOboOid | string \| null | The CommonWell OBO OID. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;FacilityModel&gt; | Promise&lt;FacilityModel&gt; | A promise that resolves to the updated `FacilityModel` object. |
+
+#### Internal Logic
+1. Retrieves the existing facility from the database using `getFacilityOrFail`.
+2. Validates the provided `eTag` against the facility's current `eTag` using `validateVersionForUpdate`.
+3. Validates the OBO-related fields using `validateObo`.
+4. If a new NPI is provided, validates it using `validateNPI`.
+5. Updates the facility record in the database with the provided data.
+6. Returns the updated `FacilityModel` object.
+
+## Error Handling
+- Throws an error if the facility is not found or if there is a version mismatch.
+- Throws an error if validation checks fail (e.g., invalid NPI, invalid OBO configuration).
+
+## Side Effects
+- Modifies the facility record in the database.

@@ -1,0 +1,61 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `packages/commonwell-jwt-maker` directory contains a Command Line Interface (CLI) tool designed to create JSON Web Tokens (JWTs) for use in CommonWell queries. This package is developed by Metriport Inc. and is part of a larger monorepo structure. It utilizes TypeScript for development and is configured to work with ESLint and Prettier for code quality and formatting.
+
+## What does it do?
+The CommonWell JWT Maker is a CLI tool that generates JWTs specifically for use with CommonWell Health Alliance's services. Here's a simplified explanation of its workflow:
+
+1. The user runs the CLI command with various required and optional parameters.
+2. The tool reads an RSA private key file specified by the user.
+3. It then uses the provided information (such as practitioner role, organization details, and purpose of use) to generate a JWT.
+4. The generated JWT is output to the console, ready for use in CommonWell queries.
+
+This tool simplifies the process of creating properly formatted and signed JWTs for CommonWell integration, reducing the complexity for developers and ensuring consistency in token generation.
+
+## Entry points
+The main entry point for this package is the `src/index.ts` file. This file contains the core logic for the CLI tool, including:
+
+1. Parsing command-line arguments using the Commander.js library.
+2. Reading the RSA private key file.
+3. Generating the JWT using the `makeJwt` function from the `@metriport/commonwell-sdk`.
+4. Outputting the generated JWT to the console.
+
+The package is designed to be used primarily as a command-line tool, with the command `cw-jwt-maker` being defined in the `package.json` file.
+
+## Key Files
+1. `src/index.ts`: The main source file containing the CLI logic and JWT generation code.
+2. `package.json`: Defines the package metadata, dependencies, and scripts for building and running the tool.
+3. `tsconfig.json` and `tsconfig.ref.json`: TypeScript configuration files that set up the compilation process and enable project references for use in the monorepo structure.
+4. `.eslintrc.js`: ESLint configuration file for maintaining code quality and consistency.
+
+## Dependencies
+The package relies on several key dependencies:
+
+1. `@metriport/commonwell-sdk` (^5.1.0): Provides the core functionality for generating JWTs compatible with CommonWell services.
+2. `commander` (^9.5.0): Used for parsing command-line arguments and creating the CLI structure.
+3. `@metriport/shared`: Imports the `PurposeOfUse` enum, likely shared across multiple packages in the monorepo.
+
+Development dependencies include TypeScript, ESLint, and various related plugins for maintaining code quality and enabling proper builds.
+
+## Configuration
+The CLI tool accepts various configuration options as command-line arguments:
+
+```
+--rsa-key &lt;file-path&gt;        Path to the RSA256 private key file (required)
+--role &lt;practitioner-role&gt;   Practitioner role (required)
+--subject-id &lt;subject-id&gt;    User ID or name for audit purposes (required)
+--org-name &lt;organization-name&gt; Organization name (required)
+--oid &lt;organization-id&gt;      Organization ID (OID) (required)
+--pou &lt;purpose-of-use&gt;       Purpose of use (required)
+--npi [npi-number]           National Provider Identifier (optional)
+--payload-hash [payload-hash] MurmurHash2 calculation of HTTP POST body (optional)
+```
+
+These options allow users to customize the JWT generation process according to their specific CommonWell integration requirements.
+
+The package is configured to use TypeScript with strict type-checking enabled, as defined in the `tsconfig.json` file. It also uses ESLint for code linting, with rules extended from recommended configurations for TypeScript and Prettier.
+
+In conclusion, the CommonWell JWT Maker is a specialized tool designed to simplify the process of generating JWTs for CommonWell integration. It provides a user-friendly CLI interface and leverages the `@metriport/commonwell-sdk` to ensure compatibility with CommonWell services.

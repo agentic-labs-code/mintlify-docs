@@ -1,0 +1,38 @@
+---
+title: "filter-oids-by-managing-org.ts"
+---
+
+## High-level description
+The `filterCqLinksByManagingOrg` function takes a managing organization name and a list of CQLink objects. It returns a filtered list of CQLink objects that belong to the specified managing organization and its children organizations.
+
+## Code Structure
+The function first retrieves the managing organization from the database based on the provided name. Then, it fetches all children organizations associated with the managing organization. Finally, it filters the input list of CQLink objects to include only those whose `oid` is present in the list of children organization IDs.
+
+## References
+- `CQLink` (from `../cq-patient-data`)
+- `CQDirectoryEntryModel` (from `../../../external/carequality/models/cq-directory`)
+
+## Symbols
+
+### `filterCqLinksByManagingOrg`
+#### Description
+This function filters a list of CQLink objects to include only those associated with a specific managing organization and its children organizations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | string | The name of the managing organization. |
+| cqLinks | CQLink[] | An array of CQLink objects to filter. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;CQLink[]\&gt; | Promise\&lt;CQLink[]\&gt; | A promise that resolves to a filtered array of CQLink objects. |
+
+#### Internal Logic
+1. **Find the managing organization:** Queries the `CQDirectoryEntryModel` to find the organization matching the provided `name`.
+2. **Handle missing organization:** If no matching organization is found, returns an empty array.
+3. **Find children organizations:** Queries the `CQDirectoryEntryModel` again to find all organizations whose `managingOrganizationId` starts with the ID of the found managing organization. This effectively retrieves all children and sub-organizations.
+4. **Extract organization IDs:** Maps the found children organizations to an array of their IDs.
+5. **Filter CQ Links:** Filters the input `cqLinks` array, keeping only the links whose `oid` is present in the array of children organization IDs.
+6. **Return filtered links:** Returns the filtered array of CQLink objects.

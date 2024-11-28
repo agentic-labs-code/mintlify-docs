@@ -1,0 +1,46 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for mapping and transforming data from the Tenovi platform to standardized formats used by the Metriport API. It includes modules for handling biometric data, body measurements, and defines constants and types specific to Tenovi data structures.
+
+## What does it do?
+The code in this directory serves as a bridge between the Tenovi platform's data format and the standardized format used by the Metriport API. It performs the following main functions:
+
+1. Transforms raw biometric data from Tenovi (such as blood pressure, heart rate, oxygen saturation, temperature, blood glucose, etc.) into a standardized `Biometrics` object.
+2. Converts body measurements, specifically weight data, from Tenovi's format to a standardized `Body` object.
+3. Defines constants for supported Tenovi metric types.
+4. Establishes TypeScript types and Zod schemas for Tenovi measurement data, ensuring type safety and data validation.
+
+These transformations involve parsing raw data, mapping fields, converting units where necessary (e.g., temperature from Fahrenheit to Celsius, weight from pounds to kilograms), and structuring the data in a way that conforms to the Metriport API's expectations.
+
+## Key Files
+
+### biometrics.ts
+This file contains the `mapToBiometrics` function, which is responsible for transforming various biometric measurements from Tenovi's format to the standardized `Biometrics` object. It handles multiple types of biometric data, including blood pressure, heart rate, oxygen saturation, temperature, blood glucose, and respiratory measurements.
+
+### body.ts
+This file defines the `mapToBody` function, which specifically handles the transformation of weight measurements from Tenovi's format to the standardized `Body` object used by the Metriport API. It includes unit conversion from pounds to kilograms and proper formatting of the data.
+
+### constants.ts
+This file defines a constant array `tenoviMetricTypes` that lists all supported metric types from Tenovi devices. It also defines a TypeScript type `TenoviMetricTypes` based on this array, which can be used for type checking and validation throughout the codebase.
+
+### index.ts
+This file defines Zod schemas and corresponding TypeScript types for Tenovi measurement data. It includes schemas for individual measurements (`tenoviMeasurementSchema`) and arrays of measurements (`tenoviMeasurementDataSchema`), as well as inferred types `TenoviMeasurement` and `TenoviMeasurementData`.
+
+## Dependencies
+The code in this directory relies on several external libraries and internal modules:
+
+1. @metriport/api-sdk: Provides data models and types for standardized biometric and body data.
+2. convert-units: Used for unit conversions, such as temperature (Fahrenheit to Celsius) and weight (pounds to kilograms).
+3. @metriport/shared/common/numbers: Offers utility functions for number handling and formatting.
+4. zod: Used for defining and validating data schemas, particularly in the index.ts file.
+
+## Configuration
+This directory does not contain specific configuration files. However, it does define constants and types that act as configuration for the mapping process:
+
+1. The `tenoviMetricTypes` array in constants.ts defines the supported metric types for Tenovi devices.
+2. The Zod schemas in index.ts define the expected structure of Tenovi measurement data, which serves as a form of configuration for data validation and typing.
+
+These "configurations" ensure that the mapping functions can correctly identify and process various types of Tenovi data, and that the resulting objects conform to the expected structure of the Metriport API.

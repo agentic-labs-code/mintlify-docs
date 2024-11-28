@@ -1,0 +1,87 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains test files for the Master Patient Index (MPI) functionality in the Metriport system. It includes unit tests for patient matching, patient data normalization, and provides test data for various MPI-related operations.
+
+## What does it do?
+The tests in this directory ensure the correct functioning of key MPI operations:
+
+1. Patient Matching: It verifies the accuracy of functions that determine if two patient records refer to the same individual. This includes testing similarity calculations, personal identifier matching, and contact detail matching.
+
+2. Patient Data Normalization: It checks the process of standardizing patient data, such as converting email addresses to lowercase, trimming whitespace, and normalizing names and addresses.
+
+3. Test Data Provision: It offers a set of sample patient data for different scenarios, including search operations, inclusions, and exclusions. This data is used across various tests to ensure consistent and comprehensive testing of MPI functionalities.
+
+## Key Files
+
+1. `match-patient.test.ts`:
+   This file contains tests for patient matching functions. It verifies the correct operation of:
+   - `jaroWinklerSimilarity`: A function that calculates the similarity between two strings.
+   - `matchingPersonalIdentifiersRule`: A function that determines if personal identifiers match between two patient records.
+   - `matchingContactDetailsRule`: A function that checks if contact details match between two patient records.
+
+   Example test:
+   ```typescript
+   describe("jaroWinklerSimilarity", () =&gt; {
+     it("should correctly identify sample inclusions as matches", () =&gt; {
+       // Test implementation
+     });
+   });
+   ```
+
+2. `normalize-patient.test.ts`:
+   This file tests the `normalizePatient` function, which is responsible for standardizing patient data. It includes tests for:
+   - Email normalization (lowercase conversion and whitespace trimming)
+   - Name and address normalization
+   - Handling of empty fields
+
+   Example test:
+   ```typescript
+   it("should normalize email addresses to lowercase and remove leading/trailing whitespaces", () =&gt; {
+     const patientMPI = makePatientMPI({
+       contact: { email: "  TEST@EXAMPLE.COM  " },
+     });
+     const result = normalizePatient(patientMPI);
+     expect(result.contact?.email).toBe("test@example.com");
+   });
+   ```
+
+3. `test_data.ts`:
+   This file provides sample patient data for MPI testing. It exports a `testPatientMPI` object containing arrays of `PatientMPI` objects for different scenarios:
+   - `sampleSearch`: Patients with varying contact information
+   - `sampleInclusions`: Patients similar to search samples but without contact information
+   - `sampleExclusions`: Patients with different addresses and contact information
+
+   Example data structure:
+   ```typescript
+   export const testPatientMPI = {
+     sampleSearch: [
+       {
+         id: "1",
+         firstName: "John",
+         lastName: "Doe",
+         // ... other fields
+       },
+       // ... more patient objects
+     ],
+     sampleInclusions: [/* ... */],
+     sampleExclusions: [/* ... */],
+   };
+   ```
+
+## Dependencies
+The test files rely on several external libraries and internal modules:
+
+1. Jest: Used as the testing framework for all unit tests.
+2. @metriport/shared: Provides shared types and enums, such as `USState`.
+3. Internal modules:
+   - `../match-patients`: Contains the patient matching functions being tested.
+   - `../normalize-patient`: Provides the patient data normalization function.
+   - `../shared`: Defines types used across the MPI system, such as `PatientMPI`.
+
+## Configuration
+The tests do not require specific configuration files or environment variables. They use Jest's default configuration for running unit tests.
+
+In summary, this directory contains a comprehensive set of tests to ensure the reliability and accuracy of the MPI system's core functionalities, including patient matching and data normalization. The provided test data allows for consistent testing across various scenarios, contributing to the overall robustness of the MPI implementation.

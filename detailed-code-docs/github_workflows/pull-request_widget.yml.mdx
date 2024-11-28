@@ -1,0 +1,60 @@
+---
+title: "pull-request_widget.yml"
+---
+
+## High-level description
+This GitHub Actions workflow file defines a CI/CD process for the Connect Widget package. It runs on pull requests that affect the "packages/connect-widget" directory, merge group events, and manual triggers. The workflow checks commits, sets up the environment, and performs various checks including installation, linting, building, and testing.
+
+## Code Structure
+The workflow consists of two jobs: `check-commits` and `check-pr`. The `check-commits` job reuses a shared workflow, while the `check-pr` job contains multiple steps for setting up the environment and running various checks on the Connect Widget package.
+
+## Symbols
+
+### `check-commits`
+#### Description
+This job uses a reusable workflow defined in `./.github/workflows/_check-commits.yml` to perform commit checks.
+
+#### Inputs
+None specified.
+
+#### Outputs
+None specified.
+
+### `check-pr`
+#### Description
+This job runs on an Ubuntu latest runner and performs various checks on the Connect Widget package.
+
+#### Inputs
+None specified.
+
+#### Outputs
+None specified.
+
+#### Internal Logic
+1. Logs the environment variables
+2. Logs in to Docker Hub
+3. Sets up Node.js 18.14
+4. Checks out the repository
+5. Logs the Git reference
+6. Installs dependencies
+7. Runs the linter
+8. Builds/compiles the package for production or staging based on the target branch
+9. Runs tests
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| docker/login-action@v2 | Logging in to Docker Hub |
+| actions/setup-node@v3 | Setting up Node.js environment |
+| actions/checkout@v3 | Checking out the repository |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| dir | string | packages/connect-widget | Directory containing the Connect Widget package |
+
+## Error Handling
+The workflow does not implement specific error handling mechanisms. It relies on GitHub Actions' default behavior of stopping the workflow if any step fails.
+
+## Performance Considerations
+The workflow uses Ubuntu latest as the runner and caches Node.js dependencies to improve performance.

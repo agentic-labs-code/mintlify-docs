@@ -1,0 +1,120 @@
+---
+title: "tenovi.ts"
+---
+
+## High-level description
+This code defines the Tenovi class, which is a provider for remote patient monitoring (RPM) devices. It implements methods to fetch body and biometrics data, disconnect devices, and revoke provider access. The class interacts with the Tenovi API to retrieve and process patient measurements.
+
+## Code Structure
+The Tenovi class extends the Provider class and implements the NoAuth interface. It contains methods for revoking provider access, disconnecting devices, and fetching patient data. The class uses axios for making HTTP requests to the Tenovi API and dayjs for date manipulation.
+
+## Symbols
+
+### Tenovi
+#### Description
+The Tenovi class represents a provider for Tenovi RPM devices. It handles data retrieval and device management operations.
+
+#### Internal Logic
+- Initializes supported data types (Body and Biometrics)
+- Implements methods for revoking access, disconnecting devices, and fetching patient data
+- Uses axios for API requests and dayjs for date handling
+
+### revokeProviderAccess
+#### Description
+Disconnects all connected devices from the user's Tenovi Gateway and removes Tenovi from the user's ProviderMap.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The user to disconnect devices from |
+| rawParams | RawParams | The raw request parameters |
+
+#### Internal Logic
+1. Retrieves connected devices from the user's providerMap
+2. Disconnects each device using the disconnectDevice method
+3. Updates the user's provider data to remove Tenovi
+
+### disconnectDevice
+#### Description
+Disconnects a specific device from the user's Tenovi Gateway and optionally updates the user's connected devices list.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The user to disconnect the device from |
+| deviceId | string | The device to disconnect |
+| updateUser | boolean | Whether to update the user's connected devices list |
+| rawParams | RawParams | The raw request parameters |
+
+#### Internal Logic
+1. Retrieves Tenovi API key and client name from request headers
+2. Sends a request to the Tenovi API to unlink the device
+3. Updates the user's connected devices list if updateUser is true
+
+### fetchPatientData
+#### Description
+Fetches patient measurement data from the Tenovi API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | string | The API endpoint URL |
+| xTenoviApiKey | string | The Tenovi API key |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | TenoviMeasurementData | The parsed patient measurement data |
+
+### getBodyData
+#### Description
+Retrieves body data (weight) for a specific date from the Tenovi API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The user to fetch data for |
+| date | string | The date to fetch data for |
+| extraParams | DAPIParams | Additional parameters |
+| rawParams | RawParams | The raw request parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bodyData | Body | The mapped body data |
+
+### getBiometricsData
+#### Description
+Retrieves biometrics data for a specific date from the Tenovi API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| connectedUser | ConnectedUser | The user to fetch data for |
+| date | string | The date to fetch data for |
+| extraParams | DAPIParams | Additional parameters |
+| rawParams | RawParams | The raw request parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| biometricsData | Biometrics | The mapped biometrics data |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides types and models for API responses |
+| axios | Used for making HTTP requests to the Tenovi API |
+| dayjs | Used for date manipulation and formatting |
+
+## Error Handling
+The code uses custom error classes (BadRequestError, MetriportError, NotFoundError) to handle various error scenarios. These errors are thrown when invalid inputs are provided or when API requests fail.
+
+## API/Interface Reference
+The Tenovi class interacts with the Tenovi API using the following endpoints:
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| /clients/{clientName}/hwi/unlink-gateway/{deviceId}/ | GET | Unlinks a device from the Tenovi Gateway |
+| /clients/{clientName}/hwi/patients/{patientId}/measurements/ | GET | Retrieves patient measurements |
+
+Note: The actual API base URL is stored in the `Tenovi.URL` static property.

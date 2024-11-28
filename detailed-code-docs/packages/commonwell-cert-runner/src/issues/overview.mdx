@@ -1,0 +1,77 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines and implements functionality for interacting with the CommonWell Health Alliance API, specifically for managing patient identity and linking. It includes methods for enrolling persons, searching for patients, managing patient links, and handling document queries.
+
+## Code Structure
+The main class `CommonWell` implements the `CommonWellAPI` interface and provides methods for various API operations. It uses axios for making HTTP requests and includes helper functions for building query headers and handling responses. The code also defines several data models using Zod for schema validation.
+
+## Symbols
+
+### `CommonWell` (class)
+#### Description
+This class represents the main client for interacting with the CommonWell API. It provides methods for various operations such as enrolling persons, searching for patients, and managing patient links.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| orgCert | string | The certificate (public key) for the organization |
+| rsaPrivateKey | string | An RSA key corresponding to the specified orgCert |
+| orgName | string | The name of the organization |
+| oid | string | The organization's OID |
+| apiMode | APIMode | The mode the client will be running (integration or production) |
+| options | object | Optional parameters including timeout |
+
+#### Internal Logic
+- Initializes an axios instance with the appropriate base URL and SSL configuration
+- Implements methods for various API operations, each making HTTP requests to the CommonWell API
+- Handles authentication by generating JWT tokens for each request
+
+### `enrollPerson` (method)
+#### Description
+Enrolls a new person in the CommonWell network.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| meta | RequestMetadata | Metadata about the request |
+| person | Person | The person to enroll |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| enrolledPerson | Person | The enrolled person data |
+
+### `addPatientLink` (method)
+#### Description
+Adds a patient link to a person in the CommonWell network.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| meta | RequestMetadata | Metadata about the request |
+| personId | string | The person id to be linked to a patient |
+| patientUri | string | The patient uri to be linked to a person |
+| patientStrongId | StrongId (optional) | The patient's strong ID, if available |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientLink | PatientLink | The created patient link |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| axios | Making HTTP requests to the CommonWell API |
+| zod | Schema validation for API request and response data |
+
+## Error Handling
+The code includes basic error handling, primarily relying on axios's built-in error handling. Some methods include specific error handling, such as the `getNetworkLinks` method which handles a 412 status code as a special case.
+
+## API/Interface Reference
+The `CommonWell` class implements the `CommonWellAPI` interface, providing methods for various API operations as defined in the CommonWell Health Alliance API specification.
+
+## TODOs
+- TODO: #322 handle errors in API calls as per https://specification.commonwellalliance.org/services/rest-api-reference (8.6.1 Error)

@@ -1,0 +1,70 @@
+---
+title: "2023-05-04_00_update-patient-data.ts"
+---
+
+## High-level description
+This migration script updates the structure of the `data` field in the `patient` table. It specifically addresses the `address` and `contact` fields within the `data` field, ensuring they are stored as arrays, even if they previously contained a single object.
+
+## Code Structure
+The code defines two asynchronous functions, `up` and `down`, representing the forward and reverse migration steps. Both functions fetch existing patient data, modify the `address` and `contact` fields within the `data` object, and then update the database.
+
+## Symbols
+
+### `up`
+#### Description
+This function performs the forward migration, converting `address` and `contact` fields within the `patient.data` object to arrays.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | \{ context: QueryInterface \} | An object containing the Sequelize QueryInterface instance. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise\&lt;void\&gt; | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. Starts a database transaction.
+2. Fetches all records from the `patient` table.
+3. Iterates through each patient record:
+    - If `data.address` exists and is not an array, it converts it to an array containing the original value.
+    - If `data.contact` exists, is not an array, and contains either an `email` or `phone` property, it converts it to an array containing the original object.
+    - Stringifies the updated `data` object.
+4. If there are any modified patient records:
+    - Deletes all existing records from the `patient` table.
+    - Inserts the modified patient records back into the table.
+5. Commits the transaction.
+
+### `down`
+#### Description
+This function performs the reverse migration, reverting the `address` and `contact` fields within the `patient.data` object back to their original structure (single object if they were not arrays before).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | \{ context: QueryInterface \} | An object containing the Sequelize QueryInterface instance. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise\&lt;void\&gt; | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. Starts a database transaction.
+2. Fetches all records from the `patient` table.
+3. Iterates through each patient record:
+    - If `data.address` exists, is an array, and has at least one element, it sets `data.address` to the first element of the array.
+    - If `data.contact` exists, is an array, and has at least one element, it sets `data.contact` to the first element of the array.
+    - Stringifies the updated `data` object.
+4. If there are any modified patient records:
+    - Deletes all existing records from the `patient` table.
+    - Inserts the modified patient records back into the table.
+5. Commits the transaction.
+
+## Side Effects
+- Modifies the structure of the `data` field in the `patient` table.
+- Deletes and reinserts all records in the `patient` table during both the `up` and `down` migrations.
+
+## Performance Considerations
+- The migration script performs a bulk delete and bulk insert operation, which can be inefficient for large datasets. Consider alternative approaches for updating the data in place if performance is a concern.

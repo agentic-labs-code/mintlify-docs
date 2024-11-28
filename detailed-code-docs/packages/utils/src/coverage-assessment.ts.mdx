@@ -1,0 +1,79 @@
+---
+title: "coverage-assessment.ts"
+---
+
+## High-level description
+This code implements a CLI tool for assessing coverage data for patients across HIEs (Health Information Exchanges). It retrieves patient data, document query status, and FHIR resource counts, then writes the results to a CSV file. The script can process multiple patients concurrently and handles errors gracefully.
+
+## Code Structure
+The main function `main()` orchestrates the overall flow of the script. It uses helper functions like `getPatientIds()`, `getCoverageForPatient()`, and `getDocQueryStatus()` to retrieve and process patient data. The script utilizes the Metriport Medical API SDK for interacting with the API and uses various utility functions from the `@metriport/core` package.
+
+## Symbols
+
+### `main()`
+#### Description
+The main function that orchestrates the coverage assessment process.
+
+#### Internal Logic
+1. Initializes the runs folder and parses command-line arguments.
+2. Retrieves customer data and patient IDs.
+3. Displays a warning and waits for confirmation.
+4. Initializes output files.
+5. Processes patients concurrently using `executeAsynchronously()`.
+6. Logs results and errors.
+
+### `getCoverageForPatient()`
+#### Description
+Retrieves coverage data for a single patient and writes it to the output file.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient |
+| outputFileName | string | The name of the output CSV file |
+| errorFileName | string | The name of the error log file |
+| log | function | The logging function |
+
+#### Internal Logic
+1. Retrieves patient data, document query status, and FHIR resource counts.
+2. Formats the data into a CSV row.
+3. Appends the row to the output file.
+4. Handles and logs any errors.
+
+### `getDocQueryStatus()`
+#### Description
+Retrieves the document query status for a given patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The customer ID |
+| patientId | string | The patient ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documentQueryProgress | DocumentQuery | undefined | The document query progress or undefined |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides the MetriportMedicalApi client |
+| @metriport/core | Provides utility functions |
+| axios | HTTP client for making API requests |
+| commander | CLI argument parsing |
+| dayjs | Date and time manipulation |
+| fs | File system operations |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| CX_ID | string | N/A | Customer ID (environment variable) |
+| API_KEY | string | N/A | API key for authentication (environment variable) |
+| API_URL | string | N/A | Base URL for the API (environment variable) |
+
+## Error Handling
+Errors are caught and logged to both the console and an error file. The script continues processing other patients even if an error occurs for one patient.
+
+## Logging
+The script uses console.log for general logging and a custom log file for error logging.

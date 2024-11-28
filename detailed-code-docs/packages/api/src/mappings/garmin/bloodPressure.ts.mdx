@@ -1,0 +1,140 @@
+---
+title: "bloodPressure.ts"
+---
+
+## High-level description
+The `bloodPressure.ts` file defines functions for mapping Garmin blood pressure data to the Metriport Biometrics data model. It includes functions for grouping and transforming raw Garmin blood pressure data into structured Biometrics objects, handling cases with missing data, and validating data using Zod schemas.
+
+## Code Structure
+The code defines several functions for mapping Garmin blood pressure data:
+- `mapToBiometricsFromBloodPressure`: This function orchestrates the mapping process, grouping data by user and date, and calling other functions to map specific data points.
+- `mapToDiastolicSamples`, `mapToSystolicSamples`, `mapToHeartRateSamples`: These functions extract and format diastolic, systolic, and heart rate data respectively.
+- The code also defines Zod schemas for validating Garmin blood pressure data.
+
+## References
+- `Biometrics`, `BloodPressure`, `HeartRate` from "@metriport/api-sdk/devices/models/common"
+- `groupBy` from "lodash"
+- `DeepNonNullable`, `DeepRequired` from "ts-essentials"
+- `z` from "zod"
+- `garminMetaSchema`, `garminTypes`, `User`, `UserData` from "./index"
+- `PROVIDER_GARMIN` from "../../shared/constants"
+- `secondsToISODate`, `secondsToISODateTime` from "../../shared/date"
+
+## Symbols
+
+### `mapToBiometricsFromBloodPressure`
+#### Description
+This function maps an array of raw Garmin blood pressure data to an array of `UserData&lt;Biometrics&gt;` objects. It groups the input data by user access token and date, then maps each group to a `Biometrics` object containing diastolic, systolic, and heart rate data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| items | `GarminBloodPressureList` | An array of raw Garmin blood pressure data objects. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `UserData&lt;Biometrics&gt;[]` | An array of `UserData&lt;Biometrics&gt;` objects, representing the mapped blood pressure data for each user and date. |
+
+#### Internal Logic
+1. Groups the input `items` by `userAccessToken`.
+2. Iterates over each user's data and groups it by date using `secondsToISODate`.
+3. For each date, filters out data points with missing systolic, diastolic, or pulse values.
+4. Calls `mapToDiastolicSamples`, `mapToSystolicSamples`, and `mapToHeartRateSamples` to extract and format the respective data points.
+5. Constructs a `Biometrics` object with the mapped data and metadata.
+6. Returns an array of `UserData&lt;Biometrics&gt;` objects, one for each user and date.
+
+### `mapToDiastolicSamples`
+#### Description
+This function extracts and formats diastolic blood pressure samples from an array of `GarminBloodPressure` objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| garminBloodPressure | `GarminBloodPressure[]` | An array of `GarminBloodPressure` objects. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `BloodPressure["diastolic_mm_Hg"]` | An object containing an array of diastolic blood pressure samples, or undefined if no valid samples are found. |
+
+#### Internal Logic
+1. Filters the input array for objects with non-null `diastolic` values.
+2. If no valid objects are found, returns undefined.
+3. Otherwise, maps the valid objects to an array of samples, each containing the time and diastolic value.
+4. Returns an object with the `samples` array.
+
+### `mapToSystolicSamples`
+#### Description
+This function extracts and formats systolic blood pressure samples from an array of `GarminBloodPressure` objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| garminBloodPressure | `GarminBloodPressure[]` | An array of `GarminBloodPressure` objects. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `BloodPressure["systolic_mm_Hg"]` | An object containing an array of systolic blood pressure samples, or undefined if no valid samples are found. |
+
+#### Internal Logic
+1. Filters the input array for objects with non-null `systolic` values.
+2. If no valid objects are found, returns undefined.
+3. Otherwise, maps the valid objects to an array of samples, each containing the time and systolic value.
+4. Returns an object with the `samples` array.
+
+### `mapToHeartRateSamples`
+#### Description
+This function extracts and formats heart rate samples from an array of `GarminBloodPressure` objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| garminBloodPressure | `GarminBloodPressure[]` | An array of `GarminBloodPressure` objects. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | `Pick&lt;HeartRate, "samples_bpm"&gt; \| undefined` | An object containing an array of heart rate samples, or undefined if no valid samples are found. |
+
+#### Internal Logic
+1. Filters the input array for objects with non-null `pulse` values.
+2. If no valid objects are found, returns undefined.
+3. Otherwise, maps the valid objects to an array of samples, each containing the time and pulse value.
+4. Returns an object with the `samples_bpm` array.
+
+### `garminBloodPressureSchema`
+#### Description
+A Zod schema defining the structure and data types for a single Garmin blood pressure data point.
+
+### `GarminBloodPressure`
+#### Description
+A TypeScript type representing a single Garmin blood pressure data point, inferred from the `garminBloodPressureSchema`.
+
+### `garminBloodPressureWithMetaSchema`
+#### Description
+A Zod schema combining the `garminMetaSchema` and `garminBloodPressureSchema` to define the structure of a Garmin blood pressure data point with metadata.
+
+### `GarminBloodPressureWithMeta`
+#### Description
+A TypeScript type representing a Garmin blood pressure data point with metadata, inferred from the `garminBloodPressureWithMetaSchema`.
+
+### `garminBloodPressureListSchema`
+#### Description
+A Zod schema defining an array of `garminBloodPressureWithMetaSchema` objects, representing a list of Garmin blood pressure data points with metadata.
+
+### `GarminBloodPressureList`
+#### Description
+A TypeScript type representing a list of Garmin blood pressure data points with metadata, inferred from the `garminBloodPressureListSchema`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides data models and types for Biometrics data. |
+| lodash | Used for the `groupBy` function. |
+| ts-essentials | Provides utility types like `DeepNonNullable` and `DeepRequired`. |
+| zod | Used for data validation with Zod schemas. |
+
+## Error Handling
+The code does not implement specific error handling beyond basic exception raising. Zod schemas are used for data validation, which will throw errors if the input data does not match the expected structure.

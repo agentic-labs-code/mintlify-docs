@@ -1,0 +1,51 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains utility templates and helper functions for the FHIR Converter, specifically for processing Clinical Document Architecture (CDA) data. These utilities are designed to assist in the conversion of CDA documents to FHIR resources by providing reusable components for common tasks such as generating unique identifiers, mapping codes, and extracting specific data elements.
+
+## What does it do?
+The utilities in this directory perform various tasks essential for CDA to FHIR conversion:
+
+1. Generate unique identifiers for FHIR resources based on CDA data (e.g., for patients, practitioners, organizations, and locations).
+2. Map CDA codes and text to standardized FHIR CodeableConcepts (e.g., contact role codes, observation categories, related person codes).
+3. Extract and format specific data elements from CDA documents (e.g., reason for visit, visit diagnosis).
+4. Determine appropriate FHIR resource types based on CDA section template IDs.
+5. Handle time periods and ensure consistent formatting of date/time information.
+
+These utilities work together to transform complex CDA structures into FHIR-compliant resources, ensuring data consistency and adherence to FHIR standards throughout the conversion process.
+
+## Key Files
+
+1. `GenerateId.hbs`: Creates unique identifiers for FHIR resources based on CDA data.
+2. `ContactRoleCode.hbs`: Maps contact role codes to standardized display names and code systems.
+3. `ResourceTypeFromSection.hbs`: Determines the appropriate FHIR resource type based on CDA section template IDs.
+4. `ObservationCategoryDisplayFromCode.hbs`: Converts observation category codes to human-readable display names.
+5. `RelatedPersonCodeFromText.hbs`: Maps textual descriptions of personal relationships to standardized codes and display names.
+6. `ReasonForVisit.hbs`: Extracts and formats "Reason for Visit" information from CDA documents.
+7. `VisitDiagnosis.hbs`: Extracts and formats visit diagnosis information from CDA documents.
+
+These files contain Handlebars templates that process specific aspects of CDA data, transforming it into FHIR-compliant structures. They use various helper functions and conditional logic to handle the complexities of CDA to FHIR conversion.
+
+## Dependencies
+The utilities in this directory rely on the Handlebars templating engine for processing and rendering. They also use custom helper functions that are not defined within these files but are assumed to be available in the Handlebars environment. Some of these helpers include:
+
+- `generateUUID`: Generates a UUID based on input data.
+- `concatDefined`: Concatenates defined values from input objects.
+- `nullFlavorAwareOr`: Checks for null or empty values in a null-flavor aware manner.
+- `getFirstCdaSectionsByTemplateId`: Extracts specific sections from CDA documents based on template IDs.
+- `toArray`, `elementAt`, `contains`, `toString`, `toJsonString`: Various utility functions for data manipulation and comparison.
+
+Additionally, some templates reference other partial templates, such as `CodeableConcept.hbs` and `Period.hbs`, which are used for formatting specific FHIR data types.
+
+## Configuration
+These utilities do not have explicit configuration files. However, they often use hardcoded values for code systems, template IDs, and mappings. For example:
+
+- `ContactRoleCode.hbs` uses the code system "2.16.840.1.113883.5.111" for all contact role codes.
+- `ResourceTypeFromSection.hbs` contains a mapping of CDA template IDs to FHIR resource types.
+- `RelatedPersonCodeFromText.hbs` includes a comprehensive list of relationship descriptions and their corresponding codes.
+
+These hardcoded values effectively serve as configuration for the conversion process and may need to be updated if standards or requirements change.
+
+In conclusion, this Utils directory provides a set of essential tools for the CDA to FHIR conversion process, handling various aspects of data transformation and standardization. The templates work together to ensure that CDA data is accurately and consistently converted to FHIR-compliant resources.

@@ -1,0 +1,82 @@
+---
+title: "oss-api.ts"
+---
+
+## High-level description
+This code defines an API client for interacting with an OSS (Open Source Software) API. It provides functions for notifying the API about document conversion status and creating feedback. The client is designed to handle network retries and supports both deprecated and current API endpoints.
+
+## Code Structure
+The main function `apiClient` creates and returns an object with methods for interacting with the API. It uses axios for making HTTP requests and includes retry logic for network operations.
+
+## Symbols
+
+### `apiClient`
+#### Description
+Creates and returns an API client object with methods for interacting with the OSS API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| apiURL | string | The base URL for the API |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| client | Object | An object containing methods for API interactions |
+
+#### Internal Logic
+1. Constructs the document progress URL using the provided API URL.
+2. Defines a function to get the create feedback URL.
+3. Implements the `notifyApi` function for sending notifications to the API.
+4. Implements the `createFeedback` function for creating feedback entries.
+5. Returns an object with both deprecated and current API methods.
+
+### `notifyApi`
+#### Description
+Sends a notification to the API about document conversion status.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | NotificationParams | Parameters for the notification |
+| log | Function | Logging function |
+
+#### Internal Logic
+1. Logs the notification attempt.
+2. Uses `executeWithNetworkRetries` to make a POST request to the API.
+3. Retries on timeout and has a maximum number of attempts.
+
+### `createFeedback`
+#### Description
+Creates a feedback entry in the API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | CreateFeedback & \{ id: string \} | Parameters for creating feedback |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | AxiosResponse | The API response |
+
+#### Internal Logic
+1. Constructs the feedback URL using the provided ID.
+2. Makes a PUT request to the API with the feedback parameters.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/shared | Provides utility functions like `executeWithNetworkRetries` |
+| axios | Used for making HTTP requests |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| MAX_API_NOTIFICATION_ATTEMPTS | number | 5 | Maximum number of retry attempts for API notifications |
+
+## Error Handling
+The code uses `executeWithNetworkRetries` for handling network errors and retrying failed requests. It specifically retries on timeout errors.
+
+## Side Effects
+The `notifyApi` and `createFeedback` functions make HTTP requests to external APIs, which can have side effects on the server-side.

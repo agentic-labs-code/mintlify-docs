@@ -1,0 +1,73 @@
+---
+title: "ccda-search-connector.ts"
+---
+
+## High-level description
+This code defines a `CCDAOpenSearch` connector for integrating CCDA (Consolidated Clinical Document Architecture) documents with OpenSearch. It sets up the necessary AWS infrastructure, including an SQS queue, Lambda function, and OpenSearch domain, to process and index CCDA documents stored in an S3 bucket.
+
+## Code Structure
+The main function `setup` creates and configures the required AWS resources. It uses helper functions and constructs from other modules to set up the OpenSearch domain, SQS queue, and Lambda function. The `settings` function provides configuration values for the connector.
+
+## Symbols
+
+### `settings()`
+#### Description
+This function returns the configuration settings for the CCDAOpenSearch connector, including OpenSearch settings and SQS queue parameters.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | OpenSearchConnectorConfig & \{ connectorName: string; sqs: \{ ... \} \} | Configuration object for the connector |
+
+### `setup()`
+#### Description
+This function sets up the CCDAOpenSearch connector by creating and configuring the necessary AWS resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| stack | Construct | The CDK construct representing the stack |
+| awsAccount | string | The AWS account ID |
+| vpc | IVpc | The VPC to deploy the resources in |
+| ccdaS3Bucket | s3.IBucket | The S3 bucket containing CCDA documents |
+| lambdaLayers | LambdaLayers | Lambda layers to be used |
+| envType | EnvType | The environment type (e.g., production, staging) |
+| alarmSnsAction | SnsAction | (Optional) SNS action for alarms |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queue | IQueue | The SQS queue for processing CCDA documents |
+| lambda | IFunction | The Lambda function for processing queue messages |
+| searchDomain | IDomain | The OpenSearch domain |
+| searchDomainUserName | string | The username for accessing the OpenSearch domain |
+| searchDomainSecret | ISecret | The secret containing the OpenSearch domain password |
+| indexName | string | The name of the OpenSearch index |
+
+#### Internal Logic
+1. Retrieves configuration settings using the `settings()` function.
+2. Creates an OpenSearch domain using the `OpenSearchConstruct`.
+3. Sets up an SQS queue for processing CCDA documents.
+4. Creates a Lambda function to process messages from the SQS queue and index documents in OpenSearch.
+5. Configures necessary permissions and event sources.
+6. Sets up CloudWatch alarms for monitoring.
+
+## Dependencies
+- aws-cdk-lib: Various CDK constructs for AWS services
+- constructs: CDK's Construct class
+- ../../config/open-search-config: OpenSearch configuration
+- ../env-type: Environment type definitions
+- ../shared/config: Shared configuration utilities
+- ../shared/lambda: Lambda creation utilities
+- ../shared/lambda-layers: Lambda layers
+- ../shared/open-search-construct: OpenSearch domain creation utility
+- ../shared/sqs: SQS queue creation utilities
+
+## Error Handling
+The code doesn't implement explicit error handling. It relies on CDK's built-in error handling and propagation.
+
+## Logging
+There's no explicit logging implemented in this code. Logging would typically be handled by the individual AWS services (e.g., CloudWatch Logs for Lambda functions).
+
+## API/Interface Reference
+This module doesn't expose a public API. It's designed to be used as part of the CDK stack definition process.

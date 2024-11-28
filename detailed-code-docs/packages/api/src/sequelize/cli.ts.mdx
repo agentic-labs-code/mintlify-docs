@@ -1,0 +1,53 @@
+---
+title: "cli.ts"
+---
+
+## High-level description
+This code provides a command-line interface (CLI) for managing database migrations using Sequelize and Umzug. It reads database credentials from environment variables, initializes a Sequelize instance, and executes Umzug commands based on user input.
+
+## References
+- `getUmzugWithMeta`: This function is imported from `./index` and is responsible for initializing and returning an Umzug instance configured with Sequelize.
+
+## Symbols
+### `main`
+#### Description
+This asynchronous function serves as the entry point for the CLI. It retrieves an Umzug instance and metadata about migrations, logs the migration status, and then executes Umzug commands based on user input.
+
+#### Inputs
+- None
+
+#### Outputs
+- None (exits the process after running migrations)
+
+#### Internal Logic
+1. **Retrieve Umzug instance and migration metadata:**
+   - Calls `getUmzugWithMeta(sequelize)` to obtain an Umzug instance, the total number of migrations, the number of executed migrations, the number of pending migrations, and the timestamp of the last executed migration.
+2. **Log migration status:**
+   - Prints a formatted message to the console displaying the migration status information.
+3. **Execute Umzug commands:**
+   - Calls `umzug.runAsCLI()` to execute Umzug commands based on user input. This function handles parsing command-line arguments and running the appropriate migration commands.
+4. **Exit process:**
+   - Calls `process.exit()` to terminate the process after running the migrations.
+
+## Side Effects
+- **Database Migrations:** This code directly interacts with the database to perform migrations based on user input.
+- **Process Termination:** The `process.exit()` call terminates the Node.js process after executing migrations.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv     | Loads environment variables from a `.env` file. |
+| sequelize  | Provides an ORM for interacting with SQL databases. |
+| @metriport/core | Provides custom error class for error handling. |
+
+## Configuration
+- **Database Credentials:** The code reads database connection details from the `DB_CREDS` environment variable. This variable should contain a JSON string with the following keys: `dbname`, `username`, `password`, `host`, `port`, and `engine`.
+
+## Error Handling
+- **Environment Variable Parsing:** The code includes a `try...catch` block to handle potential errors when parsing the `DB_CREDS` environment variable. If an error occurs, it logs an error message and throws a `MetriportError`.
+
+## Logging
+- **Migration Status:** The code logs the current migration status to the console, including the number of executed, pending, and total migrations, as well as the timestamp of the last executed migration.
+
+## TODOs
+- None

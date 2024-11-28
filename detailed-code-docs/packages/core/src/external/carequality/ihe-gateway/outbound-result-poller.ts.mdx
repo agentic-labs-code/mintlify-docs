@@ -1,0 +1,75 @@
+---
+title: "outbound-result-poller.ts"
+---
+
+## High-level description
+This code defines an abstract class `OutboundResultPoller` and a type `PollOutboundResults` for handling outbound result polling in a healthcare interoperability context. It provides a structure for implementing polling mechanisms for patient discovery, document query, and document retrieval operations.
+
+## Code Structure
+The code consists of two main parts: the `PollOutboundResults` type and the `OutboundResultPoller` abstract class. The abstract class defines methods that need to be implemented by concrete classes to handle different types of outbound result polling.
+
+## Symbols
+
+### `PollOutboundResults`
+#### Description
+A type definition that specifies the structure of parameters required for polling outbound results.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| requestId | string | Unique identifier for the request |
+| patientId | string | Identifier for the patient |
+| cxId | string | Context identifier |
+| numOfGateways | number | Number of gateways to poll |
+| maxPollingDuration | number \| undefined | Optional maximum duration for polling |
+
+### `OutboundResultPoller`
+#### Description
+An abstract class that defines the structure for implementing outbound result polling operations.
+
+#### Methods
+1. `isPDEnabled`
+   - Description: Checks if Patient Discovery is enabled
+   - Input: `lambdaName` (optional string)
+   - Output: boolean
+
+2. `pollOutboundPatientDiscoveryResults`
+   - Description: Polls for outbound patient discovery results
+   - Input: `params` (PollOutboundResults)
+   - Output: Promise&lt;void&gt;
+
+3. `isDQEnabled`
+   - Description: Checks if Document Query is enabled
+   - Input: `lambdaName` (optional string)
+   - Output: boolean
+
+4. `pollOutboundDocQueryResults`
+   - Description: Polls for outbound document query results
+   - Input: `params` (PollOutboundResults)
+   - Output: Promise&lt;void&gt;
+
+5. `isDREnabled`
+   - Description: Checks if Document Retrieval is enabled
+   - Input: `lambdaName` (optional string)
+   - Output: boolean
+
+6. `pollOutboundDocRetrievalResults`
+   - Description: Polls for outbound document retrieval results
+   - Input: `params` (PollOutboundResults)
+   - Output: Promise&lt;void&gt;
+
+## Dependencies
+This code doesn't directly import any external libraries, but it is designed to be extended and used in conjunction with other parts of the system, as seen in the related code snippets.
+
+## References
+The `PollOutboundResults` type and `OutboundResultPoller` class are referenced in the related code snippets:
+1. `ihe-outbound-patient-discovery.ts`
+2. `ihe-outbound-document-query.ts`
+
+These files implement Lambda functions that use concrete implementations of the `OutboundResultPoller` (specifically `OutboundResultPollerDirect`) to perform polling operations.
+
+## Notes
+1. The code is part of a larger system dealing with healthcare interoperability, likely implementing IHE (Integrating the Healthcare Enterprise) profiles.
+2. The abstract class design allows for different implementations of polling mechanisms, providing flexibility in how results are retrieved and processed.
+3. The related code snippets show that this structure is used in AWS Lambda functions, indicating a serverless architecture for handling these operations.
+4. Error handling and logging are implemented in the Lambda functions, not in the abstract class itself, allowing for more specific error management in each use case.

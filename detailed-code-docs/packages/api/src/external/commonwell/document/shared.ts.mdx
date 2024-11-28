@@ -1,0 +1,92 @@
+---
+title: "shared.ts"
+---
+
+## High-level description
+This code defines shared types and utility functions for handling CommonWell documents in the Metriport API. It provides data structures for documents with additional Metriport-specific information and functions for generating file names and content types.
+
+## Symbols
+
+### `sandboxSleepTime`
+#### Description
+A constant that defines the sleep time for sandbox operations.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sandboxSleepTime | number | The sleep time in milliseconds (5000ms or 5 seconds) |
+
+### `DocumentWithMetriportId`
+#### Description
+A type that extends the `Document` type from the CommonWell SDK with an additional `originalId` field.
+
+### `DocumentWithLocation`
+#### Description
+A type that extends `DocumentWithMetriportId` and includes a `content` field with a `location` property.
+
+### `CWDocumentWithMetriportData`
+#### Description
+A type that extends `DocumentWithMetriportId` and includes a `metriport` field with additional Metriport-specific data.
+
+### `getFileName`
+#### Description
+A function that generates a file name based on the patient and document information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient object |
+| doc | Document | The document object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileName | string | The generated file name |
+
+#### Internal Logic
+1. Creates a prefix using the patient ID.
+2. Extracts the display name from the document's content type coding.
+3. Gets a suffix from the document ID.
+4. Determines the file extension based on the document's MIME type.
+5. Combines these elements to create the file name.
+6. Replaces spaces with hyphens in the final file name.
+
+### `getSuffix`
+#### Description
+A private function that generates a suffix from a given ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string \| undefined | The ID to generate a suffix from |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| suffix | string | The generated suffix |
+
+#### Internal Logic
+Removes the "urn:uuid:" prefix from the ID if present, otherwise returns an empty string.
+
+### `getContentTypeOrUnknown`
+#### Description
+A function that retrieves the content type of a document or returns "unknown" if not available.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| doc | Document | The document object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| contentType | string | The content type or "unknown" |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/commonwell-sdk | Provides the `Document` type |
+| @metriport/core/domain/patient | Provides the `Patient` type |
+| @metriport/core/util/mime | Provides the `getFileExtension` function |
+
+This code is part of a larger system for handling medical documents and patient data, specifically integrating with the CommonWell Health Alliance's services. It provides utility functions and type definitions that are likely used throughout the API for consistent document handling and naming conventions.

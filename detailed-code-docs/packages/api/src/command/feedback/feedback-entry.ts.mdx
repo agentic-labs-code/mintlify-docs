@@ -1,0 +1,103 @@
+---
+title: "feedback-entry.ts"
+---
+
+## High-level description
+The `feedback-entry.ts` file contains the logic for managing feedback entries associated with AI briefs. It provides functions for creating new feedback entries, retrieving existing ones, and sending notifications to Slack when new feedback is received.
+
+## Code Structure
+The code defines several functions related to feedback entries: `createFeedbackEntry`, `getFeedbackEntry`, and `getFeedbackEntryOrFail`. The `createFeedbackEntry` function is responsible for creating new feedback entries and sending notifications. It utilizes the `getFeedbackOrFail` function to retrieve the associated feedback. The `getFeedbackEntry` and `getFeedbackEntryOrFail` functions handle retrieving feedback entries by ID, with the latter throwing an error if the entry is not found.
+
+## References
+- `@metriport/core/external/aws/s3`: Used for generating signed URLs for S3 objects.
+- `@metriport/core/external/slack/index`: Used for sending notifications to Slack.
+- `@metriport/core/util/config`: Used for retrieving configuration values.
+- `@metriport/core/util/uuid-v7`: Used for generating UUIDs.
+- `@metriport/shared`: Provides shared utilities and error classes.
+- `dayjs`: Used for date and time manipulation.
+- `duration`: A plugin for `dayjs` that adds duration functionality.
+- `FeedbackEntry`, `FeedbackEntryCreate`: Domain models representing feedback entries.
+- `FeedbackEntryModel`: Sequelize model for interacting with the `feedback_entry` database table.
+- `normalizeString`: A utility function for normalizing strings.
+- `getFeedbackOrFail`: A function for retrieving feedback by ID or throwing an error.
+
+## Symbols
+
+### `createFeedbackEntry`
+#### Description
+Creates a new feedback entry in the database and sends a notification to Slack.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| feedbackId | string | The ID of the feedback to which this entry belongs. |
+| comment | string | The feedback comment. |
+| authorName | string | The name of the feedback author. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| feedbackEntry | `FeedbackEntry` | The newly created feedback entry. |
+
+#### Internal Logic
+1. Retrieves the associated feedback using `getFeedbackOrFail`.
+2. Creates a new `FeedbackEntryModel` instance with the provided data.
+3. Generates a signed URL for the feedback's MR location (if available).
+4. Sends a notification to Slack with the feedback details.
+5. Returns the newly created feedback entry.
+
+### `getFeedbackEntry`
+#### Description
+Retrieves a feedback entry from the database by ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The ID of the feedback entry. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| entry | `FeedbackEntryModel` \| undefined | The retrieved feedback entry, or undefined if not found. |
+
+#### Internal Logic
+1. Queries the database for a `FeedbackEntryModel` with the matching ID.
+2. Returns the found entry, or undefined if none is found.
+
+### `getFeedbackEntryOrFail`
+#### Description
+Retrieves a feedback entry from the database by ID, throwing an error if not found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string | The ID of the feedback entry. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| entry | `FeedbackEntryModel` | The retrieved feedback entry. |
+
+#### Internal Logic
+1. Calls `getFeedbackEntry` to retrieve the entry.
+2. If the entry is not found, throws a `NotFoundError`.
+3. Otherwise, returns the found entry.
+
+## Side Effects
+- Creates new entries in the `feedback_entry` database table.
+- Sends notifications to a Slack channel specified in the configuration.
+
+## Dependencies
+- `@metriport/core/external/aws/s3`
+- `@metriport/core/external/slack/index`
+- `@metriport/core/util/config`
+- `@metriport/core/util/uuid-v7`
+- `@metriport/shared`
+- `dayjs`
+- `dayjs/plugin/duration`
+
+## Error Handling
+- Throws a `NotFoundError` if a feedback entry is not found when using `getFeedbackEntryOrFail`.
+
+## Logging
+- Logs an error message to the console if sending a Slack notification fails due to a missing URL.

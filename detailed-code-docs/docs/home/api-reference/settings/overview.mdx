@@ -1,0 +1,64 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains documentation for the Settings API endpoints in the Metriport Medical API. It covers four main operations: retrieving settings, updating settings, getting webhook status, and retrying webhook requests. These endpoints allow users to manage their account settings, particularly focusing on webhook configurations and status.
+
+## What does it do?
+The Settings API provides functionality to:
+1. Retrieve current account settings, including webhook URL and authentication key.
+2. Update account settings, specifically the webhook URL.
+3. Check the status of the webhook, including whether it's enabled, any error messages, and the number of requests being processed or failed.
+4. Trigger a retry of failed webhook requests.
+
+These operations are crucial for integrating Metriport's services with a user's application, especially for setting up and managing webhooks for real-time data updates.
+
+## Key Files
+1. `get-settings.mdx`: Documents the GET /settings endpoint, which retrieves the current account settings.
+2. `post-settings.mdx`: Covers the POST /settings endpoint, used for updating the webhook URL in the account settings.
+3. `get-webhook.mdx`: Describes the GET /settings/webhook endpoint, which provides detailed status information about the webhook.
+4. `retry-webhook.mdx`: Explains the POST /settings/webhook/retry endpoint, used to retry failed webhook requests.
+
+## Dependencies
+The documentation references the Metriport SDK, specifically the `MetriportMedicalApi` class from the `@metriport/api-sdk` package. This SDK is used in the code examples to demonstrate how to interact with the API endpoints.
+
+## Configuration
+The API endpoints require an API key for authentication. This is demonstrated in the code examples where a `MetriportMedicalApi` instance is created with `"YOUR_API_KEY"`.
+
+Key configurable fields include:
+- `webhookUrl`: The URL where webhook notifications will be sent.
+- `webhookKey`: An authentication key for securing webhook calls.
+
+Here's an example of how to use the Metriport SDK to update settings:
+
+```javascript
+import { MetriportMedicalApi } from "@metriport/api-sdk";
+
+const metriportClient = new MetriportMedicalApi("YOUR_API_KEY");
+
+const response = await metriportClient.updateSettings("https://api.health.com/webhook");
+```
+
+The response from the settings endpoints typically includes:
+
+```json
+{
+  "id": "&lt;settings-id&gt;",
+  "webhookUrl": "https://server.domain.com/webhook/endpoint",
+  "webhookKey": "&lt;webhook-key&gt;"
+}
+```
+
+The webhook status endpoint provides more detailed information:
+
+```json
+{
+  "webhookEnabled": false,
+  "webhookStatusDetail": "Request failed with status code 404",
+  "webhookRequestsProcessing": 0,
+  "webhookRequestsFailed": 3
+}
+```
+
+These endpoints are crucial for managing the integration between a user's application and Metriport's services, particularly for setting up and monitoring real-time data updates via webhooks.

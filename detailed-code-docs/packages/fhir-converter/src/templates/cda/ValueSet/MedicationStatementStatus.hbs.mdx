@@ -1,0 +1,48 @@
+---
+title: "MedicationStatementStatus.hbs"
+---
+
+## High-level description
+This Handlebars template file is designed to map medication statement status codes from a source format (likely CDA) to the FHIR R4 MedicationStatement status codes. It provides a standardized way to convert various status codes to the appropriate FHIR status, ensuring consistency in medication statement status representation.
+
+## Symbols
+
+### Main Template Logic
+#### Description
+The template takes an input `code` and maps it to the corresponding FHIR MedicationStatement status.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | string | The input status code to be mapped |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | string | The mapped FHIR MedicationStatement status |
+
+#### Internal Logic
+1. Check if a `code` is provided.
+2. If provided, convert the code to lowercase for case-insensitive matching.
+3. Use a series of conditional statements to map the normalized code to the appropriate FHIR status:
+   - "aborted", "discontinued", "stopped", "failed" map to "stopped"
+   - "in-progress", "active", "not-done" map to "active"
+   - "entered-in-error", "error", "nullified" map to "entered-in-error"
+   - "on-hold", "suspended" map to "on-hold"
+   - "complete", "completed" map to "completed"
+   - Any other value maps to "unknown"
+4. If no code is provided or the code is an empty string, return "unknown"
+
+## Dependencies
+This template relies on the Handlebars templating engine for its functionality.
+
+## Configuration
+The template doesn't have any explicit configuration options. The mapping is hardcoded based on the ConceptMap defined in the HL7 CCDA on FHIR implementation guide.
+
+## Error Handling
+The template handles potential errors by defaulting to "unknown" status in cases where:
+- No code is provided
+- The provided code is an empty string
+- The provided code doesn't match any of the defined mappings
+
+This approach ensures that the template always produces a valid FHIR MedicationStatement status, even with unexpected input.

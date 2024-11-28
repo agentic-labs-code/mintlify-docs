@@ -1,0 +1,58 @@
+---
+title: "document-bulk-signer-factory.ts"
+---
+
+## High-level description
+This code defines a factory function `makeDocumentBulkSigner` that creates and returns an instance of `DocumentBulkSigner` based on the current environment configuration. It provides different implementations for development and production environments.
+
+## Code Structure
+The main function `makeDocumentBulkSigner` uses configuration settings to determine which implementation of `DocumentBulkSigner` to instantiate. It imports necessary classes and utilities from other modules.
+
+## References
+- `DocumentBulkSignerLambda` from "@metriport/core/external/aws/document-signing/document-bulk-signer-lambda"
+- `DocumentBulkSignerLocal` from "@metriport/core/external/aws/document-signing//document-bulk-signer-local"
+- `DocumentBulkSigner` from "@metriport/core/external/aws/document-signing//document-bulk-signer"
+- `Config` from "@metriport/core/util/config"
+
+## Symbols
+
+### makeDocumentBulkSigner
+#### Description
+This function creates and returns an instance of `DocumentBulkSigner` based on the current environment configuration.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | DocumentBulkSigner | An instance of either DocumentBulkSignerLocal or DocumentBulkSignerLambda |
+
+#### Internal Logic
+1. Retrieves the AWS region using `Config.getAWSRegion()`.
+2. Checks if the environment is development using `Config.isDev()`.
+3. If in development:
+   - Retrieves the bucket name for medical documents and API URL.
+   - Returns a new instance of `DocumentBulkSignerLocal`.
+4. If not in development:
+   - Returns a new instance of `DocumentBulkSignerLambda`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/external/aws/document-signing/document-bulk-signer-lambda | Provides DocumentBulkSignerLambda class |
+| @metriport/core/external/aws/document-signing//document-bulk-signer-local | Provides DocumentBulkSignerLocal class |
+| @metriport/core/external/aws/document-signing//document-bulk-signer | Provides DocumentBulkSigner abstract class |
+| @metriport/core/util/config | Provides configuration utilities |
+
+### Configuration
+The code uses the following configuration options:
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| AWS_REGION | string | AWS region for the services |
+| MEDICAL_DOCUMENTS_BUCKET_NAME | string | S3 bucket name for medical documents (dev only) |
+| API_URL | string | API URL for the application (dev only) |
+
+## Constants
+| Name | Type | Value | Description |
+|:-----|:-----|:------|:------------|
+| bulkSigningLambdaName | string | "BulkUrlSigningLambda" | Name of the Lambda function for bulk URL signing |
+
+This factory function provides a flexible way to create the appropriate `DocumentBulkSigner` instance based on the environment, allowing for different implementations in development and production settings. The development environment uses a local implementation, while the production environment uses a Lambda-based implementation for document bulk signing.

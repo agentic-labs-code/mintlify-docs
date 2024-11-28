@@ -1,0 +1,84 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains TypeScript models and schemas for various data types used in the Whoop API integration. It uses the Zod library for schema validation and type inference, ensuring type safety and data integrity when working with Whoop API responses.
+
+## What does it do?
+This directory defines the structure and types for different aspects of user data retrieved from the Whoop API, including:
+
+1. Body metrics (height, weight, max heart rate)
+2. Cycle data (representing periods of activity and rest)
+3. Recovery data (sleep quality, heart rate variability, etc.)
+4. Sleep data (sleep stages, duration, quality scores)
+5. User profile information
+6. Workout data (duration, intensity, heart rate zones)
+
+These models serve as a bridge between the raw JSON data received from the Whoop API and the typed TypeScript objects used in the application. They ensure that the data is properly structured and validated before being used in other parts of the codebase.
+
+## Key Files
+
+1. `body.ts`: Defines the `WhoopBody` type for body metrics data.
+2. `cycle.ts`: Contains the `WhoopCycle` type representing Whoop activity cycles.
+3. `recovery.ts`: Defines the `WhoopRecovery` type for recovery metrics.
+4. `score.ts`: Specifies the `WhoopScore` type for various scoring states.
+5. `sleep.ts`: Contains the `WhoopSleep` type for detailed sleep data.
+6. `user.ts`: Defines the `WhoopUser` type for user profile information.
+7. `workout.ts`: Specifies the `WhoopWorkout` type for workout session data.
+
+Each file follows a similar pattern:
+
+1. It imports necessary dependencies, primarily the Zod library.
+2. It defines a Zod schema (e.g., `whoopBodyResp`, `whoopCycleResp`) that describes the expected structure and types of the API response.
+3. It creates a TypeScript type alias (e.g., `WhoopBody`, `WhoopCycle`) using Zod's `z.infer&lt;&gt;` to derive the type from the schema.
+
+These types and schemas are likely used in other parts of the application to ensure type safety when working with Whoop API data, such as in API client functions, data mapping utilities, or database operations.
+
+## Dependencies
+The primary dependency used across all files in this directory is the Zod library. Zod is used for runtime type checking and schema validation, which helps ensure that the data received from the Whoop API conforms to the expected structure and types.
+
+```typescript
+import { z } from "zod";
+```
+
+Zod is particularly useful in this context because it allows for:
+1. Runtime type checking of API responses
+2. Automatic TypeScript type inference
+3. Easy schema composition and reuse
+
+Some files also import types or schemas from other files within the same directory, such as the `whoopScoreSchema` used in multiple files.
+
+## Configuration
+While there's no explicit configuration in these files, they do define the expected structure of the Whoop API responses. This acts as a form of configuration for the application, ensuring that it can properly handle and process the data received from the API.
+
+For example, the `whoopWorkoutResp` schema in `workout.ts` defines the expected fields for a workout:
+
+```typescript
+const whoopWorkoutResp = z.object({
+  id: z.number(),
+  user_id: z.number(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  start: z.string(),
+  end: z.string(),
+  timezone_offset: z.string(),
+  sport_id: z.number(),
+  score_state: whoopScoreSchema,
+  score: z.object({
+    // ... various workout metrics
+  }).nullable().optional(),
+});
+```
+
+This schema serves as a configuration that defines what fields are expected in a workout response and what types those fields should have. If the API response doesn't match this schema, it will fail validation, allowing the application to handle such cases appropriately.
+
+It's worth noting that there's a TODO comment in the `workout.ts` file regarding mapping `sport_id` to activity types:
+
+```typescript
+// TODO: map sport_id to some activity types, can't find a definition for this anywhere.
+```
+
+This suggests that there might be a need for additional configuration or mapping in the future to translate the numeric `sport_id` into meaningful activity types.
+
+In summary, this directory provides a robust type system for working with Whoop API data, ensuring type safety and data integrity throughout the application that uses these models.

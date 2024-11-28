@@ -1,0 +1,60 @@
+---
+title: "document-downloader.test.ts"
+---
+
+## High-level description
+This file contains a test suite for the `DocumentDownloaderLocal` class, which is responsible for downloading documents from CommonWell and storing them in S3. The tests are designed to be run locally and not in CI/CD environments.
+
+## Code Structure
+The test file imports necessary dependencies and defines a `DocumentDownloaderForTest` class that extends `DocumentDownloaderLocal`. It then sets up a test suite with environment variables and configurations for CommonWell and S3. The main test case checks if a document can be downloaded from CommonWell and stored in S3 correctly.
+
+## Symbols
+
+### `DocumentDownloaderForTest`
+#### Description
+A class that extends `DocumentDownloaderLocal` to expose protected methods for testing purposes.
+
+#### Internal Logic
+Overrides two methods from the parent class to make them accessible for testing:
+1. `getUploadStreamToS3`
+2. `downloadDocumentFromCW`
+
+### `describe.skip("document-downloader", () =&gt; {...})`
+#### Description
+A test suite for the document downloader functionality, skipped by default.
+
+#### Internal Logic
+1. Sets up environment variables and configurations for CommonWell and S3.
+2. Creates instances of `CommonWell`, `S3Utils`, and `DocumentDownloaderForTest`.
+3. Defines a test case to download a document from CommonWell and store it in S3.
+
+### `it("should download the document from cw and store in s3", async () =&gt; {...})`
+#### Description
+A test case that verifies the document download and storage process.
+
+#### Internal Logic
+1. Checks if required objects are defined.
+2. Gets an upload stream to S3 using `getUploadStreamToS3`.
+3. Downloads the document from CommonWell using `downloadDocumentFromCW`.
+4. Waits for the upload to complete and checks the result.
+5. Verifies the uploaded file's size and content type in S3.
+
+## Dependencies
+- `@metriport/commonwell-sdk`: For CommonWell API interactions
+- `stream`: For handling data streams
+- `../../../../domain/oid`: For OID-related utilities
+- `../../../../util/env-var`: For environment variable handling
+- `../../../aws/s3`: For S3 utilities
+- `../document-downloader-local`: For the main `DocumentDownloaderLocal` class
+
+## Configuration
+The test suite uses various environment variables for configuration, including:
+- CommonWell credentials and organization details
+- S3 bucket and region information
+- File details (name, location, MIME type, size)
+
+## Error Handling
+The test case includes basic error checking by throwing errors if required objects are undefined.
+
+## TODOs
+The test suite is skipped (`describe.skip`) and meant to be run locally, not in CI/CD environments. This suggests that there might be plans to implement a more robust testing strategy for CI/CD in the future.

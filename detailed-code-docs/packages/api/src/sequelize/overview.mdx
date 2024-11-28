@@ -1,0 +1,55 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `packages/api/src/sequelize` directory contains code for managing database migrations and interactions using Sequelize ORM in the API component of the project. It includes a command-line interface for running migrations, utility functions for managing the migration process, and a collection of migration scripts that define the evolution of the database schema over time.
+
+## What does it do?
+This directory provides functionality to:
+
+1. Initialize and manage database connections using Sequelize.
+2. Execute database migrations through a command-line interface.
+3. Define and apply changes to the database schema, including creating new tables, modifying existing ones, adding indexes, and implementing data transformations.
+4. Handle migration errors and provide rollback capabilities.
+5. Offer utility functions for creating tables with default columns and triggers.
+6. Manage the evolution of various entities in the database, such as users, organizations, facilities, and patients.
+
+The code allows developers to maintain and update the database schema in a controlled and versioned manner, ensuring consistency across different environments and facilitating collaborative development.
+
+## Entry points
+The main entry points for this directory are:
+
+1. `cli.ts`: Provides a command-line interface for running database migrations. It reads database credentials from environment variables, initializes a Sequelize instance, and executes Umzug commands based on user input.
+
+2. `index.ts`: Exports functions for managing the migration process, including `getUmzug` for retrieving an Umzug instance and `updateDB` for executing pending migrations.
+
+3. `migrations/`: This directory contains individual migration scripts that define specific changes to the database schema. Each script typically has an `up` function to apply changes and a `down` function to revert them.
+
+4. `migrations-shared.ts`: Provides utility functions and a base model definition for creating tables with default columns and triggers.
+
+The flow of control typically starts from the CLI, which uses the functions in `index.ts` to manage the migration process. The migration process then executes the individual scripts in the `migrations/` directory, utilizing the utility functions from `migrations-shared.ts` as needed.
+
+## Key Files
+1. `cli.ts`: The command-line interface for running migrations.
+2. `index.ts`: Contains core functions for managing the migration process.
+3. `migrations-shared.ts`: Provides utility functions for creating tables and defining common columns.
+4. `migrations/*.ts`: Individual migration scripts defining specific schema changes.
+
+## Dependencies
+The code in this directory primarily depends on:
+
+1. Sequelize (^6.32.1): An ORM for Node.js, used for defining models and interacting with the database.
+2. Umzug: A migration framework for Node.js, used in conjunction with Sequelize to manage the execution of migrations.
+3. dotenv: Used to load environment variables from a `.env` file.
+4. @metriport/core: A local package that provides utility functions and shared types.
+5. @metriport/shared/config: Provides configuration settings for the project.
+
+## Configuration
+The migration process relies on several configuration elements:
+
+1. Database Credentials: Stored in the `DB_CREDS` environment variable as a JSON string containing `dbname`, `username`, `password`, `host`, `port`, and `engine`.
+2. Migration File Path: Determined based on the environment using the `Config` class from `@metriport/shared/config`.
+3. Sequelize Configuration: Likely defined in a separate configuration file (not shown in the provided code snippets) that specifies database connection details and other Sequelize options.
+
+The `cli.ts` file reads these configurations to set up the database connection and run migrations, while individual migration scripts use the Sequelize configuration to define and apply schema changes.

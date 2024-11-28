@@ -1,0 +1,85 @@
+---
+title: "bundle-to-brief.ts"
+---
+
+## High-level description
+This code is responsible for converting a FHIR (Fast Healthcare Interoperability Resources) bundle to a brief summary and an HTML or PDF medical record summary. It includes functionality for deduplicating FHIR data, generating AI-powered briefs, and storing the results in S3.
+
+## Code Structure
+The main function `bundleToBrief` processes the FHIR bundle, potentially deduplicates it, generates an AI brief if enabled, and creates an HTML summary. The `BedrockUtils` class is used to interact with AWS Bedrock for AI-powered brief generation. Various utility functions are used for data processing, S3 interactions, and HTML generation.
+
+## Symbols
+
+### `bundleToBrief`
+#### Description
+This function converts a FHIR bundle to a brief summary.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fhirBundle | Bundle | The FHIR bundle to process |
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| brief | string \| undefined | The generated brief summary |
+
+#### Internal Logic
+1. Prepares the bundle for brief generation by deduplicating and filtering resources.
+2. Generates a prompt for the AI model.
+3. Uses BedrockUtils to get an AI-generated response.
+4. Returns the generated brief or undefined if an error occurs.
+
+### `prepareBundleForBrief`
+#### Description
+Prepares the FHIR bundle for brief generation by deduplicating and filtering resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | Bundle | The FHIR bundle to prepare |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| processedBundle | string \| undefined | The prepared bundle as a string |
+
+#### Internal Logic
+1. Deduplicates bundle resources.
+2. Filters bundle resources.
+3. Preprocesses data using RAG (Retrieval-Augmented Generation) model.
+
+### `BedrockUtils`
+#### Description
+A class for interacting with AWS Bedrock to generate AI-powered responses.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| modelId | string \| undefined | The Bedrock model ID |
+| modelVersion | string \| undefined | The Bedrock model version |
+
+#### Methods
+- `getBedrockResponse`: Sends a request to Bedrock and returns the generated response.
+
+## Side Effects
+- Interacts with AWS S3 to store and retrieve data.
+- Makes API calls to AWS Bedrock for AI-powered brief generation.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | FHIR type definitions |
+| @metriport/shared | Shared utilities |
+| lodash | Utility functions |
+| dayjs | Date manipulation |
+
+## Error Handling
+The code includes error handling for various operations, such as S3 interactions and Bedrock API calls. Errors are logged and captured for monitoring.
+
+## Logging
+The code uses a custom logging utility (`out`) for consistent log formatting.
+
+This code is part of a larger system for processing medical records and generating summaries. It integrates with various AWS services and uses AI capabilities to enhance the summarization process.

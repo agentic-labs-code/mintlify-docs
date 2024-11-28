@@ -1,0 +1,87 @@
+---
+title: "get-user-token.ts"
+---
+
+## High-level description
+The code defines functions for retrieving user tokens from a DynamoDB table named 'token'. It provides functionality to fetch a token by its unique identifier or by an OAuth user access token. 
+
+The code also includes a helper function to convert DynamoDB items into `UserToken` objects and handles potential errors during retrieval.
+
+## Code Structure
+The code defines two main functions: `getUserToken` and `getUserTokenByUAT`. Both functions interact with the DynamoDB table to retrieve user tokens. The `ddbItemAsOAuth` function is a helper function used by both main functions to convert DynamoDB items into `UserToken` objects.
+
+## References
+- `UserToken`: Represents a user token object and is defined in the `../../domain/user-token` module.
+- `NotFoundError`: Represents a "not found" error and is defined in the `../../errors/not-found` module.
+- `docTableNames`, `getDB`: Used for accessing DynamoDB and are defined in the `../../models/db` module.
+- `capture`: Used for logging and is defined in the `../../shared/notifications` module.
+
+## Symbols
+
+### `getUserToken`
+#### Description
+Retrieves a single user token from DynamoDB based on the provided token string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `{ token }` | `GetUserTokenCommand` | An object containing the token string to search for. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `Promise&lt;UserToken&gt;` | `Promise&lt;UserToken&gt;` | A promise that resolves to the found `UserToken` object or throws an error if not found. |
+
+#### Internal Logic
+1. Retrieves an item from the 'token' table in DynamoDB using the provided `token` as the key.
+2. If an item is found:
+    - Converts the DynamoDB item to a `UserToken` object using `ddbItemAsOAuth`.
+    - Sets the user ID in the `capture` logger.
+    - Returns the `UserToken` object.
+3. If no item is found:
+    - Logs an error message.
+    - Throws a `NotFoundError`.
+
+### `getUserTokenByUAT`
+#### Description
+Retrieves a list of user tokens from DynamoDB that match the provided OAuth user access token.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `{ oauthUserAccessToken }` | `GetUserTokenByUATCommand` | An object containing the OAuth user access token to search for. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `Promise&lt;UserToken[]&gt;` | `Promise&lt;UserToken[]&gt;` | A promise that resolves to an array of `UserToken` objects or an empty array if none are found. |
+
+#### Internal Logic
+1. Queries the 'token' table in DynamoDB using the `oauthUserAccessToken_idx` index.
+2. The query searches for items where the `oauthUserAccessToken` attribute matches the provided value.
+3. If items are found:
+    - Maps the DynamoDB items to an array of `UserToken` objects using `ddbItemAsOAuth`.
+    - Returns the array of `UserToken` objects.
+4. If no items are found, returns an empty array.
+
+### `ddbItemAsOAuth`
+#### Description
+Converts a DynamoDB item to a `UserToken` object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `item` | `DocumentClient.AttributeMap` | The DynamoDB item to convert. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `UserToken` | `UserToken` | The converted `UserToken` object. |
+
+#### Internal Logic
+1. Extracts the required attributes (`token`, `cxId`, `userId`, `expiryTime`) from the DynamoDB item.
+2. If any of the required attributes are missing, throws an error.
+3. Constructs a new `UserToken` object using the extracted attributes and returns it.
+
+## TODOs
+- `getUserToken`:  protect the token on log, show only 5 first and last chars

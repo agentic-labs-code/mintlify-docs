@@ -1,0 +1,60 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code contains unit tests for the `buildIheResponseKey` function, which is responsible for constructing file paths for storing IHE (Integrating the Healthcare Enterprise) responses. The tests verify that the function correctly generates file paths for different types of responses, including XCPD (Cross-Community Patient Discovery) and DR (Document Retrieval).
+
+## Symbols
+
+### `buildIheResponseKey`
+#### Description
+This function constructs a file path for storing IHE responses based on the provided parameters. It is not directly defined in the test file but is imported from the "../store" module.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| type | "xcpd" \| "dq" \| "dr" | The type of IHE response |
+| cxId | string | Customer ID |
+| patientId | string | Patient ID |
+| requestId | string | Request ID |
+| oid | string | Organization Identifier |
+| timestamp | string | Timestamp of the request |
+| requestChunkId | string \| undefined | Optional chunk ID for DR requests |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| key | string | The constructed file path for storing the IHE response |
+
+### Test: "should construct the correct file path for type 'xcpd'"
+#### Description
+This test verifies that the `buildIheResponseKey` function correctly constructs a file path for an XCPD response.
+
+#### Internal Logic
+1. Arrange: Set up input parameters for an XCPD response.
+2. Act: Call `buildIheResponseKey` with the arranged parameters.
+3. Assert: Check if the returned key matches the expected file path format.
+
+### Test: "should construct the correct file path for type 'dr' with index"
+#### Description
+This test verifies that the `buildIheResponseKey` function correctly constructs a file path for a DR response, including the optional `requestChunkId`.
+
+#### Internal Logic
+1. Arrange: Set up input parameters for a DR response, including a `requestChunkId`.
+2. Act: Call `buildIheResponseKey` with the arranged parameters.
+3. Assert: Check if the returned key matches the expected file path format, including the `requestChunkId`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| "../store" | Imports the `buildIheResponseKey` function being tested |
+
+## Notes
+- The tests use Jest's `it` function for test cases and `expect` for assertions.
+- The timestamp is provided in ISO 8601 format (YYYY-MM-DDTHH:mm:ss) but only the date part is used in the resulting file path.
+- The `buildIheResponseKey` function seems to handle different types of IHE responses (xcpd, dq, dr) and constructs file paths accordingly.
+- The file paths are structured to include customer ID, patient ID, response type, request ID, date, organization ID, and file extension.
+- For DR responses, an additional `requestChunkId` can be included in the file path.
+
+These tests ensure that the `buildIheResponseKey` function correctly generates file paths for different scenarios, which is crucial for proper storage and retrieval of IHE responses in the system.

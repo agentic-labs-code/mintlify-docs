@@ -1,0 +1,80 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains utility scripts for working with OpenSearch, a distributed search and analytics engine. The scripts provide functionality for cleaning up XML/CDA files, re-populating OpenSearch with data from a FHIR server, and performing simple test operations on OpenSearch.
+
+## What does it do?
+The scripts in this directory perform three main functions:
+
+1. Cleanup: It processes XML/CDA files by reading their contents, cleaning them up using a specialized method, and writing the cleaned content to new files.
+
+2. Re-population: It retrieves document references from a FHIR server for specified customers, loads CCDA/XML documents from S3, cleans them up, and indexes them in OpenSearch. This process is designed to handle large-scale data processing with parallel execution capabilities.
+
+3. Simple Test: It demonstrates basic OpenSearch operations such as creating an index, adding a document to the index, and deleting the index.
+
+These scripts are primarily used for data management, migration, and testing purposes in a healthcare data processing environment that utilizes FHIR standards and OpenSearch for data storage and retrieval.
+
+## Key Files
+
+### cleanup.ts
+This file contains a utility script for cleaning up XML/CDA files. It uses the `OpenSearchFileIngestorDirect` class to process file contents and create cleaned versions of the files.
+
+Key features:
+- Reads a file specified by `fileName`
+- Processes the file contents using the `cleanUpContents` method
+- Writes the cleaned content to a new file with a ".cleaned" extension
+- Measures and logs the total execution time
+
+### re-populate.ts
+This script is responsible for re-populating OpenSearch with data from a FHIR server. It's designed to handle large-scale data processing and includes error handling and parallel execution capabilities.
+
+Key features:
+- Retrieves document references for specified customers from a FHIR server
+- Loads CCDA/XML documents from S3
+- Cleans up the documents
+- Indexes the processed documents in OpenSearch
+- Uses parallel processing for optimized performance
+- Includes error handling for various operations
+
+### simple-test.ts
+This file contains a test script for performing simple operations on OpenSearch using the OpenSearch client library.
+
+Key features:
+- Creates an OpenSearch client
+- Checks if a specified index exists
+- Creates the index if it doesn't exist
+- Adds a sample document to the index
+- Deletes the index
+- Logs operations and results to the console
+
+## Dependencies
+The scripts in this directory rely on several external libraries and frameworks:
+
+1. @metriport/core: Provides core functionality and utilities specific to the Metriport project.
+2. @opensearch-project/opensearch: The OpenSearch client library for Node.js, used for interacting with OpenSearch.
+3. @medplum/fhirtypes: Provides FHIR type definitions used in the re-population script.
+4. dotenv: Used for environment variable management in the re-population script.
+5. lodash: Utility functions for data manipulation, used in the re-population script.
+6. fs: Node.js built-in module for file system operations, used in the cleanup script.
+
+## Configuration
+The scripts use various configuration options and environment variables:
+
+1. cleanup.ts:
+   - `fileName`: The path to the file to be processed (needs to be set by the user)
+
+2. re-populate.ts:
+   - `PARALLEL_INGESTION_COUNT`: Number of documents to ingest in parallel (default: 15)
+   - Various environment variables for API keys, endpoints, and other sensitive information
+
+3. simple-test.ts:
+   - `username`: OpenSearch authentication username (default: "admin")
+   - `password`: OpenSearch authentication password (default: "admin")
+   - `host`: OpenSearch server host and port (default: "localhost:9200")
+   - `indexName`: Name of the index to be created and used (default: "test")
+
+It's important to note that sensitive information like usernames, passwords, and API keys should be managed securely, preferably using environment variables or secure configuration management systems in a production environment.
+
+The scripts in this directory provide essential utilities for managing and testing OpenSearch in a healthcare data processing context, with a focus on FHIR integration and large-scale data handling. They demonstrate best practices for parallel processing, error handling, and performance optimization when working with OpenSearch and FHIR data.

@@ -1,0 +1,47 @@
+---
+title: "builder.ts"
+---
+
+## High-level description
+This code defines a function `createMtomContentTypeAndPayload` that generates MTOM (Message Transmission Optimization Mechanism) content type and payload for SOAP messages. It's specifically designed to work with IHE (Integrating the Healthcare Enterprise) Gateway v2 for outbound XCA (Cross-Community Access) communications in the Carequality framework.
+
+## Symbols
+
+### `createMtomContentTypeAndPayload`
+#### Description
+This function creates the MTOM content type and payload for a given signed XML. It constructs a multipart MIME message with the necessary headers and boundaries.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| signedXml | string | The signed XML content to be included in the MTOM payload |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| contentType | string | The MIME content type for the MTOM message |
+| payload | Buffer | The complete MTOM payload as a Buffer |
+
+#### Internal Logic
+1. Defines the content type string with specific parameters including boundary, start, and start-info.
+2. Constructs the payload string with MIME headers, the signed XML content, and appropriate boundaries.
+3. Returns an object containing the content type and the payload as a Buffer.
+
+## Constants
+The code defines several constants used in constructing the MTOM message:
+
+| Constant | Value | Description |
+|:---------|:------|:------------|
+| boundary | "MIMEBoundary782a6cafc4cf4aab9dbf291522804454" | The MIME boundary used to separate parts of the multipart message |
+| contentId | "&lt;doc0@metriport.com&gt;" | The content ID for the main part of the MIME message |
+| carriageReturn | "\r\n" | The carriage return string used for line breaks in the MIME message |
+
+These constants are crucial for formatting the MTOM message correctly and ensuring compatibility with the IHE Gateway and Carequality standards.
+
+## Performance Considerations
+The function uses string concatenation to build the payload, which is generally efficient for small to medium-sized messages. For very large XML payloads, consider using a streaming approach or buffer concatenation for better performance and memory usage.
+
+## Dependencies
+This code relies on the Node.js `Buffer` class to convert the string payload into a buffer, which is part of the Node.js built-in modules.
+
+This function is likely part of a larger system for handling healthcare data exchange using the Carequality framework and IHE profiles. It specifically deals with the MTOM encoding, which is used to efficiently transmit binary data within SOAP messages.

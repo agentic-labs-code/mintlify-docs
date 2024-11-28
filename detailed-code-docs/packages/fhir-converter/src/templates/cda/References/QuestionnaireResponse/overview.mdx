@@ -1,0 +1,64 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for generating various components of a FHIR QuestionnaireResponse resource. These templates are part of a larger FHIR converter system, specifically designed for converting Clinical Document Architecture (CDA) data to FHIR format. Each template focuses on a specific attribute or reference within the QuestionnaireResponse resource, allowing for modular and flexible resource construction.
+
+## What does it do?
+These templates work together to create different parts of a FHIR QuestionnaireResponse resource. They generate JSON structures that represent various aspects of a QuestionnaireResponse, such as the author, the encounter it's associated with, what it's based on, what it's part of, its source, and its subject. By using these templates, developers can easily construct QuestionnaireResponse resources with the correct FHIR structure, ensuring interoperability and standardization in healthcare data exchange.
+
+## Key Files
+1. `author.hbs`: Generates the `author` field of a QuestionnaireResponse, specifying who created or is responsible for the response.
+
+2. `basedOn.hbs`: Creates the `basedOn` field, indicating other resources that this QuestionnaireResponse is derived from or based upon.
+
+3. `encounter.hbs`: Produces the `encounter` field, linking the QuestionnaireResponse to a specific healthcare encounter.
+
+4. `partOf.hbs`: Generates the `partOf` field, showing that this QuestionnaireResponse is part of another resource or event.
+
+5. `source.hbs`: Creates the `source` field, indicating the origin of the QuestionnaireResponse data.
+
+6. `subject.hbs`: Produces the `subject` field, specifying who or what the QuestionnaireResponse is about.
+
+Each of these templates follows a similar structure:
+
+```handlebars
+{
+  "resource": {
+    "resourceType": "QuestionnaireResponse",
+    "id": "{{ID}}",
+    "specificField": {
+      "reference": "{{REF}}"
+    }
+  }
+}
+```
+
+Where `specificField` is replaced by the relevant field name (e.g., `author`, `encounter`, etc.), and `{{ID}}` and `{{REF}}` are placeholders for the resource ID and reference value, respectively.
+
+## Dependencies
+These templates are part of a larger FHIR converter system and depend on:
+
+| Dependency | Purpose | Version |
+|:-----------|:--------|:--------|
+| Handlebars | Template engine for generating JSON structures | Not specified |
+| FHIR Converter | The broader system that utilizes these templates for CDA to FHIR conversion | Not specified |
+
+The Handlebars templating engine is crucial for processing the placeholders and generating the final JSON structures. The FHIR Converter system likely provides the context and data needed to populate these templates.
+
+## Configuration
+These templates don't include specific configuration options. They rely on two main inputs:
+
+1. `{{ID}}`: The identifier for the QuestionnaireResponse resource.
+2. `{{REF}}`: The reference value for the specific field (e.g., author reference, encounter reference).
+
+These values are expected to be provided when the templates are rendered, likely by the broader FHIR Converter system.
+
+## Notes
+1. All templates include a comprehensive copyright notice, indicating they are part of a project by Metriport Inc. and incorporate work from Microsoft Corporation.
+2. The templates generate partial JSON structures, suggesting they are meant to be combined to form complete FHIR QuestionnaireResponse resources.
+3. The JSON structures in some templates include trailing commas, which may need to be removed for strict JSON parsing.
+4. These templates focus on reference fields within the QuestionnaireResponse resource, allowing for linking to other FHIR resources.
+5. The modular nature of these templates allows for flexible construction of QuestionnaireResponse resources, as different combinations can be used based on the available data and requirements.
+6. While these templates provide the structure for QuestionnaireResponse references, they don't include logic for populating the actual questionnaire items or responses. This suggests that other templates or processes in the FHIR Converter system handle those aspects of the resource.

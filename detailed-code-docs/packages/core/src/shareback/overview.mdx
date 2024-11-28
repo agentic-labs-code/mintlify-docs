@@ -1,0 +1,107 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for handling the upload and metadata creation of Clinical Document Architecture (CDA) documents to an S3 bucket. It provides functionality for uploading CDA documents, creating associated metadata files in XML format, and managing the storage of these files in a specified S3 bucket.
+
+## What does it do?
+The code in this directory facilitates the process of sharing back medical documents, specifically CDA documents, by:
+
+1. Uploading CDA documents to a specified S3 bucket.
+2. Creating metadata files for each uploaded document, which contain important information about the document and the patient.
+3. Uploading these metadata files to the same S3 bucket.
+
+This process ensures that medical documents are stored securely and are accompanied by structured metadata, which can be useful for document management, retrieval, and integration with other healthcare systems.
+
+## Key Files
+
+### cda-uploader.ts
+This file contains the main function `cdaDocumentUploaderHandler` which orchestrates the process of uploading a CDA document and its associated metadata. It:
+
+1. Calculates the size of the CDA document.
+2. Generates a unique file path for the document in S3.
+3. Uploads the CDA document to the specified S3 bucket.
+4. Creates a metadata file name.
+5. Calls the function to create and upload the metadata file.
+
+Example usage:
+
+```typescript
+await cdaDocumentUploaderHandler(
+  cxId,
+  patientId,
+  cdaDocument,
+  s3BucketName,
+  awsRegion,
+  organizationInfo,
+  documentId,
+  documentReference
+);
+```
+
+### create-and-upload-extrinsic-object.ts
+This file contains the `createAndUploadDocumentMetadataFile` function, which is responsible for creating the metadata XML file and uploading it to S3. It:
+
+1. Generates a unique patient ID.
+2. Extracts relevant information from the document reference (if available).
+3. Creates an XML representation of the document metadata.
+4. Uploads the XML metadata file to the specified S3 bucket.
+
+Example usage:
+
+```typescript
+await createAndUploadDocumentMetadataFile(
+  s3Utils,
+  cxId,
+  patientId,
+  docId,
+  documentSize,
+  documentReference,
+  organizationInfo,
+  metadataFileName,
+  s3BucketName,
+  documentMimeType
+);
+```
+
+## Dependencies
+The code in this directory relies on several external libraries and internal modules:
+
+1. @medplum/fhirtypes: Provides type definitions for FHIR resources, used for handling document references and organization information.
+2. @metriport/shared: Contains utility functions used throughout the code.
+3. AWS SDK (implied): Used for S3 operations through the `S3Utils` class.
+
+Internal dependencies include:
+- Utility functions for creating file paths and handling errors.
+- Logging utilities for consistent logging across the application.
+- MIME type constants.
+- Functions for creating XML metadata and unique patient IDs.
+
+## Configuration
+While there are no explicit configuration files in this directory, the code relies on several parameters that would typically be configured elsewhere in the application:
+
+1. S3 bucket name for storing medical documents.
+2. AWS region for S3 operations.
+3. Organization information.
+
+These parameters are passed to the functions as arguments, allowing for flexible configuration based on the specific deployment or use case.
+
+## Error Handling
+The code implements error handling using try-catch blocks. In case of errors during the upload process or metadata creation, it:
+
+1. Logs the error details using the custom logging utility.
+2. Throws a `MetriportError` with additional context information, including the customer ID and patient ID.
+
+This approach ensures that errors are properly logged and propagated up the call stack, allowing for appropriate handling at higher levels of the application.
+
+## Logging
+The code uses a custom logging utility (`out`) to provide consistent and informative logging throughout the upload and metadata creation process. Log messages include:
+
+- Start and completion of the CDA document upload.
+- File sizes and paths.
+- Any errors encountered during the process.
+
+The logging includes context information such as customer ID and patient ID, which can be valuable for troubleshooting and monitoring the application's behavior.
+
+In conclusion, this directory contains essential functionality for handling the upload and metadata creation of CDA documents, providing a robust solution for managing medical document storage and metadata in a cloud-based environment.

@@ -1,0 +1,75 @@
+---
+title: "get-xcpd-statistics.ts"
+---
+
+## High-level description
+This code implements a function to retrieve and calculate statistics for XCPD (Cross-Community Patient Discovery) operations. It queries a database for patient discovery results, processes the data, and returns a summary of the findings, including the number of successful matches, parsed patients, and MPI (Master Patient Index) matches.
+
+## Code Structure
+The main function `getXcpdStatisticsForPatient` uses helper functions and external modules to query the database, process the results, and calculate statistics. It utilizes the `MPIMetriportAPI` class for patient matching and the `executeAsynchronously` function for parallel processing of patient data.
+
+## Symbols
+
+### `getXcpdStatisticsForPatient`
+#### Description
+This function retrieves XCPD statistics for a given customer (CX) ID, optionally filtered by date and patient ID. It queries the database, processes the results, and calculates various statistics related to patient discovery.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| apiUrl | string | The URL of the API |
+| sqlDBCreds | string | The SQL database credentials |
+| cxId | string | The customer (CX) ID |
+| dateString | string (optional) | The date string for filtering results |
+| patientId | string (optional) | The patient ID for filtering results |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string | A formatted string containing the calculated statistics |
+
+#### Internal Logic
+1. Initialize the MPI API and database connection.
+2. Construct and execute a SQL query to retrieve patient discovery results.
+3. Process the query results asynchronously, calculating various statistics.
+4. Return a formatted string with the calculated statistics.
+
+### `getXcpdStatistics`
+#### Description
+This is an inner function that processes individual patient discovery results and updates the statistics counters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| pd | any | A patient discovery result object |
+
+#### Internal Logic
+1. Check if the patient resource exists in the result.
+2. Parse the row data using the `rowWithDataSchema`.
+3. Increment success counter if the status is "success".
+4. Map the patient resource to patient data.
+5. Attempt to find a matching patient using the MPI API.
+6. Update the respective counters based on the results.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | Loading environment variables |
+| @metriport/ihe-gateway-sdk | Providing patient resource schema |
+| sequelize | Database ORM for querying |
+| zod | Schema validation |
+| MPIMetriportAPI | Patient matching functionality |
+| executeAsynchronously | Parallel processing of patient data |
+| initDbPool | Database connection initialization |
+| mapPatientResourceToPatientData | Mapping patient resource to patient data |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| MAX_NUMBER_OF_PARALLEL_XCPD_PROCESSING_REQUESTS | number | 20 | Maximum number of parallel XCPD processing requests |
+
+## Error Handling
+The function wraps the main logic in a try-catch block. If an error occurs during execution, it logs the error and throws a new error with a generic message.
+
+## Performance Considerations
+The function uses `executeAsynchronously` to process patient discovery results in parallel, improving performance for large datasets. The number of parallel executions is limited by `MAX_NUMBER_OF_PARALLEL_XCPD_PROCESSING_REQUESTS`.

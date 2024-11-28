@@ -1,0 +1,44 @@
+---
+title: "create-outbound-patient-discovery-resp.ts"
+---
+
+## High-level description
+The `createOutboundPatientDiscoveryResp` function in `create-outbound-patient-discovery-resp.ts` is responsible for persisting the response received from an external gateway after a Patient Discovery request. It takes the response details as input and creates a new record in the `OutboundPatientDiscoveryRespModel` table.
+
+## References
+- `OutboundPatientDiscoveryResp` from `@metriport/ihe-gateway-sdk`: Represents the response structure from the external gateway.
+- `OutboundPatientDiscoveryRespModel` from `../../models/outbound-patient-discovery-resp`: Sequelize model for the `patient_discovery_result` table.
+- `DefaultPayload` from `./shared`: Likely contains common payload properties like `id`, `requestId`, `patientId`.
+
+## Symbols
+
+### `createOutboundPatientDiscoveryResp`
+#### Description
+This function creates a new record in the database to store the response received from an external gateway for a Patient Discovery request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payload | `CreatePatientDiscoverRespParam` | An object containing the response details to be persisted. It includes the response status, the actual response object from the external gateway, and likely common payload properties like `id`, `requestId`, `patientId`. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;OutboundPatientDiscoveryRespModel&gt; | A promise that resolves to the newly created `OutboundPatientDiscoveryRespModel` instance representing the persisted response. |
+
+#### Internal Logic
+1.  The function receives the response details in the `payload` object.
+2.  It uses the `OutboundPatientDiscoveryRespModel.create` method to create a new record in the `patient_discovery_result` table.
+3.  The new record is populated with the following data from the `payload`:
+    - `id`: Unique identifier for the response.
+    - `requestId`: Unique identifier for the original request.
+    - `patientId`: Unique identifier for the patient.
+    - `status`: Status of the response (e.g., "success", "failure").
+    - `data`: The actual response object received from the external gateway.
+4.  The function returns a promise that resolves to the newly created `OutboundPatientDiscoveryRespModel` instance.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| `@metriport/ihe-gateway-sdk` | Provides the `OutboundPatientDiscoveryResp` type representing the response structure from the external gateway. |
+| `sequelize` | Used for database interactions, specifically creating a new record in the `patient_discovery_result` table. | 

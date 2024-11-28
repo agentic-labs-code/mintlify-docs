@@ -1,0 +1,105 @@
+---
+title: "poll-outbound-results.ts"
+---
+
+## High-level description
+This code implements functionality to poll outbound results from an IHE Gateway for patient discovery, document query, and document retrieval operations. It uses Sequelize to interact with a database, implements a race condition control mechanism, and handles timeouts and error scenarios.
+
+## Code Structure
+The main functions `pollOutboundPatientDiscoveryResults`, `pollOutboundDocQueryResults`, and `pollOutboundDocRetrievalResults` are wrappers around the core `pollResults` function. These functions use the `pollResults` function to retrieve data from specific database tables and process the results.
+
+## Symbols
+
+### `pollOutboundPatientDiscoveryResults`
+#### Description
+Polls for outbound patient discovery results from the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | PollOutboundResults | Object containing request parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| results | OutboundPatientDiscoveryResp[] | Array of patient discovery responses |
+
+### `pollOutboundDocQueryResults`
+#### Description
+Polls for outbound document query results from the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | PollOutboundResults | Object containing request parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| results | OutboundDocumentQueryResp[] | Array of document query responses |
+
+### `pollOutboundDocRetrievalResults`
+#### Description
+Polls for outbound document retrieval results from the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | PollOutboundResults | Object containing request parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| results | OutboundDocumentRetrievalResp[] | Array of document retrieval responses |
+
+### `pollResults`
+#### Description
+Core function that polls the database for results based on the provided parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | PollOutboundResults & \{ resultsTable: string; context: string \} | Object containing request parameters, result table name, and context |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| results | object[] | Array of result objects from the database |
+
+#### Internal Logic
+1. Initializes a Sequelize connection and race control.
+2. Uses `Promise.race` to handle timeout and completion scenarios.
+3. Queries the database for results.
+4. Handles incomplete results and logging.
+5. Returns the results or throws an error if the query fails.
+
+### `isResultsComplete`
+#### Description
+Checks if the number of results in the database matches the expected number of gateways.
+
+### `getResultsCount`
+#### Description
+Retrieves the count of results from the specified table for a given request ID.
+
+### `getResults`
+#### Description
+Retrieves all results from the specified table for a given request ID.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/ihe-gateway-sdk | Provides types for outbound responses |
+| dayjs | Date and time manipulation |
+| sequelize | Database ORM for querying results |
+
+## Error Handling
+The code uses `MetriportError` for custom error handling, capturing additional context information. Errors are logged and rethrown with relevant details.
+
+## Logging
+The code uses `console.log` for logging information about the polling process, including timeouts and incomplete results.
+
+## TODOs
+- Include in the result if it timed out and all gateways completed
+- Consider if retries should be implemented for timeouts
+
+This code provides a robust mechanism for polling and processing outbound results from an IHE Gateway, with built-in timeout handling and error management.

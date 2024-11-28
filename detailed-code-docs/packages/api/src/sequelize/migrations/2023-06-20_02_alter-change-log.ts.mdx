@@ -1,0 +1,42 @@
+---
+title: "2023-06-20_02_alter-change-log.ts"
+---
+
+## High-level description
+This migration script alters the `change_log` table in the database. Specifically, it modifies the `old_val` and `new_val` columns to allow null values, both during the upgrade (`up`) and the downgrade (`down`) operations.
+
+## Symbols
+
+### `up`
+#### Description
+This asynchronous function defines the database migration steps to be executed when upgrading the schema. It runs within a transaction to ensure atomicity.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | object | An object containing the `queryInterface` object, which provides methods for interacting with the database schema. |
+
+#### Internal Logic
+1. **Begin Transaction:** Starts a database transaction to ensure both column alterations are applied or rolled back together.
+2. **Alter `old_val` Column:** Modifies the `old_val` column in the `change_log` table to have a data type of `JSONB` and allow null values.
+3. **Alter `new_val` Column:** Modifies the `new_val` column in the `change_log` table to have a data type of `JSONB` and allow null values.
+
+### `down`
+#### Description
+This asynchronous function defines the database migration steps to be executed when downgrading the schema. It also runs within a transaction for atomicity.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | object | An object containing the `queryInterface` object, which provides methods for interacting with the database schema. |
+
+#### Internal Logic
+1. **Begin Transaction:** Starts a database transaction to ensure both column alterations are applied or rolled back together.
+2. **Alter `old_val` Column:** Modifies the `old_val` column in the `change_log` table to have a data type of `JSONB` and disallow null values.
+3. **Alter `new_val` Column:** Modifies the `new_val` column in the `change_log` table to have a data type of `JSONB` and disallow null values.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Provides the ORM and migration framework. |
+| DataTypes | Used to specify data types for database columns. |

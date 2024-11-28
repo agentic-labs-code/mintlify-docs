@@ -1,0 +1,67 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains unit tests for SAML (Security Assertion Markup Language) functionality in the context of IHE (Integrating the Healthcare Enterprise) gateway interactions. The tests cover various aspects of SAML envelope creation, signing, and verification for different IHE transactions, including XCPD (Cross-Community Patient Discovery), ITI-38 (Cross Gateway Query), and ITI-39 (Cross Gateway Retrieve).
+
+## What does it do?
+These tests ensure the correct functioning of SAML-related operations in healthcare interoperability scenarios. They verify:
+
+1. Creation of SOAP envelopes for different IHE transactions (ITI-55, ITI-38, ITI-39).
+2. Signing of SOAP envelopes with SAML assertions and timestamps.
+3. Verification of signed SOAP envelopes.
+4. Detection of tampering with SAML assertions, signatures, or timestamps.
+5. Handling of edge cases in SAML verification.
+
+These tests are crucial for maintaining the security and integrity of healthcare data exchanges between different systems and organizations.
+
+## Key Files
+
+1. `saml-envelope.test.ts`:
+   - Tests SAML envelope signature verification for ITI-55, ITI-38, and ITI-39 transactions.
+   - Verifies that tampering with SAML assertions, signatures, or digests leads to verification failures.
+
+2. `saml-full-signing.test.ts`:
+   - Tests the full process of creating, signing, and verifying SOAP envelopes for XCPD, ITI-38, and ITI-39 transactions.
+   - Includes signing with timestamps and full envelope signing.
+
+3. `saml-timestamp.test.ts`:
+   - Focuses on SAML timestamp signature verification for ITI-55, ITI-38, and ITI-39 transactions.
+   - Tests the integrity of timestamp signatures and detection of modifications.
+
+4. `saml-verify.test.ts`:
+   - Tests edge cases for the `verifySaml` function.
+   - Covers scenarios with valid and invalid inputs, including different public certificates and XML strings.
+
+## Dependencies
+The test files rely on several key dependencies:
+
+| Dependency | Purpose | Version |
+|:-----------|:--------|:--------|
+| @metriport/ihe-gateway-sdk | Provides types and functions for IHE gateway interactions | Not specified |
+| fast-xml-parser | Used for XML parsing and manipulation | Not specified |
+| dayjs | Used for date and time operations | Not specified |
+| Jest | Testing framework | Not specified |
+
+Additionally, the tests use custom functions and constants:
+
+- `createITI5SoapEnvelope`, `createITI38SoapEnvelope`, `createITI39SoapEnvelope`: Create SOAP envelopes for different IHE transactions.
+- `verifySaml`: Verifies SAML signatures.
+- `signTimestamp`: Signs the timestamp in the SOAP envelope.
+- `signEnvelope`: Signs the entire SOAP envelope.
+- `TEST_CERT`, `TEST_KEY`: Test certificate and private key for signing and verification.
+- `outboundXcpdRequest`, `outboundDqRequest`, `outboundDrRequest`: Test data for different transaction types.
+
+## Configuration
+The tests use Jest as the testing framework. While no specific configuration is shown in the provided summaries, it's likely that there's a Jest configuration file in a parent directory that sets up the testing environment.
+
+The tests rely on test data and certificates, which are imported from other parts of the project. These include:
+
+- Test certificates and keys (`TEST_CERT`, `TEST_KEY`)
+- Sample request data (`outboundXcpdRequest`, `outboundDqRequest`, `outboundDrRequest`)
+- XML files containing sample SAML assertions
+
+Ensure that these test resources are properly maintained and updated as needed to keep the tests relevant and effective.
+
+In summary, this test suite plays a critical role in ensuring the security and correctness of SAML-based operations in healthcare data exchange scenarios, covering a wide range of use cases and potential issues.

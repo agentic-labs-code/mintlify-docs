@@ -1,0 +1,64 @@
+---
+title: "AllergyIntolerance.hbs"
+---
+
+## High-level description
+This Handlebars template file defines the structure for converting CDA (Clinical Document Architecture) allergy data into a FHIR (Fast Healthcare Interoperability Resources) AllergyIntolerance resource. It creates a JSON representation of an AllergyIntolerance resource, including its identifier, clinical status, reaction details, and onset date.
+
+## Symbols
+
+### AllergyIntolerance Resource Template
+#### Description
+This is the main template for creating an AllergyIntolerance resource. It defines the structure of the resource, including its unique identifier, clinical status, reaction details, and onset date.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ID | String | Unique identifier for the AllergyIntolerance resource |
+| allergyEntry | Object | Contains allergy information from the CDA document |
+| allergyStatus | Object | Contains the status of the allergy |
+
+#### Internal Logic
+1. Creates a unique identifier for the resource using the provided ID.
+2. Sets the clinical status using the allergyStatus code.
+3. Defines the reaction, including the substance and manifestation.
+4. Sets the onset date if available.
+5. Handles multiple reaction entries if present in the allergyEntry.entryRelationship.
+6. Sets the severity of the allergy reaction if available.
+
+### Partial Templates
+The main template uses several partial templates to populate specific sections:
+
+1. `DataType/Identifier.hbs`: Used to generate identifier information.
+2. `ValueSet/AllergyStatus.hbs`: Used to map the allergy status code.
+3. `DataType/CodeableConcept.hbs`: Used to generate CodeableConcept structures for substance and manifestation.
+4. `ValueSet/AllergySeverity.hbs`: Used to map the allergy severity.
+
+These partial templates are referenced using the `{{&gt;PartialName}}` syntax and are likely defined in separate files.
+
+## Dependencies
+The template relies on several helper functions:
+- `toArray`: Converts a value to an array.
+- `contains`: Checks if a string contains a substring.
+- `toJsonString`: Converts a value to a JSON string.
+- `formatAsDateTime`: Formats a date value as a datetime string.
+
+These helpers are likely defined in a separate helper file or provided by the templating engine.
+
+## Configuration
+The template uses specific OIDs (Object Identifiers) to identify certain types of data:
+- "2.16.840.1.113883.10.20.22.4.9": Likely identifies a reaction observation.
+- "2.16.840.1.113883.10.20.22.4.8": Likely identifies a severity observation.
+
+These OIDs are used to determine how to process different parts of the input data.
+
+## Error Handling
+The template uses conditional statements to handle cases where certain data might be missing. For example, it checks for the existence of `allergyEntry.entryRelationship` before processing reaction details.
+
+## API/Interface Reference
+This template expects to be called with specific context data, including:
+- An `ID` for the resource
+- An `allergyEntry` object containing allergy information
+- An `allergyStatus` object containing the status of the allergy
+
+The output is a JSON structure representing a FHIR AllergyIntolerance resource, which can be used in a FHIR-compliant system.

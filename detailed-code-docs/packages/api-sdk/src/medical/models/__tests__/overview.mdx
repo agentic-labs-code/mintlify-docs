@@ -1,0 +1,71 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains test files for the medical models in the API SDK. It includes tests for contact and demographics schemas, ensuring the proper validation and handling of contact information and email addresses.
+
+## What does it do?
+The code in this directory performs unit testing for the contact and demographics schemas used in the medical module of the API SDK. It verifies that:
+
+1. The contact schema correctly handles various types of email inputs, including valid emails, null values, and undefined values.
+2. The email schema accurately validates a wide range of email formats, accepting valid ones and rejecting invalid ones.
+3. The test data generation utility (`makeContact`) creates realistic mock data for contacts, which can be used in tests or for sample data generation.
+
+These tests help ensure that the medical models in the API SDK correctly validate and process user input for contact information, particularly email addresses, which is crucial for maintaining data integrity and preventing errors in medical applications.
+
+## Key Files
+
+### contact.ts
+This file defines a utility function `makeContact` for creating test data for the `Contact` type. It uses the Faker library to generate realistic mock data for phone numbers and email addresses. The function allows for partial overrides, which is useful for testing specific scenarios or edge cases.
+
+Key features:
+- Generates random phone numbers and email addresses using Faker
+- Allows partial overrides of generated data
+- Useful for unit tests and generating sample data
+
+### demographics.test.ts
+This file contains unit tests for the `contactSchema` and `emailSchema` defined in the `demographics.ts` file. It validates the behavior of these schemas under various input scenarios.
+
+Key test cases:
+- Acceptance of simple, valid email addresses
+- Handling of null and undefined email values
+- Validation of multiple valid and invalid email formats
+
+## Dependencies
+| Dependency | Purpose | Version |
+|:-----------|:--------|:--------|
+| @faker-js/faker | Generates realistic mock data for phone numbers and email addresses | Not specified |
+| Jest | Testing framework used for unit tests | Not specified |
+
+Faker was likely chosen for its ability to generate a wide variety of realistic data, which is crucial for thorough testing of input validation and data handling in the medical models.
+
+## Configuration
+No specific configuration files are mentioned in the provided summaries. However, the tests rely on the schemas defined in the parent directory's `demographics.ts` file.
+
+## Code Examples
+
+Example of creating a contact with `makeContact`:
+
+```typescript
+const contact = makeContact({
+  email: 'custom@example.com',
+  // phone will be generated if not provided
+});
+```
+
+Example of a test case for email validation:
+
+```typescript
+it("accepts valid email", () =&gt; {
+  const validEmail = "user@example.com";
+  expect(() =&gt; emailSchema.parse(validEmail)).not.toThrow();
+});
+
+it("rejects invalid email", () =&gt; {
+  const invalidEmail = "not-an-email";
+  expect(() =&gt; emailSchema.parse(invalidEmail)).toThrow();
+});
+```
+
+These tests ensure that the email schema correctly validates email addresses, accepting valid formats and rejecting invalid ones. This is crucial for maintaining data integrity in the medical records system.

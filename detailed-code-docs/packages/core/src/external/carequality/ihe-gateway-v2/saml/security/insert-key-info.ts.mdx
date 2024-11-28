@@ -1,0 +1,48 @@
+---
+title: "insert-key-info.ts"
+---
+
+## High-level description
+This code defines a function `insertKeyInfo` that inserts key information into an XML SOAP message containing SAML assertions. It modifies the XML structure to include RSA key values and X509 certificate data in the appropriate security sections.
+
+## Code Structure
+The main function `insertKeyInfo` uses utility functions from `security-header.ts` to process the input XML and certificate. It then modifies the XML structure to insert key information in both the SAML assertion and the SOAP security header.
+
+## References
+This code references functions from `security-header.ts`, including `stripPemCertificate`, `extractPublicKeyInfo`, and the constant `securityHeaderEnvelopedId`.
+
+## Symbols
+
+### `insertKeyInfo`
+#### Description
+This function takes an XML content string and a public certificate, parses the XML, inserts key information into specific sections, and returns the modified XML as a string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| xmlContent | string | The input XML content as a string |
+| publicCert | string | The public certificate in PEM format |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | string | The modified XML content with inserted key information |
+
+#### Internal Logic
+1. Parse the input XML using `XMLParser`.
+2. Strip the PEM certificate and extract public key information.
+3. If a SAML assertion signature is present, insert RSA key values and X509 certificate data.
+4. If a SOAP security signature is present, insert a security token reference.
+5. Build and return the modified XML.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| fast-xml-parser | For parsing and building XML |
+| uuid | For generating UUIDs |
+
+## Error Handling
+The code doesn't implement explicit error handling. Errors from parsing or manipulating the XML structure would propagate to the caller.
+
+## Performance Considerations
+The function performs XML parsing and manipulation, which can be computationally expensive for large XML documents. Consider the size of the input XML when using this function in performance-critical contexts.

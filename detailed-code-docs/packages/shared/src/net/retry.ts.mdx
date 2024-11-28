@@ -1,0 +1,90 @@
+---
+title: "retry.ts"
+---
+
+Here's a documentation for the `retry.ts` file:
+
+## High-level description
+This file provides utility functions for executing network-related operations with retry logic. It includes functionality to retry operations based on specific network error codes and HTTP status codes, with customizable retry behavior.
+
+## Code Structure
+The main function `executeWithNetworkRetries` is built on top of the more generic `executeWithRetries` function. It specializes in handling network-related errors and retries. The file also includes helper functions for extracting error information from various types of errors.
+
+## Symbols
+
+### `executeWithNetworkRetries`
+#### Description
+Executes a function with retries, specifically tailored for network operations. It retries on certain network error codes and HTTP status codes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fn | (attempt: number) =&gt; Promise&lt;T&gt; | The function to be executed with retry logic |
+| options | Partial&lt;ExecuteWithNetworkRetriesOptions&gt; | Options to customize retry behavior |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Promise&lt;T&gt; | The result of the executed function |
+
+#### Internal Logic
+1. Merges default options with provided options
+2. Extracts HTTP codes and status codes to retry on
+3. Calls `executeWithRetries` with a custom `shouldRetry` function that checks for specific network error codes and HTTP status codes
+4. Uses a custom `getTimeToWait` function that applies special handling for 429 (Too Many Requests) status code
+
+### `getHttpStatusFromError`
+#### Description
+Extracts the HTTP status code from an error object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| error | any | The error object to extract the status code from |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | number \| undefined | The extracted HTTP status code, if available |
+
+### `getHttpCodeFromError`
+#### Description
+Extracts the HTTP error code from an error object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| error | any | The error object to extract the error code from |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | string \| undefined | The extracted HTTP error code, if available |
+
+### `networkGetTimeToWait`
+#### Description
+Custom function to calculate the time to wait before the next retry, with special handling for 429 (Too Many Requests) status code.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | GetTimeToWaitParams | Parameters for calculating wait time |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| timeToWait | number | The calculated time to wait in milliseconds |
+
+## Dependencies
+- `axios`: Used for making HTTP requests and handling Axios-specific errors
+- `../common/retry`: Imports the base retry functionality
+- `./error`: Imports network error type definitions
+
+## Configuration
+The file defines several constants and types for configuring retry behavior:
+- `tooManyRequestsStatus`: HTTP status code for "Too Many Requests"
+- `tooManyRequestsMultiplier`: Multiplier for increasing delay on "Too Many Requests"
+- `defaultOptions`: Default options for network retries
+
+## Error Handling
+The code handles various types of network errors, including Axios errors and Node.js system errors. It provides mechanisms to retry on specific error codes and HTTP status codes.

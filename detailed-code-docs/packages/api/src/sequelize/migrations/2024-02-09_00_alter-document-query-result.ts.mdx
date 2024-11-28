@@ -1,0 +1,57 @@
+---
+title: "2024-02-09_00_alter-document-query-result.ts"
+---
+
+## High-level description
+This migration script adds an index to the `request_id` column in the `document_query_result` table. This is likely done to improve the performance of queries that filter or sort by `request_id`.
+
+## References
+- This migration script uses the `Migration` type from a local file.
+- It also uses the `queryInterface` object, which is provided by the Umzug library and allows interacting with the database schema.
+
+## Symbols
+
+### `up`
+#### Description
+This asynchronous function defines the steps to apply the migration. It starts a database transaction and adds an index to the `request_id` column in the `document_query_result` table within that transaction.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} |  \{ context: QueryInterface \} | An object containing the queryInterface object, which is an instance of Sequelize's QueryInterface. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (implicit) | Promise\&lt;void\&gt; | A promise that resolves when the migration is applied successfully. |
+
+#### Internal Logic
+1. **Begin Transaction:** It starts a database transaction using `queryInterface.sequelize.transaction`.
+2. **Add Index:** It adds an index to the `request_id` column of the `document_query_result` table using `queryInterface.addIndex`. The index is created within the transaction.
+
+### `down`
+#### Description
+This asynchronous function defines the steps to revert the migration. It starts a database transaction and removes the index from the `request_id` column in the `document_query_result` table within that transaction.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | \{ context: QueryInterface \} | An object containing the queryInterface object, which is an instance of Sequelize's QueryInterface. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (implicit) | Promise\&lt;void\&gt; | A promise that resolves when the migration is reverted successfully. |
+
+#### Internal Logic
+1. **Begin Transaction:** It starts a database transaction using `queryInterface.sequelize.transaction`.
+2. **Remove Index:** It removes the index from the `request_id` column of the `document_query_result` table using `queryInterface.removeIndex`. The index is removed within the transaction.
+
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Migration (local) | Provides the type definition for migration functions. |
+
+## Error Handling
+The code uses database transactions to ensure that both `up` and `down` operations are executed atomically. If any error occurs during the execution of either function, the transaction will be rolled back, preventing partial updates to the database schema.

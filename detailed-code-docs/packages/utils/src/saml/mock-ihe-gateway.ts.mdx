@@ -1,0 +1,100 @@
+---
+title: "mock-ihe-gateway.ts"
+---
+
+## High-level description
+This code implements a mock IHE (Integrating the Healthcare Enterprise) gateway server using Express.js. It provides endpoints for patient discovery, document query, and document retrieval, simulating the functionality of a real IHE gateway for testing and development purposes.
+
+## Code Structure
+The code sets up an Express application with three POST endpoints, each corresponding to a different IHE transaction. It uses mock S3 utilities for storing requests and processes incoming SOAP XML requests using imported functions from the @metriport/core package.
+
+## Symbols
+
+### Express Application Setup
+#### Description
+Initializes an Express application and configures it to handle SOAP XML requests.
+
+#### Internal Logic
+- Creates an Express application
+- Configures middleware to parse raw SOAP XML requests with a 2MB limit
+- Sets up three POST routes: `/v2/patient-discovery`, `/v2/document-query`, and `/v2/document-retrieve`
+
+### POST /v2/patient-discovery
+#### Description
+Handles patient discovery requests.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.body | string | SOAP XML request body |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | JSON | Processed XCPD response |
+
+#### Internal Logic
+- Calls `processInboundXcpdRequest` with the request body
+- Sets the response content type to JSON
+- Sends the processed response or an error message
+
+### POST /v2/document-query
+#### Description
+Handles document query requests.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.body | string | SOAP XML request body |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | JSON | Processed document query response |
+
+#### Internal Logic
+- Calls `processInboundDqRequest` with the request body
+- Sets the response content type to JSON
+- Sends the processed response or an error message
+
+### POST /v2/document-retrieve
+#### Description
+Handles document retrieval requests.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| req.body | string | SOAP XML request body |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | JSON | Processed document retrieve response |
+
+#### Internal Logic
+- Calls `processInboundDrRequest` with the request body
+- Sets the response content type to JSON
+- Sends the processed response or an error message
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | Load environment variables |
+| express | Web application framework |
+| @metriport/core | Processing IHE requests |
+
+## Error Handling
+Each endpoint wraps its logic in a try-catch block. If an error occurs, it sends a 400 status code with the error message.
+
+## Logging
+The server logs a message to the console when it starts running on port 3000.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /v2/patient-discovery | POST | SOAP XML | JSON | Handle patient discovery requests |
+| /v2/document-query | POST | SOAP XML | JSON | Handle document query requests |
+| /v2/document-retrieve | POST | SOAP XML | JSON | Handle document retrieval requests |
+
+## Side Effects
+The code initializes a MockS3Utils instance and sets it as the S3 utils instance for storing IHE requests. This affects how request data is stored and retrieved during the mock gateway's operation.

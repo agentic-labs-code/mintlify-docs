@@ -1,0 +1,76 @@
+---
+title: "dr-response.ts"
+---
+
+## High-level description
+This code defines a function `createInboundDrResponse` that creates an XML response for an Inbound Document Retrieval (DR) request in the context of an IHE (Integrating the Healthcare Enterprise) Cross-Community Access (XCA) gateway. It processes the response data, constructs a SOAP envelope with appropriate headers and body, and returns the response as an XML string.
+
+## Code Structure
+The main function `createInboundDrResponse` relies on helper functions like `createIti39SoapBody` and `createSecurityHeader` to construct different parts of the SOAP response. It also uses utility functions from other modules for operations like S3 file downloads and XML building.
+
+## Symbols
+
+### createInboundDrResponse
+#### Description
+This asynchronous function creates an XML response for an Inbound Document Retrieval request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | InboundDocumentRetrievalResp | The response object containing document retrieval information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| xmlContent | string | The generated XML response as a string |
+
+#### Internal Logic
+1. Creates a security header using `createSecurityHeader`
+2. Generates the SOAP body using `createIti39SoapBody`
+3. Constructs the full SOAP envelope with headers and body
+4. Uses `XMLBuilder` to convert the SOAP envelope object to an XML string
+
+### createIti39SoapBody
+#### Description
+This asynchronous function creates the SOAP body for an ITI-39 (Cross Gateway Retrieve) response.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | InboundDocumentRetrievalResp | The response object containing document retrieval information |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| soapBody | object | An object representing the SOAP body structure |
+
+#### Internal Logic
+1. Determines if the response was successful based on the presence of `documentReference`
+2. For successful responses, downloads each document from S3 and encodes it in base64
+3. For failed responses, constructs error information
+4. Builds the SOAP body object with appropriate namespaces and content
+
+### getS3UtilsInstance and setS3UtilsInstance
+#### Description
+These functions manage a singleton instance of the S3Utils class for S3 operations.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| fast-xml-parser | Used for XML building |
+| @metriport/ihe-gateway-sdk | Provides types and schemas for IHE gateway operations |
+| @metriport/shared | Utility functions |
+| aws-sdk | AWS SDK for S3 operations |
+
+## Configuration
+The code uses configuration values from the `Config` class:
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| AWS_REGION | string | AWS region for S3 operations |
+| MEDICAL_DOCUMENTS_BUCKET_NAME | string | S3 bucket name for medical documents |
+
+## Error Handling
+The code throws errors for missing required information, such as document URN or content type. It also includes error information in the SOAP response for failed retrievals.
+
+## Performance Considerations
+The code downloads documents from S3 in parallel using `Promise.all`, which can improve performance when retrieving multiple documents.

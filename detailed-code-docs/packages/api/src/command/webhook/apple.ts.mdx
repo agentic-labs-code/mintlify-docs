@@ -1,0 +1,44 @@
+---
+title: "apple.ts"
+---
+
+## High-level description
+The `processAppleData` function processes Apple health data received from a webhook, maps it to the Metriport data model, and sends it to the appropriate webhook endpoint defined in the user's settings. It also reports device usage for the connected user.
+
+## References
+- `getConnectedUserOrFail` from `../connected-user/get-connected-user`
+- `getSettingsOrFail` from `../settings/getSettings`
+- `reportDevicesUsage` from `./devices`
+- `processRequest` from `./webhook`
+- `buildWebhookRequestData` from `./webhook-request`
+
+## Symbols
+### `processAppleData`
+#### Description
+This asynchronous function processes Apple health data received from a webhook. It retrieves the connected user, their settings, maps the received data to the Metriport data model, builds a webhook request, sends the request to the appropriate endpoint, and reports device usage.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | `AppleWebhookPayload` | The Apple health data payload from the webhook. |
+| metriportUserId | `string` | The ID of the Metriport user. |
+| cxId | `string` | The ID of the customer. |
+
+#### Outputs
+This function does not return any value (returns `Promise&lt;void&gt;`).
+
+#### Internal Logic
+1. Retrieves the connected user using `getConnectedUserOrFail`.
+2. Retrieves the user's settings using `getSettingsOrFail`.
+3. Constructs the payload for the webhook request, including the user ID and the received data.
+4. Builds the webhook request data using `buildWebhookRequestData`, specifying the request type as "devices.health-data".
+5. Sends the webhook request using `processRequest`.
+6. Reports device usage using `reportDevicesUsage`.
+7. Logs any errors encountered during the process.
+
+## Side Effects
+- Sends a webhook request to the endpoint defined in the user's settings.
+- Updates device usage statistics for the connected user.
+
+## Error Handling
+The function uses a `try...catch` block to handle any errors encountered during the process. Errors are logged using the `log` function.

@@ -1,0 +1,88 @@
+---
+title: "validate-doc-query-progress.ts"
+---
+
+## High-level description
+This code is a utility script for testing document query progress for a set of patients. It creates a facility, creates patients, checks if they are linked, starts document queries, monitors the progress, and logs the results. It's designed to validate the document query functionality of the Metriport Medical API.
+
+## Code Structure
+The main function `main()` orchestrates the entire process. It uses helper functions like `validateDocQueryProgress()`, `checkPatientLinkingStatus()`, and `queryPatientDocs()` to perform specific tasks. The script interacts with the Metriport Medical API using the `MetriportMedicalApi` class.
+
+## Symbols
+
+### `main()`
+#### Description
+The main function that orchestrates the entire testing process.
+
+#### Internal Logic
+1. Creates a facility
+2. Creates patients
+3. Validates document query progress
+4. Optionally resets and runs the validation again
+5. Deletes the created patients
+
+### `validateDocQueryProgress()`
+#### Description
+Validates the document query progress for a set of patients.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| createdPatients | PatientDTO[] | Array of created patients |
+| facilityId | string | ID of the facility |
+| resetAndRunAgain | boolean | Flag to reset and run the validation again |
+
+#### Internal Logic
+1. Checks if each patient is linked
+2. Queries documents for linked patients
+3. Logs the results of the queries
+
+### `checkPatientLinkingStatus()`
+#### Description
+Checks if a patient is linked to the facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | PatientDTO | Patient to check |
+| facilityId | string | ID of the facility |
+
+#### Internal Logic
+Repeatedly checks if the patient is linked, with a sleep interval between checks.
+
+### `queryPatientDocs()`
+#### Description
+Starts a document query for a patient and monitors its progress.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | PatientDTO | Patient to query documents for |
+| facilityId | string | ID of the facility |
+| resetAndRunAgain | boolean | Flag to reset and run the query again |
+
+#### Internal Logic
+1. Starts a document query
+2. Uses a race condition to monitor the query progress
+3. Returns the query result
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | Load environment variables |
+| @faker-js/faker | Generate fake data for facility creation |
+| @metriport/api-sdk | Interact with Metriport Medical API |
+| @metriport/core/util/env-var | Get environment variables |
+| @metriport/shared | Utility functions |
+| axios | Make HTTP requests |
+| dayjs | Date manipulation |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| API_KEY | string | N/A | API key for Metriport Medical API |
+| API_URL | string | N/A | URL for Metriport Medical API |
+| CX_ID | string | N/A | Customer ID |
+
+## TODOs
+- The `resetAndRunAgain` functionality is marked as "This is to test that the count works after the doc query is complete and subsequent doc query is performed."

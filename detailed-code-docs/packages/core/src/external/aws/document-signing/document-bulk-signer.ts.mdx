@@ -1,0 +1,67 @@
+---
+title: "document-bulk-signer.ts"
+---
+
+## High-level description
+This code defines an abstract class `DocumentBulkSigner` and a type `DocumentBulkSignerRequest` for bulk signing documents. It provides a foundation for implementing document signing functionality, likely for patient-related documents in a healthcare or medical context.
+
+## Code Structure
+The code consists of two main parts: a type definition (`DocumentBulkSignerRequest`) and an abstract class (`DocumentBulkSigner`). The abstract class serves as a base for concrete implementations of document bulk signing functionality.
+
+## Symbols
+
+### `DocumentBulkSignerRequest`
+#### Description
+This type defines the structure of a request for bulk document signing.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | Identifier for the patient |
+| cxId | string | Likely a customer or context identifier |
+| requestId | string | Unique identifier for the request |
+
+### `DocumentBulkSigner`
+#### Description
+An abstract class that defines the structure for document bulk signing implementations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| region | string | AWS region where the signing operation will take place |
+
+#### Internal Logic
+- The class constructor initializes the `region` property.
+- It declares an abstract `sign` method that concrete implementations must define.
+
+### `DocumentBulkSigner.sign`
+#### Description
+An abstract method that concrete implementations must define to perform the actual document signing.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| request | DocumentBulkSignerRequest | Object containing patientId, cxId, and requestId |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Promise&lt;void&gt; | A promise that resolves when signing is complete |
+
+## References
+The `DocumentBulkSigner` class is referenced and used in the related file `packages/api/src/external/aws/document-bulk-signer-factory.ts`. This factory file creates concrete implementations of `DocumentBulkSigner` based on the environment (development or production).
+
+## Dependencies
+The code doesn't explicitly import any external libraries, but it's designed to work within an AWS environment, as indicated by the `region` parameter and the related factory file.
+
+## Configuration
+The code itself doesn't define any configuration options, but the related factory file uses a `Config` object to determine the environment and AWS settings.
+
+## API/Interface Reference
+The `DocumentBulkSigner` class defines the following interface:
+
+| Method | Inputs | Outputs | Description |
+|:-------|:-------|:--------|:------------|
+| sign | DocumentBulkSignerRequest | Promise&lt;void&gt; | Abstract method for signing documents in bulk |
+
+This interface is intended to be implemented by concrete classes that provide specific signing functionality, such as `DocumentBulkSignerLambda` and `DocumentBulkSignerLocal` mentioned in the related factory file.

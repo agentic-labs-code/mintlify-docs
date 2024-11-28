@@ -1,0 +1,98 @@
+---
+title: "bulk-saml.ts"
+---
+
+## High-level description
+This code is a helper script for testing SOAP+SAML requests in a Metriport IHE Gateway environment. It constructs SOAP envelopes, sends them to specified gateways, and logs the results for analysis. The script is designed to work with a staging environment and uses mock S3 utilities for storing responses.
+
+## Code Structure
+The main function `main()` reads a bulk request file, filters gateways, creates and signs XCPD requests, sends them to the gateways, and writes the responses to a file. It utilizes various imported functions and configurations to accomplish these tasks.
+
+## Symbols
+
+### `main()`
+#### Description
+The main function that orchestrates the process of sending bulk XCPD requests and storing the responses.
+
+#### Internal Logic
+1. Reads and parses the bulk request file
+2. Filters out specific gateways
+3. Creates and signs bulk XCPD requests
+4. Sends and processes the requests in parallel
+5. Writes the responses to a file
+
+### `samlCertsAndKeys`
+#### Description
+An object containing SAML certificates and keys for authentication.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| publicCert | string | Public certificate for SAML |
+| privateKey | string | Private key for SAML |
+| privateKeyPassword | string | Password for the private key |
+| certChain | string | Certificate chain for SAML |
+
+### `createAndSignBulkXCPDRequests()`
+#### Description
+Creates and signs bulk XCPD requests using the provided body and SAML certificates and keys.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| body | object | The request body containing gateway information |
+| samlCertsAndKeys | object | SAML certificates and keys |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| signedRequests | array | Array of signed XCPD requests |
+
+### `sendProcessXcpdRequest()`
+#### Description
+Sends and processes a single XCPD request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| signedRequest | object | The signed XCPD request |
+| samlCertsAndKeys | object | SAML certificates and keys |
+| patientId | string | The patient ID |
+| cxId | string | The CX ID |
+| index | number | The index of the request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | object | The result of processing the XCPD request |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | Load environment variables |
+| fs | File system operations |
+| dayjs | Date and time manipulation |
+| uuid | Generate UUIDs |
+| @metriport/core/util/env-var | Environment variable utilities |
+| @metriport/ihe-gateway-sdk | IHE Gateway SDK |
+| @metriport/core/external/carequality/ihe-gateway-v2/outbound/xcpd/create/iti55-envelope | Create XCPD requests |
+| @metriport/core/external/carequality/ihe-gateway-v2/outbound/ihe-gateway-v2-logic | Send and process XCPD requests |
+| @metriport/core/external/carequality/ihe-gateway-v2/saml/saml-client | SAML client utilities |
+| @metriport/core/external/carequality/ihe-gateway-v2/monitor/store | Store IHE responses |
+| ./mock-s3 | Mock S3 utilities |
+| @metriport/core/util/config | Configuration utilities |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| ENV_TYPE | string | "STAGING" | Environment type |
+| rejectUnauthorized | boolean | false | Whether to reject unauthorized SSL connections |
+
+## Error Handling
+The script uses basic try-catch blocks for error handling, logging errors to the console.
+
+## Logging
+Console logging is used to output progress and results of the script execution.
+
+## TODOs
+- Remove `false &&` in `getRejectUnauthorized()` once Allscripts patches their endpoints.

@@ -1,0 +1,81 @@
+---
+title: "security-header.ts"
+---
+
+## High-level description
+This code defines functions and constants for creating and manipulating SAML (Security Assertion Markup Language) security headers used in IHE (Integrating the Healthcare Enterprise) Gateway communications. It provides utilities for handling X.509 certificates, extracting public key information, and constructing SAML assertions with specific attributes required for healthcare information exchange.
+
+## Code Structure
+The main function `createSecurityHeader` generates a security header object with SAML assertions. It uses helper functions like `extractPublicKeyInfo` and `stripPemCertificate` to process X.509 certificates. Constants are defined for various identifiers, namespaces, and regular expressions used throughout the code.
+
+## Symbols
+
+### `createSecurityHeader`
+#### Description
+Creates a security header object containing SAML assertions for use in IHE Gateway communications.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| publicCert | string | Public X.509 certificate in PEM format |
+| createdTimestamp | string | Timestamp for when the assertion was created |
+| expiresTimestamp | string | Timestamp for when the assertion expires |
+| toUrl | string | URL of the recipient |
+| subjectRole | string | Role of the subject |
+| metriportOrganization | string | Organization name |
+| homeCommunityId | string | Identifier for the home community |
+| purposeOfUse | string | Purpose of use code |
+| gatewayOid | string | (Optional) Gateway Object Identifier |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| securityHeader | object | Security header object with SAML assertions |
+
+#### Internal Logic
+1. Strips the PEM certificate and extracts public key information.
+2. Constructs a SAML assertion with various attributes including subject, conditions, and statements.
+3. Includes specific healthcare-related attributes such as subject role, organization, and purpose of use.
+
+### `extractPublicKeyInfo`
+#### Description
+Extracts the modulus and exponent from an X.509 certificate's public key.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| certificatePem | string | X.509 certificate in PEM format (base64-encoded) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| [modulus, exponent] | [string, string] | Base64-encoded modulus and exponent of the public key |
+
+### `stripPemCertificate`
+#### Description
+Removes PEM headers and newlines from a certificate string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| x509CertPem | string | X.509 certificate in PEM format |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| certPemStripped | string | Certificate content without PEM headers and newlines |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| pkijs | Handling X.509 certificates and public key operations |
+| asn1js | ASN.1 parsing for certificate processing |
+| pvutils | Utility functions for array buffer and base64 conversions |
+
+## Constants
+The code defines several constants for identifiers, namespaces, and regular expressions used in security header creation and certificate processing.
+
+## Error Handling
+The code includes basic error handling, throwing errors for issues like ASN.1 parsing failures or missing public key information.
+
+This code is crucial for implementing secure communication in healthcare information exchange, ensuring proper authentication and authorization through SAML assertions.

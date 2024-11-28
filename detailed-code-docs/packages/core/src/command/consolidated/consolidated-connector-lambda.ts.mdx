@@ -1,0 +1,67 @@
+---
+title: "consolidated-connector-lambda.ts"
+---
+
+## High-level description
+This code defines a `ConsolidatedDataConnectorLambda` class that implements the `ConsolidatedDataConnector` interface. It's designed to execute consolidated data requests by invoking an AWS Lambda function, which processes FHIR data and returns a consolidated bundle.
+
+## Code Structure
+The main class `ConsolidatedDataConnectorLambda` uses AWS SDK to interact with Lambda. It's initialized with configuration from the `Config` utility and uses helper functions from the AWS Lambda utility module.
+
+## References
+- `Config` from "../../util/config"
+- `getLambdaResultPayload`, `makeLambdaClient` from "../../external/aws/lambda"
+- Types and interfaces from "./consolidated-connector"
+
+## Symbols
+
+### `ConsolidatedDataConnectorLambda`
+#### Description
+A class that implements the `ConsolidatedDataConnector` interface, using AWS Lambda to process consolidated data requests.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | N/A | The constructor doesn't take any parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| instance | ConsolidatedDataConnectorLambda | An instance of the class |
+
+#### Internal Logic
+- Initializes `lambdaName` and `lambdaClient` in the constructor using configuration and AWS SDK.
+- Implements an `execute` method to invoke the Lambda function and process the response.
+
+### `execute`
+#### Description
+Executes a consolidated data request by invoking an AWS Lambda function.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | ConsolidatedDataRequestSync \| ConsolidatedDataRequestAsync | The request parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Promise&lt;ConsolidatedDataResponse&gt; | The consolidated data response |
+
+#### Internal Logic
+1. Invokes the Lambda function with the provided parameters.
+2. Processes the Lambda result using `getLambdaResultPayload`.
+3. Parses the result payload and returns it as a `ConsolidatedDataResponse`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dayjs | Date and time manipulation library |
+| AWS SDK | Interacting with AWS services (Lambda) |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| TIMEOUT_CALLING_CONVERTER_LAMBDA | Duration | 15 minutes and 2 seconds | Timeout for Lambda function calls |
+
+## Performance Considerations
+The code sets a relatively long timeout (15 minutes and 2 seconds) for Lambda function calls, which might be necessary for processing large amounts of data but could impact performance for smaller requests.

@@ -1,0 +1,55 @@
+---
+title: "2023-07-27_01_alter-patient-remove-patientNumber.ts"
+---
+
+## High-level description
+This code defines a database migration that removes the `patient_number` column from the `patient` table. It includes both `up` and `down` functions to apply and revert the migration, respectively. This ensures that the database schema can be managed effectively during development and deployment.
+
+## Symbols
+
+### `up`
+#### Description
+This asynchronous function defines the steps to apply the migration, which in this case is removing the `patient_number` column from the `patient` table. It uses a transaction to ensure that the operation is atomic.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | \{ context: QueryInterface \} | An object containing the `queryInterface` object, which provides methods for interacting with the database schema. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise\&lt;void\&gt; | A promise that resolves when the migration is successfully applied. |
+
+#### Internal Logic
+1. Starts a database transaction using `queryInterface.sequelize.transaction`.
+2. Removes the `patient_number` column from the `patient` table using `queryInterface.removeColumn`.
+3. Commits the transaction if all operations are successful. If any operation fails, the transaction is rolled back.
+
+### `down`
+#### Description
+This asynchronous function defines the steps to revert the migration, which in this case is adding back the `patient_number` column to the `patient` table. It also uses a transaction to ensure atomicity.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | \{ context: QueryInterface \} | An object containing the `queryInterface` object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise\&lt;void\&gt; | Promise\&lt;void\&gt; | A promise that resolves when the migration is successfully reverted. |
+
+#### Internal Logic
+1. Starts a database transaction using `queryInterface.sequelize.transaction`.
+2. Adds the `patient_number` column back to the `patient` table using `queryInterface.addColumn`. The column is defined as an INTEGER type.
+3. Commits the transaction if all operations are successful. If any operation fails, the transaction is rolled back.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Provides the database abstraction layer and migration utilities. |
+| umzug | A migration framework used to manage database schema changes. |
+
+## Error Handling
+Both `up` and `down` functions use database transactions to ensure atomicity. If any operation within the transaction fails, the entire transaction is rolled back, preventing the database from being left in an inconsistent state.

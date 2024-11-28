@@ -1,0 +1,61 @@
+---
+title: "restart_api_prod.yml"
+---
+
+## High-level description
+This GitHub Actions workflow file, named "Restart API - PRODUCTION", is designed to restart the production API service on Amazon ECS (Elastic Container Service). It can be manually triggered and uses a reusable workflow to perform the restart operation with production-specific configuration.
+
+## Code Structure
+The workflow consists of a single job named "restart" that utilizes a reusable workflow defined in `_restart-ecs.yml`. It passes various production environment variables and secrets to the reusable workflow.
+
+## Symbols
+
+### `restart` (job)
+#### Description
+This job is responsible for restarting the production API service. It uses a reusable workflow defined in `_restart-ecs.yml` and provides production-specific parameters and secrets.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| deploy_env | string | Deployment environment, set to "production" |
+| ECR_REPO_URI | string | URI of the ECR repository for production |
+| ECS_CLUSTER | string | Name of the ECS cluster for production |
+| ECS_SERVICE | string | Name of the ECS service for production |
+| AWS_REGION | string | AWS region for the production API |
+
+#### Secrets
+| Name | Description |
+|:-----|:------------|
+| AWS_ACCESS_KEY_ID | AWS access key ID for authentication |
+| AWS_SECRET_ACCESS_KEY | AWS secret access key for authentication |
+| DOCKERHUB_USERNAME | DockerHub username for authentication |
+| DOCKERHUB_TOKEN | DockerHub token for authentication |
+
+#### Internal Logic
+1. The job uses the reusable workflow defined in `_restart-ecs.yml`.
+2. It passes production-specific environment variables and secrets to the reusable workflow.
+3. The actual restart logic is implemented in the reusable workflow.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ./.github/workflows/_restart-ecs.yml | Reusable workflow for restarting ECS services |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| name | string | "Restart API - PRODUCTION" | Name of the workflow |
+| on.workflow_dispatch | object | {} | Enables manual triggering of the workflow |
+
+## References
+This workflow references several GitHub Actions variables and secrets:
+- `vars.ECR_REPO_URI_PRODUCTION`
+- `vars.ECS_CLUSTER_PRODUCTION`
+- `vars.ECS_SERVICE_PRODUCTION`
+- `vars.API_REGION_PRODUCTION`
+- `secrets.AWS_ACCESS_KEY_ID`
+- `secrets.AWS_SECRET_ACCESS_KEY`
+- `secrets.DOCKERHUB_USERNAME`
+- `secrets.DOCKERHUB_TOKEN`
+
+These references suggest that the corresponding variables and secrets are defined in the repository's settings.

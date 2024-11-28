@@ -1,0 +1,58 @@
+---
+title: "documentDTO.ts"
+---
+
+## High-level description
+This code defines a Data Transfer Object (DTO) for DocumentReference resources and provides a function to convert FHIR DocumentReference resources to this DTO format. It is used to standardize the representation of document references in the API responses.
+
+## Code Structure
+The main symbols in this code are:
+1. `DocumentReferenceDTO`: A type definition for the DTO.
+2. `toDTO`: A function that converts FHIR DocumentReference resources to the DTO format.
+
+These symbols are related as `toDTO` creates objects of type `DocumentReferenceDTO`.
+
+## References
+This code references:
+- `DocumentReference` from "@medplum/fhirtypes"
+- `getMetriportContent` from "@metriport/core/external/fhir/shared/extensions/metriport"
+- `CodeableConceptDTO` and `toDTO` as `codeableToDTO` from "./codeableDTO"
+
+## Symbols
+
+### DocumentReferenceDTO
+#### Description
+This type defines the structure for a simplified representation of a DocumentReference resource.
+
+#### Internal Logic
+The type includes fields for essential document metadata such as id, fileName, description, status, indexed date, MIME type, size, and type.
+
+### toDTO
+#### Description
+This function converts an array of FHIR DocumentReference resources to an array of DocumentReferenceDTO objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docs | DocumentReference[] \| undefined | An array of FHIR DocumentReference resources or undefined |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | DocumentReferenceDTO[] | An array of DocumentReferenceDTO objects |
+
+#### Internal Logic
+1. If the input is undefined, return an empty array.
+2. Use `flatMap` to process each DocumentReference:
+   - Check if the document and its ID exist.
+   - Extract Metriport-specific content using `getMetriportContent`.
+   - If valid content is found, create a DocumentReferenceDTO object with extracted information.
+   - If no valid content is found, return an empty array for that document.
+3. The resulting array contains only the DocumentReferenceDTO objects for documents with valid content.
+
+## Dependencies
+- "@medplum/fhirtypes": Provides the DocumentReference type.
+- "@metriport/core/external/fhir/shared/extensions/metriport": Provides the getMetriportContent function.
+- "./codeableDTO": Provides the CodeableConceptDTO type and toDTO function for codeable concepts.
+
+This code is crucial for transforming complex FHIR DocumentReference resources into a simplified format that's easier to work with in the API layer. It focuses on extracting key information and presenting it in a consistent structure.

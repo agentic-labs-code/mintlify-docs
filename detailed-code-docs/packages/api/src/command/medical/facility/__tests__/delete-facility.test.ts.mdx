@@ -1,0 +1,41 @@
+---
+title: "delete-facility.test.ts"
+---
+
+## High-level description
+The `deleteFacility` function in `delete-facility.test.ts` provides a test suite for the `deleteFacility` function, which is responsible for deleting a facility from the system. The tests cover scenarios such as checking for facility existence, handling cases with associated patients, and successful deletion.
+
+## Code Structure
+The code defines a test suite using Jest, mocking dependencies like `FacilityModel` and functions like `getFacilityOrFail`. It sets up mocks in `beforeAll`, clears them after each test in `afterEach`, and restores them in `afterAll`. The `describe` block groups tests related to `deleteFacility`.
+
+## References
+- `NotFoundError` from "@metriport/core/util/error/not-found"
+- `BadRequestError` from "@metriport/shared"
+- `makeFacility`, `makeFacilityModel` from "../../../../domain/medical/__tests__/facility"
+- `FacilityModel` from "../../../../models/medical/facility"
+- `makePatientModel` from "../../../../models/medical/__tests__/patient"
+- `mockStartTransaction` from "../../../../models/__tests__/transaction"
+- `getPatients` from "../../patient/get-patient"
+- `getFacilityOrFail` from "../get-facility"
+
+## Symbols
+### `describe(deleteFacility, ...)`
+#### Description
+This block encapsulates the test suite for the `deleteFacility` function.
+
+#### Internal Logic
+The test suite includes the following test cases:
+
+- **"checks if facility exists"**: Verifies that `getFacilityOrFail` is called with the correct facility identifier when `deleteFacility` is invoked.
+- **"throws if facility does not exists"**: Asserts that a `NotFoundError` is thrown if `getFacilityOrFail` indicates the facility doesn't exist, and that `FacilityModel.destroy` is not called.
+- **"throws if facility contains patients"**: Checks that a `BadRequestError` is thrown if there are patients associated with the facility, preventing deletion.
+- **"deletes if facility does not contain patients"**: Confirms that `FacilityModel.destroy` is called to delete the facility when no patients are associated.
+
+## Dependencies
+- jest
+- jest-mock
+- @metriport/core/util/error/not-found
+- @metriport/shared
+
+## Error Handling
+The tests specifically address error handling by asserting that `NotFoundError` is thrown when a facility is not found and `BadRequestError` is thrown when attempting to delete a facility with associated patients.

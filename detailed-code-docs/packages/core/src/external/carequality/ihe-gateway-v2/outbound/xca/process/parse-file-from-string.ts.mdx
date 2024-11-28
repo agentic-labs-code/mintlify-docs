@@ -1,0 +1,93 @@
+---
+title: "parse-file-from-string.ts"
+---
+
+## High-level description
+This code provides functionality to parse and process files from strings or buffers, specifically handling XML and non-XML content. It detects file types, decodes content, and extracts embedded non-XML bodies from XML documents.
+
+## Code Structure
+The main functions `parseFileFromBuffer` and `parseFileFromString` use helper functions like `detectFileType`, `isXMLContentType`, and `extractNonXmlBody` to process the input and return a `ParsedFile` object.
+
+## References
+This code references utility functions from other modules:
+- `detectFileType`, `isXMLContentType` from "../../../../../../util/file-type"
+- `XML_APP_MIME_TYPE`, `XML_TXT_MIME_TYPE` from "../../../../../../util/mime"
+- `out` from "../../../../../../util/log"
+
+## Symbols
+
+### `parseFileFromBuffer`
+#### Description
+Parses a file from a Buffer, detecting its type and extracting content if it's XML.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| buffer | Buffer | The input file content as a Buffer |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ParsedFile | object | Contains fileExtension, mimeType, and decodedBytes |
+
+#### Internal Logic
+1. Detects file type using `detectFileType`
+2. If XML, extracts non-XML body
+3. Returns ParsedFile object
+
+### `parseFileFromString`
+#### Description
+Parses a file from a string, detecting its type, decoding content, and extracting if it's XML.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fileAsString | string | The input file content as a string |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ParsedFile | object | Contains fileExtension, mimeType, and decodedBytes |
+
+#### Internal Logic
+1. Checks if content is XML
+2. Decodes content (base64 if not XML)
+3. Detects file type
+4. If XML, extracts non-XML body
+5. Returns ParsedFile object
+
+### `extractNonXmlBody`
+#### Description
+Extracts non-XML body from XML content, parsing it using XMLParser.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| mimeType | string | MIME type of the file |
+| fileExtension | string | File extension |
+| decodedBytes | Buffer | Decoded file content |
+| fileAsString | string | Original file content as string |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ParsedFile | object | Contains fileExtension, mimeType, and decodedBytes |
+
+#### Internal Logic
+1. Decodes buffer to string
+2. Parses XML using XMLParser
+3. Extracts non-XML body if present
+4. Recursively parses extracted content or returns original content
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| fast-xml-parser | Used to parse XML content |
+
+## Error Handling
+The code includes basic error handling, logging errors when decoding fails or when required data is missing.
+
+## Logging
+The code uses a custom logging utility (`out`) to log messages with a specific prefix.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

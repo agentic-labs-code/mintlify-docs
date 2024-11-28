@@ -1,0 +1,90 @@
+---
+title: "fhir-converter-service.ts"
+---
+
+Here's a detailed documentation of the target file:
+
+## High-level description
+This file defines the FHIR Converter Service, which is responsible for setting up and configuring an Amazon ECS Fargate service to run FHIR conversion tasks. It creates the necessary infrastructure components such as ECS cluster, task definition, load balancer, and associated CloudWatch alarms.
+
+## Code Structure
+The file exports two main functions:
+1. `settings()`: Defines the configuration settings for the FHIR Converter Service.
+2. `createFHIRConverterService()`: Creates and configures the FHIR Converter Service infrastructure.
+
+## Symbols
+
+### `settings()`
+#### Description
+This function returns an object containing the configuration settings for the FHIR Converter Service. It determines the CPU, memory, and task count based on whether the environment is production or not.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| settings | object | An object containing CPU amount, CPU units, memory limit, minimum and maximum task count, and maximum execution timeout |
+
+#### Internal Logic
+- Determines if the environment is production using the `isProd()` function
+- Sets CPU amount, memory, and task count based on the environment
+- Uses `MAXIMUM_LAMBDA_TIMEOUT` for the maximum execution timeout
+
+### `createFHIRConverterService()`
+#### Description
+This function creates and configures the FHIR Converter Service infrastructure using AWS CDK constructs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| stack | Construct | The CDK construct representing the stack |
+| props | FhirConverterServiceProps | Properties for the FHIR Converter Service |
+| vpc | ec2.IVpc | The VPC in which to create the service |
+| alarmAction | SnsAction \| undefined | Optional SNS action for alarms |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| service | FargateService | The created Fargate service |
+| address | string | The DNS address of the load balancer |
+
+#### Internal Logic
+1. Creates an ECS cluster
+2. Creates a Docker image asset
+3. Creates an ApplicationLoadBalancedFargateService
+4. Configures CloudWatch alarms for CPU and memory utilization
+5. Sets up auto-scaling for the Fargate service
+6. Configures security group rules
+7. Sets up health checks and deregistration delay for the target group
+8. Adds default metrics to the target group
+
+## Dependencies
+- aws-cdk-lib: Various CDK constructs for AWS services
+- constructs: CDK's Construct class
+- ../config/env-config: EnvConfig type
+- ../shared/config: getConfig function
+- ../shared/fargate: vCPU constant
+- ../shared/lambda: MAXIMUM_LAMBDA_TIMEOUT constant
+- ../shared/s3: buildLbAccessLogPrefix function
+- ../shared/target-group: addDefaultMetricsToTargetGroup function
+- ../shared/util: isProd function
+
+## Configuration
+The service configuration is determined by the `settings()` function, which uses the environment type to set appropriate values for CPU, memory, and task count.
+
+## Error Handling
+The code implements CloudWatch alarms for CPU and memory utilization to detect and alert on potential issues with the Fargate service.
+
+## Logging
+The code sets up access logging for the load balancer, storing logs in an S3 bucket.
+
+## Performance Considerations
+- Auto-scaling is configured based on CPU and memory utilization
+- The service uses Fargate for serverless container management
+- Health check and deregistration delay settings are optimized for faster deployments
+
+## TODOs
+There is one TODO comment regarding security:
+```typescript
+// TODO: #489 ain't the most secure, but the above code doesn't work as CDK complains we can't use the connections
+// from the cluster created above, should be fine for now as it will only accept connections in the VPC
+```
+This suggests that the current security group configuration might need improvement in the future.

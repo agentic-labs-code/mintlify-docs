@@ -1,0 +1,96 @@
+---
+title: "migrations-shared.ts"
+---
+
+## High-level description
+The `packages/api/src/sequelize/migrations-shared.ts` file provides helper functions and a base model definition for Sequelize migrations in the API package. It defines common table columns, a trigger for updating `updatedAt` timestamps, and a utility function for creating tables with these defaults.
+
+## Code Structure
+The `migrations-shared.ts` file defines a `BaseModel` class and several helper functions: `defaultColumnsDef`, `addUpdatedAtTrigger`, and `createTable`. The `createTable` function utilizes `defaultColumnsDef` to define default columns and `addUpdatedAtTrigger` to add a trigger for updating the `updatedAt` column.
+
+## References
+- `sequelize`: This module is used for interacting with the database.
+
+## Symbols
+
+### `BaseModel`
+#### Description
+An abstract base class for Sequelize models, defining common attributes like `createdAt` and `updatedAt`.
+
+#### Inputs
+None.
+
+#### Outputs
+None.
+
+#### Internal Logic
+The class extends the Sequelize `Model` class and declares two properties:
+- `createdAt`: Represents the creation timestamp of the record.
+- `updatedAt`: Represents the last update timestamp of the record.
+
+### `defaultColumnsDef`
+#### Description
+Defines the default columns for database tables, including `createdAt`, `updatedAt`, and optionally a `version` column.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| version | boolean \| undefined | Flag indicating whether to include the `version` column. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| columns | ModelAttributes&lt;BaseModel, CreationAttributes&lt;BaseModel&gt;&gt; | An object representing the default column definitions. |
+
+#### Internal Logic
+The function returns an object containing the definitions for `createdAt` and `updatedAt` columns. If the `version` flag is true, it also includes a `version` column definition.
+
+### `addUpdatedAtTrigger`
+#### Description
+Creates a trigger on the specified table to automatically update the `updatedAt` column before each update operation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queryInterface | QueryInterface | The Sequelize QueryInterface instance. |
+| transaction | Transaction | The Sequelize transaction object. |
+| tableName | string | The name of the table to add the trigger to. |
+
+#### Outputs
+None.
+
+#### Internal Logic
+The function uses the `queryInterface.createTrigger` method to create a trigger named `trg_update_{tableName}`. This trigger executes the `updateUpdatedAtFnName` function before each update operation on the table.
+
+### `createTable`
+#### Description
+A helper function to create a new database table with default columns and an `updatedAt` trigger.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queryInterface | QueryInterface | The Sequelize QueryInterface instance. |
+| tableName | string | The name of the table to create. |
+| tableDefinitions | ModelAttributes | An object defining the table's columns. |
+| options | CreateTableOptions | An object containing options for table creation, including the transaction object and a flag for adding the `version` column. |
+
+#### Outputs
+None.
+
+#### Internal Logic
+The function first calls `queryInterface.createTable` to create the table with the provided definitions and default columns. Then, it calls `addUpdatedAtTrigger` to add the `updatedAt` trigger to the newly created table.
+
+## Side Effects
+- Modifies the database schema by creating tables and triggers.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Provides database interaction functionality. |
+| ts-essentials | Provides the `DeepNonNullable` type. |
+
+## Error Handling
+The code does not implement specific error handling beyond basic exception raising.
+
+## Logging
+The code does not implement logging.

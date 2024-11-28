@@ -1,0 +1,89 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the output processing components of the FHIR converter library. It includes functionality for parsing and processing JSON data, deduplicating and merging FHIR resources, and moving resources within FHIR JSON objects. The code utilizes the ANTLR framework for JSON parsing and custom listeners for processing the parsed data.
+
+## What does it do?
+The output processor performs several key functions in the FHIR conversion process:
+
+1. JSON Parsing and Processing: It uses ANTLR-generated code to parse JSON input and a custom listener to process the parsed data.
+
+2. Resource Deduplication: It identifies and merges duplicate FHIR Encounter resources based on their identifiers, ensuring data consistency.
+
+3. Resource Merging: It combines multiple FHIR resources with the same key, handling complex merging scenarios for arrays and nested objects.
+
+4. Resource Moving: It relocates specific resources to a global scope within the FHIR JSON structure, improving organization and accessibility.
+
+5. Text Replacement: It applies text replacements using a provided dictionary, allowing for dynamic content updates in the FHIR resources.
+
+These processes work together to refine and optimize the FHIR data structure, improving data quality and consistency in the converted output.
+
+## Entry points
+The main entry points for this module are:
+
+1. `jsonProcessor.js`: The `Process` function in this file is the primary entry point for JSON processing. It takes a JSON string as input, parses it using ANTLR, and processes it using a custom listener.
+
+2. `resourceDeduplicator.js`: The `Process` function in this file handles the deduplication of FHIR Encounter resources. It identifies and merges duplicate encounters based on their identifiers.
+
+3. `resourceMerger.js`: The `Process` function in this file manages the merging of FHIR resources with the same key. It also exports a `merge` function for external use.
+
+4. `resourceMover.js`: This file exports two main functions: `Process` for moving resources to a global scope, and `ReplaceText` for applying text replacements to FHIR JSON objects.
+
+The data flow typically starts with JSON processing, followed by resource deduplication, merging, and moving. Text replacements can be applied at various stages of the process.
+
+## Key Files
+
+1. `jsonCustomListener.js`: Defines a custom JSON listener that extends the ANTLR-generated listener. It builds a stack-based representation of the parsed JSON elements.
+
+2. `jsonProcessor.js`: Implements the main JSON processing logic using ANTLR and the custom listener.
+
+3. `resourceDeduplicator.js`: Handles the deduplication of FHIR Encounter resources, including merging duplicates and selecting the most informative status.
+
+4. `resourceMerger.js`: Manages the merging of FHIR resources with the same key, using deep merge with custom array handling.
+
+5. `resourceMover.js`: Provides functionality to move specific resources to a global scope and replace text placeholders in FHIR JSON objects.
+
+6. `autogen/` directory: Contains auto-generated ANTLR code for JSON parsing, including lexer, parser, listener, and visitor files.
+
+## Dependencies
+The output processor relies on several external libraries:
+
+1. ANTLR4 (version 4.9.2): Used for generating and running the JSON parser and lexer.
+2. deepmerge: Utilized in resource merging for deep object merging.
+3. underscore: Used for array deduplication in resource merging.
+4. crypto: Employed for generating MD5 hashes in the deduplication process.
+
+These dependencies were chosen for their robustness and efficiency in handling complex data structures and parsing tasks.
+
+## Configuration
+The output processor doesn't require specific configuration files. However, it does use some constants and relies on the structure of FHIR resources. The behavior of the JSON parser is determined by the ANTLR grammar file (`json.g4`), which is used to generate the lexer and parser code.
+
+Key configurable aspects include:
+- The replacement dictionary used in text replacement operations.
+- The criteria for identifying resources to be moved to the global scope.
+- The rules for selecting the most informative status in resource deduplication.
+
+Example of using the output processor:
+
+```javascript
+const jsonProcessor = require('./jsonProcessor');
+const resourceDeduplicator = require('./resourceDeduplicator');
+const resourceMover = require('./resourceMover');
+
+// Process JSON input
+let result = jsonProcessor.Process(jsonInput);
+
+// Deduplicate resources
+result = resourceDeduplicator.Process(result);
+
+// Move resources and apply text replacements
+const replacementDictionary = { /* key-value pairs for text replacement */ };
+result = resourceMover.Process(result, replacementDictionary);
+
+// Final output
+console.log(JSON.stringify(result, null, 2));
+```
+
+This example demonstrates the typical flow of data through the output processor, starting with JSON processing, followed by resource deduplication, and finally resource moving and text replacement.

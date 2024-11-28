@@ -1,0 +1,67 @@
+---
+title: "acc-init.ts"
+---
+
+## High-level description
+This code is a utility script for initializing customer accounts based on their Cognito users. It retrieves users from an AWS Cognito User Pool and then initializes their accounts by making API calls to a specified endpoint.
+
+## Code Structure
+The main function `main()` orchestrates the process, calling `getUsers()` to retrieve user information from Cognito, and then making API calls to initialize each user's account. The `getUsers()` function handles the interaction with the AWS Cognito service, including pagination of results.
+
+## Symbols
+
+### `main()`
+#### Description
+This function is the entry point of the script. It retrieves environment variables, fetches users from Cognito, and initializes their accounts.
+
+#### Internal Logic
+1. Retrieves necessary environment variables.
+2. Calls `getUsers()` to fetch users from Cognito.
+3. Logs the number of users and their details.
+4. Iterates through each user and makes a POST request to initialize their account.
+
+### `getUsers(accessKeyId: string, secretAccessKey: string, userPoolId: string, region: string)`
+#### Description
+This function retrieves users from an AWS Cognito User Pool.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| accessKeyId | string | AWS access key ID |
+| secretAccessKey | string | AWS secret access key |
+| userPoolId | string | Cognito User Pool ID |
+| region | string | AWS region |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| users | string[] | Array of user IDs |
+
+#### Internal Logic
+1. Configures the AWS Cognito Identity Provider client.
+2. Sets up the input for the ListUsersCommand.
+3. Sends the initial command and collects user IDs.
+4. Handles pagination by repeatedly sending commands with pagination tokens.
+5. Returns a unique list of user IDs.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | Loading environment variables |
+| @aws-sdk/client-cognito-identity-provider | Interacting with AWS Cognito |
+| axios | Making HTTP requests |
+| lodash | Utility functions (uniq) |
+| @metriport/core/util/env-var | Retrieving environment variables |
+
+## Configuration
+The script relies on several environment variables:
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| ACCESS_KEY | string | AWS access key ID |
+| SECRET_KEY | string | AWS secret access key |
+| USER_POOL_ID | string | Cognito User Pool ID |
+| REGION | string | AWS region |
+| API_ADRESS | string | API address for account initialization |
+
+## TODOs
+- The script includes a comment referencing issue #366, which may indicate ongoing development or improvements related to this functionality.

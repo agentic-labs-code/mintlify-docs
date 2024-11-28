@@ -1,0 +1,45 @@
+---
+title: "make-immunization.ts"
+---
+
+## High-level description
+This code defines a function `makeImmunization` that creates a mock Immunization resource for FHIR (Fast Healthcare Interoperability Resources). It's primarily used for testing purposes, allowing the creation of realistic-looking Immunization data with customizable parameters.
+
+## Symbols
+
+### `makeImmunization`
+#### Description
+This function generates a mock Immunization resource by combining default values, base domain properties, subject reference, and any custom parameters provided.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | Partial&lt;Immunization&gt; | Optional. Partial Immunization object to override default values |
+| ids | \{ imm?: string; loc?: string \} | Optional. Object containing custom IDs for the Immunization and Location resources |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| immunization | Immunization | A complete Immunization resource |
+
+#### Internal Logic
+1. Spreads the result of `makeBaseDomain()` to include common domain properties.
+2. Spreads the result of `makeSubjectReference()` to include subject reference properties.
+3. Sets the `resourceType` to "Immunization".
+4. Generates an `id` using either the provided `ids.imm` or a random UUID.
+5. Creates a `location` object with a reference to a Location resource, using either the provided `ids.loc` or a random UUID.
+6. Spreads the `params` object to override any default values with custom ones.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @faker-js/faker | Used to generate random UUIDs for IDs |
+| @medplum/fhirtypes | Provides TypeScript types for FHIR resources |
+| ./shared | Imports utility functions for creating base domain and subject reference properties |
+
+## References
+The function references two imported functions:
+- `makeBaseDomain()`: Likely provides common properties for FHIR resources.
+- `makeSubjectReference()`: Likely provides properties related to the subject of the Immunization.
+
+These functions are imported from a local `shared` module, indicating they are utility functions used across multiple test files.

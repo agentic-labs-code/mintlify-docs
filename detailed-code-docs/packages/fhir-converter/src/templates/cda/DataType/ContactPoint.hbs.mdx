@@ -1,0 +1,44 @@
+---
+title: "ContactPoint.hbs"
+---
+
+## High-level description
+This Handlebars template file is designed to convert contact point information from a CDA (Clinical Document Architecture) format to FHIR (Fast Healthcare Interoperability Resources) format. It specifically handles phone numbers and email addresses, extracting the relevant information and formatting it according to FHIR specifications.
+
+## Symbols
+
+### ContactPoint.hbs
+#### Description
+This template processes a `contactPoint` object and generates a FHIR-compliant JSON structure for contact information. It distinguishes between phone numbers and email addresses based on the prefix in the `value` field.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| contactPoint | Object | An object containing contact information, including `value` and `use` properties |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON object | Object | A FHIR-compliant JSON object representing the contact point |
+
+#### Internal Logic
+1. Check if `contactPoint.value` exists.
+2. If the value contains 'tel:', it's processed as a phone number:
+   - Set "system" to "phone"
+   - Extract the phone number by removing the 'tel:' prefix
+   - Set "use" using the TelecomUse.hbs partial
+3. If the value contains 'mailto:', it's processed as an email:
+   - Set "system" to "email"
+   - Extract the email address by removing the 'mailto:' prefix
+   - Set "use" using the TelecomUse.hbs partial
+4. The resulting object is wrapped in curly braces and followed by a comma, suggesting it's meant to be part of a larger array or object.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ValueSet/TelecomUse.hbs | Partial template used to determine the "use" value for the contact point |
+
+## Notes
+1. The template uses Handlebars helpers such as `if`, `contains`, and `replace` for conditional rendering and string manipulation.
+2. The output is structured to be compatible with FHIR ContactPoint resource requirements.
+3. The template includes a comprehensive copyright notice, indicating it's based on work by Microsoft but is now maintained by Metriport Inc. under the AGPLv3 license.

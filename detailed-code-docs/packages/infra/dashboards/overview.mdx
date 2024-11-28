@@ -1,0 +1,68 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains JSON configuration files for CloudWatch dashboards used to monitor AWS services and resources in both production and staging environments. The dashboards are designed to provide comprehensive visibility into the performance and health of various components of the infrastructure, including API servers, databases, Lambda functions, ECS services, and other AWS services.
+
+## What does it do?
+The CloudWatch dashboards defined in these JSON files serve as centralized monitoring tools for the infrastructure. They allow DevOps teams and engineers to:
+
+1. Visualize real-time metrics from various AWS services in a single view.
+2. Monitor the health and performance of key components such as API servers, databases, and serverless functions.
+3. Track resource utilization, including CPU, memory, and storage.
+4. Identify potential issues or bottlenecks by monitoring error rates and latency.
+5. Compare performance across different environments (production vs. staging).
+
+These dashboards enable quick identification of anomalies, performance issues, or potential areas for optimization across the entire infrastructure stack.
+
+## Key Files
+
+1. `cw-dashboard-prod.json`: This file defines the CloudWatch dashboard for the production environment. It includes widgets for monitoring various AWS services and resources, with a focus on production-specific metrics and thresholds.
+
+2. `cw-dashboard-staging.json`: This file contains the configuration for the staging environment's CloudWatch dashboard. While similar to the production dashboard, it may include additional widgets or different thresholds tailored to the staging environment's needs.
+
+Both files use a similar structure, with an array of widget objects that define the layout and content of the dashboard. Each widget represents a specific metric or set of metrics to be displayed, including its type, size, position, and visualization properties.
+
+## Dependencies
+The dashboards rely on various AWS services for data collection and visualization:
+
+1. AWS CloudWatch: The primary service used for monitoring and observability. It collects and processes the metrics displayed in the dashboards.
+2. AWS ECS (Elastic Container Service): Used for container orchestration and management. The dashboards monitor ECS tasks and services.
+3. AWS RDS (Relational Database Service): Provides database metrics for monitoring performance and utilization.
+4. AWS Lambda: Serverless compute service. The dashboards track Lambda function invocations, errors, and performance.
+5. AWS API Gateway: Managed service for creating and maintaining APIs. The dashboards monitor API request counts, errors, and latency.
+6. AWS SQS (Simple Queue Service): Message queuing service. The dashboards track queue metrics such as message count.
+7. AWS OpenSearch (formerly Elasticsearch): Search and analytics engine. The production dashboard includes widgets for monitoring the OpenSearch cluster.
+
+## Configuration
+Both dashboard configurations use a JSON structure with a "widgets" array containing multiple widget objects. Each widget represents a visual component on the CloudWatch dashboard and includes the following key properties:
+
+- `height` and `width`: Dimensions of the widget
+- `y` and `x`: Position of the widget on the dashboard
+- `type`: Type of widget (e.g., "metric", "log", "text")
+- `properties`: Configuration properties specific to the widget type
+
+The dashboards are configured to monitor resources in the "us-west-1" region, but this can be adjusted as needed.
+
+Key components monitored in both production and staging environments include:
+
+1. API Servers (ECS tasks for OSS and Internal/Admin APIs)
+2. Databases (RDS instances for API and FHIR databases)
+3. FHIR Server and FHIR Converter (ECS tasks)
+4. Lambda functions
+5. API Gateway
+6. SQS queues
+
+The production dashboard also includes widgets for monitoring an OpenSearch cluster and IHE Gateway (Inbound and Outbound).
+
+Widgets are organized into sections using text widgets as headers, making it easy to navigate and understand the dashboard layout.
+
+Performance considerations in the dashboard configurations include:
+
+1. Use of various statistics (e.g., Maximum, Average, SampleCount) for different metrics
+2. Different time periods (e.g., 60 seconds, 300 seconds) for metric aggregation
+3. Monitoring of CPU utilization, memory usage, and latency across services
+4. Tracking of error rates and status codes for services like API Gateway and Lambda functions
+
+These configurations provide a comprehensive view of the infrastructure, allowing for real-time monitoring, troubleshooting, and performance optimization in both production and staging environments.

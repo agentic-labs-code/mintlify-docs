@@ -1,0 +1,215 @@
+---
+title: "shared.ts"
+---
+
+## High-level description
+The `packages/api/src/external/carequality/shared.ts` file contains shared functions and types used for interacting with the Carequality system. It includes functions for checking Carequality enablement, formatting dates, building organization names, and retrieving address coordinates.
+
+## Code Structure
+This file defines several functions and types that are used by other modules in the Carequality integration. The functions are mostly independent, but some rely on types defined in the same file.
+
+## References
+- `@metriport/core/util/error/not-found`: Used for throwing a `NotFoundError` when an organization is not found.
+- `@metriport/carequality-sdk`: Provides the Carequality API client.
+- `@metriport/core/domain/patient`: Defines the `Patient` type.
+- `@metriport/core/domain/location-address`: Defines the `AddressStrict` type.
+- `@metriport/core/domain/address`: Defines the `Coordinates` type.
+- `@metriport/core/util/notifications`: Used for capturing errors and messages.
+- `@metriport/shared`: Provides the `PurposeOfUse` enum and utility functions.
+- `@metriport/core/external/index`: Defines the `MedicalDataSource` enum.
+- `@metriport/core/domain/organization`: Defines the `OrganizationBizType` enum.
+- `../aws/app-config`: Provides functions for checking Carequality feature flag enablement.
+- `../hie/get-hie-initiator`: Provides functions for retrieving HIE initiator information.
+- `../../domain/medical/address`: Provides a function for retrieving address coordinates.
+- `./cq-directory`: Defines the `CQDirectoryEntryData` type.
+- `./command/cq-directory/parse-cq-directory-entry`: Provides a function for parsing Carequality directory entries.
+
+## Symbols
+
+### `createPurposeOfUse`
+#### Description
+Creates a `PurposeOfUse` object for Carequality interactions. Currently, it only supports the `TREATMENT` purpose of use.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | `PurposeOfUse` | The `TREATMENT` purpose of use. |
+
+#### Internal Logic
+- Returns `PurposeOfUse.TREATMENT`.
+
+### `isGWValid`
+#### Description
+Checks if a Carequality gateway object is valid.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| gateway | `{ homeCommunityId: string; url: string }` | The Carequality gateway object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | `boolean` | True if the gateway is valid, false otherwise. |
+
+#### Internal Logic
+- Returns true if both `homeCommunityId` and `url` properties of the gateway object are truthy.
+
+### `isCqEnabled`
+#### Description
+Checks if Carequality is enabled for a given patient and facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `Pick&lt;Patient, "id" | "cxId"&gt;` | The patient object. |
+| facilityId | `string` | The facility ID. |
+| forceEnabled | `boolean` | Whether to force Carequality to be enabled. |
+| log | `typeof console.log` | A logging function. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | `Promise&lt;boolean&gt;` | True if Carequality is enabled, false otherwise. |
+
+#### Internal Logic
+- Checks if the Carequality feature flag is enabled.
+- Checks if Carequality Direct is enabled for the patient's customer organization.
+- Checks if the facility is enabled to query Carequality.
+- Logs messages and captures errors if any of the checks fail.
+
+### `formatDate`
+#### Description
+Formats a date string to ISO format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dateString | `string \| undefined` | The date string to format. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | `string \| undefined` | The formatted date string in ISO format, or undefined if the input is undefined or invalid. |
+
+#### Internal Logic
+- Removes hyphens and colons from the input date string.
+- Extracts the year, month, and day from the preprocessed string.
+- Creates a `Date` object from the extracted values.
+- Returns the ISO string representation of the `Date` object.
+- Logs an error if the `Date` object cannot be created.
+
+### `getCqInitiator`
+#### Description
+Retrieves the HIE initiator information for Carequality interactions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `Pick&lt;Patient, "id" | "cxId"&gt;` | The patient object. |
+| facilityId | `string \| undefined` | The facility ID. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | `Promise&lt;HieInitiator&gt;` | The HIE initiator information. |
+
+#### Internal Logic
+- Calls the `getHieInitiator` function from the `../hie/get-hie-initiator` module.
+
+### `isFacilityEnabledToQueryCQ`
+#### Description
+Checks if a facility is enabled to query Carequality.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facilityId | `string \| undefined` | The facility ID. |
+| patient | `Pick&lt;Patient, "id" | "cxId"&gt;` | The patient object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | `Promise&lt;boolean&gt;` | True if the facility is enabled to query Carequality, false otherwise. |
+
+#### Internal Logic
+- Calls the `isHieEnabledToQuery` function from the `../hie/get-hie-initiator` module with the `MedicalDataSource.CAREQUALITY` argument.
+
+### `getSystemUserName`
+#### Description
+Generates a system user name for a given organization name.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| orgName | `string` | The organization name. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | `string` | The generated system user name. |
+
+#### Internal Logic
+- Returns a string in the format `${orgName} System User`.
+
+### `buildCqOrgNameForFacility`
+#### Description
+Builds a Carequality organization name for a facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| vendorName | `string` | The vendor name. |
+| orgName | `string` | The organization name. |
+| oboOid | `string \| undefined` | The OBO OID. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | `string` | The built Carequality organization name. |
+
+#### Internal Logic
+- If `oboOid` is defined, returns a string in the format `${vendorName} - ${orgName} #OBO# ${oboOid}`.
+- Otherwise, returns a string in the format `${vendorName} - ${orgName}`.
+
+### `getCqAddress`
+#### Description
+Retrieves the address coordinates and address line for a given address.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | `string` | The customer organization ID. |
+| address | `AddressStrict` | The address object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | `Promise&lt;{ coordinates: Coordinates; addressLine: string }&gt;` | An object containing the address coordinates and address line. |
+
+#### Internal Logic
+- Calls the `getAddressWithCoordinates` function from the `../../domain/medical/address` module to retrieve the address coordinates.
+- Builds the address line by combining `addressLine1` and `addressLine2` if present.
+
+### `getParsedCqOrgOrFail`
+#### Description
+Retrieves a parsed Carequality organization from the directory or throws an error if not found.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cq | `CarequalityManagementAPI` | The Carequality API client. |
+| oid | `string` | The organization OID. |
+| active | `boolean` | Whether to retrieve an active organization. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | `Promise&lt;CQDirectoryEntryData&gt;` | The parsed Carequality organization. |
+
+#### Internal Logic
+- Calls the `listOrganizations` method of the Carequality API client to retrieve organizations with the given OID and active status.
+- Throws a `NotFoundError` if no organizations are found.
+- Parses the retrieved organizations using the `parseCQDirectoryEntries` function.
+- Captures a message if more than one organization with the same OID is found.
+- Returns the first parsed organization.

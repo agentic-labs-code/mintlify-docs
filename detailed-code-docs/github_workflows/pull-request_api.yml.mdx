@@ -1,0 +1,58 @@
+---
+title: "pull-request_api.yml"
+---
+
+## High-level description
+This GitHub Actions workflow file, named "PR Check - API", is designed to run checks on pull requests that affect the API package. It triggers on pull requests that modify files in the "packages/api" directory, merge group events, and manual workflow dispatches.
+
+## Code Structure
+The workflow consists of two jobs: `check-commits` and `check-pr`, both of which reuse existing workflow files.
+
+## Symbols
+
+### `name`
+#### Description
+Defines the name of the GitHub Actions workflow as "PR Check - API".
+
+### `on`
+#### Description
+Specifies the events that trigger this workflow.
+
+#### Internal Logic
+- Triggers on pull requests that modify files in the "packages/api" directory
+- Triggers on merge group events
+- Allows manual triggering through workflow dispatch
+
+### `jobs`
+#### Description
+Defines the jobs to be executed as part of this workflow.
+
+#### Internal Logic
+1. `check-commits`: Reuses the `.github/workflows/_check-commits.yml` workflow
+2. `check-pr`: Reuses the `.github/workflows/_build.yml` workflow with specific inputs
+
+### `check-commits`
+#### Description
+A job that runs commit checks using a reusable workflow.
+
+#### Internal Logic
+- Uses the `./.github/workflows/_check-commits.yml` workflow
+- Inherits secrets from the calling workflow
+
+### `check-pr`
+#### Description
+A job that runs build checks for the API package using a reusable workflow.
+
+#### Internal Logic
+- Uses the `./.github/workflows/_build.yml` workflow
+- Specifies the `path` input as "packages/api"
+- Inherits secrets from the calling workflow
+
+## Dependencies
+This workflow depends on two other workflow files:
+| Dependency | Purpose |
+|:-----------|:--------|
+| `./.github/workflows/_check-commits.yml` | Performs commit checks |
+| `./.github/workflows/_build.yml` | Runs build checks for the API package |
+
+Note: The exact contents and functionality of these dependent workflows are not provided in the given code snippet.

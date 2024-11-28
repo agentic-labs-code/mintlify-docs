@@ -1,0 +1,100 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for handling document-related operations within the CommonWell Health Alliance integration in the Metriport core package. It includes functionality for downloading documents from CommonWell, parsing XML files, detecting content types, and storing documents in AWS S3.
+
+## What does it do?
+The code in this directory facilitates the following workflows:
+
+1. Document Downloading: It provides mechanisms to download medical documents from CommonWell Health Alliance, either through a local process or by invoking an AWS Lambda function.
+
+2. Content Type Detection: The system checks and updates MIME types of downloaded documents, ensuring proper file extensions and content type classifications.
+
+3. XML Parsing: For XML documents, it can extract embedded content (such as base64 encoded PDFs) and handle them appropriately.
+
+4. S3 Storage: Downloaded documents are stored in AWS S3 buckets for further access and processing.
+
+5. Error Handling and Retries: The code implements error handling for network issues, API errors, and S3 upload failures, including retry mechanisms for improved reliability.
+
+## Entry points
+The main entry points for this functionality are:
+
+1. `DocumentDownloaderLocal` in `document-downloader-local.ts`: This class handles the local implementation of document downloading, content type detection, and S3 storage.
+
+2. `DocumentDownloaderLambda` in `document-downloader-lambda.ts`: This class provides an implementation that uses AWS Lambda for document downloading.
+
+Both classes extend the abstract `DocumentDownloader` class defined in `document-downloader.ts`, which sets up the basic structure and interface for document downloaders.
+
+The data flow typically starts with a request to download a document, which is then processed through either the local or Lambda implementation, resulting in the document being stored in S3 and metadata being returned about the download.
+
+## Key Files
+1. `document-downloader.ts`: Defines the abstract `DocumentDownloader` class and related interfaces, providing the foundation for document downloading implementations.
+
+2. `document-downloader-local.ts`: Implements the `DocumentDownloaderLocal` class, which handles local document downloading, content type detection, XML parsing, and S3 storage.
+
+3. `document-downloader-lambda.ts`: Implements the `DocumentDownloaderLambda` class, which uses AWS Lambda for document downloading.
+
+4. `document-contribution.ts`: Provides utilities for constructing URLs related to document contributions in the CommonWell context.
+
+## Dependencies
+The code relies on several external libraries and internal utilities:
+
+1. @metriport/commonwell-sdk: For interacting with the CommonWell Health Alliance API.
+2. aws-sdk: For AWS services interaction, particularly S3 and Lambda.
+3. xmldom: For parsing XML documents.
+4. Various internal utilities from the Metriport core package for error handling, network retries, and AWS interactions.
+
+## Configuration
+The document downloaders use configuration objects that include:
+
+1. AWS region and S3 bucket name for document storage.
+2. CommonWell API instance and query metadata.
+3. Organization details (name, OID, NPI) for CommonWell interactions.
+4. Lambda function name (for the Lambda implementation).
+
+These configurations are typically provided when instantiating the document downloader classes.
+
+## Code Snippets
+Here's an example of how the `DocumentDownloaderLocal` handles content type detection and updating:
+
+```typescript
+async checkAndUpdateMimeType(
+  document: Document,
+  fileInfo: FileInfo,
+  downloadedDocument: string,
+  downloadResult: DownloadResult
+): Promise&lt;DownloadResult&gt; {
+  const detectedContentType = await detectContentType(downloadedDocument);
+  if (!acceptedContentTypes.includes(detectedContentType)) {
+    const newExtension = getExtensionFromContentType(detectedContentType);
+    const newKey = updateFileExtension(downloadResult.key, newExtension);
+    await this.s3Client
+      .copyObject({
+        Bucket: this.config.bucketName,
+        CopySource: `/${this.config.bucketName}/${downloadResult.key}`,
+        Key: newKey,
+        ContentType: detectedContentType,
+        MetadataDirective: "REPLACE",
+      })
+      .promise();
+    await this.s3Client
+      .deleteObject({
+        Bucket: this.config.bucketName,
+        Key: downloadResult.key,
+      })
+      .promise();
+    return {
+      ...downloadResult,
+      key: newKey,
+      contentType: detectedContentType,
+    };
+  }
+  return downloadResult;
+}
+```
+
+This method checks the content type of a downloaded document, updates it if necessary, and ensures the correct file extension is used in S3 storage.
+
+In conclusion, this directory provides a robust and flexible system for handling document operations within the CommonWell integration, ensuring proper downloading, processing, and storage of medical documents.

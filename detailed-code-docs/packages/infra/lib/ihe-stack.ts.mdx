@@ -1,0 +1,98 @@
+---
+title: "ihe-stack.ts"
+---
+
+## High-level description
+This code defines an `IHEStack` class that extends the AWS CDK `Stack` class. It sets up an API Gateway with Lambda integrations for handling IHE (Integrating the Healthcare Enterprise) transactions, including patient discovery, document query, and document retrieval. The stack also configures various AWS resources such as S3 buckets, certificates, and Route 53 records.
+
+## Code Structure
+The `IHEStack` class contains the main logic for setting up the IHE-related infrastructure. It uses several helper methods to create Lambda functions for different IHE operations. The class also sets up API Gateway routes, S3 buckets, and other necessary AWS resources.
+
+## Symbols
+
+### IHEStack
+#### Description
+This class represents the main IHE stack, extending the AWS CDK Stack class. It sets up the necessary infrastructure for handling IHE transactions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | Construct | The parent construct |
+| id | string | The stack's unique identifier |
+| props | IHEStackProps | Configuration properties for the stack |
+
+#### Internal Logic
+1. Sets up VPC and SNS topic for alarms
+2. Configures secrets
+3. Sets up API Gateway with custom domain and mTLS
+4. Creates S3 buckets for various purposes
+5. Sets up Lambda functions for patient discovery, document query, and document retrieval
+6. Configures API Gateway routes for the Lambda functions
+7. Sets up CloudWatch logs and alarms
+
+### setupPatientDiscoveryLambda
+#### Description
+Creates and configures the Lambda function for handling patient discovery requests.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| props | IHEStackProps | Stack configuration properties |
+| lambdaLayers | LambdaLayers | Lambda layers to be used |
+| vpc | ec2.IVpc | VPC for the Lambda function |
+| secrets | Secrets | Secrets manager for the Lambda function |
+| posthogSecretName | string \| undefined | Secret name for PostHog API key |
+| alarmSnsAction | SnsAction \| undefined | SNS action for alarms |
+| iheRequestsBucket | s3.IBucket | S3 bucket for IHE requests |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Lambda | Lambda | The created Lambda function |
+
+### setupDocumentQueryLambda
+#### Description
+Creates and configures the Lambda function for handling document query requests.
+
+#### Inputs
+(Similar to setupPatientDiscoveryLambda, with additional medicalDocumentsBucket)
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Lambda | Lambda | The created Lambda function |
+
+### setupDocumentRetrievalLambda
+#### Description
+Creates and configures the Lambda function for handling document retrieval requests.
+
+#### Inputs
+(Similar to setupDocumentQueryLambda)
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Lambda | Lambda | The created Lambda function |
+
+## Dependencies
+The code relies on various AWS CDK libraries and custom modules for configuration and shared functionality.
+
+## Configuration
+The stack uses an `EnvConfig` object for configuration, which includes settings for VPC, API Gateway, certificates, and various AWS resource names and ARNs.
+
+## Error Handling
+Error handling is primarily managed through CloudWatch alarms and logs. The code sets up alarms for Lambda function errors and out-of-memory issues.
+
+## Logging
+CloudWatch logs are set up for the API Gateway access logs and Lambda functions.
+
+## API/Interface Reference
+The API Gateway exposes the following endpoints:
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| /v1/patient-discovery | POST | Handles patient discovery requests |
+| /v1/document-query | POST | Handles document query requests |
+| /v1/document-retrieve | POST | Handles document retrieval requests |
+
+## TODOs
+- TODO 1377: Setup WAF

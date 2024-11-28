@@ -1,0 +1,54 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for generating partial FHIR RiskEvidenceSynthesis resources. These templates are part of a larger FHIR converter system, likely used to transform Clinical Document Architecture (CDA) data to FHIR format. Each template focuses on a specific aspect of the RiskEvidenceSynthesis resource: exposure, outcome, and population.
+
+## What does it do?
+These templates work together to create JSON structures representing different parts of a FHIR RiskEvidenceSynthesis resource. When used in a conversion process, they help transform CDA data into FHIR-compliant format by generating specific sections of the RiskEvidenceSynthesis resource. Each template takes simple inputs (an ID and a reference) and produces a JSON object with the appropriate structure for its respective field in the RiskEvidenceSynthesis resource.
+
+## Key Files
+1. exposure.hbs: This template generates the 'exposure' section of a RiskEvidenceSynthesis resource.
+2. outcome.hbs: This template creates the 'outcome' section of a RiskEvidenceSynthesis resource.
+3. population.hbs: This template produces the 'population' section of a RiskEvidenceSynthesis resource.
+
+Each of these files follows a similar structure:
+
+```handlebars
+{
+  "resource": {
+    "resourceType": "RiskEvidenceSynthesis",
+    "id": "{{ID}}",
+    "{{fieldName}}": {
+      "reference": "{{REF}}"
+    }
+  }
+}
+```
+
+Where `{{fieldName}}` is replaced with "exposure", "outcome", or "population" depending on the specific template.
+
+## Dependencies
+These templates rely on the Handlebars templating engine for processing and rendering. They are designed to be part of a larger FHIR conversion system, which would provide the necessary context and data for rendering these templates.
+
+## Configuration
+While the templates themselves don't have specific configuration options, they expect two inputs when rendered:
+
+1. ID: A string representing the unique identifier for the RiskEvidenceSynthesis resource.
+2. REF: A string containing the reference to the specific resource (exposure, outcome, or population) being linked.
+
+These inputs are used in the template as `{{ID}}` and `{{REF}}` respectively.
+
+## Notes
+1. These templates generate partial FHIR resources, not complete valid FHIR resources on their own. They are likely designed to be combined with other templates or processed further to create complete FHIR resources.
+
+2. The templates are part of the FHIR Converter project, which is now maintained by Metriport Inc. but incorporates work originally done by Microsoft Corporation. This is evident from the comprehensive copyright and license notices at the beginning of each file.
+
+3. The project is licensed under AGPLv3, as stated in the header comments of each file.
+
+4. The templates don't implement any explicit error handling. They assume that the required inputs (ID and REF) will be provided correctly when the templates are rendered.
+
+5. The generated JSON structures are wrapped in additional "resource" and outer object layers. This suggests they might be designed to be part of a larger data structure or message format in the FHIR conversion process.
+
+6. These templates demonstrate a modular approach to FHIR resource generation, allowing for flexibility in how RiskEvidenceSynthesis resources are constructed during the CDA to FHIR conversion process.

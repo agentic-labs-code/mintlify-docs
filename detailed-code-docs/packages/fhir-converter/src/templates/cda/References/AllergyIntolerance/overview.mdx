@@ -1,0 +1,97 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for creating partial FHIR (Fast Healthcare Interoperability Resources) AllergyIntolerance resources. These templates are part of a larger FHIR converter system, specifically designed to transform Clinical Document Architecture (CDA) data into FHIR format. Each template focuses on a specific aspect of the AllergyIntolerance resource, such as the asserter, encounter, patient, and recorder.
+
+## What does it do?
+These templates work together to create different parts of an AllergyIntolerance resource in FHIR format. They handle the conversion of various elements related to allergies and intolerances from CDA to FHIR:
+
+1. The asserter template creates the part of the resource that identifies who asserted the allergy or intolerance.
+2. The encounter template links the allergy information to a specific healthcare encounter.
+3. The patient template associates the allergy with a specific patient.
+4. The recorder template specifies who recorded the allergy information.
+
+Each template generates a JSON structure that represents a portion of the complete AllergyIntolerance resource. These partial structures can be combined to form a complete FHIR-compliant AllergyIntolerance resource.
+
+## Key Files
+1. asserter.hbs: Creates the `asserter` field of the AllergyIntolerance resource.
+2. encounter.hbs: Generates the `encounter` reference within the resource.
+3. patient.hbs: Produces the `patient` reference for the AllergyIntolerance.
+4. recorder.hbs: Constructs the `recorder` field of the resource.
+
+Each of these files follows a similar structure:
+
+```handlebars
+{
+  "resource": {
+    "resourceType": "AllergyIntolerance",
+    "id": "{{ID}}",
+    "{{fieldName}}": {
+      "reference": "{{REF}}"
+    }
+  }
+}
+```
+
+Where `{{fieldName}}` is replaced by "asserter", "encounter", "patient", or "recorder" depending on the specific template.
+
+## Dependencies
+These templates are part of a larger FHIR conversion system and primarily depend on:
+
+| Dependency | Purpose | Version |
+|:-----------|:--------|:--------|
+| Handlebars | Template engine for generating JSON structures | Not specified |
+
+Handlebars is chosen for its simplicity and flexibility in creating dynamic templates, which is crucial for transforming varied CDA data into standardized FHIR format.
+
+## Configuration
+These templates don't include specific configuration options. They are designed to be used as part of a larger conversion process, where the configuration is likely handled at a higher level. Each template expects two inputs:
+
+1. `ID`: A string representing the unique identifier for the AllergyIntolerance resource.
+2. `REF`: A string containing the reference to the relevant entity (asserter, encounter, patient, or recorder).
+
+These inputs are likely provided by the main conversion system based on the CDA data being processed.
+
+The templates are structured to be flexible and reusable, allowing the main conversion system to populate them with appropriate data as needed during the CDA to FHIR transformation process.
+
+It's worth noting that these templates represent partial resources and would typically be combined with other data to create complete FHIR AllergyIntolerance resources. The system using these templates would need to ensure that all required fields for a valid FHIR AllergyIntolerance resource are included in the final output.
+
+Code Example:
+To illustrate how these templates might be used in a conversion process, here's a hypothetical example using the patient.hbs template:
+
+```javascript
+const Handlebars = require('handlebars');
+const fs = require('fs');
+
+// Load the template
+const patientTemplate = Handlebars.compile(fs.readFileSync('patient.hbs', 'utf8'));
+
+// Sample data (would come from CDA parsing in a real scenario)
+const data = {
+  ID: "allergy123",
+  REF: "Patient/patient456"
+};
+
+// Generate the partial resource
+const partialResource = patientTemplate(data);
+
+console.log(JSON.stringify(partialResource, null, 2));
+```
+
+This would output:
+
+```json
+{
+  "resource": {
+    "resourceType": "AllergyIntolerance",
+    "id": "allergy123",
+    "patient": {
+      "reference": "Patient/patient456"
+    }
+  }
+}
+```
+
+In a complete system, similar processes would be applied for each template, and the results would be combined to form a complete AllergyIntolerance resource.

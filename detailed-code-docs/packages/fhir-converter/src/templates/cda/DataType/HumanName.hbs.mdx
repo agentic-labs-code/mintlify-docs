@@ -1,0 +1,41 @@
+---
+title: "HumanName.hbs"
+---
+
+## High-level description
+This Handlebars template file defines the structure for converting a human name from CDA (Clinical Document Architecture) format to FHIR (Fast Healthcare Interoperability Resources) format. It creates a JSON object representing a person's name with various components such as use, family name, given names, full text, prefixes, and suffixes.
+
+## Symbols
+
+### HumanName.hbs
+#### Description
+This Handlebars template generates a JSON object representing a human name in FHIR format. It extracts information from the CDA `name` object and maps it to the corresponding FHIR HumanName fields.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | Object | The CDA name object containing various name components |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON object | Object | A FHIR-compliant HumanName object |
+
+#### Internal Logic
+1. Sets the `use` field by calling the `NameUse.hbs` partial template with `name.use` as the code.
+2. Sets the `family` field from `name.family._`.
+3. Creates an array of `given` names by iterating over `name.given` using the `toArray` helper.
+4. Sets the `text` field from `name._`.
+5. Creates `prefix` and `suffix` arrays with single elements from `name.prefix._` and `name.suffix._` respectively.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ValueSet/NameUse.hbs | Partial template for converting the name use code |
+
+## Notes
+- The template uses Handlebars syntax, including helpers like `#each` and `toArray`.
+- The `{{!-- --}}` block at the beginning contains copyright and license information, indicating that this file incorporates work from Microsoft Corporation and is licensed under AGPLv3.
+- The template assumes that the input `name` object follows the CDA structure, with properties like `use`, `family`, `given`, `prefix`, and `suffix`.
+- Some fields (like `prefix` and `suffix`) are always created as arrays, even if they contain only one element.
+- The `text` field is set to the entire name string (`name._`), which might not always be available or accurate in all CDA documents.

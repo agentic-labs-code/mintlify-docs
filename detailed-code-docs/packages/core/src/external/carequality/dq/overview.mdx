@@ -1,0 +1,58 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code related to the Carequality Document Query (DQ) functionality within the core package of a healthcare interoperability system. It includes utilities for processing inbound document queries, creating metadata XML, and handling patient IDs.
+
+## What does it do?
+The code in this directory facilitates the exchange of healthcare documents between different systems using the Carequality framework. Specifically, it:
+
+1. Processes inbound Document Query requests from other healthcare systems.
+2. Retrieves patient documents from an S3 bucket or generates new Continuity of Care Documents (CCDs) if necessary.
+3. Creates standardized XML metadata for healthcare documents, complying with IHE (Integrating the Healthcare Enterprise) standards.
+4. Handles the decoding and validation of patient IDs used in the document query process.
+
+## Key Files
+
+### create-metadata-xml.ts
+This file contains the `createExtrinsicObjectXml` function, which generates an XML representation of an Extrinsic Object for use in healthcare document metadata. It takes various parameters related to a healthcare document and constructs a standardized XML string containing metadata fields such as creation time, document class, practice setting, and patient information.
+
+### process-inbound-dq.ts
+This file implements the `processInboundDq` function, which is the main entry point for handling inbound Document Query requests. It orchestrates the entire process of validating the request, retrieving or generating documents, and constructing the appropriate response. It also includes utility functions for retrieving document contents from S3.
+
+### utils.ts
+This file provides the `decodePatientId` utility function, which decodes a base64-encoded patient ID string into its constituent parts: a CX ID (likely a customer or organization identifier) and a patient ID. This function is crucial for processing patient identifiers used in document queries.
+
+## Dependencies
+The code relies on several external libraries and internal modules:
+
+1. @medplum/fhirtypes: Provides types for FHIR (Fast Healthcare Interoperability Resources) data models.
+2. @metriport/ihe-gateway-sdk: Likely provides interfaces and types for IHE (Integrating the Healthcare Enterprise) gateway functionality.
+3. @metriport/shared: Contains shared utilities and constants used across the application.
+4. axios: Used for making HTTP requests, particularly when generating CCDs.
+5. AWS SDK (S3): Used for interacting with Amazon S3 to store and retrieve document metadata.
+
+## Configuration
+The code uses a `Config` class for accessing configuration values, including:
+
+- AWS region
+- S3 bucket names
+- API URLs
+
+These configuration values are crucial for the proper functioning of the document query and retrieval processes.
+
+## Error Handling
+The code implements error handling in various ways:
+
+1. In `process-inbound-dq.ts`, try-catch blocks are used to catch errors and construct appropriate error responses using the `constructDQErrorResponse` function.
+2. The `decodePatientId` function in `utils.ts` throws a custom `XDSUnknownPatientId` error when it encounters an invalid patient ID format.
+
+## Performance Considerations
+Several performance optimizations are implemented:
+
+1. The use of `executeWithNetworkRetries` and `executeWithRetriesS3` functions for improved reliability in network requests and S3 operations.
+2. Checking for the existence of a CCD before attempting to generate a new one, potentially saving unnecessary processing.
+3. The `createExtrinsicObjectXml` function uses template literals for XML construction, which could be a performance bottleneck for very large documents or high-frequency calls. A streaming XML writer could be considered for better performance in such cases.
+
+In summary, this directory contains critical functionality for handling document queries in a healthcare interoperability system, focusing on processing requests, generating metadata, and managing patient identifiers. The code is designed to work with cloud storage (S3) and follows healthcare IT standards for document exchange.

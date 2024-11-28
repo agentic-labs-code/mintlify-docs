@@ -1,0 +1,53 @@
+---
+title: "DisplayFromSectionEntry.hbs"
+---
+
+## High-level description
+This Handlebars template file is designed to generate display values for different resource types in a FHIR (Fast Healthcare Interoperability Resources) context. It specifically handles AllergyIntolerance and Observation resource types, extracting relevant display information from the provided CDA (Clinical Document Architecture) data structure.
+
+## Code Structure
+The template uses nested Handlebars helpers and conditionals to determine the resource type and extract the appropriate display values from the CDA structure.
+
+## Symbols
+
+### Root Template
+#### Description
+The root template evaluates the resource type using another template file and then conditionally renders display values based on the determined resource type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| section | Object | The section data from the CDA document |
+| entry | Object | The entry data containing specific clinical information |
+
+#### Internal Logic
+1. Evaluates the resource type using the 'Utils/ResourceTypeFromSection.hbs' template.
+2. Based on the resource type, it extracts and renders different display values:
+   - For AllergyIntolerance: Iterates through entryRelationship array to find specific template ID and extracts display names.
+   - For Observation: Extracts display values from the observation code.
+
+### AllergyIntolerance Section
+#### Description
+Handles the rendering of display values for AllergyIntolerance resources.
+
+#### Internal Logic
+1. Iterates through the `entry.act.entryRelationship` array.
+2. Checks for a specific template ID ('2.16.840.1.113883.10.20.22.4.7').
+3. If found, renders display values from `participantRole.playingEntity.code`.
+
+### Observation Section
+#### Description
+Handles the rendering of display values for Observation resources.
+
+#### Internal Logic
+Directly extracts and renders display values from `entry.observation.code`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Utils/ResourceTypeFromSection.hbs | Determines the resource type based on the section data |
+
+## Notes
+- The template uses Handlebars helpers like `#with`, `#if`, `#each`, `eq`, `contains`, and `toArray`.
+- It handles potential variations in the CDA structure by providing multiple paths to extract display values.
+- The template is designed to be flexible and handle different CDA structures for AllergyIntolerance and Observation resources.

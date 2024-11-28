@@ -1,0 +1,105 @@
+---
+title: "jsonCustomListener.js"
+---
+
+## High-level description
+This code defines a custom JSON listener class (`jsonCustomListener`) that extends the `jsonListener` class. It's designed to process JSON structures and build a stack-based representation of the parsed JSON elements. The class provides methods to handle different JSON components (objects, arrays, key-value pairs, and values) and constructs a final JSON string.
+
+## Code Structure
+The `jsonCustomListener` class extends `jsonListener` and implements several methods to handle different parts of a JSON structure. These methods work together to build a stack-based representation of the JSON, with each method popping elements from the stack, processing them, and pushing the results back onto the stack.
+
+## Symbols
+
+### `jsonCustomListener`
+#### Description
+A class that extends `jsonListener` to provide custom handling of JSON parsing events.
+
+#### Internal Logic
+- Maintains a stack to keep track of parsed JSON elements
+- Implements methods to handle different JSON components (objects, arrays, pairs, values)
+- Builds a string representation of the JSON structure
+
+### `constructor()`
+#### Description
+Initializes the `jsonCustomListener` instance with an empty stack.
+
+### `exitJson()`
+#### Description
+Handles the end of JSON parsing by ensuring the final result is a valid JSON object.
+
+#### Internal Logic
+- Pops the top element from the stack
+- Pushes either the popped element or an empty object `"{}"` if undefined
+
+### `exitObj(ctx)`
+#### Description
+Processes the end of a JSON object by combining its key-value pairs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ctx | Context | The parsing context for the object |
+
+#### Internal Logic
+- Iterates through child elements, processing key-value pairs
+- Combines pairs into a single object string
+- Pushes the resulting object string onto the stack
+
+### `exitArray(ctx)`
+#### Description
+Processes the end of a JSON array by combining its values.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ctx | Context | The parsing context for the array |
+
+#### Internal Logic
+- Iterates through child elements, processing array values
+- Combines values into a single array string
+- Pushes the resulting array string onto the stack
+
+### `exitPair(ctx)`
+#### Description
+Processes a key-value pair in a JSON object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ctx | Context | The parsing context for the pair |
+
+#### Internal Logic
+- Pops the value from the stack
+- Combines the key and value into a string
+- Pushes the resulting pair string onto the stack
+
+### `exitValue(ctx)`
+#### Description
+Processes a JSON value (string, number, boolean, null, object, or array).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ctx | Context | The parsing context for the value |
+
+#### Internal Logic
+- Handles primitive values (strings, numbers, booleans, null)
+- Pushes the value onto the stack or null if empty
+
+### `getResult()`
+#### Description
+Retrieves the final processed JSON result.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | string | The final processed JSON string |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| jsonListener | Base class for JSON parsing events |
+
+## Notes
+- The code includes commented-out debugging methods (`dumpCtx` and `printState`) which could be useful for troubleshooting.
+- The implementation assumes a specific structure of the parsing context (`ctx`) provided by the underlying parsing library.

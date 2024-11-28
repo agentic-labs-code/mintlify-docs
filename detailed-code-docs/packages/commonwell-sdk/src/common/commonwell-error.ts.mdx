@@ -1,0 +1,60 @@
+---
+title: "commonwell-error.ts"
+---
+
+## High-level description
+This code defines a `CommonwellError` class that extends the built-in `Error` class. It's designed to handle errors specific to CommonWell operations, including network-related errors. The class captures additional information such as HTTP status codes, error codes, and a CommonWell reference.
+
+## Code Structure
+The `CommonwellError` class is the main symbol in this code. It uses the `getNetworkErrorDetails` function from the `@metriport/shared` package to extract error details when a cause is provided.
+
+## Symbols
+
+### `CommonwellError`
+#### Description
+A custom error class for CommonWell-related errors. It extends the built-in `Error` class and adds properties for status code, error code, and a CommonWell reference.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| message | string \| undefined | The error message |
+| cause | any | The original error that caused this error |
+| additionalInfo | AdditionalInfo | Additional information about the error |
+
+#### Outputs
+An instance of `CommonwellError`
+
+#### Internal Logic
+1. Calls the parent `Error` constructor with the provided message.
+2. If a cause is provided, it uses `getNetworkErrorDetails` to extract status and code.
+3. Sets the `cwReference` from the `additionalInfo` if provided.
+
+#### Properties
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | number \| undefined | The HTTP status code of the error |
+| code | string \| undefined | The error code |
+| response | \{ status: number \| undefined \} | An object containing the status code |
+| cwReference | string \| undefined | The CommonWell correlation/log code |
+
+### `AdditionalInfo`
+#### Description
+A type definition for additional information that can be passed to the `CommonwellError` constructor.
+
+#### Properties
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cwReference | string \| undefined | The CommonWell correlation/log code |
+| [key: string] | string \| number \| undefined \| null \| Record&lt;string, string&gt; | Any additional key-value pairs |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/shared | Provides the `getNetworkErrorDetails` function |
+
+## Error Handling
+This class is itself an error handling mechanism. It's designed to provide more context and information for errors that occur during CommonWell operations, especially network-related errors.
+
+___
+
+This code provides a structured way to handle errors in CommonWell operations, allowing for better error reporting and debugging by including additional context such as HTTP status codes and CommonWell-specific reference codes.

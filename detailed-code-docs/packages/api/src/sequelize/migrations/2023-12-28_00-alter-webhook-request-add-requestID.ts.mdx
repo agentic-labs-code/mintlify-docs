@@ -1,0 +1,56 @@
+---
+title: "2023-12-28_00-alter-webhook-request-add-requestID.ts"
+---
+
+## High-level description
+This migration script adds a new column named `request_id` to the `webhook_request` table in the database. This column is of type STRING and allows null values.
+
+## Symbols
+
+### `up`
+#### Description
+This asynchronous function defines the steps to apply the migration (add the `request_id` column). It uses a transaction to ensure atomicity.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | \{ context: QueryInterface \} | An object containing the queryInterface, which provides access to Sequelize's query building methods. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise&lt;void&gt; | A promise that resolves when the migration is successfully applied. |
+
+#### Internal Logic
+1. Starts a database transaction.
+2. Uses `queryInterface.addColumn` to add the `request_id` column to the `webhook_request` table.
+   - The column is defined as type STRING and allows null values.
+3. Commits the transaction.
+
+### `down`
+#### Description
+This asynchronous function defines the steps to revert the migration (remove the `request_id` column). It also uses a transaction for atomicity.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | \{ context: QueryInterface \} | An object containing the queryInterface, which provides access to Sequelize's query building methods. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise&lt;void&gt; | A promise that resolves when the migration is successfully reverted. |
+
+#### Internal Logic
+1. Starts a database transaction.
+2. Uses `queryInterface.removeColumn` to remove the `request_id` column from the `webhook_request` table.
+3. Commits the transaction.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Provides database interaction using Sequelize ORM. |
+| umzug |  A migration framework for Node.js that helps manage database schema changes. |
+
+## Error Handling
+The code uses database transactions to ensure that either all changes are applied or none are, preventing partial updates in case of errors. 

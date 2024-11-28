@@ -1,0 +1,76 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for converting various sections of Clinical Document Architecture (CDA) documents into FHIR (Fast Healthcare Interoperability Resources) format. Each template file corresponds to a specific section or type of clinical information found in CDA documents, such as allergies, medications, procedures, vital signs, etc.
+
+## What does it do?
+These templates collectively form a system for transforming structured clinical data from the CDA format, which is an XML-based standard, into FHIR resources, which use a JSON-based format. This conversion allows for interoperability between systems using different healthcare data standards. 
+
+The templates extract relevant information from specific sections of CDA documents and map that data to appropriate FHIR resources. For example, allergy information is converted to AllergyIntolerance resources, medication data to MedicationStatement or MedicationAdministration resources, and vital signs to Observation resources.
+
+Each template handles the nuances of its particular clinical domain, ensuring that the semantics and structure of the original CDA data are accurately represented in the resulting FHIR resources. The templates also generate the necessary references between resources to maintain the relationships present in the original data.
+
+## Entry points
+The main entry points for this conversion process are the individual section templates. Each template is designed to be called with a specific section of a CDA document as input. The typical flow would be:
+
+1. A CDA document is parsed and divided into its constituent sections.
+2. Each section is passed to the corresponding template in this directory.
+3. The template processes the section data and generates one or more FHIR resources.
+4. The generated resources are collected and potentially bundled into a complete FHIR document.
+
+Key templates that would likely be called for most CDA documents include:
+
+- `Allergies_and_Adverse_Reactions.hbs`: Converts allergy information
+- `Medication.hbs`: Handles medication data
+- `Problems.hbs`: Processes problem list entries
+- `Procedures.hbs`: Converts procedure information
+- `Vital_Signs.hbs`: Transforms vital signs data
+
+## Key Files
+While all templates in this directory are important for comprehensive CDA to FHIR conversion, some key files include:
+
+1. `Allergies_and_Adverse_Reactions.hbs`: Crucial for patient safety, this template converts allergy information to FHIR AllergyIntolerance resources.
+
+2. `Medication.hbs`: Essential for medication reconciliation and management, this template handles the complex task of converting CDA medication entries to various FHIR medication-related resources.
+
+3. `Problems.hbs`: Central to understanding a patient's health status, this template converts problem list entries to FHIR Condition resources.
+
+4. `Procedures.hbs`: Important for tracking patient interventions, this template converts procedure information to FHIR Procedure resources.
+
+5. `Vital_Signs.hbs`: Critical for monitoring patient health, this template transforms vital signs data into FHIR Observation resources.
+
+6. `Results.hbs`: Crucial for clinical decision-making, this template handles the conversion of laboratory and other diagnostic results to FHIR DiagnosticReport and Observation resources.
+
+These files are key because they handle the most commonly used and clinically significant types of data found in CDA documents. They form the core of the conversion process for most clinical scenarios.
+
+## Dependencies
+These templates rely on several external dependencies and helper functions:
+
+1. Handlebars: The templating engine used to process the CDA data and generate FHIR resources.
+
+2. Custom Helper Functions: The templates use various custom Handlebars helpers such as `generateUUID`, `toArray`, `contains`, `evaluate`, etc. These helpers are likely defined in a separate file and registered with the Handlebars instance.
+
+3. Partial Templates: Many templates reference partial templates (e.g., `Resources/Condition.hbs`, `References/Observation/subject.hbs`) which are likely stored in separate directories. These partials are crucial for generating specific FHIR resources and references.
+
+4. Utility Templates: Templates like `Utils/GeneratePatientId.hbs`, `Utils/GeneratePractitionerId.hbs`, etc., are used across multiple section templates for consistent ID generation.
+
+5. FHIR Specification: While not a direct code dependency, these templates are designed to produce output conforming to the FHIR specification, likely a specific version of FHIR.
+
+6. CDA Specification: The templates are built to understand and process CDA documents conforming to specific CDA templates, as evidenced by the use of template IDs like '2.16.840.1.113883.10.20.22.2.6.1'.
+
+## Configuration
+While the templates themselves don't contain explicit configuration options, they do use certain conventions and identifiers that could be considered configuration:
+
+1. CDA Template IDs: Each template uses specific CDA template IDs to identify the relevant sections in the input document. For example, '2.16.840.1.113883.10.20.22.2.6.1' for allergies.
+
+2. FHIR Resource Types: The templates are configured to generate specific FHIR resource types for each section, such as AllergyIntolerance for allergies, Condition for problems, etc.
+
+3. Context Variables: Some templates use context variables like `@metriportPatientId`, suggesting that these are expected to be set in the broader conversion environment.
+
+4. Partial Template Paths: The paths used to reference partial templates (e.g., 'Resources/Condition.hbs') imply a specific directory structure for these supporting templates.
+
+5. Helper Function Names: The templates rely on specific helper function names, which must be configured in the Handlebars environment.
+
+These configuration aspects ensure that the templates can correctly identify and process the relevant parts of CDA documents and generate the appropriate FHIR resources. Any changes to the CDA or FHIR specifications, or to the overall conversion system architecture, would likely require updates to these implicit configuration settings.

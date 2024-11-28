@@ -1,0 +1,44 @@
+---
+title: "create-facility.test.ts"
+---
+
+## High-level description
+The `create-facility.test.ts` file contains unit tests for the `createFacility` and `validateObo` functions, which are responsible for creating new medical facilities in the system and validating their OBO (Organization Based Onboarding) data. These tests ensure that the functions correctly handle different input scenarios and data validation rules.
+
+## Code Structure
+The code defines a test suite using `describe("createFacility", ...)` that focuses on testing the `createFacility` and `validateObo` functions. Inside, there are two nested `describe` blocks, one for each function being tested. Each nested block contains several `it` blocks, representing individual test cases.
+
+## Symbols
+
+### `describe("createFacility", ...)`
+#### Description
+This block contains tests for the `createFacility` function. It sets up mocks for database interactions and tests different scenarios of creating facilities with and without OBO data.
+
+#### Internal Logic
+- It uses `jest.spyOn` to mock the `FacilityModel.findOne` and `FacilityModel.create` methods.
+- The `beforeEach` block ensures that mocks are reset before each test.
+- Each `it` block sets up specific input data using `makeFacilityCreateCmd` and calls the `createFacility` function.
+- Assertions are made using `expect` to verify that the `FacilityModel.create` method is called with the expected data.
+
+### `describe("validateObo", ...)`
+#### Description
+This block contains tests for the `validateObo` function. It focuses on testing the validation rules related to OBO data when creating a facility.
+
+#### Internal Logic
+- Each `it` block sets up specific input data using `makeFacilityCreate` representing different OBO scenarios.
+- It calls the `validateObo` function within an `expect` statement that expects an error to be thrown (`toThrow`) for invalid OBO data.
+- The test cases cover scenarios where OBO OIDs are missing for active OBO facilities.
+
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| jest       | Provides testing framework and assertion library. |
+| @metriport/core/domain/medical/facility | Provides types and enums related to medical facilities. |
+| @metriport/core/util/error/bad-request | Provides the `BadRequestError` class for handling bad requests. |
+| ../../../../models/medical/facility | Provides the `FacilityModel` for interacting with the facility data. |
+| ./create-facility | Imports the functions being tested: `createFacility` and `validateObo`. |
+| ./create-facility | Imports helper functions for creating test data: `makeFacilityCreate` and `makeFacilityCreateCmd`. |
+
+## Error Handling
+The `validateObo` function throws a `BadRequestError` if the provided facility data violates OBO validation rules. This error is then caught and asserted in the tests.

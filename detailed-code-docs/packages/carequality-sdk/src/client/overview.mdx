@@ -1,0 +1,96 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the implementation of a client for the Carequality Management API. It provides functionality to interact with the Carequality directory, allowing users to list organizations, register new organizations, and update existing ones. The client handles authentication, retries, and supports different API modes (dev, staging, production).
+
+## What does it do?
+The Carequality SDK client enables developers to interact with the Carequality Management API in a structured and type-safe manner. It provides methods to:
+
+1. List organizations: Retrieve a list of organizations from the Carequality directory based on various criteria such as count, start index, organization identifier (OID), and active status.
+
+2. Register new organizations: Add new organizations to the Carequality directory by submitting XML data containing the organization's information.
+
+3. Update existing organizations: Modify the details of organizations already present in the Carequality directory by providing updated XML data and the organization's OID.
+
+The client handles the complexities of API communication, including authentication using certificates and API keys, automatic retries with exponential backoff for failed requests, and proper error handling.
+
+## Entry points
+The main entry point for developers using this client is the `CarequalityManagementAPIImpl` class in the `carequality.ts` file. This class implements the `CarequalityManagementAPI` interface defined in `carequality-api.ts`.
+
+The workflow typically follows these steps:
+1. Instantiate the `CarequalityManagementAPIImpl` class with the necessary credentials and configuration.
+2. Use the instance methods (`listOrganizations`, `registerOrganization`, `updateOrganization`) to interact with the Carequality API.
+3. Handle the returned promises and process the data or errors as needed.
+
+## Key Files
+
+1. `carequality-api.ts`:
+   - Defines the `CarequalityManagementAPI` interface.
+   - Specifies the contract for interacting with the Carequality Management API.
+   - Provides type definitions for the main API methods.
+
+2. `carequality.ts`:
+   - Implements the `CarequalityManagementAPIImpl` class.
+   - Handles the actual API communication, authentication, and retry logic.
+   - Provides concrete implementations of the methods defined in the interface.
+
+## Dependencies
+The client relies on several external libraries:
+
+1. Axios (version not specified):
+   - Used for making HTTP requests to the Carequality API.
+   - Chosen for its wide adoption, ease of use, and extensive features.
+
+2. axios-retry (version not specified):
+   - Implements retry logic for failed requests.
+   - Provides exponential backoff and jitter for more robust error handling.
+
+3. dayjs (version not specified):
+   - Used for date and time manipulation.
+   - Chosen as a lightweight alternative to moment.js.
+
+4. https (Node.js built-in module):
+   - Used to create an HTTPS agent for secure connections.
+
+## Configuration
+The `CarequalityManagementAPIImpl` class accepts several configuration options:
+
+1. Authentication:
+   - `orgCert`: The certificate (public key) for the organization.
+   - `rsaPrivateKey`: An RSA key corresponding to the specified orgCert.
+   - `rsaPrivateKeyPassword`: The password to decrypt the private key.
+   - `apiKey`: The API key to use for authentication.
+
+2. API Mode:
+   - `apiMode`: Specifies the mode the client will be running (dev, staging, production).
+
+3. Optional parameters:
+   - `timeout`: Connection timeout in milliseconds (default: 120 seconds).
+   - `retries`: Number of retries for failed requests (default: 3).
+   - `maxBackoff`: Maximum backoff time during retry attempts (default: 30 seconds).
+
+Example usage:
+
+```typescript
+const client = new CarequalityManagementAPIImpl({
+  orgCert: '-----BEGIN CERTIFICATE-----\n...',
+  rsaPrivateKey: '-----BEGIN PRIVATE KEY-----\n...',
+  rsaPrivateKeyPassword: 'password123',
+  apiKey: 'your-api-key',
+  apiMode: 'production',
+  options: {
+    timeout: 180000,
+    retries: 5,
+    maxBackoff: 60000
+  }
+});
+
+// Use the client to interact with the API
+const organizations = await client.listOrganizations({ count: 10, active: true });
+```
+
+The client uses these configuration options to set up secure HTTPS connections, handle authentication, and manage request retries and timeouts.
+
+In summary, this directory provides a robust and type-safe client for interacting with the Carequality Management API, handling authentication, retries, and error management while offering a clean interface for developers to work with.

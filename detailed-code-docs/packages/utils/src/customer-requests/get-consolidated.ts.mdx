@@ -1,0 +1,88 @@
+---
+title: "get-consolidated.ts"
+---
+
+## High-level description
+This code is a utility script for retrieving and storing consolidated data for a subset of a customer's patients. It creates a new folder, fetches each patient's consolidated data as JSON from an API, and stores it on the local filesystem.
+
+## Code Structure
+The main function orchestrates the process, calling helper functions to get customer data, create directories, fetch patient data, and store it. It uses environment variables for configuration and external libraries for HTTP requests, date manipulation, and file system operations.
+
+## Symbols
+
+### `main()`
+#### Description
+The main function that orchestrates the entire process of fetching and storing consolidated patient data.
+
+#### Internal Logic
+1. Initializes the runs folder
+2. Logs the start of the process
+3. Retrieves customer data
+4. Creates a directory for storing the data
+5. Iterates through patient IDs, fetching and storing data for each
+6. Logs the completion of the process, including duration
+
+### `getData(patientId: string)`
+#### Description
+Fetches consolidated data for a specific patient from the API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient to fetch data for |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | Bundle&lt;DocumentReference&gt; \| undefined | The fetched patient data or undefined if no data is returned |
+
+#### Internal Logic
+1. Constructs the API URL with query parameters
+2. Makes a GET request to the API
+3. Returns the response data as a Bundle&lt;DocumentReference&gt; or undefined
+
+### `storeData(data: Bundle&lt;DocumentReference&gt;, patientId: string, dirName: string)`
+#### Description
+Stores the fetched patient data as a JSON file in the specified directory.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data | Bundle&lt;DocumentReference&gt; | The patient data to store |
+| patientId | string | The ID of the patient |
+| dirName | string | The directory to store the file in |
+
+#### Internal Logic
+1. Constructs the filename using the patient ID
+2. Writes the data as formatted JSON to the file
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dotenv | Loading environment variables |
+| @medplum/fhirtypes | Type definitions for FHIR resources |
+| @metriport/core/util/env-var | Utility for getting environment variables |
+| @metriport/shared/common/error | Error handling utility |
+| @metriport/shared/common/numbers | Number formatting utility |
+| axios | Making HTTP requests |
+| dayjs | Date and time manipulation |
+| fs | File system operations |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| API_URL | string | N/A | The base URL for the API |
+| CX_ID | string | N/A | The customer ID |
+
+## Error Handling
+The script uses try-catch blocks to handle errors during the data fetching process for each patient. Errors are logged with the patient ID and error message.
+
+## Logging
+The script uses console.log for logging various stages of the process, including start and end times, patient processing, and any errors encountered.
+
+## Side Effects
+- Creates a new directory in the "runs" folder
+- Writes JSON files to the local filesystem
+
+## Performance Considerations
+The script processes patients sequentially, which may be slow for a large number of patients. Consider implementing parallel processing for improved performance with large datasets.

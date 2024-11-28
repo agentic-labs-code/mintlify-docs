@@ -1,0 +1,88 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for handling patient data operations and consolidated data requests in a medical data system. It provides functionality for loading, updating, and consolidating patient information, as well as interacting with external APIs and AWS services. The code is designed to work in both development and production environments, using different connectors and implementations based on the current context.
+
+## What does it do?
+The code in this directory performs several key functions related to patient data management:
+
+1. Patient Loading: It defines interfaces and implementations for retrieving patient information, including methods to get patient states, retrieve single patients, and find patients by similarity across one or multiple customers.
+
+2. Patient Updating: It provides an abstract class and implementations for updating patient information, supporting batch updates for multiple patients associated with a specific customer.
+
+3. Consolidated Data Handling: It manages the process of generating, storing, and retrieving consolidated FHIR bundles for patients. This includes:
+   - Defining interfaces and types for consolidated data requests and responses.
+   - Implementing connectors for local development and AWS Lambda-based production environments.
+   - Handling both synchronous and asynchronous data request processing.
+   - Managing the storage and retrieval of consolidated bundles in AWS S3.
+
+For example, when a user or system requests consolidated patient data, this code will:
+1. Receive the request with specified parameters (e.g., patient ID, date range, resource types).
+2. Generate a consolidated FHIR bundle containing the requested data.
+3. Upload the bundle to S3 for storage.
+4. For asynchronous requests, notify an API endpoint about the completed consolidation.
+5. Return information about the location and filename of the stored bundle.
+
+Similarly, when updating patient information, the code can handle batch updates across multiple patients, interacting with the appropriate API or system based on the implementation used.
+
+## Entry points
+The main entry points for this directory are:
+
+1. For consolidated data operations: The `buildConsolidatedDataConnector()` function in the `consolidated-connector-factory.ts` file. This function determines whether to use the local or Lambda-based connector based on the current environment.
+
+2. For patient loading: The `PatientLoader` interface in `patient-loader.ts`, which is implemented by classes like `PatientLoaderMetriportAPI`.
+
+3. For patient updating: The `PatientUpdater` abstract class in `patient-updater.ts`, which is extended by classes like `PatientUpdaterMetriportAPI`.
+
+The data flow typically follows these paths:
+- For consolidated data: Factory function → Appropriate connector → Execute request → Generate FHIR bundle → Upload to S3 → Optional API notification
+- For patient loading: PatientLoader implementation → API request → Data conversion and validation
+- For patient updating: PatientUpdater implementation → API request → Update processing
+
+## Key Files
+1. `consolidated-connector.ts`: Defines the main interfaces and types for consolidated data operations.
+2. `consolidated-connector-factory.ts`: Contains the factory function for creating the appropriate consolidated data connector.
+3. `consolidated-connector-local.ts`: Implements the connector for local development environments.
+4. `consolidated-connector-lambda.ts`: Implements the connector for AWS Lambda-based production environments.
+5. `consolidated-on-s3.ts`: Provides functions for interacting with AWS S3 for storing and retrieving consolidated bundles.
+6. `patient-loader.ts`: Defines the `PatientLoader` interface for patient data retrieval operations.
+7. `patient-loader-metriport-api.ts`: Implements the `PatientLoader` interface for interacting with the Metriport API.
+8. `patient-updater.ts`: Defines the abstract `PatientUpdater` class for patient update operations.
+9. `patient-updater-metriport-api.ts`: Implements the `PatientUpdater` class for updating patient information through the Metriport API.
+
+## Dependencies
+The code relies on several external libraries and internal modules:
+
+1. AWS SDK: Used for interacting with AWS services, particularly Lambda and S3.
+2. dayjs: A lightweight date manipulation library.
+3. axios: Used for making HTTP requests in various connectors and API interactions.
+4. @medplum/fhirtypes: Provides FHIR resource type definitions.
+5. @metriport/shared: Contains utility functions and shared types.
+6. @metriport/api-sdk: Provides types related to consolidation conversion and patient data.
+
+Internal dependencies include various utility modules for configuration, AWS interactions, and FHIR data handling.
+
+## Configuration
+The code uses a `Config` utility to manage environment-specific settings. Key configurable aspects include:
+
+1. Environment detection (development vs. production)
+2. S3 bucket names for storing medical documents
+3. API URLs for notifications and data retrieval
+4. AWS region settings
+5. Lambda function names and timeouts
+
+Example configuration usage:
+```typescript
+const isDev = Config.isDev();
+const bucketName = Config.getMedicalDocumentsBucketName();
+const apiUrl = Config.getApiUrl();
+```
+
+The code also includes some hardcoded configuration values, such as:
+- Maximum number of API notification attempts: 5
+- Timeout for Lambda function calls: 15 minutes and 2 seconds
+- Update timeout for patient updates: 2 minutes
+
+These configurations allow the system to adapt to different environments and adjust its behavior accordingly.

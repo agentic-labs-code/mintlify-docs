@@ -1,0 +1,53 @@
+---
+title: "facility.ts"
+---
+
+## High-level description
+This code defines the schema for creating and managing facilities in a medical API. It includes data validation using Zod, and defines the structure for facility creation, update, and listing operations.
+
+## Code Structure
+The main schema `facilityCreateSchema` defines the structure for creating a facility. The `facilitySchema` extends this by merging it with a base update schema. These schemas are used to create TypeScript types `FacilityCreate` and `Facility`. The `facilityListSchema` is used for listing facilities.
+
+## Symbols
+
+### `facilityCreateSchema`
+#### Description
+Defines the schema for creating a new facility.
+
+#### Internal Logic
+- Uses Zod to define a schema with the following fields:
+  - `name`: A non-empty string
+  - `npi`: A 10-character string that must be a valid NPI (National Provider Identifier)
+  - `tin`: An optional, nullable string
+  - `active`: An optional, nullable boolean
+  - `address`: Uses the `addressSchema` imported from "./common/address"
+
+### `FacilityCreate`
+#### Description
+TypeScript type inferred from `facilityCreateSchema`.
+
+### `facilitySchema`
+#### Description
+Extends `facilityCreateSchema` by merging it with `baseUpdateSchema`.
+
+### `Facility`
+#### Description
+TypeScript type inferred from `facilitySchema`.
+
+### `facilityListSchema`
+#### Description
+Defines a schema for a list of facilities.
+
+#### Internal Logic
+- Uses Zod to define an object with a `facilities` property, which is an array of `facilitySchema` objects.
+
+## Dependencies
+- `z` from "zod": Used for schema definition and validation
+- `addressSchema` from "./common/address": Used for the `address` field in `facilityCreateSchema`
+- `baseUpdateSchema` from "./common/base-update": Used to extend `facilityCreateSchema` into `facilitySchema`
+- `validateNPI` from "@metriport/shared": Used to validate the NPI field
+
+## Error Handling
+The `npi` field uses a custom refinement to validate the NPI using the `validateNPI` function. If the NPI is invalid, it will raise a validation error with the message "NPI is not valid".
+
+This code provides a robust structure for managing facility data in a medical API context, ensuring data integrity through schema validation.

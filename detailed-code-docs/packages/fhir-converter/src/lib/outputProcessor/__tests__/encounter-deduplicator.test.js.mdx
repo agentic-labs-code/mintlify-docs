@@ -1,0 +1,58 @@
+---
+title: "encounter-deduplicator.test.js"
+---
+
+## High-level description
+This file contains unit tests for the `resourceDeduplicator` module, specifically focusing on the deduplication of encounter resources in FHIR bundles. The tests verify that the deduplication process correctly merges duplicate encounters, handles cases with no duplicates, and properly deduplicates multiple sets of duplicate encounters.
+
+## Code Structure
+The test file uses Jest as the testing framework. It imports the `Process` function from the `resourceDeduplicator` module, test inputs from a separate file, and the `faker` library for generating random data. The tests are organized into three separate `it` blocks, each testing a different aspect of the deduplication process.
+
+## References
+- `../resourceDeduplicator`: The module being tested
+- `./encounter-deduplicator-inputs`: A file containing test input data
+
+## Symbols
+
+### `describe("resourceDeduplicator", function () { ... })`
+#### Description
+This is the main test suite for the `resourceDeduplicator` module.
+
+### `it("properly merges duplicates encounters", function (done) { ... })`
+#### Description
+This test verifies that the `Process` function correctly merges duplicate encounters in a bundle.
+
+#### Internal Logic
+1. Creates a bundle with two encounters (encompassing and internal)
+2. Calls the `Process` function with the bundle
+3. Expects the result to contain a single merged encounter
+
+### `it("returns the encounter if no duplicates", function (done) { ... })`
+#### Description
+This test checks that the `Process` function returns the original encounter when there are no duplicates.
+
+#### Internal Logic
+1. Creates a bundle with a single encounter
+2. Calls the `Process` function with the bundle
+3. Expects the result to be identical to the input
+
+### `it("deduplicates all duplicate encounters", function (done) { ... })`
+#### Description
+This test ensures that the `Process` function can handle multiple sets of duplicate encounters.
+
+#### Internal Logic
+1. Creates a bundle with four encounters (two pairs of duplicates)
+2. Uses `faker` to generate unique identifiers and IDs
+3. Calls the `Process` function with the bundle
+4. Expects the result to contain two merged encounters
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @faker-js/faker | Used to generate random UUIDs for testing |
+
+## Error Handling
+The tests do not explicitly handle errors. They rely on Jest's built-in assertion mechanisms to catch and report any unexpected behavior.
+
+## Performance Considerations
+These tests are designed to be fast and lightweight, suitable for frequent execution during development. However, the test with multiple duplicates might be slightly more computationally intensive due to the creation and processing of a larger bundle.

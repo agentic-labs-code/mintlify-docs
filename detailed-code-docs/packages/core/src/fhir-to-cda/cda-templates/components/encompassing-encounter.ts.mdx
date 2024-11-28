@@ -1,0 +1,101 @@
+---
+title: "encompassing-encounter.ts"
+---
+
+## High-level description
+This code defines functions to build the "EncompassingEncounter" section of a Clinical Document Architecture (CDA) document using FHIR resources. It primarily focuses on converting FHIR Encounter resources into CDA-compatible structures.
+
+## Code Structure
+The main function `buildEncompassingEncounter` uses helper functions like `findEncounterInBundle`, `createAugmentedEncounters`, and `createComponentOf` to construct the EncompassingEncounter object. The `buildResponsibleParty` function is used to create the responsible party information within the encounter.
+
+## Symbols
+
+### `findEncounterInBundle`
+#### Description
+Finds an Encounter resource in a FHIR Bundle using its ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fhirBundle | Bundle | The FHIR Bundle to search in |
+| encounterId | string \| undefined | The ID of the Encounter to find |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| encounter | Encounter \| undefined | The found Encounter resource or undefined |
+
+### `buildEncompassingEncounter`
+#### Description
+Builds the EncompassingEncounter object for the CDA document using FHIR resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fhirBundle | Bundle | The FHIR Bundle containing resources |
+| composition | Composition \| undefined | The FHIR Composition resource |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| encompassingEncounter | EncompassingEncounter \| undefined | The constructed EncompassingEncounter object |
+
+#### Internal Logic
+1. Extracts the encounter reference from the composition
+2. Finds the encounter in the bundle
+3. Creates augmented encounters
+4. Calls `createComponentOf` to build the EncompassingEncounter object
+
+### `createComponentOf`
+#### Description
+Creates the EncompassingEncounter object from an AugmentedEncounter.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| encounter | AugmentedEncounter | The augmented encounter object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| encompassingEncounter | EncompassingEncounter | The constructed EncompassingEncounter object |
+
+### `buildLocation`
+#### Description
+Builds the location information for the EncompassingEncounter.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| location | Location \| Location[] \| undefined | The location(s) associated with the encounter |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| location | \{ name: string \| undefined, addr: CdaAddress \| undefined \} | The constructed location object |
+
+### `buildResponsibleParty`
+#### Description
+Builds the responsible party information for the EncompassingEncounter.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| practitioner | Practitioner \| undefined | The practitioner associated with the encounter |
+| location | Location \| undefined | The location associated with the encounter |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| responsibleParty | ResponsibleParty \| undefined | The constructed responsible party object |
+
+## Dependencies
+The code relies on various utility functions and types from other modules, including:
+- `@medplum/fhirtypes` for FHIR resource types
+- `@metriport/shared` for utility functions
+- Custom error types and utility functions from local modules
+
+## Error Handling
+The code throws a `BadRequestError` if the Encounter resource is not found in the bundle.
+
+This code is crucial for generating the EncompassingEncounter section of a CDA document from FHIR resources, ensuring proper conversion and structuring of encounter-related information.

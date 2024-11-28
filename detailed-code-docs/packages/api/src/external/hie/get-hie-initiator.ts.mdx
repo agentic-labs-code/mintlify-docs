@@ -1,0 +1,86 @@
+---
+title: "get-hie-initiator.ts"
+---
+
+## High-level description
+This code defines functions for retrieving and processing Health Information Exchange (HIE) initiator information, specifically for CommonWell and Carequality. It includes functionality to determine if a facility is enabled for HIE queries and to get the appropriate initiator details based on the organization type.
+
+## Code Structure
+The main symbols in the code are interconnected functions that work together to retrieve and process HIE initiator information. The `getHieInitiator` function is the primary entry point, which uses `getPatientWithDependencies` to fetch related data and then determines the appropriate initiator based on the organization type.
+
+## Symbols
+
+### `getHieInitiator`
+#### Description
+Retrieves the HIE initiator information for a given patient and facility.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" | "cxId"&gt; | Patient information |
+| facilityId | string \| undefined | Optional facility ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| HieInitiator | object | HIE initiator information |
+
+#### Internal Logic
+1. Retrieves patient dependencies (organization and facilities)
+2. Gets the patient's facility
+3. Determines the initiator based on the organization type
+
+### `isHieEnabledToQuery`
+#### Description
+Checks if HIE querying is enabled for a given facility and patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| facilityId | string \| undefined | Optional facility ID |
+| patient | Pick&lt;Patient, "id" | "cxId"&gt; | Patient information |
+| hie | MedicalDataSource.COMMONWELL \| MedicalDataSource.CAREQUALITY | HIE type |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| boolean | boolean | Whether HIE querying is enabled |
+
+#### Internal Logic
+1. Retrieves patient dependencies
+2. Gets the patient's facility
+3. Checks if the facility is active for the specified HIE
+
+### `getPatientsFacility`
+#### Description
+Retrieves the facility for a given patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | Patient ID |
+| facilities | Facility[] | List of facilities |
+| facilityId | string \| undefined | Optional facility ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Facility | object | The patient's facility |
+
+#### Internal Logic
+1. Checks if a facility ID is provided when there are multiple facilities
+2. Finds the facility based on the provided ID or uses the first facility if only one exists
+3. Throws errors for various edge cases (e.g., no facility found, multiple facilities without a specified ID)
+
+## Dependencies
+- @metriport/core/domain/patient
+- @metriport/core/external/index
+- @metriport/core/domain/organization
+- @metriport/core/util/error/metriport-error
+- ../../domain/medical/facility
+- ../../command/medical/patient/get-patient
+
+## Error Handling
+The code uses `MetriportError` for handling specific error cases, such as when a facility cannot be determined for a patient or when a patient is not associated with a given facility.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

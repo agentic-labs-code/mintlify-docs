@@ -1,0 +1,59 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains code for converting FHIR (Fast Healthcare Interoperability Resources) data to CDA (Clinical Document Architecture) format. It includes functionality for splitting FHIR bundles, generating CDA documents, and uploading the resulting documents to S3 storage.
+
+## What does it do?
+The code in this directory performs the following main tasks:
+
+1. Splits FHIR bundles into separate compositions for processing.
+2. Converts FHIR resources into CDA-compliant structures for various clinical data types.
+3. Generates complete CDA XML documents from FHIR bundles.
+4. Uploads the generated CDA documents and FHIR bundles to S3 storage.
+5. Provides utility functions for identifying specific types of FHIR observations.
+
+## Entry points
+The main entry point for the FHIR to CDA conversion process is the `convertFhirBundleToCda` function in the `fhir-to-cda.ts` file. This function orchestrates the entire conversion process, including:
+
+1. Splitting the input FHIR bundle using `splitBundleByCompositions` from `composition-splitter.ts`.
+2. Generating CDA documents for each composition using `generateCdaFromFhirBundle` from `cda-generators.ts`.
+
+For uploading the generated documents, the `uploadCdaDocuments` and `uploadFhirBundleToS3` functions in `upload.ts` serve as entry points.
+
+## Key Files
+
+1. `fhir-to-cda.ts`: Contains the main `convertFhirBundleToCda` function for orchestrating the conversion process.
+2. `cda-generators.ts`: Provides the `generateCdaFromFhirBundle` function for creating CDA documents from FHIR bundles.
+3. `composition-splitter.ts`: Implements the `splitBundleByCompositions` function for dividing FHIR bundles into separate compositions.
+4. `upload.ts`: Contains functions for uploading CDA documents and FHIR bundles to S3 storage.
+5. `fhir.ts`: Provides utility functions for identifying specific types of FHIR observations.
+6. `cda-templates/`: A directory containing modules for generating various sections of CDA documents.
+7. `cda-types/`: A directory defining TypeScript types and interfaces for CDA document structures.
+
+## Dependencies
+The code relies on several external libraries and internal modules:
+
+1. `@medplum/fhirtypes`: Provides FHIR type definitions.
+2. `@metriport/shared`: Contains shared utilities and constants.
+3. `dayjs`: Used for date manipulation and formatting.
+4. `fast-xml-parser`: Used for XML generation in CDA document creation.
+5. AWS SDK: Used for S3 operations in the upload process.
+
+## Configuration
+The code uses various configuration options and constants:
+
+1. S3 bucket names and AWS region settings for document uploads.
+2. OIDs (Object Identifiers) for different sections and coding systems in CDA documents.
+3. LOINC codes for identifying specific types of observations and sections.
+4. Mapping tables for converting between FHIR and CDA status codes, vital sign categories, etc.
+
+## Error Handling
+The code implements error handling throughout the conversion and upload processes:
+
+1. Custom `BadRequestError` is used for handling invalid input or missing required data.
+2. Try-catch blocks are used in upload functions to catch and log errors, then throw `MetriportError` with relevant details.
+3. Error logging and capturing is implemented using utilities from `@metriport/shared`.
+
+In summary, this directory contains a comprehensive set of modules for converting FHIR data to CDA format and managing the upload of the resulting documents. It demonstrates a well-structured approach to healthcare data interoperability, with careful attention to standards compliance, error handling, and configurability.

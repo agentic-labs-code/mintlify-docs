@@ -1,0 +1,71 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains Handlebars templates for creating FHIR Location resources with various references. These templates are part of a larger FHIR converter system, specifically designed to transform Clinical Document Architecture (CDA) data into FHIR format. The templates focus on different aspects of the Location resource, including endpoint, managing organization, and part-of relationships.
+
+## What does it do?
+These templates generate JSON structures that represent FHIR Location resources. Each template specializes in a specific type of reference:
+
+1. The endpoint template creates a Location resource with a reference to an associated endpoint.
+2. The managing organization template creates a Location resource with a reference to the organization that manages it.
+3. The part-of template creates a Location resource that is part of another location, establishing a hierarchical relationship between locations.
+
+These templates allow for the creation of structured data that describes physical places where healthcare services are provided, including their relationships to other entities in the healthcare system.
+
+## Key Files
+1. `endpoint.hbs`: This template creates a Location resource with an endpoint reference. It's used to associate a location with a specific communication endpoint.
+
+2. `managingOrganization.hbs`: This template creates a Location resource with a managing organization reference. It's used to indicate which organization is responsible for managing the location.
+
+3. `partOf.hbs`: This template creates a Location resource with a 'partOf' reference. It's used to represent hierarchical relationships between locations, such as a room being part of a building.
+
+Each of these templates plays a crucial role in representing different aspects of a location within a healthcare system, allowing for detailed and interconnected descriptions of physical places in FHIR format.
+
+## Dependencies
+These templates are part of a larger FHIR conversion system and depend on:
+
+1. Handlebars: The templating engine used for generating the JSON structures.
+2. FHIR Converter: The broader system these templates are a part of, used for converting CDA to FHIR.
+
+The templates themselves don't specify versions, but they adhere to the FHIR resource structure for Locations.
+
+## Configuration
+These templates don't use explicit configuration files or environment variables. Instead, they rely on input parameters provided when the templates are rendered:
+
+1. For all templates:
+   - `ID`: A string representing the unique identifier for the Location resource.
+
+2. Template-specific inputs:
+   - `endpoint.hbs`: `REF` - A string reference to the associated endpoint.
+   - `managingOrganization.hbs`: `REF` - A string reference to the managing organization.
+   - `partOf.hbs`: `REF` - A string reference to the parent location.
+
+These inputs allow the templates to be flexible and reusable across different contexts within the FHIR conversion process.
+
+Here's an example of how the `endpoint.hbs` template might be used:
+
+```handlebars
+{{&gt; References/Location/endpoint.hbs ID="location123" REF="Endpoint/endpoint456"}}
+```
+
+This would produce a JSON output like:
+
+```json
+{
+  "resource": {
+    "resourceType": "Location",
+    "id": "location123",
+    "endpoint": [
+      {
+        "reference": "Endpoint/endpoint456"
+      }
+    ]
+  }
+}
+```
+
+Similar patterns apply to the other templates, with the specific reference type changing based on the template's purpose.
+
+These templates form a crucial part of the CDA to FHIR conversion process, allowing for the creation of detailed and interconnected Location resources that accurately represent the physical places involved in healthcare delivery.

@@ -1,0 +1,67 @@
+---
+title: "set-doc-query-start.test.ts"
+---
+
+## High-level description
+This file contains unit tests for the `setDocQueryStartAt` function, which is responsible for setting the start time for document query progress in a patient's external data. The tests ensure that the function correctly updates the patient's document query progress with the provided start time and maintains existing progress information.
+
+## Code Structure
+The test file imports necessary dependencies and sets up mock data and functions. It then defines two test cases within the `describe` block for the `setDocQueryStartAt` function.
+
+## Symbols
+
+### `setDocQueryStartAt`
+#### Description
+This is the main function being tested. It updates a patient's document query progress with a start time for a specific medical data source.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Pick&lt;Patient, "id" \| "cxId"&gt; | Patient object with id and cxId |
+| source | MedicalDataSource | The medical data source (e.g., CAREQUALITY) |
+| startedAt | Date | The start time for the document query |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Patient | Updated patient object |
+
+### `beforeEach`
+#### Description
+This function sets up the test environment before each test case. It initializes mock data and sets up Jest spies on the PatientModel methods.
+
+### `afterEach`
+#### Description
+This function cleans up the test environment after each test case by restoring all mocked functions.
+
+### Test: "has startedAt when startedAt is new Date"
+#### Internal Logic
+1. Calls `setDocQueryStartAt` with mock data
+2. Extracts the `documentQueryProgress` from the result
+3. Asserts that the `startedAt` in the progress matches the input `startedAt`
+
+### Test: "has documentQueryProgress download and convert when setting new startedAt"
+#### Internal Logic
+1. Calls `setDocQueryStartAt` with mock data
+2. Extracts the `documentQueryProgress` from the result
+3. Asserts that the resulting progress contains the original `download` and `convert` data, plus the new `startedAt`
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/domain/patient | Importing Patient and PatientExternalData types |
+| @metriport/core/domain/document-query | Importing DocumentQueryProgress type |
+| @metriport/core/external/index | Importing MedicalDataSource enum |
+| ../../../domain/medical/__tests__/patient | Importing patient data generation utilities |
+| ../../../models/medical/patient | Importing PatientModel |
+| ../../../models/__tests__/transaction | Importing mock transaction utilities |
+| ../set-doc-query-start | Importing the function being tested |
+| ../../../domain/medical/__tests__/document-query | Importing document query progress generation utilities |
+
+## Error Handling
+The tests do not explicitly cover error handling scenarios. They focus on the happy path where the function successfully updates the patient's document query progress.
+
+## Notes
+- The tests use Jest's mocking capabilities to isolate the function being tested from external dependencies.
+- The `mockStartTransaction` function is used to mock database transactions, allowing the tests to run without actual database interactions.
+- The tests verify that the `setDocQueryStartAt` function correctly updates the patient's external data with the new start time while preserving existing progress information.

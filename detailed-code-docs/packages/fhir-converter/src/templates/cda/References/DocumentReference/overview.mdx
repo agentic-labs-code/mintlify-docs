@@ -1,0 +1,66 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains a collection of Handlebars templates that define partial FHIR DocumentReference resource structures. These templates are designed to be used in the context of converting Clinical Document Architecture (CDA) documents to FHIR format. Each template focuses on a specific field or aspect of the DocumentReference resource, allowing for modular and flexible construction of the complete resource.
+
+## What does it do?
+These templates work together to facilitate the conversion of CDA documents into FHIR DocumentReference resources. They provide a structured way to populate various fields of a DocumentReference, such as the authenticator, author, context (including encounter and related information), custodian, and subject. By using these templates, developers can ensure consistent and standardized conversion of CDA data into FHIR format, which is crucial for interoperability in healthcare information systems.
+
+The workflow typically involves:
+1. Parsing the CDA document to extract relevant information.
+2. Using the appropriate template for each field of the DocumentReference resource.
+3. Providing the extracted data as inputs to these templates.
+4. Combining the outputs of these templates to construct a complete FHIR DocumentReference resource.
+
+This modular approach allows for flexibility in handling different types of CDA documents and accommodating variations in the required FHIR fields.
+
+## Key Files
+1. `authenticator.hbs`: Defines the `authenticator` field of the DocumentReference.
+2. `author.hbs`: Populates the `author` field of the DocumentReference.
+3. `context.encounter.hbs`: Handles the `context.encounter` field, linking the document to a specific healthcare encounter.
+4. `context.related.hbs`: Manages the `context.related` field, establishing relationships to other resources.
+5. `context.sourcePatientInfo.hbs`: Deals with the `context.sourcePatientInfo` field, referencing the source patient information.
+6. `custodian.hbs`: Sets up the `custodian` field, indicating the organization responsible for maintaining the document.
+7. `relatesTo.target.hbs`: Manages the `relatesTo` field, establishing relationships between documents.
+8. `subject.hbs`: Defines the `subject` field of the DocumentReference, typically referencing the patient.
+
+Each of these templates follows a similar structure:
+```handlebars
+{
+  "resource": {
+    "resourceType": "DocumentReference",
+    "id": "{{ID}}",
+    "specificField": {
+      "reference": "{{REF}}"
+    }
+  }
+}
+```
+
+Where `specificField` is replaced by the relevant field name (e.g., `authenticator`, `author`, etc.), and `{{ID}}` and `{{REF}}` are placeholders for the resource ID and reference value respectively.
+
+## Dependencies
+These templates are part of the FHIR Converter project and primarily depend on:
+| Dependency | Purpose |
+|:-----------|:--------|
+| Handlebars | Template engine used for generating the JSON structures |
+
+The templates are designed to work within a larger system for CDA to FHIR conversion, likely involving other components of the FHIR Converter project.
+
+## Configuration
+While the templates themselves don't include explicit configuration options, they are designed to be flexible through the use of input placeholders:
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| ID | String | The identifier for the DocumentReference resource |
+| REF | String | The reference value for the specific field being populated |
+
+These placeholders allow the templates to be dynamically populated with appropriate values during the conversion process.
+
+## Notes
+1. All templates include a comprehensive copyright and license notice, indicating they are based on work by Microsoft but are now part of a project by Metriport Inc., licensed under AGPLv3 with additional permissions and disclaimers.
+2. The templates are designed to be partial representations of a DocumentReference resource, meant to be combined with other templates or data to form a complete FHIR resource.
+3. The modular nature of these templates allows for easy maintenance and updates to specific aspects of the DocumentReference resource without affecting others.
+4. The use of Handlebars syntax (e.g., `{{ID}}`, `{{REF}}`) allows for easy integration with dynamic data sources during the conversion process.
+5. While these templates focus on specific fields, a complete DocumentReference resource would likely require additional fields and more complex structures, which may be handled by other parts of the FHIR Converter system.

@@ -1,0 +1,94 @@
+---
+title: "index.ts"
+---
+
+## High-level description
+This code defines a `CanvasSDK` class that provides an interface for interacting with the Canvas Medical API. It handles authentication, FHIR resource management, and custom API calls for creating and updating medical records in the Canvas system.
+
+## Code Structure
+The `CanvasSDK` class is the main component, containing methods for various API operations. It uses Axios for HTTP requests and implements error handling and token management. The class is designed to be instantiated using a static `create` method, which initializes the SDK with the necessary configuration and authentication.
+
+## Symbols
+
+### CanvasSDK
+#### Description
+A class that encapsulates the functionality to interact with the Canvas Medical API, including FHIR resources and custom endpoints.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | SDKConfig | Configuration object containing environment, clientId, and clientSecret |
+
+#### Internal Logic
+1. Initializes Axios instances for FHIR and custom API endpoints.
+2. Fetches and manages OAuth tokens for authentication.
+3. Provides methods for various API operations, including CRUD operations on FHIR resources and custom Canvas API endpoints.
+
+### create
+#### Description
+A static method to create and initialize a new instance of the CanvasSDK.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| config | SDKConfig | Configuration object for the SDK |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| instance | Promise&lt;CanvasSDK&gt; | A promise that resolves to an initialized CanvasSDK instance |
+
+### initialize
+#### Description
+Initializes the SDK by fetching an OAuth token and setting up Axios instances.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Promise&lt;void&gt; | A promise that resolves when initialization is complete |
+
+### handleAxiosRequest
+#### Description
+A private method that wraps Axios requests with error handling.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| requestFunction | () =&gt; Promise&lt;AxiosResponse&lt;T&gt;&gt; | A function that returns a promise for an Axios request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Promise&lt;AxiosResponse&lt;T&gt;&gt; | A promise that resolves to the Axios response |
+
+### API Methods
+The class includes several methods for interacting with the Canvas API, such as:
+- `getPractitioner`
+- `createPatient`
+- `getLocation`
+- `createNote`
+- `updateNoteTitle`
+- `createCondition`
+- `createMedicationStatement`
+- `createAllergy`
+- `getFirstEncounter`
+- `getMedication`
+- `searchMedication`
+- `getAppointment`
+
+Each of these methods corresponds to a specific API operation and handles the necessary request formatting and error handling.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| axios | HTTP client for making API requests |
+| @medplum/fhirtypes | Type definitions for FHIR resources |
+
+## Error Handling
+The SDK implements error handling in the `handleAxiosRequest` method, which catches Axios errors and throws custom error messages with detailed information about the failed request.
+
+## API/Interface Reference
+The CanvasSDK class exposes methods that correspond to various Canvas API endpoints. These methods handle authentication, request formatting, and error handling internally.
+
+## Performance Considerations
+The SDK uses a single instance of Axios for FHIR API calls and another for custom API calls, which can help with connection reuse and improve performance for multiple requests.

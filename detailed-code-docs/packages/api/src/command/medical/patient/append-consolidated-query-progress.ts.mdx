@@ -1,0 +1,75 @@
+---
+title: "append-consolidated-query-progress.ts"
+---
+
+## High-level description
+The `updateConsolidatedQueryProgress` function updates the progress of a consolidated query for a specific patient in the database. It retrieves the patient's data, updates the status of the relevant consolidated query, and saves the changes back to the database.
+
+## Code Structure
+The code defines two functions: `updateConsolidatedQueryProgress` and `generateUpdateConsolidatedProgress`. The `updateConsolidatedQueryProgress` function is the main function that handles updating the patient's consolidated query progress in the database. It uses the `generateUpdateConsolidatedProgress` function to generate the updated list of consolidated queries with the new progress.
+
+## References
+- `Patient`: Represents a patient in the system.
+- `ConsolidatedQuery`: Represents a consolidated query for a patient.
+- `QueryProgress`: Represents the progress of a query.
+- `PatientModel`: Sequelize model for interacting with the `patients` table in the database.
+- `executeOnDBTx`: A helper function for executing a callback within a database transaction.
+- `getPatientOrFail`: A helper function for retrieving a patient by ID or throwing an error if not found.
+
+## Symbols
+
+### `updateConsolidatedQueryProgress`
+#### Description
+This function updates the progress of a consolidated query for a specific patient in the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | `Pick&lt;Patient, "id" | "cxId"&gt;` | An object containing the patient's ID and external ID. |
+| requestId | `string` | The ID of the consolidated query to update. |
+| progress | `QueryProgress` | The updated progress of the consolidated query. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | `Promise&lt;void&gt;` | A promise that resolves when the update is complete. |
+
+#### Internal Logic
+1. Defines a filter to find the patient based on their ID and external ID.
+2. Uses the `executeOnDBTx` helper function to execute the update within a database transaction.
+3. Retrieves the patient's data using `getPatientOrFail`, locking the record for the duration of the transaction.
+4. Calls the `generateUpdateConsolidatedProgress` function to generate the updated list of consolidated queries with the new progress.
+5. Updates the patient's data in the database using `PatientModel.update`.
+
+### `generateUpdateConsolidatedProgress`
+#### Description
+This function takes a list of consolidated queries, the updated progress, and the request ID. It returns a new list of consolidated queries with the updated progress for the matching request ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| consolidatedQueries | `ConsolidatedQuery[] \| undefined` | An array of consolidated queries for the patient. |
+| updatedProgress | `QueryProgress` | The updated progress of the consolidated query. |
+| requestId | `string` | The ID of the consolidated query to update. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | `ConsolidatedQuery[]` | An updated array of consolidated queries with the new progress. |
+
+#### Internal Logic
+1. Checks if the `consolidatedQueries` array is defined. If not, logs a warning message and returns an empty array.
+2. Iterates through the `consolidatedQueries` array.
+3. If the `requestId` of the current query matches the provided `requestId`, updates the `status` of the query with the `updatedProgress.status`.
+4. Returns the updated `consolidatedQueries` array.
+
+## Side Effects
+- Modifies the `consolidatedQueries` property of the patient's data in the database.
+
+## Error Handling
+- Uses the `getPatientOrFail` function to retrieve the patient, which throws a `NotFoundError` if the patient is not found.
+- The `executeOnDBTx` helper function handles any errors within the transaction, rolling back the transaction and re-throwing the error.
+
+## Logging
+- Logs a warning message if no consolidated queries are found for the patient.
+- Uses the `capture.message` function to capture the warning message in Sentry.

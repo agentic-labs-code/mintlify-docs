@@ -1,0 +1,45 @@
+---
+title: "connector-factory.ts"
+---
+
+## High-level description
+This code defines a factory function `makeFHIRConverterConnector()` that creates and returns an instance of a FHIR (Fast Healthcare Interoperability Resources) converter connector. The function selects between two different implementations based on the environment configuration.
+
+## Code Structure
+The code imports necessary dependencies and defines a single factory function. The function uses the `Config` class to determine the environment and returns the appropriate connector implementation.
+
+## Symbols
+
+### `makeFHIRConverterConnector()`
+#### Description
+This function is a factory that creates and returns an instance of a FHIR converter connector. It determines which implementation to use based on the environment configuration.
+
+#### Inputs
+This function takes no inputs.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return value | FHIRConverterConnector | An instance of either FHIRConverterConnectorHTTP or FHIRConverterConnectorSQS |
+
+#### Internal Logic
+1. The function checks if the current environment is a cloud environment using `Config.isCloudEnv()`.
+2. If it's not a cloud environment, it returns a new instance of `FHIRConverterConnectorHTTP`.
+3. If it is a cloud environment, it returns a new instance of `FHIRConverterConnectorSQS`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Config | Used to check the environment configuration |
+| FHIRConverterConnector | Interface implemented by both connector types |
+| FHIRConverterConnectorHTTP | HTTP implementation of the FHIR converter connector |
+| FHIRConverterConnectorSQS | SQS (Simple Queue Service) implementation of the FHIR converter connector |
+
+## Notes
+1. The code uses a factory pattern to create the appropriate connector based on the environment.
+2. The `FHIRConverterConnectorHTTP` is used for non-cloud environments, which might be useful for local development or testing.
+3. The `FHIRConverterConnectorSQS` is used for cloud environments, suggesting that in production, the FHIR conversion requests are handled through an AWS SQS queue.
+4. The actual implementations of `FHIRConverterConnectorHTTP` and `FHIRConverterConnectorSQS` are not provided in this file, but they both implement the `FHIRConverterConnector` interface.
+5. The `Config` class is used to determine the environment, with `isCloudEnv()` likely checking if the environment is set to production or a cloud-based staging environment.
+
+This factory function allows the application to switch between different FHIR converter implementations seamlessly based on the deployment environment, promoting flexibility and easier testing/development workflows.

@@ -1,0 +1,75 @@
+---
+title: "document-contribution.ts"
+---
+
+## High-level description
+This code implements a document contribution process for the CommonWell Health Alliance API. It queries for documents served by Metriport's FHIR server, creates or retrieves organizations and patients, and performs document queries and retrievals.
+
+## Code Structure
+The main function `documentContribution` orchestrates the process, utilizing helper functions for creating/retrieving organizations and patients, querying documents, and interacting with the FHIR server. It relies on environment variables for configuration and uses the CommonWell SDK for API interactions.
+
+## Symbols
+
+### `documentContribution`
+#### Description
+This is the main function that orchestrates the document contribution process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| memberManagementApi | CommonWell | API client for member management |
+| api | CommonWell | API client for the default organization |
+| queryMeta | RequestMetadata | Metadata for API requests |
+
+#### Internal Logic
+1. Checks for required environment variables
+2. Creates or retrieves an organization
+3. Finds or creates a patient and person on the main organization
+4. Finds or creates a patient on the new organization
+5. Gets and upgrades patient network links
+6. Populates test data on the FHIR server
+7. Queries for documents from the main organization
+8. Retrieves and stores document contents
+
+### `getOrCreateOrg`
+#### Description
+Creates a new organization or retrieves an existing one.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| memberManagementApi | CommonWell | API client for member management |
+| queryMeta | RequestMetadata | Metadata for API requests |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| orgAPI | CommonWell | API client for the new organization |
+| orgName | string | Name of the organization |
+| orgId | string | ID of the organization |
+
+### `addOrgToFHIRServer`, `addPatientToFHIRServer`, `addDocumentRefAndBinaryToFHIRServer`
+#### Description
+These functions add organization, patient, and document reference data to the FHIR server.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| orgId | string | Organization ID |
+| orgName | string | Organization name |
+| patientId | string | Patient ID |
+| fhirApi | AxiosInstance | Axios instance for FHIR API calls |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/commonwell-sdk | Provides CommonWell API client and types |
+| axios | HTTP client for making API requests |
+| fs | File system operations |
+| lodash | Utility functions (cloneDeep) |
+
+## Error Handling
+The code uses try-catch blocks and console.log statements for error handling and logging. It also checks for the existence of required data in API responses.
+
+## Logging
+The code uses console.log statements throughout to log progress and important information.

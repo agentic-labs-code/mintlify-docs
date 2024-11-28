@@ -1,0 +1,79 @@
+---
+title: "folder.ts"
+---
+
+## High-level description
+This code provides utility functions for managing a "runs" folder in the user's home directory and creating file paths within it. It includes functions to initialize the runs folder, create symlinks, and generate file paths for specific folders and organizations.
+
+## Code Structure
+The code defines three main functions:
+1. `initRunsFolder`: Creates a symlink to the runs folder in the user's home directory.
+2. `buildGetDirPathInside`: Returns a function that creates a directory path inside the runs folder.
+3. `getFileNameForOrg`: Generates a filename for a given organization name.
+
+These functions work together to manage the runs folder and create organized file paths for different purposes.
+
+## Symbols
+
+### `initRunsFolder`
+#### Description
+Creates a symlink to the runs folder in the user's home directory.
+
+#### Internal Logic
+1. Gets the user's home directory using `os.homedir()`.
+2. Creates a destination path for the runs folder.
+3. Creates the destination directory if it doesn't exist.
+4. Attempts to create a symlink to the destination folder if it doesn't already exist.
+
+#### Side Effects
+- Creates a directory in the user's home directory.
+- Creates a symlink in the current working directory.
+
+### `buildGetDirPathInside`
+#### Description
+Returns a function that creates a directory path inside the runs folder.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| folder | string | The name of the folder inside ./runs |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| function | Function | A function that takes an organization name and returns a file path |
+
+#### Internal Logic
+Returns a function that:
+1. Constructs a path using the provided folder name.
+2. Calls `getFileNameForOrg` to generate a filename for the given organization.
+3. Returns the complete file path.
+
+### `getFileNameForOrg`
+#### Description
+Generates a filename for a given organization name.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| orgName | string | The name of the organization |
+| extension | string | (optional) The file extension |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| string | string | The generated filename |
+
+#### Internal Logic
+1. Removes commas and periods from the organization name.
+2. Replaces spaces with hyphens.
+3. Appends the current date and time in ISO format.
+4. Adds the file extension if provided.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| fs | File system operations |
+| os | Operating system-related utilities |
+
+This code is designed to work with other utility functions in the project, providing a consistent way to manage file paths and organize output for various operations related to customer data and document processing.

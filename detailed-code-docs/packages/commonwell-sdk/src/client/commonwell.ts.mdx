@@ -1,0 +1,130 @@
+---
+title: "commonwell.ts"
+---
+
+## High-level description
+This file implements the CommonWell class, which serves as a client for interacting with the CommonWell Health Alliance API. It provides methods for various operations related to patient management, document retrieval, and organization management within the CommonWell network.
+
+## Code Structure
+The main `CommonWell` class implements the `CommonWellAPI` interface. It contains methods for different API endpoints, organized into sections for organization management, person management, patient management, document management, and link management. The class uses Axios for making HTTP requests and includes error handling and response processing.
+
+## Symbols
+
+### `CommonWell`
+#### Description
+The main class that implements the CommonWell API client.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| orgCert | string | The certificate (public key) for the organization |
+| rsaPrivateKey | string | An RSA key corresponding to the specified orgCert |
+| orgName | string | The name of the organization |
+| oid | string | The organization's OID |
+| apiMode | APIMode | The mode the client will be running (integration or production) |
+| options | object | Optional parameters including timeout |
+
+#### Internal Logic
+- Initializes an Axios instance with the provided configuration
+- Sets up interceptors for response handling
+- Implements methods for various API endpoints, organized by functionality
+
+### `createOrg`
+#### Description
+Creates a new organization in the CommonWell network.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| meta | RequestMetadata | Metadata about the request |
+| organization | Organization | The organization to create |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Organization | object | The created organization |
+
+### `enrollPerson`
+#### Description
+Enrolls a new person in the CommonWell network.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| meta | RequestMetadata | Metadata about the request |
+| person | Person | The person to enroll |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Person | object | The enrolled person |
+
+### `registerPatient`
+#### Description
+Registers a new patient in the CommonWell network.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| meta | RequestMetadata | Metadata about the request |
+| patient | Patient | The patient to register |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Patient | object | The registered patient |
+
+### `queryDocuments`
+#### Description
+Queries for documents associated with a patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| meta | RequestMetadata | Metadata about the request |
+| patientId | string | The patient's ID |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| DocumentQueryResponse | object | The query response containing document references |
+
+### `retrieveDocument`
+#### Description
+Retrieves a document and pipes its bytes into the provided output stream.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| meta | RequestMetadata | Metadata about the request |
+| inputUrl | string | The URL of the document to retrieve |
+| outputStream | stream.Writable | The stream to receive the document bytes |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| void | - | No return value |
+
+## Dependencies
+- axios: For making HTTP requests
+- http-status: For HTTP status codes
+- https: For creating an HTTPS agent
+- stream: For handling document retrieval streams
+- @metriport/shared: For PurposeOfUse enum
+- Various internal modules for models and utilities
+
+## Error Handling
+The class uses a custom `MetriportError` for error handling. It also includes interceptors for Axios responses to handle successful and error responses uniformly.
+
+## Logging
+The class doesn't implement explicit logging but uses console.log for debugging in some methods.
+
+## API/Interface Reference
+The `CommonWell` class implements the `CommonWellAPI` interface, which defines all the methods available for interacting with the CommonWell API.
+
+## Performance Considerations
+The class includes a configurable timeout option for API requests, defaulting to 120 seconds.
+
+## TODOs
+- Handle errors in API calls as per CommonWell specification (TODO #322)
+- Consider implementing more robust error handling and logging

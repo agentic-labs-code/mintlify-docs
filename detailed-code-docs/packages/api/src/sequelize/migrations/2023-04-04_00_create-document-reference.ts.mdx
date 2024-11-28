@@ -1,0 +1,71 @@
+---
+title: "2023-04-04_00_create-document-reference.ts"
+---
+
+## High-level description
+This code defines database migration scripts for creating and dropping the `document_reference` table. This table likely stores metadata and references to patient documents, potentially from external sources.
+
+## References
+- `shared`: This refers to the `migrations-shared.ts` file, which likely contains helper functions for common migration tasks.
+
+## Symbols
+
+### `up`
+#### Description
+This asynchronous function defines the steps to apply the migration, creating the `document_reference` table.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | \{ context: QueryInterface \} | An object containing the Sequelize QueryInterface for interacting with the database. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (Implicit) | Promise\&lt;void\&gt; | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. **Transaction:** It starts a database transaction to ensure atomicity.
+2. **createTable:** It calls the `createTable` function from the `shared` module, passing the following:
+    - `queryInterface`: The Sequelize QueryInterface.
+    - `"document_reference"`: The name of the table to create.
+    - An object defining the table schema:
+        - `id`: A string primary key.
+        - `cxId`: A UUID foreign key referencing a "cx" (likely "clinic").
+        - `patientId`: A string foreign key referencing a patient.
+        - `source`: A string indicating the document source.
+        - `externalId`: A string for external system reference.
+        - `data`: A JSONB column for storing document-specific data.
+    - Options:
+        - `transaction`: The active database transaction.
+        - `addVersion`: A flag to add a versioning column (likely for optimistic locking).
+        - `uniqueKeys`: Defines a unique constraint on `patient_id`, `source`, and `external_id`.
+3. **Transaction End:** The transaction is automatically committed if successful or rolled back if an error occurs.
+
+### `down`
+#### Description
+This asynchronous function defines the steps to revert the migration, dropping the `document_reference` table.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| \{ context: queryInterface \} | \{ context: QueryInterface \} | An object containing the Sequelize QueryInterface. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (Implicit) | Promise\&lt;void\&gt; | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. **Transaction:** It starts a database transaction.
+2. **dropTable:** It calls `queryInterface.dropTable` to drop the "document_reference" table.
+3. **Transaction End:** The transaction is automatically committed or rolled back based on the success or failure of the drop operation.
+
+## Dependencies
+- `DataTypes` from "sequelize": Used to define data types for the table columns.
+- `Migration` from "..": This likely imports a type definition for migration functions.
+- `shared` from "../migrations-shared": Imports helper functions, including `createTable`.
+
+## Error Handling
+- Both `up` and `down` functions are wrapped in a database transaction to ensure that either all changes are applied or none are, preventing partial migrations.
+- Any errors during the migration process will be caught by the transaction and rolled back.

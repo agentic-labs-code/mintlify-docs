@@ -1,0 +1,93 @@
+---
+title: "get-medication-list.ts"
+---
+
+## High-level description
+This code implements a utility function to get a list of medications for a patient. It uses the Metriport Medical API to fetch medication requests, processes them, and generates CSV files with medication information for individual patients and a consolidated file for all patients.
+
+## Code Structure
+The main function `main()` orchestrates the process of fetching patient data, querying medication requests, and generating CSV files. It uses helper functions like `queryResourceForPatient()`, `createMedicationRow()`, and `createConsolidatedRow()` to process the data. The code also utilizes external libraries and utilities from the Metriport ecosystem.
+
+## Symbols
+
+### `main()`
+#### Description
+The main function that orchestrates the process of fetching patient data, querying medication requests, and generating CSV files.
+
+#### Internal Logic
+1. Fetches the list of patients using the Metriport Medical API.
+2. Filters patients based on the `patientIds` array.
+3. Creates a directory for storing CSV files.
+4. Iterates through patients, querying medication requests for each.
+5. Processes medication data and writes it to individual patient CSV files and a consolidated CSV file.
+6. Handles errors and logs the results.
+
+### `queryResourceForPatient(patientId: string)`
+#### Description
+Queries the Metriport Medical API for medication requests for a specific patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patientId | string | The ID of the patient to query |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| medicationRequests | MedicationRequest[] | An array of medication requests for the patient |
+
+### `createMedicationRow(medication: MedicationRequest)`
+#### Description
+Creates a row of medication data from a MedicationRequest object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| medication | MedicationRequest | The medication request object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| row | Row | An object containing the formatted medication data and a toString() method |
+
+### `createConsolidatedRow(patient: PatientDTO, medication: MedicationRequest)`
+#### Description
+Creates a consolidated row of patient and medication data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | PatientDTO | The patient data object |
+| medication | MedicationRequest | The medication request object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| row | Row | An object containing the formatted patient and medication data and a toString() method |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides FHIR type definitions |
+| @metriport/api-sdk | Metriport API SDK for medical data |
+| @metriport/core/util/concurrency | Utility for asynchronous execution |
+| @metriport/core/util/env-var | Utility for handling environment variables |
+| @metriport/core/util/log | Logging utility |
+| @metriport/core/util/sleep | Utility for adding delays |
+| dayjs | Date manipulation library |
+| fs | File system operations |
+| lodash | Utility library for various operations |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| API_URL | string | N/A | The URL of the Metriport API |
+| API_KEY | string | N/A | The API key for authentication |
+| CX_NAME | string | N/A | The customer name |
+| FACILITY_ID | string | N/A | The ID of the facility |
+| BULK_INSERT_DELAY_TIME | number | 200 | Delay time between bulk inserts |
+| PARALLEL_QUERIES | number | 5 | Number of parallel queries to execute |
+
+## TODOs
+- Make the `fromDate` dynamic, possibly using a number of months with a default of 6 months.
+- Update the code to use `getCxData()` instead of environment variables for API_URL, API_KEY, CX_NAME, and FACILITY_ID.

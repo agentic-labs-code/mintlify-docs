@@ -1,0 +1,84 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains modules related to user token management in the API. It includes functionality for creating, retrieving, and saving user tokens, which are likely used for authentication or authorization purposes within the application.
+
+## What does it do?
+The code in this directory manages user tokens, which are probably used to authenticate or authorize users in the system. Here's a breakdown of the main functionalities:
+
+1. Token Creation: It allows the creation of new user tokens, generating them based on provided data and saving them to a database.
+
+2. Token Retrieval: It provides methods to fetch user tokens either by their unique identifier or by an OAuth user access token. This allows the system to validate and use these tokens for user authentication.
+
+3. Token Storage: It includes functionality to save user tokens to a DynamoDB database, ensuring that the tokens are persisted and can be retrieved later.
+
+These processes work together to create a system for managing user authentication tokens, allowing the application to create, store, and retrieve tokens as needed for user sessions or API access.
+
+## Key Files
+
+### create-user-token.ts
+This file contains the `createUserToken` function, which is responsible for generating new user tokens. It takes user token creation data, creates a new token, saves it to the database, and returns the created token.
+
+### get-user-token.ts
+This file provides two main functions:
+- `getUserToken`: Retrieves a single user token from the database based on the token string.
+- `getUserTokenByUAT`: Retrieves a list of user tokens that match a given OAuth user access token.
+
+It also includes a helper function `ddbItemAsOAuth` to convert DynamoDB items into `UserToken` objects.
+
+### save-user-token.ts
+This file contains the `saveUserToken` function, which is responsible for persisting user tokens to the DynamoDB database.
+
+## Dependencies
+The code in this directory relies on several external dependencies and internal modules:
+
+1. AWS SDK: Used for interacting with DynamoDB. The exact version is not specified in the provided code snippets.
+
+2. Internal modules:
+   - `../../domain/user-token`: Defines the `UserToken` type used throughout the code.
+   - `../../errors/not-found`: Provides the `NotFoundError` used in error handling.
+   - `../../models/db`: Offers utilities for database access (`getDB`, `docTableNames`).
+   - `../../shared/notifications`: Provides the `capture` function for logging.
+
+## Configuration
+The code uses a DynamoDB table named 'token' for storing user tokens. This configuration is likely defined in the `docTableNames` object from the `../../models/db` module.
+
+Key configuration points:
+- DynamoDB table name: 'token'
+- DynamoDB index: 'oauthUserAccessToken_idx' (used in `getUserTokenByUAT`)
+
+No environment variables are directly referenced in the provided code snippets, but they may be used in the referenced modules for database connection details or other configurations.
+
+## Code Examples
+
+Here's an example of how the `createUserToken` function might be used:
+
+```typescript
+const userTokenData = {
+  userId: '12345',
+  cxId: 'cx_67890',
+  expiryTime: Date.now() + 3600000 // 1 hour from now
+};
+
+const newToken = await createUserToken(userTokenData);
+console.log('New token created:', newToken.token);
+```
+
+And an example of retrieving a user token:
+
+```typescript
+try {
+  const token = await getUserToken({ token: 'abc123' });
+  console.log('Retrieved token:', token);
+} catch (error) {
+  if (error instanceof NotFoundError) {
+    console.log('Token not found');
+  } else {
+    console.error('Error retrieving token:', error);
+  }
+}
+```
+
+These examples demonstrate how the functions in this directory work together to manage user tokens throughout their lifecycle in the application.

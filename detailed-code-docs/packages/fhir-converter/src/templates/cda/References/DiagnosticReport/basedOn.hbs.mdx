@@ -1,0 +1,46 @@
+---
+title: "basedOn.hbs"
+---
+
+## High-level description
+This Handlebars template file defines the structure for a DiagnosticReport resource in FHIR format. It specifically focuses on the `basedOn` field of the DiagnosticReport, which references the request or order that led to this diagnostic report.
+
+## Symbols
+
+### Handlebars Template
+#### Description
+This template generates a JSON structure for a DiagnosticReport resource with a `basedOn` field. It uses Handlebars syntax to dynamically populate values.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ID | string | Unique identifier for the DiagnosticReport |
+| diagReport.code | object | Code describing the diagnostic report |
+| diagReport.title._ | string | Title of the diagnostic report |
+| diagReport.statusCode.code | string | Status code of the diagnostic report |
+| REF | string | Reference to the order or request that this report is based on |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| JSON | object | A JSON structure representing a DiagnosticReport resource |
+
+#### Internal Logic
+1. Creates a `fullUrl` using the provided `ID`.
+2. Sets the `resourceType` to "DiagnosticReport".
+3. Uses the `ID` for the resource's `id` field.
+4. Populates the `code` field using a partial template `DataType/CodeableConcept.hbs`.
+5. Sets the `status` using a partial template `ValueSet/DiagnosticReportStatus.hbs`.
+6. Creates a `basedOn` array with a single object containing a `reference` to `REF`.
+
+## Dependencies
+This template relies on two partial Handlebars templates:
+| Dependency | Purpose |
+|:-----------|:--------|
+| DataType/CodeableConcept.hbs | Used to generate the `code` field |
+| ValueSet/DiagnosticReportStatus.hbs | Used to generate the `status` field |
+
+## Notes
+- The template includes a comprehensive copyright notice at the beginning, indicating its origins and licensing terms.
+- The `canBeUnknown=true` parameter in the `CodeableConcept` partial suggests that the code can be set to an "unknown" value if necessary.
+- The structure follows the FHIR DiagnosticReport resource format, focusing specifically on the `basedOn` field.

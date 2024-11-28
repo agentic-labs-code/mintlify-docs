@@ -1,0 +1,134 @@
+---
+title: "2023-03-24_00_create-customer-sequence.ts"
+---
+
+## High-level description
+This migration script sets up a database table named `customer_sequence` to manage unique, sequential IDs for organizations, facilities, and patients. It ensures existing organizations, facilities, and patients have corresponding entries in the `customer_sequence` table with the correct next sequence number.
+
+## Code Structure
+The code defines two main functions: `up` and `down`. The `up` function is responsible for creating the `customer_sequence` table and populating it with initial data. It uses helper functions `getCxIDs`, `getMaxSeq`, and `getSeq` to retrieve existing customer IDs and calculate the next sequence number. The `down` function simply drops the `customer_sequence` table.
+
+## References
+- `Config.getSystemRootOID()`: This function is referenced to retrieve the system's root OID. It's defined in the `Config` class from the `../../shared/config` module.
+
+## Symbols
+### `up`
+#### Description
+This function is an asynchronous migration function that creates the `customer_sequence` table and populates it with initial data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queryInterface | Sequelize.QueryInterface | An object that provides access to Sequelize's query interface for database operations. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. Starts a database transaction to ensure atomicity.
+2. Creates the `customer_sequence` table with columns for ID, data type, and sequence number.
+3. Iterates through each data type (organization, facility, patient).
+4. For each data type, retrieves existing customer IDs using the `getCxIDs` function.
+5. For each customer ID, retrieves the maximum existing sequence number using the `getMaxSeq` function.
+6. Calculates the next sequence number based on the maximum existing sequence number.
+7. Inserts a new row into the `customer_sequence` table with the customer ID, data type, and next sequence number.
+8. Commits the transaction if all operations are successful.
+
+### `down`
+#### Description
+This function is an asynchronous migration function that reverts the changes made by the `up` function.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queryInterface | Sequelize.QueryInterface | An object that provides access to Sequelize's query interface for database operations. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;void&gt; | Promise | A promise that resolves when the migration is complete. |
+
+#### Internal Logic
+1. Starts a database transaction to ensure atomicity.
+2. Drops the `customer_sequence` table.
+3. Commits the transaction if the table is successfully dropped.
+
+### `getCxIDs`
+#### Description
+This asynchronous function retrieves a list of distinct customer IDs for a given data type from the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sequelize | Sequelize.Sequelize | A Sequelize instance representing the database connection. |
+| dataType | DataType | The type of data to retrieve customer IDs for (organization, facility, or patient). |
+| transaction | Sequelize.Transaction | An ongoing database transaction. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;string[]&gt; | Promise | A promise that resolves with an array of customer IDs. |
+
+#### Internal Logic
+1. Executes a SQL query to retrieve distinct customer IDs from the `organization` and `connected_user` tables, excluding those already present in the `customer_sequence` table for the given data type.
+2. Returns an empty array if no results are found, otherwise returns an array of customer IDs extracted from the query result.
+
+### `getMaxSeq`
+#### Description
+This asynchronous function retrieves the maximum existing sequence number for a given customer ID and data type from the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sequelize | Sequelize.Sequelize | A Sequelize instance representing the database connection. |
+| cxId | string | The customer ID to retrieve the maximum sequence number for. |
+| dataType | DataType | The type of data to retrieve the maximum sequence number for (organization, facility, or patient). |
+| transaction | Sequelize.Transaction | An ongoing database transaction. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Promise&lt;string&gt; | Promise | A promise that resolves with the maximum sequence number as a string, or undefined if no matching records are found. |
+
+#### Internal Logic
+1. Determines the appropriate table name and whether to filter by customer ID based on the provided data type.
+2. Executes a SQL query to retrieve the maximum ID from the determined table, optionally filtering by customer ID.
+3. Returns undefined if no results are found, otherwise returns the maximum ID extracted from the query result.
+
+### `getSeq`
+#### Description
+This function extracts the sequence number from a given ID string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | string \| undefined | The ID string to extract the sequence number from. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| number \| undefined | number \| undefined | The extracted sequence number as a number, or undefined if the ID string is invalid or does not contain a sequence number. |
+
+#### Internal Logic
+1. Returns undefined if the ID string is undefined.
+2. Splits the ID string by ".".
+3. Returns undefined if the split result is invalid or empty.
+4. Parses the last element of the split result as a number and returns it as the sequence number.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sequelize | Provides database interaction capabilities. |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| `OID_ID_START` | number | 100 | The starting value for the sequence number. |
+
+## Error Handling
+The `getMaxSeq` function throws an error if an invalid data type is provided.
+
+## Side Effects
+This script modifies the database schema by creating and populating the `customer_sequence` table. It also reads data from the `organization`, `connected_user`, `facility`, and `patient` tables.

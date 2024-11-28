@@ -1,0 +1,100 @@
+---
+title: "bundle.ts"
+---
+
+## High-level description
+This code defines functions and types for working with FHIR bundles, specifically for extracting and managing references between resources. It provides utilities for consolidating FHIR data, filtering resources, and handling resource references.
+
+## Code Structure
+The main symbols in this code are:
+1. `getReferencesFromResources`: Extracts references from given resources.
+2. `getReferencesFromRaw`: Extracts references from a raw string representation of resources.
+3. `buildBundle`: Constructs a FHIR bundle from given entries.
+4. `ExtractedFhirTypes`: Defines a type for extracted FHIR resources.
+5. `extractFhirTypesFromBundle`: Extracts specific FHIR resource types from a bundle.
+
+These functions work together to process FHIR bundles, extract references, and organize resources by type.
+
+## Symbols
+
+### `getReferencesFromResources`
+#### Description
+Extracts references from given resources, including missing references.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resources | Resource[] | Array of FHIR resources |
+| referencesToInclude | ResourceType[] | (Optional) Resource types to include in the result |
+| referencesToExclude | ResourceType[] | (Optional) Resource types to exclude from the result |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| references | Reference[] | References found in the resources |
+| missingReferences | Reference[] | References not present in the given resources |
+
+#### Internal Logic
+1. Extracts resource IDs from the input resources.
+2. Calls `getReferencesFromRaw` to get all references.
+3. Identifies missing references by comparing with extracted resource IDs.
+
+### `getReferencesFromRaw`
+#### Description
+Extracts references from a raw string representation of resources.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| rawContents | string | Raw string representation of resources |
+| referencesToInclude | ResourceType[] | Resource types to include |
+| referencesToExclude | ResourceType[] | Resource types to exclude |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | Reference[] | Array of extracted references |
+
+#### Internal Logic
+1. Uses regex to find reference strings in the raw content.
+2. Parses references into `Reference` objects.
+3. Filters references based on inclusion and exclusion lists.
+
+### `buildBundle`
+#### Description
+Constructs a FHIR bundle from given entries.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| entries | BundleEntry[] | Array of bundle entries |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | SearchSetBundle&lt;Resource&gt; | Constructed FHIR bundle |
+
+### `extractFhirTypesFromBundle`
+#### Description
+Extracts specific FHIR resource types from a bundle.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bundle | Bundle | FHIR bundle to extract from |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| - | ExtractedFhirTypes | Object containing extracted resources by type |
+
+#### Internal Logic
+Iterates through the bundle entries, categorizing resources by their type into the `ExtractedFhirTypes` structure.
+
+## Dependencies
+- @medplum/fhirtypes: Provides FHIR type definitions
+- @metriport/shared/medical: Provides `SearchSetBundle` type
+- dayjs: Used for date manipulation
+- lodash: Used for utility functions like `uniq`
+
+This code is crucial for processing and organizing FHIR data, particularly in scenarios where resource references need to be managed or specific resource types need to be extracted from bundles.

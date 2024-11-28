@@ -1,0 +1,115 @@
+---
+title: "error-categories.ts"
+---
+
+## High-level description
+This code implements functionality for querying and processing medical documents from CommonWell Health Alliance (CW) for a given patient. It handles document reference retrieval, document downloading, conversion to FHIR format, and storage in S3 and a FHIR server.
+
+## Code Structure
+The main function `queryAndProcessDocuments` orchestrates the entire process, calling other functions like `internalGetDocuments` for querying CW, and `downloadDocsAndUpsertFHIR` for downloading and processing the documents. These functions use various utility functions and external services for tasks such as error handling, progress tracking, and data conversion.
+
+## Symbols
+
+### `queryAndProcessDocuments`
+#### Description
+This is the main entry point for querying and processing documents from CommonWell for a given patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient to query for |
+| facilityId | string \| undefined | The facility to query for (optional) |
+| forceQuery | boolean | Whether to force a query even if waiting for enhanced coverage |
+| forcePatientDiscovery | boolean | Whether to force patient discovery |
+| forceDownload | boolean | Whether to force download of documents |
+| ignoreDocRefOnFHIRServer | boolean | Whether to ignore existing document references on FHIR server |
+| ignoreFhirConversionAndUpsert | boolean | Whether to skip FHIR conversion and upsert |
+| requestId | string | Unique identifier for the request |
+| getOrgIdExcludeList | () =&gt; Promise&lt;string[]&gt; | Function to get organization IDs to exclude |
+| triggerConsolidated | boolean | Whether to trigger consolidated processing |
+
+#### Internal Logic
+1. Checks if CommonWell is enabled for the customer and facility
+2. Sets up document query progress tracking
+3. Retrieves patient data and checks status
+4. Queries CommonWell for document references
+5. Downloads documents and processes them (conversion to FHIR, storage in S3 and FHIR server)
+6. Handles errors and updates progress
+
+### `internalGetDocuments`
+#### Description
+Queries CommonWell for document references for a given patient.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | PatientWithCWData | The patient to query for |
+| initiator | HieInitiator | Information about the initiator of the query |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| documents | Document[] | Array of document references from CommonWell |
+
+#### Internal Logic
+1. Sets up CommonWell API client
+2. Queries CommonWell for documents
+3. Processes the response, separating documents and errors
+4. Reports any errors encountered
+5. Formats and returns the document references
+
+### `downloadDocsAndUpsertFHIR`
+#### Description
+Downloads documents from CommonWell, stores them in S3, converts them to FHIR if applicable, and stores the results in the FHIR server.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| patient | Patient | The patient the documents belong to |
+| facilityId | string \| undefined | The facility ID |
+| documents | Document[] | Array of document references to process |
+| forceDownload | boolean | Whether to force download even if already in S3 |
+| ignoreDocRefOnFHIRServer | boolean | Whether to ignore existing document references on FHIR server |
+| ignoreFhirConversionAndUpsert | boolean | Whether to skip FHIR conversion and upsert |
+| requestId | string | Unique identifier for the request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| docsNewLocation | DocumentReference[] | Array of processed document references |
+
+#### Internal Logic
+1. Prepares document references with Metriport IDs
+2. Checks which documents need to be downloaded (not in S3 or not in FHIR server)
+3. Downloads documents in chunks, with delays to avoid overloading servers
+4. Converts applicable documents to FHIR format
+5. Uploads documents to S3 and upserts to FHIR server
+6. Tracks progress and handles errors throughout the process
+
+## Error Handling
+The code implements extensive error handling, including:
+- Capturing and reporting errors to an external service (likely Sentry)
+- Logging errors for debugging
+- Updating progress status in case of failures
+- Handling specific error types (e.g., NotFoundError for documents not found in CommonWell)
+
+## Logging
+The code uses a custom logging utility (`Util.out`) to log important events and errors throughout the process.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/commonwell-sdk | Interacting with CommonWell Health Alliance API |
+| @metriport/core | Various utility functions and domain models |
+| @medplum/fhirtypes | FHIR type definitions |
+
+## Configuration
+The code uses various configuration options, including:
+- `DOC_DOWNLOAD_CHUNK_SIZE`: Number of documents to download in each chunk
+- `DOC_DOWNLOAD_JITTER_DELAY_MAX_MS`: Maximum delay between individual document downloads
+- `DOC_DOWNLOAD_CHUNK_DELAY_MAX_MS`: Maximum delay between chunks of document downloads
+
+## Performance Considerations
+- The code implements chunking and delays to avoid overloading servers during document downloads
+- It uses `Promise.allSettled` for parallel processing of documents within chunks
+- The code checks for existing documents in S3 and FHIR server to avoid unnecessary downloads and processing

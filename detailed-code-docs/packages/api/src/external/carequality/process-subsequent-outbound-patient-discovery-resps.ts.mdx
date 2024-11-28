@@ -1,0 +1,57 @@
+---
+title: "process-subsequent-outbound-patient-discovery-resps.ts"
+---
+
+## High-level description
+This code defines an asynchronous function `processPostRespOutboundPatientDiscoveryResps` that handles the processing of responses received after initiating an outbound patient discovery request to external Carequality systems. It updates the patient's discovery status, polls for results from the gateways, and handles potential errors during the process.
+
+## References
+- `makeOutboundResultPoller` from `../ihe-gateway/outbound-result-poller-factory`
+- `updatePatientDiscoveryStatus` from `./command/update-patient-discovery-status`
+- `getCQData` from `./patient`
+- `getPatientOrFail` from `../../command/medical/patient/get-patient`
+
+## Symbols
+
+### `processPostRespOutboundPatientDiscoveryResps`
+#### Description
+This asynchronous function orchestrates the processing of responses received after an outbound patient discovery request. It retrieves patient information, updates their discovery status, polls for results from gateways, and handles potential errors.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| requestId | string | The unique identifier for the outbound patient discovery request. |
+| patientId | string | The unique identifier for the patient. |
+| cxId | string | The unique identifier for the clinical context. |
+
+#### Outputs
+This function does not return any value (returns `Promise&lt;void&gt;`).
+
+#### Internal Logic
+1. **Retrieve Patient Data:** Fetches the patient's data using `getPatientOrFail`.
+2. **Check Discovery Status:** Extracts the current discovery status from the patient's external data using `getCQData`.
+3. **Initiate Processing (if not already processing):**
+   - If the discovery status is not already "processing", it updates the status to "processing" using `updatePatientDiscoveryStatus`.
+   - It then initiates the polling process for outbound patient discovery results using `resultPoller.pollOutboundPatientDiscoveryResults`.
+4. **Error Handling:**
+   - If any error occurs during the process, it updates the patient's discovery status to "failed" using `updatePatientDiscoveryStatus`.
+   - It logs the error and captures it using the `capture.error` function for monitoring and debugging.
+
+#### Side Effects
+- Updates the patient's discovery status in the database.
+- Logs informational messages and potential errors.
+- Captures errors for monitoring and debugging.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/core/util/log | Provides logging functionality. |
+| @metriport/core/util/notifications | Provides error capturing and notification functionality. |
+| @metriport/shared/common/error | Provides error handling utilities. |
+| dayjs | Provides date and time manipulation functionality. |
+| dayjs/plugin/duration | Extends dayjs with duration functionality. |
+
+## Error Handling
+- The code uses a `try...catch` block to handle potential errors during the patient discovery response processing.
+- Errors are logged using the `out` and `capture.error` functions, providing context and details for debugging.
+- The patient's discovery status is updated to "failed" in case of errors.

@@ -1,0 +1,55 @@
+---
+title: "get-consolidated-webhook.test.ts"
+---
+
+## High-level description
+The `getConsolidatedWebhook` function retrieves the URL of a consolidated medical record file from a webhook response. It checks the status of a consolidated query and, if completed, extracts the file URL from the corresponding webhook payload. This function is used to provide the final download link for consolidated medical records.
+
+## References
+- `WebhookRequest`: This model represents webhook requests stored in the database. It is used to retrieve the webhook payload containing the file URL.
+
+## Symbols
+
+### `getConsolidatedWebhook`
+#### Description
+This function retrieves the URL of a consolidated medical record file from a webhook response. It first checks if the corresponding consolidated query is marked as "completed". If so, it fetches the associated webhook data from the database, extracts the file URL from the payload, and returns it along with the status and conversion type. If the query is not completed or an error occurs during the process, the function returns an appropriate error message.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cxId | string | The ID of the customer. |
+| requestId | string | The ID of the request for the consolidated medical record. |
+| consolidatedQueries | ConsolidatedQuery[] \| null | An array of consolidated queries, potentially including the one being searched for. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | ConsolidatedWebhookQuery | An object containing the status of the request, the file URL (if available), the conversion type, and an optional error message. |
+
+#### Internal Logic
+1. **Find the relevant query:** Search the `consolidatedQueries` array for a query with a matching `requestId`.
+2. **Check query status:**
+   - If no matching query is found, return a "failed" status with a "Consolidated webhook query not found" message.
+   - If the query status is not "completed", return the current status with a "Consolidated webhook query is not completed" message.
+3. **Validate conversion type:**
+   - If the query's `conversionType` is not "html", "pdf", or "json", return a "failed" status with a "No URL to return for this conversion type" message.
+4. **Retrieve webhook data:** Fetch the `WebhookRequest` from the database using the `cxId` and `requestId`.
+   - If no webhook data is found, return a "failed" status with a "Webhook data not found" message.
+5. **Extract file URL:** Parse the webhook payload and extract the file URL from the nested structure.
+   - If no URL is found, return a "failed" status with a "No URL found for this webhook" message.
+6. **Return success:** If all checks pass, return a "completed" status with the extracted file URL and conversion type.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @metriport/api-sdk | Provides types for `ConsolidationConversionType` and `ConsolidatedQuery`. |
+| @metriport/core/src/domain/query-status | Provides the `QueryStatus` type. |
+| ../../../models/webhook-request | Provides the `WebhookRequest` model. |
+
+## Error Handling
+The function handles various error scenarios by returning a specific error message in the `result` object. These scenarios include:
+- Consolidated query not found
+- Consolidated query not completed
+- Invalid conversion type
+- Webhook data not found
+- File URL not found in webhook payload 

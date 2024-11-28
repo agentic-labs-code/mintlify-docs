@@ -1,0 +1,84 @@
+---
+title: "iti38-envelope.ts"
+---
+
+## High-level description
+This code defines functions for creating and signing SOAP envelopes for IHE (Integrating the Healthcare Enterprise) transactions, specifically ITI-38 (Cross-Gateway Query) requests. It handles the creation of SOAP bodies, security headers, and signing of the requests using SAML assertions.
+
+## Code Structure
+The main functions in this file are `createITI38SoapEnvelope`, `createAndSignDQRequest`, and `createAndSignBulkDQRequests`. These functions work together to create and sign SOAP envelopes for document queries. They utilize helper functions and constants defined in the file and imported from other modules.
+
+## Symbols
+
+### `createITI38SoapEnvelope`
+#### Description
+Creates a SOAP envelope for an ITI-38 (Cross-Gateway Query) request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bodyData | OutboundDocumentQueryReq | Request data for the document query |
+| publicCert | string | Public certificate for SAML assertion |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| xmlContent | string | XML string representing the SOAP envelope |
+
+#### Internal Logic
+1. Extracts necessary data from the input
+2. Creates the SOAP body using `createSoapBody`
+3. Creates the security header using `createSecurityHeader`
+4. Constructs the full SOAP envelope
+5. Converts the envelope object to an XML string
+
+### `createAndSignDQRequest`
+#### Description
+Creates and signs a Document Query request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bodyData | OutboundDocumentQueryReq | Request data for the document query |
+| samlCertsAndKeys | SamlCertsAndKeys | Certificates and keys for SAML signing |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fullySignedSaml | string | Signed XML string of the SOAP envelope |
+
+#### Internal Logic
+1. Creates the SOAP envelope using `createITI38SoapEnvelope`
+2. Determines if SHA-1 should be used for signing
+3. Signs the SAML assertion using `signFullSaml`
+
+### `createAndSignBulkDQRequests`
+#### Description
+Creates and signs multiple Document Query requests in bulk.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bulkBodyData | OutboundDocumentQueryReq[] | Array of request data for document queries |
+| samlCertsAndKeys | SamlCertsAndKeys | Certificates and keys for SAML signing |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| signedRequests | SignedDqRequest[] | Array of signed requests with associated metadata |
+
+#### Internal Logic
+Iterates through the input array, calling `createAndSignDQRequest` for each item and collecting the results.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| dayjs | Date manipulation and formatting |
+| fast-xml-parser | XML parsing and building |
+| @metriport/ihe-gateway-sdk | IHE Gateway SDK types and schemas |
+
+## Error Handling
+The code includes basic error handling, such as throwing an error if the gateway is not provided in the request data.
+
+## Performance Considerations
+The code uses bulk processing for multiple requests, which can be more efficient than processing requests individually.

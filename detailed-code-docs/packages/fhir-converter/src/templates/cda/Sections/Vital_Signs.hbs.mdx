@@ -1,0 +1,71 @@
+---
+title: "Vital_Signs.hbs"
+---
+
+## High-level description
+This Handlebars template is designed to process and transform Clinical Document Architecture (CDA) Vital Signs data into FHIR (Fast Healthcare Interoperability Resources) format. It specifically handles the conversion of vital signs observations, including associated patient, practitioner, and organization information.
+
+## Code Structure
+The template uses nested conditional statements and loops to extract relevant data from the CDA structure and generate corresponding FHIR resources. It primarily focuses on creating Observation resources for vital signs, along with associated Patient, Practitioner, and Organization resources.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template checks for the presence of specific CDA section template IDs related to vital signs and processes the entries within these sections.
+
+#### Internal Logic
+1. Checks if the input message contains the specified template ID for vital signs.
+2. Retrieves the first CDA section with matching template IDs.
+3. Iterates through the entries in the retrieved section.
+4. For each entry, processes the observation components.
+
+### Observation Processing
+#### Description
+This part of the template handles the creation of FHIR Observation resources for each vital sign entry.
+
+#### Internal Logic
+1. Calls the Observation partial template to create an Observation resource.
+2. Generates a unique ID for the Observation.
+3. Sets the observation category to "vital-signs".
+4. Creates a reference to the associated Patient.
+5. Processes author information to create Practitioner and Organization resources if present.
+
+### Patient Reference
+#### Description
+Creates a reference to the associated Patient resource.
+
+#### Internal Logic
+1. Calls the GeneratePatientId partial to get the patient ID.
+2. Uses the Observation/subject partial to create a reference to the Patient resource.
+
+### Practitioner and Organization Processing
+#### Description
+Handles the creation of Practitioner and Organization resources associated with the Observation.
+
+#### Internal Logic
+1. Iterates through author entries.
+2. For each author with an assignedAuthor:
+   - Generates a Practitioner resource and its ID.
+   - Creates a reference from the Observation to the Practitioner.
+3. If the author has a representedOrganization:
+   - Generates an Organization resource and its ID.
+   - Creates a reference from the Observation to the Organization.
+
+## Dependencies
+This template relies on several partial templates and helper functions:
+- Resources/Observation.hbs
+- References/Observation/subject.hbs
+- Utils/GeneratePatientId.hbs
+- Utils/GeneratePractitionerId.hbs
+- Resources/Practitioner.hbs
+- References/Observation/performer.hbs
+- Utils/GenerateOrganizationId.hbs
+- Resources/Organization.hbs
+
+## Configuration
+The template uses specific CDA template IDs to identify vital signs sections:
+- '2.16.840.1.113883.10.20.22.2.4.1'
+- '2.16.840.1.113883.10.20.22.2.4'
+
+These IDs are crucial for correctly identifying and processing the vital signs data within the CDA document.

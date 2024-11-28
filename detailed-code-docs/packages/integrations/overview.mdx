@@ -1,0 +1,70 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the implementation of a Canvas integration for appointment notifications. It includes a Python script that defines a protocol for handling appointment creation events and sending notifications to an external API (Metriport). The integration is designed to work with the Canvas Medical platform and utilizes the Canvas Workflow Kit.
+
+## What does it do?
+The main functionality of this integration is to:
+
+1. Listen for appointment creation events in the Canvas Medical system.
+2. When a new appointment is created, it retrieves the appointment and patient data.
+3. It then prepares this data and sends it to the Metriport API to create or update a patient record.
+4. If successful, it initiates a document query with additional metadata.
+
+This workflow allows for real-time synchronization of appointment and patient data between the Canvas Medical system and the Metriport platform, enabling seamless integration of patient information across different healthcare systems.
+
+## Key Files
+
+### canvas_protocols/appointment_event.py
+This is the main Python script that implements the `AppointmentNotification2` class. It contains the core logic for processing appointment creation events and sending notifications to the Metriport API. Key features of this file include:
+
+- The `AppointmentNotification2` class, which extends `ClinicalQualityMeasure`.
+- The `compute_results` method, which handles the main workflow of processing appointments and sending notifications.
+- FHIR data retrieval using the `FumageHelper` class.
+- HTTP requests to the Metriport API for sending patient data and initiating document queries.
+
+### README.md
+This file provides instructions for setting up and configuring the Canvas Notification Protocol. It includes:
+
+- Steps to create a virtual environment and install the required dependencies.
+- Instructions for configuring the Canvas CLI with the appropriate environment settings.
+- Guidance on uploading the protocol script to Canvas.
+- Information on setting up necessary variables in the Canvas UI for API authentication and integration.
+
+## Dependencies
+The integration relies on the following main dependencies:
+
+1. canvas-workflow-kit: This is the core library for developing protocols for the Canvas Medical platform. It provides the necessary classes and utilities for interacting with the Canvas system.
+
+2. requests: Although not explicitly mentioned in the provided code, it's likely used for making HTTP requests to the Metriport API.
+
+3. json: Used for JSON manipulation when preparing data payloads.
+
+## Configuration
+The integration requires several configuration settings:
+
+1. Canvas environment configuration:
+   - Set in `~/.canvas/config.ini`
+   - Includes the Canvas API URL and API key
+
+2. Protocol settings (set in Canvas UI):
+   - CLIENT_ID and CLIENT_SECRET: For Canvas API authentication
+   - METRIPORT_CX_ID: Metriport customer ID
+   - METRIPORT_FACILITY_ID: Metriport facility ID
+   - METRIPORT_API_KEY: API key for Metriport authentication
+
+3. Additional settings used in the code:
+   - CANVAS_PROVIDER_NAME: The name of the provider in Canvas
+
+It's important to note that the `base_url` in the code needs to be manually changed before uploading the protocol to the production account.
+
+## Error Handling and Logging
+The integration includes basic error handling:
+- It raises an exception if the FHIR Appointment search fails.
+- It adds an error narrative if unable to retrieve the patient ID from the API response.
+
+Logging is done through the `add_narrative` method of the `ProtocolResult` object, which logs information about API responses and operation status.
+
+In conclusion, this integration provides a robust solution for synchronizing appointment and patient data between Canvas Medical and Metriport, enabling healthcare providers to maintain up-to-date patient information across different systems.

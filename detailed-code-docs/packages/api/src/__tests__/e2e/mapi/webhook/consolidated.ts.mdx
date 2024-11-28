@@ -1,0 +1,67 @@
+---
+title: "consolidated.ts"
+---
+
+## High-level description
+This code defines a set of functions for testing purposes, specifically for handling and inspecting consolidated webhook requests in a medical API context. It provides mechanisms to store, retrieve, and reset the last received webhook request, as well as a handler function that logs the request and sends a success response.
+
+## Code Structure
+The code consists of three exported functions: `getConsolidatedWebhookRequest`, `resetConsolidatedData`, and `handleConsolidated`. `handleConsolidated` is the main entry point, receiving a webhook request and storing it in a module-level variable. The other two functions provide access to and control over this stored request data.
+
+## Symbols
+
+### `getConsolidatedWebhookRequest`
+#### Description
+This function retrieves the last consolidated webhook request that was processed by the `handleConsolidated` function.
+
+#### Inputs
+*None*
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | `ConsolidatedWebhookRequest | undefined` | The last processed consolidated webhook request, or `undefined` if none have been processed yet. |
+
+#### Internal Logic
+The function simply returns the value of the module-level variable `webhookRequest`.
+
+### `resetConsolidatedData`
+#### Description
+This function resets the stored consolidated webhook request data. This is useful for cleaning up between tests.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `value` | `ConsolidatedWebhookRequest | undefined` | (Optional) The value to set the stored webhook request to. Defaults to `undefined`. |
+
+#### Outputs
+*None*
+
+#### Internal Logic
+The function sets the module-level variable `webhookRequest` to the provided `value` or `undefined` if no value is provided.
+
+### `handleConsolidated`
+#### Description
+This function simulates handling a consolidated webhook request. It logs the request and stores it for later retrieval, then sends a success response.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `whRequest` | `ConsolidatedWebhookRequest` | The consolidated webhook request to handle. |
+| `res` | `Response` | The Express response object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | `Response` | The Express response object with a 200 (OK) status code sent. |
+
+#### Internal Logic
+1. Logs a message indicating that the handler is running and includes the number of patients in the request (if available).
+2. Stores the received `whRequest` in the module-level variable `webhookRequest`.
+3. Sends a 200 (OK) status code using the provided `res` object.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| `@metriport/shared/src/medical/webhook/webhook-request` | Provides the `ConsolidatedWebhookRequest` type. |
+| `express` | Provides the `Response` type. |

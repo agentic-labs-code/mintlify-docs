@@ -1,0 +1,45 @@
+---
+title: "Procedure_Findings.hbs"
+---
+
+## High-level description
+This Handlebars template file is designed to process Clinical Document Architecture (CDA) data related to procedure findings and convert it into FHIR (Fast Healthcare Interoperability Resources) Condition resources. It extracts information from specific CDA sections and generates corresponding FHIR Condition resources along with their subject references.
+
+## Code Structure
+The template uses nested Handlebars helpers and partials to iterate through CDA entries, generate Condition resources, and create references to the patient. The main structure involves accessing specific CDA sections, looping through entries, and calling partial templates to create FHIR resources.
+
+## Symbols
+
+### Main Template
+#### Description
+The main template iterates through CDA sections with a specific template ID and processes each entry to create Condition resources and their subject references.
+
+#### Internal Logic
+1. Uses `getFirstCdaSectionsByTemplateId` to find the relevant CDA section.
+2. Iterates through entries in the section using `toArray` and `each` helpers.
+3. For each entry, calls the `Condition.hbs` partial to create a Condition resource.
+4. Generates a unique ID for each Condition using `generateUUID`.
+5. Calls `GeneratePatientId.hbs` to get the patient ID.
+6. Creates a subject reference for each Condition using the `Condition/subject.hbs` partial.
+
+## Dependencies
+The template relies on several external partials and helpers:
+
+| Dependency | Purpose |
+|:-----------|:--------|
+| Resources/Condition.hbs | Creates the Condition resource |
+| Utils/GeneratePatientId.hbs | Generates the patient ID |
+| References/Condition/subject.hbs | Creates the subject reference for the Condition |
+
+## Configuration
+The template uses a specific CDA template ID for identifying the relevant section:
+
+| Option | Type | Value | Description |
+|:-------|:-----|:------|:------------|
+| CDA Template ID | string | 2.16.840.1.113883.10.20.22.2.28 | Identifies the CDA section for procedure findings |
+
+## Notes
+- The template is part of a larger FHIR conversion system, specifically handling procedure findings from CDA documents.
+- It uses custom Handlebars helpers like `getFirstCdaSectionsByTemplateId`, `toArray`, `generateUUID`, and `evaluate`.
+- The generated FHIR resources include both the Condition resource and its subject reference to the patient.
+- The template is designed to work with a specific CDA structure and may need adjustments for different CDA formats.

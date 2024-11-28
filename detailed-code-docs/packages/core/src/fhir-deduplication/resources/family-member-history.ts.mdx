@@ -1,0 +1,81 @@
+---
+title: "family-member-history.ts"
+---
+
+## High-level description
+This code provides functionality for deduplicating and grouping Family Member History resources in FHIR. It includes functions to combine similar family member histories based on their relationship and date of birth, and to extract codes from CodeableConcept objects.
+
+## Code Structure
+The main function `deduplicateFamilyMemberHistories` uses `groupSameFamilyMemberHistories` to group similar family member histories. The `extractCode` function is a utility used within the grouping process.
+
+## Symbols
+
+### `deduplicateFamilyMemberHistories`
+#### Description
+This function deduplicates an array of FamilyMemberHistory resources by grouping similar ones together.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| famMemberHists | FamilyMemberHistory[] | An array of FamilyMemberHistory resources to deduplicate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| combinedFamMemHistories | FamilyMemberHistory[] | An array of deduplicated FamilyMemberHistory resources |
+| refReplacementMap | Map&lt;string, string[]&gt; | A map of original references to their replacements |
+
+#### Internal Logic
+1. Calls `groupSameFamilyMemberHistories` to group similar family member histories
+2. Uses `combineResources` (imported from "../shared") to combine the grouped histories
+
+### `groupSameFamilyMemberHistories`
+#### Description
+This function groups FamilyMemberHistory resources based on their relationship and date of birth.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| famMemberHists | FamilyMemberHistory[] | An array of FamilyMemberHistory resources to group |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| famMemberHistsMap | Map&lt;string, FamilyMemberHistory&gt; | A map of grouped FamilyMemberHistory resources |
+| refReplacementMap | Map&lt;string, string[]&gt; | A map of original references to their replacements |
+
+#### Internal Logic
+1. Iterates through each FamilyMemberHistory resource
+2. Extracts the relationship code using `extractCode`
+3. Creates a key using the relationship and date of birth
+4. Uses `fillMaps` (imported from "../shared") to populate the maps
+
+### `extractCode`
+#### Description
+This function extracts a code or display value from a CodeableConcept object, prioritizing non-unknown values.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| concept | CodeableConcept \| undefined | The CodeableConcept object to extract the code from |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | string \| undefined | The extracted code or display value, or undefined if not found |
+
+#### Internal Logic
+1. Checks if the concept and its coding array exist
+2. Iterates through the coding array
+3. Prioritizes non-"unknown" display values and non-"unk" codes
+4. Returns the first valid code or display value found, or undefined if none are found
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| @medplum/fhirtypes | Provides TypeScript types for FHIR resources |
+| ../shared | Imports utility functions for combining resources and filling maps |
+
+## Notes
+- The code includes a commented-out line suggesting that the "date" field is not currently used for mapping FamilyMemberHistory resources.
+- The grouping logic focuses on the relationship and date of birth, which may not capture all possible duplicates in some scenarios.
