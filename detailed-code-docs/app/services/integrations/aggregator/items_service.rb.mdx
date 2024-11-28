@@ -1,0 +1,95 @@
+---
+title: "items_service.rb"
+---
+
+## High-level description
+This code defines the `ItemsService` class within the `Integrations::Aggregator` module. Its primary purpose is to fetch and process items from an external API, storing them as `IntegrationItem` records in the database. The service is designed to handle pagination and limit the number of subsequent requests to the API.
+
+## Code Structure
+The `ItemsService` class inherits from `BaseService` and contains methods for making API requests, processing the received items, and storing them in the database. The main logic is implemented in the `call` method, which orchestrates the entire process.
+
+## References
+- `BaseService`: The parent class that provides common functionality for service objects.
+- `IntegrationItem`: The model used to store the fetched items in the database.
+- `LagoHttpClient`: A custom HTTP client used for making API requests.
+
+## Symbols
+
+### `ItemsService`
+#### Description
+This service class is responsible for fetching items from an external API and storing them in the database as `IntegrationItem` records.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Integrations::BaseIntegration | The integration object containing connection details |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the operation result and fetched items |
+
+#### Internal Logic
+1. Initialize variables for cursor and items.
+2. Start a database transaction.
+3. Delete existing standard integration items.
+4. Make API requests in a loop (up to MAX_SUBSEQUENT_REQUESTS times):
+   - Send a GET request to the API with headers and params.
+   - Process the received items using `handle_items`.
+   - Update the cursor for pagination.
+   - Break the loop if the cursor is blank.
+5. Store the fetched items in the result object.
+
+### `action_path`
+#### Description
+Defines the API endpoint path for fetching items.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| path | String | The API endpoint path |
+
+### `headers`
+#### Description
+Generates the headers required for the API request.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| headers | Hash | The headers for the API request |
+
+### `handle_items`
+#### Description
+Processes the received items and creates `IntegrationItem` records in the database.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| new_items | Array | An array of item data received from the API |
+
+### `params`
+#### Description
+Generates the query parameters for the API request.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | Hash | The query parameters for the API request |
+
+## Side Effects
+- Deletes existing standard integration items from the database.
+- Creates new `IntegrationItem` records in the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| LagoHttpClient | Used for making HTTP requests to the external API |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LIMIT | Integer | 450 | The maximum number of items to fetch per request |
+| MAX_SUBSEQUENT_REQUESTS | Integer | 15 | The maximum number of subsequent API requests to make |
+
+## Error Handling
+The service relies on the error handling mechanisms provided by the `BaseService` class. Any errors raised during the API requests or database operations will be caught and handled by the calling code.

@@ -1,0 +1,75 @@
+---
+title: "gocardless_service.rb"
+---
+
+## High-level description
+This code defines a service class `GocardlessService` within the `CreditNotes::Refunds` module. It handles the creation and status updates of refunds for credit notes using the GoCardless payment provider. The service interacts with the GoCardless API to process refunds and manages the associated database records.
+
+## Code Structure
+The `GocardlessService` class inherits from `BaseService` and includes the `Customers::PaymentProviderFinder` module. It contains two main public methods: `create` for initiating refunds and `update_status` for updating the status of existing refunds. The class also includes several private helper methods to support these operations.
+
+## Symbols
+
+### `GocardlessService`
+#### Description
+This class manages the creation and status updates of refunds for credit notes using the GoCardless payment provider.
+
+#### Inputs
+- `credit_note`: An optional `CreditNote` object passed to the initializer.
+
+#### Internal Logic
+- Initializes with a credit note object.
+- Defines constants for pending, success, and failed statuses.
+- Implements methods for creating refunds and updating their statuses.
+- Interacts with the GoCardless API to process refunds.
+- Updates local database records for refunds and credit notes.
+- Handles error cases and delivers error webhooks when necessary.
+
+### `create`
+#### Description
+Creates a new refund for the associated credit note using the GoCardless API.
+
+#### Outputs
+- `result`: A `BaseService::Result` object containing the created refund and updated credit note.
+
+#### Internal Logic
+1. Checks if the refund should be processed.
+2. Creates a refund through the GoCardless API.
+3. Creates a local `Refund` record with the API response data.
+4. Updates the credit note status.
+5. Tracks the refund status change using Segment.
+
+### `update_status`
+#### Description
+Updates the status of an existing refund based on information from GoCardless.
+
+#### Inputs
+- `provider_refund_id`: The GoCardless refund ID.
+- `status`: The new status of the refund.
+- `metadata`: Additional metadata (optional).
+
+#### Outputs
+- `result`: A `BaseService::Result` object containing the updated refund and credit note.
+
+#### Internal Logic
+1. Finds the refund by the provider refund ID.
+2. Updates the refund status.
+3. Updates the credit note status.
+4. Tracks the refund status change using Segment.
+5. Handles failed refunds by delivering error webhooks.
+
+## Dependencies
+- `GoCardlessPro`: Used for interacting with the GoCardless API.
+- `Customers::PaymentProviderFinder`: Module for finding payment providers.
+- `Utils::SegmentTrack`: Utility for tracking events with Segment.
+- `SendWebhookJob`: Job for sending webhooks.
+
+## Error Handling
+- Delivers error webhooks for GoCardless API errors and refund failures.
+- Raises errors for GoCardless API failures during refund creation.
+- Returns validation failures for invalid refund statuses.
+
+## Logging
+The service uses `Utils::SegmentTrack` to log refund status changes.
+
+This service is crucial for managing refunds through the GoCardless payment provider, ensuring that refunds are properly created, tracked, and updated in both the GoCardless system and the local database.

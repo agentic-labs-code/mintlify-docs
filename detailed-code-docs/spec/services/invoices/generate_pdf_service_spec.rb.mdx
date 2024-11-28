@@ -1,0 +1,64 @@
+---
+title: "generate_pdf_service_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Invoices::GeneratePdfService` class. It tests the functionality of generating PDF invoices, including various scenarios such as successful generation, error handling, and different contexts (graphql, api, admin).
+
+## Code Structure
+The test suite is organized around the `#call` method of the `Invoices::GeneratePdfService` class. It uses RSpec's `describe` and `context` blocks to group related tests and set up different scenarios.
+
+## Symbols
+
+### `RSpec.describe Invoices::GeneratePdfService`
+#### Description
+This is the main describe block for the test suite, focusing on the `Invoices::GeneratePdfService` class.
+
+### `subject(:invoice_generate_service)`
+#### Description
+Defines the subject of the test, which is an instance of `Invoices::GeneratePdfService`.
+
+### `let` statements
+#### Description
+These statements set up the test data and dependencies, including:
+- `context`: The context in which the service is called (e.g., 'graphql', 'api', 'admin')
+- `organization`, `customer`, `subscription`: Related models
+- `invoice`: The invoice object to be processed
+- `credit`, `fees`, `invoice_subscription`: Associated invoice data
+- `pdf_content`, `pdf_generator`, `pdf_response`: Mocked PDF generation components
+
+### `describe '#call'`
+#### Description
+This block contains the main tests for the `#call` method of the service.
+
+#### Internal Logic
+1. Tests successful PDF generation
+2. Checks if the `SendWebhookJob` is enqueued
+3. Tests error handling for not found invoice and draft invoice
+4. Checks behavior with already generated files
+5. Tests scenario with deleted billable metric
+6. Tests different contexts (API, Admin)
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| Utils::PdfGenerator | Mocked for PDF generation |
+
+## Error Handling
+The test suite checks for error handling in cases such as:
+- Not found invoice
+- Draft invoice status
+
+## Side Effects
+The test checks for side effects such as:
+- File attachment to the invoice
+- Enqueuing of `SendWebhookJob`
+
+## Performance Considerations
+The test mocks the actual PDF generation to avoid performance issues during testing.
+
+## Notes
+- The test suite uses factory_bot for creating test data
+- It mocks external services like `Utils::PdfGenerator` to isolate the service under test
+- Different contexts (graphql, api, admin) are tested to ensure correct behavior in various scenarios

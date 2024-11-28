@@ -1,0 +1,42 @@
+---
+title: "ruby_sandbox.rb"
+---
+
+## High-level description
+The `lib/lago_utils/lago_utils/ruby_sandbox.rb` file defines a module `LagoUtils::RubySandbox` that provides a method to run Ruby code in a sandboxed environment. This module acts as an interface to execute potentially unsafe Ruby code in a controlled manner.
+
+## Code Structure
+The `LagoUtils::RubySandbox` module contains a single class method `run` that delegates the execution to an instance of `LagoUtils::RubySandbox::Runner`.
+
+## Symbols
+
+### `LagoUtils::RubySandbox.run`
+#### Description
+This class method is the main entry point for running Ruby code in a sandboxed environment. It creates a new instance of `LagoUtils::RubySandbox::Runner` with the provided code and calls its `run` method.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | The Ruby code to be executed in the sandbox |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | The result of executing the provided code |
+
+#### Internal Logic
+1. Creates a new instance of `LagoUtils::RubySandbox::Runner` with the provided code.
+2. Calls the `run` method on the runner instance.
+3. Returns the result of the `run` method.
+
+## Dependencies
+The code relies on the `LagoUtils::RubySandbox::Runner` class, which is defined in a separate file (`lib/lago_utils/lago_utils/ruby_sandbox/runner.rb`).
+
+## Error Handling
+While not explicitly shown in this file, error handling is implemented in the `Runner` class. It uses a custom `SandboxError` class (defined in `lib/lago_utils/lago_utils/ruby_sandbox/sandbox_error.rb`) to handle exceptions that occur during code execution in the sandbox.
+
+## Performance Considerations
+The sandboxed execution of Ruby code may have performance implications, especially for complex or long-running code. The `Runner` class uses temporary files and subprocesses to execute the code, which adds some overhead to the execution time.
+
+## Usage Context
+This module is likely used in the context of custom aggregations for billable metrics, as seen in the `BillableMetrics::Aggregations::CustomService` class. It allows for the execution of user-defined aggregation logic in a controlled environment, ensuring that the custom code doesn't interfere with the main application's stability and security.

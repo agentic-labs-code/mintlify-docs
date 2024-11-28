@@ -1,0 +1,66 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for payment-related jobs in a Rails application. The tests focus on three different payment providers: Adyen, GoCardless, and Stripe. Each test file corresponds to a specific job that handles payment creation for its respective provider.
+
+## What does it do?
+These test files ensure that the payment creation jobs for Adyen, GoCardless, and Stripe are functioning correctly. They verify that each job:
+
+1. Initializes the appropriate payment service (AdyenService, GocardlessService, or StripeService) with the correct payment request.
+2. Calls the `create` method on the initialized service.
+3. Handles the result of the service call appropriately.
+
+The tests use mocking and stubbing techniques to isolate the job's behavior from the actual payment service implementations, ensuring that the jobs are tested independently of the external payment provider APIs.
+
+## Key Files
+1. `adyen_create_job_spec.rb`: Tests the `PaymentRequests::Payments::AdyenCreateJob`.
+2. `gocardless_create_job_spec.rb`: Tests the `PaymentRequests::Payments::GocardlessCreateJob`.
+3. `stripe_create_job_spec.rb`: Tests the `PaymentRequests::Payments::StripeCreateJob`.
+
+Each of these files follows a similar structure:
+
+1. They use RSpec's `describe` block to group tests for the specific job.
+2. They create a mock payment request using FactoryBot.
+3. They create a mock service object (AdyenService, GocardlessService, or StripeService).
+4. They contain a test case that verifies the job initializes the correct service and calls its `create` method.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used to create test data, specifically the payment request objects.
+3. Rails: The tests are written for a Rails application, as evidenced by the use of `rails_helper`.
+
+## Configuration
+The tests use the following RSpec configuration:
+
+```ruby
+RSpec.describe PaymentRequests::Payments::JobName, type: :job
+```
+
+This configuration sets up the tests as job specs, which may apply specific behaviors or settings for testing ActiveJob classes.
+
+Here's an example of how the tests are structured, using the Stripe job as an example:
+
+```ruby
+RSpec.describe PaymentRequests::Payments::StripeCreateJob, type: :job do
+  let(:payment_request) { create(:payment_request) }
+  let(:stripe_service) { instance_double(PaymentRequests::Payments::StripeService) }
+
+  it 'calls the stripe create service' do
+    expect(PaymentRequests::Payments::StripeService).to receive(:new)
+      .with(payment_request)
+      .and_return(stripe_service)
+    expect(stripe_service).to receive(:create)
+      .and_return(BaseService::Result.new)
+
+    described_class.perform_now(payment_request)
+  end
+end
+```
+
+This structure is consistent across all three test files, with minor variations for each payment provider.
+
+The tests ensure that the jobs correctly delegate the payment creation process to their respective services, maintaining separation of concerns and testability in the payment processing system. By using mocks and stubs, the tests can verify the behavior of the jobs without actually making calls to external payment APIs, which is crucial for fast and reliable test execution.

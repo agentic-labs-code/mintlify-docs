@@ -1,0 +1,44 @@
+---
+title: "customer_metadata.rb"
+---
+
+## High-level description
+The `CustomerMetadata` model represents arbitrary key-value metadata associated with a specific customer. It enforces data integrity through validations and provides a scope for retrieving metadata suitable for display on invoices.
+
+## Code Structure
+The `CustomerMetadata` model is defined within the `Metadata` module. It has a `belongs_to` association with the `Customer` model, indicating a one-to-many relationship. It also defines several validations for the `key` and `value` attributes, ensuring data integrity. The `displayable` scope filters metadata records based on the `display_in_invoice` attribute.
+
+## References
+- `Customer` model (belongs_to association)
+
+## Symbols
+
+### `CustomerMetadata`
+#### Description
+This class represents a single metadata entry associated with a customer. It inherits from `ApplicationRecord`, providing database persistence.
+
+#### Inputs
+This class doesn't define any custom methods with inputs.
+
+#### Outputs
+This class doesn't define any custom methods with outputs.
+
+#### Internal Logic
+The class defines several validations:
+- **`validates :key, presence: true, uniqueness: {scope: :customer_id}, length: {maximum: 20}`**: Ensures the `key` attribute is present, unique within the scope of a customer, and has a maximum length of 20 characters.
+- **`validates :value, presence: true, length: {maximum: 40}`**: Ensures the `value` attribute is present and has a maximum length of 40 characters.
+
+It also defines a scope:
+- **`scope :displayable, -&gt; { where(display_in_invoice: true) }`**: This scope retrieves all `CustomerMetadata` records where the `display_in_invoice` attribute is set to `true`.
+
+## Side Effects
+This class doesn't have any notable side effects.
+
+## Dependencies
+This class depends on:
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides database persistence and model functionality. |
+
+## Configuration
+This class doesn't define any configuration options.

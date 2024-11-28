@@ -1,0 +1,68 @@
+---
+title: "data_exports.rb"
+---
+
+## High-level description
+This file defines a factory for creating `DataExport` objects using FactoryBot, a popular Ruby gem for generating test data. The factory includes default attributes and several traits to create data exports in different states, such as processing, completed, and expired.
+
+## Symbols
+
+### `FactoryBot.define`
+#### Description
+This method is used to define factories for FactoryBot. It encapsulates all the factory definitions within its block.
+
+### `factory :data_export`
+#### Description
+Defines a factory for creating `DataExport` objects with default attributes and associations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | association | Associated organization for the data export |
+| membership | association | Associated membership for the data export, linked to the same organization |
+| format | string | Format of the export, default is 'csv' |
+| resource_type | string | Type of resource being exported, default is "invoices" |
+| resource_query | hash | Query parameters for the export, default filters for EUR currency |
+| status | string | Status of the export, default is 'pending' |
+| file | nil | File attachment, initially set to nil |
+
+### Trait: `:processing`
+#### Description
+Defines a trait for a data export in the processing state.
+
+#### Internal Logic
+- Sets the status to 'processing'
+- Sets the started_at timestamp to 2 hours ago
+
+### Trait: `:completed`
+#### Description
+Defines a trait for a completed data export.
+
+#### Internal Logic
+- Sets the status to 'completed'
+- Sets the started_at timestamp to 2 hours ago
+- Sets the completed_at timestamp to 30 minutes ago
+- Sets the expires_at timestamp to 7 days from now
+- Attaches a test file to the export
+
+### Trait: `:expired`
+#### Description
+Defines a trait for an expired data export.
+
+#### Internal Logic
+- Includes the :completed trait
+- Overrides the expires_at timestamp to 1 day ago
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| FactoryBot | Used for defining factories and traits |
+| Rack::Test::UploadedFile | Used to create a test file attachment |
+
+## Notes
+- The factory uses associations for `organization` and `membership`, ensuring that the membership belongs to the same organization as the data export.
+- The `resource_query` is set with a default filter for EUR currency, which can be overridden when creating instances.
+- The `:expired` trait builds upon the `:completed` trait, demonstrating trait inheritance.
+- The file attachment uses a fixture file located at "spec/fixtures/export.csv" for completed exports.
+
+This factory provides a flexible way to create `DataExport` objects in various states for testing purposes, allowing developers to easily set up different scenarios in their tests.

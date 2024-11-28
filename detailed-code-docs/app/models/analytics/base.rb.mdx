@@ -1,0 +1,98 @@
+---
+title: "base.rb"
+---
+
+## High-level description
+The `Analytics::Base` class is an abstract base class for analytics models. It provides a common interface for querying and caching analytics data from the database. It uses caching to improve performance and allows for cache expiration.
+
+## Code Structure
+The `Analytics::Base` class is a subclass of `ApplicationRecord`. It defines several class methods related to data retrieval and caching. The `find_all_by` method is the main entry point for querying data, and it utilizes caching. The `cache_expiration`, `expire_cache_for_customer`, and `cache_key` methods support the caching functionality.
+
+## References
+This class is inherited by other analytics models, such as `Analytics::GrossRevenue` and `Analytics::Mrr`, which are used in resolvers like `Resolvers::Analytics::GrossRevenuesResolver` and `Resolvers::Analytics::MrrsResolver` respectively.
+
+## Symbols
+
+### `Analytics::Base`
+#### Description
+This class serves as an abstract base class for analytics models, providing shared functionality for data retrieval and caching.
+
+#### Inputs
+This class doesn't have a constructor and doesn't accept inputs directly.
+
+#### Outputs
+This class doesn't directly return any outputs. Its methods return analytics data or cached values.
+
+#### Internal Logic
+This class doesn't have complex internal logic. It defines helper methods for analytics models.
+
+### `find_all_by`
+#### Description
+This class method retrieves analytics data for a given organization, optionally filtering by provided arguments. It utilizes caching to improve performance.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | Integer | The ID of the organization to retrieve data for. |
+| **args | Hash | Optional arguments for filtering data and cache management. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Array | An array of hashes representing the retrieved analytics data. |
+
+#### Internal Logic
+1. **Cache Expiration:** If `expire_cache` is true and `external_customer_id` is present in `args`, it calls `expire_cache_for_customer` to clear the cache for the specific customer.
+2. **Cache Retrieval:** It attempts to retrieve data from the cache using a generated `cache_key` based on provided arguments.
+3. **Database Query:** If data is not found in the cache, it constructs an SQL query using the `query` method and executes it using `ActiveRecord::Base.connection.exec_query`.
+4. **Cache Storage:** The retrieved data is cached for future use with a specified expiration time.
+5. **Result:** The method returns the retrieved analytics data as an array of hashes.
+
+### `cache_expiration`
+#### Description
+This class method defines the default cache expiration time for analytics data.
+
+#### Inputs
+This method doesn't accept any inputs.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| expiration_time | ActiveSupport::Duration | The duration for which cached data is considered valid (4 hours). |
+
+### `expire_cache_for_customer`
+#### Description
+This class method is intended to be overridden by subclasses to implement logic for expiring cached data for a specific customer.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | Integer | The ID of the organization. |
+| external_customer_id | String | The external ID of the customer. |
+
+#### Outputs
+This method doesn't return any output. It's expected to have side effects on the cache.
+
+### `cache_key`
+#### Description
+This class method is intended to be overridden by subclasses to generate a unique cache key based on provided arguments.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | Integer | The ID of the organization. |
+| **args | Hash | Optional arguments used for generating the cache key. |
+
+#### Outputs
+This method doesn't return any output. It's expected to be overridden by subclasses.
+
+## Side Effects
+- **Caching:** This class interacts with the Rails cache to store and retrieve analytics data, potentially modifying the cache state.
+- **Database Queries:** The `find_all_by` method executes SQL queries against the database to retrieve data when not available in the cache.
+
+## Dependencies
+- `ActiveRecord`
+- `Rails.cache`
+
+## Error Handling
+- The `expire_cache_for_customer` method raises a `NotImplementedError` as it's intended to be overridden by subclasses.

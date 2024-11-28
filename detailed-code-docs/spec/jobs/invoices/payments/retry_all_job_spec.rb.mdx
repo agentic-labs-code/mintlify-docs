@@ -1,0 +1,54 @@
+---
+title: "retry_all_job_spec.rb"
+---
+
+## High-level description
+This code defines a RSpec test for the `Invoices::Payments::RetryAllJob` job. It verifies that the job correctly calls the `Invoices::Payments::RetryBatchService` to retry payments for a batch of invoices within an organization.
+
+## Symbols
+
+### `RSpec.describe Invoices::Payments::RetryAllJob, type: :job`
+#### Description
+This is the main RSpec test suite for the `Invoices::Payments::RetryAllJob` job. It sets up the necessary context and defines a test case to ensure the job's functionality.
+
+### `subject(:retry_all_job)`
+#### Description
+Defines the subject of the test, which is the `Invoices::Payments::RetryAllJob` class.
+
+### `let` blocks
+#### Description
+These blocks set up the test environment by creating doubles, mocks, and test data:
+
+- `retry_batch_service`: A double of the `Invoices::Payments::RetryBatchService`
+- `result`: An instance of `BaseService::Result`
+- `organization`: A factory-created organization
+- `invoice`: A factory-created invoice associated with the organization
+
+### `before` block
+#### Description
+Sets up expectations for the `Invoices::Payments::RetryBatchService`:
+- Expects the service to be instantiated
+- Expects the `call` method to be called on the service instance
+- Sets up the return value for the `call` method
+
+### `it 'calls the retry batch service'`
+#### Description
+This is the main test case that verifies the job's behavior.
+
+#### Internal Logic
+1. Arranges: The test environment is set up in the `let` and `before` blocks.
+2. Acts: Calls the `perform_now` method on the job with the organization ID and invoice IDs.
+3. Asserts: 
+   - Verifies that `Invoices::Payments::RetryBatchService.new` was called.
+   - Verifies that `retry_batch_service.call` was called.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| FactoryBot | Implied by the use of `create` method for generating test data |
+
+## Notes
+- This test focuses on ensuring that the job correctly delegates the work to the `Invoices::Payments::RetryBatchService`.
+- It does not test the actual implementation of the retry logic, which is presumably handled by the service.
+- The test uses doubles and mocks to isolate the job's behavior from the actual service implementation.

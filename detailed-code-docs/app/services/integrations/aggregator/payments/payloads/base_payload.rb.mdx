@@ -1,0 +1,89 @@
+---
+title: "base_payload.rb"
+---
+
+## High-level description
+This code defines a `BasePayload` class within the `Integrations::Aggregator::Payments::Payloads` module. It serves as a foundation for creating payment payloads for integration with external systems, providing a structure for formatting payment data.
+
+## Code Structure
+The `BasePayload` class inherits from `Integrations::Aggregator::BasePayload` and defines methods to initialize and format payment data. It also includes private helper methods to access related data such as invoices and customers.
+
+## Symbols
+
+### `BasePayload`
+#### Description
+This class is responsible for creating a standardized payload structure for payment data. It initializes with integration and payment objects and provides a method to generate a formatted body of payment information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Object | The integration object associated with the payment |
+| payment | Object | The payment object containing payment details |
+
+#### Internal Logic
+The class initializes with integration and payment objects. It provides a `body` method that returns an array containing a hash with payment details. The class also includes private methods to access related data such as invoices and customers.
+
+### `initialize`
+#### Description
+Initializes the `BasePayload` object with integration and payment information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Object | The integration object associated with the payment |
+| payment | Object | The payment object containing payment details |
+
+### `body`
+#### Description
+Generates and returns a formatted array containing payment information.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| body | Array | An array containing a hash with payment details |
+
+#### Internal Logic
+The method creates an array with a single hash containing the following payment details:
+- `invoice_id`: The external ID of the associated integration invoice
+- `account_code`: The external account code of the account item
+- `date`: The creation date of the payment in UTC ISO8601 format
+- `amount_cents`: The payment amount in cents
+
+### `invoice`
+#### Description
+A private method that returns the payable object associated with the payment.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Object | The payable object associated with the payment |
+
+### `integration_invoice`
+#### Description
+A private method that retrieves the integration resource associated with the invoice.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration_invoice | Object | The integration resource associated with the invoice |
+
+### `integration_customer`
+#### Description
+A private method that retrieves the first integration customer associated with the invoice's customer.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration_customer | Object | The first integration customer associated with the invoice's customer |
+
+## Dependencies
+This class depends on the `Integrations::Aggregator::BasePayload` class, which it inherits from.
+
+## References
+The code references other parts of the system, including:
+- `Integrations::Aggregator::BasePayload`
+- `Invoice` model (implied by the `integration_resources` association)
+- `Customer` model (implied by the `integration_customers` association)
+
+## Notes
+This `BasePayload` class serves as a foundation for creating specific payment payloads for different integration systems. The related file `netsuite.rb` shows an example of a subclass (`Netsuite`) that extends `BasePayload` to provide a more specific payload structure for NetSuite integration.

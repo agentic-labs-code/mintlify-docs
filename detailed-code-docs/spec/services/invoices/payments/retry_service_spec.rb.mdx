@@ -1,0 +1,80 @@
+---
+title: "retry_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Invoices::Payments::RetryService` class. It tests various scenarios for retrying invoice payments, including different payment providers, invoice types, and error conditions.
+
+## Code Structure
+The test suite is organized into a main `describe` block for the `Invoices::Payments::RetryService`, with nested `context` blocks for different scenarios. Each test case uses `let` statements to set up the necessary objects and stubs.
+
+## Symbols
+
+### `RSpec.describe Invoices::Payments::RetryService`
+#### Description
+This is the main describe block for the `Invoices::Payments::RetryService` tests.
+
+### `describe '#call'`
+#### Description
+This block contains all the tests for the `call` method of the `RetryService`.
+
+### `subject(:retry_service)`
+#### Description
+This defines the subject of the tests, which is an instance of `Invoices::Payments::RetryService`.
+
+### `let(:invoice)`
+#### Description
+This creates a test invoice object with various attributes.
+
+### `let(:customer)`
+#### Description
+This creates a test customer object associated with the invoice.
+
+### `let(:payment_provider)`
+#### Description
+This sets the payment provider for the customer, defaulting to 'stripe'.
+
+### `it 'enqueues a job to create a new stripe payment'`
+#### Description
+This test ensures that calling the service enqueues a `Invoices::Payments::StripeCreateJob`.
+
+### `it 'enqueues a SendWebhookJob'`
+#### Description
+This test verifies that calling the service enqueues a `SendWebhookJob` with the correct parameters.
+
+### `context 'with one_off invoice type'`
+#### Description
+This context block tests the behavior when the invoice type is 'one_off'.
+
+### `context 'with gocardless payment provider'`
+#### Description
+This context block tests the behavior when the payment provider is 'gocardless'.
+
+### `context 'when invoice does not exist'`
+#### Description
+This context block tests the error handling when the invoice is nil.
+
+### `context 'when invoice payment status is already succeeded'`
+#### Description
+This context block tests the error handling when the invoice payment status is already 'succeeded'.
+
+### `context 'when invoice status is draft'`
+#### Description
+This context block tests the error handling when the invoice status is 'draft'.
+
+### `context 'when invoice is not ready for payment processing'`
+#### Description
+This context block tests the error handling when the invoice is not ready for payment processing.
+
+## Dependencies
+- RSpec
+- FactoryBot (implied by the use of `create` method)
+- Rails (implied by the use of `rails_helper`)
+
+## Error Handling
+The tests cover various error scenarios, including:
+- Invoice not found
+- Invalid invoice status
+- Invoice not ready for payment processing
+
+These are tested by checking the result of the `call` method for success and specific error codes.

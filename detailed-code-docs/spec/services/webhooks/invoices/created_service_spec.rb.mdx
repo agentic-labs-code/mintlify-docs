@@ -1,0 +1,55 @@
+---
+title: "created_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Webhooks::Invoices::CreatedService` class. It verifies that the service correctly creates a webhook event for the 'invoice.created' action, including the invoice data with associated fees and credits.
+
+## Code Structure
+The test suite uses RSpec and follows a standard structure for describing the behavior of the `Webhooks::Invoices::CreatedService` class. It sets up necessary test data and uses a shared example to verify the webhook creation.
+
+## Symbols
+
+### `RSpec.describe Webhooks::Invoices::CreatedService`
+#### Description
+This is the main describe block that groups all tests for the `Webhooks::Invoices::CreatedService` class.
+
+### `subject(:webhook_service)`
+#### Description
+Defines the subject of the test, which is an instance of `Webhooks::Invoices::CreatedService` initialized with an invoice object.
+
+### `let` blocks
+#### Description
+These blocks define the test data used throughout the specs:
+- `organization`: A factory-created organization
+- `customer`: A factory-created customer associated with the organization
+- `subscription`: A factory-created subscription associated with the organization
+- `invoice`: A factory-created invoice associated with the customer and organization
+
+### `before` block
+#### Description
+This block sets up additional test data by creating 4 fees and 4 credits associated with the invoice.
+
+### `describe '.call'`
+#### Description
+This describe block focuses on testing the `.call` method of the `Webhooks::Invoices::CreatedService` class.
+
+#### Internal Logic
+It uses a shared example `'creates webhook'` to test the webhook creation with the following parameters:
+- Event type: 'invoice.created'
+- Resource type: 'invoice'
+- Expected data structure: A hash containing 'fees' and 'credits' keys, both expected to be Arrays
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and RSpec configuration |
+| FactoryBot | Implied usage for creating test data (e.g., `create(:organization)`) |
+
+## Notes
+1. The test relies on factory methods (likely defined using FactoryBot) to create test data.
+2. The use of `it_behaves_like` suggests that there's a shared example defined elsewhere that tests the webhook creation process.
+3. The test verifies that the created webhook includes both fees and credits associated with the invoice.
+4. The actual implementation of the `Webhooks::Invoices::CreatedService` is not shown in this file, as this is only the test specification.
+
+This test ensures that when an invoice is created, a corresponding webhook is triggered with the correct event type, resource type, and data structure, including the associated fees and credits.

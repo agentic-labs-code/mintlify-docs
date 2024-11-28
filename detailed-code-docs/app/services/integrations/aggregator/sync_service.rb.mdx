@@ -1,0 +1,93 @@
+---
+title: "sync_service.rb"
+---
+
+## High-level description
+This code defines a `SyncService` class within the `Integrations::Aggregator` module. It is responsible for triggering synchronization of various data types (accounts, items, subsidiaries, contacts, tax items) for different integration types (NetSuite and Xero) through an HTTP POST request to an external API.
+
+## Code Structure
+The `SyncService` class inherits from `BaseService` and contains two main methods: `action_path` and `call`. The `call` method prepares the payload and sends the HTTP request, while the `sync_list` private method determines which data types to synchronize based on the integration type and options provided.
+
+## References
+This code references:
+- `BaseService` class (inherited)
+- `http_client` method (likely defined in `BaseService`)
+- `integration` and `options` instance variables (likely set in `BaseService`)
+
+## Symbols
+
+### `SyncService`
+#### Description
+A service class that handles synchronization of various data types for different integration types.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Integration | The integration object (NetSuite or Xero) |
+| options | Hash | Optional parameters to control synchronization |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result of the synchronization operation |
+
+#### Internal Logic
+1. Defines the `action_path` for the API endpoint.
+2. In the `call` method:
+   - Prepares the payload with provider config key and sync list.
+   - Sends a POST request to the API.
+   - Sets the response in the result object.
+3. The `sync_list` method determines which data types to synchronize based on the integration type and options.
+
+### `action_path`
+#### Description
+Defines the API endpoint path for the sync operation.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| path | String | The API endpoint path |
+
+### `call`
+#### Description
+Executes the synchronization process by sending a POST request to the API.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result of the synchronization operation |
+
+#### Internal Logic
+1. Prepares the payload with provider config key and sync list.
+2. Sends a POST request to the API using the `http_client`.
+3. Sets the response in the result object.
+
+### `sync_list` (private)
+#### Description
+Determines the list of data types to synchronize based on the integration type and options.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| list | Array | An array of sync types to be performed |
+
+#### Internal Logic
+1. Defines sync types for NetSuite and Xero integrations.
+2. Checks options to return specific sync types if requested.
+3. Returns all sync types if no specific option is set.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| http_client | Used to send HTTP requests to the API |
+
+## Error Handling
+The code doesn't implement explicit error handling. Errors are likely handled by the `BaseService` class or the calling code.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| sync/trigger | POST | { provider_config_key, syncs } | Not specified | Triggers synchronization for specified data types |
+
+## TODOs
+- Extend it with other providers if needed (as noted in a comment)

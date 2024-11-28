@@ -1,0 +1,52 @@
+---
+title: "create_pay_in_advance_charge_job.rb"
+---
+
+## High-level description
+This code defines a background job class `CreatePayInAdvanceChargeJob` within the `Invoices` module. Its primary purpose is to create a pay-in-advance charge for an invoice, handling retries and potential conflicts in the process.
+
+## Code Structure
+The `CreatePayInAdvanceChargeJob` class inherits from `ApplicationJob` and uses various ActiveJob features such as queue specification, retry mechanisms, and uniqueness constraints.
+
+## Symbols
+
+### `CreatePayInAdvanceChargeJob`
+#### Description
+This job is responsible for creating a pay-in-advance charge using the `Invoices::CreatePayInAdvanceChargeService`. It handles the creation process, including retries and error management.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Object | The charge to be processed |
+| event | Object | The event associated with the charge |
+| timestamp | Time | The timestamp of the event |
+| invoice | Object (optional) | An existing invoice, if any |
+
+#### Internal Logic
+1. Calls the `Invoices::CreatePayInAdvanceChargeService` with the provided parameters.
+2. If the service call is successful, the job ends.
+3. If the service call fails:
+   - If an invoice is provided, or if no invoice was created, or if the created invoice is not in a generating state, it raises an error.
+   - Otherwise, it retries the job after 3 seconds, passing the created invoice to avoid creating a new one.
+
+#### Performance Considerations
+The job uses the `unique` constraint to prevent duplicate executions, which is important for avoiding race conditions in invoice creation.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ApplicationJob | Base job class |
+| Sequenced::SequenceError | Error type for retrying on sequence errors |
+
+## Error Handling
+The job implements retry logic for `Sequenced::SequenceError`. It also has custom error handling for cases where the service call fails, either raising an error or scheduling a retry depending on the state of the invoice.
+
+## Logging
+The job uses the `:log` option for the `unique` constraint, which will log conflicts instead of raising errors.
+
+## TODOs
+There is a NOTE in the code explaining the retry logic:
+```ruby
+# NOTE: retry the job with the already created invoice in a previous failed attempt
+```
+This indicates that the retry mechanism is designed to use an existing invoice if one was created in a previous failed attempt, to avoid creating duplicate invoices.

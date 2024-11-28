@@ -1,0 +1,60 @@
+---
+title: "subscription_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying a single subscription of an organization. It's part of a larger GraphQL API and handles authentication, organization validation, and retrieval of subscription data.
+
+## Code Structure
+The `SubscriptionResolver` class is defined within the `Resolvers` module and inherits from `Resolvers::BaseResolver`. It includes two modules: `AuthenticableApiUser` and `RequiredOrganization`, which provide authentication and organization-related functionality.
+
+## References
+- `Resolvers::BaseResolver`
+- `Types::Subscriptions::Object`
+- `current_organization.subscriptions`
+
+## Symbols
+
+### `SubscriptionResolver`
+#### Description
+This class resolves queries for a single subscription within an organization. It ensures the user is authenticated and has the necessary permissions before fetching the subscription data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | Unique identifier of the subscription |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription | Types::Subscriptions::Object | The requested subscription object or null if not found |
+
+#### Internal Logic
+1. Validates user authentication and organization membership (handled by included modules).
+2. Attempts to find the subscription by ID within the current organization.
+3. Returns the subscription if found, or a not found error if the subscription doesn't exist.
+
+## Side Effects
+This resolver doesn't have any side effects as it only reads data from the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides user authentication functionality |
+| RequiredOrganization | Ensures the user belongs to a valid organization |
+
+## Error Handling
+- If the subscription is not found, it raises a `not_found_error` with the message "subscription not found".
+- Authentication and organization-related errors are handled by the included modules.
+
+## API/Interface Reference
+| Field | Type | Description |
+|:------|:-----|:------------|
+| subscription(id: ID!) | Types::Subscriptions::Object | Queries a single subscription by ID |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'subscriptions:view' | The permission required to access this resolver |
+
+This resolver is part of the larger GraphQL API structure and is used in the `QueryType` to provide the `subscription` field for querying individual subscriptions.

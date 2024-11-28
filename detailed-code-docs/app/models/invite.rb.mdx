@@ -1,0 +1,81 @@
+---
+title: "invite.rb"
+---
+
+## High-level description
+The `Invite` class represents an invitation to join an organization in a specific role. It manages the lifecycle of an invitation, from creation and acceptance to revocation. 
+
+## Code Structure
+The `Invite` class is an ActiveRecord model that interacts with the `invites` database table. It has relationships with `Organization` and `Membership` models. It also uses the `PaperTrailTraceable` concern for tracking changes and defines enums for `status` and `role`.
+
+## References
+- `Membership`: Represents a user's membership in an organization.
+- `Organization`: Represents an organization in the system.
+- `PaperTrailTraceable`: A concern for tracking changes to the model.
+
+## Symbols
+
+### `Invite`
+#### Description
+The `Invite` class represents an invitation to join an organization. It stores information about the invitee's email, the organization, the assigned role, and the invitation status.
+
+#### Inputs
+This class doesn't define any custom inputs. It uses ActiveRecord's built-in mechanisms for creating and updating records.
+
+#### Outputs
+This class doesn't define any custom outputs. It returns standard ActiveRecord objects.
+
+#### Internal Logic
+The class defines several methods for managing the invitation lifecycle:
+- `mark_as_revoked!`: Marks the invitation as revoked and sets the `revoked_at` timestamp.
+- `mark_as_accepted!`: Marks the invitation as accepted and sets the `accepted_at` timestamp.
+
+## Side Effects
+- Creating an `Invite` instance creates a new record in the `invites` database table.
+- Updating an `Invite` instance updates the corresponding record in the `invites` database table.
+
+## Dependencies
+- `ActiveRecord`: Provides the ORM framework for interacting with the database.
+- `PaperTrail`: Provides versioning and auditing capabilities.
+
+### `INVITE_STATUS`
+#### Description
+A constant array defining the possible statuses for an invitation.
+
+### `status`
+#### Description
+An enum attribute representing the current status of the invitation. It uses the values defined in `INVITE_STATUS`.
+
+### `role`
+#### Description
+An enum attribute representing the role assigned to the invitee upon accepting the invitation. It uses the values defined in `Membership::ROLES`.
+
+### `validates`
+#### Description
+Defines validations for the `email` and `token` attributes. The `email` must be a valid email address, and the `token` must be unique.
+
+### `mark_as_revoked!`
+#### Description
+Marks the invitation as revoked.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| timestamp | Time | (Optional) The timestamp to record for the revocation. Defaults to the current time. |
+
+#### Internal Logic
+- Sets the `revoked_at` attribute to the provided timestamp or the current time if not provided.
+- Sets the `status` to `revoked`.
+
+### `mark_as_accepted!`
+#### Description
+Marks the invitation as accepted.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| timestamp | Time | (Optional) The timestamp to record for the acceptance. Defaults to the current time. |
+
+#### Internal Logic
+- Sets the `accepted_at` attribute to the provided timestamp or the current time if not provided.
+- Sets the `status` to `accepted`.

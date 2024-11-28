@@ -1,0 +1,89 @@
+---
+title: "compute_amounts_from_fees_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Invoices::ComputeAmountsFromFees` service. It tests the calculation of various invoice amounts based on fees, taxes, and coupons, including scenarios with external tax providers.
+
+## Code Structure
+The test file contains a main `RSpec.describe` block for the `Invoices::ComputeAmountsFromFees` service. Within this block, there are multiple `it` blocks testing different aspects of the service's functionality, and a nested `context` block for testing scenarios with external tax providers.
+
+## Symbols
+
+### `RSpec.describe Invoices::ComputeAmountsFromFees`
+#### Description
+This is the main describe block for the `Invoices::ComputeAmountsFromFees` service tests.
+
+#### Internal Logic
+1. Sets up test data including an organization, customer, invoice, taxes, fees, and credits.
+2. Tests various aspects of the service's functionality, including tax application, fee calculations, and total amount computations.
+3. Includes a nested context for testing scenarios with external tax providers.
+
+### `subject(:compute_amounts)`
+#### Description
+Defines the subject of the test, which is an instance of the `Invoices::ComputeAmountsFromFees` service.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice object to compute amounts for |
+
+### `let` statements
+#### Description
+These statements define various test objects and data used throughout the tests.
+
+### `it 'applied taxes to the fees'`
+#### Description
+Tests whether taxes are correctly applied to the fees.
+
+#### Internal Logic
+1. Calls the `compute_amounts` service.
+2. Checks if the correct number of taxes are applied to each fee.
+3. Verifies the tax rates and amounts for each fee.
+
+### `it 'sets fees_amount_cents from the list of fees'`
+#### Description
+Tests if the total fees amount is correctly calculated and set on the invoice.
+
+### `it 'sets coupons_amount_cents from the list of fees'`
+#### Description
+Tests if the total coupons amount is correctly calculated and set on the invoice.
+
+### `it 'sets sub_total_excluding_taxes_amount_cents from the list of fees'`
+#### Description
+Tests if the subtotal excluding taxes is correctly calculated and set on the invoice.
+
+### `it 'sets taxes_amount_cents from the list of fees'`
+#### Description
+Tests if the total taxes amount is correctly calculated and set on the invoice.
+
+### `it 'sets sub_total_including_taxes_amount_cents'`
+#### Description
+Tests if the subtotal including taxes is correctly calculated and set on the invoice.
+
+### `it 'sets total_amount_cents'`
+#### Description
+Tests if the total amount is correctly calculated and set on the invoice.
+
+### `context 'when taxes are fetched from external provider'`
+#### Description
+Tests the scenario where taxes are fetched from an external provider (Anrok in this case).
+
+#### Internal Logic
+1. Sets up additional test data for the external provider scenario.
+2. Defines mock tax data from the external provider.
+3. Tests if fee and invoice applied taxes are created correctly and totals are calculated accurately.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Used for creating test objects |
+
+## Error Handling
+This test file does not explicitly test error handling scenarios.
+
+## Notes
+- The test file uses FactoryBot for creating test objects, which is a common practice in Rails testing.
+- The tests cover various scenarios including basic tax calculations and integration with external tax providers.
+- The `aggregate_failures` block is used to group multiple expectations together, allowing all expectations to be evaluated even if one fails.

@@ -1,0 +1,115 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains the implementation of the LagoEuVat module, which is responsible for managing and providing access to European Union (EU) Value Added Tax (VAT) rates. The module consists of two main components: a JSON data file containing detailed VAT rate information for EU countries, and a Ruby class that loads and exposes this data.
+
+## What does it do?
+The LagoEuVat module serves as a comprehensive solution for handling EU VAT rates within the Lago application. It performs the following key functions:
+
+1. Stores up-to-date VAT rate information for all EU countries, including standard rates, reduced rates, and special exceptions for specific regions.
+2. Provides an easy-to-use interface for accessing this VAT rate data programmatically.
+3. Allows for retrieval of country codes and specific country rates, including standard rates and exceptions.
+4. Supports historical and future VAT rates by including effective dates for each rate configuration.
+
+This functionality is crucial for applications that need to calculate or display EU VAT rates accurately, especially in e-commerce or financial contexts where tax calculations are essential.
+
+## Key Files
+
+1. `eu_vat_rates.json`:
+   This JSON file serves as the data source for all EU VAT rates. It contains a structured representation of VAT rates for each EU country, including:
+   - Standard rates
+   - Reduced rates (where applicable)
+   - Super-reduced rates (where applicable)
+   - Parking rates (where applicable)
+   - Exceptions for specific regions within countries
+   - Effective dates for each rate configuration
+
+   The file is organized by country code, allowing for easy lookup and updates. Here's a simplified example of the structure:
+
+   ```json
+   {
+     "details": "https://example.com/vat-rates-source",
+     "version": 1,
+     "items": {
+       "ES": [
+         {
+           "effective_from": "2021-01-01",
+           "rates": {
+             "standard": 21,
+             "reduced": 10,
+             "super_reduced": 4
+           },
+           "exceptions": [
+             {
+               "name": "Canary Islands",
+               "postcode": "35\\d{3}|38\\d{3}",
+               "standard": 7
+             }
+           ]
+         }
+       ]
+     }
+   }
+   ```
+
+2. `rate.rb`:
+   This Ruby file defines the `LagoEuVat::Rate` class, which is responsible for loading the VAT rate data from the JSON file and providing methods to access it. Key features of this class include:
+
+   - Initialization: Loads the JSON data when a new `Rate` object is created.
+   - `countries_code` method: Returns an array of available country codes.
+   - `country_rates` method: Retrieves VAT rates for a specific country, including standard rates and exceptions.
+
+   Here's a simplified example of how the `Rate` class is structured:
+
+   ```ruby
+   module LagoEuVat
+     class Rate
+       def initialize
+         # Load JSON data
+       end
+
+       def countries_code
+         # Return array of country codes
+       end
+
+       def country_rates(country_code)
+         # Return rates and exceptions for the given country
+       end
+
+       private
+
+       attr_reader :json_countries_rates
+     end
+   end
+   ```
+
+## Dependencies
+The LagoEuVat module relies on the following dependencies:
+
+1. JSON: Used for parsing the `eu_vat_rates.json` file.
+2. Rails: Used for accessing the application's root path when loading the JSON file.
+
+## Configuration
+The module is configured through the `eu_vat_rates.json` file, which serves as the central repository for all VAT rate information. This file should be updated whenever there are changes to EU VAT rates or when new countries join the EU.
+
+The `Rate` class is designed to automatically use the most recent applicable rates based on the current date, allowing for seamless updates and historical rate tracking.
+
+## Entry points
+The main entry point for using the LagoEuVat functionality is through the `LagoEuVat::Rate` class. Developers can create an instance of this class and use its methods to access VAT rate information:
+
+```ruby
+rate = LagoEuVat::Rate.new
+country_codes = rate.countries_code
+spain_rates = rate.country_rates('ES')
+```
+
+This class is utilized by other parts of the Lago application, such as the `Taxes::AutoGenerateService`, to automatically generate tax entries for organizations based on EU VAT rates.
+
+The data flow in this module is straightforward:
+1. The JSON file stores the raw VAT rate data.
+2. The `Rate` class loads this data upon initialization.
+3. The `Rate` class methods process and return the requested information when called.
+
+This design allows for easy maintenance of VAT rates and provides a clean interface for other parts of the application to access this data without directly interacting with the JSON file.

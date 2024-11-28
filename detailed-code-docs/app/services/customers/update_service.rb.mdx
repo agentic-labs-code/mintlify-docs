@@ -1,0 +1,75 @@
+---
+title: "update_service.rb"
+---
+
+## High-level description
+This code defines the `UpdateService` class within the `Customers` module. It is responsible for updating customer information, including various attributes, billing configurations, and associated data such as taxes and metadata. The service handles complex update scenarios, including currency changes, payment provider updates, and EU tax management.
+
+## Code Structure
+The `UpdateService` class inherits from `BaseService` and includes the `Customers::PaymentProviderFinder` module. It contains a main `update` method that processes the update request, along with several private helper methods for specific update tasks.
+
+## Symbols
+
+### UpdateService
+#### Description
+This class provides functionality to update customer information, handling various aspects such as basic details, billing configuration, taxes, and payment providers.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | A hash containing the customer update parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the update result and updated customer |
+
+#### Internal Logic
+1. Finds the customer based on the provided ID
+2. Validates metadata count
+3. Updates customer attributes within a transaction
+4. Handles currency updates
+5. Processes EU tax management if enabled
+6. Updates or creates payment provider information
+7. Handles billing configuration updates
+8. Updates invoice grace period and payment due dates if applicable
+9. Creates or updates integration customers
+
+### update_currency
+#### Description
+Updates the customer's currency if it differs from the current one.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Customer | The customer object to update |
+| currency | String | The new currency code |
+| customer_update | Boolean | Indicates if it's a direct customer update |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result of the currency update operation |
+
+#### Internal Logic
+1. Checks if the new currency is different from the current one
+2. Validates if the currency can be updated based on the customer's editability
+3. Updates the customer's currency if valid
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Customers::PaymentProviderFinder | Provides methods for finding payment providers |
+| Customers::UpdateInvoiceGracePeriodService | Handles updating invoice grace periods |
+| Customers::UpdateInvoicePaymentDueDateService | Updates invoice payment due dates |
+| Customers::EuAutoTaxesService | Manages EU tax-related operations |
+| Customers::ApplyTaxesService | Applies tax codes to customers |
+| Customers::Metadata::UpdateService | Updates customer metadata |
+| IntegrationCustomers::CreateOrUpdateService | Creates or updates integration customers |
+| PaymentProviderCustomers::UpdateService | Updates payment provider customer information |
+
+## Error Handling
+The service uses a `result` object to handle and propagate errors. It catches various exceptions such as `ActiveRecord::RecordInvalid` and `BaseService::FailedResult` to provide appropriate error responses.
+
+## Performance Considerations
+The service uses database transactions to ensure data consistency when updating multiple related records. It also performs some operations asynchronously, such as sending webhooks, to improve performance.

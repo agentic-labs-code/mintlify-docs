@@ -1,0 +1,110 @@
+---
+title: "billable_metrics_query.rb"
+---
+
+## High-level description
+The `BillableMetricsQuery` class is responsible for querying and filtering billable metrics for an organization. It provides functionality to search, filter, and paginate billable metrics based on various criteria such as recurring status and aggregation types.
+
+## Code Structure
+The `BillableMetricsQuery` class inherits from `BaseQuery` and defines a main `call` method that orchestrates the query building process. It uses private methods to construct different parts of the query based on the provided filters and search parameters.
+
+## Symbols
+
+### `BillableMetricsQuery`
+#### Description
+This class encapsulates the logic for querying billable metrics, allowing for flexible filtering and pagination.
+
+#### Inputs
+The class likely receives inputs through its initializer (not shown in the provided code), which may include:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization to query billable metrics for |
+| search_term | String | Optional search term for filtering metrics |
+| pagination | Hash | Pagination parameters |
+| filters | Hash | Additional filters for the query |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the queried billable metrics |
+
+#### Internal Logic
+1. Builds the base scope for the query using `base_scope` method
+2. Applies pagination to the result set
+3. Orders the results by creation date in descending order
+4. Applies additional filters based on recurring status and aggregation types if specified
+5. Assigns the final result to `result.billable_metrics`
+
+### `call`
+#### Description
+The main method that executes the query and returns the result.
+
+#### Internal Logic
+1. Retrieves the base scope of billable metrics
+2. Applies pagination
+3. Orders the results by creation date (descending)
+4. Applies filters for recurring status and aggregation types if specified
+5. Assigns the final result to `result.billable_metrics`
+6. Returns the result object
+
+### `base_scope`
+#### Description
+Defines the initial scope for the billable metrics query.
+
+#### Internal Logic
+1. Queries the `BillableMetric` model for the given organization
+2. Applies search parameters using Ransack if a search term is provided
+
+### `search_params`
+#### Description
+Constructs the search parameters for Ransack based on the provided search term.
+
+#### Outputs
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| search_params | Hash | Ransack search parameters |
+
+#### Internal Logic
+If a search term is present, it creates a hash with 'or' condition to search in both name and code fields.
+
+### `with_recurring`
+#### Description
+Filters the scope based on the recurring status.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | ActiveRecord::Relation | The current query scope |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filtered_scope | ActiveRecord::Relation | The scope filtered by recurring status |
+
+### `with_aggregation_type`
+#### Description
+Filters the scope based on the specified aggregation types.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | ActiveRecord::Relation | The current query scope |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filtered_scope | ActiveRecord::Relation | The scope filtered by aggregation types |
+
+## Dependencies
+The class depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| BillableMetric | The model representing billable metrics |
+| Ransack | Used for searching and filtering |
+
+## References
+This class is referenced in:
+- `Resolvers::BillableMetricsResolver`: Uses `BillableMetricsQuery` to resolve GraphQL queries for billable metrics.
+
+## Performance Considerations
+The query uses pagination and ordering, which can help with performance when dealing with large datasets. The use of scopes and chained queries allows for efficient SQL generation.

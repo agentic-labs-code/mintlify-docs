@@ -1,0 +1,59 @@
+---
+title: "usage_serializer.rb"
+---
+
+## High-level description
+The `V1::Customers::UsageSerializer` class is responsible for serializing a customer's usage data into a JSON structure for API responses. It includes details like usage period, currency, amounts, and optionally, detailed charge usage.
+
+## Code Structure
+The `UsageSerializer` class defines a `serialize` method that constructs the payload hash. It conditionally includes `charges_usage` based on the `include?` condition. The `charges_usage` method utilizes the `V1::Customers::ChargeUsageSerializer` to serialize the fees data.
+
+## References
+- `V1::Customers::ChargeUsageSerializer`: Used to serialize the `fees` data within the `charges_usage` method.
+
+## Symbols
+
+### `UsageSerializer`
+#### Description
+This class serializes a customer's usage data into a JSON-compatible format.
+
+#### Inputs
+The `UsageSerializer` operates on a `model` object, which represents the customer's usage data.
+
+#### Outputs
+Returns a hash representing the serialized usage data.
+
+#### Internal Logic
+1. **Initializes payload:** Creates a hash `payload` with basic usage information like `from_datetime`, `to_datetime`, `currency`, `amount_cents`, etc.
+2. **Conditional inclusion of charges usage:** If `include?(:charges_usage)` is true, it merges the output of the `charges_usage` method into the `payload`.
+3. **Returns payload:** Returns the constructed `payload` hash.
+
+### `serialize`
+#### Description
+This method is responsible for constructing the serialized representation of the customer's usage data.
+
+#### Outputs
+Returns a hash containing the serialized usage data.
+
+#### Internal Logic
+See "Internal Logic" of the `UsageSerializer` class description.
+
+### `charges_usage`
+#### Description
+This private method generates the serialized representation of the charges usage data.
+
+#### Outputs
+Returns a hash containing the serialized charges usage data under the key `charges_usage`.
+
+#### Internal Logic
+1. **Serializes fees data:** Utilizes the `V1::Customers::ChargeUsageSerializer` to serialize the `model.fees` data.
+2. **Returns charges usage data:** Returns a hash with the serialized fees data under the key `charges_usage`.
+
+## Dependencies
+- `ModelSerializer`: This serializer likely inherits from a base `ModelSerializer` class, providing common serialization logic.
+
+## Error Handling
+The code does not implement specific error handling beyond potential exceptions raised during data processing.
+
+## API/Interface Reference
+This serializer is used within the `/customers/:customer_external_id/usage` endpoint to format the response for customer usage data.

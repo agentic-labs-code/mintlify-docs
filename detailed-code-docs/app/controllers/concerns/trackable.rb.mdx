@@ -1,0 +1,70 @@
+---
+title: "trackable.rb"
+---
+
+## High-level description
+The `Trackable` module is a Ruby on Rails concern that provides functionality for tracking and setting tracing information in controllers. It sets membership information in the `CurrentContext` based on the current organization and user, which can be used for tracing and logging purposes.
+
+## Code Structure
+The `Trackable` module is defined as an ActiveSupport::Concern. It includes a `before_action` callback and three methods: `set_tracing_information`, `membership_id`, and `first_membership_id`. These methods work together to set the tracing information based on the current organization and user.
+
+## References
+- `CurrentContext`: A module used to store thread-specific context information.
+- `current_organization`: A method assumed to be defined in the including controller.
+- `current_user`: A method assumed to be defined in the including controller.
+
+## Symbols
+
+### `Trackable`
+#### Description
+A module that provides functionality for setting tracing information in controllers.
+
+#### Internal Logic
+- Extends `ActiveSupport::Concern`
+- Includes a `before_action` callback to set tracing information
+
+### `set_tracing_information`
+#### Description
+Sets the membership information in the `CurrentContext`.
+
+#### Internal Logic
+- Calls `membership_id` method to get the membership ID
+- Sets `CurrentContext.membership` to a string in the format "membership/{id}"
+
+### `membership_id`
+#### Description
+Determines the membership ID based on the current organization and user.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| membership_id | Integer or nil | The ID of the membership for the current user and organization |
+
+#### Internal Logic
+- Returns `nil` if there's no current organization
+- If `current_user` is defined and present, finds the membership ID for the current user in the current organization
+- If `current_user` is not available (e.g., API requests), calls `first_membership_id`
+
+### `first_membership_id`
+#### Description
+Retrieves the ID of the first membership in the current organization.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| first_membership_id | Integer or nil | The ID of the first membership in the current organization |
+
+#### Internal Logic
+- Memoizes the result using the `@first_membership_id` instance variable
+- Retrieves the first membership of the current organization, ordered by creation date
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveSupport::Concern | Provides a way to create modules that can be included in classes with added behavior |
+
+## Performance Considerations
+The `first_membership_id` method uses memoization to avoid repeated database queries, which can improve performance when the method is called multiple times.
+
+## TODOs
+There is a NOTE in the `membership_id` method explaining that for API requests, the tracing information is added based on the first created membership of the organization since the current user information is not available.

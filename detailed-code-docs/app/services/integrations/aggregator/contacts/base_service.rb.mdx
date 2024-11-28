@@ -1,0 +1,88 @@
+---
+title: "base_service.rb"
+---
+
+## High-level description
+This code defines a base service class for handling contact-related operations in an integration aggregator system. It provides common functionality for creating and managing contacts across different accounting providers (e.g., Netsuite, Xero, Anrok) through a unified API.
+
+## Code Structure
+The `BaseService` class inherits from `Integrations::Aggregator::BaseService` and defines methods for constructing API requests, processing responses, and handling webhooks for contact-related operations.
+
+## References
+This code references:
+- `Integrations::Aggregator::BaseService`
+- `SendWebhookJob`
+
+## Symbols
+
+### `Integrations::Aggregator::Contacts::BaseService`
+#### Description
+This class serves as a base for contact-related operations across different accounting providers. It defines common methods for API interactions and response processing.
+
+#### Internal Logic
+1. Defines the API endpoint for contact operations
+2. Constructs headers for API requests
+3. Handles successful contact creation by sending a webhook
+4. Processes API responses, both for successful and failed operations
+
+### `action_path`
+#### Description
+Defines the API endpoint for contact operations.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| action_path | String | The API endpoint path for contact operations |
+
+### `headers`
+#### Description
+Constructs the headers required for API requests.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| headers | Hash | A hash containing necessary headers for API requests |
+
+### `deliver_success_webhook`
+#### Description
+Sends a webhook notification for successful contact creation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Object | The customer object for which the contact was created |
+
+#### Internal Logic
+Uses `SendWebhookJob` to asynchronously send a webhook notification with the event type 'customer.accounting_provider_created'.
+
+### `process_hash_result`
+#### Description
+Processes the API response when it's in hash format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| body | Hash | The response body from the API |
+
+#### Internal Logic
+1. Extracts the contact ID from the successful contacts list
+2. If a contact ID is found, it's stored in the result
+3. If no contact ID is found, it processes the error message and sends an error webhook
+
+### `process_string_result`
+#### Description
+Processes the API response when it's in string format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| body | String | The response body from the API |
+
+#### Internal Logic
+Stores the response string as the contact ID in the result.
+
+## Dependencies
+This code depends on the `SendWebhookJob` for sending webhook notifications.
+
+## Error Handling
+Error handling is implemented in the `process_hash_result` method. When contact creation fails, it extracts error messages from the API response and sends an error webhook using the `deliver_error_webhook` method (inherited from the parent class).

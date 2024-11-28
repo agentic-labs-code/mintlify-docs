@@ -1,0 +1,69 @@
+---
+title: "integrations_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying an organization's integrations. It allows filtering by integration type and supports pagination. The resolver ensures that the user is authenticated and has the necessary permissions to view the organization's integrations.
+
+## Code Structure
+The `IntegrationsResolver` class inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the resolver's arguments, return type, and the main `resolve` method.
+
+## References
+- `Types::Integrations::IntegrationTypeEnum`
+- `Types::Integrations::Object`
+
+## Symbols
+
+### `IntegrationsResolver`
+#### Description
+This class is responsible for resolving queries for an organization's integrations. It handles authentication, authorization, and filtering of integrations based on the provided arguments.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| type | Types::Integrations::IntegrationTypeEnum | Optional. The type of integration to filter by. |
+| page | Integer | Optional. The page number for pagination. |
+| limit | Integer | Optional. The number of items per page. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integrations | Types::Integrations::Object.collection_type | A collection of integration objects. |
+
+#### Internal Logic
+1. Checks if the user is authenticated and has the required permission.
+2. Retrieves the integrations for the current organization.
+3. Applies pagination using the `page` and `limit` arguments.
+4. If a `type` is provided, filters the integrations by that type.
+5. Returns the filtered and paginated scope of integrations.
+
+### `integration_type`
+#### Description
+A private method that maps the input integration type to the corresponding integration class name.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| type | String | The integration type to map. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration_class | String | The corresponding integration class name. |
+
+#### Internal Logic
+Uses a case statement to map the input type to the appropriate integration class name. Raises a `NotImplementedError` for unknown types.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication functionality for API users. |
+| RequiredOrganization | Ensures the presence of a valid organization context. |
+
+## Error Handling
+- Raises an `unauthorized_error` if the user is not authenticated.
+- Raises an `organization_error` if the organization is missing or the user is not a member.
+- Raises a `NotImplementedError` for unknown integration types.
+
+## Performance Considerations
+The resolver uses pagination (`page` and `limit` arguments) to optimize query performance for large datasets. It also applies filtering by integration type at the database level, which can improve query efficiency when dealing with a large number of integrations.

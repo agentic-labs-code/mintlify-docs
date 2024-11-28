@@ -1,0 +1,76 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for the `CreditNotes::Refunds` services, specifically for Adyen, GoCardless, and Stripe payment providers. These tests ensure the proper functionality of creating and updating refunds through these payment gateways, including error handling and various edge cases.
+
+## What does it do?
+The tests in this directory verify that the refund services for different payment providers work correctly. They simulate the process of creating refunds and updating their statuses, ensuring that:
+
+1. Refunds are created successfully with the correct attributes.
+2. Refund statuses are updated properly.
+3. Error scenarios are handled appropriately.
+4. Tracking and webhook events are triggered when necessary.
+5. Edge cases, such as missing payments or invalid statuses, are handled correctly.
+
+These tests help maintain the reliability and consistency of the refund process across different payment providers, which is crucial for financial operations and customer satisfaction.
+
+## Key Files
+1. `adyen_service_spec.rb`: Tests the Adyen refund service.
+2. `gocardless_service_spec.rb`: Tests the GoCardless refund service.
+3. `stripe_service_spec.rb`: Tests the Stripe refund service.
+
+Each file follows a similar structure, testing the `create` and `update_status` methods of their respective service classes. They cover various scenarios, including successful operations, error handling, and edge cases specific to each payment provider.
+
+## Dependencies
+The test files rely on the following key dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data and fixtures.
+3. Mocked payment provider clients:
+   - Adyen::Client
+   - GoCardlessPro::Client
+   - Stripe
+
+These mocked clients allow the tests to simulate interactions with the payment providers without making actual API calls.
+
+Other dependencies include:
+
+- SegmentTrackJob: Used for tracking events related to refunds.
+- SendWebhookJob: Used for sending webhooks in certain scenarios, particularly for error handling.
+
+## Configuration
+While there are no explicit configuration files mentioned, the tests use various setup blocks and shared contexts to configure the test environment. This includes creating test data (customers, organizations, invoices, payments, and credit notes) and setting up mocked responses for the payment provider APIs.
+
+Key aspects of the test configuration include:
+
+1. Setting up test data using FactoryBot.
+2. Mocking payment provider API clients and their responses.
+3. Defining shared contexts for different test scenarios.
+
+Here's an example of how test data is typically set up:
+
+```ruby
+let(:customer) { create(:customer) }
+let(:organization) { create(:organization) }
+let(:invoice) { create(:invoice, organization:, customer:) }
+let(:payment) { create(:payment, invoice:) }
+let(:credit_note) { create(:credit_note, invoice:, customer:) }
+```
+
+And an example of mocking a payment provider client:
+
+```ruby
+let(:adyen_client) { instance_double(Adyen::Client) }
+let(:adyen_checkout) { instance_double(Adyen::Checkout) }
+let(:adyen_refunds) { instance_double(Adyen::Checkout::Refunds) }
+
+before do
+  allow(Adyen::Client).to receive(:new).and_return(adyen_client)
+  allow(adyen_client).to receive(:checkout).and_return(adyen_checkout)
+  allow(adyen_checkout).to receive(:refunds).and_return(adyen_refunds)
+end
+```
+
+These tests provide comprehensive coverage of the refund services, ensuring they handle various scenarios correctly across different payment providers. This is crucial for maintaining the integrity and reliability of the refund process in the application.

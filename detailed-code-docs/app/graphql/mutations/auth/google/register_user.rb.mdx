@@ -1,0 +1,49 @@
+---
+title: "register_user.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for registering a new user using Google OAuth. It's part of the authentication system, specifically handling user registration through Google's authentication service.
+
+## Code Structure
+The `RegisterUser` class is nested within the `Mutations::Auth::Google` module, indicating its role in Google-based authentication mutations. It inherits from `BaseMutation`, suggesting a common structure for mutations in this application.
+
+## Symbols
+
+### `Mutations::Auth::Google::RegisterUser`
+#### Description
+This class defines a GraphQL mutation for registering a new user with Google OAuth. It takes a Google authentication code and an organization name as inputs, and returns user registration details.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | The Google OAuth authentication code |
+| organization_name | String | The name of the organization the user is registering for |
+
+#### Outputs
+The mutation returns a `Types::Payloads::RegisterUserType`, which likely includes fields for membership, organization, authentication token, and user details.
+
+#### Internal Logic
+1. The `resolve` method is called with the provided `code` and `organization_name`.
+2. It uses the `::Auth::GoogleService` to register the user.
+3. If successful, it returns the result. Otherwise, it returns an error.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ::Auth::GoogleService | Handles the actual user registration process using Google OAuth |
+| Types::Payloads::RegisterUserType | Defines the structure of the mutation's return type |
+
+## References
+- `::Auth::GoogleService`: This service is used to perform the actual user registration.
+- `Types::Payloads::RegisterUserType`: This type is used to define the structure of the mutation's return value.
+
+## Error Handling
+The mutation uses a simple error handling mechanism. If the registration is not successful, it calls a `result_error` method (likely defined in the `BaseMutation` class) to handle the error.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| googleRegisterUser | POST | \{ code: String, organizationName: String \} | RegisterUserType | Registers a new user with Google OAuth |
+
+This mutation would be accessed through the GraphQL API, likely as part of the `MutationType` defined in the application's schema.

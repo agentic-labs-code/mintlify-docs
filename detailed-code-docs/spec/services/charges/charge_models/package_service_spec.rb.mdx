@@ -1,0 +1,79 @@
+---
+title: "package_service_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Charges::ChargeModels::PackageService` class. It tests the functionality of applying package-based charges, including scenarios with free units and different package sizes.
+
+## Symbols
+
+### `RSpec.describe Charges::ChargeModels::PackageService`
+#### Description
+This is the main describe block for the test suite, focusing on the `Charges::ChargeModels::PackageService` class.
+
+### `apply_package_service`
+#### Description
+This is the subject of the test, which calls the `apply` method of the `Charges::ChargeModels::PackageService` class with specific parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | PackageCharge | The charge object with properties |
+| aggregation_result | BaseService::Result | The result object containing the aggregation |
+| properties | Hash | The properties of the charge |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| apply_package_service | Object | The result of applying the package service |
+
+### `let(:charge)`
+#### Description
+This creates a factory-generated package charge with specific properties.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| amount | String | The base amount for the charge |
+| package_size | Integer | The size of each package |
+| free_units | Integer | The number of free units |
+
+### Main Test Case
+#### Description
+Tests the basic functionality of applying the package size to the value.
+
+#### Internal Logic
+1. Applies the package service
+2. Checks the resulting amount
+3. Verifies the unit amount
+4. Validates the amount details
+
+### Context: "with free_units"
+#### Description
+Tests the scenario where free units are included in the charge.
+
+#### Internal Logic
+1. Sets free units to 10
+2. Applies the package service
+3. Checks the resulting amount, unit amount, and amount details
+
+### Context: "when free units is higher than the value"
+#### Description
+Tests the edge case where the number of free units exceeds the total units.
+
+#### Internal Logic
+1. Sets free units to 200 (higher than the aggregation value)
+2. Applies the package service
+3. Verifies that the amount and unit amount are zero
+4. Checks the amount details for correct free and paid units
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| FactoryBot | Used for creating test data (package charge) |
+
+## Notes
+- The test suite uses RSpec's `aggregate_failures` to group multiple expectations.
+- The `create` method suggests the use of FactoryBot for generating test data.
+- The test covers various scenarios including basic package charging, applying free units, and edge cases where free units exceed the total units.

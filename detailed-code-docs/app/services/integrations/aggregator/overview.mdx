@@ -1,0 +1,69 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains services and classes for integrating with various accounting and tax providers through an aggregator API. It provides functionality for managing accounts, contacts, credit notes, invoices, items, payments, sales orders, subsidiaries, and taxes across different integration types such as NetSuite, Xero, and Anrok.
+
+## What does it do?
+The code in this directory performs the following main functions:
+
+1. Fetches and synchronizes account information from external systems.
+2. Manages contacts, including creation and updates, across different accounting providers.
+3. Handles credit note creation and synchronization with external systems.
+4. Processes invoices, including creation, updating, and synchronization.
+5. Manages items and tax items, fetching and storing them locally.
+6. Handles payment creation and synchronization with external accounting systems.
+7. Creates and manages sales orders based on finalized invoices.
+8. Fetches and processes subsidiary data from external APIs.
+9. Provides tax-related services for invoices, including draft creation, processing, negation, and voiding.
+10. Offers a general synchronization service for various data types across different integration types.
+
+These services interact with external APIs, handle responses, manage error scenarios, and update local data structures based on the information received from external systems.
+
+## Entry points
+The main entry points for this directory are the various service classes, each responsible for a specific aspect of the integration:
+
+1. `AccountsService`: Manages account synchronization.
+2. `Contacts::CreateService` and `Contacts::UpdateService`: Handle contact operations.
+3. `CreditNotes::CreateService`: Manages credit note creation and synchronization.
+4. `Invoices::CreateService`: Handles invoice creation and processing.
+5. `ItemsService` and `TaxItemsService`: Manage item and tax item synchronization.
+6. `Payments::CreateService`: Handles payment creation and synchronization.
+7. `SalesOrders::CreateService`: Manages sales order creation.
+8. `SubsidiariesService`: Fetches and processes subsidiary data.
+9. `Taxes::Invoices::CreateDraftService`, `CreateService`, `NegateService`, and `VoidService`: Handle tax-related invoice operations.
+10. `SyncService`: Provides general synchronization capabilities for various data types.
+
+These services are likely called from other parts of the application when specific integration operations need to be performed.
+
+## Key Files
+1. `base_service.rb`: Provides common functionality for all integration services.
+2. `accounts_service.rb`: Handles account synchronization.
+3. `contacts/create_service.rb` and `contacts/update_service.rb`: Manage contact operations.
+4. `credit_notes/create_service.rb`: Handles credit note creation and synchronization.
+5. `invoices/create_service.rb`: Manages invoice creation and processing.
+6. `items_service.rb` and `tax_items_service.rb`: Handle item and tax item synchronization.
+7. `payments/create_service.rb`: Manages payment creation and synchronization.
+8. `sales_orders/create_service.rb`: Handles sales order creation.
+9. `subsidiaries_service.rb`: Fetches and processes subsidiary data.
+10. `taxes/invoices/base_service.rb`, `create_draft_service.rb`, `create_service.rb`, `negate_service.rb`, and `void_service.rb`: Handle tax-related invoice operations.
+11. `sync_service.rb`: Provides general synchronization capabilities.
+
+## Dependencies
+The services in this directory rely on several external dependencies and internal modules:
+
+1. `LagoHttpClient`: Used for making HTTP requests to external APIs.
+2. `ActiveRecord`: Used for database operations and transactions.
+3. `JSON`: Used for parsing API responses.
+4. Various internal models such as `IntegrationItem`, `IntegrationResource`, and others.
+
+## Configuration
+While there are no explicit configuration files in this directory, the services rely on configuration and settings from the broader application context. This includes:
+
+1. API endpoints: Defined in each service's `action_path` method.
+2. Integration types: The services check for specific integration types, such as 'Integrations::NetsuiteIntegration', 'Integrations::XeroIntegration', and 'Integrations::AnrokIntegration'.
+3. Headers: Generated in the base services for API requests.
+4. Environment variables: Some services use environment variables for configuration, such as `LAGO_FRONT_URL`.
+
+These services are designed to be flexible and work with different integration types, providing a comprehensive solution for managing various aspects of accounting and tax integrations through a unified aggregator API.

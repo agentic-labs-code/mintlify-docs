@@ -1,0 +1,53 @@
+---
+title: "create_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Integrations::Aggregator::CreditNotes::CreateService` class. It tests the functionality of creating credit notes in NetSuite through an integration service, including both synchronous and asynchronous calls, successful and failed scenarios, and various edge cases.
+
+## Code Structure
+The test suite is organized around the `CreateService` class, with two main describe blocks for `#call_async` and `#call` methods. It uses extensive setup with let statements to create necessary objects and mock external dependencies.
+
+## Symbols
+
+### `RSpec.describe Integrations::Aggregator::CreditNotes::CreateService`
+#### Description
+This is the main describe block for the test suite, focusing on the `CreateService` class for credit notes in the NetSuite integration.
+
+### `describe '#call_async'`
+#### Description
+Tests the asynchronous call method of the service.
+
+#### Internal Logic
+- Tests enqueuing of the create job when a credit note exists
+- Tests error handling when a credit note doesn't exist
+
+### `describe '#call'`
+#### Description
+Tests the synchronous call method of the service.
+
+#### Internal Logic
+- Tests successful credit note creation with both hash and string responses
+- Tests failed credit note creation scenarios
+- Tests error handling for server and client errors
+- Verifies creation of `IntegrationResource` objects
+- Checks for webhook job enqueuing in error scenarios
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| LagoHttpClient::Client | Mocked for HTTP requests |
+| Net::HTTPOK | Mocked for successful HTTP responses |
+
+## Error Handling
+The test suite covers various error scenarios, including:
+- Missing credit note
+- Server errors (500-599)
+- Client errors (400-499)
+
+## Performance Considerations
+The tests use extensive mocking and stubbing to avoid actual HTTP requests, which helps in maintaining fast test execution.
+
+## TODOs
+There are no explicit TODOs in the code, but the test suite could potentially be expanded to cover more edge cases or specific NetSuite integration scenarios.

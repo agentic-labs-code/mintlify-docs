@@ -1,0 +1,70 @@
+---
+title: "values.rb"
+---
+
+## High-level description
+This code defines a custom GraphQL scalar type called `ChargeFilterValues` within the `Types::ChargeFilters` module. It is designed to handle the conversion of input and output values for charge filter data, ensuring proper formatting and type coercion for GraphQL operations.
+
+## Symbols
+
+### `Types::ChargeFilters::Values`
+#### Description
+This class is a custom GraphQL scalar type that extends `Types::BaseScalar`. It provides methods for coercing input and result values related to charge filters.
+
+#### Internal Logic
+The class implements two main methods:
+
+1. `coerce_input`: Converts the input value into a standardized hash format.
+2. `coerce_result`: Converts the Ruby value to a hash for GraphQL output.
+
+### `self.coerce_input`
+#### Description
+This method processes the input value, converting it into a standardized hash format where keys are strings and values are arrays of strings.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| input_value | Hash | The input value to be coerced |
+| _context | GraphQL::Query::Context | The GraphQL query context (unused) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Hash | A hash with string keys and array of string values |
+
+#### Internal Logic
+1. Converts the input value to a hash using `to_h`.
+2. Iterates over each key-value pair in the input hash.
+3. Converts each key to a string.
+4. Converts each value to an array of strings, or an empty array if the value is nil.
+5. If any error occurs during the process, it raises a `GraphQL::CoercionError`.
+
+### `self.coerce_result`
+#### Description
+This method converts the Ruby value to a hash for GraphQL output.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ruby_value | Any | The Ruby value to be coerced |
+| _context | GraphQL::Query::Context | The GraphQL query context (unused) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Hash | The input value converted to a hash |
+
+#### Internal Logic
+Simply calls `to_h` on the input `ruby_value` to ensure it's returned as a hash.
+
+## References
+This custom scalar type is used in other parts of the GraphQL schema:
+
+1. In `Types::ChargeFilters::Object`, it's used as the return type for the `values` field.
+2. In `Types::ChargeFilters::Input`, it's used as the type for the `values` argument.
+3. In `Types::Customers::Usage::ChargeFilter`, it's used as the return type for the `values` field.
+
+## Error Handling
+The `coerce_input` method includes error handling. If any error occurs during the coercion process, it raises a `GraphQL::CoercionError` with a message indicating that the input value is not a valid hash object.
+
+This custom scalar type provides a robust way to handle charge filter values in the GraphQL schema, ensuring consistent data formatting and proper error handling for invalid inputs.

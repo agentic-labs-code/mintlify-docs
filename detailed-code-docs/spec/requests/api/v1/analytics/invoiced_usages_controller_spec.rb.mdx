@@ -1,0 +1,63 @@
+---
+title: "invoiced_usages_controller_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Api::V1::Analytics::InvoicedUsagesController`. It specifically tests the GET request to the '/analytics/invoiced_usage' endpoint, focusing on the behavior under different license conditions (premium and non-premium).
+
+## Code Structure
+The test suite is organized into a single describe block for the GET request, with two nested context blocks testing different license scenarios. Each context block contains an example (it block) that makes a request and asserts the expected behavior.
+
+## Symbols
+
+### RSpec.describe Api::V1::Analytics::InvoicedUsagesController
+#### Description
+This is the main describe block that groups all tests for the `InvoicedUsagesController`.
+
+### describe 'GET /analytics/invoiced_usage'
+#### Description
+This describe block focuses on testing the GET request to the '/analytics/invoiced_usage' endpoint.
+
+### context 'when license is premium'
+#### Description
+This context block tests the behavior when the license is premium.
+
+#### Internal Logic
+1. Sets up the premium license environment using `lago_premium!`
+2. Makes a GET request to the endpoint
+3. Asserts that the response is successful and the returned invoiced usages are empty
+
+### context 'when license is not premium'
+#### Description
+This context block tests the behavior when the license is not premium.
+
+#### Internal Logic
+1. Makes a GET request to the endpoint
+2. Asserts that the response has a forbidden status
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used for creating test data (customer and organization) |
+
+## Configuration
+The test suite uses the following configuration:
+
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| type: :request | Symbol | N/A | Specifies that this is a request spec |
+
+## Error Handling
+The test suite doesn't explicitly test error handling beyond checking for a forbidden status when the license is not premium.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /api/v1/analytics/invoiced_usage | GET | N/A | JSON with invoiced_usages array | Returns invoiced usage data |
+
+## Notes
+1. The `lago_premium!` method is used to simulate a premium license environment. This method is likely defined in a helper file (possibly in the `LicenseHelper` module).
+2. The `get_with_token` method is used to make authenticated GET requests. This method is likely defined in a helper file (possibly in the `ApiHelper` module).
+3. The test uses FactoryBot to create test data (customer and organization).
+4. The test is marked with `# rubocop:disable RSpec/FilePath`, indicating that it intentionally doesn't follow the RuboCop convention for file paths in RSpec tests.

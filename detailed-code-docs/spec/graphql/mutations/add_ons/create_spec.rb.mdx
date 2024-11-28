@@ -1,0 +1,95 @@
+---
+title: "create_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Mutations::AddOns::Create` GraphQL mutation. It verifies the functionality of creating an add-on in the system, including permission checks and validating the created add-on's attributes.
+
+## Code Structure
+The test suite is organized as a single RSpec describe block for the `Mutations::AddOns::Create` mutation. It includes shared examples for common checks and a main test case for creating an add-on.
+
+## Symbols
+
+### RSpec.describe Mutations::AddOns::Create
+#### Description
+This is the main describe block for the test suite, focusing on the `Mutations::AddOns::Create` GraphQL mutation.
+
+### let blocks
+#### Description
+These blocks define variables used throughout the test suite, including:
+- `required_permission`: The permission needed to create an add-on
+- `membership`: A factory-created membership object
+- `organization`: The organization associated with the membership
+- `tax`: A factory-created tax object associated with the organization
+- `mutation`: The GraphQL mutation string for creating an add-on
+
+### Shared Examples
+#### Description
+The test suite includes shared examples for common checks:
+- `requires current user`
+- `requires current organization`
+- `requires permission`
+
+These shared examples likely check that the mutation behaves correctly when these requirements are not met.
+
+### Main Test Case: 'creates an add-on'
+#### Description
+This test case verifies the successful creation of an add-on using the GraphQL mutation.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with specific input data
+2. Retrieves the result data from the mutation response
+3. Uses `aggregate_failures` to group multiple expectations
+4. Checks various attributes of the created add-on, including:
+   - Presence of an ID
+   - Name
+   - Invoice display name
+   - Code
+   - Description
+   - Amount in cents
+   - Amount currency
+   - Associated tax codes
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails and RSpec configuration |
+| FactoryBot | Used for creating test data (implied by the use of `create` method) |
+| GraphQL | The mutation being tested is a GraphQL mutation |
+
+## Configuration
+The test uses the following configuration:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| type: :graphql | Symbol | N/A | Specifies that this is a GraphQL-related test |
+
+## Error Handling
+The test doesn't explicitly handle errors but relies on RSpec's built-in error handling and reporting mechanisms.
+
+## API/Interface Reference
+The test verifies the following GraphQL mutation:
+| Mutation | Input | Response | Description |
+|:---------|:------|:---------|:------------|
+| createAddOn | CreateAddOnInput | AddOn fields | Creates a new add-on with the given input data |
+
+The mutation accepts the following input fields:
+- name
+- invoiceDisplayName
+- code
+- description
+- amountCents
+- amountCurrency
+- taxCodes
+
+And returns the following fields:
+- id
+- name
+- invoiceDisplayName
+- code
+- description
+- amountCents
+- amountCurrency
+- taxes (with id, code, and rate)
+
+This test suite ensures that the `Mutations::AddOns::Create` GraphQL mutation correctly creates an add-on with the provided input and returns the expected data structure.

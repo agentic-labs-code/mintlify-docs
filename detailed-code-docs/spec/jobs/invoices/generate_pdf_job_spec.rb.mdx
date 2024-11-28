@@ -1,0 +1,67 @@
+---
+title: "generate_pdf_job_spec.rb"
+---
+
+## High-level description
+This file contains a RSpec test for the `Invoices::GeneratePdfJob` job. The test verifies that the job correctly delegates the PDF generation task to the `Invoices::GeneratePdfService`.
+
+## Symbols
+
+### `RSpec.describe Invoices::GeneratePdfJob, type: :job`
+#### Description
+This is the main RSpec describe block that groups the tests for the `Invoices::GeneratePdfJob` job.
+
+### `let(:invoice)`
+#### Description
+Creates a test invoice using FactoryBot's `create` method.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | A test invoice object |
+
+### `let(:result)`
+#### Description
+Creates a new instance of `BaseService::Result` to simulate the result of the PDF generation service.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | A result object for the PDF generation service |
+
+### `let(:generate_service)`
+#### Description
+Creates a test double for the `Invoices::GeneratePdfService` using RSpec's `instance_double` method.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| generate_service | RSpec::Mocks::InstanceVerifyingDouble | A test double for the PDF generation service |
+
+### `it 'delegates to the Generate service'`
+#### Description
+This test case verifies that the `Invoices::GeneratePdfJob` correctly delegates the PDF generation task to the `Invoices::GeneratePdfService`.
+
+#### Internal Logic
+1. Arrange:
+   - Set up expectations for the `Invoices::GeneratePdfService.new` method to return the test double.
+   - Set up expectations for the `generate_service.call` method to return the result object.
+2. Act:
+   - Call `described_class.perform_now(invoice)` to execute the job.
+3. Assert:
+   - Verify that `Invoices::GeneratePdfService.new` was called with the correct arguments.
+   - Verify that `generate_service.call` was called.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and RSpec configuration |
+| FactoryBot | Used to create test data (invoice) |
+| RSpec | Testing framework |
+
+## References
+- `Invoices::GeneratePdfJob`: The job class being tested
+- `Invoices::GeneratePdfService`: The service class responsible for generating the PDF
+- `BaseService::Result`: A result object class used by the service
+
+This test file ensures that the `Invoices::GeneratePdfJob` correctly integrates with the `Invoices::GeneratePdfService` to generate PDFs for invoices. It uses RSpec's mocking and stubbing capabilities to isolate the job's behavior and verify its interactions with the service.

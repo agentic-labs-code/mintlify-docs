@@ -1,0 +1,71 @@
+---
+title: "invoice_collections_controller.rb"
+---
+
+## High-level description
+This code defines an API controller for retrieving invoice collection analytics. It's part of the API v1 namespace and handles requests for invoice collection data, applying filters based on currency and months.
+
+## Code Structure
+The `InvoiceCollectionsController` inherits from `BaseController` and defines an `index` action that utilizes the `InvoiceCollectionsService` to fetch and process data. The controller also defines a private `filters` method to extract and format request parameters.
+
+## References
+- `::Analytics::InvoiceCollectionsService`
+- `BaseController` (inherited)
+
+## Symbols
+
+### `Api::V1::Analytics::InvoiceCollectionsController`
+#### Description
+This controller handles requests for invoice collection analytics data. It processes the request, applies filters, and delegates the data retrieval to the `InvoiceCollectionsService`.
+
+#### Internal Logic
+1. The `index` action is defined to handle GET requests.
+2. It instantiates an `InvoiceCollectionsService` with the current organization and filters.
+3. The service's `call` method is invoked to retrieve the data.
+4. The result is stored in the `@result` instance variable.
+5. It calls `super`, likely to handle common response formatting or error handling defined in the `BaseController`.
+
+### `index`
+#### Description
+This action handles the GET request for invoice collection analytics data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| current_organization | Organization | The organization context for the request |
+| params | Hash | Request parameters including filters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @result | Object | The result of the InvoiceCollectionsService call |
+
+### `filters` (private)
+#### Description
+This method extracts and formats the filter parameters from the request.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Hash | Hash | Formatted filters including currency and months |
+
+#### Internal Logic
+1. Extracts the `currency` parameter and converts it to uppercase.
+2. Extracts the `months` parameter.
+3. Returns a hash with these filters.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Analytics::InvoiceCollectionsService | Service class for retrieving invoice collection data |
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /api/v1/analytics/invoice_collections | GET | Query params: currency, months | JSON response with invoice collection data | Retrieves invoice collection analytics data |
+
+## Additional Notes
+1. The controller is namespaced under `Api::V1::Analytics`, indicating it's part of a versioned API structure.
+2. The use of `current_organization` suggests that the request is scoped to a specific organization, likely determined through authentication or request context.
+3. The `super` call in the `index` action implies that there's common behavior defined in the `BaseController` that is being utilized.
+4. The related `InvoiceCollectionsService` code snippet shows that there's a premium license check, which is not visible in this controller but affects the service's behavior.

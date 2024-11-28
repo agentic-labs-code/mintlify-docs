@@ -1,0 +1,58 @@
+---
+title: "override_service_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Plans::OverrideService` class. It tests the functionality of creating a new plan based on an existing parent plan with overridden attributes and associated charges, usage thresholds, and minimum commitments.
+
+## Code Structure
+The test file contains a single `RSpec.describe` block for the `Plans::OverrideService` class, focusing on the `#call` method. It sets up various test scenarios and expectations to verify the correct creation of an overridden plan.
+
+## Symbols
+
+### `Plans::OverrideService#call`
+#### Description
+This method creates a new plan based on a parent plan, applying overrides specified in the input parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| plan | Plan | The parent plan to be overridden |
+| params | Hash | Parameters for overriding plan attributes |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | ServiceResult | The result of the operation, including the created plan |
+
+#### Internal Logic
+1. Creates a new plan based on the parent plan's attributes
+2. Applies overrides from the input parameters (e.g., name, description, amount)
+3. Associates taxes with the new plan
+4. Creates a minimum commitment for the plan if specified
+5. Creates charges based on the parent plan's charges with overrides
+6. Creates usage thresholds for the plan
+7. Tracks the plan creation event using SegmentTrackJob
+
+## Side Effects
+- Creates a new `Plan` record in the database
+- Creates associated `Charge` records
+- Creates associated `UsageThreshold` records
+- Creates a `MinimumCommitment` record if specified
+- Calls `SegmentTrackJob` to track the plan creation event
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| FactoryBot | Creating test data |
+| SegmentTrackJob | Tracking plan creation events |
+
+## Error Handling
+The test includes a scenario for handling invalid minimum commitment parameters, expecting the service to return an unsuccessful result without creating a new plan.
+
+## Performance Considerations
+The test uses `aggregate_failures` to group multiple expectations, which can improve test performance by reducing the number of database transactions.
+
+## TODOs
+- Consider adding more test cases for different charge types (e.g., percentage, package)
+- Add tests for error scenarios related to charge creation and usage threshold creation

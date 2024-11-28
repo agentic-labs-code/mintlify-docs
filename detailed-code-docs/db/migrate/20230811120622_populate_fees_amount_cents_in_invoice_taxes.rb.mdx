@@ -1,0 +1,43 @@
+---
+title: "20230811120622_populate_fees_amount_cents_in_invoice_taxes.rb"
+---
+
+## High-level description
+This migration populates the `fees_amount_cents` column in the `invoices_taxes` table by calculating the total fees amount for each invoice and tax combination. It uses a complex SQL query to perform this update efficiently across multiple related tables.
+
+## Symbols
+
+### `PopulateFeesAmountCentsInInvoiceTaxes`
+#### Description
+This is a Rails migration class that inherits from `ActiveRecord::Migration[7.0]`. It defines a change to be applied to the database schema, specifically to populate the `fees_amount_cents` column in the `invoices_taxes` table.
+
+#### Internal Logic
+The migration uses a reversible block, which allows the migration to be rolled back if needed. However, only the `up` direction is defined, meaning this migration is not designed to be reversed.
+
+Inside the `up` block, the migration executes a complex SQL statement within a `safety_assured` block. This SQL statement does the following:
+
+1. Creates a Common Table Expression (CTE) named `invoice_fees_amounts` that:
+   - Joins the `fees`, `invoices`, and `fees_taxes` tables.
+   - Calculates the total fees amount for each invoice and tax combination by summing `amount_cents - precise_coupons_amount_cents` for each fee.
+   - Groups the results by `invoice_id` and `tax_id`.
+
+2. Updates the `invoices_taxes` table by:
+   - Setting the `fees_amount_cents` column to the calculated `fees_total_amount` from the CTE.
+   - Matching the records based on `invoice_id` and `tax_id`.
+
+## Side Effects
+This migration will update the `fees_amount_cents` column in the `invoices_taxes` table for all matching records. It does not create or drop any tables or columns.
+
+## Performance Considerations
+The use of a CTE and a single UPDATE statement suggests that this migration is optimized for performance, especially when dealing with large datasets. It performs the calculations and updates in a single database operation, which is generally more efficient than doing it row-by-row in application code.
+
+## Error Handling
+The migration uses the `safety_assured` method, which is likely from the `strong_migrations` gem. This indicates that the migration has been reviewed and deemed safe to run, even though it might normally trigger warnings about potential issues with large tables or long-running operations.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for defining database schema changes |
+| strong_migrations (implied) | Provides the `safety_assured` method for bypassing migration safety checks |
+
+Note: The `strong_migrations` gem is not explicitly imported in this file, but its use is implied by the presence of the `safety_assured` method.

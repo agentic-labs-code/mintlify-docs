@@ -1,0 +1,75 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `app/services/data_exports` directory contains services responsible for creating, processing, and exporting data in CSV format. It primarily focuses on exporting invoice and invoice fee data, with the ability to handle large datasets efficiently.
+
+## What does it do?
+This directory provides functionality to:
+
+1. Create data export records and initiate asynchronous export jobs.
+2. Generate CSV exports for invoices and invoice fees.
+3. Process large datasets in batches to manage memory efficiently.
+4. Handle the entire export lifecycle, including file generation, attachment, and email notification.
+
+The workflow typically involves:
+1. A user or system initiates a data export request.
+2. The `CreateService` creates a data export record and queues an asynchronous job.
+3. The `ExportResourcesService` processes the queued job, generating the CSV file using the appropriate CSV service (`Invoices` or `InvoiceFees`).
+4. The generated file is attached to the data export record, and a notification email is sent to the user.
+
+## Key Files
+
+1. `create_service.rb`:
+   - Contains the `CreateService` class for initiating data exports.
+   - Creates a `DataExport` record and enqueues an `ExportResourcesJob`.
+
+2. `export_resources_service.rb`:
+   - Contains the `ExportResourcesService` class for processing data exports.
+   - Manages the export lifecycle, including file generation, attachment, and notification.
+
+3. `csv/invoices.rb`:
+   - Contains the `Invoices` class for generating CSV exports of invoice data.
+   - Processes invoices in batches and serializes them to CSV format.
+
+4. `csv/invoice_fees.rb`:
+   - Contains the `InvoiceFees` class for generating CSV exports of invoice fee data.
+   - Processes invoices and their associated fees, combining data from invoices, fees, and subscriptions.
+
+## Dependencies
+The code in this directory relies on the following dependencies:
+
+1. Ruby standard library:
+   - `csv`: For CSV file manipulation.
+   - `forwardable`: For method delegation.
+   - `tempfile`: For creating temporary files.
+
+2. Internal dependencies:
+   - `BaseService`: Base class for service objects.
+   - `InvoicesQuery`: For retrieving invoices based on search criteria.
+   - Serializer classes: `V1::InvoiceSerializer`, `V1::FeeSerializer`, `V1::SubscriptionSerializer`.
+   - `DataExportMailer`: For sending completion notifications.
+
+## Configuration
+While there are no explicit configuration files, the services use configurable parameters:
+
+1. In `CreateService`:
+   - Accepts parameters for organization, user, format, resource_type, and resource_query.
+
+2. In `ExportResourcesService`:
+   - Uses delegation to access `data_export` attributes.
+
+3. In CSV services (`Invoices` and `InvoiceFees`):
+   - Configurable serializer classes.
+   - Customizable output file (defaults to a temporary file).
+   - Adjustable batch size for processing (default is 50 for `InvoiceFees`).
+
+## Performance Considerations
+The services implement several performance optimizations:
+
+1. Asynchronous processing: Export jobs are queued and processed asynchronously to prevent blocking the main thread.
+2. Batch processing: Invoices and fees are processed in batches to manage memory efficiently when dealing with large datasets.
+3. Lazy enumeration: The `InvoiceFees` class uses lazy enumeration to process items one at a time, reducing memory consumption.
+
+These optimizations ensure that the export process can handle large volumes of data without overwhelming system resources, making it suitable for use in production environments with potentially large datasets.

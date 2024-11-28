@@ -1,0 +1,52 @@
+---
+title: "20220727132848_create_invoice_subscriptions.rb"
+---
+
+## High-level description
+This migration creates a new `invoice_subscriptions` table to establish a many-to-many relationship between invoices and subscriptions. It also removes the existing direct reference from invoices to subscriptions, effectively changing the relationship structure in the database.
+
+## Symbols
+
+### `CreateInvoiceSubscriptions`
+#### Description
+This is a Rails migration class that defines changes to the database schema. It creates a new table and modifies an existing one to restructure the relationship between invoices and subscriptions.
+
+#### Internal Logic
+The migration performs two main actions:
+1. Creates a new `invoice_subscriptions` table with references to both invoices and subscriptions.
+2. Removes the existing `subscription` reference from the `invoices` table.
+
+## Side Effects
+- Creates a new table in the database named `invoice_subscriptions`.
+- Modifies the `invoices` table by removing the `subscription` reference.
+- Changes the relationship between invoices and subscriptions from a one-to-many to a many-to-many relationship.
+
+___
+
+### `change`
+#### Description
+This method defines the changes to be applied to the database schema when the migration is run.
+
+#### Internal Logic
+1. Creates the `invoice_subscriptions` table:
+   - Uses UUID as the primary key.
+   - Adds a reference to `invoice` (foreign key).
+   - Adds a reference to `subscription` (foreign key).
+   - Adds timestamps (`created_at` and `updated_at`).
+
+2. Removes the `subscription` reference from the `invoices` table:
+   - Uses `safety_assured` to bypass Strong Migrations checks.
+   - Removes the `subscription_id` column and its associated index and foreign key constraint.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for defining database schema changes |
+| Strong Migrations | Implied by the use of `safety_assured`, likely used for migration safety checks |
+
+## Error Handling
+This migration does not implement explicit error handling. It relies on Rails' built-in migration error handling mechanisms.
+
+## TODOs
+- Consider adding a unique constraint on the combination of `invoice_id` and `subscription_id` in the `invoice_subscriptions` table to prevent duplicate associations.
+- Ensure that existing data is migrated correctly when removing the `subscription` reference from the `invoices` table.

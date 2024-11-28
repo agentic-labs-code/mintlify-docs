@@ -1,0 +1,103 @@
+---
+title: "prorated_graduated_service.rb"
+---
+
+## High-level description
+This code defines the `ProratedGraduatedService` class within the `Charges::ChargeModels` module. It implements a prorated graduated pricing model for calculating charges based on usage tiers and prorated units. The class extends the `BaseService` and provides complex logic for computing amounts and unit prices for prorated graduated pricing.
+
+## Code Structure
+The `ProratedGraduatedService` class inherits from `Charges::ChargeModels::BaseService` and implements protected methods for calculating charges. The main computation logic is in the `compute_amount` method, which uses helper methods like `range`, `calculate_overflow`, and `result_with_flat_amount` to perform the calculations.
+
+## Symbols
+
+### `ProratedGraduatedService`
+#### Description
+This class implements a prorated graduated pricing model for calculating charges. It handles complex scenarios where usage may span multiple tiers and requires prorating.
+
+#### Internal Logic
+The class uses several key methods to implement its functionality:
+
+1. `ranges`: Retrieves the graduated ranges from the properties.
+2. `compute_amount`: The core method that calculates the total charge amount based on prorated usage across different tiers.
+3. `unit_amount`: Calculates the per-unit amount by dividing the total charge by the total units.
+4. `result_with_flat_amount`: Applies flat amounts to the calculated result based on the usage tiers.
+5. `range`: Determines the current pricing tier based on usage.
+6. `calculate_overflow`: Computes the overflow of units from one tier to the next.
+7. `per_event_aggregation_result`: Memoized method to get the per-event aggregation result.
+8. `prorated_coefficient`: Calculates the proration coefficient for a given event.
+9. `skip_overflow_calculation?`: Determines if overflow calculation should be skipped for the current usage.
+
+#### Performance Considerations
+The `compute_amount` method uses a while loop to iterate through usage data, which could be performance-intensive for large datasets. Memoization is used for `per_event_aggregation_result` to optimize repeated calls.
+
+### `compute_amount`
+#### Description
+This method calculates the total charge amount based on prorated usage across different tiers.
+
+#### Internal Logic
+1. Initialize variables for tracking full and prorated units, sums, and results.
+2. Iterate through the units, calculating prorated sums for each tier.
+3. Handle overflow between tiers, adjusting prorated sums accordingly.
+4. Apply per-unit amounts for each tier to the prorated sums.
+5. Add flat amounts to the final result.
+
+### `unit_amount`
+#### Description
+Calculates the per-unit amount by dividing the total charge by the total units.
+
+### `result_with_flat_amount`
+#### Description
+Applies flat amounts to the calculated result based on the usage tiers.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BigDecimal | The calculated charge amount |
+| total_full_units | Numeric | Total number of full units |
+| max_full_units | Numeric | Maximum number of full units in any tier |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BigDecimal | The final charge amount including flat amounts |
+
+### `range`
+#### Description
+Determines the current pricing tier based on usage.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| full_units | Numeric | Current full units count |
+| overflow | Numeric | Overflow from previous tier |
+| next_full_unit | Numeric | Next full unit value |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| range | Hash | The pricing tier details |
+
+### `calculate_overflow`
+#### Description
+Computes the overflow of units from one tier to the next.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| full_sum | Numeric | Current sum of full units |
+| to_value | Numeric | Upper bound of the current tier |
+| from_value | Numeric | Lower bound of the current tier |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| overflow | Numeric | The calculated overflow amount |
+
+## Dependencies
+This class depends on the `Charges::ChargeModels::BaseService` class, which it inherits from. It also relies on the presence of an `aggregation_result` object with specific methods like `aggregator.per_event_aggregation`.
+
+## Error Handling
+The code does not implement explicit error handling beyond basic Ruby exception mechanisms. It does handle edge cases, such as zero units or negative results, by returning zero in those scenarios.
+
+## Performance Considerations
+The `compute_amount` method uses a complex algorithm with multiple iterations and condition checks. For large datasets or high-frequency calls, this could become a performance bottleneck. The use of memoization for `per_event_aggregation_result` helps to mitigate some performance concerns.

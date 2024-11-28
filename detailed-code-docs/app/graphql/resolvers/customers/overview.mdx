@@ -1,0 +1,89 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL resolvers for customer-related queries within a larger application. The resolvers handle various aspects of customer data, including invoices, subscriptions, and usage information. These resolvers are designed to work within a GraphQL API structure, providing authenticated and authorized access to customer-specific data.
+
+## What does it do?
+The resolvers in this directory facilitate the retrieval of customer-related information through a GraphQL API. Here's a breakdown of their functionalities:
+
+1. Invoices Resolver: Allows querying of a customer's invoices with various filtering options such as status, search term, and pagination.
+2. Subscriptions Resolver: Enables fetching of a customer's subscriptions, with the ability to filter by status and handle special cases for pending subscriptions.
+3. Usage Resolver: Provides access to a customer's usage data for a specific subscription during the current billing period.
+
+These resolvers work together to provide a comprehensive view of a customer's financial and subscription-related information within the application.
+
+## Entry points
+The main entry points for this directory are the three resolver files:
+
+1. `invoices_resolver.rb`: Handles queries for customer invoices.
+2. `subscriptions_resolver.rb`: Manages queries for customer subscriptions.
+3. `usage_resolver.rb`: Processes queries for customer usage data.
+
+Each resolver is responsible for a specific aspect of customer data and can be accessed through the GraphQL API. The data flow typically starts with a GraphQL query hitting one of these resolvers, which then authenticates the request, retrieves the necessary data (often using external services), and returns the formatted response.
+
+## Dependencies
+The resolvers in this directory rely on several external dependencies and internal modules:
+
+1. GraphQL: The core framework used for building the API.
+2. AuthenticableApiUser: A module used for user authentication in the API.
+3. RequiredOrganization: A module that ensures the user belongs to the required organization.
+4. InvoicesQuery: A service used for querying and filtering invoices.
+5. Invoices::CustomerUsageService: A service for retrieving customer usage data.
+
+These dependencies are crucial for the proper functioning of the resolvers, handling authentication, data retrieval, and business logic.
+
+## Configuration
+While there are no explicit configuration files in this directory, the resolvers use various GraphQL-specific configurations:
+
+1. Argument definitions: Each resolver defines its own set of arguments that can be passed in GraphQL queries.
+2. Return types: The resolvers specify the structure of the data they return using GraphQL types.
+3. Authentication and authorization: The resolvers incorporate authentication checks and organization membership verification.
+
+These configurations are embedded within the resolver classes themselves, defining the interface through which the GraphQL API interacts with the underlying data and services.
+
+To illustrate the usage of these resolvers, here are some example GraphQL queries:
+
+1. Querying customer invoices:
+```graphql
+query {
+  customerInvoices(customerId: "123", limit: 10, page: 1, status: [DRAFT, FINALIZED]) {
+    id
+    status
+    totalAmount
+  }
+}
+```
+
+2. Fetching customer subscriptions:
+```graphql
+query {
+  customerSubscriptions(status: [ACTIVE, PENDING]) {
+    id
+    status
+    startDate
+    endDate
+  }
+}
+```
+
+3. Retrieving customer usage data:
+```graphql
+query {
+  customerUsage(customerId: "123", subscriptionId: "456") {
+    fromDate
+    toDate
+    currency
+    totalAmount
+    chargeUsages {
+      chargeId
+      billableMetric
+      units
+      amount
+    }
+  }
+}
+```
+
+These resolvers work together to provide a comprehensive API for accessing and managing customer-related data within the application. They handle authentication, data retrieval, and formatting, ensuring that the GraphQL API can efficiently serve client requests for customer information.

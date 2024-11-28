@@ -1,0 +1,55 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines a background job `Wallets::RefreshOngoingBalanceJob` that refreshes the ongoing balance of a given wallet. It is part of a larger system for managing wallets and their balances, likely in a financial or subscription-based application.
+
+## Code Structure
+The `RefreshOngoingBalanceJob` is defined within the `Wallets` module and inherits from `ApplicationJob`. It uses the `Wallets::Balance::RefreshOngoingService` to perform the actual balance refresh operation.
+
+## References
+- `ApplicationJob`
+- `Wallets::Balance::RefreshOngoingService`
+
+## Symbols
+
+### `Wallets::RefreshOngoingBalanceJob`
+#### Description
+This job is responsible for refreshing the ongoing balance of a given wallet. It uses the `Wallets::Balance::RefreshOngoingService` to perform the actual refresh operation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet | Wallet | The wallet object whose ongoing balance needs to be refreshed |
+
+#### Outputs
+This job doesn't return any output directly, as it's a background job.
+
+#### Internal Logic
+1. The job is queued in the 'wallets' queue.
+2. It uses the `unique` method to ensure that only one instance of this job is executed for a given wallet at a time.
+3. In the `perform` method, it calls the `Wallets::Balance::RefreshOngoingService.call` method, passing the wallet as an argument.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveJob | Provides the base functionality for background job processing |
+| Sidekiq | Used for job queuing and processing (inferred from `ApplicationJob`) |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| queue_as | Symbol | 'wallets' | Specifies the queue in which this job should be processed |
+| unique | Symbol | :until_executed | Ensures that only one instance of this job is executed for a given wallet |
+| on_conflict | Symbol | :log | Specifies the behavior when a duplicate job is encountered (it logs the conflict) |
+
+## Related Information
+The `Clock::RefreshWalletsOngoingBalanceJob` (from the related snippets) seems to be responsible for scheduling `RefreshOngoingBalanceJob` for all active wallets in the system. It only does this for premium licenses and enqueues a separate job for each active wallet.
+
+The `Wallets::Balance::RefreshOngoingService` (from the related snippets) appears to be the service that actually performs the balance refresh operation. It calculates the total amount from active subscriptions, converts it to usage credits, and updates the wallet's ongoing balance.
+
+The job inherits from `ApplicationJob`, which sets Sidekiq options to not retry failed jobs (`retry: 0`).
+
+## Performance Considerations
+The use of the `unique` option helps prevent redundant processing and potential race conditions by ensuring only one instance of this job runs for a given wallet at a time.

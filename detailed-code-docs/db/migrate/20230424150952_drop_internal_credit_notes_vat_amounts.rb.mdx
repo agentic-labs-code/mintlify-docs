@@ -1,0 +1,54 @@
+---
+title: "20230424150952_drop_internal_credit_notes_vat_amounts.rb"
+---
+
+## High-level description
+This migration file removes four columns related to VAT amounts from the `credit_notes` table in the up direction and adds them back in the down direction. It's part of a database schema change to eliminate internal credit notes VAT amount columns.
+
+## Symbols
+
+### `DropInternalCreditNotesVatAmounts`
+#### Description
+This class is an ActiveRecord migration that defines the changes to be applied to the database schema. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0.
+
+#### Internal Logic
+The class contains two methods: `up` and `down`, which define the forward and backward migrations respectively.
+
+### `up`
+#### Description
+This method removes four columns from the `credit_notes` table related to VAT amounts.
+
+#### Internal Logic
+1. Uses `safety_assured` to bypass Strong Migrations checks.
+2. Calls `change_table` with `bulk: true` for optimized performance.
+3. Removes four columns: `credit_vat_amount_cents`, `credit_vat_amount_currency`, `refund_vat_amount_cents`, and `refund_vat_amount_currency`.
+
+### `down`
+#### Description
+This method adds back the four columns removed in the `up` method and populates the currency columns with data from the `total_amount_currency` column.
+
+#### Internal Logic
+1. Calls `change_table` with `bulk: true` for optimized performance.
+2. Adds four columns:
+   - `credit_vat_amount_cents` (bigint, not null, default 0)
+   - `credit_vat_amount_currency` (string)
+   - `refund_vat_amount_cents` (bigint, not null, default 0)
+   - `refund_vat_amount_currency` (string)
+3. Executes a SQL statement to update the newly added currency columns with values from `total_amount_currency`.
+
+## Performance Considerations
+The migration uses `bulk: true` in `change_table` calls, which can improve performance for multiple column operations by combining them into a single ALTER TABLE statement.
+
+## Error Handling
+This migration does not implement explicit error handling. It relies on the default behavior of ActiveRecord migrations.
+
+## Side Effects
+- The `up` method will permanently remove the specified columns and their data from the `credit_notes` table.
+- The `down` method will add back the columns, but the `*_cents` columns will be populated with the default value of 0, potentially losing any previous data.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the migration framework and database interaction capabilities |
+
+Note: This migration appears to be part of a larger change in how VAT amounts are handled for credit notes in the application. It's important to ensure that any code relying on these columns is updated accordingly.

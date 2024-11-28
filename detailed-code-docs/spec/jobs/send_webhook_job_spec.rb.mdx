@@ -1,0 +1,67 @@
+---
+title: "send_webhook_job_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `SendWebhookJob` class. It tests various scenarios of sending webhooks for different events related to invoices, customers, and other business operations. The tests ensure that the job correctly handles different webhook types and their associated services.
+
+## Code Structure
+The test suite is organized into multiple contexts, each testing a specific webhook type or scenario. It uses shared examples for common webhook service behaviors and mocks various service classes to isolate the testing of the `SendWebhookJob`.
+
+## Symbols
+
+### `SendWebhookJob`
+#### Description
+This is the main class being tested. It's responsible for sending webhooks for various events in the system.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_type | String | The type of webhook to be sent |
+| object | Various | The object associated with the webhook |
+| options | Hash | Additional options for the webhook |
+| webhook_id | Integer | Optional ID of a specific webhook |
+
+#### Internal Logic
+The job determines the appropriate service to use based on the webhook type and calls that service with the provided object and options.
+
+### `shared_examples 'a webhook service'`
+#### Description
+A shared example that tests common behavior for webhook services.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_type | String | The type of webhook |
+| service_class | Class | The service class to be used |
+| object | Various | The object associated with the webhook |
+| options | Hash | Additional options for the webhook |
+
+#### Internal Logic
+It sets up a double for the service class, expects it to be initialized with the correct parameters, and verifies that its `call` method is invoked.
+
+## Tests
+
+The test suite covers various scenarios, including:
+
+1. Handling webhooks with a specific `webhook_id`
+2. Different types of invoice-related webhooks (created, add-on added, paid credit added)
+3. Event error webhooks
+4. Fee creation webhooks
+5. Customer-related webhooks (payment provider created, checkout URL generated)
+6. Credit note webhooks
+7. Subscription-related webhooks
+8. Error handling for not implemented webhook types
+
+Each test typically:
+1. Sets up the necessary data and mocks
+2. Calls the `SendWebhookJob.perform_now` method with appropriate parameters
+3. Verifies that the correct service was called or the expected job was enqueued
+
+## Dependencies
+The test suite relies on various factory-created objects (e.g., `create(:organization)`, `create(:invoice)`) and uses RSpec's mocking and stubbing features extensively.
+
+## Error Handling
+The test suite includes a scenario for handling not implemented webhook types, expecting a `NotImplementedError` to be raised.
+
+This test suite ensures that the `SendWebhookJob` correctly handles a wide variety of webhook scenarios, providing confidence in its ability to manage the system's webhook sending responsibilities.

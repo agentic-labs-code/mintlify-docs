@@ -1,0 +1,76 @@
+---
+title: "base_service.rb"
+---
+
+## High-level description
+This code defines a base service class for handling webhooks in a Ruby on Rails application. It provides a framework for creating and sending webhook payloads to multiple webhook endpoints associated with an organization. The class is designed to be extended by specific webhook services for different object types and events.
+
+## Code Structure
+The `BaseService` class is the main symbol in this code. It contains methods that are meant to be overridden by child classes to provide specific implementations for different webhook types. The `call` method is the main entry point, which creates and sends webhook payloads for each webhook endpoint associated with the current organization.
+
+## Symbols
+
+### `Webhooks::BaseService`
+#### Description
+This is an abstract base class for webhook services. It initializes with an object and options, and provides a framework for creating and sending webhook payloads.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object | Object | The object associated with the webhook event |
+| options | Hash | Additional options for the webhook service |
+
+#### Internal Logic
+1. Checks if the current organization has any webhook endpoints.
+2. Constructs a payload with webhook type, object type, and serialized object data.
+3. Iterates through each webhook endpoint of the organization.
+4. Creates a webhook record for each endpoint.
+5. Enqueues a job to send the webhook payload.
+
+#### Performance Considerations
+The TODO comment suggests wrapping the webhook creation in a transaction to ensure all webhook models are created or none. This would improve the atomicity of the operation.
+
+### `create_webhook`
+#### Description
+A private method that creates a new `Webhook` record with the given webhook endpoint and payload.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_endpoint | Object | The webhook endpoint to send the payload to |
+| payload | Hash | The webhook payload to be sent |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook | Webhook | A new Webhook record |
+
+#### Internal Logic
+1. Initializes a new `Webhook` object.
+2. Sets various attributes of the webhook, including type, endpoint, object ID, object type, and payload.
+3. Sets the webhook status to pending.
+4. Returns the created webhook object.
+
+## Side Effects
+- Creates `Webhook` records in the database.
+- Enqueues `SendHttpWebhookJob` jobs for asynchronous processing.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| lago_http_client | Likely used for sending HTTP requests in the `SendHttpWebhookJob` |
+
+## TODOs
+- Wrap webhook creation in a transaction to ensure all webhook models are created or none.
+- Ensure HTTP jobs are dispatched after the transaction is committed.
+
+## References
+This base class is referenced and extended by various specific webhook services in the related code snippets, such as:
+- `Webhooks::WalletTransactions::UpdatedService`
+- `Webhooks::Subscriptions::UsageThresholdsReachedService`
+- `Webhooks::Invoices::VoidedService`
+- `Webhooks::Fees::PayInAdvanceCreatedService`
+- `Webhooks::CreditNotes::CreatedService`
+- And others...
+
+These child classes provide specific implementations for the abstract methods defined in the base class, such as `current_organization`, `object_serializer`, `webhook_type`, and `object_type`.

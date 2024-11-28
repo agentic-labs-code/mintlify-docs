@@ -1,0 +1,73 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL resolvers for the Customer Portal functionality within a larger application. It includes resolvers for analytics, customer information, invoices, and organization details. These resolvers are designed to handle various queries related to customer portal users, providing authenticated access to specific data and functionalities.
+
+## What does it do?
+The code in this directory enables the following functionalities for the Customer Portal:
+
+1. Analytics: 
+   - Provides invoice collections data for a specified period.
+   - Retrieves overdue balances information.
+
+2. Customer Information:
+   - Fetches authenticated customer portal user details.
+
+3. Invoices:
+   - Allows querying of invoices with pagination, searching, and filtering options.
+
+4. Organization:
+   - Retrieves the organization associated with an authenticated customer portal user.
+
+All these resolvers implement authentication to ensure that only authorized customer portal users can access their respective data. They interact with various models and services to fetch and process the required information, returning it in the appropriate GraphQL format.
+
+## Key Files
+
+1. analytics/invoice_collections_resolver.rb
+   - Handles queries for invoice collections data.
+   - Supports optional 'months' and 'expire_cache' parameters.
+
+2. analytics/overdue_balances_resolver.rb
+   - Manages queries for overdue balances information.
+   - Also supports 'months' and 'expire_cache' parameters.
+
+3. customer_resolver.rb
+   - Retrieves the authenticated customer portal user information.
+
+4. invoices_resolver.rb
+   - Handles querying of invoices with pagination, searching, and filtering.
+   - Utilizes the InvoicesQuery service for data retrieval.
+
+5. organization_resolver.rb
+   - Fetches the organization associated with an authenticated customer portal user.
+
+All resolvers extend the BaseResolver class and include the AuthenticableCustomerPortalUser concern for authentication.
+
+## Dependencies
+The resolvers in this directory rely on several shared dependencies:
+
+1. AuthenticableCustomerPortalUser concern
+   - Provides authentication functionality for customer portal users.
+   - Used in all resolvers to ensure authorized access.
+
+2. Various GraphQL Types (e.g., Types::Customers::Object, Types::Invoices::Object)
+   - Define the structure of returned data in GraphQL queries.
+
+3. Service classes (e.g., InvoicesQuery, Analytics::InvoiceCollection)
+   - Handle data retrieval and processing for specific functionalities.
+
+4. BaseResolver
+   - Base class extended by all resolvers, likely providing common resolver functionality.
+
+## Configuration
+While there are no explicit configuration files, some resolvers use configurable parameters:
+
+1. months (Integer): Used in analytics resolvers to specify the time range for data retrieval.
+2. expire_cache (Boolean): Used in analytics resolvers to force cache expiration and fetch fresh data.
+3. limit, page, search_term, status: Used in the invoices resolver for pagination, searching, and filtering.
+
+These parameters can be adjusted when making GraphQL queries to customize the data retrieval process.
+
+In conclusion, this directory contains essential GraphQL resolvers for various Customer Portal features, including analytics, customer information, invoices, and organization details. The resolvers implement authentication, handle optional parameters, and interact with appropriate models and services to fetch and return the requested data in the specified GraphQL format.

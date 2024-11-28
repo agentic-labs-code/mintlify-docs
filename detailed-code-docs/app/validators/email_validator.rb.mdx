@@ -1,0 +1,71 @@
+---
+title: "email_validator.rb"
+---
+
+## High-level description
+The `EmailValidator` class is a custom validator for email addresses in Ruby on Rails applications. It uses a complex regular expression to validate email formats according to RFC5322 standards, ensuring that email addresses conform to the expected structure and syntax.
+
+## Code Structure
+The `EmailValidator` class inherits from `ActiveModel::EachValidator` and defines two main methods: `validate_each` and `valid?`. The class also defines a constant `EMAIL_REGEXP` that contains the regular expression used for email validation.
+
+## Symbols
+
+### `EmailValidator`
+#### Description
+This class is responsible for validating email addresses using a regular expression that conforms to RFC5322 standards.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| record | ActiveModel::Base | The record being validated |
+| attribute | Symbol | The attribute being validated |
+| value | String | The email address to validate |
+
+#### Internal Logic
+1. Defines a constant `EMAIL_REGEXP` with a complex regular expression for email validation.
+2. Implements `validate_each` method to add an error to the record if the email is invalid.
+3. Implements `valid?` method to check if the email matches the defined regular expression.
+
+### `EMAIL_REGEXP`
+#### Description
+A constant that holds the regular expression used for email validation. It's based on RFC5322 standards and covers a wide range of valid email formats.
+
+### `validate_each`
+#### Description
+This method is called by the Rails validation process for each record. It adds an error to the record if the email is invalid.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| record | ActiveModel::Base | The record being validated |
+| attribute | Symbol | The attribute being validated |
+| value | String | The email address to validate |
+
+#### Internal Logic
+Calls the `valid?` method and adds an `:invalid_email_format` error to the record if the email is invalid.
+
+### `valid?`
+#### Description
+A protected method that checks if a given value matches the `EMAIL_REGEXP`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| value | String | The email address to validate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Boolean | True if the email is valid, false otherwise |
+
+#### Internal Logic
+Uses the `match` method to check if the value matches the `EMAIL_REGEXP`. The `&.` safe navigation operator is used to handle nil values gracefully.
+
+## References
+The `EmailValidator` is referenced in the `config/initializers/console.rb` file, where it's used in the `find` method of the `Rails::ConsoleMethods` module to identify and locate users by their email addresses.
+
+## Performance Considerations
+The regular expression used for email validation is complex and may have performance implications for large-scale validation operations. Consider caching validation results or using alternative validation methods for high-volume scenarios.
+
+## Dependencies
+This class depends on the `ActiveModel::EachValidator` from the Ruby on Rails framework.

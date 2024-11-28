@@ -1,0 +1,58 @@
+---
+title: "update.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for updating an invite in an organization. It's part of a larger GraphQL API and handles the logic for updating an existing invite's role, ensuring proper authentication and authorization.
+
+## Code Structure
+The `Update` class is nested within the `Mutations::Invites` module and inherits from `BaseMutation`. It includes two modules: `AuthenticableApiUser` and `RequiredOrganization`, which provide authentication and organization-related functionality.
+
+## References
+- `Types::Memberships::RoleEnum`
+- `Types::Invites::Object`
+- `::Invites::UpdateService`
+
+## Symbols
+
+### `Mutations::Invites::Update`
+#### Description
+This class defines a GraphQL mutation for updating an invite. It ensures the user is authenticated and has the required permissions to update invites within the organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the invite to update |
+| role | Types::Memberships::RoleEnum | The new role for the invite |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invite | Types::Invites::Object | The updated invite object |
+
+#### Internal Logic
+1. Finds the pending invite in the current organization using the provided ID.
+2. Calls the `::Invites::UpdateService` to update the invite with the new role.
+3. Returns the updated invite if successful, or an error if the update fails.
+
+## Side Effects
+This mutation may modify the role of an existing invite in the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication functionality |
+| RequiredOrganization | Ensures the user is part of the required organization |
+
+## Error Handling
+The mutation uses the `result_error` method to handle and return errors from the `::Invites::UpdateService`.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| updateInvite | Mutation | `id: ID!, role: RoleEnum!` | `Types::Invites::Object` | Updates an existing invite's role |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'organization:members:update' | The permission required to perform this mutation |

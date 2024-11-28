@@ -1,0 +1,58 @@
+---
+title: "topup_with_open_invoices_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test scenario for wallet transactions with invoices after payment in a Rails application. It tests the behavior of wallet transactions and invoices when a customer's wallet requires successful payment before invoicing, focusing on different payment scenarios and their effects on wallet balances and invoice statuses.
+
+## Code Structure
+The test is organized into a single describe block with nested contexts and examples. It uses FactoryBot for creating test data and includes various expectations to verify the behavior of wallets, wallet transactions, and invoices under different conditions.
+
+## Symbols
+
+### `describe 'Wallet Transaction with invoice after payment'`
+#### Description
+This is the main test suite for wallet transactions with invoices after payment. It sets up the test environment and defines the test scenarios.
+
+#### Internal Logic
+- Sets up an organization and a customer
+- Uses the `lago_premium!` method to run the test in a premium context
+- Defines test cases for different wallet and payment scenarios
+
+### `it 'allows wallet transaction to require successful payment'`
+#### Description
+This test case verifies that a wallet transaction can require successful payment before being settled.
+
+#### Internal Logic
+1. Creates a wallet for the customer
+2. Creates a wallet transaction
+3. Verifies the initial status of the wallet transaction and invoice
+4. Sets up Stripe payment for the customer
+5. Simulates a successful payment
+6. Verifies the final status of the invoice, wallet transaction, and wallet balance
+
+### `it 'keeps the invoice invisible'`
+#### Description
+This test case checks the behavior when there is a payment failure for a wallet transaction.
+
+#### Internal Logic
+1. Sets up Stripe for the customer with a simulated payment failure
+2. Creates a wallet and a wallet transaction
+3. Verifies that the invoice remains in a draft state and the wallet transaction remains pending
+
+## Dependencies
+The test relies on the following dependencies:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| FactoryBot | Creates test data |
+| Stripe | Simulates payment processing |
+
+## Error Handling
+The test includes error handling by checking various states and statuses of wallets, transactions, and invoices after different operations.
+
+## Performance Considerations
+The test uses `allow_any_instance_of` to stub Stripe payment creation, which can impact test performance if overused. Consider using more specific stubs or mocks for better performance in larger test suites.
+
+## TODOs
+There are no explicit TODOs in the code, but the use of `allow_any_instance_of` is commented with a Rubocop disable directive, suggesting that this might be an area for future improvement.

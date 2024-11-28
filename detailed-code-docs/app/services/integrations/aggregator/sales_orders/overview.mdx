@@ -1,0 +1,76 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines a service class `CreateService` within the `Integrations::Aggregator::SalesOrders` module. Its primary purpose is to create sales orders in an external aggregator system based on finalized invoices, handling the HTTP request, response parsing, and error management.
+
+## Code Structure
+The `CreateService` class inherits from `Integrations::Aggregator::Invoices::BaseService` and implements the `call` method to perform the main functionality. It interacts with an HTTP client to send requests and creates `IntegrationResource` records to track the synchronization.
+
+## References
+- `Integrations::Aggregator::Invoices::BaseService`
+- `IntegrationResource`
+- `LagoHttpClient::HttpError`
+
+## Symbols
+
+### `Integrations::Aggregator::SalesOrders::CreateService`
+#### Description
+This service class is responsible for creating sales orders in an external aggregator system based on finalized invoices.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice object to be used for creating the sales order |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result object containing the operation outcome and external ID |
+
+#### Internal Logic
+1. Checks if the integration exists and is configured to sync sales orders
+2. Verifies if the invoice is finalized
+3. Sends a POST request to the external system with the sales order payload
+4. Parses the response to extract the external ID
+5. Creates an `IntegrationResource` record to track the synchronization
+6. Handles HTTP errors by delivering error webhooks and re-raising the exception
+
+### `action_path`
+#### Description
+Defines the API endpoint path for creating sales orders.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| path | String | The API endpoint path |
+
+### `call`
+#### Description
+The main method that orchestrates the sales order creation process.
+
+#### Internal Logic
+1. Performs initial checks (integration existence, sync configuration, invoice status)
+2. Sends the HTTP request and processes the response
+3. Creates an `IntegrationResource` record
+4. Handles errors and delivers error webhooks if necessary
+
+## Error Handling
+The service uses a `rescue` block to catch `LagoHttpClient::HttpError` exceptions. When an error occurs, it:
+1. Extracts the error code and message
+2. Delivers an error webhook to the customer
+3. Re-raises the exception
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| LagoHttpClient | Used for making HTTP requests to the external system |
+| IntegrationResource | Used to create records for tracking synchronization |
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| v1/{provider}/salesorders | POST | Sales order payload | JSON with external ID | Creates a sales order in the external system |
+
+This service is designed to be called asynchronously, likely through a background job system, to handle the creation of sales orders in an external aggregator system based on finalized invoices in the Lago platform.

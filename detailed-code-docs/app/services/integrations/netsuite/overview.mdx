@@ -1,0 +1,55 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains services related to NetSuite integration within the application. It includes two main services: `CreateService` and `UpdateService`, which are responsible for creating and updating NetSuite integrations for organizations, respectively. These services handle the integration process, including validation, data persistence, and triggering of related background jobs.
+
+## What does it do?
+The services in this directory manage the lifecycle of NetSuite integrations for organizations. Here's a breakdown of the main functionalities:
+
+1. Creating NetSuite Integrations:
+   - Validates if an organization is eligible for NetSuite integration
+   - Creates a new NetSuite integration record with provided details
+   - Schedules background jobs to send restlet endpoints and perform initial synchronization
+
+2. Updating NetSuite Integrations:
+   - Modifies existing NetSuite integration configurations
+   - Handles changes in integration parameters, such as script endpoint URLs
+   - Triggers necessary synchronization jobs when specific changes occur
+
+Both services ensure that only organizations with the appropriate premium integration access can create or modify NetSuite integrations. They also handle error cases, such as validation failures, and return structured result objects containing either the successful integration or error information.
+
+## Key Files
+
+1. `create_service.rb`:
+   This file contains the `CreateService` class, which is responsible for creating new NetSuite integrations. It validates the organization's eligibility, creates the integration record, and schedules initial synchronization jobs.
+
+2. `update_service.rb`:
+   This file contains the `UpdateService` class, which handles the updating of existing NetSuite integrations. It processes changes to integration parameters and triggers necessary synchronization tasks when required.
+
+Both services inherit from a `BaseService` class, suggesting a common structure for service objects in the application.
+
+## Dependencies
+The services rely on several internal dependencies:
+
+1. `BaseService`: A parent class that likely provides common functionality for service objects.
+2. `Organization`: A model representing the organization entity.
+3. `Integrations::NetsuiteIntegration`: A model representing the NetSuite integration.
+4. `Integrations::Aggregator::SendRestletEndpointJob`: A background job for sending restlet endpoints.
+5. `Integrations::Aggregator::PerformSyncJob`: A background job for performing synchronization tasks.
+
+External dependencies include:
+- ActiveRecord: Used for database operations and validations.
+- ActiveModel::Type::Boolean: Used for casting boolean values in the `CreateService`.
+
+## Configuration
+While there are no explicit configuration files mentioned, the services use various parameters that could be considered configurable:
+
+1. Integration Type: The services check if the integration type is 'Integrations::NetsuiteIntegration' before performing certain actions.
+2. Premium Integration: The services validate if the organization has the 'netsuite' premium integration.
+3. Script Endpoint URL: In the `UpdateService`, changes to this URL trigger additional synchronization jobs.
+
+These configuration points are likely defined elsewhere in the application, possibly in environment variables or database-stored settings.
+
+The services demonstrate a well-structured approach to handling NetSuite integrations, with clear separation of concerns between creation and update operations. They also show attention to error handling and background job scheduling, which are crucial for maintaining data consistency and providing a smooth user experience in integration scenarios.

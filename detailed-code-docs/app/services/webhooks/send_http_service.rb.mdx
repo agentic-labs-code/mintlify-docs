@@ -1,0 +1,110 @@
+---
+title: "send_http_service.rb"
+---
+
+## High-level description
+The `Webhooks::SendHttpService` is responsible for sending HTTP webhooks and handling their responses. It attempts to send a webhook, processes the response, and implements a retry mechanism for failed attempts. This service is crucial for notifying external systems about events in the Lago application.
+
+## Code Structure
+The main class `SendHttpService` inherits from `::BaseService` and contains methods for initializing the service, sending the webhook, and handling successful and failed attempts. It interacts with the `LagoHttpClient::Client` for making HTTP requests and uses the `SendHttpWebhookJob` for scheduling retries.
+
+## References
+- `LagoHttpClient::Client`: Used for making HTTP requests
+- `SendHttpWebhookJob`: Used for scheduling retry attempts
+
+## Symbols
+
+### `Webhooks::SendHttpService`
+#### Description
+This service class is responsible for sending HTTP webhooks and managing their responses.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook | Object | The webhook object containing endpoint, payload, and other relevant information |
+
+#### Internal Logic
+1. Initializes the service with a webhook object
+2. Attempts to send the webhook using `LagoHttpClient::Client`
+3. Processes the response:
+   - If successful, marks the webhook as succeeded
+   - If failed, marks the webhook as failed and schedules a retry if attempts are below the limit
+4. Implements error handling for various HTTP and network-related exceptions
+
+### `initialize`
+#### Description
+Initializes the service with a webhook object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook | Object | The webhook object to be processed |
+
+### `call`
+#### Description
+The main method that attempts to send the webhook and handle the response.
+
+#### Internal Logic
+1. Sets the webhook endpoint
+2. Creates an HTTP client
+3. Sends the webhook payload with headers
+4. Processes the response
+5. Handles errors and schedules retries if necessary
+
+### `mark_webhook_as_succeeded`
+#### Description
+Updates the webhook object with success information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Object | The HTTP response object |
+
+### `mark_webhook_as_failed`
+#### Description
+Updates the webhook object with failure information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| error | Exception | The error that caused the failure |
+
+### `wait_value`
+#### Description
+Calculates the wait time for the next retry attempt.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wait_time | Float | The calculated wait time in seconds |
+
+## Side Effects
+- Updates the webhook object's status, HTTP status, response, and retry information
+- Schedules retry jobs using `SendHttpWebhookJob`
+
+## Error Handling
+The service handles various HTTP and network-related exceptions, including:
+- `LagoHttpClient::HttpError`
+- `Net::OpenTimeout`
+- `Net::ReadTimeout`
+- `Net::HTTPBadResponse`
+- `Errno::ECONNRESET`
+- `Errno::ECONNREFUSED`
+- `Errno::EPIPE`
+- `OpenSSL::SSL::SSLError`
+- `SocketError`
+- `EOFError`
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| LagoHttpClient::Client | Used for making HTTP requests |
+| SendHttpWebhookJob | Used for scheduling retry attempts |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LAGO_WEBHOOK_ATTEMPTS | Integer | 3 | Maximum number of retry attempts for a webhook |
+
+## Performance Considerations
+The service implements an exponential backoff strategy for retries, which helps to avoid overwhelming the target system during periods of high load or temporary failures.

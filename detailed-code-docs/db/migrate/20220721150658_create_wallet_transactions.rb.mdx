@@ -1,0 +1,57 @@
+---
+title: "20220721150658_create_wallet_transactions.rb"
+---
+
+## High-level description
+This migration file creates a new table called `wallet_transactions` in the database. It defines the structure for storing transactions related to wallets, including fields for tracking the transaction type, status, amounts, and settlement time.
+
+## Symbols
+
+### CreateWalletTransactions
+#### Description
+This class is a Rails migration that defines the structure for the `wallet_transactions` table. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0.
+
+#### Internal Logic
+The migration uses the `change` method to define the table structure:
+
+1. Creates a new table named `wallet_transactions` with UUID as the primary key.
+2. Adds a foreign key reference to the `wallets` table.
+3. Defines columns for transaction type, status, amounts, and timestamps.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for defining database schema changes |
+
+## Code Structure
+
+```ruby
+class CreateWalletTransactions &lt; ActiveRecord::Migration[7.0]
+  def change
+    create_table :wallet_transactions, id: :uuid do |t|
+      # Table definition
+    end
+  end
+end
+```
+
+The migration defines a single `change` method that creates the `wallet_transactions` table using `create_table`.
+
+### Table Structure
+| Column Name | Data Type | Constraints | Description |
+|:------------|:----------|:------------|:------------|
+| id | uuid | primary key | Unique identifier for each transaction |
+| wallet_id | uuid | foreign key, not null, indexed | Reference to the associated wallet |
+| transaction_type | integer | not null | Type of the transaction |
+| status | integer | not null | Status of the transaction |
+| amount | decimal | not null, default: 0, precision: 5 | Transaction amount |
+| credit_amount | decimal | not null, default: 0, precision: 5 | Credit amount for the transaction |
+| settled_at | timestamp | | Timestamp when the transaction was settled |
+| created_at | timestamp | | Timestamp of record creation |
+| updated_at | timestamp | | Timestamp of last record update |
+
+## Performance Considerations
+The migration adds an index on the `wallet_id` column, which can improve query performance when searching for transactions associated with a specific wallet.
+
+## Error Handling
+This migration does not include explicit error handling. Rails will handle any database-related errors during the migration process.

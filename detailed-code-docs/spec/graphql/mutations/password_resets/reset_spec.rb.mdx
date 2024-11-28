@@ -1,0 +1,77 @@
+---
+title: "reset_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Mutations::PasswordResets::Reset` GraphQL mutation. It verifies the functionality of resetting a user's password, including successful password reset and handling of expired password reset tokens.
+
+## Symbols
+
+### `RSpec.describe Mutations::PasswordResets::Reset, type: :graphql`
+#### Description
+This is the main test suite for the `Mutations::PasswordResets::Reset` GraphQL mutation. It sets up the test environment and contains individual test cases.
+
+#### Internal Logic
+The test suite uses FactoryBot to create test data and defines a GraphQL mutation query for password reset.
+
+### `let(:membership)`
+#### Description
+Creates a test membership associated with a user who has a predefined password.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| membership | Membership | A test membership object |
+
+### `let(:password_reset)`
+#### Description
+Creates a password reset object associated with the user from the membership.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| password_reset | PasswordReset | A test password reset object |
+
+### `let(:mutation)`
+#### Description
+Defines the GraphQL mutation query string for resetting a password.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| mutation | String | GraphQL mutation query for password reset |
+
+### `it 'returns the auth token after a password reset'`
+#### Description
+Tests the successful scenario of resetting a password.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with a new password and the reset token.
+2. Verifies that the response contains an authentication token.
+
+### `context 'when the password reset is expired'`
+#### Description
+Tests the scenario where the password reset token has expired.
+
+#### Internal Logic
+1. Creates an expired password reset token.
+2. Attempts to reset the password with the expired token.
+3. Verifies that the response indicates a "not found" error.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| FactoryBot | Used for creating test data |
+| GraphQL | The GraphQL implementation being tested |
+
+## References
+- The test file references `Mutations::PasswordResets::Reset`, which is likely defined in the application's GraphQL mutations.
+- It also uses helper methods like `execute_graphql` and `expect_not_found`, which are likely defined in the `GraphQLHelper` module included in the `rails_helper.rb` file.
+
+## Notes
+- The test uses FactoryBot to create test data, indicating that there are corresponding factory definitions for `membership`, `user`, and `password_reset`.
+- The `execute_graphql` method is used to run the GraphQL queries, which is likely a custom helper method defined in the project's test suite.
+- The `expect_not_found` method is used to check for a "not found" error response, which is also likely a custom matcher or helper method.
+
+This test file ensures that the password reset functionality works correctly in both successful and error scenarios, providing confidence in the robustness of the password reset feature in the application's GraphQL API.

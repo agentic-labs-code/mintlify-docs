@@ -1,0 +1,52 @@
+---
+title: "20240311091817_add_index_on_last_hour_events_mv.rb"
+---
+
+## High-level description
+This migration file adds an index on the `organization_id` column of the `last_hour_events_mv` materialized view in a Ruby on Rails application. It's designed to improve query performance for lookups based on the organization ID.
+
+## Symbols
+
+### `AddIndexOnLastHourEventsMv`
+#### Description
+This class is a Rails migration that adds an index to the `last_hour_events_mv` materialized view. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0.
+
+#### Internal Logic
+1. The migration disables DDL transactions using `disable_ddl_transaction!`.
+2. It defines a `change` method that wraps the index creation in a `safety_assured` block.
+3. The `add_index` method is called to create the index on the `organization_id` column of the `last_hour_events_mv` materialized view.
+
+### `disable_ddl_transaction!`
+#### Description
+This method call disables the use of a DDL (Data Definition Language) transaction for this migration. This is often used for operations that cannot be run inside a transaction, such as creating an index concurrently.
+
+### `change`
+#### Description
+This method defines the changes to be applied (or rolled back) by the migration. In this case, it adds an index to the `last_hour_events_mv` materialized view.
+
+### `safety_assured`
+#### Description
+This method is likely provided by a gem like `strong_migrations` to indicate that the following operation has been manually reviewed for safety. It's used to bypass automatic safety checks for potentially dangerous operations.
+
+### `add_index`
+#### Description
+This method adds an index to the specified table (or in this case, materialized view).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| :last_hour_events_mv | Symbol | The name of the materialized view to add the index to |
+| :organization_id | Symbol | The column name to create the index on |
+| if_not_exists: true | Boolean | Option to create the index only if it doesn't already exist |
+
+## Performance Considerations
+Adding an index on the `organization_id` column of the `last_hour_events_mv` materialized view can significantly improve query performance for lookups based on the organization ID. However, it may slightly slow down write operations on the underlying table.
+
+## Dependencies
+This migration likely depends on the `strong_migrations` gem, as evidenced by the use of the `safety_assured` method.
+
+| Dependency | Purpose |
+|:-----------|:--------|
+| strong_migrations | Provides safety checks and the `safety_assured` method for potentially dangerous migrations |
+
+Note: The exact gem providing `safety_assured` might be different, but it serves a similar purpose of ensuring migration safety.

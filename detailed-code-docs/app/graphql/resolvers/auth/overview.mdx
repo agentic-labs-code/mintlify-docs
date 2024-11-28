@@ -1,0 +1,51 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines a GraphQL resolver for obtaining a Google authentication URL. It's part of a larger authentication system that integrates with Google's OAuth service, allowing users to authenticate using their Google accounts.
+
+## Code Structure
+The `AuthUrlResolver` is nested within the `Resolvers::Auth::Google` module, inheriting from `Resolvers::BaseResolver`. It interacts with the `::Auth::GoogleService` to generate the authorization URL.
+
+## References
+- `Types::Auth::Google::AuthUrl`: The GraphQL type for the resolver's return value.
+- `::Auth::GoogleService`: The service class that handles the actual generation of the Google auth URL.
+
+## Symbols
+
+### `Resolvers::Auth::Google::AuthUrlResolver`
+#### Description
+This resolver is responsible for generating a Google authentication URL that can be used to initiate the OAuth flow.
+
+#### Inputs
+This resolver doesn't require any input arguments.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | String | The generated Google authentication URL |
+
+#### Internal Logic
+1. Creates a new instance of `::Auth::GoogleService`.
+2. Calls the `authorize_url` method on the service, passing the current request context.
+3. Checks if the result is successful. If so, it returns the result; otherwise, it calls `result_error` with the result.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| GraphQL | For defining the resolver and its type |
+
+## Error Handling
+The resolver uses the `result_error` method (likely defined in a parent class) to handle and format errors returned by the `::Auth::GoogleService`.
+
+## API/Interface Reference
+This resolver is part of the GraphQL API and can be queried as follows:
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| googleAuthUrl | QUERY | None | `{ url: String }` | Returns a Google authentication URL |
+
+## Additional Notes
+1. The resolver is marked as non-nullable (`null: false`), indicating that it will always return a value or raise an error.
+2. The `context[:request]` is passed to the `authorize_url` method, suggesting that the current HTTP request is used in generating the auth URL, possibly for security or redirect purposes.
+3. This resolver is likely used as part of a larger authentication flow, where the client would use the returned URL to redirect the user to Google's login page.

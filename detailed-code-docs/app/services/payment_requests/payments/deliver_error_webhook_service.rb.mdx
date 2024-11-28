@@ -1,0 +1,50 @@
+---
+title: "deliver_error_webhook_service.rb"
+---
+
+## High-level description
+This code defines a service class `DeliverErrorWebhookService` within the `PaymentRequests::Payments` module. Its primary purpose is to asynchronously send a webhook notification for payment failures associated with a payment request.
+
+## Code Structure
+The `DeliverErrorWebhookService` class inherits from `BaseService` and contains an initializer and a single public method `call_async`. It uses the `SendWebhookJob` to perform the actual webhook delivery asynchronously.
+
+## Symbols
+
+### `DeliverErrorWebhookService`
+#### Description
+This service class is responsible for initiating an asynchronous webhook delivery for payment failure events.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payment_request | PaymentRequest | The payment request object associated with the failure |
+| params | Hash | Additional parameters for the webhook payload |
+
+#### Internal Logic
+1. The `initialize` method sets up the service with the given payment request and parameters.
+2. The `call_async` method:
+   - Enqueues a `SendWebhookJob` to be performed later.
+   - Passes 'payment_request.payment_failure' as the event type, along with the payment request and params.
+   - Returns the result of the operation (likely a success indicator).
+
+#### Side Effects
+- Enqueues a background job (`SendWebhookJob`) for asynchronous execution.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| SendWebhookJob | Used to perform the actual webhook delivery asynchronously |
+
+## References
+This service is referenced and used in the following related files:
+1. `app/services/payment_requests/payments/gocardless_service.rb`
+2. `app/services/payment_requests/payments/adyen_service.rb`
+3. `app/services/payment_requests/payments/stripe_service.rb`
+
+In all these files, the `DeliverErrorWebhookService` is called within their respective `deliver_error_webhook` methods to handle payment provider-specific errors.
+
+## Error Handling
+This service does not implement explicit error handling. Any errors that occur during the job enqueuing process will likely be handled by the underlying job system or the calling code.
+
+## Performance Considerations
+The use of `perform_later` for the `SendWebhookJob` ensures that the webhook delivery is handled asynchronously, preventing potential delays in the main execution thread and improving overall system responsiveness.

@@ -1,0 +1,41 @@
+---
+title: "20220916131538_add_parent_id_on_plans.rb"
+---
+
+## High-level description
+This migration adds a `parent_id` column to the `plans` table, establishing a self-referential relationship between plans. This allows for the creation of a hierarchical structure of plans, where a plan can have a parent plan.
+
+## Symbols
+
+### AddParentIdOnPlans
+#### Description
+This is a Rails migration class that adds a `parent_id` column to the `plans` table. It uses the `change` method to define the migration, which allows Rails to automatically determine how to reverse the migration if needed.
+
+#### Internal Logic
+The migration uses the `safety_assured` block, which is likely provided by a gem like `strong_migrations` to bypass certain safety checks. Within this block, it adds a new reference column:
+
+1. `add_reference` is called on the `:plans` table.
+2. The new column is named `:parent`.
+3. The column type is set to `:uuid`.
+4. It allows null values (`null: true`).
+5. An index is created for this column (`index: true`).
+6. A foreign key constraint is added, referencing the `plans` table itself (`foreign_key: {to_table: :plans}`).
+
+## Side Effects
+- Adds a new `parent_id` column to the `plans` table.
+- Creates an index on the `parent_id` column.
+- Establishes a foreign key relationship from `parent_id` to the `plans` table.
+
+## Dependencies
+This migration likely depends on the `strong_migrations` gem, as evidenced by the use of the `safety_assured` block.
+
+## References
+The related `Plan` model in `app/models/plan.rb` shows how this new column is utilized:
+
+1. It defines a `belongs_to` association: `belongs_to :parent, class_name: 'Plan', optional: true`
+2. It also defines a `has_many` association for child plans: `has_many :children, class_name: 'Plan', foreign_key: :parent_id, dependent: :destroy`
+
+These associations create a self-referential relationship, allowing plans to have parent and child plans.
+
+## Performance Considerations
+Adding an index on the `parent_id` column will improve query performance when filtering or joining plans based on their parent.

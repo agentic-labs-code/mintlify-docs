@@ -1,0 +1,60 @@
+---
+title: "destroy.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for deleting a Plan. It's part of the Mutations module and specifically handles the destruction of a Plan object, ensuring that the user has the necessary permissions and that the deletion process is properly initiated.
+
+## Code Structure
+The `Destroy` class is nested within the `Mutations::Plans` module and inherits from `BaseMutation`. It includes the `AuthenticableApiUser` concern for user authentication. The class defines the GraphQL mutation structure, including arguments and return fields, and implements the `resolve` method to handle the deletion process.
+
+## References
+- `AuthenticableApiUser` concern
+- `Plans::PrepareDestroyService`
+- `BaseMutation` class (not provided in the snippets)
+
+## Symbols
+
+### `Mutations::Plans::Destroy`
+#### Description
+This class represents a GraphQL mutation for deleting a Plan. It authenticates the user, finds the specified plan, and initiates the deletion process using a service object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the Plan to be deleted |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the deleted Plan (if successful) |
+
+#### Internal Logic
+1. Authenticates the user using the `AuthenticableApiUser` concern.
+2. Defines the required permission as 'plans:delete'.
+3. In the `resolve` method:
+   - Finds the plan by ID, scoped to the current user's plans.
+   - Calls the `Plans::PrepareDestroyService` to initiate the deletion process.
+   - Returns the plan if successful, or an error if the operation fails.
+
+## Side Effects
+- Initiates the deletion process for a Plan, which may involve updating the plan's status and scheduling a background job for actual deletion.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides user authentication functionality |
+| Plans::PrepareDestroyService | Handles the preparation for plan deletion |
+
+## Error Handling
+The class uses the `result_error` method (not shown in the provided code) to handle and return errors from the `PrepareDestroyService`.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| destroyPlan | Mutation | `{ id: ID! }` | `{ id: ID }` | Deletes a Plan with the given ID |
+
+## Additional Notes
+1. The mutation requires the user to have the 'plans:delete' permission.
+2. The actual deletion process is handled by the `Plans::PrepareDestroyService`, which likely performs additional checks and operations before marking the plan for deletion.
+3. The mutation is integrated into the GraphQL schema through the `MutationType` class, where it's exposed as the `destroy_plan` field.

@@ -1,0 +1,77 @@
+---
+title: "payment_provider_customers.rb"
+---
+
+## High-level description
+This code defines factory definitions for creating test instances of payment provider customers using FactoryBot. It includes factories for Stripe, GoCardless, and Adyen customers, each associated with a specific payment provider and containing relevant attributes.
+
+## Code Structure
+The code defines three factories: `stripe_customer`, `gocardless_customer`, and `adyen_customer`. Each factory is associated with a corresponding class in the `PaymentProviderCustomers` module and inherits from a common `customer` factory.
+
+## Symbols
+
+### `stripe_customer`
+#### Description
+Defines a factory for creating `PaymentProviderCustomers::StripeCustomer` instances.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | association | Associates with a customer instance |
+| provider_customer_id | string | A unique identifier for the Stripe customer |
+| provider_payment_methods | array | An array of payment methods supported by Stripe |
+
+#### Internal Logic
+- Associates with a `customer` factory
+- Generates a random UUID for `provider_customer_id`
+- Sets `provider_payment_methods` to `['card', 'sepa_debit']`
+
+### `gocardless_customer`
+#### Description
+Defines a factory for creating `PaymentProviderCustomers::GocardlessCustomer` instances.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | association | Associates with a customer instance |
+| provider_customer_id | string | A unique identifier for the GoCardless customer |
+
+#### Internal Logic
+- Associates with a `customer` factory
+- Generates a random UUID for `provider_customer_id`
+
+### `adyen_customer`
+#### Description
+Defines a factory for creating `PaymentProviderCustomers::AdyenCustomer` instances.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | association | Associates with a customer instance |
+| provider_customer_id | string | A unique identifier for the Adyen customer |
+
+#### Internal Logic
+- Associates with a `customer` factory
+- Generates a random UUID for `provider_customer_id`
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| FactoryBot | Used to define factories for creating test instances |
+| SecureRandom | Used to generate random UUIDs for `provider_customer_id` |
+
+## References
+The factories defined in this file reference the following classes:
+- `PaymentProviderCustomers::StripeCustomer`
+- `PaymentProviderCustomers::GocardlessCustomer`
+- `PaymentProviderCustomers::AdyenCustomer`
+
+These classes are defined in the related code snippets provided and inherit from a common `BaseCustomer` class.
+
+## Notes
+1. The `StripeCustomer` factory includes `provider_payment_methods`, which is not present in the other factories. This aligns with the `StripeCustomer` model's validation and accessor methods for `provider_payment_methods`.
+2. The `AdyenCustomer` model has a `settings_accessors :payment_method_id`, but this is not reflected in the factory definition. Consider adding this attribute to the factory if it's required for testing.
+3. The factories use a common `customer` association, suggesting that there's a separate factory for creating customer instances.
+4. All factories generate a random UUID for `provider_customer_id`, which simulates a unique identifier provided by the respective payment provider.
+
+These factories provide a convenient way to create test instances of payment provider customers with predefined attributes, facilitating testing of payment provider-related functionality in the application.

@@ -1,0 +1,57 @@
+---
+title: "handle_event_job_spec.rb"
+---
+
+## High-level description
+This code defines an RSpec test for the `PaymentProviders::Adyen::HandleEventJob` job. It verifies that the job correctly calls the `PaymentProviders::AdyenService` to handle an Adyen event.
+
+## Symbols
+
+### `RSpec.describe PaymentProviders::Adyen::HandleEventJob, type: :job`
+#### Description
+This is the main RSpec test block for the `PaymentProviders::Adyen::HandleEventJob`. It sets up the test environment and defines the test cases for this job.
+
+### `subject(:handle_event_job)`
+#### Description
+Defines the subject of the test, which is the `PaymentProviders::Adyen::HandleEventJob` class.
+
+### `let(:adyen_service)`
+#### Description
+Creates a double (mock) of the `PaymentProviders::AdyenService` class.
+
+### `let(:result)`
+#### Description
+Creates an instance of `BaseService::Result` to be used as the return value of the mocked `handle_event` method.
+
+### `let(:organization)`
+#### Description
+Creates a test organization using FactoryBot.
+
+### `let(:event_json)`
+#### Description
+Defines a sample JSON string to represent an Adyen event.
+
+### `before` block
+#### Description
+Sets up the test environment by stubbing the `PaymentProviders::AdyenService.new` method to return the mocked `adyen_service`, and stubbing the `handle_event` method on `adyen_service` to return the `result` object.
+
+### `it 'calls the handle event service'`
+#### Description
+The main test case that verifies the job's behavior.
+
+#### Internal Logic
+1. Executes the job with the test organization and event JSON.
+2. Expects that `PaymentProviders::AdyenService.new` was called.
+3. Expects that `adyen_service.handle_event` was called with the correct parameters.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and RSpec configuration |
+| FactoryBot | Used for creating test data (organization) |
+
+## References
+- `PaymentProviders::AdyenService`: The service class that the job interacts with to handle Adyen events.
+- `BaseService::Result`: A result object used by the AdyenService.
+
+This test ensures that the `PaymentProviders::Adyen::HandleEventJob` correctly delegates the event handling to the `PaymentProviders::AdyenService`, which is crucial for processing Adyen payment provider events in the application.

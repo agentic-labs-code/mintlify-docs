@@ -1,0 +1,66 @@
+---
+title: "destroy_service.rb"
+---
+
+## High-level description
+This code defines a `DestroyService` class within the `Customers` module. Its primary purpose is to handle the deletion of a customer, including discarding the customer record, tracking the deletion event, and initiating a background job to terminate related customer data.
+
+## Code Structure
+The `DestroyService` class inherits from `BaseService` and contains a single public method `call` that orchestrates the customer deletion process. It also includes a private method `track_customer_deleted` for tracking the deletion event.
+
+## References
+- `BaseService`: The parent class that provides common functionality for service objects.
+- `CurrentContext`: A module used to access the current membership context.
+- `Customers::TerminateRelationsJob`: A background job that handles terminating customer relations.
+- `SegmentTrackJob`: A job responsible for tracking events using Segment analytics.
+
+## Symbols
+
+### `Customers::DestroyService`
+#### Description
+This service class is responsible for handling the deletion of a customer.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Customer | The customer object to be deleted |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the result of the operation |
+
+#### Internal Logic
+1. Check if the customer exists, return a not found failure if it doesn't.
+2. Discard the customer record using the `discard!` method.
+3. Track the customer deletion event.
+4. Enqueue a background job to terminate customer relations.
+5. Set the customer on the result object and return the result.
+
+### `track_customer_deleted` (private method)
+#### Description
+This method is responsible for tracking the customer deletion event using Segment analytics.
+
+#### Internal Logic
+Enqueues a `SegmentTrackJob` with the following information:
+- Membership ID from the current context
+- Event name: 'customer_deleted'
+- Properties including customer ID, organization ID, and deletion timestamp
+
+## Side Effects
+- Modifies the customer record by marking it as discarded.
+- Enqueues background jobs for terminating customer relations and tracking the deletion event.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseService | Parent class providing common service functionality |
+| CurrentContext | Accessing current membership information |
+| Customers::TerminateRelationsJob | Background job for terminating customer relations |
+| SegmentTrackJob | Job for tracking events with Segment analytics |
+
+## Error Handling
+The service uses the `result` object from `BaseService` to handle errors. If the customer is not found, it returns a not found failure using `result.not_found_failure!(resource: 'customer')`.
+
+## Logging
+This service does not implement explicit logging. However, it uses Segment analytics for tracking the customer deletion event, which can be considered a form of event logging.

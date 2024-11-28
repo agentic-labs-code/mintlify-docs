@@ -1,0 +1,107 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines the `Subscriptions::CreateService` class, which is responsible for creating new subscriptions or upgrading/downgrading existing ones. It handles various scenarios such as creating subscriptions for new or existing customers, applying plan overrides, and managing billing-related tasks.
+
+## Code Structure
+The main class `Subscriptions::CreateService` inherits from `BaseService`. It contains a `call` method that orchestrates the subscription creation process, and several private methods that handle specific aspects of the process, such as upgrading, downgrading, or creating new subscriptions.
+
+## Symbols
+
+### Subscriptions::CreateService
+#### Description
+This service class is responsible for creating or modifying subscriptions based on the provided parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Customer | The customer for whom the subscription is being created or modified |
+| plan | Plan | The plan to be applied to the subscription |
+| params | Hash | Additional parameters for subscription creation or modification |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the created or modified subscription and any error information |
+
+#### Internal Logic
+1. Initializes instance variables with input parameters
+2. Validates input parameters
+3. Checks for premium license if plan overrides are provided
+4. Updates customer currency if necessary
+5. Handles subscription creation, upgrade, or downgrade based on the current state
+6. Tracks subscription creation event
+7. Handles error cases and returns appropriate results
+
+### call
+#### Description
+The main method that orchestrates the subscription creation or modification process.
+
+#### Internal Logic
+1. Performs initial validations
+2. Applies plan overrides if provided
+3. Saves the customer if in API context
+4. Executes the subscription handling logic within a database transaction
+5. Tracks the subscription creation event
+6. Handles and returns any errors that occur during the process
+
+### handle_subscription (private)
+#### Description
+Determines whether to create a new subscription, upgrade, or downgrade an existing one.
+
+#### Internal Logic
+1. Checks if the current operation is an upgrade or downgrade
+2. Calls the appropriate method (upgrade_subscription, downgrade_subscription, or create_subscription)
+
+### create_subscription (private)
+#### Description
+Creates a new subscription for the customer.
+
+#### Internal Logic
+1. Initializes a new Subscription object with provided parameters
+2. Sets the subscription status based on the subscription date
+3. Schedules billing jobs if necessary
+4. Triggers webhook for subscription start if active
+
+### upgrade_subscription (private)
+#### Description
+Handles the process of upgrading an existing subscription.
+
+#### Internal Logic
+1. Creates a new subscription object with upgraded plan details
+2. Terminates the current subscription
+3. Activates the new subscription
+4. Schedules billing jobs for the upgraded subscription
+
+### downgrade_subscription (private)
+#### Description
+Handles the process of downgrading an existing subscription.
+
+#### Internal Logic
+1. Creates a new pending subscription with downgraded plan details
+2. Keeps the current subscription active until the next billing cycle
+
+## Side Effects
+- Creates or modifies database records for subscriptions
+- Enqueues background jobs for billing and webhook notifications
+- Tracks events using SegmentTrackJob
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseService | Parent class providing common functionality |
+| Subscriptions::ValidateService | Validates subscription parameters |
+| Customers::UpdateService | Updates customer currency |
+| Plans::OverrideService | Applies plan overrides |
+| Subscriptions::TerminateService | Terminates existing subscriptions during upgrades |
+| BillSubscriptionJob | Handles subscription billing |
+| BillNonInvoiceableFeesJob | Handles non-invoiceable fees |
+| SendWebhookJob | Sends webhook notifications |
+| SegmentTrackJob | Tracks subscription creation events |
+
+## Error Handling
+The service uses the `result` object to handle and propagate errors. It catches `ActiveRecord::RecordInvalid`, `ArgumentError`, and `BaseService::FailedResult` exceptions and sets appropriate error messages on the result object.
+
+This service is a crucial part of the subscription management system, handling the complex logic of creating, upgrading, and downgrading subscriptions while ensuring proper billing and notification processes are triggered.

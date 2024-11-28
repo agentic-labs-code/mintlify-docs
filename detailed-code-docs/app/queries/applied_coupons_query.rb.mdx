@@ -1,0 +1,104 @@
+---
+title: "applied_coupons_query.rb"
+---
+
+## High-level description
+The `AppliedCouponsQuery` class is responsible for querying and filtering applied coupons for a given organization. It provides functionality to paginate results, order them by creation date, and apply filters based on external customer ID and coupon status.
+
+## Code Structure
+The `AppliedCouponsQuery` class inherits from `BaseQuery` and defines methods to build and execute the query for applied coupons. The main logic is implemented in the `call` method, which uses helper methods to construct the query based on the provided filters.
+
+## References
+- `BaseQuery`: The parent class that provides common query functionality.
+- `AppliedCoupon`: The model class representing applied coupons.
+- `Customer`: Referenced in the `base_scope` method to join with customers table.
+
+## Symbols
+
+### `AppliedCouponsQuery`
+#### Description
+This class encapsulates the logic for querying applied coupons with various filters and pagination.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization to query applied coupons for |
+| pagination | Hash | Pagination parameters (inherited from BaseQuery) |
+| filters | Hash | Filtering options (inherited from BaseQuery) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | OpenStruct | An object containing the queried applied coupons |
+
+#### Internal Logic
+1. Starts with the base scope of applied coupons for the organization.
+2. Applies pagination and ordering.
+3. Applies filters for external customer ID and status if provided.
+4. Sets the result and returns it.
+
+### `call`
+#### Description
+The main method that executes the query and returns the result.
+
+#### Internal Logic
+1. Paginates the base scope.
+2. Orders the results by creation date in descending order.
+3. Applies external customer filter if provided.
+4. Applies status filter if provided and valid.
+5. Sets the result and returns it.
+
+### `base_scope`
+#### Description
+Defines the initial scope for the query, including only non-deleted customers.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | ActiveRecord::Relation | The initial scope for applied coupons |
+
+### `with_external_customer`
+#### Description
+Filters the scope by external customer ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | ActiveRecord::Relation | The current query scope |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filtered_scope | ActiveRecord::Relation | The scope filtered by external customer ID |
+
+### `with_status`
+#### Description
+Filters the scope by applied coupon status.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| scope | ActiveRecord::Relation | The current query scope |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filtered_scope | ActiveRecord::Relation | The scope filtered by status |
+
+### `valid_status?`
+#### Description
+Checks if the provided status filter is valid.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| is_valid | Boolean | True if the status is valid, false otherwise |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseQuery | Parent class providing common query functionality |
+| AppliedCoupon | Model class for applied coupons |
+
+## Performance Considerations
+The query uses joins and where clauses to filter results efficiently. Pagination is applied to limit the number of records returned, which can help with performance for large datasets.

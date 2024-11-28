@@ -1,0 +1,55 @@
+---
+title: "create_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `BillableMetrics::CreateService` class. It verifies the functionality of creating billable metrics, including handling various scenarios such as duplicate codes, filters, and custom aggregations.
+
+## Code Structure
+The test suite is organized into a main `describe` block for the `create` method, with nested `context` blocks for specific scenarios. It uses RSpec's `let` statements to set up test data and mocks.
+
+## Symbols
+
+### `BillableMetrics::CreateService#create`
+#### Description
+Tests the `create` method of the `BillableMetrics::CreateService` class, which is responsible for creating new billable metrics.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| create_args | Hash | Arguments for creating a billable metric |
+
+#### Internal Logic
+1. Sets up test data and mocks.
+2. Tests the creation of a basic billable metric.
+3. Tests creating a metric with a code already used by a deleted metric.
+4. Tests creating a metric with filters.
+5. Verifies that SegmentTrackJob is called after creation.
+6. Tests error handling for validation failures.
+7. Tests handling of custom aggregation types.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| FactoryBot | Creates test data |
+| SegmentTrackJob | Mocked for tracking metric creation |
+
+## Error Handling
+The tests verify error handling in the following scenarios:
+1. When creating a metric with an already existing code.
+2. When creating a metric with invalid filters.
+3. When attempting to create a metric with a custom aggregation type.
+
+## Logging
+The tests mock the `SegmentTrackJob` to verify that metric creation events are logged or tracked.
+
+## TODOs
+There are no explicit TODOs in the code.
+
+## Additional Notes
+1. The tests use RSpec's `aggregate_failures` to group multiple expectations together.
+2. The `create_service` is initialized with a user from a membership, implying that metric creation is tied to user permissions.
+3. The tests cover various edge cases, such as creating a metric with a code that was previously used by a deleted metric.
+4. The service seems to handle creation of both the main `BillableMetric` and associated `BillableMetricFilter` objects.
+5. There's a specific check to prevent the creation of metrics with custom aggregation types, suggesting this might be a premium or restricted feature.

@@ -1,0 +1,70 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains JSON fixtures that simulate various webhook responses and events from the Adyen payment platform. These fixtures are used for testing purposes, allowing developers to simulate different scenarios without interacting with the actual Adyen API.
+
+## What does it do?
+The fixtures in this directory represent different types of notifications that Adyen would send to a merchant's system. These include:
+
+1. Chargeback events (both won and lost)
+2. Payment authorization responses
+3. Refund notifications
+
+These JSON files mimic the structure and content of real Adyen webhook payloads, enabling developers to test their integration with Adyen's payment system in a controlled environment. By using these fixtures, developers can ensure their application correctly handles various scenarios such as successful payments, refunds, and chargeback disputes without the need for actual financial transactions.
+
+## Key Files
+
+1. `chargeback_lost_event.json`: Simulates a notification for a lost chargeback dispute.
+2. `chargeback_won_event.json`: Represents a notification for a won chargeback dispute.
+3. `webhook_authorisation_payment_response.json`: Mimics a webhook response for a successful payment authorization.
+4. `webhook_authorisation_response.json`: Similar to the previous file, but with slight variations in the data structure.
+5. `webhook_refund_response.json`: Simulates a webhook notification for a completed refund.
+
+Each of these files contains a JSON structure that includes:
+- A `live` field indicating whether it's a test or production event
+- A `notificationItems` array containing one or more `NotificationRequestItem` objects
+- Detailed information about the event, such as amount, currency, event code, merchant references, and additional data specific to each event type
+
+## Dependencies
+These JSON fixtures don't have direct dependencies as they are static data files. However, they are designed to be compatible with Adyen's webhook notification system and are likely used in conjunction with testing frameworks and Adyen integration code in the larger project.
+
+## Configuration
+While these files don't contain configuration options themselves, they represent configured webhook responses from Adyen. Key elements that might be configured in a real system include:
+
+- `merchantAccountCode`: Identifies the merchant account in Adyen's system
+- `merchantReference`: A unique reference for each transaction provided by the merchant
+- `pspReference`: Adyen's unique reference for each transaction or event
+
+## API/Interface Reference
+These fixtures represent the structure of data that would be sent to an API endpoint handling Adyen webhooks. The general structure for all notifications is:
+
+```json
+{
+  "live": "false",
+  "notificationItems": [
+    {
+      "NotificationRequestItem": {
+        "additionalData": { ... },
+        "amount": {
+          "currency": "USD",
+          "value": 1000
+        },
+        "eventCode": "AUTHORISATION",
+        "eventDate": "2019-06-28T18:03:50+01:00",
+        "merchantAccountCode": "YOUR_MERCHANT_ACCOUNT",
+        "merchantReference": "YOUR_REFERENCE",
+        "paymentMethod": "visa",
+        "pspReference": "UNIQUE_REFERENCE",
+        "reason": "...",
+        "success": "true"
+      }
+    }
+  ]
+}
+```
+
+The specific fields within `NotificationRequestItem` vary depending on the event type (e.g., authorization, refund, chargeback).
+
+Developers integrating with Adyen should expect to receive payloads in this format and implement handlers for each event type represented in these fixtures.

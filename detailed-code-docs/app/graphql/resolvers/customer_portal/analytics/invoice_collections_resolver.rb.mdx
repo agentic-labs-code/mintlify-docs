@@ -1,0 +1,59 @@
+---
+title: "invoice_collections_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying invoice collections of a customer portal user. It's part of the CustomerPortal module within the Analytics namespace and extends the BaseResolver class while including authentication functionality for customer portal users.
+
+## Code Structure
+The `InvoiceCollectionsResolver` class is defined within nested modules: `Resolvers::CustomerPortal::Analytics`. It inherits from `Resolvers::BaseResolver` and includes the `AuthenticableCustomerPortalUser` concern for authentication.
+
+## References
+- `Resolvers::BaseResolver`
+- `AuthenticableCustomerPortalUser`
+- `Types::Analytics::InvoiceCollections::Object`
+- `::Analytics::InvoiceCollection`
+
+## Symbols
+
+### `InvoiceCollectionsResolver`
+#### Description
+This resolver handles GraphQL queries for invoice collections of a customer portal user. It authenticates the user, processes query arguments, and returns a collection of invoice collections.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| months | Integer | Optional. Number of months to consider for invoice collections. |
+| expire_cache | Boolean | Optional. Flag to expire the cache for the query. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice_collections | Types::Analytics::InvoiceCollections::Object.collection_type | A collection of invoice collections objects. |
+
+#### Internal Logic
+1. The resolver authenticates the customer portal user using the `AuthenticableCustomerPortalUser` concern.
+2. It defines the query arguments and return type.
+3. In the `resolve` method, it calls `::Analytics::InvoiceCollection.find_all_by` with the following parameters:
+   - The organization ID of the authenticated customer portal user
+   - The input arguments (months and expire_cache)
+   - The currency of the authenticated customer portal user
+   - The external ID of the authenticated customer portal user
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableCustomerPortalUser | Provides authentication functionality for customer portal users |
+| Types::Analytics::InvoiceCollections::Object | Defines the GraphQL type for invoice collections |
+| ::Analytics::InvoiceCollection | Model or service class for retrieving invoice collections |
+
+## Error Handling
+Error handling is primarily managed through the `AuthenticableCustomerPortalUser` concern, which raises an unauthorized error if the customer portal user is not authenticated.
+
+## API/Interface Reference
+This resolver is part of the GraphQL API and can be queried as follows:
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| customerPortalInvoiceCollections | Query | \{ months: Int, expireCache: Boolean \} | [InvoiceCollection] | Retrieves invoice collections for the authenticated customer portal user |
+
+Note: The actual GraphQL query name is defined in the `Types::QueryType` class, which is included in the related code snippets.

@@ -1,0 +1,82 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines a service class `CreateOrUpdateBatchService` within the `BillableMetricFilters` module. Its purpose is to create or update a batch of filters for a given billable metric, handling the creation, updating, and discarding of filters and their associated values.
+
+## Code Structure
+The main class `CreateOrUpdateBatchService` inherits from `BaseService`. It contains a `call` method that orchestrates the creation or update of filters, and several private methods that handle specific tasks such as discarding filters and refreshing draft invoices.
+
+## Symbols
+
+### `CreateOrUpdateBatchService`
+#### Description
+This service class manages the creation, updating, and deletion of filters for a billable metric.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| billable_metric | BillableMetric | The billable metric to update filters for |
+| filters_params | Array | An array of filter parameters to create or update |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the updated filters |
+
+#### Internal Logic
+1. If `filters_params` is empty, discard all existing filters.
+2. Otherwise, within a transaction:
+   - For each filter parameter:
+     - Find or initialize a filter by key.
+     - Update the filter's values.
+     - Handle deletion of removed values.
+   - Discard filters not included in the update.
+3. Refresh draft invoices affected by the changes.
+
+### `discard_all`
+#### Description
+Discards all filters associated with the billable metric.
+
+### `discard_filter`
+#### Description
+Discards a single filter and its associated filter values.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filter | Filter | The filter to be discarded |
+
+### `discard_filter_value`
+#### Description
+Discards or updates a filter value based on the new values provided.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filter_value | FilterValue | The filter value to be processed |
+| new_values | Array | New values to compare against |
+
+### `refresh_draft_invoices`
+#### Description
+Marks draft invoices associated with the billable metric as ready to be refreshed.
+
+## Side Effects
+- Creates, updates, or discards filters and filter values in the database.
+- Updates the `ready_to_be_refreshed` status of related draft invoices.
+
+## Error Handling
+The service uses transactions to ensure data consistency. Any errors during the process will cause the transaction to roll back, preserving the previous state.
+
+## Performance Considerations
+- The service uses batch operations and transactions to minimize database interactions.
+- Care should be taken with large numbers of filters or invoices, as the operation could become time-consuming.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Base | For database transactions and querying |
+| BaseService | Parent class providing common functionality |
+
+This service is crucial for managing the lifecycle of billable metric filters, which are likely used in the billing and invoicing process of the application.

@@ -1,0 +1,125 @@
+---
+title: "add_ons_controller.rb"
+---
+
+## High-level description
+This code defines the `AddOnsController` within the `Api::V1` namespace, which handles CRUD operations for add-ons in an API. It provides endpoints for creating, updating, deleting, showing, and listing add-ons, utilizing various services and serializers to process and format the data.
+
+## Code Structure
+The `AddOnsController` inherits from `Api::BaseController` and contains five main actions: `create`, `update`, `destroy`, `show`, and `index`. Each action interacts with corresponding service objects (`AddOns::CreateService`, `AddOns::UpdateService`, `AddOns::DestroyService`) to perform operations on add-ons. The controller also uses `V1::AddOnSerializer` and `CollectionSerializer` for JSON rendering.
+
+## Symbols
+
+### `AddOnsController`
+#### Description
+This controller manages API endpoints for add-on operations within an organization.
+
+#### Internal Logic
+- Uses service objects for create, update, and destroy operations
+- Handles successful and failed results from services
+- Renders JSON responses using serializers
+- Implements pagination for the index action
+
+### `create`
+#### Description
+Creates a new add-on for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| input_params | Hash | Parameters for creating an add-on |
+
+#### Internal Logic
+1. Calls `AddOns::CreateService` to create the add-on
+2. Renders the created add-on or an error response
+
+### `update`
+#### Description
+Updates an existing add-on for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | Code of the add-on to update |
+| input_params | Hash | Parameters for updating the add-on |
+
+#### Internal Logic
+1. Finds the add-on by code
+2. Calls `AddOns::UpdateService` to update the add-on
+3. Renders the updated add-on or an error response
+
+### `destroy`
+#### Description
+Deletes an existing add-on for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | Code of the add-on to delete |
+
+#### Internal Logic
+1. Finds the add-on by code
+2. Calls `AddOns::DestroyService` to delete the add-on
+3. Renders the deleted add-on or an error response
+
+### `show`
+#### Description
+Retrieves a specific add-on for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | Code of the add-on to retrieve |
+
+#### Internal Logic
+1. Finds the add-on by code
+2. Renders the add-on or a not found error
+
+### `index`
+#### Description
+Lists all add-ons for the current organization with pagination.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| page | Integer | Page number for pagination |
+| per_page | Integer | Number of items per page |
+
+#### Internal Logic
+1. Retrieves paginated add-ons for the current organization
+2. Renders the add-ons using `CollectionSerializer` with pagination metadata
+
+### `input_params` (private)
+#### Description
+Defines permitted parameters for add-on creation and update.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| permitted_params | ActionController::Parameters | Permitted parameters for add-on operations |
+
+### `render_add_on` (private)
+#### Description
+Renders a single add-on using `V1::AddOnSerializer`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| add_on | AddOn | The add-on to be rendered |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AddOns::CreateService | Handles add-on creation logic |
+| AddOns::UpdateService | Handles add-on update logic |
+| AddOns::DestroyService | Handles add-on deletion logic |
+| V1::AddOnSerializer | Serializes individual add-ons |
+| CollectionSerializer | Serializes collections of add-ons |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| PER_PAGE | Integer | Not specified in the provided code | Default number of items per page for index action |
+
+## Error Handling
+The controller uses `render_error_response` method to handle and render errors from service objects. It also implements a `not_found_error` for the show action when an add-on is not found.

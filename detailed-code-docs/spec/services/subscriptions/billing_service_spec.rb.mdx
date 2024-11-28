@@ -1,0 +1,67 @@
+---
+title: "billing_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Subscriptions::BillingService` class. It tests various scenarios for billing subscriptions based on different intervals (weekly, monthly, quarterly, yearly), billing times (calendar, anniversary), and other conditions such as downgrading and subscription creation.
+
+## Code Structure
+The test suite is organized into multiple contexts, each testing different billing scenarios. The main focus is on the `.call` method of the `Subscriptions::BillingService` class, which is responsible for enqueuing billing jobs for subscriptions.
+
+## Symbols
+
+### `Subscriptions::BillingService`
+#### Description
+This is the main service class being tested. It handles the billing logic for subscriptions.
+
+#### Inputs
+The service doesn't appear to take direct inputs in these tests, but it relies on the state of subscriptions in the system.
+
+#### Outputs
+The service is expected to enqueue jobs (`BillSubscriptionJob` and `BillNonInvoiceableFeesJob`) based on the billing conditions.
+
+### `describe '.call'`
+#### Description
+This describes the main method being tested in the `BillingService`.
+
+#### Internal Logic
+The tests create various subscription scenarios and then call the `billing_service.call` method, expecting certain jobs to be enqueued or not based on the current date and subscription details.
+
+### Context blocks (e.g., `context 'when billed weekly with calendar billing time'`)
+#### Description
+These blocks set up specific scenarios for testing different billing intervals and times.
+
+#### Internal Logic
+Each context block:
+1. Sets up the necessary data (plans, subscriptions, dates)
+2. Calls the billing service
+3. Checks if the appropriate jobs are enqueued or not
+
+### `travel_to`
+#### Description
+This helper method is used to simulate different dates for testing time-dependent behavior.
+
+### `expect(BillSubscriptionJob).to have_been_enqueued`
+#### Description
+This expectation checks if the `BillSubscriptionJob` has been enqueued with the correct parameters.
+
+### `expect(BillNonInvoiceableFeesJob).to have_been_enqueued`
+#### Description
+This expectation checks if the `BillNonInvoiceableFeesJob` has been enqueued with the correct parameters.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| FactoryBot | Used for creating test data |
+
+## Error Handling
+The tests don't explicitly cover error handling scenarios. They focus on the expected behavior of the billing service under various conditions.
+
+## Performance Considerations
+The tests use `travel_to` to simulate different dates, which is an efficient way to test time-dependent behavior without actually waiting for time to pass.
+
+## TODOs
+There are no explicit TODOs in this test file.
+
+This test suite provides comprehensive coverage for the `Subscriptions::BillingService`, ensuring it correctly handles various billing scenarios and edge cases. It's particularly thorough in testing different billing intervals, billing times, and special cases like subscription anniversaries falling on specific dates.

@@ -1,0 +1,74 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines a service class `CreateService` within the `Integrations::Okta` module. Its primary purpose is to create a new Okta integration for an organization, ensuring that the organization has the necessary premium integration permissions and handling the creation process with proper error management.
+
+## Code Structure
+The `CreateService` class inherits from `BaseService` and contains a single public method `call`. This method orchestrates the creation of an Okta integration, including permission checks and error handling.
+
+## Symbols
+
+### `Integrations::Okta::CreateService`
+#### Description
+This class is responsible for creating a new Okta integration for an organization. It validates the organization's permissions, creates the integration, and handles any errors that may occur during the process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | A hash containing the necessary parameters for creating the Okta integration |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the created integration or error information |
+
+#### Internal Logic
+1. Find the organization by ID from the input arguments.
+2. Check if the organization has the 'okta' premium integration.
+3. If not, return a not allowed failure result.
+4. Create a new `Integrations::OktaIntegration` instance with the provided parameters.
+5. Save the integration.
+6. Set the created integration in the result object.
+7. Handle any `ActiveRecord::RecordInvalid` errors by setting a record validation failure in the result.
+
+### `call`
+#### Description
+This method is the main entry point for creating an Okta integration. It handles the entire process of validation, creation, and error management.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | A hash containing the necessary parameters for creating the Okta integration |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the created integration or error information |
+
+#### Internal Logic
+1. Find the organization using the provided `organization_id`.
+2. Check if the organization has the 'okta' premium integration.
+3. If not, return a not allowed failure result with the code 'premium_integration_missing'.
+4. Create a new `Integrations::OktaIntegration` instance with the provided parameters.
+5. Save the integration to the database.
+6. Set the created integration in the result object.
+7. If an `ActiveRecord::RecordInvalid` error occurs during saving, set a record validation failure in the result.
+
+## Error Handling
+The code implements error handling for invalid records using a `rescue` block. When an `ActiveRecord::RecordInvalid` error is raised, it calls `result.record_validation_failure!` with the invalid record.
+
+## References
+This service class is used by the `Mutations::Integrations::Okta::Create` GraphQL mutation, as seen in the related code snippet. The mutation calls this service to create the Okta integration based on user input.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Integrations::OktaIntegration | The model representing the Okta integration |
+| Organization | The model representing the organization |
+| BaseService | The parent class providing common functionality for services |
+
+## Side Effects
+- Creates a new `Integrations::OktaIntegration` record in the database if successful.
+- Modifies the `result` object to include either the created integration or error information.

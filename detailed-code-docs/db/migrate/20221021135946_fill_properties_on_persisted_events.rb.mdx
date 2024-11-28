@@ -1,0 +1,44 @@
+---
+title: "20221021135946_fill_properties_on_persisted_events.rb"
+---
+
+## High-level description
+This migration file is designed to fill the `properties` field on existing `PersistedEvent` records. It iterates through all `PersistedEvent` records, finds the corresponding `Event` based on specific criteria, and updates the `PersistedEvent` with the `properties` from the matched `Event`.
+
+## Symbols
+
+### `FillPropertiesOnPersistedEvents`
+#### Description
+This is a Rails migration class that inherits from `ActiveRecord::Migration[7.0]`. It defines a `change` method to perform the migration task of updating `PersistedEvent` records with properties from corresponding `Event` records.
+
+#### Internal Logic
+1. Iterates through all `PersistedEvent` records using `find_each`.
+2. For each `PersistedEvent`, it searches for a matching `Event` based on:
+   - The organization ID of the billable metric associated with the persisted event
+   - The customer ID of the persisted event
+   - A specific property matching the billable metric's field name and the persisted event's external ID
+3. Updates the `properties` of the `PersistedEvent` with the `properties` from the matched `Event`.
+
+### `PersistedEvent`
+#### Description
+This is a temporary class definition within the migration, inheriting from `ApplicationRecord`. It's used to interact with the `persisted_events` table without loading the actual model class.
+
+## Side Effects
+- This migration modifies existing data in the `persisted_events` table, updating the `properties` column for each record.
+- It performs database queries and updates, which may take considerable time depending on the number of records.
+
+## Performance Considerations
+- The migration uses `find_each` to batch process records, which is more memory-efficient for large datasets.
+- However, it performs individual updates for each record, which could be slow for a large number of records.
+- The unscoped query on both `PersistedEvent` and `Event` ignores default scopes, ensuring all records are processed.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Used for database operations and migrations |
+
+## Error Handling
+The migration does not implement explicit error handling. If an error occurs during the update process (e.g., a matching event is not found), it will raise an exception and potentially halt the migration.
+
+## TODOs
+Consider adding error handling or logging for cases where a matching `Event` is not found for a `PersistedEvent`.

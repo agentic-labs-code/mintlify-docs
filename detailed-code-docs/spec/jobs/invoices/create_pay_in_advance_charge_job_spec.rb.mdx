@@ -1,0 +1,75 @@
+---
+title: "create_pay_in_advance_charge_job_spec.rb"
+---
+
+## High-level description
+This code defines an RSpec test suite for the `Invoices::CreatePayInAdvanceChargeJob` job. It tests the job's behavior when creating a pay-in-advance charge, including various scenarios such as successful execution and error handling.
+
+## Code Structure
+The test suite is organized into a main describe block for the `Invoices::CreatePayInAdvanceChargeJob` with several nested contexts and examples. It uses RSpec's `let` statements to set up test data and mocks, and includes before blocks to set up expectations on the mocked service.
+
+## Symbols
+
+### RSpec.describe Invoices::CreatePayInAdvanceChargeJob
+#### Description
+This is the main describe block for the job test suite. It sets up the test environment and defines various test cases for the job.
+
+#### Internal Logic
+1. Sets up test data using `let` statements
+2. Mocks the `Invoices::CreatePayInAdvanceChargeService`
+3. Defines test cases for different scenarios
+
+### it 'calls the create pay in advance charge service'
+#### Description
+This test ensures that the job calls the `Invoices::CreatePayInAdvanceChargeService` with the correct parameters.
+
+#### Internal Logic
+1. Executes the job
+2. Verifies that the service was instantiated and called
+
+### context 'when result is a failure'
+#### Description
+This context block tests the job's behavior when the service returns a failure result.
+
+#### Internal Logic
+1. Sets up a failure result
+2. Verifies that the job raises a `BaseService::FailedResult` error
+3. Checks if the service was still instantiated and called
+
+### context 'with a previously created invoice'
+#### Description
+This context tests the job's behavior when an existing invoice is provided.
+
+#### Internal Logic
+1. Sets up a test invoice
+2. Verifies that the job raises an error when the service fails
+3. Checks if the service was called with the provided invoice
+
+### context 'when a generating invoice is attached to the result'
+#### Description
+This context tests the job's retry behavior when a generating invoice is attached to a failed result.
+
+#### Internal Logic
+1. Sets up a generating invoice in the result
+2. Verifies that the job enqueues itself again with the attached invoice
+
+### context 'when a not generating invoice is attached to the result'
+#### Description
+This context tests the job's behavior when a non-generating invoice is attached to a failed result.
+
+#### Internal Logic
+1. Sets up a draft invoice in the result
+2. Verifies that the job raises an error without retrying
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| Invoices::CreatePayInAdvanceChargeService | The service being tested |
+| BaseService::Result | Used for creating test result objects |
+
+## Error Handling
+The test suite covers various error scenarios, including:
+- Handling of service failures
+- Behavior with different types of invoices attached to failed results
+- Raising of `BaseService::FailedResult` errors in appropriate cases

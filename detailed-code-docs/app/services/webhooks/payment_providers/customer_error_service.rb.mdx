@@ -1,0 +1,80 @@
+---
+title: "customer_error_service.rb"
+---
+
+## High-level description
+This code defines a service class `CustomerErrorService` within the `Webhooks::PaymentProviders` module. It is responsible for handling webhook events related to customer payment provider errors. The class extends the `Webhooks::BaseService` and provides specific implementations for webhook processing.
+
+## Code Structure
+The `CustomerErrorService` class is part of a larger webhook handling system. It inherits from `Webhooks::BaseService` and overrides several methods to customize the behavior for customer payment provider errors.
+
+## References
+- `Webhooks::BaseService` (parent class)
+- `::V1::PaymentProviders::CustomerErrorSerializer` (used for object serialization)
+
+## Symbols
+
+### `Webhooks::PaymentProviders::CustomerErrorService`
+#### Description
+This class handles the processing of customer payment provider error webhooks. It provides specific implementations for serializing the error object and defining the webhook type.
+
+#### Internal Logic
+The class overrides four private methods from its parent class:
+
+1. `current_organization`: Retrieves the organization associated with the object.
+2. `object_serializer`: Creates a new instance of `CustomerErrorSerializer` with the object and additional options.
+3. `webhook_type`: Defines the type of webhook as 'customer.payment_provider_error'.
+4. `object_type`: Defines the object type as 'payment_provider_customer_error'.
+
+These methods are likely used by the parent class to process the webhook event.
+
+### `current_organization`
+#### Description
+Retrieves and memoizes the organization associated with the object.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @current_organization | Organization | The organization associated with the object |
+
+### `object_serializer`
+#### Description
+Creates a new instance of `CustomerErrorSerializer` to serialize the object.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| serializer | ::V1::PaymentProviders::CustomerErrorSerializer | Serializer instance for the object |
+
+#### Internal Logic
+- Creates a new `CustomerErrorSerializer` instance with the following parameters:
+  - `object`: The object to be serialized
+  - `root_name`: Set to the value of `object_type`
+  - `provider_error`: Taken from the `options` hash
+
+### `webhook_type`
+#### Description
+Defines the type of webhook for customer payment provider errors.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_type | String | The type of webhook ('customer.payment_provider_error') |
+
+### `object_type`
+#### Description
+Defines the object type for customer payment provider errors.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object_type | String | The type of object ('payment_provider_customer_error') |
+
+## Dependencies
+This code relies on the following dependencies:
+| Dependency | Purpose |
+|:-----------|:--------|
+| Webhooks::BaseService | Parent class providing base functionality for webhook services |
+| ::V1::PaymentProviders::CustomerErrorSerializer | Serializer for customer error objects |
+
+Based on the related code snippets, we can infer that this service is part of a larger webhook system. The `SendWebhookJob` class in `app/jobs/send_webhook_job.rb` uses this service to process 'customer.payment_provider_error' webhook events. The `CustomerErrorSerializer` in `app/serializers/v1/payment_providers/customer_error_serializer.rb` is used to serialize the customer error object for the webhook payload.

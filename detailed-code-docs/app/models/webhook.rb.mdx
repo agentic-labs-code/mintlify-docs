@@ -1,0 +1,65 @@
+---
+title: "webhook.rb"
+---
+
+## High-level description
+The `Webhook` model represents a webhook event in the Lago system. It stores details about the webhook, such as its status, payload, and associated endpoint. It also provides methods for generating signatures and managing the payload format.
+
+## Code Structure
+The `Webhook` model utilizes several other components:
+- It `belongs_to` `WebhookEndpoint` and `object` (polymorphic).
+- It delegates the `organization` method to `WebhookEndpoint`.
+- It uses the `RansackUuidSearch` concern for UUID-based searching.
+- It defines an enum `status` with values from the `STATUS` constant.
+
+## References
+- `WebhookEndpoint`: Represents the endpoint where the webhook should be sent.
+- `RansackUuidSearch`: Provides a custom ransacker for searching by UUID.
+
+## Symbols
+
+### `Webhook`
+#### Description
+The `Webhook` class represents a webhook event in the system. It stores information about the webhook, including its status, payload, and associated endpoint.
+
+#### Inputs
+This class does not define any specific inputs.
+
+#### Outputs
+This class does not define any specific outputs.
+
+#### Internal Logic
+The class defines several methods:
+- `ransackable_attributes`: Defines attributes that can be used for searching with Ransack.
+- `payload`: Provides access to the webhook payload, handling both old string-based and new hash-based formats.
+- `generate_headers`: Generates headers for the webhook request, including the signature.
+- `jwt_signature`: Generates a JWT signature for the webhook.
+- `hmac_signature`: Generates an HMAC signature for the webhook.
+- `issuer`: Returns the issuer for JWT signing.
+
+## Side Effects
+- Creating a new `Webhook` instance will persist it to the database.
+- Updating attributes of a `Webhook` instance will update the corresponding record in the database.
+- Deleting a `Webhook` instance will remove the corresponding record from the database.
+
+### `STATUS`
+#### Description
+A constant array defining the possible statuses for a webhook.
+
+#### Inputs
+This constant does not take any inputs.
+
+#### Outputs
+This constant returns an array of symbols: `[:pending, :succeeded, :failed]`.
+
+#### Internal Logic
+This constant is defined using the `%i[]` syntax for creating an array of symbols. The `freeze` method is called on the array to prevent further modifications.
+
+## Dependencies
+This class does not explicitly list external dependencies. However, it uses several gems like `activerecord`, `ransack`, and `jwt` for its functionality.
+
+## Error Handling
+This class does not implement specific error handling beyond basic exception raising.
+
+## Logging
+This class does not implement any specific logging mechanisms.

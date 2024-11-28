@@ -1,0 +1,51 @@
+---
+title: "stripe_checkout_url_job_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `PaymentProviderCustomers::StripeCheckoutUrlJob` job. It verifies that the job correctly initializes a `StripeService` instance and calls the `generate_checkout_url` method on it.
+
+## Symbols
+
+### `RSpec.describe PaymentProviderCustomers::StripeCheckoutUrlJob, type: :job`
+#### Description
+This is the main RSpec describe block that groups all tests related to the `PaymentProviderCustomers::StripeCheckoutUrlJob` job.
+
+### `subject(:stripe_checkout_job)`
+#### Description
+Defines the subject of the test as the described class (`PaymentProviderCustomers::StripeCheckoutUrlJob`).
+
+### `let(:stripe_customer)`
+#### Description
+Creates a test double for a Stripe customer using FactoryBot.
+
+### `let(:stripe_service)`
+#### Description
+Creates an instance double of the `PaymentProviderCustomers::StripeService` class.
+
+### `it 'calls generate_checkout_url method'`
+#### Description
+This test case verifies that the job correctly initializes the `StripeService` and calls the `generate_checkout_url` method.
+
+#### Internal Logic
+1. Arrange:
+   - Set up expectations for `PaymentProviderCustomers::StripeService.new` to return the `stripe_service` double.
+   - Set up expectations for `stripe_service.generate_checkout_url` to return a `BaseService::Result` object.
+
+2. Act:
+   - Perform the job by calling `stripe_checkout_job.perform_now(stripe_customer)`.
+
+3. Assert:
+   - Verify that `PaymentProviderCustomers::StripeService.new` was called with the `stripe_customer`.
+   - Verify that `generate_checkout_url` was called on the `stripe_service` instance.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and RSpec configuration |
+| FactoryBot | Used to create test data (stripe_customer) |
+
+## Notes
+- The test uses RSpec's mocking and stubbing features to isolate the job's behavior and avoid making actual API calls to Stripe.
+- The job is expected to create a new instance of `PaymentProviderCustomers::StripeService` with the given `stripe_customer` and then call `generate_checkout_url` on that service instance.
+- The actual implementation of `StripeService` and its `generate_checkout_url` method are not tested here; this test focuses solely on the job's interaction with the service.

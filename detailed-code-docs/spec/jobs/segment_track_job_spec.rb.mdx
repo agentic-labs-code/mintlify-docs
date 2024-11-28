@@ -1,0 +1,82 @@
+---
+title: "segment_track_job_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `SegmentTrackJob` class. It verifies the behavior of the job's `perform` method, which is responsible for tracking events using the Segment analytics service. The tests cover various scenarios, including different hosting types and handling of disabled tracking.
+
+## Symbols
+
+### `SegmentTrackJob`
+#### Description
+This is the main class being tested. It's a job responsible for tracking events using the Segment analytics service.
+
+### `.perform`
+#### Description
+This is the main method being tested within the `SegmentTrackJob` class. It's responsible for sending tracking data to Segment.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| membership_id | String | The ID of the membership associated with the event |
+| event | String | The name of the event being tracked |
+| properties | Hash | Additional properties associated with the event |
+
+#### Internal Logic
+1. Checks if Segment tracking is disabled via an environment variable.
+2. Determines the hosting type (self-hosted or cloud) based on environment variables.
+3. Calls the Segment client's `track` method with the provided data and additional context.
+
+## Test Cases
+
+### Default behavior
+#### Description
+Verifies that the `SegmentTrackJob` correctly calls the Segment client's `track` method with the expected parameters.
+
+#### Internal Logic
+1. Sets up the test environment and mocks.
+2. Calls `SegmentTrackJob.perform_now` with test data.
+3. Expects the Segment client to receive a `track` call with specific parameters.
+
+### Cloud hosting
+#### Description
+Tests the behavior when the application is running in cloud mode.
+
+#### Internal Logic
+1. Sets the `LAGO_CLOUD` environment variable to 'true'.
+2. Expects the `track` call to include 'cloud' as the hosting type.
+
+### Nil membership
+#### Description
+Tests the behavior when the membership ID is nil.
+
+#### Internal Logic
+1. Calls `perform_now` with a nil membership ID.
+2. Expects the `track` call to use 'membership/unidentifiable' as the user ID.
+
+### Disabled Segment tracking
+#### Description
+Verifies that no tracking occurs when Segment is disabled.
+
+#### Internal Logic
+1. Sets the `LAGO_DISABLE_SEGMENT` environment variable to 'true'.
+2. Expects no `track` call to be made to the Segment client.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides the testing environment and configuration |
+| SecureRandom | Generates random UUIDs for testing |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LAGO_DISABLE_SEGMENT | String | '' | Disables Segment tracking when set to 'true' |
+| LAGO_CLOUD | String | Not set | Determines the hosting type (cloud when 'true', self-hosted otherwise) |
+
+## Notes
+- The test suite uses RSpec's `let` statements to define reusable variables.
+- The `CurrentContext` and `SEGMENT_CLIENT` are mocked to isolate the job's behavior.
+- The test suite covers different scenarios by manipulating environment variables.
+
+This test suite ensures that the `SegmentTrackJob` correctly handles various scenarios and properly interacts with the Segment analytics service, providing confidence in the job's functionality across different configurations.

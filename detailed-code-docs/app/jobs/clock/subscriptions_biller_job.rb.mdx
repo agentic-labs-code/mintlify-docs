@@ -1,0 +1,47 @@
+---
+title: "subscriptions_biller_job.rb"
+---
+
+## High-level description
+This code defines a job class `SubscriptionsBillerJob` within the `Clock` module. Its purpose is to execute the billing process for subscriptions by calling the `Subscriptions::BillingService`.
+
+## Code Structure
+The `SubscriptionsBillerJob` class inherits from `ApplicationJob` and includes the `SentryCronConcern` module. It sets the queue as 'clock' and defines a single `perform` method that calls the `Subscriptions::BillingService`.
+
+## Symbols
+
+### `Clock::SubscriptionsBillerJob`
+#### Description
+This class represents a job that is responsible for initiating the subscription billing process. It is designed to be run periodically, likely as part of a scheduled task or cron job.
+
+#### Inputs
+This job doesn't take any explicit inputs.
+
+#### Outputs
+This job doesn't return any explicit outputs. Its main action is to trigger the billing service.
+
+#### Internal Logic
+1. The job is set to run on the 'clock' queue.
+2. When performed, it calls `Subscriptions::BillingService.call`, which initiates the billing process for subscriptions.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| SentryCronConcern | Provides Sentry monitoring capabilities for cron jobs |
+| Subscriptions::BillingService | Handles the actual subscription billing logic |
+
+## Error Handling
+This job doesn't implement any explicit error handling. However, by including `SentryCronConcern`, it likely reports any exceptions to Sentry for monitoring purposes.
+
+## Performance Considerations
+The job itself is lightweight, simply delegating the work to `Subscriptions::BillingService`. However, the billing service it calls may be computationally intensive, depending on the number of subscriptions and the complexity of the billing logic.
+
+## Related Code
+The `Subscriptions::BillingService` (found in `app/services/subscriptions/billing_service.rb`) contains the core logic for billing subscriptions. It handles various billing scenarios based on subscription types (weekly, monthly, quarterly, yearly) and billing times (calendar or anniversary).
+
+The `ScenariosHelper` module (in `spec/support/scenarios_helper.rb`) includes a `perform_billing` method that calls this job, suggesting it's used in testing scenarios.
+
+## Notes
+- This job is part of a larger subscription management and billing system.
+- It's designed to work with Sentry for monitoring, as evidenced by the inclusion of `SentryCronConcern`.
+- The actual complexity of the billing process is encapsulated in the `Subscriptions::BillingService`, which this job simply invokes.

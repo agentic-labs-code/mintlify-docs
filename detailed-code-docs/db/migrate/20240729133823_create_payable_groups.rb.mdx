@@ -1,0 +1,46 @@
+---
+title: "20240729133823_create_payable_groups.rb"
+---
+
+## High-level description
+This migration creates a new table called `payable_groups` and adds a new column to the existing `invoices` table. It's designed to group payables (likely invoices) together for a customer and track their payment status.
+
+## Symbols
+
+### `CreatePayableGroups`
+#### Description
+This is a Rails migration class that defines changes to the database schema. It creates a new table and modifies an existing one.
+
+#### Internal Logic
+The migration performs two main actions:
+1. Creates a new table called `payable_groups` with specific columns.
+2. Adds a new column to the existing `invoices` table.
+
+Let's break down each action:
+
+1. Creating the `payable_groups` table:
+   - The table uses UUID as the primary key.
+   - It has a foreign key reference to the `customers` table.
+   - It includes a `payment_status` column with a default value.
+   - It includes timestamp columns for record creation and updates.
+
+2. Modifying the `invoices` table:
+   - Adds a new column `payable_group_id` of type UUID.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for defining database schema changes |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| id | symbol | :uuid | Specifies the type of primary key for the `payable_groups` table |
+| payment_status default | integer | 0 | Sets the default value for the `payment_status` column |
+
+## Side Effects
+This migration will modify the database schema by:
+1. Creating a new table `payable_groups`.
+2. Adding a new column `payable_group_id` to the `invoices` table.
+
+These changes may affect existing queries or models that interact with the `invoices` table, and new models or queries can now be created to work with the `payable_groups` table.

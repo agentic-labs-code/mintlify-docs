@@ -1,0 +1,58 @@
+---
+title: "credit_notes.rb"
+---
+
+## High-level description
+This file defines a factory for creating `credit_note` objects using FactoryBot, a popular test data generation library for Ruby on Rails. It sets up default attributes for credit notes and includes traits for additional customization, such as attaching a file or setting a draft status.
+
+## Symbols
+
+### `credit_note` (factory)
+#### Description
+Defines a factory for creating `credit_note` objects with default attributes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N/A | N/A | This factory doesn't take explicit inputs, but uses associations and default values. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_note | CreditNote | An instance of the CreditNote model with the specified attributes |
+
+#### Internal Logic
+- Associates with a `customer` and an `invoice` (likely through other factories)
+- Sets default values for various attributes such as `issuing_date`, `reason`, `total_amount_cents`, `credit_status`, etc.
+- Uses monetary attributes with both cents and currency fields (e.g., `total_amount_cents` and `total_amount_currency`)
+
+### `:with_file` (trait)
+#### Description
+A trait that attaches a blank PDF file to the credit note after it's built.
+
+#### Internal Logic
+- Opens a blank PDF file from the `spec/fixtures` directory
+- Attaches the file to the credit note's `file` attribute using Active Storage
+- Sets the filename and content type of the attached file
+
+### `:draft` (trait)
+#### Description
+A trait that sets the credit note's status to "draft".
+
+#### Internal Logic
+- Sets the `status` attribute of the credit note to `:draft`
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| FactoryBot | Used to define factories for creating test data |
+| Rails.root | Used to locate the fixture file for the `:with_file` trait |
+| Active Storage | Implied by the use of `attach` method for file handling |
+
+## Notes
+1. The factory uses monetary values in cents (e.g., `total_amount_cents`) along with separate currency fields, which is a common practice for handling money in applications to avoid floating-point precision issues.
+2. The `:with_file` trait demonstrates how to attach files to models in tests, which can be useful for testing file-related functionality.
+3. The use of traits (`:with_file` and `:draft`) allows for flexible creation of credit notes with different characteristics in tests.
+4. The factory assumes the existence of associated `customer` and `invoice` factories, which are not defined in this file.
+
+This factory provides a convenient way to create credit note objects for testing purposes, with the ability to customize various attributes and attach files as needed.

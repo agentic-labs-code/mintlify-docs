@@ -4,66 +4,95 @@ title: "Overview"
 
 ## High-level description
 
-This directory contains GitHub-specific configuration files and workflows for the Metriport project. It includes issue templates, pull request templates, Developer Certificate of Origin (DCO) configuration, and GitHub Actions workflows. These files are designed to streamline the development process, maintain code quality, and automate various tasks such as continuous integration, deployment, and SDK releases.
+This `.github` directory contains essential configuration files and workflows for managing the Lago project on GitHub. It includes two main subdirectories: `ISSUE_TEMPLATE` and `workflows`. The `ISSUE_TEMPLATE` directory provides structured templates for bug reports and feature requests, along with configuration for the issue creation process. The `workflows` directory contains GitHub Actions workflows that automate various aspects of the development lifecycle, including continuous integration, testing, and deployment.
 
 ## What does it do?
 
-The contents of this directory serve several important functions:
+The contents of this directory serve several crucial functions in the Lago project:
 
-1. Issue Management: Provides structured templates for bug reports and feature requests, ensuring that users submit comprehensive and consistent information.
+1. Issue Management:
+   - Provides templates for users to submit well-structured bug reports and feature requests.
+   - Configures the issue creation process to guide users towards using templates or seeking support in the Lago Community Slack.
 
-2. Pull Request Process: Offers a template for pull requests, guiding contributors to provide necessary details about their changes, testing procedures, and release plans.
+2. Continuous Integration and Deployment:
+   - Automates the building and pushing of Docker images to Amazon ECR.
+   - Runs database migrations for PostgreSQL and ClickHouse to ensure schema consistency.
+   - Performs code style checks using Rubocop on pull requests.
+   - Executes the RSpec test suite in a controlled environment with necessary services.
+   - Handles the release process by building and publishing multi-architecture Docker images.
 
-3. Commit Signing: Configures the Developer Certificate of Origin (DCO) app to manage commit sign-offs for the repository.
-
-4. Automated Workflows: Implements a wide range of GitHub Actions workflows that automate various aspects of the development lifecycle, including:
-   - Continuous Integration: Running tests and linters on pull requests
-   - Continuous Deployment: Deploying to staging, production, and sandbox environments
-   - SDK Management: Generating and releasing SDKs for multiple programming languages
-   - Service Management: Restarting API services in different environments
-   - End-to-End Testing: Running E2E tests against staging environments
-   - Infrastructure as Code: Deploying and updating AWS resources using CDK
-
-These components work together to create a robust development environment that promotes code quality, efficient issue tracking, and automated processes for testing, deployment, and releases.
+These components work together to streamline development processes, maintain code quality, and improve the project's overall efficiency and reliability.
 
 ## Key Files
 
-1. Issue Templates (`ISSUE_TEMPLATE/bug-report.yml` and `ISSUE_TEMPLATE/feature-request.yml`): These YAML files define structured templates for bug reports and feature requests, ensuring that users provide all necessary information when submitting issues.
+1. Issue Templates (`ISSUE_TEMPLATE/bug_report.md` and `ISSUE_TEMPLATE/feature_request.md`):
+   These Markdown files provide structured formats for users to report bugs or suggest new features. They prompt users for specific information to help maintainers understand and address issues more effectively.
 
-2. Pull Request Template (`pull_request_template.md`): This Markdown file provides a standardized format for pull requests, prompting contributors to include details about their changes, testing procedures, and release plans.
+   Example from `bug_report.md`:
+   ```markdown
+   **Describe the bug**
+   A clear and concise description of what the bug is.
 
-3. DCO Configuration (`dco.yml`): This YAML file configures the Developer Certificate of Origin app, specifying that organization members are not required to sign off on their commits.
+   **To Reproduce**
+   Steps to reproduce the behavior:
+   1. Go to '...'
+   2. Click on '....'
+   3. Scroll down to '....'
+   4. See error
+   ```
 
-4. GitHub Actions Workflows (`workflows/` directory): This directory contains numerous YAML files defining various automated workflows for the project. Key workflows include:
-   - `_build.yml`: A reusable workflow for building and testing packages
-   - `_deploy-api.yml`: A reusable workflow for deploying the API
-   - `deploy-production.yml` and `deploy-staging.yml`: Workflows for deploying to production and staging environments
-   - `release-all-sdks.yml`: Workflow for releasing SDKs for multiple languages
-   - Various `pull-request_*.yml` files: Workflows for checking and building specific packages on pull requests
-   - Various `restart_*.yml` files: Workflows for restarting services in different environments
+2. Issue Template Configuration (`ISSUE_TEMPLATE/config.yml`):
+   This YAML file customizes the issue creation process by disabling blank issues and providing a link to the Lago Community Slack for questions and feature requests.
+
+   ```yaml
+   blank_issues_enabled: false
+   contact_links:
+     - name: Lago Community
+       url: https://www.getlago.com/slack
+       about: Please ask and answer questions here.
+   ```
+
+3. Workflow Files (in the `workflows` directory):
+   - `internal-build.yml`: Builds and pushes Docker images to Amazon ECR.
+   - `migrations-test.yml`: Runs database migrations for PostgreSQL and ClickHouse.
+   - `pronto.yml`: Performs Rubocop linting on pull requests.
+   - `release.yml`: Handles the release process, including multi-architecture Docker image builds.
+   - `spec.yml`: Executes the RSpec test suite in a controlled environment.
+
+   These workflows define jobs and steps that automate various aspects of the development process, ensuring code quality and facilitating continuous integration and deployment.
 
 ## Dependencies
 
-The GitHub Actions workflows rely on several external services and tools:
+The workflows in this directory rely on several external actions and services:
 
-1. GitHub Actions: The underlying platform for running the automated workflows
-2. AWS Services: Many workflows interact with AWS services like ECR and ECS
-3. Docker: Used for containerization and authentication with DockerHub
-4. Node.js: Used in many workflows for building and testing JavaScript/TypeScript packages
-5. Fern: A tool used for generating and releasing SDKs
-6. Various GitHub Actions: Such as `actions/checkout`, `actions/setup-node`, and `docker/login-action`
+1. GitHub Actions: `actions/checkout@v4`, `actions/upload-artifact@v4`, `actions/download-artifact@v4`, `ruby/setup-ruby@v1`
+2. AWS Actions: `aws-actions/configure-aws-credentials@v4`, `aws-actions/amazon-ecr-login@v2`
+3. Docker Actions: `docker/build-push-action@v6`, `docker/metadata-action@v5`, `docker/setup-buildx-action@v3`, `docker/login-action@v3`
+4. Database Services: PostgreSQL (postgres:14-alpine), ClickHouse (clickhouse/clickhouse-server), Redis
+5. Ruby and related gems: Ruby 3.3.4, Rubocop, RSpec
+
+These dependencies are crucial for setting up the required environments, building and pushing Docker images, running tests, and performing various CI/CD tasks.
 
 ## Configuration
 
-The workflows and templates use various configuration options:
+The workflows use a combination of environment variables and GitHub secrets to configure their behavior. Key configuration elements include:
 
-1. Issue Templates: Configure labels and required fields for bug reports and feature requests
-2. DCO Configuration: Specifies whether organization members need to sign off on commits
-3. GitHub Actions Workflows: Use a combination of GitHub secrets and variables for configuration, including:
-   - AWS credentials
-   - Docker credentials
-   - Environment-specific variables (e.g., ECR URIs, ECS cluster names, API URLs)
-   - SDK-related tokens (e.g., NPM, PyPI, Maven)
-   - Service-specific secrets
+1. AWS credentials and region for ECR access
+2. Docker Hub credentials for image publishing
+3. Database connection strings and credentials
+4. Rails environment variables (e.g., RAILS_ENV, SECRET_KEY_BASE)
+5. Lago-specific configuration variables (e.g., LAGO_API_URL, LAGO_PDF_URL)
 
-These configurations allow the workflows to be flexible and work across different environments while keeping sensitive information secure.
+The `ISSUE_TEMPLATE/config.yml` file contains the following configuration:
+
+| Option | Value | Description |
+|--------|-------|-------------|
+| `blank_issues_enabled` | `false` | Disables the creation of blank issues |
+
+It also defines a contact link:
+
+| Name | URL | Description |
+|------|-----|-------------|
+| Lago Community | https://www.getlago.com/slack | Slack community for questions and feature requests |
+
+This configuration encourages users to use predefined templates when creating issues and directs them to the Slack community for general questions and feature requests, helping maintain an organized and efficient issue tracking system.

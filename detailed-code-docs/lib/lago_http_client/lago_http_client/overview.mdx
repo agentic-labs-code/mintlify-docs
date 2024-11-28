@@ -1,0 +1,71 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `lib/lago_http_client/lago_http_client` directory contains the core components of the Lago HTTP client, which is designed to facilitate HTTP communication with external services. It consists of two main files: `client.rb` and `http_error.rb`. The `client.rb` file defines a `Client` class that provides methods for making various types of HTTP requests, while `http_error.rb` defines a custom `HttpError` class for handling HTTP-related errors.
+
+## What does it do?
+The Lago HTTP client provides a set of tools for making HTTP requests to external services. It supports various HTTP methods such as POST, PUT, and GET, and can handle different types of data payloads including JSON, multipart form data, and URL-encoded data. The client also includes error handling capabilities, allowing developers to catch and process HTTP errors in a structured manner.
+
+Here's a simplified explanation of what the code does:
+
+1. It allows you to create an HTTP client by specifying a base URL.
+2. You can then use this client to send different types of HTTP requests (GET, POST, PUT) to that URL.
+3. The client can send data in various formats, such as JSON or form data.
+4. When a request is made, the client sends it to the specified URL and waits for a response.
+5. If the response is successful, the client processes it and returns the data.
+6. If there's an error, the client captures the details and raises a custom error that you can handle in your application.
+
+## Key Files
+
+### client.rb
+This file contains the `Client` class, which is the main component of the Lago HTTP client. It provides methods for various HTTP operations:
+
+- `post`: Sends a POST request with a JSON payload
+- `put_with_response`: Sends a PUT request and returns the raw response
+- `post_multipart_file`: Sends a POST request with multipart form data
+- `post_url_encoded`: Sends a POST request with URL-encoded form data
+- `get`: Sends a GET request
+
+The `Client` class uses Ruby's standard `Net::HTTP` library for making HTTP requests. It includes error handling and response parsing functionality.
+
+Example usage:
+```ruby
+client = LagoHttpClient::Client.new('https://api.example.com')
+response = client.post('/users', { name: 'John Doe' })
+```
+
+### http_error.rb
+This file defines the `HttpError` class, which is a custom error class for handling HTTP-related errors. It captures and formats error details such as the HTTP status code, error body, and the URI that caused the error.
+
+The `HttpError` class provides methods to access the error details and parse the error body as JSON if needed.
+
+Example usage:
+```ruby
+begin
+  # Some HTTP request that might fail
+rescue LagoHttpClient::HttpError =&gt; e
+  puts e.message
+  puts e.json_message
+end
+```
+
+## Dependencies
+The Lago HTTP client relies on the following Ruby standard libraries:
+
+- `net/http`: For making HTTP requests
+- `net/http/post/multipart`: For handling multipart form data in POST requests
+- `json`: For parsing and generating JSON data
+
+## Configuration
+The `Client` class uses a constant `RESPONSE_SUCCESS_CODES` to define the HTTP status codes considered as successful responses. This can be easily modified if needed.
+
+The client also accepts a `read_timeout` parameter during initialization, allowing you to configure the timeout for read operations.
+
+Example:
+```ruby
+client = LagoHttpClient::Client.new('https://api.example.com', read_timeout: 30)
+```
+
+In summary, the Lago HTTP client provides a flexible and robust solution for making HTTP requests in Ruby applications. It offers a clean API for different types of HTTP operations, handles various data formats, and includes built-in error handling capabilities.

@@ -1,0 +1,64 @@
+---
+title: "finalize_invoices_job_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Clock::FinalizeInvoicesJob` class. It tests the behavior of the job's `perform` method, specifically focusing on how it handles invoice finalization based on the customer's invoice grace period.
+
+## Code Structure
+The test suite is organized into a single `describe` block for the `Clock::FinalizeInvoicesJob` class, with a nested `describe` block for the `.perform` method. Within this, there are two `context` blocks testing different scenarios: one during the grace period and one after the grace period.
+
+## Symbols
+
+### `Clock::FinalizeInvoicesJob`
+#### Description
+This is the main class being tested. It appears to be a job responsible for finalizing invoices based on certain conditions.
+
+### `.perform`
+#### Description
+This is the method being tested within the `Clock::FinalizeInvoicesJob` class. It's responsible for determining whether to finalize invoices based on the current date and the customer's grace period.
+
+### `let` blocks
+#### Description
+These blocks define the setup for the tests, creating necessary objects such as customers and invoices.
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Customer | A customer with a 3-day invoice grace period |
+| draft_invoice | Invoice | A draft invoice created on June 20, 2022 |
+| finalized_invoice | Invoice | A finalized invoice created on June 20, 2022 |
+
+### `before` block
+#### Description
+This block sets up the test environment by creating the invoices and stubbing the `Invoices::RefreshDraftAndFinalizeService.call` method.
+
+### Test contexts
+#### Description
+There are two main test contexts:
+
+1. "when during the grace period"
+   - Tests that the finalize service is not called when the current date is within the grace period (June 22, 2022).
+
+2. "when after the grace period"
+   - Tests that the finalize service is called when the current date is after the grace period (June 24, 2022).
+
+## Dependencies
+The test file depends on the following:
+
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| FactoryBot | Used for creating test objects (customer, invoices) |
+| ActiveSupport::Testing::TimeHelpers | Used for time manipulation in tests |
+
+## Error Handling
+This test suite doesn't explicitly test error handling scenarios.
+
+## Notes
+1. The test uses `travel_to` method to manipulate the current date for testing different scenarios.
+2. The test checks if the `Invoices::FinalizeJob` is enqueued or not, depending on whether the current date is within or after the grace period.
+3. The grace period is set to 3 days for the customer in these tests.
+4. The test file uses RSpec's `describe`, `context`, and `it` blocks for organizing tests.
+5. The `allow` method is used to stub the `Invoices::RefreshDraftAndFinalizeService.call` method, suggesting that this service is called within the job but its behavior is not being tested here.
+
+This test suite ensures that the `Clock::FinalizeInvoicesJob` correctly handles invoice finalization based on the customer's grace period, which is an important aspect of the invoice management system.

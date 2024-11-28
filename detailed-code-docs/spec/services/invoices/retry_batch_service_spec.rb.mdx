@@ -1,0 +1,55 @@
+---
+title: "retry_batch_service_spec.rb"
+---
+
+## High-level description
+This RSpec file contains unit tests for the `Invoices::RetryBatchService` class. It tests the functionality of retrying failed invoice payments in batch, including both asynchronous and synchronous operations.
+
+## Code Structure
+The test suite is organized into two main describe blocks, one for `#call_async` and another for `#call`. Each block contains various test cases to ensure the correct behavior of the service under different scenarios.
+
+## Symbols
+
+### `Invoices::RetryBatchService`
+#### Description
+This is the main class being tested. It provides functionality to retry failed invoice payments in batch for a given organization.
+
+### `#call_async`
+#### Description
+Tests the asynchronous operation of the service, which enqueues a job to retry all payments.
+
+#### Internal Logic
+The test verifies that calling `call_async` enqueues an `Invoices::RetryAllJob` job.
+
+### `#call`
+#### Description
+Tests the synchronous operation of the service, which processes a given set of invoice IDs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice_ids | Array | IDs of invoices to be retried |
+
+#### Internal Logic
+1. Sets up test data including failed and draft invoices.
+2. Mocks the `Invoices::RetryService` to return a predefined result.
+3. Tests the successful scenario where all invoices are processed.
+4. Tests the error scenario where the inner service returns a failure.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| Invoices::RetryBatchService | The service being tested |
+| Invoices::RetryAllJob | Job used for asynchronous processing |
+| Invoices::RetryService | Service used for retrying individual invoices |
+| BaseService::Result | Used for returning results from the service |
+| BaseService::MethodNotAllowedFailure | Used for testing error scenarios |
+
+## Error Handling
+The test suite includes a scenario to verify proper error handling when the inner `Invoices::RetryService` returns a failure result.
+
+## Performance Considerations
+The service uses `find_each` when processing invoices, which is optimized for handling large collections by loading records in batches.
+
+This test suite provides comprehensive coverage for the `Invoices::RetryBatchService`, ensuring its correct behavior for both successful and error scenarios in both synchronous and asynchronous operations.

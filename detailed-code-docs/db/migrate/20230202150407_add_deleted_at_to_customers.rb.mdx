@@ -1,0 +1,46 @@
+---
+title: "20230202150407_add_deleted_at_to_customers.rb"
+---
+
+## High-level description
+This migration adds a `deleted_at` column to the `customers` table, implementing soft delete functionality. It also modifies the uniqueness constraint on `external_id` and `organization_id` to only apply to non-deleted records.
+
+## Symbols
+
+### `AddDeletedAtToCustomers`
+#### Description
+This class is an ActiveRecord migration that adds a `deleted_at` column to the `customers` table and modifies related indexes. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0.
+
+#### Internal Logic
+The migration performs the following steps:
+1. Adds a `deleted_at` column of type `datetime` to the `customers` table.
+2. Adds an index on the `deleted_at` column.
+3. Removes the existing index on `external_id` and `organization_id`.
+4. Adds a new unique index on `external_id` and `organization_id`, but only for non-deleted records.
+
+### `change`
+#### Description
+This method defines the changes to be applied to the database schema. It uses ActiveRecord's migration DSL to add columns and modify indexes.
+
+#### Internal Logic
+1. `add_column :customers, :deleted_at, :datetime`: Adds the `deleted_at` column to the `customers` table.
+2. `safety_assured do`: This block is likely from a gem like `strong_migrations` that ensures safe migrations. It indicates that the following operations have been manually verified as safe.
+3. `add_index :customers, :deleted_at`: Adds an index on the `deleted_at` column for efficient querying of soft-deleted records.
+4. `remove_index :customers, %i[external_id organization_id]`: Removes the existing index on `external_id` and `organization_id`.
+5. `add_index :customers, %i[external_id organization_id], unique: true, where: 'deleted_at IS NULL'`: Adds a new unique index on `external_id` and `organization_id`, but only for non-deleted records (where `deleted_at` is NULL).
+
+## Performance Considerations
+- Adding the `deleted_at` index will improve query performance when filtering soft-deleted records.
+- The partial unique index on `external_id` and `organization_id` allows for efficient uniqueness checks while still permitting multiple soft-deleted records with the same values.
+
+## Side Effects
+- This migration implements soft delete functionality for the `customers` table.
+- It changes the uniqueness constraint on `external_id` and `organization_id` to only apply to non-deleted records, allowing multiple soft-deleted records with the same values.
+- Existing queries that rely on the old index for `external_id` and `organization_id` may need to be updated to account for the new partial index.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the migration framework and database abstraction |
+
+Note: The `safety_assured` method suggests the use of a gem like `strong_migrations`, but this is not explicitly shown in the provided code.

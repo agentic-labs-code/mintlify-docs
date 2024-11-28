@@ -1,0 +1,81 @@
+---
+title: "webhook_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the Webhook model in a Rails application. It tests various aspects of the Webhook model, including its associations, payload handling, header generation, and signature creation methods (JWT and HMAC).
+
+## Symbols
+
+### `RSpec.describe Webhook, type: :model`
+#### Description
+This is the main describe block for the Webhook model tests. It sets up the context for all the tests related to the Webhook model.
+
+### `subject(:webhook)`
+#### Description
+Defines the subject of the tests as a newly created webhook using a factory.
+
+### `let(:organization)`
+#### Description
+Creates a test organization with a specific name and API key for use in the tests.
+
+### Associations Tests
+#### Description
+Tests the associations of the Webhook model using RSpec's `is_expected.to belong_to` matcher.
+
+#### Internal Logic
+- Checks if the Webhook belongs to a webhook_endpoint
+- Checks if the Webhook optionally belongs to an object
+
+### `describe '#payload'`
+#### Description
+Tests the `payload` method of the Webhook model.
+
+#### Internal Logic
+- Checks if the payload returns a hash
+- Tests the behavior when the payload was stored as JSON
+
+### `describe '#generate_headers'`
+#### Description
+Tests the `generate_headers` method of the Webhook model.
+
+#### Internal Logic
+- Checks if the generated headers contain the expected keys
+- Verifies the values of specific headers
+
+### `describe '#jwt_signature'`
+#### Description
+Tests the `jwt_signature` method of the Webhook model.
+
+#### Internal Logic
+- Generates a JWT signature
+- Decodes the signature and verifies its contents
+
+### `describe '#hmac_signature'`
+#### Description
+Tests the `hmac_signature` method of the Webhook model.
+
+#### Internal Logic
+- Generates an HMAC signature
+- Compares the generated signature with the expected value
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails and RSpec configuration |
+| JWT | Used for JWT signature generation and verification |
+| OpenSSL | Used for HMAC signature generation |
+| Base64 | Used for encoding the HMAC signature |
+
+## Configuration
+The test suite uses FactoryBot for creating test objects, as evidenced by the `create(:webhook)` and `create(:organization)` calls.
+
+## Error Handling
+This test suite doesn't explicitly test error handling. It focuses on the happy path and expected behavior of the Webhook model methods.
+
+## Notes
+1. The test suite uses `update_column` to bypass validations when testing JSON payload storage. This is noted with a rubocop disable comment.
+2. The JWT signature test assumes the existence of a `RsaPublicKey` constant and an environment variable `LAGO_API_URL`.
+3. The HMAC signature test sets the API key directly on the organization associated with the webhook endpoint.
+
+This test suite provides comprehensive coverage of the Webhook model's core functionality, ensuring that payload handling, header generation, and signature creation work as expected.

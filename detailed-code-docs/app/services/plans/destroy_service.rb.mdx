@@ -1,0 +1,86 @@
+---
+title: "destroy_service.rb"
+---
+
+## High-level description
+This code defines a service class `Plans::DestroyService` responsible for deleting a plan and handling related operations such as terminating active subscriptions, canceling pending subscriptions, finalizing draft invoices, and tracking the plan deletion event.
+
+## Code Structure
+The `Plans::DestroyService` class inherits from `BaseService` and contains a single public method `call` that orchestrates the plan deletion process. It also includes a private method `track_plan_deleted` for tracking the deletion event.
+
+## References
+- `Subscriptions::TerminateService`
+- `Invoices::RefreshDraftAndFinalizeService`
+- `SegmentTrackJob`
+- `CurrentContext`
+
+## Symbols
+
+### `Plans::DestroyService`
+#### Description
+This service class is responsible for destroying a plan and handling related operations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| plan | Plan | The plan to be destroyed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the operation result and the destroyed plan |
+
+#### Internal Logic
+1. Check if the plan exists, return a not found failure if it doesn't.
+2. Terminate active subscriptions associated with the plan.
+3. Cancel pending subscriptions.
+4. Finalize all draft invoices related to the plan.
+5. Mark the plan as discarded.
+6. Track the plan deletion event.
+7. Return the result with the destroyed plan.
+
+### `call`
+#### Description
+The main method that orchestrates the plan destruction process.
+
+#### Internal Logic
+1. Validate plan existence.
+2. Terminate active subscriptions.
+3. Cancel pending subscriptions.
+4. Finalize draft invoices.
+5. Discard the plan.
+6. Track the plan deletion event.
+7. Return the result.
+
+### `track_plan_deleted`
+#### Description
+A private method that tracks the plan deletion event using SegmentTrackJob.
+
+#### Internal Logic
+1. Count charges by charge model.
+2. Prepare event properties.
+3. Enqueue a SegmentTrackJob with the event details.
+
+## Side Effects
+- Terminates active subscriptions
+- Cancels pending subscriptions
+- Finalizes draft invoices
+- Discards the plan
+- Enqueues a SegmentTrackJob for tracking the plan deletion event
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Subscriptions::TerminateService | Used to terminate active subscriptions |
+| Invoices::RefreshDraftAndFinalizeService | Used to finalize draft invoices |
+| SegmentTrackJob | Used to track the plan deletion event |
+| CurrentContext | Used to get the current membership ID |
+
+## Error Handling
+The service uses the `result` object to handle and return errors, such as when the plan is not found.
+
+## Logging
+No explicit logging is implemented in this service.
+
+## Performance Considerations
+The service uses `find_each` for iterating over subscriptions and invoices, which is more efficient for large collections as it loads records in batches.

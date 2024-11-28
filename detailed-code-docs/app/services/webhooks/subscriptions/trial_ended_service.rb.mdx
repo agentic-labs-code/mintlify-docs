@@ -1,0 +1,77 @@
+---
+title: "trial_ended_service.rb"
+---
+
+## High-level description
+This code defines a service class `TrialEndedService` within the `Webhooks::Subscriptions` module. It is responsible for handling webhook events related to the end of a subscription trial period. The class inherits from `Webhooks::BaseService` and provides specific implementations for webhook-related methods.
+
+## Code Structure
+The `TrialEndedService` class is part of a larger webhook system. It inherits from `BaseService` and overrides specific methods to handle the "subscription.trial_ended" event type. The class works with subscription objects and uses a serializer to format the subscription data for the webhook payload.
+
+## Symbols
+
+### `Webhooks::Subscriptions::TrialEndedService`
+#### Description
+This class is responsible for handling the "subscription.trial_ended" webhook event. It provides methods to retrieve the current organization, serialize the subscription object, and define the webhook and object types.
+
+#### Internal Logic
+The class overrides four methods from its parent class:
+1. `current_organization`: Retrieves the organization associated with the subscription.
+2. `object_serializer`: Creates a serializer for the subscription object with specific options.
+3. `webhook_type`: Defines the type of webhook event as "subscription.trial_ended".
+4. `object_type`: Specifies the type of object being processed as "subscription".
+
+### `current_organization`
+#### Description
+This method retrieves the organization associated with the subscription object.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @current_organization | Organization | The organization associated with the subscription |
+
+### `object_serializer`
+#### Description
+This method creates a serializer for the subscription object with specific options.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| serializer | V1::SubscriptionSerializer | A serializer instance for the subscription object |
+
+#### Internal Logic
+The method creates a new instance of `V1::SubscriptionSerializer` with the following options:
+- `object`: The subscription object
+- `root_name`: Set to 'subscription'
+- `includes`: An array of symbols [:plan, :customer] to include additional related data
+
+### `webhook_type`
+#### Description
+This method defines the type of webhook event.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_type | String | The type of webhook event, set to "subscription.trial_ended" |
+
+### `object_type`
+#### Description
+This method specifies the type of object being processed.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object_type | String | The type of object, set to "subscription" |
+
+## References
+- The class references `::V1::SubscriptionSerializer`, which is defined in the related file `app/serializers/v1/subscription_serializer.rb`.
+- The `SendWebhookJob` in `app/jobs/send_webhook_job.rb` uses this service class to handle the "subscription.trial_ended" event.
+
+## Dependencies
+The code depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| Webhooks::BaseService | Parent class that provides the base functionality for webhook services |
+| V1::SubscriptionSerializer | Serializer used to format the subscription data for the webhook payload |
+
+This service class is part of a larger webhook system that handles various events related to subscriptions, invoices, and other business objects. It specifically deals with the event when a subscription's trial period ends, providing the necessary data and context for the webhook to be sent to external systems or listeners.

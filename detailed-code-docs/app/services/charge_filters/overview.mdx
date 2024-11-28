@@ -1,0 +1,84 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains service classes related to charge filters within the application. These services handle various aspects of charge filter management, including creation, updating, event matching, and determining matching and ignored filters. The code is organized into separate service classes, each responsible for a specific set of operations related to charge filters.
+
+## What does it do?
+The charge filters services in this directory perform several key functions:
+
+1. Create or Update Batch Service: This service allows for the creation or updating of multiple charge filters at once. It can add new filters, update existing ones, or remove filters that are no longer needed for a given charge.
+
+2. Event Matching Service: This service matches incoming events to the most appropriate charge filter based on the event's properties and the charge's filters. This is crucial for accurately applying charges to events in the billing process.
+
+3. Matching and Ignored Service: This service identifies which filters match a given filter and which should be ignored. This is important for preventing duplicate counting of events in the billing process, ensuring accurate charge calculations.
+
+These services work together to manage the lifecycle of charge filters, from creation and updating to their application in event processing and billing calculations.
+
+## Key Files
+
+1. `create_or_update_batch_service.rb`:
+   - Handles bulk creation or updating of charge filters for a given charge.
+   - Manages the creation, update, and removal of filters and their associated values.
+   - Uses database transactions to ensure data consistency.
+
+2. `event_matching_service.rb`:
+   - Matches events to the most appropriate charge filter.
+   - Compares event properties with charge filters to find the best match.
+   - Crucial for accurate event processing in the billing system.
+
+3. `matching_and_ignored_service.rb`:
+   - Identifies matching and ignored filters for a given charge and filter combination.
+   - Prevents duplicate counting of events in the billing process.
+   - Helps maintain accuracy in charge calculations.
+
+These files work together to provide a comprehensive system for managing charge filters throughout their lifecycle and application in the billing process.
+
+## Dependencies
+The services in this directory rely on several Rails models and associations:
+
+- Charge
+- Filter
+- BillableMetric
+- FilterValue
+- Event
+- ChargeFilter
+- ChargeFilterValue
+
+These dependencies are used to interact with the database and manage the relationships between different entities in the system.
+
+## Configuration
+There are no explicit configuration files or environment variables mentioned in the provided code summaries. However, the services likely rely on the broader Rails application configuration and database setup.
+
+The `ChargeFilterValue::ALL_FILTER_VALUES` constant is used in the `matching_and_ignored_service.rb` file, which suggests there might be some configuration related to filter values elsewhere in the application.
+
+## Performance Considerations
+Several performance considerations are worth noting:
+
+1. Database Transactions: The `CreateOrUpdateBatchService` uses database transactions, which may impact performance for large batches of filters. Care should be taken when processing large numbers of filters simultaneously.
+
+2. Timestamp Updates: The `touch` method is used to update timestamps, which may trigger additional database queries. This could be optimized if it becomes a performance bottleneck.
+
+3. Filter Matching: Both the `EventMatchingService` and `MatchingAndIgnoredService` perform operations on potentially large collections of filters. For charges with many filters, these operations could become performance bottlenecks. Consider optimizing these processes if they become problematic with large datasets.
+
+4. Query Optimization: The services make extensive use of ActiveRecord associations and queries. Ensuring these queries are optimized and that appropriate indexes are in place will be crucial for maintaining good performance as the dataset grows.
+
+To illustrate some of the key concepts, here's a simplified example of how the `EventMatchingService` might match an event to a filter:
+
+```ruby
+def call
+  matching_filters = filters.select do |filter|
+    filter.properties.all? { |key, value| event.properties[key] == value }
+  end
+
+  best_match = matching_filters.max_by { |filter| filter.properties.count }
+
+  result.charge_filter = best_match
+  result
+end
+```
+
+This code snippet demonstrates how the service selects filters that match the event properties and then chooses the one with the most matching properties as the best match.
+
+In conclusion, these charge filter services provide a robust system for managing and applying filters in the billing process. They handle the creation, updating, and application of filters, ensuring accurate event matching and charge calculations. However, attention should be paid to performance optimizations, especially as the system scales with more filters and events.

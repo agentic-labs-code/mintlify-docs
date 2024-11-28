@@ -1,0 +1,48 @@
+---
+title: "subscriptions_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying customer subscriptions. It allows filtering subscriptions by status and handles special cases for pending subscriptions, particularly those starting in the future.
+
+## Code Structure
+The `SubscriptionsResolver` class is defined within the `Resolvers::Customers` module and inherits from `Resolvers::BaseResolver`. It sets up the GraphQL query structure, including arguments and return type, and implements the `resolve` method to fetch and filter subscriptions.
+
+## References
+- `Types::Subscriptions::StatusTypeEnum`: Used for defining the status argument.
+- `Types::Subscriptions::Object`: Used as the return type for the resolver.
+- `Resolvers::BaseResolver`: The base class for this resolver.
+
+## Symbols
+
+### `SubscriptionsResolver`
+#### Description
+This class resolves queries for customer subscriptions, allowing filtering by status and handling special cases for pending subscriptions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| status | [Types::Subscriptions::StatusTypeEnum] | Optional array of subscription statuses to filter by |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscriptions | [Types::Subscriptions::Object] | Array of subscription objects matching the query criteria |
+
+#### Internal Logic
+1. If no status is provided, return all subscriptions ordered by creation date.
+2. If statuses are provided but don't include 'pending', filter subscriptions by the given statuses.
+3. If only 'pending' status is requested, return future-starting subscriptions.
+4. If 'pending' and other statuses are requested, return a combination of future-starting subscriptions and subscriptions with the other statuses.
+
+## Side Effects
+This resolver doesn't have any notable side effects. It only queries and filters existing data.
+
+## Dependencies
+No external libraries are used directly in this file.
+
+## Error Handling
+No specific error handling is implemented in this resolver. It relies on the error handling mechanisms of the base resolver and GraphQL framework.
+
+## Performance Considerations
+The resolver uses database queries to filter subscriptions, which could potentially be optimized for large datasets. The `order(created_at: :desc)` is applied to all result sets, ensuring consistent ordering.

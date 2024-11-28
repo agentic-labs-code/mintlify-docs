@@ -1,0 +1,96 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains services related to processing payments for payment requests using various payment providers (Adyen, GoCardless, and Stripe). The services handle the creation of payments, interaction with payment provider APIs, error handling, and updating payment statuses for payables and associated invoices.
+
+## What does it do?
+The code in this directory manages the payment process for different payment providers. Here's a simplified explanation of what it does:
+
+1. When a payment needs to be processed, the system determines which payment provider to use (Adyen, GoCardless, or Stripe).
+2. It then creates a payment using the appropriate payment provider's API.
+3. The system handles various responses and errors from the payment provider.
+4. It updates the status of the payment request and associated invoices based on the payment result.
+5. If there are any errors or failures, it sends error notifications via webhooks.
+
+This process ensures that payments are processed correctly, regardless of the payment provider used, and keeps the system updated with the latest payment status information.
+
+## Entry points
+The main entry point for this directory is the `CreateService` class in `create_service.rb`. This service determines the appropriate payment provider and enqueues a background job to process the payment. The background jobs then call the respective provider-specific services:
+
+- `AdyenService` for Adyen payments
+- `GocardlessService` for GoCardless payments
+- `StripeService` for Stripe payments
+
+The flow of control typically goes from `CreateService` to the provider-specific service, which then interacts with the payment provider's API and updates the system's records accordingly.
+
+## Key Files
+1. `adyen_service.rb`: Handles Adyen payment processing.
+2. `gocardless_service.rb`: Manages GoCardless payment creation and processing.
+3. `stripe_service.rb`: Handles Stripe payment processing.
+4. `create_service.rb`: Determines the payment provider and enqueues the appropriate job.
+5. `deliver_error_webhook_service.rb`: Sends webhook notifications for payment failures.
+6. `payment_providers/factory.rb`: Factory class for creating payment provider service instances.
+
+Each of these files plays a crucial role in the payment processing workflow, handling different aspects of the payment lifecycle for various providers.
+
+## Dependencies
+The services in this directory rely on several external libraries and APIs:
+
+1. Adyen API client (version not specified)
+2. GoCardlessPro (version not specified)
+3. Stripe API (version not specified)
+4. ActiveJob for background job processing
+5. Sentry for error logging
+
+These dependencies were chosen to integrate with the respective payment providers' APIs and to handle asynchronous processing and error tracking.
+
+## Configuration
+The payment services use configuration from their respective payment providers. While specific configuration files are not mentioned, the following configuration aspects are important:
+
+1. Adyen: API key, environment, and merchant account
+2. GoCardless: API client configuration
+3. Stripe: API key and configuration
+
+Environment variables are likely used to store sensitive information such as API keys and merchant accounts.
+
+The services also use various internal configurations, such as:
+
+- Job queues (e.g., 'providers' queue for background jobs)
+- Webhook event types (e.g., 'payment_request.payment_failure')
+- Idempotency keys for preventing duplicate payments
+
+To illustrate the payment creation process, here's a simplified example of how the `StripeService` creates a payment:
+
+```ruby
+def create_stripe_payment
+  update_payment_method_id
+
+  Stripe::PaymentIntent.create(
+    stripe_payment_payload,
+    {
+      idempotency_key: "#{payable.id}_#{payable.payment_attempts}",
+    },
+  )
+end
+
+def stripe_payment_payload
+  {
+    amount: payable.total_amount_cents,
+    currency: payable.currency,
+    customer: payable.customer.stripe_customer.provider_customer_id,
+    payment_method: payable.customer.stripe_customer.provider_payment_methods.last&.provider_payment_method_id,
+    off_session: true,
+    confirm: true,
+    metadata: {
+      lago_invoice_id: payable.id,
+      lago_customer_id: payable.customer_id,
+    },
+  }
+end
+```
+
+This code demonstrates how the service interacts with the Stripe API to create a payment, including setting up the payment amount, currency, customer information, and metadata.
+
+The payment services in this directory form a crucial part of the application's payment processing system, handling the complexities of working with multiple payment providers and ensuring that payments are processed correctly and efficiently.

@@ -1,0 +1,41 @@
+---
+title: "adyen_create_job.rb"
+---
+
+## High-level description
+This code defines a background job class `AdyenCreateJob` within the `PaymentProviderCustomers` module. Its purpose is to create an Adyen customer asynchronously using the Adyen service, with built-in error handling and retry mechanisms.
+
+## Code Structure
+The `AdyenCreateJob` class inherits from `ApplicationJob` and uses the `PaymentProviderCustomers::AdyenService` to perform the customer creation operation.
+
+## Symbols
+
+### `AdyenCreateJob`
+#### Description
+This class represents a background job for creating an Adyen customer. It utilizes the Sidekiq queue system and implements retry logic for specific error types.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| adyen_customer | PaymentProviderCustomers::AdyenCustomer | The Adyen customer object to be created |
+
+#### Internal Logic
+1. The job is enqueued in the `:providers` queue.
+2. It retries on `Adyen::AdyenError` with a polynomial backoff strategy, up to 6 attempts.
+3. It also retries on `ActiveJob::DeserializationError`.
+4. In the `perform` method, it creates a new `AdyenService` instance with the given `adyen_customer`.
+5. It calls the `create` method on the service and raises an error if the result indicates a failure.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ApplicationJob | Base job class that provides Sidekiq integration |
+| PaymentProviderCustomers::AdyenService | Service class for interacting with the Adyen API |
+
+## Error Handling
+The job implements specific error handling:
+- It retries on `Adyen::AdyenError` with a polynomial backoff strategy, up to 6 attempts.
+- It also retries on `ActiveJob::DeserializationError`, which can occur if the job arguments can't be deserialized from the job queue.
+
+## Performance Considerations
+The use of background jobs and the retry mechanism helps in handling transient failures and improves the overall reliability of the Adyen customer creation process. The polynomial backoff strategy helps to avoid overwhelming the Adyen API with rapid retry attempts in case of persistent errors.

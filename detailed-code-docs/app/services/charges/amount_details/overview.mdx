@@ -1,0 +1,99 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `app/services/charges/amount_details` directory contains service classes responsible for calculating detailed charge amounts for different pricing models. These services are crucial components in a billing or pricing system, focusing on graduated and percentage-based pricing structures.
+
+## What does it do?
+This directory houses services that perform intricate calculations for complex pricing models. Specifically:
+
+1. It calculates charges for graduated pricing models, where the price per unit changes as the quantity increases.
+2. It handles percentage-based pricing calculations within specific ranges.
+3. It computes various components of a charge, including flat amounts, per-unit amounts, and total amounts.
+
+These services take into account factors such as the total number of units, specific pricing ranges, flat fees, and percentage rates to produce detailed breakdowns of charges. This level of detail is essential for transparent billing and for supporting various pricing strategies in a flexible manner.
+
+## Key Files
+
+1. `range_graduated_service.rb`:
+   This file contains the `RangeGraduatedService` class, which calculates the details of a graduated pricing range for a specific number of units. It's used when the pricing model involves different rates for different quantity ranges.
+
+   Key functionalities:
+   - Calculates the number of units to be billed within a specific range
+   - Computes flat amounts, per-unit amounts, and total amounts
+   - Handles edge cases such as when the total units are at or beyond range boundaries
+
+2. `range_graduated_percentage_service.rb`:
+   This file contains the `RangeGraduatedPercentageService` class, which calculates the details of a graduated percentage charge for a specific range. It's used when the pricing model involves percentage-based charging that varies across different quantity ranges.
+
+   Key functionalities:
+   - Calculates the number of units to be charged within a range
+   - Computes percentage-based charges, including flat amounts and rates
+   - Handles calculations for total amounts with and without flat fees
+
+Both services return detailed hashes containing all relevant calculated values, which can be used for billing purposes or further processing in the larger system.
+
+## Dependencies
+Both services rely on the `BigDecimal` class for precise decimal arithmetic, which is crucial for financial calculations to avoid rounding errors that could occur with floating-point arithmetic.
+
+## Configuration
+These services don't appear to use any external configuration files or environment variables. They are designed to be flexible and receive their configuration (such as range details and total units) as input parameters when they are instantiated.
+
+## Code Examples
+
+Here's an example of how the `RangeGraduatedService` might be used:
+
+```ruby
+range = {
+  from_value: 0,
+  to_value: 100,
+  flat_amount: 10,
+  per_unit_amount: 0.5
+}
+total_units = 75
+
+service = RangeGraduatedService.new(range: range, total_units: total_units)
+result = service.call
+
+puts result
+# Output might look like:
+# {
+#   from_value: 0,
+#   to_value: 100,
+#   flat_unit_amount: 10,
+#   per_unit_amount: 0.5,
+#   units: 75,
+#   per_unit_total_amount: 37.5,
+#   total_with_flat_amount: 47.5
+# }
+```
+
+And here's a similar example for the `RangeGraduatedPercentageService`:
+
+```ruby
+range = {
+  from_value: 0,
+  to_value: 100,
+  flat_amount: 10,
+  rate: 5 # 5%
+}
+total_units = 75
+
+service = RangeGraduatedPercentageService.new(range: range, total_units: total_units)
+result = service.call
+
+puts result
+# Output might look like:
+# {
+#   from_value: 0,
+#   to_value: 100,
+#   flat_unit_amount: 10,
+#   rate: 5,
+#   units: 75,
+#   per_unit_total_amount: 3.75, # 5% of 75
+#   total_with_flat_amount: 13.75
+# }
+```
+
+These services provide a flexible and precise way to calculate charges for complex pricing models, allowing for graduated pricing structures and percentage-based fees. They can be used as building blocks in a larger billing system to handle a wide variety of pricing scenarios.

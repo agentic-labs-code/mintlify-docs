@@ -1,0 +1,109 @@
+---
+title: "subscriptions_controller.rb"
+---
+
+## High-level description
+This code defines the `SubscriptionsController` within the `Api::V1` namespace, which handles CRUD operations for subscriptions. It provides endpoints for creating, terminating, updating, showing, and listing subscriptions, integrating with various services and queries to manage subscription-related operations.
+
+## Code Structure
+The `SubscriptionsController` inherits from `Api::BaseController` and contains several action methods (`create`, `terminate`, `update`, `show`, and `index`) that correspond to different API endpoints. These methods interact with various services (`Subscriptions::CreateService`, `Subscriptions::TerminateService`, `Subscriptions::UpdateService`) and queries (`SubscriptionsQuery`) to perform operations on subscriptions.
+
+## Symbols
+
+### `create`
+#### Description
+Creates a new subscription for a customer with a specified plan.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| create_params | Hash | Parameters for creating a subscription |
+
+#### Internal Logic
+1. Finds or initializes a customer based on the external ID and organization.
+2. Finds the plan based on the provided code.
+3. Calls the `Subscriptions::CreateService` to create the subscription.
+4. Renders the created subscription or an error response.
+
+### `terminate`
+#### Description
+Terminates an active or pending subscription.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:external_id] | String | External ID of the subscription |
+| params[:status] | String | Status of the subscription (optional) |
+
+#### Internal Logic
+1. Finds the subscription based on the external ID and status.
+2. Calls the `Subscriptions::TerminateService` to terminate the subscription.
+3. Renders the terminated subscription or an error response.
+
+### `update`
+#### Description
+Updates an existing subscription.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:external_id] | String | External ID of the subscription |
+| update_params | Hash | Parameters for updating the subscription |
+
+#### Internal Logic
+1. Finds the subscription based on the external ID and status.
+2. Calls the `Subscriptions::UpdateService` to update the subscription.
+3. Renders the updated subscription or an error response.
+
+### `show`
+#### Description
+Retrieves a specific subscription.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:external_id] | String | External ID of the subscription |
+| params[:status] | String | Status of the subscription (optional) |
+
+#### Internal Logic
+1. Finds the subscription based on the external ID and status.
+2. Renders the subscription or a not found error.
+
+### `index`
+#### Description
+Lists subscriptions based on provided filters and pagination parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:page] | Integer | Page number for pagination |
+| params[:per_page] | Integer | Number of items per page |
+| index_filters | Hash | Filters for the subscription list |
+
+#### Internal Logic
+1. Calls the `SubscriptionsQuery` to fetch filtered and paginated subscriptions.
+2. Renders the list of subscriptions with pagination metadata.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Subscriptions::CreateService | Handles subscription creation logic |
+| Subscriptions::TerminateService | Handles subscription termination logic |
+| Subscriptions::UpdateService | Handles subscription update logic |
+| SubscriptionsQuery | Handles querying and filtering subscriptions |
+| V1::SubscriptionSerializer | Serializes subscription data for API responses |
+| CollectionSerializer | Serializes collections of subscriptions for API responses |
+
+## Error Handling
+The controller uses the `render_error_response` method to handle and render error responses from service calls. It also includes a `not_found_error` method for handling cases where a subscription is not found.
+
+## API/Interface Reference
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| /api/v1/subscriptions | POST | Create a new subscription |
+| /api/v1/subscriptions/:external_id/terminate | POST | Terminate a subscription |
+| /api/v1/subscriptions/:external_id | PUT | Update a subscription |
+| /api/v1/subscriptions/:external_id | GET | Retrieve a specific subscription |
+| /api/v1/subscriptions | GET | List subscriptions |
+
+This controller provides a comprehensive API for managing subscriptions, integrating with various services and queries to handle complex business logic while maintaining a clean and organized structure.

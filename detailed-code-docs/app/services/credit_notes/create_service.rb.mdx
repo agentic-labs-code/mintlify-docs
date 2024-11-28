@@ -1,0 +1,72 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines the `CreditNotes::CreateService` class, which is responsible for creating credit notes in a billing system. It handles the creation of credit notes, including validation, calculation of amounts, and various associated actions such as tracking, webhooks, and email notifications.
+
+## Code Structure
+The `CreditNotes::CreateService` class inherits from `BaseService` and contains a main `call` method that orchestrates the credit note creation process. It uses several other services and models to perform various tasks, such as validation, tax calculation, and notification delivery.
+
+## Symbols
+
+### `CreditNotes::CreateService`
+#### Description
+This service class is responsible for creating credit notes. It handles the entire process from validation to creation and post-creation actions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice associated with the credit note |
+| items_attr | Array | Attributes for credit note items |
+| reason | Symbol | Reason for creating the credit note |
+| description | String | Description of the credit note |
+| credit_amount_cents | Integer | Amount to be credited in cents |
+| refund_amount_cents | Integer | Amount to be refunded in cents |
+| automatic | Boolean | Whether the credit note is created automatically |
+
+#### Internal Logic
+1. Validates the input and checks if a credit note should be created
+2. Creates the credit note and associated items within a transaction
+3. Computes amounts and taxes
+4. Validates the created credit note
+5. Updates credit note status and amounts
+6. Performs post-creation actions (tracking, webhooks, email, refund handling)
+
+#### Side Effects
+- Creates a new `CreditNote` record in the database
+- Creates associated `CreditNoteItem` records
+- Potentially sends emails and webhooks
+- May initiate a refund process
+
+### Private Methods
+Several private methods are defined to handle specific parts of the credit note creation process, such as:
+- `should_create_credit_note?`
+- `valid_type_or_status?`
+- `issuing_date`
+- `create_items`
+- `compute_amounts_and_taxes`
+- `track_credit_note_created`
+- `deliver_webhook`
+- `deliver_email`
+- `handle_refund`
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| CreditNotes::ValidateItemService | Validates individual credit note items |
+| CreditNotes::ValidateService | Validates the entire credit note |
+| CreditNotes::ApplyTaxesService | Calculates and applies taxes to the credit note |
+| SegmentTrackJob | Tracks credit note creation event |
+| SendWebhookJob | Sends webhook for credit note creation |
+| CreditNoteMailer | Sends email notification for credit note creation |
+| Various refund jobs | Handles refund processing for different payment providers |
+
+## Error Handling
+The service uses a `result` object to handle errors and success states. It raises exceptions for record validation failures and invalid arguments, which are caught and added to the result object.
+
+## Logging
+The code doesn't implement explicit logging, but it uses the `SegmentTrackJob` for tracking credit note creation events.
+
+## Performance Considerations
+The credit note creation process is wrapped in a database transaction to ensure data consistency. However, post-creation actions like sending webhooks and emails are performed outside the transaction to avoid long-running transactions.

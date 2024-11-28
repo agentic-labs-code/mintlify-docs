@@ -1,0 +1,117 @@
+---
+title: "sum_service.rb"
+---
+
+## High-level description
+This code defines the `SumService` class within the `BillableMetrics::Aggregations` module. It is responsible for calculating sum aggregations for billable metrics, handling both in-arrears and pay-in-advance scenarios, and supporting grouped aggregations.
+
+## Code Structure
+The `SumService` class inherits from `BillableMetrics::Aggregations::BaseService` and contains methods for computing aggregations, handling pay-in-advance scenarios, and calculating running totals. It interacts with an event store to retrieve and process event data.
+
+## Symbols
+
+### `SumService`
+#### Description
+This class handles sum aggregations for billable metrics, including initialization, computation of aggregations, and handling of pay-in-advance scenarios.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event_store_class | Class | The class used for event storage |
+| charge | Object | The charge associated with the billable metric |
+| subscription | Object | The subscription being processed |
+| boundaries | Hash | Contains from_datetime and to_datetime |
+| filters | Hash | Contains various filtering options |
+
+#### Internal Logic
+1. Initializes the service with necessary parameters and sets up the event store.
+2. Computes aggregations based on the sum of events' field values.
+3. Handles pay-in-advance scenarios, including current usage updates.
+4. Calculates running totals based on free units.
+5. Computes grouped aggregations when applicable.
+
+### `compute_aggregation`
+#### Description
+Calculates the sum aggregation for the given period and handles pay-in-advance scenarios.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| options | Hash | Contains flags for pay-in-advance and current usage |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | Contains aggregation, pay_in_advance_aggregation, count, and options |
+
+#### Internal Logic
+1. Retrieves the sum from the event store.
+2. Handles pay-in-advance current usage if applicable.
+3. Computes pay-in-advance aggregation.
+4. Calculates running total.
+5. Sets the result with aggregation, count, and options.
+
+### `compute_grouped_by_aggregation`
+#### Description
+Calculates grouped sum aggregations based on specified grouping criteria.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| options | Hash | Contains flags for pay-in-advance and current usage |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | Contains an array of group-specific aggregations |
+
+#### Internal Logic
+1. Retrieves grouped sums and counts from the event store.
+2. Processes each group's aggregation, handling pay-in-advance scenarios if applicable.
+3. Sets the result with an array of group-specific aggregations.
+
+### `running_total`
+#### Description
+Calculates the running total based on free units per event or total aggregation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| options | Hash | Contains free_units_per_events and free_units_per_total_aggregation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Array | Array of BigDecimal | Running total values |
+
+#### Internal Logic
+1. Determines which type of running total to calculate based on input options.
+2. Calls either `running_total_per_events` or `running_total_per_aggregation` accordingly.
+
+### `compute_pay_in_advance_aggregation`
+#### Description
+Calculates the pay-in-advance aggregation based on the current event and cached aggregations.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| BigDecimal | BigDecimal | The calculated pay-in-advance aggregation |
+
+#### Internal Logic
+1. Retrieves the current event's value for the billable metric's field.
+2. Finds the cached aggregation for the given period and grouping.
+3. Calculates the new aggregation based on the cached value and current event.
+4. Updates metadata with current aggregation, max aggregation, and units applied.
+
+## Side Effects
+- The service updates the `result` object with various aggregation values and metadata.
+- It interacts with an event store to retrieve and process event data.
+
+## Dependencies
+- Relies on an event store class (e.g., `Events::Stores::PostgresStore`) for data retrieval.
+- Uses `ActiveRecord` for database interactions and error handling.
+
+## Error Handling
+The service rescues `ActiveRecord::StatementInvalid` errors and sets a service failure result with an appropriate error code and message.
+
+This service is crucial for calculating sum-based aggregations in the billing system, handling various scenarios including pay-in-advance, grouped aggregations, and running totals.

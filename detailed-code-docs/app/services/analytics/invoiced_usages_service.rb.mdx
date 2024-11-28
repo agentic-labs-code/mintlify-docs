@@ -1,0 +1,57 @@
+---
+title: "invoiced_usages_service.rb"
+---
+
+## High-level description
+The `InvoicedUsagesService` is a service class within the `Analytics` module that retrieves invoiced usage records for a given organization. It checks for premium license availability and applies filters to the query.
+
+## Code Structure
+The `InvoicedUsagesService` inherits from `BaseService` and implements a single `call` method to perform its main functionality.
+
+## References
+- `License`: Referenced to check for premium license availability.
+- `::Analytics::InvoicedUsage`: Used to retrieve invoiced usage records.
+
+## Symbols
+
+### `InvoicedUsagesService`
+#### Description
+This service class is responsible for fetching invoiced usage records for an organization, applying filters, and ensuring the user has the necessary permissions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization for which to retrieve invoiced usage records |
+| filters | Hash | Optional filters to apply to the query |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An instance of `BaseService::Result` containing the retrieved records or an error |
+
+#### Internal Logic
+1. Check if the user has a premium license. If not, return a forbidden failure.
+2. Retrieve invoiced usage records using `::Analytics::InvoicedUsage.find_all_by` method, passing the organization ID and filters.
+3. Store the retrieved records in the `result` object.
+4. Return the `result` object.
+
+## Side Effects
+This service does not have any notable side effects beyond setting the `records` attribute of the `result` object.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| License | Used to check for premium license availability |
+| ::Analytics::InvoicedUsage | Used to retrieve invoiced usage records |
+
+## Error Handling
+The service uses the error handling mechanisms provided by the `BaseService` class. If the premium license is not available, it returns a forbidden failure using `result.forbidden_failure!`.
+
+## API/Interface Reference
+This service is likely called by the `Api::V1::Analytics::InvoicedUsagesController` in the `index` action. The controller passes the current organization and filters to the service.
+
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /api/v1/analytics/invoiced_usages | GET | Optional query parameters: currency, months | JSON containing invoiced usage records | Retrieves invoiced usage records for the current organization |
+
+Note: The actual endpoint and response format are inferred from the related controller file and may need to be verified.

@@ -1,0 +1,69 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains services for integrating various accounting and tax providers, including NetSuite, Xero, Anrok, and Okta, through an aggregator API. It provides functionality for managing accounts, contacts, invoices, payments, and other financial data across different integration types.
+
+## What does it do?
+The code in this directory performs the following main functions:
+
+1. Creates, updates, and destroys integrations for different providers (NetSuite, Xero, Anrok, Okta).
+2. Synchronizes data between the application and external accounting systems, including:
+   - Accounts, contacts, and subsidiaries
+   - Invoices, credit notes, and payments
+   - Items and tax items
+   - Sales orders
+3. Handles tax-related operations for invoices, including draft creation, processing, negation, and voiding.
+4. Manages authentication and connection details for each integration type.
+5. Ensures that only organizations with appropriate permissions can create or modify integrations.
+6. Schedules background jobs for initial synchronization and ongoing data updates.
+
+## Entry points
+The main entry points for this directory are the various service classes, each responsible for a specific aspect of the integrations:
+
+1. Provider-specific services:
+   - `Integrations::Anrok::CreateService` and `UpdateService`
+   - `Integrations::NetSuite::CreateService` and `UpdateService`
+   - `Integrations::Okta::CreateService` and `UpdateService`
+   - `Integrations::Xero::CreateService` and `UpdateService`
+
+2. Aggregator services:
+   - `Integrations::Aggregator::AccountsService`
+   - `Integrations::Aggregator::Contacts::CreateService` and `UpdateService`
+   - `Integrations::Aggregator::CreditNotes::CreateService`
+   - `Integrations::Aggregator::Invoices::CreateService`
+   - `Integrations::Aggregator::ItemsService` and `TaxItemsService`
+   - `Integrations::Aggregator::Payments::CreateService`
+   - `Integrations::Aggregator::SalesOrders::CreateService`
+   - `Integrations::Aggregator::SubsidiariesService`
+   - `Integrations::Aggregator::Taxes::Invoices::CreateDraftService`, `CreateService`, `NegateService`, and `VoidService`
+   - `Integrations::Aggregator::SyncService`
+
+3. General services:
+   - `Integrations::DestroyService`
+
+These services are likely called from other parts of the application when specific integration operations need to be performed.
+
+## Key Files
+1. Provider-specific service files (e.g., `anrok/create_service.rb`, `netsuite/update_service.rb`)
+2. Aggregator service files (e.g., `aggregator/accounts_service.rb`, `aggregator/invoices/create_service.rb`)
+3. `destroy_service.rb`: Handles the deletion of integration objects
+
+## Dependencies
+The services in this directory rely on several external dependencies and internal modules:
+
+1. `ActiveRecord`: Used for database operations and transactions
+2. `ActiveModel::Type::Boolean`: Used for casting boolean values in some services
+3. `LagoHttpClient`: Likely used for making HTTP requests to external APIs
+4. Various internal models such as `IntegrationItem`, `IntegrationResource`, and provider-specific integration models
+
+## Configuration
+While there are no explicit configuration files in this directory, the services rely on configuration and settings from the broader application context. This includes:
+
+1. Premium integration access: Services check if organizations have access to specific premium integrations (e.g., 'anrok', 'netsuite', 'okta', 'xero')
+2. API endpoints: Defined in each service's `action_path` method
+3. Integration parameters: Each integration type has specific required parameters (e.g., client_id, client_secret, domain for Okta)
+4. Synchronization options: Some integrations allow configuring which data types to sync (e.g., credit notes, invoices, payments for Xero)
+
+These services provide a comprehensive solution for managing various aspects of accounting and tax integrations through a unified aggregator API, while also offering provider-specific functionality when needed.

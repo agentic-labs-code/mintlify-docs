@@ -1,0 +1,43 @@
+---
+title: "calculate_amount_service.rb"
+---
+
+## High-level description
+This code defines a service class `CalculateAmountService` within the `Commitments` module. Its primary purpose is to calculate the prorated amount for a commitment based on the given commitment and invoice subscription. The service handles different scenarios, including pay-in-advance and pay-in-arrears billing models.
+
+## Code Structure
+The `CalculateAmountService` class inherits from `BaseService` and uses the `Commitments::CalculateProratedCoefficientService` to determine the proration coefficient. The main calculation is performed in the `commitment_amount_cents` method, which applies the proration coefficient to the commitment amount.
+
+## Symbols
+
+### `Commitments::CalculateAmountService`
+#### Description
+This service calculates the prorated amount for a given commitment and invoice subscription.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| commitment | Commitment | The commitment object for which the amount is being calculated |
+| invoice_subscription | InvoiceSubscription | The invoice subscription associated with the calculation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result.commitment_amount_cents | Integer | The calculated commitment amount in cents |
+
+#### Internal Logic
+1. Initializes the service with the given commitment and invoice subscription.
+2. In the `call` method, it sets the `commitment_amount_cents` on the result object.
+3. The `commitment_amount_cents` method:
+   - Returns 0 if there's no commitment, no invoice subscription, or if the commitment amount is zero.
+   - Otherwise, it calculates the prorated amount using the proration coefficient.
+4. The `proration_coefficient_service` method determines which instance of `CalculateProratedCoefficientService` to use based on whether the plan is pay-in-advance or not.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Money | Used for currency calculations |
+| Commitments::CalculateProratedCoefficientService | Calculates the proration coefficient |
+
+## Performance Considerations
+The service memoizes the `proration_coefficient_service` to avoid unnecessary recalculations, which can improve performance when the method is called multiple times.

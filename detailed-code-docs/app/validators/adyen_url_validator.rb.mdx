@@ -1,0 +1,61 @@
+---
+title: "adyen_url_validator.rb"
+---
+
+## High-level description
+The `AdyenUrlValidator` is a custom validator class in Ruby on Rails that validates URLs specifically for Adyen integration. It checks if a given URL has a valid format, ensuring it contains a protocol and a domain.
+
+## Symbols
+
+### `AdyenUrlValidator`
+#### Description
+This class inherits from `ActiveModel::EachValidator` and provides custom URL validation for Adyen-related URLs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| options | Hash | Options passed to the validator (not used in this implementation) |
+
+### `validate_each`
+#### Description
+This method is called for each attribute being validated. It adds an error to the record if the URL is invalid.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| record | ActiveModel::Base | The record being validated |
+| attribute | Symbol | The attribute being validated |
+| value | String | The URL value to validate |
+
+#### Internal Logic
+1. Calls the private `url_valid?` method to check if the URL is valid.
+2. If the URL is not valid, it adds an error to the record for the given attribute.
+
+### `url_valid?`
+#### Description
+A private method that checks if a given URL is valid using a simple regular expression.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | String | The URL to validate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Boolean | True if the URL is valid, false otherwise |
+
+#### Internal Logic
+Uses a regular expression `%r{.+://.+}` to check if the URL contains a protocol (e.g., "http://") followed by a domain.
+
+## Performance Considerations
+The URL validation uses a simple regular expression, which is generally fast. However, it's worth noting that this validation is not as comprehensive as it could be and might allow some invalid URLs to pass.
+
+## References
+This validator is likely used in models or forms related to Adyen integration within the application. It may be referenced in model validations or form objects where Adyen URLs need to be validated.
+
+## Dependencies
+This class depends on the `ActiveModel::EachValidator` from the `activemodel` gem, which is typically included in Ruby on Rails applications.
+
+## Error Handling
+The validator adds an error with the key `:url_invalid` to the record if the URL fails validation. The actual error message would be defined in the application's localization files.

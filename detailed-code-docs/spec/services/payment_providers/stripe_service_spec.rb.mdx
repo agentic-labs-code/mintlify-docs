@@ -1,0 +1,76 @@
+---
+title: "stripe_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `PaymentProviders::StripeService` class. It tests various methods of the service, including creating or updating a Stripe provider, refreshing webhooks, handling incoming webhooks, and processing different types of Stripe events.
+
+## Code Structure
+The test file is organized into several `describe` blocks, each focusing on a specific method of the `PaymentProviders::StripeService` class. Within these blocks, various scenarios are tested using `context` and `it` blocks.
+
+## Symbols
+
+### `PaymentProviders::StripeService`
+#### Description
+This is the main class being tested. It handles various Stripe-related operations for payment providers.
+
+### `.create_or_update`
+#### Description
+Tests the creation and updating of a Stripe provider.
+
+#### Internal Logic
+- Tests creating a new Stripe provider
+- Tests updating an existing Stripe provider
+- Tests handling validation errors
+
+### `.refresh_webhook`
+#### Description
+Tests the refreshing of a Stripe webhook.
+
+#### Internal Logic
+- Verifies that the webhook is deleted and re-registered
+
+### `.handle_incoming_webhook`
+#### Description
+Tests the handling of incoming Stripe webhooks.
+
+#### Internal Logic
+- Checks webhook signature verification
+- Tests enqueueing of the `HandleEventJob`
+- Tests error handling for invalid payloads and signatures
+
+### `.handle_event`
+#### Description
+Tests the handling of various Stripe event types.
+
+#### Internal Logic
+- Tests handling of payment intent events
+- Tests handling of charge events
+- Tests handling of setup intent events
+- Tests handling of customer updated events
+- Tests handling of payment method detached events
+- Tests handling of refund updated events
+- Tests handling of unexpected event types
+
+## Dependencies
+The test file depends on several external libraries and modules:
+| Dependency | Purpose |
+|:-----------|:--------|
+| `rails_helper` | Provides Rails-specific testing utilities |
+| `rspec` | Testing framework |
+| `faker` | Generates fake data for tests |
+| `stripe` | Stripe API library |
+
+## Error Handling
+The tests cover various error scenarios, including:
+- Validation errors when creating or updating a Stripe provider
+- Invalid payloads and signatures for incoming webhooks
+- Unexpected event types
+
+## Side Effects
+The tests mock several external service calls and job enqueuing to isolate the behavior of the `PaymentProviders::StripeService` class.
+
+## Performance Considerations
+The tests use factories and mocks to avoid unnecessary database operations and external API calls, which helps in maintaining test performance.
+
+This test file provides comprehensive coverage for the `PaymentProviders::StripeService` class, ensuring its correct behavior across various scenarios and edge cases.

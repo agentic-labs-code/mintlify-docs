@@ -1,0 +1,50 @@
+---
+title: "range_bounds_validator.rb"
+---
+
+## High-level description
+The `RangeBoundsValidator` module provides a method to validate the bounds of ranges in a pricing structure. It ensures that the ranges are contiguous and properly ordered, which is crucial for graduated, volume, and graduated percentage pricing models.
+
+## Code Structure
+This module contains a single method `valid_bounds?` which is included in various validator services for different pricing models.
+
+## Symbols
+
+### `valid_bounds?`
+#### Description
+This method validates the bounds of a given range within a sequence of ranges. It checks if the range starts at the expected value and if its upper bound is properly set.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| range | Hash | The range to be validated |
+| index | Integer | The index of the current range in the sequence |
+| next_from_value | Integer/Float | The expected start value for the current range |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Boolean | True if the bounds are valid, false otherwise |
+
+#### Internal Logic
+The method checks two conditions:
+1. The `from_value` of the range matches the expected `next_from_value`.
+2. Either:
+   - It's the last range (index == ranges.size - 1) and has no upper bound (to_value is nil), or
+   - It's not the last range, and its `to_value` is greater than its `from_value`.
+
+## References
+This module is included in:
+- `Charges::Validators::GraduatedService`
+- `Charges::Validators::VolumeService`
+- `Charges::Validators::GraduatedPercentageService`
+
+These services use the `valid_bounds?` method to validate the ranges in their respective pricing models.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveSupport | Implied by the use of `frozen_string_literal` |
+
+## Performance Considerations
+The `valid_bounds?` method is a simple comparison operation and should have constant time complexity O(1). However, it's typically called in a loop over all ranges, resulting in a linear time complexity O(n) for the entire validation process, where n is the number of ranges.

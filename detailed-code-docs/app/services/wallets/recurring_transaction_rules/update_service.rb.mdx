@@ -1,0 +1,78 @@
+---
+title: "update_service.rb"
+---
+
+## High-level description
+This code defines the `UpdateService` class within the `Wallets::RecurringTransactionRules` module. Its primary purpose is to update and manage recurring transaction rules associated with a wallet, including creating new rules, updating existing ones, and removing rules that are no longer needed.
+
+## Code Structure
+The `UpdateService` class inherits from `BaseService` and contains a single public method `call` that orchestrates the update process. It also includes a private method `sanitize_recurring_rules` for cleaning up unnecessary rules.
+
+## References
+This code references the `Wallets` module and likely interacts with a `Wallet` model that has a `has_many` association with `RecurringTransactionRule` models.
+
+## Symbols
+
+### `UpdateService`
+#### Description
+This service class handles the updating of recurring transaction rules for a given wallet based on the provided parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet | Wallet | The wallet object to update rules for |
+| params | Array | An array of hashes containing rule data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An instance of `BaseService::Result` containing the updated wallet |
+
+#### Internal Logic
+1. Initialize an empty array to store created rule IDs.
+2. Iterate through the provided rule parameters:
+   - If a rule with the given `lago_id` exists, update it.
+   - If not, create a new rule, setting `invoice_requires_successful_payment` based on the wallet's configuration if not provided.
+3. Sanitize rules by removing those no longer associated with the wallet.
+4. Set the updated wallet in the result object.
+
+### `call`
+#### Description
+The main method that processes the recurring transaction rule updates for the wallet.
+
+#### Internal Logic
+1. Convert input params to a hash with symbolized keys.
+2. Iterate through each rule in the input:
+   - Find existing rule by `lago_id` if provided.
+   - Update existing rule or create a new one.
+   - Store IDs of newly created rules.
+3. Call `sanitize_recurring_rules` to remove unnecessary rules.
+4. Set the updated wallet in the result object.
+
+### `sanitize_recurring_rules` (private)
+#### Description
+Removes recurring transaction rules that are no longer associated with the wallet.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args_recurring_rules | Array | Array of hashes containing rule data |
+| created_recurring_rules_ids | Array | IDs of newly created rules |
+
+#### Internal Logic
+1. Extract IDs of updated rules from input.
+2. Determine IDs of rules to be removed.
+3. Delete rules with the determined IDs.
+
+## Side Effects
+- Creates, updates, and deletes `RecurringTransactionRule` records in the database.
+- Modifies the association between the `Wallet` and its `RecurringTransactionRule`s.
+
+## Performance Considerations
+The service performs multiple database operations within a single method call. For large numbers of rules, this could potentially impact performance. Consider batch processing or background jobs for handling large datasets.
+
+## Error Handling
+The service relies on the error handling mechanisms provided by the `BaseService` class. It doesn't implement any specific error handling beyond raising standard ActiveRecord exceptions.
+
+## TODOs
+There is a NOTE in the code suggesting that on creation, the service follows the wallet configuration for `invoice_requires_successful_payment` if not set in the input parameters.

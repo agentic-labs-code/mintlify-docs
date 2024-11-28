@@ -1,0 +1,51 @@
+---
+title: "invite_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying a single Invite object. It's part of a larger GraphQL API structure and is responsible for retrieving an Invite based on a provided token, ensuring that only pending invites are returned.
+
+## Code Structure
+The `InviteResolver` class is defined within the `Resolvers` module and inherits from `Resolvers::BaseResolver`. It sets up the GraphQL query structure, including the description, argument, and return type.
+
+## References
+- `Types::Invites::Object`: The GraphQL type definition for an Invite object.
+- `Invite`: The ActiveRecord model representing an Invite in the database.
+
+## Symbols
+
+### `InviteResolver`
+#### Description
+This class defines a GraphQL resolver for querying a single Invite object. It takes a token as an argument and returns the corresponding pending invite or a not found error.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| token | String | Unique token of the Invite |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invite | Types::Invites::Object | The found Invite object or null |
+
+#### Internal Logic
+1. Searches for an Invite in the database using the provided token and with a 'pending' status.
+2. If found, returns the Invite object.
+3. If not found, returns a not found error.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Resolvers::BaseResolver | Base class for GraphQL resolvers |
+| Types::Invites::Object | GraphQL type definition for Invite objects |
+
+## Error Handling
+The resolver uses a `not_found_error` method (likely defined in a parent class or module) to return an error when the invite is not found.
+
+## Additional Context
+1. The `InviteResolver` is part of a larger GraphQL API structure, as evidenced by its inclusion in the `Types::QueryType` in the related `query_type.rb` file.
+2. The `Types::Invites::Object` type, defined in `types/invites/object.rb`, provides the structure for the Invite object returned by this resolver.
+3. The `Invite` model, defined in `models/invite.rb`, shows that invites have various statuses and are associated with an organization and a recipient (membership).
+4. The resolver specifically looks for 'pending' invites, which aligns with the statuses defined in the `Invite` model (`pending`, `accepted`, `revoked`).
+
+This resolver plays a crucial role in the invite management system of the application, allowing clients to query for specific pending invites using their unique tokens.

@@ -1,0 +1,89 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains services related to the Stripe payment provider integration within the application. It includes a base service class for common Stripe operations and a specific service for registering webhooks with Stripe.
+
+## What does it do?
+The code in this directory facilitates interaction with the Stripe payment platform. Specifically:
+
+1. It provides a foundation for all Stripe-related services, including error handling and API key management.
+2. It allows the application to register a webhook endpoint with Stripe, which enables the application to receive real-time notifications about payment-related events.
+
+The workflow can be described as follows:
+
+1. The application initializes a Stripe service with a payment provider object.
+2. When needed, the application can use the RegisterWebhookService to set up a webhook with Stripe.
+3. The service creates the webhook endpoint in Stripe, specifying which events it wants to listen for.
+4. If successful, it updates the local payment provider record with the new webhook details.
+5. If any errors occur during this process, the service can send error notifications via webhooks.
+
+This setup allows the application to stay synchronized with Stripe events, enabling real-time processing of payment-related activities.
+
+## Key Files
+
+1. `base_service.rb`:
+   This file defines the `BaseService` class, which serves as the foundation for all Stripe-related services in the application. It provides:
+   - Common initialization with a payment provider object
+   - Access to the API key
+   - Error webhook delivery functionality
+   - Delegation of organization-related methods
+
+   Example of API key retrieval:
+   ```ruby
+   def api_key
+     payment_provider.secret_key
+   end
+   ```
+
+2. `register_webhook_service.rb`:
+   This file contains the `RegisterWebhookService` class, which is responsible for registering a webhook endpoint with Stripe. Key functionalities include:
+   - Creating a webhook endpoint in Stripe
+   - Updating the local payment provider with webhook details
+   - Handling various exceptions that may occur during the process
+
+   Example of webhook endpoint creation:
+   ```ruby
+   Stripe::WebhookEndpoint.create(
+     {
+       url: webhook_end_point,
+       enabled_events: ['charge.succeeded', 'charge.failed'],
+     },
+     { api_key: api_key }
+   )
+   ```
+
+## Dependencies
+The directory relies on the following external dependencies:
+
+1. Stripe (version not specified):
+   - Used for interacting with the Stripe API
+   - Chosen for its robust and well-documented interface for payment processing
+
+2. URI (Ruby standard library):
+   - Used for URL manipulation and encoding
+   - Chosen for its reliability in handling URL-related operations
+
+## Configuration
+The services in this directory use the following configuration:
+
+1. Environment Variables:
+   - `LAGO_API_URL`: The base URL for the Lago API, used in constructing the webhook endpoint
+
+2. Payment Provider Configuration:
+   - `secret_key`: The Stripe API key, stored in the payment provider object
+   - `webhook_id`: The ID of the registered webhook, stored after successful registration
+   - `webhook_secret`: The secret for the registered webhook, stored after successful registration
+
+Example of how the webhook endpoint is constructed:
+```ruby
+def webhook_end_point
+  URI.join(
+    ENV['LAGO_API_URL'],
+    "/webhooks/stripe/#{organization.id}/#{URI.encode_www_form_component(payment_provider.code)}"
+  ).to_s
+end
+```
+
+This configuration allows the services to securely interact with Stripe while maintaining the necessary information for webhook management.

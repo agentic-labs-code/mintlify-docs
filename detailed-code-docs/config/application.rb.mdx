@@ -1,0 +1,57 @@
+---
+title: "application.rb"
+---
+
+## High-level description
+This file, `config/application.rb`, configures the Rails application for the LagoApi project. It sets up various Rails configurations, including autoloading paths, API-only mode, active job queue adapter, encryption settings, internationalization, and database primary key type.
+
+## Code Structure
+The main structure of this file is the `LagoApi::Application` class, which inherits from `Rails::Application`. Within this class, various configuration settings are defined using the `config` object.
+
+## Symbols
+
+### `LagoApi::Application`
+#### Description
+This class represents the Rails application configuration for the LagoApi project. It sets up various Rails settings and customizes the application behavior.
+
+#### Internal Logic
+1. Sets the Rails load defaults to version 7.1
+2. Configures autoloading and eager loading paths
+3. Sets the application to API-only mode
+4. Configures Active Job to use Sidekiq as the queue adapter
+5. Sets up Active Record encryption settings
+6. Configures internationalization (i18n) settings
+7. Sets up database primary key type as UUID for generators
+8. Sets the Active Support cache format version
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| `config.add_autoload_paths_to_load_path` | Boolean | `true` | Adds autoload paths to the load path (marked as TODO to be turned to false) |
+| `config.eager_load_paths` | Array | Various paths | Specifies additional paths for eager loading |
+| `config.api_only` | Boolean | `true` | Sets the application to API-only mode |
+| `config.active_job.queue_adapter` | Symbol | `:sidekiq` | Sets Sidekiq as the queue adapter for Active Job |
+| `config.active_record.encryption.hash_digest_class` | Class | `OpenSSL::Digest::SHA1` | Sets the hash digest class for Active Record encryption |
+| `config.active_record.encryption.primary_key` | String | `ENV['ENCRYPTION_PRIMARY_KEY']` | Sets the primary key for Active Record encryption |
+| `config.active_record.encryption.deterministic_key` | String | `ENV['ENCRYPTION_DETERMINISTIC_KEY']` | Sets the deterministic key for Active Record encryption |
+| `config.active_record.encryption.key_derivation_salt` | String | `ENV['ENCRYPTION_KEY_DERIVATION_SALT']` | Sets the key derivation salt for Active Record encryption |
+| `config.i18n.available_locales` | Array | `%i[en fr nb de it es sv]` | Sets available locales for internationalization |
+| `config.i18n.default_locale` | Symbol | `:en` | Sets the default locale for internationalization |
+| `config.active_support.cache_format_version` | Float | `7.0` | Sets the cache format version for Active Support |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| `rails/all` | Includes all Rails frameworks |
+| `bundler` | Manages gem dependencies |
+
+## TODOs
+1. `config.add_autoload_paths_to_load_path` should be turned to false
+2. `config.active_support.cache_format_version` should be updated to 7.1 after upgrading to Rails 7.1
+
+## References
+The `LagoApi::Application` class is referenced in several migration files and jobs:
+- `MigrationTaskJob` in `app/jobs/migration_task_job.rb`
+- Various migration files that invoke Rake tasks using `LagoApi::Application.load_tasks`
+
+These references indicate that the application configuration is used to load Rake tasks in different parts of the application, particularly during database migrations and background job processing.

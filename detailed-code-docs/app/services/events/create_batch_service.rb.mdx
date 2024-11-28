@@ -1,0 +1,101 @@
+---
+title: "create_batch_service.rb"
+---
+
+## High-level description
+The `Events::CreateBatchService` is responsible for creating multiple events in batch for a given organization. It validates the input, creates events, and handles post-processing tasks such as Kafka event production and job scheduling.
+
+## Code Structure
+The main class `CreateBatchService` inherits from `BaseService`. It contains a `call` method that orchestrates the event creation process, and private methods for validation and post-processing.
+
+## References
+- `Events::PostProcessJob`
+- `Event` model
+- `BaseService`
+
+## Symbols
+
+### `Events::CreateBatchService`
+#### Description
+This service handles the creation of multiple events in a batch for a given organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization for which events are being created |
+| events_params | Hash | Parameters for the events to be created |
+| timestamp | Float | Timestamp for event creation |
+| metadata | Hash | Additional metadata for the events |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An instance of `BaseService::Result` containing the operation outcome |
+
+#### Internal Logic
+1. Validates the presence and count of events
+2. Validates individual events
+3. Creates events in a transaction
+4. Performs post-processing tasks (Kafka production and job scheduling)
+
+### `call`
+#### Description
+The main method that orchestrates the event creation process.
+
+#### Internal Logic
+1. Checks if events are present
+2. Validates the number of events against `MAX_LENGTH`
+3. Calls `validate_events` to validate individual events
+4. If validation passes, calls `post_validate_events` to create and process events
+
+### `validate_events` (private)
+#### Description
+Validates individual events and populates the result object.
+
+#### Internal Logic
+1. Iterates through each event in `events_params`
+2. Creates a new `Event` object and sets its attributes
+3. Validates the event and stores any errors
+
+### `post_validate_events` (private)
+#### Description
+Creates events in the database and performs post-processing tasks.
+
+#### Internal Logic
+1. Saves events in a database transaction
+2. For each event:
+   - Produces a Kafka event (if configured)
+   - Schedules a `Events::PostProcessJob`
+
+### `produce_kafka_event` (private)
+#### Description
+Produces a Kafka event for a given event if Kafka is configured.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | Event | The event to be produced to Kafka |
+
+#### Internal Logic
+1. Checks if Kafka is configured
+2. Produces an asynchronous Kafka message with event details
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Karafka | Used for producing Kafka events |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LAGO_EVENTS_BATCH_MAX_LENGTH | Integer | 100 | Maximum number of events allowed in a batch |
+| LAGO_KAFKA_BOOTSTRAP_SERVERS | String | - | Kafka bootstrap servers configuration |
+| LAGO_KAFKA_RAW_EVENTS_TOPIC | String | - | Kafka topic for raw events |
+
+## Error Handling
+The service uses the error handling mechanisms provided by `BaseService`, including validation failures and error propagation through the `Result` object.
+
+## Performance Considerations
+- The service uses a database transaction to ensure atomic creation of all events in the batch.
+- Kafka event production is done asynchronously to avoid blocking the main thread.
+- Post-processing jobs are scheduled to run asynchronously.

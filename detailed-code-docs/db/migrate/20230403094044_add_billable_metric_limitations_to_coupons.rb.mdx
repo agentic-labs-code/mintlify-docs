@@ -1,0 +1,46 @@
+---
+title: "20230403094044_add_billable_metric_limitations_to_coupons.rb"
+---
+
+## High-level description
+This migration adds billable metric limitations to coupons and modifies the structure of coupon-related tables. It introduces a new column for coupons, changes the nullability of a column in coupon_plans, adds a reference to billable metrics, and renames the coupon_plans table to coupon_targets.
+
+## Symbols
+
+### AddBillableMetricLimitationsToCoupons
+#### Description
+This is a Rails migration class that inherits from `ActiveRecord::Migration[7.0]`. It defines changes to be applied to the database schema related to coupons and billable metrics.
+
+#### Internal Logic
+The migration performs the following steps:
+1. Adds a new boolean column `limited_billable_metrics` to the `coupons` table.
+2. Changes the `plan_id` column in the `coupon_plans` table to allow null values.
+3. Adds a reference to `billable_metric` in the `coupon_plans` table.
+4. Renames the `coupon_plans` table to `coupon_targets`.
+
+### change
+#### Description
+This method defines the changes to be applied to the database schema when the migration is run.
+
+#### Internal Logic
+1. Adds a new boolean column `limited_billable_metrics` to the `coupons` table with a default value of `false` and `null: false`.
+2. Changes the `plan_id` column in the `coupon_plans` table to allow null values.
+3. Uses `safety_assured` block to perform potentially unsafe operations:
+   - Adds a reference to `billable_metric` in the `coupon_plans` table with type UUID, allowing null values, creating an index, and setting up a foreign key.
+   - Renames the `coupon_plans` table to `coupon_targets`.
+
+## Side Effects
+- The `coupons` table will have a new column `limited_billable_metrics`.
+- The `coupon_plans` table will allow null values for `plan_id`.
+- The `coupon_plans` table will have a new reference to `billable_metric`.
+- The `coupon_plans` table will be renamed to `coupon_targets`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for defining database schema changes |
+
+## Error Handling
+This migration does not implement specific error handling beyond what is provided by the Rails migration framework.
+
+Note: The use of `safety_assured` suggests that this migration might be using a gem like `strong_migrations` to ensure safe database operations. The block is used to explicitly mark potentially unsafe operations as intentional.

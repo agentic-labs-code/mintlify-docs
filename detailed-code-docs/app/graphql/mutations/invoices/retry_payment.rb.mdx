@@ -1,0 +1,52 @@
+---
+title: "retry_payment.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation called `RetryInvoicePayment` within the `Mutations::Invoices` module. It allows authenticated users with the required permission to retry a payment for a specific invoice in their organization.
+
+## Code Structure
+The `RetryPayment` class inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the mutation's name, description, arguments, and return type. The main logic is implemented in the `resolve` method.
+
+## References
+- `Types::Invoices::Object`
+- `::Invoices::Payments::RetryService`
+
+## Symbols
+
+### `Mutations::Invoices::RetryPayment`
+#### Description
+This class defines a GraphQL mutation for retrying an invoice payment. It ensures the user is authenticated and has the required permission to perform this action.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the invoice to retry payment for |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Types::Invoices::Object | The updated invoice object after retrying payment |
+
+#### Internal Logic
+1. Finds the invoice in the current organization using the provided ID.
+2. Calls the `::Invoices::Payments::RetryService` to retry the payment.
+3. Returns the updated invoice if successful, or an error if the operation fails.
+
+## Side Effects
+- May trigger payment processing for the specified invoice.
+- May update the invoice's payment status.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user has access to the current organization |
+
+## Error Handling
+The mutation uses the `result_error` method to handle and return errors from the `RetryService`.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| RetryInvoicePayment | Mutation | `{ id: ID! }` | Invoice object or error | Retries payment for the specified invoice |

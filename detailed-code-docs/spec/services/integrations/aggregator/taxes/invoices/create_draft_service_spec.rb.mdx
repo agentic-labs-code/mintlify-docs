@@ -1,0 +1,64 @@
+---
+title: "create_draft_service_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Integrations::Aggregator::Taxes::Invoices::CreateDraftService` class. It tests the service's ability to create draft invoices with tax calculations using the Anrok integration, handling both successful and unsuccessful scenarios.
+
+## Code Structure
+The test file is organized into a single `RSpec.describe` block for the `CreateDraftService` class. Within this block, there are multiple contexts and examples testing different scenarios of the service call.
+
+## Symbols
+
+### `described_class.call(invoice:)`
+#### Description
+This is the main method being tested. It calls the `CreateDraftService` with an invoice parameter.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice object to be processed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | ServiceResult | An object containing the result of the service call |
+
+#### Internal Logic
+The service makes an HTTP POST request to the Anrok API with invoice data and processes the response to calculate taxes.
+
+### `service_call`
+#### Description
+This is the subject of the test, representing the call to the `CreateDraftService`.
+
+### `let` statements
+These define various objects and variables used throughout the tests, such as `integration`, `customer`, `invoice`, `fees`, etc.
+
+### `before` block
+Sets up the test environment by creating necessary objects and stubbing the `LagoHttpClient::Client`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| LagoHttpClient::Client | HTTP client for making API requests |
+
+## Error Handling
+The test covers various error scenarios, including:
+- API response failures
+- Validation errors
+- HTTP errors
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| https://api.nango.dev/v1/anrok/draft_invoices | POST | Invoice data | Tax calculation result | Creates a draft invoice with tax calculations |
+
+## Testing Scenarios
+1. Successful service call with tax calculation
+2. Special tax rules (notCollecting, productNotTaxed, jurisNotTaxed)
+3. Failed tax calculation
+4. Missing integration mapping
+5. Server errors
+
+The test file thoroughly covers various scenarios, including successful and failed API calls, different tax calculation rules, and error handling. It ensures that the service correctly processes the API response and handles errors appropriately, including delivering error webhooks when necessary.

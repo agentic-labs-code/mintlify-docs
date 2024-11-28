@@ -1,0 +1,70 @@
+---
+title: "progressive_billing_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Credits::ProgressiveBillingService` class. It tests various scenarios of applying progressive billing credits to invoices, including cases with single and multiple progressive billing invoices, and different subscription configurations.
+
+## Code Structure
+The test suite is organized into several contexts, each testing different scenarios for the `Credits::ProgressiveBillingService`. The main symbols are the `credit_service` subject, various `let` statements for setting up test data, and multiple `describe "#call"` blocks that test the service's behavior under different conditions.
+
+## Symbols
+
+### `Credits::ProgressiveBillingService`
+#### Description
+This is the main service being tested. It handles the application of progressive billing credits to invoices.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice to which credits will be applied |
+
+#### Outputs
+The service returns a result object containing:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credits | Array | List of credits applied to the invoice |
+
+### `credit_service.call`
+#### Description
+This method applies progressive billing credits to the invoice.
+
+#### Internal Logic
+1. Retrieves progressive billing invoices for the subscription(s) associated with the main invoice.
+2. Calculates and applies credits based on the progressive billing invoices.
+3. Updates the invoice with the applied credits.
+4. Creates credit notes for any remaining amounts from progressive billing invoices that couldn't be fully applied.
+
+## Test Scenarios
+
+### Context: "without progressive billing invoices"
+Tests that no credits are applied when there are no progressive billing invoices.
+
+### Context: "with one progressive billing invoice for the sole subscription"
+Tests the application of a single credit from one progressive billing invoice.
+
+### Context: "with multiple progressive billing invoices for the sole subscription"
+Tests the application of multiple credits from multiple progressive billing invoices.
+
+### Context: "with multiple progressive billing invoices for the sole subscription with an amount higher than the subscription charges"
+Tests the handling of progressive billing invoices with amounts exceeding the subscription charges, including the creation of credit notes for remaining amounts.
+
+### Context: "with one progressive billing invoice for one subscription and one without"
+Tests the scenario where only one of two subscriptions has a progressive billing invoice.
+
+### Context: "with one progressive billing invoice outside the current billing boundaries for the sole subscription"
+Tests that no credits are applied for progressive billing invoices outside the current billing period.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides RSpec configuration for Rails |
+| FactoryBot | Used for creating test data |
+
+## Error Handling
+The tests don't explicitly cover error handling scenarios. They focus on the expected behavior of the service under various conditions.
+
+## Performance Considerations
+The tests don't address performance considerations directly. However, the service's ability to handle multiple progressive billing invoices and subscriptions is tested, which indirectly relates to its performance characteristics.
+
+This test suite provides comprehensive coverage of the `Credits::ProgressiveBillingService`, ensuring it correctly applies progressive billing credits under various scenarios and maintains the integrity of the invoicing system.

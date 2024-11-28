@@ -1,0 +1,65 @@
+---
+title: "update.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for updating an existing tax within an organization. It's part of a larger GraphQL API and handles the process of updating tax information while ensuring proper authentication and authorization.
+
+## Code Structure
+The `Update` class is defined within the `Mutations::Taxes` module and inherits from `BaseMutation`. It includes two concerns: `AuthenticableApiUser` and `RequiredOrganization`, which provide authentication and organization-related functionality.
+
+## References
+- `Types::Taxes::UpdateInput`
+- `Types::Taxes::Object`
+- `::Taxes::UpdateService`
+
+## Symbols
+
+### `Mutations::Taxes::Update`
+#### Description
+This class defines a GraphQL mutation for updating an existing tax. It authenticates the user, ensures they belong to the required organization, and then uses the `Taxes::UpdateService` to perform the update operation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | Arguments passed to the mutation, including tax details to be updated |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Types::Taxes::Object | The updated tax object if successful |
+| error | GraphQL::ExecutionError | An error object if the operation fails |
+
+#### Internal Logic
+1. Finds the tax object in the current organization using the provided ID.
+2. Calls the `Taxes::UpdateService` with the found tax and provided parameters.
+3. Returns the updated tax if successful, or an error if the operation fails.
+
+## Side Effects
+- Updates the tax record in the database if the operation is successful.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides user authentication functionality |
+| RequiredOrganization | Ensures the user belongs to the required organization |
+| Types::Taxes::UpdateInput | Defines the input structure for the mutation |
+| Types::Taxes::Object | Defines the output structure for the mutation |
+| ::Taxes::UpdateService | Handles the business logic for updating a tax |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class) to handle and return errors from the `UpdateService`.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| updateTax | POST | GraphQL mutation with tax update details | Updated tax object or error | Updates an existing tax for the organization |
+
+## TODOs
+There is a commented-out `REQUIRED_PERMISSION` constant, suggesting that permission checks might be implemented in the future.
+
+```ruby
+# REQUIRED_PERMISSION = 'taxes:create'
+```
+
+This TODO indicates that specific permissions for tax creation might be added later, although the current mutation is for updating taxes, not creating them.

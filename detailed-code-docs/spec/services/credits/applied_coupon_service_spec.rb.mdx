@@ -1,0 +1,71 @@
+---
+title: "applied_coupon_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Credits::AppliedCouponService` class. It tests various scenarios of applying coupons to invoices, including different coupon types (fixed amount, percentage), frequencies (one-time, recurring, forever), and limitations (plan-specific, billable metric-specific).
+
+## Code Structure
+The test suite is organized around a single `describe` block for the `Credits::AppliedCouponService` class. Within this block, there are multiple `context` and `it` blocks that test different scenarios and edge cases for the `call` method of the service.
+
+## Symbols
+
+### `Credits::AppliedCouponService`
+#### Description
+This is the main class being tested. It appears to be a service responsible for applying coupons to invoices and creating corresponding credits.
+
+### `credit_service.call`
+#### Description
+This is the main method being tested. It applies a coupon to an invoice and creates a credit.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the result of the operation, including a `credit` attribute and a `success?` method |
+
+#### Internal Logic
+1. Creates a credit based on the applied coupon and invoice
+2. Updates the fees on the invoice with the coupon amount
+3. Terminates the applied coupon if necessary
+4. Handles various coupon types, frequencies, and limitations
+
+## Test Cases
+
+### Basic Coupon Application
+- Creates a credit with the correct amount and attributes
+- Terminates the applied coupon
+- Distributes the coupon amount across fees proportionally
+
+### Edge Cases
+- Handles cases where the base amount is zero
+- Limits the credit amount to the invoice amount when the coupon amount is higher
+- Prevents creating duplicate credits
+
+### Coupon Types
+- Tests fixed amount coupons
+- Tests percentage-based coupons
+
+### Coupon Frequencies
+- Tests one-time coupons
+- Tests recurring coupons (with remaining uses)
+- Tests forever coupons
+
+### Coupon Limitations
+- Tests coupons limited to specific plans
+- Tests coupons limited to specific billable metrics
+
+### Currency Mismatch
+- Does not create a credit when the coupon and invoice currencies don't match
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails and RSpec configuration |
+| FactoryBot | Used for creating test data |
+
+## Notes
+- The test suite makes extensive use of FactoryBot for creating test data
+- It uses RSpec's `let` statements for setting up test scenarios
+- The tests cover a wide range of scenarios, including edge cases and different coupon configurations
+
+This comprehensive test suite ensures that the `Credits::AppliedCouponService` handles various coupon scenarios correctly, including different types, frequencies, and limitations.

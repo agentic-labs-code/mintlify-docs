@@ -1,0 +1,79 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL mutations related to various integrations in a software application. The tests cover operations such as creating, updating, and destroying integrations, as well as syncing invoices and credit notes. The integrations tested include Anrok, NetSuite, Okta, and Xero. These tests ensure that the GraphQL mutations behave correctly, handle permissions appropriately, and interact with external services as expected.
+
+## What does it do?
+The tests in this directory verify the functionality of several integration-related operations:
+
+1. Creating new integrations: Tests ensure that users with correct permissions can successfully create integrations for various services (Anrok, NetSuite, Okta, Xero), validating input and checking returned data.
+
+2. Updating existing integrations: Verifies that users can modify the details of integrations while respecting permission requirements.
+
+3. Destroying integrations: Checks that authorized users can delete integrations from the system.
+
+4. Syncing invoices and credit notes: Tests the process of synchronizing invoice and credit note data with external services, ensuring correct formatting of requests and handling of responses.
+
+5. Fetching draft invoice taxes: For the Anrok integration, tests simulate retrieving tax information for draft invoices from the Anrok API.
+
+These tests help ensure that the integrations work correctly within the larger application, verifying that only authorized users can perform these operations and that data is processed and returned in the expected format.
+
+## Key Files
+
+1. `anrok/` directory:
+   - `create_spec.rb`: Tests creation of Anrok integrations.
+   - `update_spec.rb`: Tests updating of Anrok integrations.
+   - `fetch_draft_invoice_taxes_spec.rb`: Tests fetching draft invoice taxes from Anrok API.
+
+2. `netsuite/` directory:
+   - `create_spec.rb`: Tests creation of NetSuite integrations.
+   - `update_spec.rb`: Tests updating of NetSuite integrations.
+
+3. `okta/` directory:
+   - `create_spec.rb`: Tests creation of Okta integrations.
+   - `update_spec.rb`: Tests updating of Okta integrations.
+
+4. `xero/` directory:
+   - `create_spec.rb`: Tests creation of Xero integrations.
+   - `update_spec.rb`: Tests updating of Xero integrations.
+
+5. `destroy_spec.rb`: Tests the destruction of integrations.
+
+6. `sync_invoice_spec.rb`: Tests syncing of invoices with external services.
+
+7. `sync_credit_note_spec.rb`: Tests syncing of credit notes with external services.
+
+## Dependencies
+The test files rely on several key dependencies:
+
+1. RSpec: The testing framework used to structure and run the tests.
+2. FactoryBot: Used to create test data and database records.
+3. Rails testing environment: Provides the necessary setup for testing Rails applications.
+4. GraphQL: The query language used for defining and executing the mutations.
+5. Custom services: Various custom services are mocked or used in the tests, such as `LagoHttpClient::Client` and `Integrations::Aggregator::CreditNotes::CreateService`.
+
+## Configuration
+The tests use several configuration elements:
+
+1. `lago_premium!`: A method that ensures the tests run in the context of a premium account.
+2. GraphQL mutation strings: Defined in each test file to specify the mutation being tested.
+3. Shared examples: Used across test files to check common requirements like user authentication and permissions.
+4. Mocked HTTP responses: In some tests, HTTP clients are mocked to simulate responses from external APIs.
+5. Factory configurations: Used to create test data such as memberships, organizations, and integration records.
+
+Example of a GraphQL mutation string:
+
+```graphql
+mutation($input: CreateAnrokIntegrationInput!) {
+  createAnrokIntegration(input: $input) {
+    id
+    code
+    name
+    apiKey
+  }
+}
+```
+
+These configurations ensure that the tests accurately reflect the expected environment and functionality of the integration features in the application.

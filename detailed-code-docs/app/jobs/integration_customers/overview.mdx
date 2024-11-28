@@ -1,0 +1,65 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains job classes responsible for managing integration customers in an asynchronous manner. The jobs handle the creation and updating of integration customers, utilizing background processing to improve application responsiveness and manage external integrations efficiently.
+
+## What does it do?
+The jobs in this directory perform two main functions:
+
+1. Creating new integration customers: When a new customer needs to be integrated with an external system, the `CreateJob` is responsible for initiating this process asynchronously.
+
+2. Updating existing integration customers: When customer information needs to be updated in an external system, the `UpdateJob` handles this task in the background.
+
+Both jobs are designed to work with external integrations, which may involve network requests or time-consuming operations. By processing these tasks asynchronously, the main application can remain responsive while these potentially slow operations are handled separately.
+
+The jobs also implement retry logic specifically for HTTP errors, ensuring that temporary network issues or service disruptions don't permanently prevent the integration operations from completing successfully.
+
+## Key Files
+
+1. `create_job.rb`
+   - Defines the `IntegrationCustomers::CreateJob` class
+   - Responsible for creating new integration customers
+   - Uses the `IntegrationCustomers::CreateService` to perform the actual creation
+
+2. `update_job.rb`
+   - Defines the `IntegrationCustomers::UpdateJob` class
+   - Handles updating existing integration customer information
+   - Utilizes the `IntegrationCustomers::UpdateService` for the update operation
+
+Both job classes inherit from `ApplicationJob` and are configured to use the 'integrations' queue. They also implement retry logic for handling `LagoHttpClient::HttpError`, attempting the job up to 3 times with a polynomial backoff strategy.
+
+## Dependencies
+The jobs in this directory rely on the following dependencies:
+
+1. ActiveJob: Used for defining and processing background jobs. This is part of the Ruby on Rails framework and provides the base functionality for asynchronous job processing.
+
+2. Sidekiq: While not explicitly mentioned in the provided code, the use of queues and the inheritance from `ApplicationJob` suggests that Sidekiq is likely used as the backend for ActiveJob. Sidekiq is a popular background job processor for Ruby applications.
+
+3. Custom Services:
+   - `IntegrationCustomers::CreateService`
+   - `IntegrationCustomers::UpdateService`
+   These services encapsulate the actual logic for creating and updating integration customers.
+
+4. `LagoHttpClient::HttpError`: A custom error class used for handling HTTP-related errors during the integration process.
+
+## Configuration
+The jobs in this directory use the following configuration:
+
+1. Queue: Both jobs are configured to use the 'integrations' queue. This allows for separate processing of integration-related tasks, potentially improving overall system performance by isolating these potentially slow operations.
+
+2. Retry Configuration:
+   - Both jobs implement retry logic specifically for `LagoHttpClient::HttpError`
+   - Maximum retry attempts: 3
+   - Retry strategy: Polynomial backoff (wait times increase polynomially between attempts)
+
+This configuration ensures that temporary network issues or service disruptions are handled gracefully, giving the integration operations multiple chances to succeed before ultimately failing.
+
+Example of the retry configuration:
+
+```ruby
+retry_on LagoHttpClient::HttpError, wait: :polynomially_longer, attempts: 3
+```
+
+The jobs in this directory play a crucial role in maintaining synchronization between the application's customer data and external integration systems. By processing these tasks asynchronously and implementing robust error handling, they help ensure that integration operations are performed reliably and efficiently, even in the face of potential network or service issues.

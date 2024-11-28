@@ -1,0 +1,80 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various background jobs in a Rails application. The jobs cover a wide range of functionalities, including billing, customer management, event processing, invoice handling, payment processing, and integration with external services like Segment and various payment providers.
+
+## What does it do?
+The tests in this directory verify the correct behavior of background jobs that handle various aspects of the application's business logic:
+
+1. Billing and Invoicing:
+   - Creating and finalizing invoices
+   - Handling credit notes and refunds
+   - Processing payments through different providers (Adyen, GoCardless, Stripe)
+   - Managing subscriptions and wallet transactions
+
+2. Customer Management:
+   - Creating and updating customer records in payment provider systems
+   - Terminating customer relationships
+
+3. Event Processing:
+   - Handling events from various payment providers
+   - Processing and validating internal events
+
+4. Data Export and Analytics:
+   - Exporting resources
+   - Tracking events and identifying users in Segment
+
+5. Webhook Management:
+   - Sending webhooks for various system events
+   - Cleaning up old webhooks
+
+6. Subscription and Usage Management:
+   - Terminating subscriptions
+   - Recalculating and checking lifetime usages
+   - Refreshing draft invoices and wallet balances
+
+These tests ensure that each job correctly interacts with its corresponding service, handles both success and failure scenarios, and performs its intended function without side effects.
+
+## Entry points
+The main entry points for developers working on these job tests are:
+
+1. Individual job test files: Each file in this directory typically corresponds to a specific job class and contains tests for that job's functionality.
+
+2. Subdirectories: Some jobs are organized into subdirectories based on their functionality or the external service they interact with (e.g., `integrations/`, `payment_providers/`).
+
+3. Shared examples and contexts: Some test files may use shared examples or contexts to reduce duplication and improve maintainability.
+
+The flow of control in these tests typically follows this pattern:
+1. Set up test data and mock objects
+2. Execute the job
+3. Verify that the job interacted correctly with its dependencies (usually service classes)
+4. Check for expected outcomes or side effects
+
+## Key Files
+While all files in this directory are important for maintaining the integrity of the background job system, some key files and directories include:
+
+1. `bill_subscription_job_spec.rb`: Tests the job responsible for billing subscriptions.
+2. `invoices/`: Contains tests for various invoice-related jobs.
+3. `payment_providers/`: Includes tests for jobs that interact with different payment providers.
+4. `segment_identify_job_spec.rb` and `segment_track_job_spec.rb`: Test jobs related to Segment integration.
+5. `send_webhook_job_spec.rb`: Tests the job responsible for sending webhooks.
+
+## Dependencies
+The tests in this directory rely on several key dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data and objects.
+3. Rails: The tests are written in the context of a Rails application.
+4. Various service classes: Many jobs delegate their work to service classes, which are often mocked in these tests.
+5. External services: Some jobs interact with external services like Segment or payment providers, which are typically mocked in the tests.
+
+## Configuration
+While there's no specific configuration file for these job tests, they often rely on:
+
+1. RSpec configuration in `spec/rails_helper.rb` and `spec/spec_helper.rb`.
+2. Factory definitions for creating test data.
+3. Environment variables for controlling certain behaviors (e.g., `LAGO_DISABLE_SEGMENT`, `LAGO_CLOUD`).
+
+These tests play a crucial role in ensuring the reliability and correctness of the application's background job system. They help maintain the integrity of important business processes and integrations with external services.

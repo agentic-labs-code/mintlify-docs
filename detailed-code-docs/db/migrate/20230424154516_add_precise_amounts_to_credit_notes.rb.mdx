@@ -1,0 +1,42 @@
+---
+title: "20230424154516_add_precise_amounts_to_credit_notes.rb"
+---
+
+## High-level description
+This migration adds two new decimal columns to the `credit_notes` table: `precise_coupons_adjustment_amount_cents` and `precise_vat_amount_cents`. These columns are designed to store more precise financial amounts with high precision and scale.
+
+## Symbols
+
+### `AddPreciseAmountsToCreditNotes`
+#### Description
+This class is an ActiveRecord migration that adds two new decimal columns to the `credit_notes` table. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0.
+
+#### Internal Logic
+The migration uses the `change` method to define the changes to be applied to the database schema. It employs the `safety_assured` method, likely from a database migration safety gem, to bypass any safety checks.
+
+Inside the `change_table` block, two new decimal columns are added to the `credit_notes` table:
+
+1. `precise_coupons_adjustment_amount_cents`: For storing precise coupon adjustment amounts.
+2. `precise_vat_amount_cents`: For storing precise VAT (Value Added Tax) amounts.
+
+Both columns are configured with the following attributes:
+- `precision: 30`: Allows for up to 30 total digits.
+- `scale: 5`: Allows for 5 decimal places.
+- `null: false`: The column cannot contain null values.
+- `default: 0`: The default value is set to 0.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the migration framework for database schema changes |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| precision | integer | 30 | Total number of digits for the decimal columns |
+| scale | integer | 5 | Number of decimal places for the decimal columns |
+| null | boolean | false | Whether the columns can contain null values |
+| default | integer | 0 | Default value for the columns |
+
+## Performance Considerations
+The use of `bulk: true` in the `change_table` method suggests that this migration is optimized for performance, as it will generate a single ALTER TABLE statement instead of multiple statements for each column addition.

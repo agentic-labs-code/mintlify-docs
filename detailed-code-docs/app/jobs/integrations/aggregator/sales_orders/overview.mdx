@@ -1,0 +1,50 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines a job class `CreateJob` within the `Integrations::Aggregator::SalesOrders` module. The job is responsible for creating sales orders in an external system based on finalized invoices. It uses a service to perform the actual creation and handles potential HTTP errors.
+
+## Code Structure
+The `CreateJob` class inherits from `ApplicationJob` and is part of the `Integrations::Aggregator::SalesOrders` module. It uses the `Integrations::Aggregator::SalesOrders::CreateService` to perform the actual creation of sales orders.
+
+## Symbols
+### `CreateJob`
+#### Description
+This job class is responsible for creating sales orders in an external system based on finalized invoices.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice for which a sales order should be created |
+
+#### Internal Logic
+1. Sets the queue for the job to 'integrations'
+2. Configures retry behavior for `LagoHttpClient::HttpError`
+3. In the `perform` method:
+   - Calls the `CreateService` with the provided invoice
+   - Raises an error if the service call fails
+
+#### Performance Considerations
+The job is configured to retry on `LagoHttpClient::HttpError`, with a polynomial backoff strategy and a maximum of 3 attempts. This helps to handle temporary network issues or service unavailability.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ApplicationJob | Base job class |
+| LagoHttpClient::HttpError | Error class for HTTP-related errors |
+
+## Error Handling
+The job is configured to retry on `LagoHttpClient::HttpError`, which helps handle temporary network issues or service unavailability. If the error persists after 3 attempts, it will be raised and potentially handled by a job management system.
+
+## API/Interface Reference
+This job is designed to be enqueued by other parts of the system, typically after an invoice has been finalized. It is called in various places throughout the codebase, such as:
+- `Invoices::SubscriptionService`
+- `Invoices::CreateOneOffService`
+- `Invoices::CreatePayInAdvanceChargeService`
+- `Invoices::RefreshDraftAndFinalizeService`
+- `Invoices::FinalizeOpenCreditService`
+- `Invoices::AddOnService`
+- `Invoices::AdvanceChargesService`
+
+These services enqueue the job when certain conditions are met, typically when an invoice is finalized and should be synced as a sales order.

@@ -1,0 +1,52 @@
+---
+title: "20221024090308_add_refund_fields_to_credit_notes.rb"
+---
+
+## High-level description
+This migration adds refund-related fields to the `credit_notes` and `credit_note_items` tables in a Ruby on Rails application. It also modifies the `credit_status` column in the `credit_notes` table to allow null values.
+
+## Symbols
+
+### AddRefundFieldsToCreditNotes
+#### Description
+This is a Rails migration class that inherits from `ActiveRecord::Migration[7.0]`. It defines the changes to be made to the database schema, specifically adding refund fields to credit notes and credit note items.
+
+#### Internal Logic
+The migration is split into two main methods: `up` and `down`.
+
+##### `up` method
+The `up` method is responsible for applying the migration:
+
+1. It uses `safety_assured` to bypass Strong Migrations checks.
+2. It adds three new columns to the `credit_notes` table:
+   - `refund_amount_cents` (bigint)
+   - `refund_amount_currency` (string)
+   - `refund_status` (integer)
+3. It modifies the `credit_status` column in the `credit_notes` table to allow null values.
+4. It adds two new columns to the `credit_note_items` table:
+   - `refund_amount_cents` (bigint)
+   - `refund_amount_currency` (string)
+
+##### `down` method
+The `down` method is responsible for reverting the migration:
+
+1. It removes the three new columns from the `credit_notes` table.
+2. It changes the `credit_status` column back to not allow null values and sets a default of 0.
+3. It removes the two new columns from the `credit_note_items` table.
+
+## Performance Considerations
+The migration uses `change_table` with `bulk: true` option, which can improve performance by combining multiple ALTER TABLE statements into a single operation.
+
+## Dependencies
+This migration depends on the Rails framework, specifically ActiveRecord for database operations.
+
+## Error Handling
+The migration uses `safety_assured` to bypass Strong Migrations checks. This should be used with caution, as it may lead to potentially unsafe migrations.
+
+## Notes
+1. The `refund_amount_cents` columns are set as `bigint`, which allows for storing large monetary values.
+2. The `refund_status` column is added as an integer, suggesting it might be used with an enum in the model.
+3. The `credit_status` column is modified to allow null values, which might indicate a change in business logic regarding credit statuses.
+4. Currency fields are added separately from the amount fields, allowing for multi-currency support.
+
+This migration adds flexibility to the credit note system by introducing refund-related fields and allowing for null credit statuses. It's important to ensure that any existing application code is updated to handle these new fields and the potential for null credit statuses.

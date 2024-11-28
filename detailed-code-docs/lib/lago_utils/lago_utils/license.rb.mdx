@@ -1,0 +1,68 @@
+---
+title: "license.rb"
+---
+
+## High-level description
+This code defines a `License` class within the `LagoUtils` module. The class is responsible for verifying and managing the premium status of a Lago license. It interacts with an external license verification service to determine if the current license is valid and premium.
+
+## Code Structure
+The `License` class contains methods for initializing, verifying, and checking the premium status of a license. It uses the `LagoHttpClient` to make HTTP requests to the license verification service.
+
+## Symbols
+
+### `LagoUtils::License`
+#### Description
+This class represents a Lago license and provides functionality to verify its premium status.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | String | The base URL for the license verification service |
+
+### `initialize`
+#### Description
+Initializes a new `License` instance with the given URL and sets the initial premium status to false.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | String | The base URL for the license verification service |
+
+### `verify`
+#### Description
+Verifies the license by making an HTTP GET request to the license verification service. It updates the premium status based on the response.
+
+#### Internal Logic
+1. Checks if the `LAGO_LICENSE` environment variable is present.
+2. If present, constructs the full verification URL using the base URL and the license key.
+3. Makes an HTTP GET request to the verification endpoint.
+4. Updates the `@premium` instance variable based on the 'valid' field in the response.
+
+### `premium?`
+#### Description
+Returns the current premium status of the license.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| premium | Boolean | The premium status of the license |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| LagoHttpClient | Used to make HTTP requests to the license verification service |
+
+## Configuration
+The class relies on the `LAGO_LICENSE` environment variable for the license key.
+
+## Error Handling
+The code does not implement explicit error handling for HTTP request failures or invalid responses. It silently fails if the `LAGO_LICENSE` environment variable is not set.
+
+## References
+The `License` class is used in various parts of the application to check if premium features should be enabled. For example:
+- In `Invoices::SubscriptionService`, it's used to determine if a finalized invoice email should be delivered.
+- In `Invoices::RefreshDraftAndFinalizeService`, it's used to check if an email should be sent for a finalized invoice.
+- In `Analytics::InvoiceCollectionsService` and `Analytics::MrrsService`, it's used to restrict access to premium features.
+- In `Invoices::FinalizeOpenCreditService`, it's used to determine if an email should be sent for a finalized invoice.
+
+These references indicate that the `License` class plays a crucial role in controlling access to premium features across the application.

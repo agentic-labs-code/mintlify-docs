@@ -1,0 +1,77 @@
+---
+title: "accept_invite_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Mutations::Auth::Okta::AcceptInvite` GraphQL mutation. It verifies the functionality of accepting an invite using Okta authentication, including successful acceptance and error handling for unconfigured email domains.
+
+## Code Structure
+The test suite is organized around a single GraphQL mutation, `oktaAcceptInvite`. It sets up necessary test data, mocks external dependencies, and tests both successful and error scenarios.
+
+## Symbols
+
+### RSpec.describe Mutations::Auth::Okta::AcceptInvite
+#### Description
+This is the main test suite for the `AcceptInvite` mutation. It sets up the test environment and contains individual test cases.
+
+#### Internal Logic
+1. Sets up test data (organization, invite, Okta integration)
+2. Mocks external HTTP client responses
+3. Defines the GraphQL mutation
+4. Tests successful invite acceptance
+5. Tests error handling for unconfigured email domains
+
+### let blocks
+#### Description
+These blocks define the test data and mocked responses used throughout the test suite.
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | FactoryBot | Creates a test organization |
+| invite | FactoryBot | Creates a test invite associated with the organization |
+| okta_integration | FactoryBot | Creates a test Okta integration for the organization |
+| lago_http_client | instance_double | Mocks the LagoHttpClient::Client |
+| okta_token_response | OpenStruct | Mocks the Okta token response |
+| okta_userinfo_response | OpenStruct | Mocks the Okta user info response |
+| state | String | Generates a random UUID for the state parameter |
+| mutation | String | Defines the GraphQL mutation to be tested |
+
+### before block
+#### Description
+Sets up the test environment before each test case.
+
+#### Internal Logic
+1. Ensures the invite and Okta integration are created
+2. Caches the email associated with the state
+3. Mocks the LagoHttpClient::Client and its responses
+
+### it 'returns logged user'
+#### Description
+Tests the successful scenario of accepting an invite.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with test inputs
+2. Verifies that the response contains the correct user email and a token
+
+### context 'when email domain is not configured with an integration'
+#### Description
+Tests the error scenario when the email domain is not configured with an Okta integration.
+
+#### Internal Logic
+1. Sets the okta_integration to nil
+2. Executes the GraphQL mutation with test inputs
+3. Verifies that the response contains the expected error status and message
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| LagoHttpClient::Client | Used for making HTTP requests to Okta API |
+
+## Error Handling
+The test suite checks for proper error handling when an email domain is not configured with an Okta integration. It verifies that the correct error status (422) and message ('domain_not_configured') are returned.
+
+## Notes
+- The test uses `aggregate_failures` to group multiple expectations together, allowing all expectations to be evaluated even if one fails.
+- The `execute_graphql` method is likely defined in a helper module (probably in `spec/support/graphql_helper.rb`) to simplify running GraphQL queries in tests.
+- The test mocks external HTTP requests to Okta API to avoid making real network calls during testing.

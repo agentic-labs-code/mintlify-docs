@@ -1,0 +1,74 @@
+---
+title: "events_enriched.rb"
+---
+
+## High-level description
+This code defines a factory for creating test instances of the `Clickhouse::EventsEnriched` model using FactoryBot. It sets up default attributes and associations for the `events_enriched` table in Clickhouse, which is used for storing enriched event data related to subscriptions, customers, and billable metrics.
+
+## Code Structure
+The factory definition uses transient attributes to create associated objects (subscription, customer, organization, billable_metric, plan, and charge) and then uses these to set the attributes of the `Clickhouse::EventsEnriched` instance.
+
+## References
+This factory references several other models and factories:
+- Subscription
+- Customer
+- Organization
+- BillableMetric
+- Plan
+- StandardCharge
+
+## Symbols
+
+### `:clickhouse_events_enriched`
+#### Description
+This is the main factory definition for creating `Clickhouse::EventsEnriched` instances.
+
+#### Inputs
+The factory doesn't have explicit inputs, but it uses transient attributes to create associated objects.
+
+#### Internal Logic
+1. Creates associated objects using transient attributes.
+2. Sets attributes for the `Clickhouse::EventsEnriched` instance using the created associated objects and some generated data.
+
+### Transient Attributes
+#### Description
+These are temporary attributes used to create associated objects for the factory.
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription | Subscription | A subscription associated with the customer |
+| customer | Customer | A customer associated with the organization |
+| organization | Organization | The organization associated with the event |
+| billable_metric | BillableMetric | A billable metric associated with the organization |
+| plan | Plan | A plan associated with the organization |
+| charge | StandardCharge | A charge associated with the billable metric and plan |
+
+### Attributes
+#### Description
+These are the attributes set for the `Clickhouse::EventsEnriched` instance.
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | String | ID of the associated organization |
+| external_subscription_id | String | External ID of the associated subscription |
+| code | String | Code of the associated billable metric |
+| timestamp | Time | Current timestamp |
+| transaction_id | String | Generated unique transaction ID |
+| properties | Hash | Empty hash for properties |
+| value | Float | Default value of 21.0 |
+| charge_id | String | ID of the associated charge |
+| aggregation_type | String | Aggregation type of the associated billable metric |
+| filters | Hash | Empty hash for filters |
+| grouped_by | Hash | Empty hash for grouped_by data |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| FactoryBot | Used for defining and creating test data factories |
+| SecureRandom | Used for generating random hexadecimal strings |
+
+## Notes
+1. This factory is designed to work with the `Clickhouse::EventsEnriched` model, which is defined in a separate file (`app/models/clickhouse/events_enriched.rb`).
+2. The `Clickhouse::EventsEnriched` model inherits from `BaseRecord` and uses the table name 'events_enriched'.
+3. The schema information provided in the related code snippet shows that some attributes (like `filters`, `grouped_by`, and `properties`) are stored as strings in the database, but the factory defines them as empty hashes. This suggests that these attributes might be serialized/deserialized when interacting with the database.
+4. The `value` attribute is defined as a string in the schema but set as a float (21.0) in the factory. This might indicate that the value is stored as a string in the database but treated as a numeric value in the application.

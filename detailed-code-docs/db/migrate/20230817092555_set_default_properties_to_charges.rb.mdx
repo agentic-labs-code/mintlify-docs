@@ -1,0 +1,45 @@
+---
+title: "20230817092555_set_default_properties_to_charges.rb"
+---
+
+## High-level description
+This migration sets default properties for different charge models in the `charges` table. It updates the `properties` column with specific JSON structures based on the `charge_model` value, but only for records where the `properties` column is currently empty (represented by a JSON object with length 2, which is '{}').
+
+## Code Structure
+The migration defines a single `change` method that uses a `reversible` block to ensure the migration can be rolled back if needed. Within the `up` direction, it executes a series of SQL UPDATE statements wrapped in a `safety_assured` block.
+
+## Symbols
+
+### SetDefaultPropertiesToCharges
+#### Description
+This is a Rails migration class that inherits from `ActiveRecord::Migration[7.0]`. It defines the changes to be applied to the database schema.
+
+#### Internal Logic
+1. The migration uses a `reversible` block to define the `up` direction of the migration.
+2. Inside the `up` block, it uses `safety_assured` to bypass Strong Migrations checks.
+3. It then executes a multi-statement SQL query that updates the `properties` column of the `charges` table for different `charge_model` values.
+4. For each `charge_model`, it sets a specific JSON structure as the default `properties` value.
+5. The updates only affect rows where the current `properties` value is an empty JSON object (length 2 when converted to text).
+
+## Side Effects
+This migration modifies existing data in the `charges` table. It updates the `properties` column for rows where it was previously empty, based on the `charge_model` value.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for defining database schema changes |
+
+## Error Handling
+The migration uses `safety_assured` to bypass Strong Migrations checks. This should be used with caution as it can potentially lead to unsafe operations if not handled properly.
+
+## API/Interface Reference
+| Charge Model | Properties Structure |
+|:-------------|:---------------------|
+| 0 (Standard) | `{ "amount": "0" }` |
+| 1 (Graduated) | `{ "amount": "", "graduated_ranges": [{ "from_value": 0, "to_value": null, "per_unit_amount": "0", "flat_amount": "0" }] }` |
+| 2 (Package) | `{ "package_size": 1, "amount": "0", "free_units": 0 }` |
+| 3 (Percentage) | `{ "rate": "0" }` |
+| 4 (Volume) | `{ "amount": "", "volume_ranges": [{ "from_value": 0, "to_value": null, "per_unit_amount": "0", "flat_amount": "0" }] }` |
+| 5 (Graduated Percentage) | `{ "graduated_percentage_ranges": [{ "from_value": 0, "to_value": null, "rate": "0", "fixed_amount": "0", "flat_amount": "0" }] }` |
+
+This table shows the default properties structure set for each charge model type.

@@ -1,0 +1,75 @@
+---
+title: "add_on.rb"
+---
+
+## High-level description
+The `AddOn` class represents an additional charge that can be applied to a customer's invoice. It includes details such as the add-on's name, code, description, amount, and associated taxes.
+
+## Code Structure
+The `AddOn` class utilizes several concerns and has relationships with other models. It includes `PaperTrailTraceable` for tracking changes, `Currencies` for handling currency-related logic, `IntegrationMappable` for managing integrations, and `Discard::Model` for soft deletion. It belongs to an `Organization` and has many `AppliedAddOns`, `Customers` through `AppliedAddOns`, `Fees`, `AppliedTaxes`, and `Taxes`.
+
+## References
+- `ApplicationRecord`: The `AddOn` class inherits from `ApplicationRecord`, which provides the base functionality for interacting with the database.
+- `PaperTrailTraceable`: A concern for tracking changes to the `AddOn` model.
+- `Currencies`: A concern for handling currency-related logic.
+- `IntegrationMappable`: A concern for managing integrations.
+- `Discard::Model`: A concern for implementing soft deletion.
+- `Organization`: The `AddOn` belongs to an `Organization`.
+- `AppliedAddOn`: Represents an instance of an add-on being applied to a customer.
+- `Customer`: Represents a customer of the organization.
+- `Fee`: Represents a charge on an invoice.
+- `AppliedTax`: Represents a tax applied to an add-on.
+- `Tax`: Represents a tax that can be applied to add-ons.
+
+## Symbols
+
+### `AddOn`
+#### Description
+The `AddOn` class represents an additional charge that can be applied to a customer's invoice.
+
+#### Inputs
+This class does not have any explicit input parameters.
+
+#### Outputs
+This class does not have any explicit output parameters.
+
+#### Internal Logic
+The class defines several validations:
+- `name`: Must be present.
+- `code`: Must be unique within the scope of an organization.
+- `amount_cents`: Must be a numerical value greater than 0.
+- `amount_currency`: Must be included in the list of accepted currencies.
+
+It also defines a default scope to only include non-deleted records and a `ransackable_attributes` method for searching.
+
+### `ransackable_attributes`
+#### Description
+Defines the attributes that can be used for searching add-ons using Ransack.
+
+#### Inputs
+- `_auth_object`: An optional authorization object (not used in this implementation).
+
+#### Outputs
+- An array of searchable attribute names: `[:name, :code]`.
+
+### `invoice_name`
+#### Description
+Returns the name to be displayed on an invoice for this add-on.
+
+#### Inputs
+This method does not have any explicit input parameters.
+
+#### Outputs
+- A string representing the invoice name. If `invoice_display_name` is present, it returns that value. Otherwise, it returns the `name` attribute.
+
+
+## Side Effects
+This class has side effects related to database operations (creation, update, deletion) due to its inheritance from `ApplicationRecord` and the use of `has_many`, `belongs_to`, and other Active Record associations.
+
+## Dependencies
+- `active_record`: Provides the base functionality for interacting with the database.
+- `paper_trail`: Provides versioning and auditing capabilities.
+- `discard`: Provides soft deletion functionality.
+
+## Error Handling
+This class relies on Active Record validations to handle errors related to data integrity. If a validation fails, an `ActiveRecord::RecordInvalid` exception is raised.

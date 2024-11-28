@@ -1,0 +1,99 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions for usage thresholds in a billing or subscription system. It includes two main components: an input type for creating or updating usage thresholds, and an object type for querying usage threshold data.
+
+## What does it do?
+The code in this directory defines the structure and fields for usage thresholds in a GraphQL API. Usage thresholds are likely used to set limits or trigger points for billing or notifications based on usage in a subscription or metered billing system. 
+
+The input type allows clients to specify usage threshold data when creating or updating plans. This includes fields like the amount in cents, whether the threshold is recurring, and a display name for the threshold.
+
+The object type defines how usage threshold data can be queried through the GraphQL API. It includes fields such as the unique identifier, amount in cents, whether it's recurring, a display name, and timestamps for creation and last update.
+
+These types work together to provide a complete interface for managing usage thresholds within the larger context of a billing or subscription system.
+
+## Key Files
+
+1. `input.rb`:
+   - Defines the `Types::UsageThresholds::Input` class, which is a GraphQL input object type.
+   - Used for creating or updating usage thresholds as part of plan mutations.
+   - Contains optional fields for id, amount_cents, recurring status, and display name.
+
+2. `object.rb`:
+   - Defines the `Types::UsageThresholds::Object` class, which is a GraphQL object type.
+   - Used for querying usage threshold data.
+   - Contains fields for id, amount_cents, recurring status, display name, and timestamps.
+
+## Dependencies
+The code relies on the following external libraries and types:
+
+1. GraphQL: The core library used for defining GraphQL types and fields.
+2. GraphQL::Types::BigInt: Used for representing large integer values, specifically for the `amount_cents` field.
+3. GraphQL::Types::ISO8601DateTime: Used for representing date and time values for the `created_at` and `updated_at` fields.
+
+These dependencies are chosen to provide appropriate data types for the various fields in the usage threshold types. The use of BigInt for amount_cents suggests that the system needs to handle potentially large monetary values with high precision.
+
+## Configuration
+There are no explicit configuration files or environment variables used in this directory. However, the structure and naming of the types suggest that they follow conventions set by the larger GraphQL schema and Rails application structure.
+
+Key points to note:
+
+1. The input type uses optional arguments, allowing flexibility in usage threshold creation and updates.
+2. The object type defines most fields as non-nullable, ensuring that queried data will always have values for these fields.
+3. The `graphql_name 'UsageThreshold'` in the object type sets the name used in the GraphQL schema, which may be important for client-side code generation or documentation.
+
+Here's an example of how the input type might be used in a mutation:
+
+```graphql
+mutation CreatePlan($input: PlanInput!) {
+  createPlan(input: $input) {
+    plan {
+      id
+      name
+      usageThresholds {
+        id
+        amountCents
+        recurring
+        thresholdDisplayName
+      }
+    }
+  }
+}
+
+# Variables
+{
+  "input": {
+    "name": "Premium Plan",
+    "usageThresholds": [
+      {
+        "amountCents": 1000000,
+        "recurring": true,
+        "thresholdDisplayName": "1 Million API Calls"
+      }
+    ]
+  }
+}
+```
+
+And an example of querying usage thresholds:
+
+```graphql
+query GetPlan($id: ID!) {
+  plan(id: $id) {
+    id
+    name
+    usageThresholds {
+      id
+      amountCents
+      recurring
+      thresholdDisplayName
+      createdAt
+      updatedAt
+    }
+  }
+}
+```
+
+These types play a crucial role in managing usage-based billing or limits within the application, allowing for flexible definition and querying of usage thresholds associated with plans.

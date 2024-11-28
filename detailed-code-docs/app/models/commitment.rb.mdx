@@ -1,0 +1,52 @@
+---
+title: "commitment.rb"
+---
+
+## High-level description
+The `Commitment` model represents a financial obligation associated with a `Plan`. It defines the amount and type of commitment, such as a minimum commitment. 
+
+## Code Structure
+The `Commitment` model has a one-to-many relationship with `AppliedTax` through which it connects to the `Tax` model. It also belongs to a `Plan`.
+
+## References
+- `Plan`: A `Commitment` belongs to a `Plan`.
+- `AppliedTax`: A `Commitment` has many `AppliedTax` records.
+- `Tax`: A `Commitment` has many `Tax` records through `AppliedTax`.
+
+## Symbols
+
+### `Commitment`
+#### Description
+The `Commitment` class represents a financial commitment associated with a `Plan`. It defines the amount, type of commitment, and provides methods for managing associated data.
+
+#### Inputs
+This class does not define any custom initializers or constructors.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `invoice_name` | String | Returns the display name for invoicing purposes. It prioritizes `invoice_display_name` and defaults to a localized string for minimum commitments. |
+
+#### Internal Logic
+The class utilizes several modules:
+- `monetize`: Provides methods for handling monetary values, specifically for the `amount_cents` attribute.
+- `enum`: Defines the `commitment_type` attribute with a predefined set of values.
+
+It also defines validations:
+- `amount_cents`: Ensures the amount is a positive number.
+- `commitment_type`: Enforces uniqueness within the scope of a `plan_id`.
+
+## Side Effects
+This class does not have any notable side effects.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| `ActiveRecord::Base` | Provides the base functionality for database interactions and model management. |
+| `monetize` | Enables handling of monetary values. |
+
+## Error Handling
+This class relies on ActiveRecord validations to handle errors related to data integrity.
+
+## TODOs
+This class does not have any TODOs.

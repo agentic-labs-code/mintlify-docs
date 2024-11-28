@@ -1,0 +1,63 @@
+---
+title: "matching_and_ignored_service.rb"
+---
+
+## High-level description
+This code defines a service class `MatchingAndIgnoredService` within the `ChargeFilters` module. Its primary purpose is to identify matching and ignored filters for a given charge and filter combination, which is crucial for preventing duplicate counting of events in the billing process.
+
+## Code Structure
+The `MatchingAndIgnoredService` class inherits from `BaseService` and contains a single public method `call`. It processes the input charge and filter to determine matching filters and filters that should be ignored.
+
+## Symbols
+
+### `ChargeFilters::MatchingAndIgnoredService`
+#### Description
+This service class is responsible for determining matching and ignored filters for a given charge and filter combination.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Charge | The charge object to process |
+| filter | ChargeFilter | The filter to compare against |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing matching_filters and ignored_filters |
+
+#### Internal Logic
+1. Initializes the result's matching_filters with all values from the input filter.
+2. Finds all child filters that match the input filter's criteria.
+3. Determines the ignored filters by processing the matching children:
+   - If a child has the same keys as the input filter, it removes the filter's values from the child.
+   - This prevents duplicate counting of events.
+4. Returns the result containing matching_filters and ignored_filters.
+
+### `call`
+#### Description
+The main method that processes the charge and filter to determine matching and ignored filters.
+
+#### Internal Logic
+1. Sets up matching_filters from the input filter.
+2. Finds children filters that match the input filter's criteria.
+3. Processes these children to determine ignored_filters.
+4. Returns the result with matching_filters and ignored_filters.
+
+### `other_filters`
+#### Description
+A private method that retrieves all filters for the charge except the input filter.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseService | Parent class providing common service functionality |
+| ChargeFilterValue | Used for the ALL_FILTER_VALUES constant |
+
+## Error Handling
+This service does not implement specific error handling beyond what's provided by the BaseService class.
+
+## Performance Considerations
+The service uses `find_all` and `map` operations on potentially large collections of filters. For charges with a large number of filters, this could become a performance bottleneck and might benefit from optimization if needed.
+
+## TODOs
+There are no explicit TODOs in the code.

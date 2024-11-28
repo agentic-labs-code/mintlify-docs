@@ -1,0 +1,52 @@
+---
+title: "20240301133006_add_charge_filter_id_to_cached_aggregations.rb"
+---
+
+## High-level description
+This migration adds a new column `charge_filter_id` to the `cached_aggregations` table and creates a composite index to improve query performance. It's designed to enhance the filtering capabilities of cached aggregations based on charge filters.
+
+## Symbols
+
+### `AddChargeFilterIdToCachedAggregations`
+#### Description
+This class is an ActiveRecord migration that modifies the `cached_aggregations` table by adding a new column and an index.
+
+#### Internal Logic
+The migration performs two main operations:
+1. Adds a new column `charge_filter_id` to the `cached_aggregations` table.
+2. Creates a composite index on multiple columns of the `cached_aggregations` table.
+
+Let's break down each operation:
+
+1. Adding the new column:
+   ```ruby
+   add_column :cached_aggregations, :charge_filter_id, :uuid, null: true
+   ```
+   - Adds a new column named `charge_filter_id` to the `cached_aggregations` table.
+   - The column type is `uuid` (Universally Unique Identifier).
+   - The column allows null values (`null: true`).
+
+2. Creating the composite index:
+   ```ruby
+   safety_assured do
+     add_index :cached_aggregations,
+       %i[organization_id timestamp charge_id charge_filter_id],
+       name: :index_timestamp_filter_lookup
+   end
+   ```
+   - Creates a new index on the `cached_aggregations` table.
+   - The index is composite, including four columns: `organization_id`, `timestamp`, `charge_id`, and the newly added `charge_filter_id`.
+   - The index is named `index_timestamp_filter_lookup`.
+   - The `safety_assured` block is used to bypass any safety checks that might prevent the index creation due to its potential impact on large tables.
+
+## Performance Considerations
+The addition of the composite index `index_timestamp_filter_lookup` is likely to improve query performance for lookups that involve filtering on `organization_id`, `timestamp`, `charge_id`, and `charge_filter_id` columns together. This can be particularly beneficial for large datasets where such queries are frequent.
+
+## Dependencies
+This migration relies on the ActiveRecord framework, which is part of Ruby on Rails.
+
+## Error Handling
+The migration doesn't include explicit error handling. It relies on the default behavior of ActiveRecord migrations, which will roll back changes if an error occurs during the migration process.
+
+## TODOs
+There are no explicit TODOs in this migration file.

@@ -1,0 +1,80 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains classes responsible for generating CSV exports of invoice and invoice fee data. The main components are the `Invoices` and `InvoiceFees` classes, which process and serialize invoice data and write it to CSV files.
+
+## What does it do?
+The code in this directory provides functionality to export invoice and invoice fee data into CSV format. Here's a simplified explanation of what it does:
+
+1. For invoice exports:
+   - It fetches invoices from the database based on certain criteria.
+   - It processes these invoices in batches to manage memory efficiently.
+   - For each invoice, it extracts relevant information and formats it.
+   - It writes this formatted data into a CSV file, with each row representing an invoice.
+
+2. For invoice fee exports:
+   - It fetches invoices and their associated fees from the database.
+   - It processes these in batches, similar to the invoice export.
+   - For each invoice fee, it combines information from the invoice, the fee itself, and any related subscription.
+   - It writes this combined data into a CSV file, with each row representing an invoice fee.
+
+Both processes create organized, tabular data that can be easily read by spreadsheet software or imported into other systems for further analysis or reporting.
+
+## Key Files
+
+1. `invoices.rb`:
+   - This file contains the `Invoices` class, which is responsible for generating CSV exports of invoice data.
+   - It processes invoices in batches, serializes them using a specified serializer, and writes the data to a CSV file.
+   - The class uses the `InvoicesQuery` to retrieve invoices based on search terms and filters.
+
+2. `invoice_fees.rb`:
+   - This file contains the `InvoiceFees` class, which generates CSV exports of invoice fees data.
+   - It processes invoices and their associated fees, combining data from invoices, fees, and subscriptions.
+   - The class uses multiple serializers to format the data for invoices, fees, and subscriptions.
+
+Both classes inherit from a `BaseService` class and use the `Forwardable` module for method delegation. They also employ batch processing and lazy enumeration to handle large datasets efficiently.
+
+## Dependencies
+The code in this directory relies on the following dependencies:
+
+1. Ruby standard library:
+   - `csv`: Used for CSV file manipulation in both `Invoices` and `InvoiceFees` classes.
+   - `forwardable`: Used for method delegation in both classes.
+   - `tempfile`: Used to create temporary files for CSV output (default behavior).
+
+2. Internal dependencies:
+   - `BaseService`: Both `Invoices` and `InvoiceFees` classes inherit from this base class.
+   - `InvoicesQuery`: Used in the `Invoices` class to retrieve invoices based on search criteria.
+   - Serializer classes:
+     - `V1::InvoiceSerializer`: Default serializer for invoices in both classes.
+     - `V1::FeeSerializer`: Default serializer for fees in the `InvoiceFees` class.
+     - `V1::SubscriptionSerializer`: Default serializer for subscriptions in the `InvoiceFees` class.
+
+## Configuration
+While there are no explicit configuration files, both classes use some configurable parameters:
+
+1. In `Invoices` class:
+   - `serializer_klass`: Defaults to `V1::InvoiceSerializer` but can be overridden.
+   - `output`: Defaults to `Tempfile.create` but can be specified to use a different file.
+
+2. In `InvoiceFees` class:
+   - `invoice_serializer_klass`: Defaults to `V1::InvoiceSerializer`.
+   - `fee_serializer_klass`: Defaults to `V1::FeeSerializer`.
+   - `subscription_serializer_klass`: Defaults to `V1::SubscriptionSerializer`.
+   - `output`: Defaults to `Tempfile.create`.
+   - `DEFAULT_BATCH_SIZE`: Set to 50, used for processing invoices and fees in batches.
+
+These parameters allow for some flexibility in how the exports are generated, such as using different serializers or output files.
+
+## Performance Considerations
+Both classes implement performance optimizations to handle large datasets efficiently:
+
+1. Batch processing: The `find_each` method is used to process invoices in batches, reducing memory usage when dealing with a large number of records.
+
+2. Lazy enumeration: The `lazy` enumerator is used in conjunction with `each` to process fees in the `InvoiceFees` class, which helps in reducing memory consumption by processing items one at a time instead of loading all into memory.
+
+3. Customizable batch size: The `InvoiceFees` class uses a `DEFAULT_BATCH_SIZE` of 50, which can be adjusted if needed to optimize performance based on the specific use case and available resources.
+
+These optimizations ensure that the export process can handle large volumes of data without overwhelming system resources, making it suitable for use in production environments with potentially large datasets.

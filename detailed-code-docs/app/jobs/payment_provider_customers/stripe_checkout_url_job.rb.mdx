@@ -1,0 +1,51 @@
+---
+title: "stripe_checkout_url_job.rb"
+---
+
+## High-level description
+This code defines a background job class `StripeCheckoutUrlJob` within the `PaymentProviderCustomers` module. Its primary purpose is to generate a Stripe checkout URL for a given Stripe customer, handling potential Stripe API errors and retrying the job if necessary.
+
+## Code Structure
+The `StripeCheckoutUrlJob` class inherits from `ApplicationJob` and is responsible for executing the `generate_checkout_url` method of the `PaymentProviderCustomers::StripeService` class.
+
+## Symbols
+
+### `StripeCheckoutUrlJob`
+#### Description
+This class represents a background job that generates a Stripe checkout URL for a given Stripe customer.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| stripe_customer | Object | An instance of a Stripe customer object |
+
+#### Internal Logic
+1. The job is queued in the `:providers` queue.
+2. It retries on specific Stripe API errors (connection, general API, and rate limit) with a polynomial backoff strategy, up to 6 attempts.
+3. It also retries on `ActiveJob::DeserializationError`.
+4. In the `perform` method, it creates a new instance of `PaymentProviderCustomers::StripeService` with the given `stripe_customer`.
+5. It calls the `generate_checkout_url` method on the service instance.
+6. If an error occurs during the process, it raises the error.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Stripe | Used for handling Stripe-specific errors and API interactions |
+| ActiveJob | Provides the base job functionality and error handling |
+
+## Error Handling
+The job implements specific error handling for Stripe API-related errors:
+- `Stripe::APIConnectionError`
+- `Stripe::APIError`
+- `Stripe::RateLimitError`
+- `ActiveJob::DeserializationError`
+
+These errors are retried with a polynomial backoff strategy, up to 6 attempts for Stripe errors.
+
+## Performance Considerations
+The job uses a polynomial backoff strategy for retries, which helps to avoid overwhelming the Stripe API with rapid successive requests in case of temporary issues.
+
+## Related Code
+The `StripeCheckoutUrlJob` relies on the `PaymentProviderCustomers::StripeService` class, which is responsible for the actual generation of the checkout URL. The service class handles the Stripe API interaction, webhook delivery, and various error scenarios.
+
+The job inherits from `ApplicationJob`, which sets the default Sidekiq options for retries to 0. However, this job overrides that behavior with its own retry logic for specific errors.

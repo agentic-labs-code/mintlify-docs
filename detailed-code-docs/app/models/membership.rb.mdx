@@ -1,0 +1,84 @@
+---
+title: "membership.rb"
+---
+
+## High-level description
+The `Membership` model represents the association between a user and an organization in the application. It defines the role and status of a user within an organization, manages permissions, and tracks the membership's lifecycle.
+
+## Code Structure
+The `Membership` class inherits from `ApplicationRecord` and includes the `PaperTrailTraceable` module. It defines associations with `Organization`, `User`, and `DataExport` models. The class also defines enums for statuses and roles, and includes methods for managing membership status and permissions.
+
+## Symbols
+
+### `Membership`
+#### Description
+This is the main class that represents a user's membership in an organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization the membership belongs to |
+| user | User | The user associated with the membership |
+| role | Enum | The role of the user in the organization |
+| status | Enum | The current status of the membership |
+
+#### Internal Logic
+- Defines associations with `Organization`, `User`, and `DataExport` models
+- Sets up enums for `status` and `role`
+- Validates uniqueness of `user_id` within an organization for active memberships
+- Provides methods for marking a membership as revoked and checking permissions
+
+### `mark_as_revoked!`
+#### Description
+Marks the membership as revoked and sets the `revoked_at` timestamp.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| timestamp | Time | The time at which the membership was revoked (default: current time) |
+
+#### Internal Logic
+- Sets the `revoked_at` timestamp if not already set
+- Changes the status to `revoked`
+
+### `can?`
+#### Description
+Checks if the membership has a specific permission.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| permission | Symbol or String | The permission to check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Boolean | Whether the membership has the specified permission |
+
+### `permissions_hash`
+#### Description
+Returns the permissions hash based on the membership's role.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| permissions | Hash | The permissions hash for the membership's role |
+
+#### Internal Logic
+- Uses a case statement to return the appropriate permissions hash based on the role
+- Permissions are defined in a separate `Permission` module (not shown in the provided code)
+
+## Dependencies
+- PaperTrailTraceable (for tracking changes to the model)
+- ApplicationRecord (Rails ORM)
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| STATUSES | Array | [:active, :revoked] | Possible statuses for a membership |
+| ROLES | Hash | \{admin: 0, manager: 1, finance: 2\} | Possible roles for a membership |
+
+## Notes
+- The model uses enums for both `status` and `role`, which allows for easy querying and readability
+- The `validates` clause ensures that a user can only have one active membership per organization
+- The `permissions_hash` method suggests that different roles have different sets of permissions, which are defined elsewhere in the application

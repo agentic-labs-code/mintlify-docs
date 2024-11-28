@@ -1,0 +1,68 @@
+---
+title: "20240111151140_create_charge_filters.rb"
+---
+
+## High-level description
+This migration file creates a new table called `charge_filters` in the database. It defines the structure for storing charge filter information, including a reference to a charge, a JSON column for properties, timestamps, and a soft delete column.
+
+## Symbols
+
+### CreateChargeFilters
+#### Description
+This class is an ActiveRecord migration that defines the structure for the `charge_filters` table. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0.
+
+#### Internal Logic
+The migration uses the `change` method to define the table structure:
+
+1. Creates a new table named `charge_filters` with UUID as the primary key.
+2. Adds a reference to the `charges` table.
+3. Includes a `properties` column to store JSON data.
+4. Adds standard timestamp columns (`created_at` and `updated_at`).
+5. Includes a `deleted_at` column for soft delete functionality.
+
+## Code Structure
+
+### Table Definition
+```ruby
+create_table :charge_filters, id: :uuid do |t|
+  # ... column definitions ...
+end
+```
+
+#### Columns
+1. **charge_id**:
+   - Type: UUID
+   - Attributes: Not null, foreign key, indexed
+   - Purpose: Associates the charge filter with a specific charge
+
+2. **properties**:
+   - Type: JSONB
+   - Attributes: Not null, default empty hash
+   - Purpose: Stores flexible properties for the charge filter
+
+3. **timestamps**:
+   - Adds `created_at` and `updated_at` columns
+   - Purpose: Tracks when the record was created and last updated
+
+4. **deleted_at**:
+   - Type: DateTime
+   - Attributes: Indexed
+   - Purpose: Enables soft delete functionality
+
+## Dependencies
+This migration relies on the ActiveRecord framework, which is part of Ruby on Rails.
+
+## Performance Considerations
+- The `charge_id` column is indexed to improve query performance when filtering or joining with the `charges` table.
+- The `deleted_at` column is indexed to optimize queries that filter out soft-deleted records.
+- Using JSONB for the `properties` column allows for efficient storage and querying of flexible data structures.
+
+## Error Handling
+The migration does not include explicit error handling. Rails will handle any database-related errors during the migration process.
+
+## Notes
+- The use of UUID as the primary key (`id: :uuid`) provides better distribution for distributed systems and enhanced security compared to sequential integers.
+- The `deleted_at` column suggests that the application implements soft delete functionality, allowing for record recovery if needed.
+- The `properties` column using JSONB allows for flexible storage of additional attributes without requiring schema changes for each new property.
+
+This migration sets up a robust and flexible structure for storing charge filter data, with considerations for performance, scalability, and data integrity.

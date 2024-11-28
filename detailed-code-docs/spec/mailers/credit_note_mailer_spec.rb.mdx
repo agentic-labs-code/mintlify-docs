@@ -1,0 +1,74 @@
+---
+title: "credit_note_mailer_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `CreditNoteMailer` class. It tests the functionality of the `created` method of the mailer, including various scenarios such as when the credit note has an attached PDF file, when it doesn't, and when certain email addresses are nil.
+
+## Symbols
+
+### RSpec.describe CreditNoteMailer
+#### Description
+This is the main describe block for the `CreditNoteMailer` tests. It sets up the subject of the tests and defines a `credit_note` factory object with an attached file.
+
+#### Internal Logic
+- Sets up a `credit_note` factory object
+- Attaches a blank PDF file to the `credit_note` object
+
+### describe '#created'
+#### Description
+This describe block focuses on testing the `created` method of the `CreditNoteMailer`.
+
+#### Internal Logic
+- Tests the basic functionality of the `created` mailer
+- Tests the behavior when there's no PDF file attached
+- Tests the behavior when the organization email is nil
+- Tests the behavior when the customer email is nil
+
+### specify (unnamed test)
+#### Description
+This test checks the basic functionality of the `created` mailer.
+
+#### Internal Logic
+- Creates a mailer instance
+- Checks if the `to` email address matches the customer's email
+- Checks if the `reply_to` email address matches the organization's email
+- Verifies that the mailer has attachments
+
+### context 'with no pdf file'
+#### Description
+This context block tests the behavior of the mailer when there's no PDF file attached to the credit note.
+
+#### Internal Logic
+- Sets up a double for the `CreditNotes::GenerateService`
+- Removes the attached file from the credit note
+- Checks if the `CreditNotes::GenerateService` is called when creating the mailer
+
+### context 'when organization email is nil'
+#### Description
+This context block tests the behavior of the mailer when the organization's email is nil.
+
+#### Internal Logic
+- Sets the organization's email to nil
+- Checks if the mailer's `to` field is nil when created
+
+### context 'when customer email is nil'
+#### Description
+This context block tests the behavior of the mailer when the customer's email is nil.
+
+#### Internal Logic
+- Sets the customer's email to nil
+- Checks if the mailer's `to` field is nil when created
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Used for creating test objects (credit_note factory) |
+| RSpec | Testing framework used for writing and running the tests |
+
+## References
+- `CreditNoteMailer`: The main class being tested
+- `CreditNotes::GenerateService`: Referenced in the "with no pdf file" context for generating PDF when not attached
+
+This test suite ensures that the `CreditNoteMailer` behaves correctly under various scenarios, including handling of attachments and nil email addresses. It uses RSpec's `describe`, `context`, and `it` blocks to organize the tests in a readable and maintainable structure.

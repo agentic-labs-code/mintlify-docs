@@ -1,0 +1,62 @@
+---
+title: "object.rb"
+---
+
+## High-level description
+This code defines a GraphQL object type for representing error details in a Ruby on Rails application. It is part of a larger GraphQL schema and provides a structure for exposing error information through a GraphQL API.
+
+## Code Structure
+The `Types::ErrorDetails::Object` class inherits from `Types::BaseObject` and defines the structure of an error detail object in the GraphQL schema. It includes fields for error code, error details, and an ID.
+
+## References
+This code references:
+- `Types::BaseObject`
+- `Types::ErrorDetails::ErrorCodesEnum`
+
+## Symbols
+
+### `Types::ErrorDetails::Object`
+#### Description
+This class defines the GraphQL object type for error details. It sets up the structure and fields that can be queried for error information.
+
+#### Inputs
+This class doesn't explicitly define inputs, as it's a GraphQL object type definition.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| error_code | Types::ErrorDetails::ErrorCodesEnum | The code representing the type of error |
+| error_details | String | Additional details about the error |
+| id | ID | A unique identifier for the error detail object |
+
+#### Internal Logic
+The class defines three fields: `error_code`, `error_details`, and `id`. It also includes a custom resolver for the `error_details` field, which retrieves the details from the underlying object based on the error code.
+
+```ruby
+def error_details
+  object.details[object.error_code]
+end
+```
+
+This method suggests that the underlying `object` has a `details` hash and an `error_code` attribute. It uses the `error_code` to look up the corresponding details in the `details` hash.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Types::BaseObject | Base class for GraphQL object types |
+| Types::ErrorDetails::ErrorCodesEnum | Enum type for error codes |
+
+## API/Interface Reference
+This GraphQL object type can be queried as follows:
+
+```graphql
+{
+  errorDetail {
+    id
+    errorCode
+    errorDetails
+  }
+}
+```
+
+Note that this is just the structure, and the actual query would depend on how this type is used in the broader GraphQL schema.

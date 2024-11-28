@@ -1,0 +1,76 @@
+---
+title: "graduated_service.rb"
+---
+
+## High-level description
+This code defines the `GraduatedService` class within the `Charges::ChargeModels` module. It implements a graduated pricing model for charges, where the total amount is calculated based on predefined ranges of units consumed.
+
+## Code Structure
+The `GraduatedService` class inherits from `Charges::ChargeModels::BaseService` and overrides several methods to implement the graduated pricing logic. It uses the `Charges::AmountDetails::RangeGraduatedService` to calculate details for each range.
+
+## Symbols
+
+### `GraduatedService`
+#### Description
+This class implements the graduated pricing model for charges. It calculates the total amount based on graduated ranges defined in the properties.
+
+#### Internal Logic
+1. Retrieves the graduated ranges from the properties.
+2. Calculates amount details for each range using `RangeGraduatedService`.
+3. Computes the total amount by summing the amounts from each range.
+4. Calculates the unit amount by dividing the total amount by the number of units.
+
+### `ranges`
+#### Description
+Retrieves and processes the graduated ranges from the properties.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ranges | Array | An array of hashes representing the graduated ranges |
+
+### `amount_details`
+#### Description
+Calculates the amount details for each graduated range.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| amount_details | Hash | A hash containing an array of graduated range details |
+
+#### Internal Logic
+1. Iterates through each range in the `ranges` array.
+2. Calls `RangeGraduatedService` for each range to calculate its details.
+3. Stops processing if the current range's `to_value` is nil or greater than or equal to the total units.
+
+### `compute_amount`
+#### Description
+Calculates the total amount based on the graduated ranges.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| total_amount | Numeric | The total calculated amount |
+
+#### Internal Logic
+Sums the `total_with_flat_amount` from each graduated range in the `amount_details`.
+
+### `unit_amount`
+#### Description
+Calculates the amount per unit.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| unit_amount | Numeric | The calculated amount per unit |
+
+#### Internal Logic
+1. Retrieves the total units from `aggregation_result.full_units_number` or `units`.
+2. Returns 0 if total units is zero.
+3. Otherwise, divides the computed amount by the total units.
+
+## Dependencies
+This class depends on the `Charges::AmountDetails::RangeGraduatedService` for calculating details of each graduated range.
+
+## Performance Considerations
+The performance of this class depends on the number of graduated ranges defined. For a large number of ranges, the calculation time may increase linearly.

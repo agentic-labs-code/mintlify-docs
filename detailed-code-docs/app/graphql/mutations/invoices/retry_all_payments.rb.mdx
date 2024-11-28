@@ -1,0 +1,53 @@
+---
+title: "retry_all_payments.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation called `RetryAllPayments` within the `Mutations::Invoices` module. It allows authenticated users with the required permission to retry all pending or failed invoice payments for their organization asynchronously.
+
+## Code Structure
+The `RetryAllPayments` class inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines a GraphQL mutation that returns a collection of Invoice objects.
+
+## References
+- `::Invoices::Payments::RetryBatchService`
+- `Types::Invoices::Object`
+
+## Symbols
+
+### `Mutations::Invoices::RetryAllPayments`
+#### Description
+This class defines a GraphQL mutation for retrying all pending or failed invoice payments for an organization.
+
+#### Inputs
+This mutation doesn't require any input parameters.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoices | [Types::Invoices::Object] | A collection of Invoice objects representing the invoices for which payments were retried |
+
+#### Internal Logic
+1. The mutation uses the `::Invoices::Payments::RetryBatchService` to initiate an asynchronous job for retrying payments.
+2. If the service call is successful, it returns the invoices; otherwise, it returns an error.
+
+## Side Effects
+This mutation triggers an asynchronous job to retry payments for multiple invoices, which may result in payment processing and updates to invoice statuses.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user has access to the current organization |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'invoices:update' | The permission required to execute this mutation |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class) to handle and return errors from the service call.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| RetryAllInvoicePayments | Mutation | None | Collection of Invoice objects | Retries all pending or failed invoice payments for the organization |

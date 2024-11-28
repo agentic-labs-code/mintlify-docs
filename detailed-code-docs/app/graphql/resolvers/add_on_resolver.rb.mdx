@@ -1,0 +1,55 @@
+---
+title: "add_on_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying a single add-on of an organization. It is part of a larger GraphQL API implementation and handles authentication, organization membership, and error handling for the add-on query.
+
+## Code Structure
+The `AddOnResolver` class is defined within the `Resolvers` module and inherits from `Resolvers::BaseResolver`. It includes two modules: `AuthenticableApiUser` and `RequiredOrganization`, which provide authentication and organization-related functionality.
+
+## References
+- `Types::AddOns::Object`: The GraphQL type returned by this resolver.
+- `current_organization`: A method provided by the `RequiredOrganization` module to access the current organization.
+
+## Symbols
+
+### `AddOnResolver`
+#### Description
+This class resolves queries for a single add-on within an organization. It ensures the user is authenticated and has the necessary permissions before executing the query.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | Unique identifier of the add-on |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| add_on | Types::AddOns::Object | The requested add-on object, or null if not found |
+
+#### Internal Logic
+1. Checks for user authentication and organization membership (handled by included modules).
+2. Attempts to find the add-on with the given ID within the current organization.
+3. Returns the add-on if found, or raises a not found error if the add-on doesn't exist.
+
+## Side Effects
+This resolver doesn't have any side effects as it only performs a read operation.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication functionality |
+| RequiredOrganization | Ensures the user belongs to the required organization |
+
+## Error Handling
+- Raises an `unauthorized_error` if the user is not authenticated (provided by `AuthenticableApiUser`).
+- Raises an `organization_error` if the organization is missing or the user is not a member (provided by `RequiredOrganization`).
+- Calls `not_found_error` if the requested add-on is not found.
+
+## API/Interface Reference
+| Field | Type | Description |
+|:------|:-----|:------------|
+| add_on(id: ID!) | Types::AddOns::Object | Query a single add-on of an organization |
+
+Note: This resolver is used as part of the larger GraphQL API, specifically for the `add_on` field in the `QueryType`.

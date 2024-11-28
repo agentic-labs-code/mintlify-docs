@@ -1,0 +1,58 @@
+---
+title: "sidekiq.yml"
+---
+
+## High-level description
+This YAML file configures Sidekiq, a background job processing system for Ruby applications. It defines global settings and queue priorities, with specific overrides for production and staging environments.
+
+## Configuration
+The file defines various configuration options for Sidekiq. Here's a breakdown of the settings:
+
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| concurrency | integer | 10 | The number of threads Sidekiq will use to process jobs |
+| timeout | integer | 25 | The maximum time (in seconds) a job is allowed to run before being terminated |
+| retry | integer | 1 | The number of times a job will be retried if it fails |
+| queues | array | - | A list of queue names in order of priority |
+| production.concurrency | integer | ENV variable or 10 | Concurrency setting specific to the production environment |
+| staging.concurrency | integer | 10 | Concurrency setting specific to the staging environment |
+
+### Queues
+The file defines a list of queues in order of priority. Sidekiq will process jobs from these queues in the order they are listed:
+
+1. default
+2. mailers
+3. clock
+4. providers
+5. billing
+6. webhook
+7. invoices
+8. wallets
+9. integrations
+
+### Environment-specific settings
+The file includes environment-specific configurations:
+
+#### Production
+In the production environment, the concurrency is set dynamically using an environment variable:
+
+```yaml
+production:
+  concurrency: &lt;%= ENV.fetch('SIDEKIQ_CONCURRENCY', 10) %&gt;
+```
+
+This setting will use the value of the `SIDEKIQ_CONCURRENCY` environment variable if it's set, or default to 10 if the variable is not present.
+
+#### Staging
+For the staging environment, the concurrency is explicitly set to 10:
+
+```yaml
+staging:
+  concurrency: 10
+```
+
+## Performance Considerations
+The concurrency setting is crucial for performance tuning. In the production environment, it can be adjusted via an environment variable, allowing for easy scaling without code changes. The queue order also affects performance, as Sidekiq will prioritize jobs from queues listed earlier in the configuration.
+
+## Dependencies
+This configuration file implies the use of Sidekiq in the application, which is typically used with Ruby on Rails or other Ruby-based applications for background job processing.

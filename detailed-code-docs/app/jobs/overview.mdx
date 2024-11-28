@@ -1,0 +1,95 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains a collection of background job classes responsible for handling various asynchronous tasks related to the application's core functionality. These jobs cover a wide range of operations, including billing, customer management, event processing, integration with payment providers, and more.
+
+## What does it do?
+The jobs in this directory perform several key functions:
+
+1. Billing and Invoicing:
+   - Generate and finalize invoices
+   - Process payments through various providers (Adyen, GoCardless, Stripe)
+   - Handle credit notes and refunds
+   - Manage subscriptions and their billing cycles
+
+2. Customer and Organization Management:
+   - Create and update customer records in payment provider systems
+   - Handle customer data exports
+   - Manage organization-specific operations
+
+3. Event Processing:
+   - Handle incoming webhook events from payment providers
+   - Process and validate internal events
+   - Manage pay-in-advance scenarios
+
+4. Integration and Synchronization:
+   - Sync data with external aggregator systems
+   - Manage webhooks for various integrations
+   - Handle API interactions with payment providers
+
+5. Wallet and Credit Management:
+   - Process wallet transactions
+   - Refresh wallet balances
+   - Handle prepaid credits
+
+6. Miscellaneous Tasks:
+   - Generate PDFs for invoices and credit notes
+   - Send email notifications
+   - Perform data migrations and cleanup tasks
+
+These jobs are designed to run asynchronously, improving the overall performance and responsiveness of the application by offloading time-consuming or potentially unreliable operations to background processes.
+
+## Entry points
+The main entry points for these jobs are their respective `perform` methods. Jobs are typically enqueued by other parts of the application (e.g., controllers, services) when specific actions need to be performed asynchronously. Some common patterns include:
+
+- Billing jobs triggered by scheduled tasks or user actions
+- Webhook processing jobs triggered by incoming API calls
+- Integration jobs triggered by data changes or user-initiated sync requests
+
+The flow of control usually starts from a service or controller that enqueues a job, which is then picked up and executed by the background job processor (likely Sidekiq, based on the configurations seen in various jobs).
+
+## Key Files
+While there are numerous important files in this directory, some key files and patterns include:
+
+1. `application_job.rb`: Likely the base class for all background jobs, providing common configuration and behavior.
+2. `bill_subscription_job.rb`, `bill_paid_credit_job.rb`: Handle core billing operations.
+3. `events/create_batch_job.rb`, `events/post_process_job.rb`: Manage event processing and validation.
+4. `invoices/finalize_job.rb`, `invoices/generate_pdf_and_notify_job.rb`: Handle invoice finalization and PDF generation.
+5. `payment_provider_customers/adyen_create_job.rb`, `payment_provider_customers/gocardless_create_job.rb`, `payment_provider_customers/stripe_create_job.rb`: Manage customer creation in different payment provider systems.
+6. `integrations/perform_sync_job.rb`: Handles data synchronization with external systems.
+7. `send_webhook_job.rb`, `send_http_webhook_job.rb`: Manage webhook sending for various events.
+
+## Dependencies
+The jobs in this directory rely on several shared dependencies:
+
+1. ActiveJob: The base framework for defining and running background jobs.
+2. Sidekiq: Likely used as the backend for ActiveJob, providing job queueing and processing capabilities.
+3. Various service classes: Many jobs delegate their core logic to service objects (e.g., `Invoices::FinalizeService`, `Events::CreateBatchService`).
+4. External APIs: Jobs interacting with payment providers (Adyen, GoCardless, Stripe) depend on their respective APIs.
+5. Database models: Many jobs interact with ActiveRecord models representing core business objects (e.g., `Invoice`, `Subscription`, `Wallet`).
+
+## Configuration
+Common configuration patterns across these jobs include:
+
+1. Queue selection: Jobs are often assigned to specific queues (e.g., 'billing', 'events', 'providers') for better organization and prioritization.
+2. Retry behavior: Many jobs implement custom retry logic for specific errors, often using exponential or polynomial backoff strategies.
+3. Job uniqueness: Some jobs use Sidekiq's `unique` feature to prevent duplicate job execution.
+4. Error handling: Jobs often include specific error handling for known issues, such as API rate limits or connection failures.
+
+Example configuration:
+
+```ruby
+class SomeJob &lt; ApplicationJob
+  queue_as :some_queue
+  retry_on SomeError, wait: :exponentially_longer, attempts: 5
+  unique :until_executed, on_conflict: :log
+
+  def perform(args)
+    # Job logic here
+  end
+end
+```
+
+These jobs form the backbone of the application's asynchronous processing capabilities, handling a wide range of tasks from core business logic to integration with external systems. They are designed to be robust, with careful consideration given to error handling, retries, and performance optimization.

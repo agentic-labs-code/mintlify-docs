@@ -1,0 +1,72 @@
+---
+title: "update_service.rb"
+---
+
+## High-level description
+This code defines the `UpdateService` class within the `Integrations::Okta` module. It is responsible for updating an existing Okta integration with new parameters, ensuring that the organization has the necessary premium integration access, and handling any validation errors that may occur during the update process.
+
+## Code Structure
+The `UpdateService` class inherits from `BaseService` and contains a single public method `call` that performs the update operation. It uses instance variables to store the integration and params, which are set in the initializer.
+
+## Symbols
+
+### `Integrations::Okta::UpdateService`
+#### Description
+This class is responsible for updating an existing Okta integration with new parameters provided.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Integrations::OktaIntegration | The Okta integration to be updated |
+| params | Hash | A hash containing the new values for the integration |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the result of the update operation |
+
+#### Internal Logic
+1. Check if the integration exists
+2. Verify if the organization has access to premium Okta integration
+3. Update the integration attributes if provided in the params
+4. Save the updated integration
+5. Set the updated integration in the result object
+6. Handle any validation errors that may occur during the save operation
+
+### `#initialize`
+#### Description
+Initializes the UpdateService with the given integration and params.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Integrations::OktaIntegration | The Okta integration to be updated |
+| params | Hash | A hash containing the new values for the integration |
+
+### `#call`
+#### Description
+Performs the update operation on the Okta integration.
+
+#### Internal Logic
+1. Check if the integration exists, return a not_found_failure if it doesn't
+2. Verify if the organization has access to premium Okta integration, return a not_allowed_failure if it doesn't
+3. Update the integration attributes (client_id, client_secret, domain, organization_name) if provided in the params
+4. Save the updated integration
+5. Set the updated integration in the result object
+6. Handle any ActiveRecord::RecordInvalid errors that may occur during the save operation
+
+## Error Handling
+The service handles two main types of errors:
+1. Not found error: When the integration doesn't exist
+2. Not allowed error: When the organization doesn't have access to premium Okta integration
+3. Record validation failure: When there are validation errors during the save operation
+
+## Dependencies
+This code depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseService | The parent class that provides the basic structure and result handling |
+| ActiveRecord | For database operations and error handling |
+
+## Configuration
+The code doesn't define any specific configuration options. However, it relies on the organization's `premium_integrations` setting to determine if the Okta integration can be updated.

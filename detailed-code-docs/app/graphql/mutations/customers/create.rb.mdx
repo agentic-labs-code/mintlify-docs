@@ -1,0 +1,54 @@
+---
+title: "create.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for creating a new customer in a Ruby on Rails application. It is part of a larger GraphQL API and includes authentication and organization checks before executing the customer creation process.
+
+## Code Structure
+The `Mutations::Customers::Create` class inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the GraphQL mutation structure, including input and output types, and delegates the actual customer creation to a service object.
+
+## References
+- `Types::Customers::CreateCustomerInput`
+- `Types::Customers::Object`
+- `::Customers::CreateService`
+
+## Symbols
+
+### `Mutations::Customers::Create`
+#### Description
+This class defines a GraphQL mutation for creating a new customer. It ensures the user is authenticated and belongs to an organization before processing the creation request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | Customer creation arguments as defined in `Types::Customers::CreateCustomerInput` |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Types::Customers::Object | The created customer object if successful |
+| errors | [String] | Array of error messages if the creation fails |
+
+#### Internal Logic
+1. Checks for user authentication and organization membership (via included modules)
+2. Calls the `::Customers::CreateService` to handle the customer creation process
+3. Merges the current organization ID with the input arguments
+4. Returns the created customer if successful, or error messages if not
+
+## Side Effects
+- Creates a new customer record in the database if successful
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user belongs to an organization |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'customers:create' | The permission required to execute this mutation |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class) to handle and format errors from the creation service.

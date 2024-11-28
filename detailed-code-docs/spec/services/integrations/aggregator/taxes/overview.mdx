@@ -1,0 +1,40 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various services related to invoice operations in the context of tax calculations and integrations with external tax providers, specifically Anrok. The services tested include creating draft invoices, creating finalized invoices, negating invoices, and voiding invoices.
+
+## What does it do?
+These test files ensure that the invoice-related services function correctly when interacting with the Anrok tax calculation API. They verify that:
+
+1. Draft invoices can be created with proper tax calculations.
+2. Finalized invoices can be created and taxes applied correctly.
+3. Invoices can be negated (reversed) while maintaining tax consistency.
+4. Invoices can be voided in both the local system and the Anrok service.
+
+The tests cover various scenarios, including successful operations, error handling, and edge cases such as special tax rules. They also verify that the system responds appropriately to API failures and server errors, including delivering error webhooks when necessary.
+
+## Key Files
+1. `create_draft_service_spec.rb`: Tests the creation of draft invoices with tax calculations.
+2. `create_service_spec.rb`: Tests the creation of finalized invoices with tax calculations.
+3. `negate_service_spec.rb`: Tests the negation (reversal) of invoices.
+4. `void_service_spec.rb`: Tests the voiding of invoices.
+
+Each of these files focuses on a specific service within the `Integrations::Aggregator::Taxes::Invoices` module and ensures that it interacts correctly with the Anrok API and handles various scenarios appropriately.
+
+## Dependencies
+The main external dependency used in these tests is the `LagoHttpClient::Client`, which is mocked to simulate HTTP requests to the Anrok API. The tests also rely on the Rails testing environment, loaded through `rails_helper`.
+
+## Configuration
+While not explicitly shown in the test files, the tests simulate API calls to Anrok using the following endpoint:
+
+```
+https://api.nango.dev/v1/anrok/[operation]
+```
+
+Where `[operation]` can be `draft_invoices`, `negate_invoices`, or `void_invoices`, depending on the specific service being tested.
+
+The tests use mocked API responses to simulate various scenarios, including successful operations and different types of errors. This allows for comprehensive testing of the services' behavior without actually making external API calls during test execution.
+
+In summary, this directory contains a comprehensive set of tests that ensure the reliability and correctness of invoice-related operations, particularly in the context of tax calculations and integrations with the Anrok tax service. The tests cover a wide range of scenarios, from successful operations to various error conditions, providing confidence in the robustness of the invoice handling system.

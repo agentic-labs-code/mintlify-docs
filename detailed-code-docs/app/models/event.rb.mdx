@@ -1,0 +1,94 @@
+---
+title: "event.rb"
+---
+
+## High-level description
+The `Event` model represents a specific occurrence or action within the system, associated with an organization and potentially linked to a customer and subscription. It stores details about the event, such as a unique code, timestamp, metadata, and properties.
+
+## Code Structure
+The `Event` model inherits from `EventsRecord` and includes several modules like `Discard::Model`, `CustomerTimezone`, and `OrganizationTimezone`. It has relationships with other models like `Organization`, `Customer`, `Subscription`, and `BillableMetric`. It also defines validations, scopes, and instance methods to manage and retrieve event data.
+
+## References
+- `EventsRecord`: Parent class of `Event`.
+- `Discard::Model`: Provides soft delete functionality.
+- `CustomerTimezone`: Module for handling customer-specific timezones.
+- `OrganizationTimezone`: Module for handling organization-specific timezones.
+- `Organization`, `Customer`, `Subscription`, `BillableMetric`: Related models.
+
+## Symbols
+
+### `Event`
+#### Description
+The `Event` model represents a specific event within the system. It stores information about the event, including its code, timestamp, metadata, and properties.
+
+#### Inputs
+This section is not applicable as `Event` is a model and doesn't have explicit input parameters.
+
+#### Outputs
+This section is not applicable as `Event` is a model and doesn't have explicit output parameters.
+
+#### Internal Logic
+The `Event` model defines several instance methods:
+
+- `api_client`: Returns the user agent from the event metadata.
+- `ip_address`: Returns the IP address from the event metadata.
+- `billable_metric`: Returns the associated `BillableMetric` based on the event code.
+- `customer`: Returns the associated `Customer` based on the `external_customer_id` and timestamp.
+- `subscription`: Returns the associated `Subscription` based on the `external_customer_id`, `external_subscription_id`, and timestamp.
+
+## Side Effects
+- Creating or updating an event will create a record in the `events` table.
+- Soft deleting an event will update the `deleted_at` column.
+
+## Dependencies
+- `discard`: Provides soft delete functionality.
+
+### `api_client`
+#### Description
+Returns the user agent associated with the event, extracted from the event metadata.
+
+#### Inputs
+This method does not accept any input parameters.
+
+#### Outputs
+Returns a string representing the user agent, or `nil` if not available in the metadata.
+
+### `ip_address`
+#### Description
+Returns the IP address associated with the event, extracted from the event metadata.
+
+#### Inputs
+This method does not accept any input parameters.
+
+#### Outputs
+Returns a string representing the IP address, or `nil` if not available in the metadata.
+
+### `billable_metric`
+#### Description
+Retrieves the `BillableMetric` associated with the event based on the event's code.
+
+#### Inputs
+This method does not accept any input parameters.
+
+#### Outputs
+Returns the `BillableMetric` object associated with the event's code, or `nil` if no match is found.
+
+### `customer`
+#### Description
+Retrieves the `Customer` associated with the event based on the `external_customer_id` and the event timestamp. It considers soft-deleted customers and returns the most recently deleted or active customer.
+
+#### Inputs
+This method does not accept any input parameters.
+
+#### Outputs
+Returns the `Customer` object associated with the event, or `nil` if no match is found.
+
+### `subscription`
+#### Description
+Retrieves the active `Subscription` associated with the event based on the `external_customer_id`, `external_subscription_id`, and the event timestamp. It considers the subscription's start and termination dates to ensure it was active at the time of the event.
+
+#### Inputs
+This method does not accept any input parameters.
+
+#### Outputs
+Returns the `Subscription` object associated with the event, or `nil` if no match is found.

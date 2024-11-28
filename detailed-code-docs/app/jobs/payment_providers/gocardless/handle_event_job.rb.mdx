@@ -1,0 +1,50 @@
+---
+title: "handle_event_job.rb"
+---
+
+## High-level description
+This code defines a job class `HandleEventJob` within the `PaymentProviders::Gocardless` module. Its purpose is to handle Gocardless payment provider events asynchronously by delegating the event processing to the `PaymentProviders::GocardlessService`.
+
+## Code Structure
+The `HandleEventJob` class inherits from `ApplicationJob` and defines a single method `perform` that processes the events.
+
+## References
+- `PaymentProviders::GocardlessService`
+- `ApplicationJob`
+
+## Symbols
+
+### `PaymentProviders::Gocardless::HandleEventJob`
+#### Description
+This class represents a background job for handling Gocardless payment provider events. It uses ActiveJob for job processing and sets the queue name to 'providers'.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| events_json | String | JSON representation of Gocardless events to be processed |
+
+#### Internal Logic
+1. Creates a new instance of `PaymentProviders::GocardlessService`.
+2. Calls the `handle_event` method on the service instance, passing the `events_json`.
+3. Raises an error if the result of `handle_event` indicates a failure.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveJob | Provides the job processing framework |
+
+## Error Handling
+The job uses the `raise_if_error!` method on the result object returned by the `GocardlessService`. This suggests that any errors occurring during event processing will be raised, potentially triggering job retries or failure handling mechanisms.
+
+## Performance Considerations
+The job is queued in the 'providers' queue, which may be useful for managing the priority or resource allocation for payment provider-related tasks.
+
+## API/Interface Reference
+| Method | Input | Description |
+|:-------|:------|:------------|
+| perform | events_json: String | Processes the given Gocardless events |
+
+## Additional Notes
+1. The job inherits from `ApplicationJob`, which sets Sidekiq options to disable retries (`retry: 0`). This means that if the job fails, it won't be automatically retried.
+2. The `GocardlessService` is responsible for the actual processing of events, keeping the job class focused on job management concerns.
+3. The use of a dedicated job for event handling allows for asynchronous processing of Gocardless events, which can improve the responsiveness of the main application, especially when dealing with webhooks or large volumes of events.

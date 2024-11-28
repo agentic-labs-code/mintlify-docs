@@ -1,0 +1,44 @@
+---
+title: "current.rb"
+---
+
+## High-level description
+The `Current` class represents the usage of a customer for the current billing period. It provides details about the usage period, currency, charges, and total amounts.
+
+## Code Structure
+The `Current` class inherits from `Types::BaseObject` and defines several fields representing customer usage data. It fetches the charges usage data by grouping fees by `charge_id` from an `object` (presumably a customer or subscription object).
+
+## References
+- `Types::BaseObject`: The parent class for GraphQL object types.
+- `Types::CurrencyEnum`: An enum type representing available currencies.
+- `Types::Customers::Usage::Charge`: A GraphQL type representing a charge within the customer usage.
+
+## Symbols
+
+### `Current`
+#### Description
+A GraphQL type representing the current usage of a customer.
+
+#### Inputs
+This is a GraphQL type, it does not have explicit inputs. It receives data from the resolver.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| from_datetime | `GraphQL::Types::ISO8601DateTime` | Start date and time of the usage period. |
+| to_datetime | `GraphQL::Types::ISO8601DateTime` | End date and time of the usage period. |
+| currency | `Types::CurrencyEnum` | Currency of the usage amounts. |
+| issuing_date | `GraphQL::Types::ISO8601Date` | Date when the usage was issued. |
+| amount_cents | `GraphQL::Types::BigInt` | Total usage amount in cents, excluding taxes. |
+| taxes_amount_cents | `GraphQL::Types::BigInt` | Total amount of taxes in cents. |
+| total_amount_cents | `GraphQL::Types::BigInt` | Total usage amount in cents, including taxes. |
+| charges_usage | `[Types::Customers::Usage::Charge]` | List of charges incurred during the usage period. |
+
+#### Internal Logic
+The `charges_usage` field retrieves the fees from the `object` and groups them by `charge_id`. This suggests that the `object` has a `fees` association, likely representing individual usage records.
+
+## Dependencies
+- `graphql`: Provides the GraphQL type system and utilities.
+
+## API/Interface Reference
+This code defines a part of a GraphQL API. The `Current` type represents data returned by a GraphQL query for customer usage. The specific query and its usage are not shown in this code snippet.

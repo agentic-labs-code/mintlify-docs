@@ -1,0 +1,81 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test suites for GraphQL mutations related to membership management in an organization. The tests cover two main operations: revoking a membership and updating a membership's role. These tests ensure that the mutations behave correctly under various scenarios, including permission checks and error handling.
+
+## What does it do?
+The test suites in this directory verify the functionality of two important membership-related operations:
+
+1. Revoking a membership: This tests the ability to remove a user's membership from an organization. It checks various scenarios such as:
+   - Successfully revoking a membership
+   - Preventing users from revoking their own membership
+   - Ensuring the last admin of an organization cannot be removed
+
+2. Updating a membership's role: This tests the ability to change a user's role within an organization. It verifies that:
+   - A membership's role can be successfully updated
+   - Proper permissions are required to perform the update
+
+These tests help ensure that the membership management system works as expected, maintaining the integrity of organization structures and user roles.
+
+## Key Files
+
+1. `revoke_spec.rb`: This file contains tests for the `Mutations::Memberships::Revoke` GraphQL mutation. It verifies the following:
+   - The mutation requires a current user and proper permissions
+   - A membership can be successfully revoked
+   - Users cannot revoke their own membership
+   - The last admin of an organization cannot have their membership revoked
+
+   Example test case:
+   ```ruby
+   it 'Revokes a membership' do
+     user = create(:user)
+     admin_membership = create(:membership, :admin, organization: organization)
+     result = execute_graphql(
+       current_user: user,
+       query: mutation,
+       variables: { input: { id: admin_membership.id } }
+     )
+     expect(result.dig('data', 'revokeMembership', 'membership', 'id')).to eq(admin_membership.id)
+     expect(result.dig('data', 'revokeMembership', 'membership', 'revokedAt')).to be_present
+   end
+   ```
+
+2. `update_spec.rb`: This file contains tests for the `Mutations::Memberships::Update` GraphQL mutation. It focuses on:
+   - Verifying that the mutation requires proper permissions
+   - Ensuring a membership's role can be successfully updated
+
+   Example test case:
+   ```ruby
+   it 'updates a membership' do
+     membership = create(:membership, organization: organization)
+     result = execute_graphql(
+       current_user: current_user,
+       query: mutation,
+       variables: { input: { id: membership.id, role: 'admin' } }
+     )
+     expect(result.dig('data', 'updateMembership', 'membership', 'id')).to eq(membership.id)
+     expect(result.dig('data', 'updateMembership', 'membership', 'role')).to eq('admin')
+   end
+   ```
+
+## Dependencies
+The test suites rely on the following key dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: A library for creating test data, used to generate user and membership objects for testing.
+3. GraphQL: The query language being tested, specifically the mutations related to membership management.
+
+## Configuration
+The test files use RSpec's configuration, likely set up in a `rails_helper` or `spec_helper` file. This configuration includes:
+
+1. Setting up the testing environment
+2. Loading necessary support files and shared examples
+3. Configuring FactoryBot for creating test data
+
+Both test files make use of shared examples for common checks, such as requiring a current user and specific permissions. These shared examples are likely defined in a separate support file.
+
+The tests also rely on factory definitions for creating test data, which are probably defined in separate factory files within the `spec/factories` directory.
+
+In summary, this directory contains comprehensive test coverage for membership-related GraphQL mutations, ensuring that these critical operations behave correctly and securely within the application.

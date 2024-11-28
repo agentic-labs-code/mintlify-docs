@@ -1,0 +1,76 @@
+---
+title: "sidekiq.rb"
+---
+
+## High-level description
+This code initializes and configures Sidekiq, a background job processing system for Ruby applications. It sets up Redis connection settings, configures Sidekiq for both server and client, and implements a liveness check server for monitoring Sidekiq's health.
+
+## Code Structure
+The code is structured into three main parts: Redis configuration, Sidekiq server configuration, and Sidekiq client configuration. It also includes a conditional setup for Sidekiq Web UI and a liveness check server implementation.
+
+## Symbols
+
+### Redis Configuration
+#### Description
+Sets up the Redis connection configuration for Sidekiq, including URL, timeouts, and SSL parameters.
+
+#### Internal Logic
+- Creates a `redis_config` hash with connection settings
+- Adds password to the configuration if `REDIS_PASSWORD` environment variable is present
+- Conditionally sets up Sidekiq Web UI if `LAGO_SIDEKIQ_WEB` environment variable is set to 'true'
+
+### Sidekiq Server Configuration
+#### Description
+Configures Sidekiq server with Redis settings, logging, and custom parameters.
+
+#### Internal Logic
+- Sets Redis configuration
+- Configures logging to stdout with JSON formatting
+- Sets maximum retries to 0
+- Sets maximum dead jobs limit based on environment variable or default value
+- Implements a liveness check server on startup
+
+### Liveness Check Server
+#### Description
+A TCP server that responds to health check requests, indicating whether Sidekiq and its Redis connection are functioning properly.
+
+#### Internal Logic
+- Starts a new thread on Sidekiq server startup
+- Listens on localhost:8080
+- For each incoming connection:
+  - Attempts to ping Redis through Sidekiq
+  - Responds with HTTP 200 and "Live!" if successful
+  - Responds with HTTP 404 and an error message if unsuccessful or an exception occurs
+
+### Sidekiq Client Configuration
+#### Description
+Configures Sidekiq client with Redis settings and logging.
+
+#### Internal Logic
+- Sets Redis configuration
+- Configures logging to stdout with JSON formatting
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sidekiq | Background job processing |
+| socket | TCP server implementation for liveness check |
+| sidekiq/web | Sidekiq Web UI (conditional) |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REDIS_URL | string | N/A | Redis server URL |
+| REDIS_PASSWORD | string | N/A | Redis server password |
+| LAGO_SIDEKIQ_WEB | string | N/A | Enable Sidekiq Web UI if set to 'true' |
+| LAGO_SIDEKIQ_MAX_DEAD_JOBS | integer | 100,000 | Maximum number of dead jobs to keep |
+
+## Error Handling
+The liveness check server implements basic error handling by catching any exceptions that occur during the health check process and responding with an HTTP 404 status and an error message.
+
+## Logging
+Sidekiq logging is configured to use stdout with JSON formatting for both server and client configurations.
+
+## Performance Considerations
+- The liveness check server runs in a separate thread to avoid blocking the main Sidekiq process.
+- Redis connection timeout is set to 5 seconds to prevent long-running operations from hanging the application.

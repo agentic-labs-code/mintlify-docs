@@ -1,0 +1,65 @@
+---
+title: "update_service.rb"
+---
+
+## High-level description
+This code defines the `UpdateService` class within the `Organizations` module. It is responsible for updating an organization's attributes based on the provided parameters. The service handles various organization fields, including contact information, billing configuration, and premium features.
+
+## Code Structure
+The `UpdateService` class inherits from `BaseService` and contains a single public method `call` that performs the update operation. It also includes private helper methods for handling specific update scenarios.
+
+## Symbols
+
+### `Organizations::UpdateService`
+#### Description
+This service class is responsible for updating an organization's attributes based on the provided parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization to be updated |
+| params | Hash | A hash containing the attributes to be updated |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the updated organization and any error information |
+
+#### Internal Logic
+1. Updates basic organization attributes if provided in the params.
+2. Handles billing configuration updates.
+3. Manages EU tax settings if applicable.
+4. Updates webhook endpoint if a new URL is provided.
+5. Handles premium features like invoice grace period and payment due date updates.
+6. Assigns premium attributes if the license is premium.
+7. Handles logo upload if a base64 encoded logo is provided.
+8. Saves the updated organization.
+9. Returns the result object with the updated organization.
+
+### Private Methods
+
+#### `assign_premium_attributes`
+Assigns premium attributes (timezone and email settings) if the license is premium.
+
+#### `handle_base64_logo`
+Processes and attaches a base64 encoded logo to the organization.
+
+#### `handle_eu_tax_management`
+Manages EU tax settings for the organization, including validation and auto-generation of taxes.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseService | Parent class providing common service functionality |
+| Organizations::UpdateInvoiceGracePeriodService | Updates invoice grace period |
+| Organizations::UpdateInvoicePaymentDueDateService | Updates invoice payment due dates |
+| Taxes::AutoGenerateService | Generates taxes for EU organizations |
+
+## Error Handling
+The service uses the error handling mechanisms provided by the `BaseService` class. It catches `ActiveRecord::RecordInvalid` and `BaseService::FailedResult` exceptions and updates the result object accordingly.
+
+## Performance Considerations
+The service performs multiple database operations, including updates to related models (e.g., webhook endpoints, invoices). For large organizations with many related records, this could potentially impact performance.
+
+## TODOs
+- There is a NOTE regarding handling EU tax management for the organization, which might indicate a need for future improvements or considerations in this area.

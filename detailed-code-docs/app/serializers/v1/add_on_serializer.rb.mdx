@@ -1,0 +1,41 @@
+---
+title: "add_on_serializer.rb"
+---
+
+## High-level description
+The `V1::AddOnSerializer` class is responsible for serializing `AddOn` model objects into a JSON representation for API responses. It includes attributes like `lago_id`, `name`, `code`, `amount`, and optionally, associated `taxes`.
+
+## Code Structure
+The `V1::AddOnSerializer` inherits from `ModelSerializer` and overrides the `serialize` method. It uses the `CollectionSerializer` to serialize the associated `taxes` if the `:taxes` key is present in the `includes` option.
+
+## References
+- `ModelSerializer`: Parent class providing basic serialization functionality.
+- `CollectionSerializer`: Used to serialize the collection of associated `taxes`.
+- `V1::TaxSerializer`: Serializer used for individual `Tax` objects within the `taxes` collection.
+
+## Symbols
+
+### `V1::AddOnSerializer`
+#### Description
+Serializes an `AddOn` object into a JSON-compatible hash.
+
+#### Inputs
+This class does not define any specific input parameters. It inherits the initializer from `ModelSerializer` which takes the model instance and options.
+
+#### Outputs
+Returns a hash representing the serialized `AddOn` object.
+
+#### Internal Logic
+1. **`serialize` method:**
+    - Creates a payload hash with basic attributes of the `AddOn` object.
+    - Conditionally includes the serialized `taxes` if the `:taxes` key is present in the `includes` option.
+    - Returns the assembled payload hash.
+
+2. **`taxes` method:**
+    - Creates and returns a `CollectionSerializer` instance to serialize the `taxes` association of the `AddOn` object using the `V1::TaxSerializer`.
+
+## Dependencies
+- `ModelSerializer`: Provides base serialization functionality.
+- `CollectionSerializer`: Used for serializing collections.
+- `V1::TaxSerializer`: Used for serializing individual `Tax` objects.
+

@@ -1,0 +1,67 @@
+---
+title: "create_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Integrations::Aggregator::Contacts::CreateService` class. It tests the functionality of creating contacts in various accounting providers (like NetSuite and Xero) through an integration aggregator service.
+
+## Code Structure
+The test suite is organized around the `#call` method of the service, with different contexts for successful and unsuccessful service calls. It tests different scenarios for NetSuite and Xero integrations, including successful creation, failed creation, and various error conditions.
+
+## Symbols
+
+### `RSpec.describe Integrations::Aggregator::Contacts::CreateService`
+#### Description
+This is the main describe block for the test suite, focusing on the `CreateService` class within the `Integrations::Aggregator::Contacts` module.
+
+### `subject(:service_call)`
+#### Description
+Defines the subject of the test as the result of calling the described class with specific parameters.
+
+### `let` statements
+#### Description
+These statements set up the test environment by creating necessary objects and defining variables used across multiple tests.
+
+### `describe '#call'`
+#### Description
+This describe block focuses on testing the `#call` method of the service.
+
+#### Internal Logic
+The tests are organized into two main contexts:
+1. When the service call is successful
+2. When the service call is not successful
+
+Each context further breaks down into specific scenarios for different integration types (NetSuite and Xero) and response formats.
+
+### `context 'when service call is successful'`
+#### Description
+Tests scenarios where the service successfully creates a contact.
+
+#### Internal Logic
+- Tests both string and hash response formats
+- Verifies that the correct contact ID is returned
+- Checks if a success webhook is enqueued
+
+### `context 'when service call is not successful'`
+#### Description
+Tests various error scenarios when the service fails to create a contact.
+
+#### Internal Logic
+- Tests server errors, payload errors, and client errors
+- Verifies that the correct error information is returned
+- Checks if an error webhook is enqueued with the appropriate details
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| LagoHttpClient::Client | Mocked to simulate HTTP requests to the integration service |
+
+## Error Handling
+The test suite covers various error scenarios, including server errors, payload errors, and client authentication errors. It verifies that these errors are properly captured and reported through the service's result object and webhooks.
+
+## Logging
+No specific logging mechanisms are implemented in this test file.
+
+## TODOs
+There are no explicit TODOs in the code.

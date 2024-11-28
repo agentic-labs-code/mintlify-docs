@@ -1,0 +1,66 @@
+---
+title: "post_validation_job.rb"
+---
+
+## High-level description
+This code defines a job class `Events::PostValidationJob` that performs post-validation tasks for events related to a specific organization. It determines the queue for job execution based on an environment variable and calls a service to perform the actual validation.
+
+## Code Structure
+The `Events::PostValidationJob` class inherits from `ApplicationJob` and defines two main methods: `queue_as` and `perform`.
+
+## References
+- `ApplicationJob`: The parent class for this job.
+- `Events::PostValidationService`: The service class called to perform the validation.
+
+## Symbols
+
+### `Events::PostValidationJob`
+#### Description
+This class represents a background job for post-validation of events. It determines the queue for execution and delegates the actual validation to a service.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization for which to perform post-validation |
+
+#### Internal Logic
+1. Determines the queue based on the `SIDEKIQ_EVENTS` environment variable.
+2. Calls the `Events::PostValidationService` to perform the validation for the given organization.
+
+### `queue_as`
+#### Description
+Determines the queue for job execution based on the `SIDEKIQ_EVENTS` environment variable.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queue_name | Symbol | The name of the queue (:events or :default) |
+
+#### Internal Logic
+- Checks the `SIDEKIQ_EVENTS` environment variable using `ActiveModel::Type::Boolean`.
+- Returns `:events` if the variable is truthy, otherwise returns `:default`.
+
+### `perform`
+#### Description
+Executes the post-validation service for the given organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization for which to perform post-validation |
+
+#### Internal Logic
+Calls `Events::PostValidationService.call` with the provided organization.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveModel::Type::Boolean | Used to cast the environment variable to a boolean |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| SIDEKIQ_EVENTS | Boolean | N/A | Determines whether to use the 'events' queue or the 'default' queue |
+
+## Related Information
+The `Events::PostValidationJob` is likely triggered by the `Clock::EventsValidationJob`, which refreshes a materialized view of events from the last hour and enqueues `Events::PostValidationJob` for each organization with webhook endpoints. The actual validation logic is implemented in the `Events::PostValidationService`, which checks for invalid codes, missing aggregation properties, and invalid filter values in the events. If errors are found, it delivers a webhook with the error information.

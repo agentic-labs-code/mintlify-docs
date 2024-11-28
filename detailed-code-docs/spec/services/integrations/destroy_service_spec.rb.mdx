@@ -1,0 +1,57 @@
+---
+title: "destroy_service_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Integrations::DestroyService` class. It verifies the behavior of the service when destroying an integration, including successful destruction and error handling when the integration is not found.
+
+## Symbols
+
+### `RSpec.describe Integrations::DestroyService, type: :service`
+#### Description
+This is the main describe block for the `Integrations::DestroyService` test suite. It sets up the context for testing the service and defines the subject and necessary let variables.
+
+#### Internal Logic
+- Sets up the subject as an instance of `Integrations::DestroyService` with an integration.
+- Defines let variables for membership, organization, and integration.
+
+### `describe '.call'`
+#### Description
+This describe block focuses on testing the `call` method of the `Integrations::DestroyService`.
+
+#### Internal Logic
+- Sets up a before block to ensure the integration exists before each test.
+- Contains two test cases: one for successful destruction and one for handling a non-existent integration.
+
+### `it 'destroys the integration'`
+#### Description
+This test verifies that calling the service successfully destroys the integration.
+
+#### Internal Logic
+- Expects the count of `Integrations::BaseIntegration` to decrease by 1 after calling the service.
+
+### `context 'when integration is not found'`
+#### Description
+This context block tests the behavior of the service when the integration is not found (nil).
+
+#### Internal Logic
+- Sets the integration to nil.
+- Tests that the service returns an error result with the correct error code.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used for creating test data (implied by the use of `create` method) |
+
+## References
+- `Integrations::DestroyService`: The service being tested
+- `Integrations::BaseIntegration`: The base class for integrations, used to check the count of integrations
+
+## Notes
+1. The test uses FactoryBot to create test data, as evidenced by the `create` method calls.
+2. The test is using RSpec's `aggregate_failures` to group multiple expectations together.
+3. The test is checking both the happy path (successful destruction) and an error case (integration not found).
+4. The error case is checking for a specific error code ('integration_not_found'), which implies that the service is expected to return structured error responses.
+
+This test suite provides good coverage for the basic functionality of the `Integrations::DestroyService`, ensuring it behaves correctly in both successful and error scenarios.

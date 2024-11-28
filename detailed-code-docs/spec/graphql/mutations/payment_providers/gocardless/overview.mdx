@@ -1,0 +1,70 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL mutations related to GoCardless payment providers. The tests focus on the creation and update operations for GoCardless providers within the application's payment system.
+
+## What does it do?
+These tests ensure that the application correctly handles the creation and updating of GoCardless payment providers through GraphQL mutations. They verify that:
+
+1. Users have the correct permissions to perform these operations.
+2. The mutations correctly process input data, including OAuth2 authentication for GoCardless.
+3. The mutations return the expected data structure after successful operations.
+4. The application correctly handles edge cases, such as setting the success redirect URL to nil during an update.
+
+The tests simulate the entire process of creating and updating a GoCardless provider, including mocking the OAuth2 authentication flow that would typically interact with the GoCardless API.
+
+## Key Files
+
+1. `create_spec.rb`: This file tests the `Mutations::PaymentProviders::Gocardless::Create` GraphQL mutation. It verifies the creation process of a GoCardless payment provider, including permission checks, input validation, and the correct response structure.
+
+2. `update_spec.rb`: This file tests the `Mutations::PaymentProviders::Gocardless::Update` GraphQL mutation. It verifies the update process of an existing GoCardless payment provider, including permission checks and handling of the success redirect URL.
+
+Both files use similar testing structures, including shared examples for common permission checks and mocking of OAuth2 components.
+
+## Dependencies
+The test files rely on the following key dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data, such as memberships and payment providers.
+3. OAuth2: The tests mock various OAuth2 components (Client, Strategy::AuthCode, AccessToken) to simulate the authentication process with GoCardless without making actual API calls.
+
+## Configuration
+The tests use the following configuration:
+
+1. RSpec configuration: The tests are set up as GraphQL tests using `type: :graphql`.
+2. FactoryBot: Used to create test data for memberships and payment providers.
+3. Mocked OAuth2 components: The tests configure mock objects for OAuth2::Client, OAuth2::Strategy::AuthCode, and OAuth2::AccessToken to simulate the OAuth flow.
+
+Both test files use similar configurations, including:
+
+- Setting up required permissions
+- Creating test memberships and payment providers
+- Mocking OAuth2 components
+- Defining GraphQL mutation strings
+
+For example, in `create_spec.rb`:
+
+```ruby
+let(:required_permission) { 'create_payment_provider' }
+let(:membership) { create(:membership) }
+let(:oauth_client) { instance_double(OAuth2::Client) }
+let(:auth_code_strategy) { instance_double(OAuth2::Strategy::AuthCode) }
+let(:access_token) { instance_double(OAuth2::AccessToken) }
+```
+
+And in `update_spec.rb`:
+
+```ruby
+let(:required_permission) { 'update_payment_provider' }
+let(:membership) { create(:membership) }
+let(:gocardless_provider) { create(:gocardless_provider, organization: membership.organization) }
+let(:oauth_client) { instance_double(OAuth2::Client) }
+let(:auth_code_strategy) { instance_double(OAuth2::Strategy::AuthCode) }
+let(:access_token) { instance_double(OAuth2::AccessToken) }
+```
+
+These configurations allow the tests to simulate the creation and update processes for GoCardless providers without interacting with actual external services, ensuring isolated and reproducible test scenarios.
+
+The tests in this directory play a crucial role in ensuring the reliability and correctness of the GoCardless payment provider integration within the application's GraphQL API.

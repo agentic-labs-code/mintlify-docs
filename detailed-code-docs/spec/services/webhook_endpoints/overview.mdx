@@ -1,0 +1,86 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code is a RSpec test suite for the `WebhookEndpoints::UpdateService` class. It tests the functionality of updating webhook endpoints, including successful updates, handling non-existent endpoints, and validating input parameters.
+
+## Symbols
+
+### `RSpec.describe WebhookEndpoints::UpdateService`
+#### Description
+This is the main describe block for the `WebhookEndpoints::UpdateService` test suite. It sets up the context for all the tests related to this service.
+
+### `subject(:update_service)`
+#### Description
+Defines the subject of the test, which is an instance of `WebhookEndpoints::UpdateService` with specific parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | Integer | ID of the webhook endpoint |
+| organization | Organization | Associated organization |
+| params | Hash | Update parameters |
+
+### `let(:organization)`
+#### Description
+Creates a test organization using FactoryBot.
+
+### `let!(:webhook_endpoint)`
+#### Description
+Creates a test webhook endpoint associated with the organization.
+
+### `let(:update_params)`
+#### Description
+Defines the parameters used to update the webhook endpoint.
+
+### `describe '.call'`
+#### Description
+Describes the tests for the `call` method of the `UpdateService`.
+
+#### Internal Logic
+1. Tests successful update of webhook endpoint
+2. Tests handling of non-existent webhook endpoint
+3. Tests validation of invalid webhook URL
+
+### `it 'updates the webhook endpoint'`
+#### Description
+Tests the successful update of a webhook endpoint.
+
+#### Internal Logic
+1. Calls the update service
+2. Checks if the result is successful
+3. Verifies that the webhook URL and signature algorithm are updated correctly
+
+### `context 'when webhook endpoint does not exist'`
+#### Description
+Tests the scenario where the webhook endpoint to be updated doesn't exist.
+
+#### Internal Logic
+1. Sets up a non-existent webhook endpoint
+2. Calls the update service
+3. Checks if the result is not successful
+4. Verifies that the correct error message is returned
+
+### `context 'when webhook url is invalid'`
+#### Description
+Tests the scenario where an invalid webhook URL is provided.
+
+#### Internal Logic
+1. Sets up update parameters with an invalid URL
+2. Calls the update service
+3. Checks if the result is not successful
+4. Verifies that a validation failure error is returned
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| FactoryBot | Used for creating test data |
+
+## Error Handling
+The test suite checks for two main error scenarios:
+1. When the webhook endpoint is not found
+2. When there's a validation failure due to an invalid webhook URL
+
+These are handled by checking the success status of the result and the error messages or types returned.

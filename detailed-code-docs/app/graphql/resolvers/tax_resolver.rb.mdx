@@ -1,0 +1,67 @@
+---
+title: "tax_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying a single tax record within an organization. It ensures that the user is authenticated and belongs to the required organization before allowing access to the tax information.
+
+## Code Structure
+The `TaxResolver` class inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. These modules provide authentication and organization-specific functionality.
+
+## References
+- `Resolvers::BaseResolver`
+- `Types::Taxes::Object`
+- `AuthenticableApiUser` module
+- `RequiredOrganization` module
+
+## Symbols
+
+### `TaxResolver`
+#### Description
+This class resolves queries for a single tax record within an organization. It ensures the user is authenticated and belongs to the required organization before fetching the tax information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | Unique identifier of the tax record |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tax | Types::Taxes::Object | The requested tax record, or null if not found |
+
+#### Internal Logic
+1. Validates user authentication and organization membership (via included modules)
+2. Attempts to find the tax record in the current organization using the provided ID
+3. Returns the tax record if found
+4. Raises a not found error if the tax record doesn't exist
+
+## Side Effects
+This resolver doesn't have any side effects as it only reads data from the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user belongs to the required organization |
+
+## Error Handling
+- Raises an unauthorized error if the user is not authenticated (handled by `AuthenticableApiUser`)
+- Raises a forbidden error if the user doesn't belong to the required organization (handled by `RequiredOrganization`)
+- Raises a not found error if the requested tax record doesn't exist
+
+## API/Interface Reference
+This resolver is part of a GraphQL API. It can be queried as follows:
+
+```graphql
+query {
+  tax(id: "tax_id_here") {
+    id
+    name
+    rate
+    # other fields as defined in Types::Taxes::Object
+  }
+}
+```
+
+Note: The actual available fields for the tax object are defined in the `Types::Taxes::Object` class, which includes fields such as `id`, `organization`, `code`, `description`, `name`, `rate`, and various count fields.

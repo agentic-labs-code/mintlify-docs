@@ -1,0 +1,95 @@
+---
+title: "weighted_sum_query.rb"
+---
+
+## High-level description
+This code defines a `WeightedSumQuery` class within the `Events::Stores::Clickhouse` module. It generates SQL queries for calculating weighted sums of event data stored in ClickHouse, supporting both aggregated and grouped queries. The class is designed to work with time-series data and provides methods for generating various types of SQL queries, including breakdown queries for debugging purposes.
+
+## Code Structure
+The `WeightedSumQuery` class contains several public methods (`query`, `grouped_query`, `breakdown_query`) that generate SQL queries, and private methods that construct different parts of these queries. The class relies on a `store` object, which is expected to provide information about events, charges duration, and property names.
+
+## Symbols
+
+### `WeightedSumQuery`
+#### Description
+This class generates SQL queries for calculating weighted sums of event data stored in ClickHouse.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| store | Object | An object that provides methods for accessing event data and configuration |
+
+#### Public Methods
+
+### `query`
+#### Description
+Generates a SQL query for calculating the weighted sum of events.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| query | String | SQL query for calculating the weighted sum |
+
+#### Internal Logic
+1. Constructs a Common Table Expression (CTE) for event data.
+2. Calculates the period ratio for each event.
+3. Sums up the period ratios to get the final aggregation.
+
+### `grouped_query`
+#### Description
+Generates a SQL query for calculating grouped weighted sums of events.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| initial_values | Array | Initial values for each group |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| query | String | SQL query for calculating grouped weighted sums |
+
+#### Internal Logic
+1. Constructs a CTE for grouped event data, including initial values.
+2. Calculates the period ratio for each event within each group.
+3. Sums up the period ratios for each group to get the final aggregations.
+
+### `breakdown_query`
+#### Description
+Generates a SQL query for debugging purposes, showing the breakdown of calculations.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| query | String | SQL query for showing the calculation breakdown |
+
+#### Internal Logic
+1. Constructs a CTE for event data.
+2. Calculates cumulative sums, durations, and period ratios for each event.
+3. Orders the results by timestamp.
+
+## Private Methods
+The class includes several private methods that generate specific parts of the SQL queries, such as:
+- `events_cte_sql`
+- `initial_value_sql`
+- `end_of_period_value_sql`
+- `period_ratio_sql`
+- `grouped_events_cte_sql`
+- `grouped_initial_value_sql`
+- `grouped_end_of_period_value_sql`
+- `grouped_period_ratio_sql`
+
+These methods are used internally to construct the various parts of the SQL queries.
+
+## Dependencies
+The class relies on methods provided by the `store` object, such as:
+- `events`
+- `charges_duration`
+- `sanitized_property_name`
+- `sanitized_numeric_property`
+- `grouped_by`
+
+## Performance Considerations
+The queries use Common Table Expressions (CTEs) and window functions, which can be performance-intensive for large datasets. The efficiency of these queries will depend on the underlying ClickHouse configuration and the amount of data being processed.
+
+This class is designed to work with ClickHouse, a column-oriented database management system, which is typically used for analytical workloads. The queries are optimized for this type of database, using features like `arrayJoin` and `leadInFrame` that are specific to ClickHouse.

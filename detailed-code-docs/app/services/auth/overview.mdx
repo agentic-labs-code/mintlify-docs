@@ -1,0 +1,86 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `app/services/auth` directory contains services responsible for handling authentication processes in the application, specifically focusing on Google OAuth and Okta authentication. These services manage user authorization, login, registration, and invitation acceptance using external authentication providers.
+
+## What does it do?
+This directory implements authentication workflows for both Google and Okta:
+
+1. Google Authentication:
+   - Generates authorization URLs for Google OAuth flow
+   - Handles user login using Google OAuth codes
+   - Registers new users with Google OAuth information
+   - Processes invitation acceptance using Google authentication
+
+2. Okta Authentication:
+   - Manages Okta OAuth2 authorization process
+   - Handles user login through Okta
+   - Accepts invitations using Okta OAuth
+   - Provides base functionality for Okta-related authentication services
+
+These services work together to create a comprehensive authentication system that supports multiple providers, allowing users to authenticate, register, and accept invitations using either Google or Okta credentials.
+
+## Key Files
+
+1. `google_service.rb`:
+   - Implements the `Auth::GoogleService` class for Google OAuth authentication
+   - Provides methods for authorization, login, user registration, and invite acceptance
+   - Interacts with Google's authentication libraries and the application's user model
+
+2. `okta/accept_invite_service.rb`:
+   - Handles invitation acceptance using Okta OAuth
+   - Validates invites and performs necessary authentication steps
+   - Creates new user accounts and accepts invitations
+
+3. `okta/authorize_service.rb`:
+   - Initiates the Okta OAuth2 authorization process
+   - Generates authorization URLs with required parameters
+
+4. `okta/base_service.rb`:
+   - Serves as a foundation for Okta-based authentication services
+   - Provides common functionality for Okta integration and API interactions
+
+5. `okta/login_service.rb`:
+   - Manages the Okta authentication process for users
+   - Handles user creation, membership management, and token generation
+
+## Dependencies
+The authentication services rely on several external libraries and internal components:
+
+1. Google Authentication:
+   - Google::Auth: Provides OAuth and token verification functionality
+   - Signet: Used for handling authorization errors
+
+2. Okta Authentication:
+   - Rails framework: For caching, HTTP requests, and application structure
+   - LagoHttpClient: Custom HTTP client for Okta API requests
+   - SecureRandom: For generating random passwords and state tokens
+   - Redis: For caching state tokens and associated emails
+   - URI: For building authorization URLs
+
+Internal dependencies include various models and services such as `Invites::AcceptService`, `Integrations::OktaIntegration`, `User` model, and `UsersService`.
+
+## Configuration
+The authentication services require several configuration settings:
+
+1. Environment Variables:
+   - Google Authentication:
+     - `GOOGLE_AUTH_CLIENT_ID`: Google OAuth client ID
+     - `GOOGLE_AUTH_CLIENT_SECRET`: Google OAuth client secret
+     - `LAGO_FRONT_URL`: Frontend URL for callback
+   - Okta Authentication:
+     - `LAGO_FRONT_URL`: Frontend URL used in the redirect_uri for Okta
+
+2. Okta Integration Settings:
+   - Stored in the database, associated with the `Integrations::OktaIntegration` model
+   - Include Okta organization name, client ID, and client secret
+
+3. Redis Configuration:
+   - Used for caching state tokens and associated emails (90-second expiration)
+
+4. Database Configuration:
+   - Stores and retrieves user and membership information
+
+These authentication services provide a flexible and extensible system for handling user authentication through multiple providers. The modular structure allows for easy maintenance and potential addition of new authentication methods in the future.

@@ -1,0 +1,91 @@
+---
+title: "applied_coupons_controller_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Api::V1::Customers::AppliedCouponsController`, specifically testing the `destroy` action. It verifies the behavior of terminating an applied coupon for a customer, including various edge cases and error scenarios.
+
+## Code Structure
+The test suite is organized around the `destroy` action of the controller, with multiple contexts to cover different scenarios. It uses FactoryBot to create test data and RSpec's request specs to simulate API calls.
+
+## Symbols
+
+### RSpec.describe Api::V1::Customers::AppliedCouponsController
+#### Description
+This is the main describe block for the test suite, focusing on the AppliedCouponsController.
+
+### describe 'destroy'
+#### Description
+This describe block contains all the tests related to the destroy action of the controller.
+
+### let(:organization)
+#### Description
+Creates an organization instance using FactoryBot for use in the tests.
+
+### let(:customer)
+#### Description
+Creates a customer instance associated with the organization using FactoryBot.
+
+### let(:applied_coupon)
+#### Description
+Creates an applied_coupon instance associated with the customer using FactoryBot.
+
+### let(:identifier)
+#### Description
+Sets the identifier for the applied coupon, initially set to the applied_coupon's id.
+
+### it 'terminates the applied coupon'
+#### Description
+Tests that calling the destroy action changes the status of the applied coupon from 'active' to 'terminated'.
+
+#### Internal Logic
+1. Makes a DELETE request to the appropriate endpoint using `delete_with_token`.
+2. Checks if the applied_coupon's status changes from 'active' to 'terminated'.
+
+### it 'returns the applied_coupon'
+#### Description
+Verifies that the destroy action returns the correct applied_coupon data in the response.
+
+#### Internal Logic
+1. Makes a DELETE request to the endpoint.
+2. Checks if the response status is successful.
+3. Verifies that the returned applied_coupon's lago_id matches the original applied_coupon's id.
+
+### context 'when customer does not exist'
+#### Description
+Tests the behavior when trying to delete an applied coupon for a non-existent customer.
+
+#### Internal Logic
+Makes a DELETE request with an unknown customer ID and expects a 404 (not found) response.
+
+### context 'when applied coupon does not exist'
+#### Description
+Tests the behavior when trying to delete a non-existent applied coupon.
+
+#### Internal Logic
+Sets the identifier to 'unknown', makes a DELETE request, and expects a 404 (not found) response.
+
+### context 'when coupon is not applied to customer'
+#### Description
+Tests the behavior when trying to delete an applied coupon that belongs to a different customer.
+
+#### Internal Logic
+1. Creates another applied_coupon not associated with the test customer.
+2. Attempts to delete this coupon for the test customer.
+3. Expects a 404 (not found) response.
+
+## Dependencies
+The test suite relies on the following dependencies:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails and RSpec configuration |
+| FactoryBot | Creates test data |
+| RSpec | Testing framework |
+
+## Error Handling
+The test suite checks for proper error responses in various scenarios:
+- Non-existent customer: expects 404 response
+- Non-existent applied coupon: expects 404 response
+- Coupon not applied to the specified customer: expects 404 response
+
+These tests ensure that the controller handles error cases appropriately by returning the correct HTTP status codes.

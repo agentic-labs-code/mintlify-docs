@@ -1,0 +1,49 @@
+---
+title: "refresh.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation called `RefreshInvoice` within the `Mutations::Invoices` module. It allows authenticated users with the required permission to refresh a draft invoice for a specific organization.
+
+## Code Structure
+The `Refresh` class inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the mutation's name, description, input argument, and return type. The main logic is implemented in the `resolve` method.
+
+## Symbols
+
+### `Mutations::Invoices::Refresh`
+#### Description
+This class represents a GraphQL mutation for refreshing a draft invoice. It ensures the user is authenticated and has the required permission to perform this action.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the invoice to be refreshed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Types::Invoices::Object | The refreshed invoice object |
+
+#### Internal Logic
+1. The mutation checks for user authentication and organization membership using the included modules.
+2. It verifies that the user has the 'invoices:update' permission.
+3. The `resolve` method finds the invoice by ID within the current organization's visible invoices.
+4. It calls the `::Invoices::RefreshDraftService` to perform the actual refresh operation.
+5. If successful, it returns the refreshed invoice; otherwise, it returns an error.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user belongs to the required organization |
+| ::Invoices::RefreshDraftService | Service class that handles the invoice refresh logic |
+
+## Error Handling
+The mutation uses the `result_error` method to handle and return errors from the `RefreshDraftService`. Specific error handling for authentication and organization membership is implemented in the included modules.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| RefreshInvoice | Mutation | `{ id: ID! }` | Types::Invoices::Object | Refreshes a draft invoice |
+
+This mutation is part of a larger GraphQL API, as evidenced by its inclusion in the `Types::MutationType` in the related code snippets.

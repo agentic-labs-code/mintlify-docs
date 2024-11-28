@@ -1,0 +1,64 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains database migration files for ClickHouse, a column-oriented database management system. The migrations define the schema and structure for various tables and materialized views related to event data processing and aggregation.
+
+## What does it do?
+The migrations in this directory set up a data pipeline for processing and aggregating event data. Here's a high-level overview of the workflow:
+
+1. Raw events are ingested into the `events_raw` table.
+2. A Kafka queue (`events_raw_queue`) is set up to consume raw events.
+3. A materialized view (`events_raw_mv`) transforms and structures the raw event data.
+4. Enriched events are stored in the `events_enriched` table.
+5. Another Kafka queue (`events_enriched_queue`) is used for consuming enriched events.
+6. A materialized view (`events_enriched_mv`) further processes and structures the enriched event data.
+7. Various aggregation tables and materialized views are created for different types of aggregations:
+   - Sum aggregation (`events_sum_agg` and `events_sum_agg_mv`)
+   - Count aggregation (`events_count_agg` and `events_count_agg_mv`)
+   - Max aggregation (`events_max_agg` and `events_max_agg_mv`)
+
+These migrations set up a system that can efficiently ingest, process, and aggregate large volumes of event data, likely for analytics or billing purposes in a multi-tenant application.
+
+## Entry points
+The main entry points for this data pipeline are:
+
+1. `20231024084411_create_events_raw.rb`: Creates the initial table for raw event data.
+2. `20231026124912_create_events_raw_queue.rb`: Sets up the Kafka queue for consuming raw events.
+3. `20240705080709_create_events_enriched.rb`: Creates the table for storing enriched event data.
+4. `20240705084952_create_events_enriched_queue.rb`: Sets up the Kafka queue for consuming enriched events.
+
+The data flows from raw events to enriched events, and then into various aggregation tables and materialized views for different types of analysis.
+
+## Key Files
+1. `20231030163703_create_events_raw_mv.rb`: Creates a materialized view for transforming raw event data.
+2. `20240705085501_create_events_enriched_mv.rb`: Creates a materialized view for processing enriched event data.
+3. `20240705090006_create_events_sum_agg.rb` and `20240705090310_create_events_sum_agg_mv.rb`: Set up sum aggregation for events.
+4. `20240709095907_create_events_count_agg.rb` and `20240709100047_create_events_count_agg_mv.rb`: Set up count aggregation for events.
+5. `20240709135506_create_events_max_agg.rb` and `20240709135535_create_events_max_agg_mv.rb`: Set up max aggregation for events.
+
+These files define the core structure and logic for processing and aggregating event data in the system.
+
+## Dependencies
+The migrations rely on the following key dependencies:
+
+1. ActiveRecord: Used for the migration framework and database abstraction.
+2. ClickHouse: The target database system for which these migrations are designed.
+3. Kafka: Used for event streaming and queueing.
+
+## Configuration
+The migrations use several environment variables for configuration, particularly for Kafka:
+
+- `LAGO_KAFKA_BOOTSTRAP_SERVERS`: Kafka broker list
+- `LAGO_KAFKA_RAW_EVENTS_TOPIC`: Kafka topic for raw events
+- `LAGO_KAFKA_ENRICHED_EVENTS_TOPIC`: Kafka topic for enriched events
+- `LAGO_KAFKA_CLICKHOUSE_CONSUMER_GROUP`: Kafka consumer group for ClickHouse
+
+The ClickHouse tables use various engines and configurations for optimized performance:
+
+- `events_raw` and `events_enriched` use the ReplacingMergeTree engine.
+- Aggregation tables use the SummingMergeTree or AggregatingMergeTree engines.
+- Materialized views are used for efficient data transformation and aggregation.
+
+These configurations are crucial for the performance and functionality of the event processing system.

@@ -1,0 +1,78 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains service classes within the `Organizations` module, responsible for managing various aspects of organization updates and invoice-related operations. The services handle tasks such as updating organization attributes, managing invoice grace periods, and adjusting payment due dates.
+
+## What does it do?
+The services in this directory perform the following key functions:
+
+1. Update an organization's attributes, including contact information, billing configuration, and premium features.
+2. Manage the invoice grace period for an organization, including updating related invoices and their dates.
+3. Update payment due dates for draft invoices when an organization's net payment term changes.
+
+These services work together to ensure that changes to an organization's settings are properly reflected in their invoices and billing processes. They handle complex operations such as finalizing ready invoices, updating draft invoice dates, and managing EU tax settings.
+
+## Key Files
+
+1. `update_service.rb`:
+   - Main service for updating organization attributes.
+   - Handles various aspects such as billing configuration, EU tax settings, webhook endpoints, and premium features.
+   - Manages logo uploads and premium attribute assignments.
+
+2. `update_invoice_grace_period_service.rb`:
+   - Updates the invoice grace period for an organization.
+   - Finalizes ready-to-be-finalized invoices and updates draft invoice dates.
+   - Calculates new issuing and payment due dates based on the updated grace period.
+
+3. `update_invoice_payment_due_date_service.rb`:
+   - Updates payment due dates for draft invoices when an organization's net payment term changes.
+   - Recalculates payment due dates for affected invoices.
+
+## Dependencies
+These services rely on several external dependencies and internal services:
+
+1. ActiveRecord: Used for database operations and transactions.
+2. BaseService: Parent class providing common service functionality.
+3. Invoices::RefreshDraftAndFinalizeService: Used to finalize ready invoices.
+4. Taxes::AutoGenerateService: Generates taxes for EU organizations.
+
+## Configuration
+While there are no explicit configuration files, these services use various organization attributes and settings to determine their behavior:
+
+1. Invoice grace period
+2. Net payment term
+3. EU tax settings
+4. Premium license status
+
+These settings are typically stored in the organization model and accessed within the services.
+
+## Code Examples
+
+Here's an example of how the `UpdateInvoiceGracePeriodService` calculates the new issuing date for an invoice:
+
+```ruby
+def grace_period_issuing_date(invoice)
+  invoice_created_at(invoice) + organization.invoice_grace_period.days
+end
+```
+
+And here's how the `UpdateService` handles base64 encoded logos:
+
+```ruby
+def handle_base64_logo
+  return unless params[:base64_logo]
+
+  decoded_logo = Base64.decode64(params[:base64_logo])
+  content_type = Marcel::MimeType.for(decoded_logo)
+
+  organization.logo.attach(
+    io: StringIO.new(decoded_logo),
+    filename: "logo.#{content_type.split('/').last}",
+    content_type: content_type
+  )
+end
+```
+
+These services work together to provide a comprehensive system for managing organization updates and their impact on invoicing processes. They handle complex calculations and ensure that changes are properly reflected across the system.

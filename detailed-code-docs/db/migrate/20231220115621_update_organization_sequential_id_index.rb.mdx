@@ -1,0 +1,42 @@
+---
+title: "20231220115621_update_organization_sequential_id_index.rb"
+---
+
+## High-level description
+This migration updates the index on the `invoices` table to improve the uniqueness constraint for organization sequential IDs. It removes an existing index and adds a new one with a modified date truncation and a condition to exclude entries with `organization_sequential_id` equal to 0.
+
+## Symbols
+
+### `UpdateOrganizationSequentialIdIndex`
+#### Description
+This class is a Rails migration that modifies the indexing strategy for the `invoices` table, specifically targeting the organization sequential ID and creation date.
+
+#### Internal Logic
+1. Disables DDL transactions for this migration.
+2. Uses `safety_assured` to bypass Strong Migrations checks.
+3. Removes the existing index on `invoices` table.
+4. Adds a new index with modified columns and conditions.
+
+## Side Effects
+- Removes an existing index from the `invoices` table.
+- Adds a new unique index to the `invoices` table.
+- May temporarily impact database performance during the migration process.
+
+## Performance Considerations
+- The use of `disable_ddl_transaction!` suggests this migration might be intended for large tables or production environments where long-running migrations could be problematic.
+- The new index includes a condition (`where: 'organization_sequential_id != 0'`) which may improve query performance by reducing the index size.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the migration framework |
+
+## Error Handling
+The migration uses `safety_assured` to bypass Strong Migrations checks, indicating that the developer has manually verified the safety of this migration.
+
+## API/Interface Reference
+| Method | Purpose |
+|:-------|:--------|
+| `change` | Defines the migration changes to be applied (or rolled back) |
+
+Note: This migration modifies database schema and should be applied with caution, especially in production environments.

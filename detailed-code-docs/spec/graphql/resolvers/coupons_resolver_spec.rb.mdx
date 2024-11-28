@@ -1,0 +1,100 @@
+---
+title: "coupons_resolver_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Resolvers::CouponsResolver` in a GraphQL API. It verifies the behavior of the coupons query, including permission checks, filtering, and response structure.
+
+## Code Structure
+The test suite is organized as a single RSpec describe block for the `Resolvers::CouponsResolver`. It includes shared examples for common checks and a main test case for querying coupons.
+
+## Symbols
+
+### RSpec.describe Resolvers::CouponsResolver
+#### Description
+This is the main test suite for the CouponsResolver. It sets up the necessary test data and defines the GraphQL query to be tested.
+
+#### Internal Logic
+1. Sets up test data including a membership, organization, and coupons.
+2. Defines a GraphQL query to fetch coupons with specific parameters.
+3. Includes shared examples for common checks (user, organization, and permission).
+4. Executes the main test case to verify the coupons query response.
+
+### let(:required_permission)
+#### Description
+Defines the permission required to access the coupons query.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| required_permission | String | The permission string 'coupons:view' |
+
+### let(:query)
+#### Description
+Defines the GraphQL query used to fetch coupons.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| query | String | A GraphQL query string to fetch coupons with limit and status parameters |
+
+### let(:membership)
+#### Description
+Creates a test membership using FactoryBot.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| membership | Membership | A test membership object |
+
+### let(:organization)
+#### Description
+References the organization associated with the test membership.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization associated with the test membership |
+
+### let(:coupon)
+#### Description
+Creates a test coupon associated with the test organization.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| coupon | Coupon | A test coupon object |
+
+### before
+#### Description
+Sets up the test data by creating an active coupon and a terminated coupon.
+
+### it_behaves_like
+#### Description
+Includes shared examples for common checks.
+
+### it 'returns a list of coupons'
+#### Description
+The main test case that executes the GraphQL query and verifies the response.
+
+#### Internal Logic
+1. Executes the GraphQL query with the necessary context (user, organization, permissions).
+2. Verifies the response structure and content:
+   - Checks the count of returned coupons matches active coupons in the organization.
+   - Verifies the ID of the first returned coupon.
+   - Checks the metadata for current page and total count.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used for creating test data (membership, coupon) |
+| GraphQL | The query language used for the API |
+
+## Error Handling
+This test suite doesn't explicitly test error handling. It focuses on the happy path where the query is successful.
+
+## Notes
+- The test suite uses shared examples for common checks, which are likely defined in a separate file.
+- The `execute_graphql` method is not defined in this file and is likely a helper method defined elsewhere (possibly in the `GraphQLHelper` module included in the `rails_helper.rb` file).
+- The test creates both active and terminated coupons but only queries for active ones, verifying that the status filter works correctly.

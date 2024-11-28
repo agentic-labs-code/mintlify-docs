@@ -1,0 +1,54 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL types related to customer usage within a billing or subscription system. It defines structures for representing charges, filters, current usage, and grouped usage data. These types are likely used to expose customer usage information through a GraphQL API.
+
+## What does it do?
+This code provides a structured way to represent and query customer usage data in a GraphQL API. It allows clients to retrieve information about:
+
+1. Individual charges, including the amount, number of events, units consumed, and associated billable metrics.
+2. Filters applied to charges, which can affect how usage is calculated or displayed.
+3. Current usage for a customer, including the billing period, total amounts, and a breakdown of charges.
+4. Grouped usage data, which aggregates charges based on certain criteria.
+
+These types enable a flexible and detailed representation of customer usage, supporting various use cases such as displaying usage dashboards, generating invoices, or analyzing consumption patterns.
+
+## Key Files
+
+1. `charge.rb`: Defines the `Types::Customers::Usage::Charge` type, representing individual usage charges. It aggregates data from multiple usage records and provides fields for accessing total charges, events count, units consumed, and associated metadata.
+
+2. `charge_filter.rb`: Implements the `Types::Customers::Usage::ChargeFilter` type, representing filters applied to charges. It includes information such as the filter's ID, amount, event count, display name, and associated values.
+
+3. `current.rb`: Contains the `Types::Customers::Usage::Current` type, which represents a customer's usage for the current billing period. It provides details about the usage period, currency, charges, and total amounts.
+
+4. `grouped_usage.rb`: Defines the `Types::Customers::Usage::GroupedUsage` type, representing aggregated usage data for a group of charges. It includes fields for total amount, event count, units consumed, applied filters, and grouping criteria.
+
+## Dependencies
+The code relies on the following external libraries and frameworks:
+
+1. GraphQL Ruby: The entire codebase is built using the GraphQL Ruby library, which provides the foundation for defining GraphQL types and schemas in Ruby.
+
+2. BigDecimal: Used for precise decimal arithmetic when calculating aggregated values.
+
+The code also references other custom types that are likely defined elsewhere in the application:
+
+- `Types::BaseObject`: A base class for GraphQL object types.
+- `Types::BillableMetrics::Object`: Represents billable metrics.
+- `Types::Charges::Object`: Represents charges.
+- `Types::ChargeFilters::Values`: Represents charge filter values.
+- `Types::CurrencyEnum`: An enum type for currencies.
+
+## Configuration
+The code doesn't explicitly define any configuration options. However, the behavior of these types may be influenced by the overall GraphQL schema configuration and any application-wide settings related to customer usage calculation or display.
+
+Key points to note:
+
+1. The `Charge` type assumes that the underlying `object` is an array of usage records. The structure and content of these records would need to be consistent with the expectations of the `Charge` type.
+
+2. The `Current` type expects the `object` to have a `fees` association that can be grouped by `charge_id`. This implies a specific data structure for storing and retrieving usage data.
+
+3. The `GroupedUsage` type assumes that the `object` is an array of charge usage records with a consistent structure, including fields like `amount_cents`, `events_count`, and `units`.
+
+These assumptions about data structure suggest that there may be configuration or setup required elsewhere in the application to ensure that the correct data is provided to these types when resolving GraphQL queries.

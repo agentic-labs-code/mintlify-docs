@@ -1,0 +1,63 @@
+---
+title: "mrrs_service_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Analytics::MrrsService` class. It tests the behavior of the service's `call` method under different license conditions (premium and non-premium).
+
+## Code Structure
+The test suite defines a set of shared contexts and examples to test the `Analytics::MrrsService` class. It uses RSpec's `describe` and `context` blocks to organize the tests and FactoryBot to create test data.
+
+## Symbols
+
+### `RSpec.describe Analytics::MrrsService`
+#### Description
+This is the main describe block for the `Analytics::MrrsService` test suite. It sets up the context for all the tests within it.
+
+#### Internal Logic
+- Sets up the service, customer, and organization using let blocks
+- Defines the main subject of the tests as the `call` method of the service
+
+### `describe '#call'`
+#### Description
+This describe block focuses on testing the `call` method of the `Analytics::MrrsService`.
+
+#### Internal Logic
+- Defines the subject of the tests as `service_call`, which invokes the `call` method on the service instance
+
+### `context 'when licence is premium'`
+#### Description
+This context block tests the behavior of the service when the license is premium.
+
+#### Internal Logic
+- Uses the `around` hook with `lago_premium!` to set up the premium license context
+- Tests that the service call returns a successful result
+
+### `context 'when licence is not premium'`
+#### Description
+This context block tests the behavior of the service when the license is not premium.
+
+#### Internal Logic
+- Tests that the service call is not successful
+- Checks that the error code returned is 'feature_unavailable'
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used for creating test data (customer and organization) |
+
+## Configuration
+The test suite uses several RSpec configuration options:
+- `type: :service` - Specifies that this is a service test
+- `let` blocks for setting up test data
+- `around` hook for setting up the premium license context
+
+## Error Handling
+The test suite checks for specific error conditions:
+- When the license is not premium, it expects an error with the code 'feature_unavailable'
+
+## TODOs
+There are no explicit TODOs in this code.
+
+Note: The `lago_premium!` method used in the `around` hook is likely defined in a helper file (possibly in the `LicenseHelper` module mentioned in the related `rails_helper.rb` file) and is used to simulate a premium license environment for testing purposes.

@@ -1,0 +1,54 @@
+---
+title: "generate_payment_url_service.rb"
+---
+
+## High-level description
+This code defines a service class `GeneratePaymentUrlService` within the `Invoices::Payments` module. Its primary purpose is to generate a payment URL for a given invoice, considering various validation checks and utilizing the appropriate payment provider.
+
+## Code Structure
+The `GeneratePaymentUrlService` class inherits from `BaseService` and contains a single public method `call`. It interacts with the `Invoices::Payments::PaymentProviders::Factory` to generate the payment URL based on the invoice's associated payment provider.
+
+## Symbols
+
+### `GeneratePaymentUrlService`
+#### Description
+This service class is responsible for generating a payment URL for a given invoice. It performs several validation checks before attempting to generate the URL.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice for which to generate a payment URL |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the success status and either the payment URL or an error message |
+
+#### Internal Logic
+1. Validates the presence of the invoice and its associated payment provider.
+2. Checks if the payment provider is valid (not 'gocardless').
+3. Verifies the invoice status (not paid, voided, or draft).
+4. Uses the `Invoices::Payments::PaymentProviders::Factory` to generate the payment URL.
+5. Validates the generated payment URL.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Invoices::Payments::PaymentProviders::Factory | Used to create an instance of the appropriate payment provider service |
+
+## Error Handling
+The service uses the `result` object to handle and return various error states:
+- Not found failure for missing invoice
+- Single validation failure for missing payment provider
+- Single validation failure for invalid payment provider (gocardless)
+- Single validation failure for invalid invoice status
+- Single validation failure for payment provider error (blank payment URL)
+
+## References
+- `Invoices::Payments::PaymentProviders::Factory`: Used to create an instance of the appropriate payment provider service.
+- `BaseService`: The parent class from which `GeneratePaymentUrlService` inherits.
+
+## Performance Considerations
+The service performs several database queries to check the invoice status and associated customer's payment provider. These queries should be optimized or eager loaded if possible to improve performance, especially when dealing with a large number of invoices.
+
+This service is likely called from the `payment_url` action in the `InvoicesController`, as seen in the related code snippets. It's important to ensure that the invoice and its associated customer are properly loaded before calling this service to minimize database queries.

@@ -1,0 +1,64 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for three different jobs related to creating refunds for credit notes using different payment providers: Adyen, GoCardless, and Stripe. Each job is responsible for delegating the refund creation process to its respective service.
+
+## What does it do?
+These test files ensure that the refund creation jobs for different payment providers are working correctly. They verify that:
+
+1. The jobs initialize the correct refund service with the provided credit note.
+2. The jobs call the `create` method on the initialized service.
+3. The jobs handle the result returned by the service.
+
+This testing approach helps maintain the integrity of the refund creation process across different payment providers, ensuring that each job correctly delegates its responsibilities to the appropriate service.
+
+## Key Files
+1. `adyen_create_job_spec.rb`: Tests the `CreditNotes::Refunds::AdyenCreateJob`.
+2. `gocardless_create_job_spec.rb`: Tests the `CreditNotes::Refunds::GocardlessCreateJob`.
+3. `stripe_create_job_spec.rb`: Tests the `CreditNotes::Refunds::StripeCreateJob`.
+
+Each of these files follows a similar structure:
+
+1. They describe the job being tested using `RSpec.describe`.
+2. They create a test `credit_note` object using FactoryBot.
+3. They create a mock (double) of the respective refund service.
+4. They contain a test case that verifies the job delegates to the correct refund service.
+
+Here's an example of the test structure, using the Stripe job as an example:
+
+```ruby
+RSpec.describe CreditNotes::Refunds::StripeCreateJob, type: :job do
+  let(:credit_note) { create(:credit_note) }
+  let(:refund_service) { instance_double(CreditNotes::Refunds::StripeService) }
+
+  it 'delegates to the stripe refund service' do
+    expect(CreditNotes::Refunds::StripeService).to receive(:new)
+      .with(credit_note).and_return(refund_service)
+    expect(refund_service).to receive(:create).and_return(BaseService::Result.new)
+
+    described_class.perform_now(credit_note)
+  end
+end
+```
+
+This structure is consistent across all three test files, with the only difference being the specific job and service being tested.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test objects, specifically the `credit_note` in these tests.
+3. Rails: The tests are written for a Rails application, as indicated by the use of `type: :job` in the RSpec descriptions.
+
+## Configuration
+These test files don't require specific configuration, but they do assume the existence of:
+
+1. A `rails_helper` file that sets up the Rails testing environment.
+2. FactoryBot factories for creating `credit_note` objects.
+3. The actual job classes (`CreditNotes::Refunds::AdyenCreateJob`, `CreditNotes::Refunds::GocardlessCreateJob`, and `CreditNotes::Refunds::StripeCreateJob`) in the main application code.
+4. The corresponding service classes (`CreditNotes::Refunds::AdyenService`, `CreditNotes::Refunds::GocardlessService`, and `CreditNotes::Refunds::StripeService`) in the main application code.
+5. A `BaseService::Result` class that is returned by the `create` method of each service.
+
+These tests play a crucial role in ensuring the correct behavior of the refund creation jobs for different payment providers. They verify that each job correctly delegates the refund creation process to its respective service, maintaining a consistent interface across different payment providers while allowing for provider-specific implementations in the services themselves.

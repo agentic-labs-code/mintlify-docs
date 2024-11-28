@@ -1,0 +1,41 @@
+---
+title: "20240807100609_add_metadata_to_wallet_transactions.rb"
+---
+
+## High-level description
+This migration adds a new `metadata` column to the `wallet_transactions` table. The column is of type `jsonb` and has a default value of an empty JSON object. This allows for storing additional, flexible data associated with wallet transactions.
+
+## Symbols
+
+### `AddMetadataToWalletTransactions`
+#### Description
+This class is an ActiveRecord migration that defines a change to be applied to the database schema. It inherits from `ActiveRecord::Migration[7.1]`, indicating it's compatible with Rails 7.1 migration framework.
+
+#### Internal Logic
+The migration uses the `change` method to define a reversible database change. It adds a new column named `metadata` to the `wallet_transactions` table using the `add_column` method.
+
+### `change`
+#### Description
+This method defines the changes to be applied (and potentially reversed) by the migration.
+
+#### Internal Logic
+1. Calls `add_column` method to add a new column to the `wallet_transactions` table.
+2. Specifies the column name as `:metadata`.
+3. Sets the column type to `:jsonb`, which is a PostgreSQL-specific data type for storing JSON data in a binary format.
+4. Sets a default value of an empty hash `{}` for the new column.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the migration framework and database interaction capabilities |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| default | Hash | {} | Sets the default value for the `metadata` column to an empty JSON object |
+
+## Notes
+1. The use of `jsonb` type suggests that this migration is specifically designed for PostgreSQL databases, as `jsonb` is a PostgreSQL-specific data type.
+2. The `# frozen_string_literal: true` comment at the top of the file is a Ruby magic comment that helps improve performance by preventing the modification of string literals within the file.
+3. This migration allows for flexible storage of additional data related to wallet transactions without needing to modify the schema for each new piece of information.
+4. The migration is reversible by default, meaning Rails can automatically generate the reverse migration (removing the column) if needed.

@@ -1,0 +1,114 @@
+---
+title: "eu_auto_taxes_service.rb"
+---
+
+## High-level description
+This code defines the `EuAutoTaxesService` class within the `Customers` module. Its primary purpose is to determine the appropriate EU tax code for a customer based on their VAT information and location. The service performs VIES (VAT Information Exchange System) checks and applies tax rules accordingly.
+
+## Code Structure
+The main class `EuAutoTaxesService` inherits from `BaseService`. It contains a `call` method that orchestrates the tax code determination process, and several private methods that handle specific aspects of the tax logic.
+
+## Symbols
+
+### `EuAutoTaxesService`
+#### Description
+This service class is responsible for automatically determining the appropriate EU tax code for a customer.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Customer | The customer object for which to determine the tax code |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tax_code | String | The determined EU tax code for the customer |
+
+#### Internal Logic
+1. Perform a VIES check on the customer's tax identification number.
+2. If VIES check is successful, process the tax based on VIES information.
+3. If VIES check fails, process the tax based on non-VIES information.
+4. Apply specific tax rules based on the customer's country, organization's country, and postal code exceptions.
+
+### `vies_check`
+#### Description
+Performs a VIES check on the customer's tax identification number and sends a webhook with the result.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| vies_check | Hash | The result of the VIES check |
+
+### `process_vies_tax`
+#### Description
+Determines the tax code for a customer with a valid VIES check result.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer_vies | Hash | The result of the VIES check |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tax_code | String | The determined tax code |
+
+### `process_not_vies_tax`
+#### Description
+Determines the tax code for a customer without a valid VIES check result.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tax_code | String | The determined tax code |
+
+### `eu_countries_code`
+#### Description
+Retrieves the list of EU country codes.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| country_codes | Array | List of EU country codes |
+
+### `applicable_tax_exceptions`
+#### Description
+Finds applicable tax exceptions based on the customer's postal code.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| country_code | String | The country code to check for exceptions |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| exceptions | Array | List of applicable tax exceptions |
+
+### `eu_country_exceptions`
+#### Description
+Retrieves the list of tax exceptions for a specific EU country.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| country_code | String | The country code to get exceptions for |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| exceptions | Array | List of tax exceptions for the country |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| valvat | Used for performing VIES checks on VAT numbers |
+| LagoEuVat | Used for retrieving EU VAT rates and country information |
+
+## Error Handling
+The code doesn't implement specific error handling beyond what's provided by the `BaseService` class it inherits from.
+
+## Logging
+The code doesn't implement any explicit logging mechanisms.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

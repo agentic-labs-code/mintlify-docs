@@ -1,0 +1,70 @@
+---
+title: "standard_service.rb"
+---
+
+## High-level description
+This code defines a `StandardService` class within the `Charges::Validators` module, which is responsible for validating the properties of a standard charge. It extends the `BaseService` class and implements specific validation rules for the amount and grouped_by properties of a charge.
+
+## Code Structure
+The `StandardService` class inherits from `Charges::Validators::BaseService` and overrides the `valid?` method. It also defines private methods for accessing and validating specific properties of the charge.
+
+## Symbols
+
+### `StandardService`
+#### Description
+This class is responsible for validating the properties of a standard charge, specifically the amount and grouped_by fields.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Charge | The charge object to be validated |
+| properties | Hash | The properties of the charge (optional, defaults to charge.properties) |
+
+#### Internal Logic
+1. Overrides the `valid?` method from the base class.
+2. Calls `validate_amount` and `validate_grouped_by` methods.
+3. Calls the parent class's `valid?` method using `super`.
+
+### `valid?`
+#### Description
+This method performs the validation of the standard charge properties.
+
+#### Internal Logic
+1. Calls `validate_amount` to check the validity of the amount property.
+2. Calls `validate_grouped_by` to check the validity of the grouped_by property.
+3. Calls the parent class's `valid?` method to perform any additional validations.
+
+### `amount`
+#### Description
+A private method that returns the 'amount' value from the properties hash.
+
+### `grouped_by`
+#### Description
+A private method that returns the 'grouped_by' value from the properties hash.
+
+### `validate_amount`
+#### Description
+Validates the amount property of the charge.
+
+#### Internal Logic
+1. Uses the `Validators::DecimalAmountService` to check if the amount is valid.
+2. If the amount is invalid, it adds an error to the errors collection.
+
+### `validate_grouped_by`
+#### Description
+Validates the grouped_by property of the charge.
+
+#### Internal Logic
+1. Checks if grouped_by is nil or an empty array.
+2. If grouped_by is an array, it checks if all elements are non-empty strings.
+3. If the validation fails, it adds an error to the errors collection.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Validators::DecimalAmountService | Used to validate the amount property |
+
+## Error Handling
+The class uses the `add_error` method (likely defined in the parent class) to add validation errors. Errors are added for invalid amount and grouped_by values.
+
+This class is part of a larger validation system for different types of charges, as evidenced by the related code snippets showing validators for other charge types like graduated, package, percentage, and volume charges.

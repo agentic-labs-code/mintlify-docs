@@ -1,0 +1,58 @@
+---
+title: "refresh_draft_invoices_job.rb"
+---
+
+## High-level description
+The `RefreshDraftInvoicesJob` is a background job responsible for refreshing draft invoices. It iterates through invoices that are ready to be refreshed and have active subscriptions, then enqueues individual refresh jobs for each invoice.
+
+## Code Structure
+The `RefreshDraftInvoicesJob` is defined within the `Clock` module and inherits from `ApplicationJob`. It includes the `SentryCronConcern` for monitoring and uses Sidekiq's unique job feature to prevent duplicate job execution.
+
+## References
+- `Invoice` model
+- `Invoices::RefreshDraftJob`
+
+## Symbols
+
+### `Clock::RefreshDraftInvoicesJob`
+#### Description
+This job is responsible for finding invoices that are ready to be refreshed and have active subscriptions, then enqueuing individual refresh jobs for each of these invoices.
+
+#### Inputs
+This job doesn't take any explicit inputs.
+
+#### Internal Logic
+1. The job queries for invoices using `Invoice.ready_to_be_refreshed.with_active_subscriptions.find_each`.
+2. For each invoice found, it enqueues an `Invoices::RefreshDraftJob` with the invoice as an argument.
+
+#### Performance Considerations
+The job uses `find_each` to batch process invoices, which is more memory-efficient for large datasets compared to loading all records at once.
+
+### `queue_as 'clock'`
+#### Description
+This method call sets the queue for this job to 'clock', indicating that it should be processed by workers dedicated to clock-based or scheduled tasks.
+
+### `unique :until_executed, on_conflict: :log`
+#### Description
+This line uses Sidekiq's unique job feature to ensure that only one instance of this job is enqueued or executing at any given time. If a duplicate job is attempted to be enqueued, it will be logged instead of executed.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| SentryCronConcern | Provides monitoring and error tracking functionality for cron jobs |
+
+## Error Handling
+The job relies on the default error handling provided by ActiveJob and any additional error handling implemented in the `SentryCronConcern`.
+
+## Logging
+Logging is indirectly implemented through the `unique` option, which logs conflicts when duplicate jobs are attempted.
+
+Based on the related code snippets, we can infer some additional context:
+
+1. The `SentryCronConcern` is included, which suggests that this job is monitored using Sentry for error tracking and performance monitoring.
+
+2. The `Invoices::RefreshDraftJob` (from the related snippets) is the job that actually performs the refresh operation for individual invoices.
+
+3. The `ScenariosHelper` module in the related snippets includes a `perform_invoices_refresh` method that directly calls this job, suggesting it might be used in testing or scenario setup.
+
+This job serves as a coordinator, identifying invoices that need refreshing and delegating the actual refresh work to individual `Invoices::RefreshDraftJob` instances for each invoice. This design allows for better scalability and more granular error handling and retrying if needed.

@@ -1,0 +1,71 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains custom RSpec matchers that enhance the testing capabilities for various aspects of the application, including datetime comparisons, GraphQL field permissions, invoice charge fees, and negated matchers. These matchers are designed to improve the readability and expressiveness of test assertions in the project.
+
+## What does it do?
+The matchers in this directory provide specialized functionality for testing specific scenarios:
+
+1. The datetime matcher allows for flexible comparison of datetime values, ignoring microseconds and handling both Time objects and string representations.
+2. The GraphQL field permissions matcher enables testing of permissions associated with GraphQL fields and arguments.
+3. The empty charge fees matcher checks if an invoice object has charge fees that are all empty (zero amount) and have valid date ranges.
+4. The negated matcher defines a `not_change` matcher that is the opposite of the existing `change` matcher, allowing for more intuitive assertions when expecting no change.
+
+These matchers can be used in RSpec tests throughout the project to write more precise and readable assertions for complex scenarios.
+
+## Key Files
+
+### datetime_matcher.rb
+This file defines the `match_datetime` custom matcher. It compares two datetime values for equality, ignoring microseconds. This matcher is particularly useful when dealing with timestamps from different sources that might have slight microsecond differences.
+
+Usage example:
+```ruby
+expect(actual_datetime).to match_datetime(expected_datetime)
+```
+
+### graphql_field_permissions_matcher.rb
+This file introduces custom matchers for testing GraphQL field permissions. It defines the `WithPermissions` module, which is included in both `HaveAField` and `AcceptArgument` classes. The core functionality is implemented in the `WithPermissionsMatcher` class.
+
+Usage example:
+```ruby
+it { is_expected.to have_a_field(:api_key).with_permissions('developers:manage') }
+```
+
+### have_empty_charge_fees.rb
+This file defines the `have_empty_charge_fees` custom matcher. It checks if all charge fees in an invoice have zero total amount and valid date ranges. This matcher is useful for testing billing or invoicing functionality.
+
+Usage example:
+```ruby
+expect(invoice).to have_empty_charge_fees
+```
+
+### negated_matchers.rb
+This file defines a negated matcher `not_change` that is the opposite of the existing `change` matcher. It allows for more expressive and readable test assertions when expecting that something does not change.
+
+Usage example:
+```ruby
+expect { ... }.to not_change { ... }
+```
+
+## Dependencies
+The matchers in this directory rely on the following dependencies:
+
+1. RSpec: The testing framework for which these custom matchers are defined.
+2. Time: Used for datetime parsing and manipulation in the datetime matcher and empty charge fees matcher.
+3. Ruby/Rails core features: Such as `Array.wrap` used in the GraphQL field permissions matcher.
+
+## Configuration
+These matchers do not require specific configuration files or environment variables. They are designed to be used within RSpec tests and integrate seamlessly with the existing testing setup.
+
+To use these matchers in your tests, you may need to require them in your `spec_helper.rb` or `rails_helper.rb` file, depending on your project structure. For example:
+
+```ruby
+require 'support/matchers/datetime_matcher'
+require 'support/matchers/graphql_field_permissions_matcher'
+require 'support/matchers/have_empty_charge_fees'
+require 'support/matchers/negated_matchers'
+```
+
+These custom matchers enhance the testing capabilities of the project by providing specialized assertions for complex scenarios. They improve the readability and maintainability of the test suite by allowing developers to write more expressive and precise test cases for datetime comparisons, GraphQL permissions, invoice charge fees, and change expectations.

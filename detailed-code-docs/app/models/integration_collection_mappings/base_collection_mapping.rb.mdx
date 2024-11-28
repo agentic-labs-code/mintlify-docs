@@ -1,0 +1,49 @@
+---
+title: "base_collection_mapping.rb"
+---
+
+## High-level description
+The `BaseCollectionMapping` class represents a mapping between a Lago collection (e.g., coupon, subscription_fee) and an external system's equivalent. It defines the structure and common behavior for all integration collection mappings.
+
+## Code Structure
+The `BaseCollectionMapping` class inherits from `ApplicationRecord` and includes modules for settings storage, paper trail tracking, and defines an enum for different mapping types. It also defines relationships with other models like `Integrations::BaseIntegration`.
+
+## References
+- `Integrations::BaseIntegration`: Represents an integration with an external system.
+- `PaperTrailTraceable`: Provides paper trail tracking for the model.
+- `SettingsStorable`: Enables storing settings as JSON in the `settings` column.
+
+## Symbols
+
+### `BaseCollectionMapping`
+#### Description
+This class represents a mapping between a Lago collection and an external system's equivalent. It stores the mapping type and any specific settings for the mapping.
+
+#### Inputs
+This class doesn't define any specific input parameters.
+
+#### Outputs
+This class doesn't define any specific output parameters.
+
+#### Internal Logic
+The class defines several constants and methods:
+- `MAPPING_TYPES`: An array of symbols representing the different types of mappings supported.
+- `mapping_type`: An enum attribute using the `MAPPING_TYPES` values.
+- `settings_accessors`: Defines accessor methods for settings stored in the `settings` JSON column.
+
+## Side Effects
+- Creating or updating an instance of this class will create a record in the `integration_collection_mappings` table.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the ORM framework for database interactions. |
+| PaperTrail | Enables paper trail tracking for auditing purposes. |
+
+### Configuration
+The class uses the `SettingsStorable` module to store settings as JSON in the `settings` column. The following settings are accessible via accessor methods:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| `external_id` | String | nil | The external ID of the mapped item in the integrated system. |
+| `external_account_code` | String | nil | The external account code of the mapped item in the integrated system. |
+| `external_name` | String | nil | The external name of the mapped item in the integrated system. |

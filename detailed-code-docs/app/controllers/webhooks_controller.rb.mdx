@@ -1,0 +1,84 @@
+---
+title: "webhooks_controller.rb"
+---
+
+## High-level description
+This code defines a `WebhooksController` that handles incoming webhooks from different payment providers (Stripe, GoCardless, and Adyen). It processes the webhook data and delegates the handling to the respective payment provider services.
+
+## Code Structure
+The `WebhooksController` contains three main actions: `stripe`, `gocardless`, and `adyen`. Each action follows a similar pattern of calling the corresponding payment provider service to handle the incoming webhook, with slight variations in the parameters passed and error handling.
+
+## Symbols
+
+### `WebhooksController`
+#### Description
+This controller handles incoming webhooks from different payment providers.
+
+### `stripe`
+#### Description
+Handles incoming webhooks from Stripe.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | String | The ID of the organization |
+| code | String | An optional code |
+| params | String | The request body |
+| signature | String | The Stripe signature header |
+
+#### Internal Logic
+1. Calls `PaymentProviders::StripeService.new.handle_incoming_webhook` with the provided parameters.
+2. If the result is not successful, it checks for a specific error type and returns a bad request status if matched.
+3. If successful, it returns an OK status.
+
+### `gocardless`
+#### Description
+Handles incoming webhooks from GoCardless.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | String | The ID of the organization |
+| code | String | An optional code |
+| body | String | The request body |
+| signature | String | The GoCardless webhook signature |
+
+#### Internal Logic
+Similar to the `stripe` method, but uses `PaymentProviders::GocardlessService`.
+
+### `adyen`
+#### Description
+Handles incoming webhooks from Adyen.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | String | The ID of the organization |
+| code | String | An optional code |
+| body | Hash | The request parameters |
+
+#### Internal Logic
+1. Calls `PaymentProviders::AdyenService.new.handle_incoming_webhook` with the provided parameters.
+2. If the result is not successful, it returns a bad request status for a specific error code.
+3. If successful, it renders a JSON response with '[accepted]'.
+
+### `adyen_params`
+#### Description
+A helper method to extract and permit specific Adyen parameters from the request.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| adyen_params | ActionController::Parameters | Permitted Adyen parameters |
+
+## Error Handling
+The controller implements error handling for each payment provider. If the result of handling the webhook is not successful, it checks for specific error types and returns appropriate HTTP status codes (e.g., 400 for bad requests).
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| PaymentProviders::StripeService | Handles Stripe webhook processing |
+| PaymentProviders::GocardlessService | Handles GoCardless webhook processing |
+| PaymentProviders::AdyenService | Handles Adyen webhook processing |
+
+This controller relies on the respective payment provider services to process the incoming webhooks. The services are responsible for the actual logic of handling the webhook data, while the controller manages the HTTP responses and basic error handling.

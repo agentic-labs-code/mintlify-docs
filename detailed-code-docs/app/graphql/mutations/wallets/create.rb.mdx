@@ -1,0 +1,59 @@
+---
+title: "create.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for creating a new customer wallet in a Ruby on Rails application. It's part of a larger system that manages wallets, customers, and organizations, likely for a financial or e-commerce platform.
+
+## Code Structure
+The `Create` class is nested within the `Mutations::Wallets` module and inherits from `BaseMutation`. It includes two concerns: `AuthenticableApiUser` and `RequiredOrganization`, which add authentication and organization-related functionality.
+
+## References
+- `Types::Wallets::CreateInput`
+- `Types::Wallets::Object`
+- `::Wallets::CreateService`
+- `Customer` model
+
+## Symbols
+
+### `Mutations::Wallets::Create`
+#### Description
+This class defines a GraphQL mutation for creating a new customer wallet. It authenticates the user, ensures they have the required organization, and then calls a service to create the wallet.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | Arguments passed to the mutation, including customer_id and other wallet creation parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet | Types::Wallets::Object | The created wallet object |
+
+#### Internal Logic
+1. The `resolve` method is called with the input arguments.
+2. It merges the current organization ID and customer object into the arguments.
+3. Calls the `::Wallets::CreateService` to create the wallet.
+4. Returns the created wallet if successful, or an error if not.
+
+#### Side Effects
+- Creates a new wallet in the database
+- May update the customer's currency
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides user authentication functionality |
+| RequiredOrganization | Ensures the user has access to the required organization |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'wallets:create' | The permission required to create a wallet |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class) to handle and return errors from the `CreateService`.
+
+___
+
+This documentation provides a comprehensive overview of the `Create` mutation for customer wallets, explaining its purpose, inputs, outputs, and internal logic. It also highlights the dependencies and configuration options used in the code.

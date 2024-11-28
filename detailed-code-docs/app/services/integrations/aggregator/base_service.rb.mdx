@@ -1,0 +1,137 @@
+---
+title: "base_service.rb"
+---
+
+## High-level description
+This code defines a base service class for integrating with various accounting and tax providers through an aggregator API. It provides common functionality and structure for different integration types, including Netsuite, Xero, and Anrok, handling API communication, error management, and webhook delivery.
+
+## Code Structure
+The `BaseService` class is the foundation for other service classes in the `Integrations::Aggregator` module. It sets up the basic structure for API interactions, including URL construction, HTTP client initialization, and header management. Other services in the module inherit from this base class and implement specific functionalities.
+
+## Symbols
+
+### `Integrations::Aggregator::BaseService`
+#### Description
+This class serves as a base for integration services, providing common functionality for API interactions with different providers.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Object | The integration object containing provider-specific information |
+| options | Hash | Additional options for the service (default: {}) |
+
+#### Internal Logic
+- Initializes with an integration object and options
+- Defines methods for determining the provider and provider key based on the integration type
+- Sets up an HTTP client for API communication
+- Manages headers for API requests
+- Provides methods for error handling and webhook delivery
+
+### `#action_path`
+#### Description
+An abstract method that should be implemented by subclasses to define the specific API endpoint path.
+
+### `#provider`
+#### Description
+Determines the provider based on the integration type.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| provider | String | The provider name (e.g., 'netsuite', 'xero', 'anrok') |
+
+### `#provider_key`
+#### Description
+Determines the provider key based on the integration type.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| provider_key | String | The provider key used in API requests |
+
+### `#http_client`
+#### Description
+Creates and returns an HTTP client for making API requests.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| http_client | LagoHttpClient::Client | An instance of the HTTP client |
+
+### `#headers`
+#### Description
+Generates headers for API requests.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| headers | Hash | Headers including Connection-Id and Authorization |
+
+### `#deliver_error_webhook`
+#### Description
+Enqueues a job to send an error webhook for accounting provider errors.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Object | The customer object |
+| code | String | The error code |
+| message | String | The error message |
+
+### `#deliver_tax_error_webhook`
+#### Description
+Enqueues a job to send an error webhook for tax provider errors.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Object | The customer object |
+| code | String | The error code |
+| message | String | The error message |
+
+### `#code`
+#### Description
+Extracts the error code from an error object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| error | Object | The error object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | The extracted error code |
+
+### `#message`
+#### Description
+Extracts the error message from an error object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| error | Object | The error object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| message | String | The extracted error message |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| lago_http_client | Provides HTTP client functionality for API requests |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| BASE_URL | String | 'https://api.nango.dev/' | The base URL for API requests |
+
+## Error Handling
+The class provides methods for extracting error codes and messages from error objects. It also includes methods for delivering error webhooks for both accounting and tax provider errors.
+
+## Logging
+This class does not implement explicit logging mechanisms.
+
+## API/Interface Reference
+This base class does not directly expose an API but provides the foundation for other services that interact with external APIs.

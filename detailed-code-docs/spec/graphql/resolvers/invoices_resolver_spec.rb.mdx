@@ -1,0 +1,112 @@
+---
+title: "invoices_resolver_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Resolvers::InvoicesResolver` GraphQL resolver. It tests various scenarios for querying invoices, including filtering by different attributes such as payment status, invoice status, currency, and issuing date.
+
+## Code Structure
+The test suite is organized into a main context and several nested contexts, each testing different filtering scenarios for the invoices query. The tests use factory-created objects and GraphQL queries to verify the resolver's behavior.
+
+## Symbols
+
+### RSpec.describe Resolvers::InvoicesResolver
+#### Description
+This is the main test suite for the `InvoicesResolver`. It sets up the necessary test data and includes shared examples for common GraphQL resolver behaviors.
+
+#### Internal Logic
+1. Sets up test data including users, organizations, customers, and invoices.
+2. Defines a basic GraphQL query for fetching invoices.
+3. Includes shared examples for testing permissions and authentication.
+4. Tests various filtering scenarios in nested contexts.
+
+### Main "it" block
+#### Description
+Tests the basic functionality of the invoices resolver without any filters.
+
+#### Internal Logic
+1. Executes the GraphQL query with necessary permissions and context.
+2. Verifies that all created invoices are returned.
+3. Checks the metadata for correct pagination information.
+
+### Context: "when filtering by succeeded payment status"
+#### Description
+Tests filtering invoices by payment status.
+
+#### Internal Logic
+1. Modifies the GraphQL query to include a payment status filter.
+2. Verifies that only invoices with the specified payment status are returned.
+
+### Context: "when filtering by draft status"
+#### Description
+Tests filtering invoices by draft status.
+
+#### Internal Logic
+1. Creates an additional draft invoice.
+2. Modifies the GraphQL query to filter by draft status.
+3. Verifies that only draft invoices are returned.
+
+### Context: "when filtering by payment dispute lost"
+#### Description
+Tests filtering invoices by payment dispute lost status.
+
+#### Internal Logic
+1. Creates additional invoices including one with a lost dispute.
+2. Modifies the GraphQL query to filter by payment dispute lost.
+3. Verifies that only invoices with lost disputes are returned.
+
+### Context: "when filtering by invoice type"
+#### Description
+Tests filtering invoices by invoice type.
+
+#### Internal Logic
+1. Creates an invoice with a specific type (one_off).
+2. Modifies the GraphQL query to filter by invoice type.
+3. Verifies that only invoices of the specified type are returned.
+
+### Context: "when filtering by currency"
+#### Description
+Tests filtering invoices by currency.
+
+#### Internal Logic
+1. Creates an invoice with a specific currency (USD).
+2. Modifies the GraphQL query to filter by currency.
+3. Verifies that only invoices with the specified currency are returned.
+
+### Context: "when filtering by customer external id"
+#### Description
+Tests filtering invoices by customer's external ID.
+
+#### Internal Logic
+1. Creates a customer with a specific external ID and an associated invoice.
+2. Modifies the GraphQL query to filter by customer external ID.
+3. Verifies that only invoices associated with the specified customer external ID are returned.
+
+### Context: "when filtering by issuing date"
+#### Description
+Tests filtering invoices by issuing date range.
+
+#### Internal Logic
+1. Creates an invoice with a specific issuing date.
+2. Modifies the GraphQL query to filter by issuing date range.
+3. Verifies that only invoices within the specified date range are returned.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides Rails-specific testing utilities and configurations |
+| rspec | Testing framework used for writing and running the tests |
+| factory_bot | Used for creating test data (factories) |
+| graphql | GraphQL implementation for Ruby, used for defining and executing queries |
+
+## Error Handling
+This test file doesn't explicitly test error handling scenarios. It focuses on testing the successful execution of queries with various filters.
+
+## API/Interface Reference
+The test file implicitly documents the GraphQL API for querying invoices:
+
+| Query | Filters | Description |
+|:------|:--------|:------------|
+| invoices | limit, paymentStatus, status, paymentDisputeLost, invoiceType, currency, customerExternalId, issuingDateFrom, issuingDateTo | Fetches invoices based on specified filters |
+
+The response includes a collection of invoices and metadata with pagination information.

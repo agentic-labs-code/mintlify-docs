@@ -1,0 +1,96 @@
+---
+title: "post_process_service.rb"
+---
+
+## High-level description
+This code defines the `Events::PostProcessService` class, which is responsible for post-processing events in a billing or subscription system. It handles various tasks such as updating event attributes, managing subscriptions, expiring cached charges, and triggering pay-in-advance processing.
+
+## Code Structure
+The `Events::PostProcessService` class inherits from `BaseService` and contains a main `call` method that orchestrates the post-processing steps. It also includes several private methods that handle specific tasks within the post-processing flow.
+
+## References
+- `Events::PostProcessJob`: Uses this service to perform event post-processing.
+- `Subscriptions::ChargeCacheService`: Used to expire cached charges.
+- `LifetimeUsages::FlagRefreshFromSubscriptionService`: Called to flag subscriptions for usage recalculation.
+- `Events::PayInAdvanceJob`: Triggered for pay-in-advance processing.
+- `Events::CommonFactory`: Used to create event instances for pay-in-advance processing.
+- `SendWebhookJob`: Used to deliver error webhooks.
+
+## Symbols
+
+### `Events::PostProcessService`
+#### Description
+This service class handles the post-processing of events, including updating event attributes, managing subscriptions, expiring cached charges, and triggering pay-in-advance processing.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | Event | The event object to be post-processed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the processed event and any error information |
+
+#### Internal Logic
+1. Update event attributes (external_customer_id and external_subscription_id).
+2. Save the updated event.
+3. Expire cached charges for affected subscriptions.
+4. Flag subscriptions for usage recalculation.
+5. Handle pay-in-advance processing if applicable.
+6. Handle errors and deliver error webhooks if necessary.
+
+### `customer`
+#### Description
+A private method that retrieves the customer associated with the event's subscription.
+
+### `subscriptions`
+#### Description
+A private method that retrieves the subscriptions related to the event, based on the customer or external subscription ID.
+
+### `billable_metric`
+#### Description
+A private method that retrieves the billable metric associated with the event's code.
+
+### `expire_cached_charges`
+#### Description
+A private method that expires cached charges for active subscriptions affected by the event.
+
+### `flag_refresh_from_subscription`
+#### Description
+A private method that flags active subscriptions for usage recalculation.
+
+### `handle_pay_in_advance`
+#### Description
+A private method that triggers pay-in-advance processing for applicable charges.
+
+### `charges`
+#### Description
+A private method that retrieves pay-in-advance charges associated with the event's billable metric and subscription plan.
+
+### `deliver_error_webhook`
+#### Description
+A private method that delivers an error webhook when an exception occurs during post-processing.
+
+## Side Effects
+- Updates the event object in the database.
+- Expires cached charges for affected subscriptions.
+- Flags subscriptions for usage recalculation.
+- Triggers pay-in-advance processing.
+- Delivers error webhooks in case of exceptions.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Used for database operations and error handling |
+| Deprecation | Used to report deprecated usage of missing external_subscription_id |
+
+## Error Handling
+The service handles two types of errors:
+1. `ActiveRecord::RecordInvalid`: Occurs when the event fails validation during save.
+2. `ActiveRecord::RecordNotUnique`: Occurs when there's a duplicate transaction_id.
+
+In both cases, an error webhook is delivered with the appropriate error message.
+
+## Logging
+The code uses the `Deprecation.report` method to log deprecated usage of events missing an external_subscription_id.

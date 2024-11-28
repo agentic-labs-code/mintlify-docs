@@ -1,0 +1,58 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines a RSpec test for the `Integrations::Aggregator::Invoices::CreateJob` job. It verifies that the job correctly calls the `Integrations::Aggregator::Invoices::CreateService` with the provided invoice.
+
+## Symbols
+
+### `RSpec.describe Integrations::Aggregator::Invoices::CreateJob, type: :job`
+#### Description
+This is the main RSpec describe block that groups all the tests for the `Integrations::Aggregator::Invoices::CreateJob` job.
+
+### `subject(:create_job)`
+#### Description
+Defines the subject of the test as the described class (`Integrations::Aggregator::Invoices::CreateJob`).
+
+### `let(:service)`
+#### Description
+Creates a double (mock) of the `Integrations::Aggregator::Invoices::CreateService`.
+
+### `let(:invoice)`
+#### Description
+Creates a factory-generated invoice object for testing purposes.
+
+### `let(:result)`
+#### Description
+Creates a new instance of `BaseService::Result` to be used as the return value of the service call.
+
+### `before` block
+#### Description
+Sets up the test environment by configuring the mock objects and their expected behavior.
+
+#### Internal Logic
+1. Configures the `Integrations::Aggregator::Invoices::CreateService` to return the mock service object when instantiated.
+2. Sets up the mock service object to return the `result` object when its `call` method is invoked.
+
+### `it 'calls the aggregator create invoice service'`
+#### Description
+The main test case that verifies the correct behavior of the job.
+
+#### Internal Logic
+1. Executes the job by calling `described_class.perform_now(invoice:)`.
+2. Uses `aggregate_failures` to group multiple expectations.
+3. Verifies that `Integrations::Aggregator::Invoices::CreateService.new` was called.
+4. Verifies that the `call` method of the service object was invoked.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used to create test data (invoice factory) |
+| RSpec | Testing framework |
+
+## Notes
+- This test file is focused on ensuring that the job correctly delegates its work to the appropriate service object.
+- The test uses doubles and stubs to isolate the job's behavior and avoid calling the actual service implementation.
+- The use of `aggregate_failures` allows multiple expectations to be checked within a single test, providing more comprehensive verification.

@@ -1,0 +1,56 @@
+---
+title: "organization_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying the current organization in a Ruby on Rails application. It is part of a larger GraphQL API structure and includes authentication and organization membership checks.
+
+## Code Structure
+The `OrganizationResolver` class is defined within the `Resolvers` module and inherits from `Resolvers::BaseResolver`. It includes two modules: `AuthenticableApiUser` and `RequiredOrganization`, which provide authentication and organization-related functionality.
+
+## References
+- `Types::Organizations::CurrentOrganizationType`
+- `Resolvers::BaseResolver`
+- `AuthenticableApiUser` module
+- `RequiredOrganization` module
+
+## Symbols
+
+### `OrganizationResolver`
+#### Description
+This class resolves queries for the current organization. It ensures that the user is authenticated and belongs to the organization before returning the organization data.
+
+#### Inputs
+This resolver doesn't explicitly define any inputs.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | Types::Organizations::CurrentOrganizationType | The current organization object |
+
+#### Internal Logic
+1. The resolver includes `AuthenticableApiUser` and `RequiredOrganization` modules, which provide authentication and organization checks.
+2. The `resolve` method simply returns the `current_organization`, which is likely set in the context by the `RequiredOrganization` module.
+
+## Side Effects
+This resolver doesn't have any direct side effects, but it relies on the included modules for authentication and organization checks, which may raise exceptions if the conditions are not met.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication checks |
+| RequiredOrganization | Ensures the user belongs to the organization and sets the current organization |
+
+## Error Handling
+Error handling is primarily managed by the included modules:
+- `AuthenticableApiUser` may raise an unauthorized error if the user is not authenticated.
+- `RequiredOrganization` may raise organization-related errors if the organization is missing or the user is not a member.
+
+## API/Interface Reference
+This resolver is part of the GraphQL API and is likely referenced in the `QueryType` as a field:
+
+| Field | Resolver | Description |
+|:------|:---------|:------------|
+| organization | Resolvers::OrganizationResolver | Query the current organization |
+
+The resolver returns a `Types::Organizations::CurrentOrganizationType` object, which includes various fields related to the organization, such as id, name, logo_url, timezone, and other organizational details.

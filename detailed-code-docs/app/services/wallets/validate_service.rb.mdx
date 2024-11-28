@@ -1,0 +1,100 @@
+---
+title: "validate_service.rb"
+---
+
+## High-level description
+The `Wallets::ValidateService` class is responsible for validating the input parameters for creating a wallet. It checks various aspects such as customer validity, credit amounts, expiration date, recurring transaction rules, and metadata to ensure all provided information is correct and consistent before a wallet is created.
+
+## Code Structure
+This class inherits from `BaseValidator` and defines a `valid?` method that performs multiple validation checks. Each validation is implemented as a separate private method, which is called conditionally based on the presence of specific parameters.
+
+## References
+- `BaseValidator`
+- `::Validators::DecimalAmountService`
+- `Utils::Datetime`
+- `Wallets::RecurringTransactionRules::ValidateService`
+- `::Validators::MetadataValidator`
+
+## Symbols
+
+### `Wallets::ValidateService`
+#### Description
+This class validates various aspects of wallet creation parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object to store validation results |
+| args | Hash | A hash of parameters to validate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid? | Boolean | Returns true if all validations pass, false otherwise |
+
+#### Internal Logic
+1. Checks for a valid customer
+2. Validates paid and granted credits amounts if provided
+3. Validates expiration date if provided
+4. Validates recurring transaction rules if present
+5. Validates metadata if provided
+6. If any errors are found, sets validation failure and returns false
+7. Returns true if all validations pass
+
+### `valid_customer?`
+#### Description
+Validates the customer associated with the wallet.
+
+#### Internal Logic
+1. Sets the current customer in the result object
+2. Checks if the customer exists
+3. Checks if the customer already has an active wallet
+
+### `valid_paid_credits_amount?`
+#### Description
+Validates the amount of paid credits.
+
+#### Internal Logic
+Uses `::Validators::DecimalAmountService` to check if the amount is valid.
+
+### `valid_granted_credits_amount?`
+#### Description
+Validates the amount of granted credits.
+
+#### Internal Logic
+Uses `::Validators::DecimalAmountService` to check if the amount is valid.
+
+### `valid_expiration_at?`
+#### Description
+Validates the expiration date of the wallet.
+
+#### Internal Logic
+1. Checks if the expiration date is in a valid format using `Utils::Datetime`
+2. Ensures the expiration date is in the future
+
+### `valid_recurring_transaction_rules?`
+#### Description
+Validates the recurring transaction rules for the wallet.
+
+#### Internal Logic
+1. Checks if there is only one recurring transaction rule
+2. Uses `Wallets::RecurringTransactionRules::ValidateService` to validate the rule
+
+### `valid_metadata?`
+#### Description
+Validates the transaction metadata.
+
+#### Internal Logic
+Uses `::Validators::MetadataValidator` to check if the metadata is valid.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseValidator | Parent class providing basic validation functionality |
+| ::Validators::DecimalAmountService | Validates decimal amounts |
+| Utils::Datetime | Validates date formats |
+| Wallets::RecurringTransactionRules::ValidateService | Validates recurring transaction rules |
+| ::Validators::MetadataValidator | Validates metadata |
+
+## Error Handling
+The class uses the `add_error` method inherited from `BaseValidator` to collect errors during validation. If any errors are found, it sets a validation failure in the result object.

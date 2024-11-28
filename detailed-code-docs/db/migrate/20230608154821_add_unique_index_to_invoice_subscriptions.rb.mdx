@@ -1,0 +1,38 @@
+---
+title: "20230608154821_add_unique_index_to_invoice_subscriptions.rb"
+---
+
+## High-level description
+This migration adds two unique indexes to the `invoice_subscriptions` table in a Ruby on Rails application. These indexes are designed to ensure uniqueness for specific combinations of columns, with additional conditions on the `created_at` and `recurring` columns.
+
+## Symbols
+
+### `AddUniqueIndexToInvoiceSubscriptions`
+#### Description
+This class is a Rails migration that adds two unique indexes to the `invoice_subscriptions` table. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0.
+
+#### Internal Logic
+The migration uses the `change` method, which is automatically reversible. Inside this method, it uses `safety_assured` (likely from a gem like `strong_migrations`) to bypass potential safety checks. It then adds two unique indexes:
+
+1. An index on `subscription_id`, `from_datetime`, and `to_datetime`.
+2. An index on `subscription_id`, `charges_from_datetime`, and `charges_to_datetime`.
+
+Both indexes have conditions that they only apply to records created on or after June 9, 2023, and where `recurring` is true.
+
+## Side Effects
+This migration will modify the database schema by adding two new indexes to the `invoice_subscriptions` table. This may temporarily lock the table during index creation, potentially affecting database performance during the migration.
+
+## Performance Considerations
+Adding indexes can improve query performance for searches on the indexed columns but may slightly slow down insert and update operations on the `invoice_subscriptions` table.
+
+## Error Handling
+The `safety_assured` block suggests that there might be some potential safety concerns with this migration, which are being explicitly bypassed. Care should be taken to ensure this doesn't cause issues in production environments.
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| `unique` | boolean | true | Ensures uniqueness of the indexed columns combination |
+| `where` | string | "created_at &gt;= '2023-06-09' and recurring is true" | Condition for applying the index |
+
+## TODOs
+Consider reviewing the use of `safety_assured` and ensure that bypassing safety checks is necessary and safe in this context.

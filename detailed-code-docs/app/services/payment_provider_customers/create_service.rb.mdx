@@ -1,0 +1,124 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines a service class `CreateService` within the `PaymentProviderCustomers` module. Its primary purpose is to create or update payment provider customer records, handle provider-specific payment methods, and initiate asynchronous jobs for creating customers on the provider's side or generating checkout URLs.
+
+## Code Structure
+The `CreateService` class inherits from `BaseService` and contains methods for creating or updating payment provider customers, handling provider-specific payment methods, and initiating asynchronous jobs. It interacts with different payment provider customer models (Stripe, Adyen, and GoCardless) and their corresponding job classes.
+
+## Symbols
+
+### `PaymentProviderCustomers::CreateService`
+#### Description
+This class is responsible for creating or updating payment provider customer records and initiating related processes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Customer | The customer object for which the payment provider customer is being created or updated |
+
+#### Internal Logic
+1. Initializes the service with a customer object.
+2. Provides a method `create_or_update` to create or update a payment provider customer record.
+3. Handles provider-specific payment methods.
+4. Initiates asynchronous jobs for creating customers on the provider's side or generating checkout URLs based on certain conditions.
+
+### `create_or_update`
+#### Description
+This method creates or updates a payment provider customer record and initiates related processes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer_class | Class | The class of the payment provider customer (e.g., StripeCustomer) |
+| payment_provider_id | String | The ID of the payment provider |
+| params | Hash | Additional parameters for creating or updating the customer |
+| async | Boolean | Whether to perform provider-related actions asynchronously (default: true) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result object containing the created or updated provider customer |
+
+#### Internal Logic
+1. Finds or initializes a provider customer record.
+2. Updates provider customer attributes based on input parameters.
+3. Handles provider-specific payment methods.
+4. Saves the provider customer record.
+5. Initiates customer creation on the provider's side or generates a checkout URL based on certain conditions.
+6. Handles record validation failures.
+
+### `handle_provider_payment_methods`
+#### Description
+This private method handles provider-specific payment methods for Stripe customers.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| provider_customer | StripeCustomer | The Stripe customer object |
+| params | Hash | Parameters containing provider payment methods |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| provider_customer | StripeCustomer | The updated Stripe customer object |
+
+#### Internal Logic
+1. Checks if the provider customer is a Stripe customer.
+2. Updates the provider payment methods based on the input parameters and the customer's persistence status.
+
+### `create_customer_on_provider_service`
+#### Description
+This private method initiates the creation of a customer on the provider's side.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| async | Boolean | Whether to perform the action asynchronously |
+
+#### Internal Logic
+1. Determines the appropriate job class based on the provider customer type.
+2. Enqueues or performs the job based on the async parameter.
+
+### `generate_checkout_url`
+#### Description
+This private method initiates the generation of a checkout URL.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| async | Boolean | Whether to perform the action asynchronously |
+
+#### Internal Logic
+1. Determines the appropriate job class based on the provider customer type.
+2. Enqueues or performs the job based on the async parameter.
+
+### `should_create_provider_customer?`
+#### Description
+This private method determines whether a provider customer should be created.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Boolean | Whether a provider customer should be created |
+
+### `should_generate_checkout_url?`
+#### Description
+This private method determines whether a checkout URL should be generated.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Boolean | Whether a checkout URL should be generated |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | For database operations and validations |
+| BaseService | Parent class for the CreateService |
+| Various job classes | For asynchronous processing of customer creation and checkout URL generation |
+
+## Error Handling
+The service handles `ActiveRecord::RecordInvalid` errors by calling `record_validation_failure!` on the result object.

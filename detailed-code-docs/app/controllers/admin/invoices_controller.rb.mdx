@@ -1,0 +1,89 @@
+---
+title: "invoices_controller.rb"
+---
+
+## High-level description
+This code defines the `Admin::InvoicesController`, which handles administrative actions related to invoices. It provides functionality to regenerate invoice PDFs and display invoice details in HTML format.
+
+## Code Structure
+The `Admin::InvoicesController` inherits from `BaseController` and contains two main actions: `regenerate` and `show`. It also includes a private method `invoice` to fetch the invoice based on the provided ID.
+
+## References
+- `::Invoices::GeneratePdfService`: Used for generating and rendering invoice PDFs
+- `Invoice`: Model used to fetch invoice records
+- `BaseController`: Parent controller class (from `Admin` module)
+
+## Symbols
+
+### `Admin::InvoicesController`
+#### Description
+This controller manages administrative actions for invoices, specifically regenerating PDFs and displaying invoice details.
+
+### `regenerate`
+#### Description
+Regenerates the PDF for a specific invoice using the `Invoices::GeneratePdfService`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:id] | Integer/String | The ID of the invoice to regenerate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| HTTP Status | Symbol | `:ok` if successful, error status otherwise |
+
+#### Internal Logic
+1. Calls `Invoices::GeneratePdfService.call` with the invoice and 'admin' context
+2. If the result is not successful, renders an error response
+3. If successful, returns an HTTP 200 OK status
+
+### `show`
+#### Description
+Renders the HTML representation of a specific invoice.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:id] | Integer/String | The ID of the invoice to display |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| HTML | String | The HTML representation of the invoice |
+
+#### Internal Logic
+1. Initializes a new `Invoices::GeneratePdfService` instance with the invoice
+2. Calls `render_html` on the service to get the HTML representation
+3. Renders the HTML content
+
+### `invoice` (private)
+#### Description
+Fetches and memoizes the invoice based on the provided ID.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:id] | Integer/String | The ID of the invoice to fetch |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @invoice | Invoice | The fetched invoice object |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Invoices::GeneratePdfService | Generates and renders invoice PDFs |
+| Invoice | ActiveRecord model for invoice data |
+
+## Error Handling
+The `regenerate` action uses `render_error_response` to handle errors returned by the `GeneratePdfService`. This method is likely defined in a parent controller or a concern.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /admin/invoices/:id/regenerate | POST | Invoice ID in URL | 200 OK or Error | Regenerates the PDF for the specified invoice |
+| /admin/invoices/:id | GET | Invoice ID in URL | HTML content | Displays the HTML representation of the specified invoice |
+
+This controller is part of an admin interface, as indicated by the `Admin` module and the `BaseController` inheritance. It likely requires authentication and sets an admin context, as seen in the `BaseController` implementation provided in the related code snippets.

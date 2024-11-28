@@ -1,0 +1,60 @@
+---
+title: "rsa_keys.rb"
+---
+
+## High-level description
+This code initializes RSA key pairs for use in the Rails application. It loads a private key from either a file (in development/test environments) or an environment variable (in production), and then generates a corresponding public key. These keys are stored in global constants for use throughout the application.
+
+## Code Structure
+The code defines two global constants: `RsaPrivateKey` and `RsaPublicKey`. The private key is loaded first, and the public key is derived from it.
+
+## Symbols
+
+### `private_key_string`
+#### Description
+This variable holds the RSA private key as a string. Its value is determined based on the Rails environment.
+
+#### Internal Logic
+- If the environment is development or test:
+  - Reads the private key from a file named '.rsa_private.pem' in the Rails root directory
+- Otherwise (presumably in production):
+  - Decodes the private key from a base64-encoded environment variable 'LAGO_RSA_PRIVATE_KEY'
+
+### `RsaPrivateKey`
+#### Description
+This constant stores the RSA private key object created from the `private_key_string`.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| RsaPrivateKey | OpenSSL::PKey::RSA | RSA private key object |
+
+### `RsaPublicKey`
+#### Description
+This constant stores the RSA public key object derived from the `RsaPrivateKey`.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| RsaPublicKey | OpenSSL::PKey::RSA | RSA public key object |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| OpenSSL | Used to create RSA key objects |
+| Base64 | Used to decode the base64-encoded private key from the environment variable |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LAGO_RSA_PRIVATE_KEY | Environment Variable | None | Base64-encoded RSA private key used in non-development/test environments |
+
+## References
+The `RsaPublicKey` is used in the `WebhooksController` to provide the public key for webhook verification:
+- `public_key` method (deprecated) returns the base64-encoded public key as plain text
+- `json_public_key` method returns the base64-encoded public key in a JSON format
+
+The `RsaPrivateKey` is used in the `OrganizationsController` to sign a JWT token:
+- `grpc_token` method creates a JWT token signed with the RSA private key
+
+These usages suggest that the RSA keys are employed for secure communication and authentication in the application's API and gRPC services.

@@ -1,0 +1,56 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains classes responsible for generating and managing credit note payloads for different integration types within an aggregator system. The main purpose is to provide a flexible and extensible way to create structured data for credit notes that can be used with various external systems like NetSuite, Xero, and Anrok.
+
+## What does it do?
+The code in this directory handles the creation of structured data (payloads) for credit notes, which are likely used in financial transactions or accounting processes. Here's a simplified explanation of what it does:
+
+1. It takes information about a credit note and a customer's integration type.
+2. Based on the integration type (e.g., NetSuite, Xero, or Anrok), it creates a specific payload structure.
+3. The payload includes details like customer information, credit note status, dates, currency, and line items for various fees and coupons.
+4. It handles tax calculations and adjustments for the credit note items.
+5. The resulting payload can then be used to send credit note information to the appropriate external system in the correct format.
+
+This process allows the system to work with different external accounting or financial systems while maintaining a consistent internal structure for credit notes.
+
+## Entry points
+The main entry point for this directory is the `Factory` class in the `factory.rb` file. This class is responsible for creating the appropriate payload object based on the integration type. The workflow typically follows these steps:
+
+1. The `Factory.new_instance` method is called with an integration customer and a credit note.
+2. Based on the integration type, it creates an instance of the appropriate payload class (Netsuite, Xero, or Anrok).
+3. The created payload object then uses the `BasePayload` class (defined in `base_payload.rb`) as a foundation for generating the payload structure.
+4. Specific integration classes (like `Netsuite` in `netsuite.rb`) may override or extend the base functionality to provide custom payload structures.
+
+The data flow starts from the credit note and customer information, goes through the appropriate payload class for processing, and results in a structured payload that can be used for integration with external systems.
+
+## Key Files
+1. `base_payload.rb`: Contains the `BasePayload` class, which provides the core functionality for generating credit note payloads. It handles the processing of credit note items, tax adjustments, and coupon calculations.
+
+2. `factory.rb`: Defines the `Factory` class, which is responsible for creating the appropriate payload object based on the integration type. This is the main entry point for payload generation.
+
+3. `netsuite.rb`: Implements the `Netsuite` class, which extends `BasePayload` to provide NetSuite-specific payload formatting. It overrides methods like `body` and `item` to create a structure suitable for NetSuite integration.
+
+4. `xero.rb` and `anrok.rb`: These files define classes for Xero and Anrok integrations, respectively. While currently empty, they are placeholders for future implementation of integration-specific payload formatting.
+
+## Dependencies
+The code in this directory relies on several external dependencies and internal modules:
+
+1. Ruby standard library: The code uses Ruby's built-in features and classes.
+2. ActiveSupport: Implied by the use of nested modules and likely used for various utility functions.
+3. Internal dependencies:
+   - `Integrations::Aggregator::BasePayload`: The parent class for `BasePayload`, likely defined elsewhere in the project.
+   - Various item mapping methods (e.g., `billable_metric_item`, `add_on_item`) referenced in `BasePayload` but defined elsewhere.
+
+## Configuration
+While there are no explicit configuration files in this directory, the code structure allows for easy extension to support new integration types. To add a new integration:
+
+1. Create a new class file (e.g., `new_integration.rb`) that inherits from `BasePayload`.
+2. Implement any necessary overrides or custom methods in the new class.
+3. Update the `Factory` class in `factory.rb` to include the new integration type.
+
+This modular approach allows for flexible configuration of supported integrations without modifying the core payload generation logic.
+
+In conclusion, this directory provides a robust and extensible system for generating credit note payloads for various integration types, centralizing the logic for payload creation while allowing for customization based on specific integration requirements.

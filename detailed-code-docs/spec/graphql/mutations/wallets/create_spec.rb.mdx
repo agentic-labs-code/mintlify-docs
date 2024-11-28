@@ -1,0 +1,70 @@
+---
+title: "create_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Mutations::Wallets::Create` GraphQL mutation. It verifies that the mutation correctly creates a wallet for a customer, including various attributes and recurring transaction rules, while also ensuring proper authentication and authorization.
+
+## Code Structure
+The test file defines a set of shared examples for authentication and authorization, then proceeds to test the main functionality of creating a wallet with different scenarios.
+
+## Symbols
+
+### RSpec.describe Mutations::Wallets::Create
+#### Description
+This is the main describe block for the `Mutations::Wallets::Create` GraphQL mutation tests.
+
+#### Internal Logic
+1. Sets up necessary test data (customer, membership, etc.)
+2. Defines the GraphQL mutation query
+3. Runs tests within a premium license context
+4. Includes shared examples for authentication and authorization
+5. Tests the main wallet creation functionality
+6. Tests wallet creation when the name is not present
+
+### let blocks
+#### Description
+These blocks define variables and objects used throughout the tests.
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| required_permission | String | The permission required to create a wallet |
+| membership | Membership | A factory-created membership object |
+| customer | Customer | A factory-created customer object |
+| expiration_at | Time | The expiration time for the wallet |
+| mutation | String | The GraphQL mutation query |
+
+### it 'creates a wallet'
+#### Description
+This test verifies that the mutation successfully creates a wallet with the provided attributes.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with specific input
+2. Verifies the returned data matches the expected values
+3. Checks for the presence of recurring transaction rules
+
+### context 'when name is not present'
+#### Description
+This context tests the behavior of wallet creation when the name attribute is not provided.
+
+#### Internal Logic
+1. Executes the GraphQL mutation without a name input
+2. Verifies that the wallet is created successfully
+3. Checks that the returned name is nil
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| FactoryBot | Used for creating test data |
+| GraphQL | The GraphQL implementation being tested |
+
+## Error Handling
+The test file doesn't explicitly test error handling, but it does verify correct behavior for different input scenarios.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| createCustomerWallet | Mutation | CreateCustomerWalletInput | Wallet details | Creates a new wallet for a customer |
+
+Note: The actual endpoint is part of the GraphQL API, not a REST endpoint.

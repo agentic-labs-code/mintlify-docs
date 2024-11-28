@@ -1,0 +1,52 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various mailer classes in the application, as well as a subdirectory for mailer previews. The tests cover the functionality of different mailers, including CreditNoteMailer, DataExportMailer, InvoiceMailer, and PasswordResetMailer. The preview subdirectory provides a mechanism for generating sample emails for development and testing purposes.
+
+## What does it do?
+The code in this directory serves two main purposes:
+
+1. Testing Mailers: It provides comprehensive test coverage for the application's mailer classes. These tests ensure that emails are generated correctly, with the right recipients, content, and attachments under various scenarios.
+
+2. Email Previews: The `previews` subdirectory contains classes that allow developers to visualize and inspect email templates in a development environment without actually sending emails.
+
+The tests verify the behavior of mailers in different situations, such as:
+- Handling of attachments (e.g., PDF files for invoices and credit notes)
+- Correct email recipients and reply-to addresses
+- Proper content generation based on the type of email (e.g., invoice finalization, password reset)
+- Handling of edge cases like nil email addresses or zero-amount invoices
+
+The preview functionality allows developers to quickly iterate on email designs and content without the need to set up complex test scenarios or send actual emails.
+
+## Key Files
+1. `credit_note_mailer_spec.rb`: Tests for the CreditNoteMailer, focusing on the 'created' method.
+2. `data_export_mailer_spec.rb`: Tests for the DataExportMailer, specifically the 'completed' method.
+3. `invoice_mailer_spec.rb`: Tests for the InvoiceMailer, covering the 'finalized' method.
+4. `password_reset_mailer_spec.rb`: Tests for the PasswordResetMailer, verifying the 'requested' method.
+5. `previews/base_preview_mailer.rb`: Defines a base class for all mailer previews, ensuring they run within a database transaction.
+6. `previews/data_export_mailer_preview.rb`: Provides a preview for the DataExportMailer's 'completed' email.
+
+## Dependencies
+The test files rely on the following main dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test objects and sample data.
+3. Rails testing environment: Loaded via `rails_helper`.
+
+The preview functionality depends on:
+
+1. ActionMailer::Preview: Base class for mailer previews.
+2. ActiveRecord::Base: Used for database transactions in the BasePreviewMailer.
+
+## Configuration
+The mailer preview functionality is configured in the development environment. The relevant configuration can be found in `config/environments/development.rb`:
+
+```ruby
+config.action_mailer.preview_paths &lt;&lt; Rails.root.join("spec/mailers/previews").to_s
+```
+
+This configuration adds the `spec/mailers/previews` directory to the list of paths where Rails will look for mailer previews.
+
+In summary, this directory plays a crucial role in ensuring the reliability and correctness of the application's email functionality through comprehensive testing and providing tools for efficient email template development.

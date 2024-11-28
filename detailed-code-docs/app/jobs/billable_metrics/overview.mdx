@@ -1,0 +1,51 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines a background job `DeleteEventsJob` within the `BillableMetrics` module. Its purpose is to soft-delete events associated with a discarded billable metric, updating their `deleted_at` timestamp.
+
+## Code Structure
+The `DeleteEventsJob` class inherits from `ApplicationJob` and contains a single `perform` method that carries out the deletion logic.
+
+## References
+- `Event` model
+- `Charge` model
+- `ApplicationJob` class
+
+## Symbols
+
+### `BillableMetrics::DeleteEventsJob`
+#### Description
+A background job class responsible for soft-deleting events related to a discarded billable metric.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| metric | BillableMetric | The billable metric whose associated events should be deleted |
+
+#### Internal Logic
+1. Check if the provided metric is discarded. If not, exit the method.
+2. Set the current time as the deletion timestamp.
+3. Construct a query to find relevant events:
+   - Match the event code with the metric's code.
+   - Find subscriptions associated with charges that use this metric.
+   - Use these subscription IDs to filter events.
+4. Update all matching events, setting their `deleted_at` field to the current time.
+
+#### Side Effects
+- Modifies the `deleted_at` field of multiple `Event` records in the database.
+
+#### Performance Considerations
+- Uses `update_all` for bulk updates, bypassing Active Record callbacks and validations for better performance when dealing with large numbers of records.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ApplicationJob | Base class for background jobs |
+
+## Error Handling
+The job doesn't implement specific error handling beyond what's provided by `ApplicationJob`.
+
+## TODOs
+The code includes a Rubocop disable comment for the `Rails/SkipsModelValidations` cop, suggesting that the use of `update_all` might be revisited in the future for consistency with model validations.

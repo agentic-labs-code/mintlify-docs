@@ -1,0 +1,49 @@
+---
+title: "object.rb"
+---
+
+## High-level description
+This code defines a GraphQL object type for representing usage thresholds in a billing or subscription system. It specifies the structure and fields of a UsageThreshold object that can be queried through a GraphQL API.
+
+## Code Structure
+The `Types::UsageThresholds::Object` class inherits from `Types::BaseObject` and defines various fields that represent the properties of a usage threshold.
+
+## Symbols
+
+### `Types::UsageThresholds::Object`
+#### Description
+This class defines the GraphQL object type for a usage threshold. It specifies the fields that can be queried for a usage threshold object.
+
+#### Fields
+| Name | Type | Nullable | Description |
+|:-----|:-----|:---------|:------------|
+| id | ID | false | Unique identifier for the usage threshold |
+| amount_cents | GraphQL::Types::BigInt | false | The threshold amount in cents |
+| recurring | Boolean | false | Indicates if the threshold is recurring |
+| threshold_display_name | String | true | Display name for the threshold |
+| created_at | GraphQL::Types::ISO8601DateTime | false | Timestamp of when the threshold was created |
+| updated_at | GraphQL::Types::ISO8601DateTime | false | Timestamp of when the threshold was last updated |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| GraphQL::Types::BigInt | Used for representing large integer values (amount_cents) |
+| GraphQL::Types::ISO8601DateTime | Used for representing date and time values (created_at, updated_at) |
+
+## References
+The `Types::UsageThresholds::Object` is referenced in the related file `app/graphql/types/plans/object.rb`:
+
+```ruby
+field :usage_thresholds, [Types::UsageThresholds::Object]
+```
+
+This suggests that a Plan object can have multiple associated UsageThreshold objects.
+
+## Notes
+1. The `graphql_name 'UsageThreshold'` line sets the name of this type in the GraphQL schema.
+2. All fields except `threshold_display_name` are defined as non-nullable (null: false), indicating that they will always have a value when queried.
+3. The use of `GraphQL::Types::BigInt` for `amount_cents` suggests that this field may contain large values, possibly to represent high-precision monetary amounts.
+4. The `recurring` field implies that usage thresholds can be set to repeat periodically.
+5. The presence of `created_at` and `updated_at` fields indicates that the system tracks when usage thresholds are created and modified.
+
+This object type appears to be part of a larger GraphQL schema that likely includes other types related to billing, subscriptions, and usage tracking. The related Plans object suggests that usage thresholds are associated with specific plans, possibly to define limits or trigger points for billing or notifications based on usage.

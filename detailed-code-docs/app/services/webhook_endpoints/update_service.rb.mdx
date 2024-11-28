@@ -1,0 +1,74 @@
+---
+title: "update_service.rb"
+---
+
+## High-level description
+This code defines the `UpdateService` class within the `WebhookEndpoints` module. It is responsible for updating an existing webhook endpoint for a given organization. The service handles the process of finding the webhook endpoint, updating its attributes, and managing any errors that may occur during the update process.
+
+## Code Structure
+The `UpdateService` class inherits from `BaseService` and contains a single public method `call` that performs the update operation. It uses instance variables to store the input parameters and leverages the `result` object from the `BaseService` to handle the operation's outcome.
+
+## References
+This code references the following external components:
+- `BaseService`: The parent class that provides common functionality and error handling.
+- `WebhookEndpoint`: The model representing a webhook endpoint.
+- `Organization`: The model representing an organization that owns webhook endpoints.
+
+## Symbols
+
+### `WebhookEndpoints::UpdateService`
+#### Description
+This service class is responsible for updating an existing webhook endpoint for a given organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | Integer/String | The ID of the webhook endpoint to update |
+| organization | Organization | The organization that owns the webhook endpoint |
+| params | Hash | The parameters containing the updated webhook endpoint attributes |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the operation result and updated webhook endpoint |
+
+#### Internal Logic
+1. Find the webhook endpoint by ID within the given organization.
+2. If the webhook endpoint is not found, return a not found error.
+3. Update the webhook endpoint with the provided parameters.
+4. If the update is successful, set the updated webhook endpoint in the result object.
+5. If a validation error occurs during the update, set a record validation failure in the result object.
+
+### `initialize`
+#### Description
+Initializes the service with the necessary parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | Integer/String | The ID of the webhook endpoint to update |
+| organization | Organization | The organization that owns the webhook endpoint |
+| params | Hash | The parameters containing the updated webhook endpoint attributes |
+
+### `call`
+#### Description
+Performs the webhook endpoint update operation.
+
+#### Internal Logic
+1. Find the webhook endpoint using `organization.webhook_endpoints.find_by(id:)`.
+2. If not found, call `result.not_found_failure!(resource: 'webhook_endpoint')`.
+3. Update the webhook endpoint using `update!` with `webhook_url` and `signature_algo` from params.
+4. Set the updated webhook endpoint in the result object.
+5. Handle `ActiveRecord::RecordInvalid` exception by calling `result.record_validation_failure!`.
+
+## Error Handling
+The service handles two main error scenarios:
+1. Webhook endpoint not found: Returns a not found failure using `result.not_found_failure!`.
+2. Validation errors during update: Catches `ActiveRecord::RecordInvalid` and sets a record validation failure using `result.record_validation_failure!`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Used for database operations and error handling |
+
+This service is designed to be used in both API and GraphQL contexts, as evidenced by the related code snippets provided. It encapsulates the business logic for updating a webhook endpoint, allowing for easy reuse across different interfaces while maintaining consistent behavior and error handling.

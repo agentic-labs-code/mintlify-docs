@@ -1,0 +1,96 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for utility services in the application. It includes tests for datetime handling and PDF generation functionalities. These tests ensure the correct behavior of utility functions that are likely used across various parts of the application.
+
+## What does it do?
+The tests in this directory verify two main utility services:
+
+1. Datetime Utility: This service handles datetime validations and calculations. The tests ensure that the service can correctly validate different datetime formats and calculate date differences while considering timezones and daylight saving time changes. This is crucial for applications that need to handle time-sensitive operations across different timezones.
+
+2. PDF Generator: This service is responsible for generating PDF documents. The tests verify that the service can create PDF documents synchronously using specified templates and contexts. This functionality is important for applications that need to generate reports or documents in PDF format.
+
+## Key Files
+
+1. `datetime_spec.rb`: This file contains tests for the `Utils::Datetime` service. It verifies:
+   - The `valid_format?` method, which checks if a given datetime string or object is in a valid format.
+   - The `date_diff_with_timezone` method, which calculates the difference between two dates while considering timezones and daylight saving time changes.
+
+2. `pdf_generator_spec.rb`: This file tests the `Utils::PdfGenerator` service. It focuses on:
+   - The `call` method, which generates a PDF document synchronously using a specified template and context.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used in the PDF generator tests for creating test data (e.g., invoices).
+3. WebMock: Implied usage in the PDF generator tests for stubbing HTTP requests to simulate external API calls.
+
+## Configuration
+The tests use environment variables and specific configurations:
+
+1. `ENV["LAGO_PDF_URL"]`: An environment variable used in the PDF generator tests to specify the URL of the PDF generation service.
+2. RSpec configuration: The tests are configured as service tests using `type: :service`.
+
+## Code Snippets and Examples
+
+Here's an example of how the datetime utility tests are structured:
+
+```ruby
+RSpec.describe Utils::Datetime, type: :service do
+  describe '.valid_format?' do
+    it 'returns false for invalid format' do
+      expect(described_class.valid_format?('invalid')).to be_falsey
+    end
+
+    it 'returns true for valid string format' do
+      expect(described_class.valid_format?('2021-08-24T14:15:22Z')).to be_truthy
+    end
+
+    # More tests...
+  end
+
+  describe '.date_diff_with_timezone' do
+    it 'returns the difference between two dates' do
+      from_datetime = Time.zone.parse('2022-01-01T00:00:00')
+      to_datetime = Time.zone.parse('2022-01-02T00:00:00')
+      timezone = 'Europe/Paris'
+
+      result = described_class.date_diff_with_timezone(from_datetime, to_datetime, timezone)
+
+      expect(result).to eq(1)
+    end
+
+    # More tests...
+  end
+end
+```
+
+For the PDF generator, here's an example of how the tests are set up:
+
+```ruby
+RSpec.describe Utils::PdfGenerator, type: :service do
+  let(:invoice) { create(:invoice) }
+  let(:template) { 'invoices/show' }
+  let(:context) { { invoice: invoice } }
+
+  subject { described_class.new(template, context) }
+
+  before do
+    stub_request(:post, "#{ENV['LAGO_PDF_URL']}/generate")
+      .to_return(status: 200, body: 'pdf_content', headers: {})
+  end
+
+  describe '.call' do
+    it 'generates a document synchronously' do
+      result = subject.call
+
+      expect(result.io).to be_present
+    end
+  end
+end
+```
+
+These tests ensure that the utility services function correctly, handling various scenarios and edge cases. They provide a safety net for developers when making changes to these critical utility functions, helping maintain the reliability and correctness of the application's core functionalities.

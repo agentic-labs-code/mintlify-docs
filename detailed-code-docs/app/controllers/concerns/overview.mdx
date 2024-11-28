@@ -1,0 +1,64 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `app/controllers/concerns` directory contains a collection of Ruby modules that provide reusable functionality for controllers in a Ruby on Rails application. These modules are designed to be included in various controllers to add specific behaviors or handle common tasks related to API responses, error handling, authentication, pagination, and request tracking.
+
+## What does it do?
+This directory contains modules that enhance controller functionality in the following ways:
+
+1. API Error Handling: Provides standardized JSON responses for various HTTP error statuses.
+2. API Response Formatting: Ensures consistent JSON formatting for API responses.
+3. User Authentication: Implements JWT-based authentication for users.
+4. Customer Portal Authentication: Handles authentication for customer portal users.
+5. Organization Header Handling: Manages organization-specific headers in requests.
+6. Pagination: Offers pagination functionality for collections of records.
+7. Request Tracking: Sets tracing information for requests based on user and organization context.
+8. Date Validation: Provides a utility method for validating date strings.
+
+These modules work together to create a robust foundation for building API endpoints and handling common web application concerns.
+
+## Key Files
+
+1. `api_errors.rb`: Defines the `ApiErrors` module for standardized error responses.
+2. `api_responses.rb`: Contains the `ApiResponses` module for consistent JSON formatting.
+3. `authenticable_user.rb`: Implements the `AuthenticableUser` module for JWT-based user authentication.
+4. `customer_portal_user.rb`: Provides the `CustomerPortalUser` module for customer portal authentication.
+5. `organization_header.rb`: Defines the `OrganizationHeader` module for handling organization-specific headers.
+6. `pagination.rb`: Implements the `Pagination` module for paginating collections of records.
+7. `trackable.rb`: Contains the `Trackable` module for setting tracing information in requests.
+8. `common.rb`: Defines the `Common` module with a utility method for date validation.
+
+Each of these files defines a module that encapsulates specific functionality:
+
+- `ApiErrors` provides methods like `bad_request_error`, `unauthorized_error`, and `validation_errors` for rendering standardized error responses.
+- `ApiResponses` ensures all responses are in JSON format and provides a `not_found_error` method.
+- `AuthenticableUser` handles JWT token extraction, decoding, and renewal, as well as retrieving the current authenticated user.
+- `CustomerPortalUser` authenticates and retrieves customer portal users based on a token in the request headers.
+- `OrganizationHeader` manages the retrieval of the current organization based on the user and a header value.
+- `Pagination` offers a method to generate pagination metadata for collections of records.
+- `Trackable` sets membership information in the `CurrentContext` for tracing and logging purposes.
+- `Common` provides a `valid_date?` method for date string validation.
+
+## Dependencies
+These modules rely on several external libraries and frameworks:
+
+1. ActiveSupport::Concern: Used in all modules to create easily includable functionality.
+2. JWT: Used in `AuthenticableUser` for JSON Web Token handling.
+3. ActiveSupport::MessageVerifier: Used in `CustomerPortalUser` for secure token verification.
+
+Additionally, these modules interact with other parts of the application:
+
+- Various service classes (e.g., `UsersService`)
+- Model classes (e.g., `Customer`, `Organization`)
+- `CurrentContext` module for storing thread-specific information
+
+## Configuration
+Some modules use environment variables or configuration settings:
+
+- `AuthenticableUser` uses the application's secret key for JWT decoding.
+- `CustomerPortalUser` relies on the `SECRET_KEY_BASE` environment variable for token verification.
+- `Pagination` defines a `PER_PAGE` constant set to 100 for limiting the number of records per page.
+
+These modules are designed to be included in various controllers throughout the application, providing a set of common functionalities that can be easily shared and maintained across different parts of the codebase. They help in keeping the controllers DRY (Don't Repeat Yourself) by extracting common patterns and behaviors into reusable components.

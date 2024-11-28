@@ -1,0 +1,56 @@
+---
+title: "20240801134832_create_payment_requests.rb"
+---
+
+## High-level description
+This migration file creates a new table called `payment_requests` and adds a new column to the existing `payments` table. It sets up the structure for handling payment requests in the application, establishing relationships between customers, payment requests, and payments.
+
+## Code Structure
+The code defines a single class `CreatePaymentRequests` that inherits from `ActiveRecord::Migration[7.1]`. This class contains a `change` method that performs the database schema modifications.
+
+## Symbols
+
+### `CreatePaymentRequests`
+#### Description
+This class is an Active Record migration that creates the `payment_requests` table and modifies the `payments` table to add a reference to payment requests.
+
+#### Internal Logic
+1. Creates the `payment_requests` table with specific columns and constraints.
+2. Modifies the `payments` table to add a `payment_request_id` column.
+3. Adds a foreign key constraint between `payments` and `payment_requests` tables.
+
+### `change`
+#### Description
+This method defines the changes to be applied to the database schema.
+
+#### Internal Logic
+1. Creates the `payment_requests` table:
+   - Uses UUID as the primary key.
+   - Adds a reference to the `customers` table.
+   - Includes polymorphic association columns for `payment_requestable`.
+   - Adds columns for amount, currency, email, and timestamps.
+
+2. Modifies the `payments` table:
+   - Uses `safety_assured` block to bypass safety checks.
+   - Adds a `payment_request_id` column of type UUID.
+   - Establishes a foreign key relationship between `payments` and `payment_requests`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for defining database schema changes |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| id | symbol | :uuid | Sets the primary key type for the `payment_requests` table |
+
+## Error Handling
+This migration does not implement specific error handling beyond what is provided by Active Record migrations.
+
+## Performance Considerations
+The use of `safety_assured` suggests that this migration might have potential performance implications, as it bypasses some safety checks. Care should be taken when running this migration on large datasets.
+
+___
+
+This migration sets up the foundation for a payment request system, allowing the application to associate payment requests with customers and specific payment requestable entities (defaulting to invoices). It also establishes a link between payment requests and actual payments, enabling tracking of which payments fulfill which requests.

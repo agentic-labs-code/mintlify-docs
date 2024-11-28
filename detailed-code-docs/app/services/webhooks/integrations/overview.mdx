@@ -1,0 +1,81 @@
+---
+title: "Overview"
+---
+
+## High-level description
+
+The `app/services/webhooks/integrations` directory contains service classes responsible for handling webhook events related to customer operations and tax provider integrations. These services are part of a larger webhook system designed to communicate various events and errors to external systems or listeners.
+
+## What does it do?
+
+This directory implements services that prepare and send webhook notifications for different scenarios:
+
+1. Customer Creation: It handles events when a customer is successfully created in an accounting provider integration.
+2. Customer Errors: It manages notifications for errors that occur during customer-related operations with accounting providers.
+3. Tax-related Errors: It deals with errors from tax providers, both for customer-related tax operations and fee calculations.
+
+These services ensure that external systems are notified of important events and errors, allowing for proper handling, logging, and integration with other applications.
+
+## Key Files
+
+1. `customer_created_service.rb`:
+   - Handles webhooks for successful customer creation in accounting provider integrations.
+   - Defines the webhook type as 'customer.accounting_provider_created'.
+   - Uses `V1::CustomerSerializer` to format customer data.
+
+2. `customer_error_service.rb`:
+   - Manages webhooks for customer-related errors in accounting provider integrations.
+   - Sets the webhook type to 'customer.accounting_provider_error'.
+   - Utilizes `::V1::Integrations::CustomerErrorSerializer` for error data formatting.
+
+3. `taxes/error_service.rb`:
+   - Handles webhooks for customer-related tax provider errors.
+   - Uses the webhook type 'customer.tax_provider_error'.
+   - Employs `::V1::Integrations::CustomerErrorSerializer` for error data serialization.
+
+4. `taxes/fee_error_service.rb`:
+   - Manages webhooks for fee-related tax provider errors.
+   - Defines the webhook type as 'fee.tax_provider_error'.
+   - Uses `::V1::Integrations::Taxes::FeeErrorSerializer` for fee error data formatting.
+
+All these services inherit from `Webhooks::BaseService`, overriding specific methods to customize the webhook behavior for their respective event types.
+
+## Dependencies
+
+The services in this directory rely on the following dependencies:
+
+1. `Webhooks::BaseService`: The parent class providing core webhook functionality.
+2. Various serializers:
+   - `V1::CustomerSerializer`
+   - `::V1::Integrations::CustomerErrorSerializer`
+   - `::V1::Integrations::Taxes::FeeErrorSerializer`
+
+These dependencies indicate a structured approach to handling webhooks and serializing data, with specific implementations for different types of events and errors.
+
+## Configuration
+
+While there are no explicit configuration files, the services use several key configurations:
+
+1. Webhook Types:
+   - 'customer.accounting_provider_created'
+   - 'customer.accounting_provider_error'
+   - 'customer.tax_provider_error'
+   - 'fee.tax_provider_error'
+
+2. Object Types:
+   - 'customer'
+   - 'tax_provider_customer_error'
+   - 'tax_provider_fee_error'
+
+These configurations are hardcoded in the respective service classes and are used to identify the type of webhook and the nature of the event or error being reported.
+
+The services also expect certain options to be passed when instantiated, such as:
+- `provider_error`
+- `provider`
+- `provider_code`
+- `event_transaction_id`
+- `lago_charge_id`
+
+These options provide additional context in the serialized data for the webhook payload.
+
+In summary, the `app/services/webhooks/integrations` directory contains specialized services for handling various webhook events related to customer operations, accounting provider integrations, and tax provider interactions. These services are designed to integrate with a larger webhook system and use custom serializers to format the event data appropriately for external consumption.

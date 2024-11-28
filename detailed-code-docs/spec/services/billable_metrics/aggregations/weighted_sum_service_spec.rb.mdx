@@ -1,0 +1,65 @@
+---
+title: "weighted_sum_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `BillableMetrics::Aggregations::WeightedSumService` class. It tests various scenarios for aggregating weighted sum metrics, including grouped aggregations, recurring metrics, and different event configurations.
+
+## Code Structure
+The test suite is organized into several contexts, each testing different aspects of the weighted sum aggregation service. The main `describe` block sets up the subject and common let variables. Nested contexts then test specific scenarios such as single events, no events, grouped aggregations, and recurring metrics.
+
+## Symbols
+
+### `BillableMetrics::Aggregations::WeightedSumService`
+#### Description
+This is the main class being tested. It's responsible for aggregating weighted sum metrics based on events and other parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event_store_class | Class | The class used for event storage (e.g., Events::Stores::PostgresStore) |
+| charge | Object | The charge associated with the billable metric |
+| subscription | Object | The subscription for which the aggregation is performed |
+| boundaries | Hash | Contains from_datetime, to_datetime, and charges_duration |
+| filters | Hash | Contains grouped_by, matching_filters, and ignored_filters |
+
+#### Outputs
+The service returns an aggregation result object with properties such as aggregation, count, and potentially grouped aggregations.
+
+### `aggregate`
+#### Description
+This is the main method being tested on the WeightedSumService. It performs the aggregation based on the provided inputs.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | Contains aggregation, count, and other relevant data |
+
+## Tests
+
+1. Basic aggregation test
+2. Single event test
+3. No events test
+4. Events with the same timestamp test
+5. Recurring billable metric tests
+6. Grouped aggregation tests
+7. Filtered aggregation tests
+
+Each test sets up a specific scenario by creating events with different timestamps and values, then calls the `aggregate` method and asserts the expected results.
+
+## Dependencies
+The test file depends on:
+- Rails testing framework (RSpec)
+- FactoryBot for creating test objects
+- Various model and service classes (e.g., Subscription, BillableMetric, Event)
+
+## Configuration
+The tests use a specific date range (August 2023) and various event configurations to test different scenarios.
+
+## Error Handling
+The tests don't explicitly check for error handling, focusing instead on the correct aggregation of events under different conditions.
+
+## Performance Considerations
+While the tests don't directly address performance, they cover various scenarios that could impact performance in a real-world application, such as handling many events or grouped aggregations.
+
+This test suite ensures that the WeightedSumService correctly aggregates events under various conditions, providing confidence in its functionality for different use cases.

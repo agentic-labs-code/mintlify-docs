@@ -1,0 +1,73 @@
+---
+title: "subscription_service_spec.rb"
+---
+
+## High-level description
+This RSpec file tests the `Invoices::SubscriptionService` class, which is responsible for creating invoices for subscriptions. It covers various scenarios including invoice creation, payment processing, webhook sending, and PDF generation.
+
+## Code Structure
+The main test suite is organized around the `call` method of the `Invoices::SubscriptionService` class. It sets up various test scenarios using let statements and before blocks, then tests different aspects of the invoice creation process.
+
+## Symbols
+
+### `describe Invoices::SubscriptionService`
+#### Description
+This is the main describe block for the `Invoices::SubscriptionService` class.
+
+### `describe 'call'`
+#### Description
+This describe block focuses on testing the `call` method of the `Invoices::SubscriptionService`.
+
+### `let(:invoice_service)`
+#### Description
+Creates an instance of `Invoices::SubscriptionService` with specified parameters.
+
+### `it 'calls SegmentTrackJob'`
+#### Description
+Tests if the `SegmentTrackJob` is called with the correct parameters after invoice creation.
+
+### `it 'creates a payment'`
+#### Description
+Verifies that the `Invoices::Payments::CreateService` is called to create a payment for the invoice.
+
+### `it 'creates an invoice'`
+#### Description
+Tests the creation of an invoice, checking various attributes and states of the created invoice.
+
+### `it 'enqueues a SendWebhookJob'`
+#### Description
+Ensures that a `SendWebhookJob` is enqueued for the 'invoice.created' event.
+
+### `it 'enqueues GeneratePdfAndNotifyJob with email false'`
+#### Description
+Verifies that `Invoices::GeneratePdfAndNotifyJob` is enqueued with email set to false.
+
+### `context 'with lago_premium'`
+#### Description
+Tests behavior specific to the premium version of Lago, particularly email settings.
+
+### `context 'with customer timezone'`
+#### Description
+Tests invoice creation with respect to customer's timezone settings.
+
+### `context 'with applicable grace period'`
+#### Description
+Tests invoice creation behavior when a grace period is applicable.
+
+### `context 'when invoice already exists'`
+#### Description
+Tests the scenario where an invoice for the given period already exists.
+
+## Dependencies
+The test file depends on various Rails and RSpec helpers, as well as factory_bot for creating test data.
+
+## Error Handling
+The test suite doesn't explicitly test error handling, but it does cover various edge cases and scenarios.
+
+## Performance Considerations
+The tests use database transactions and mocking to improve performance and isolate test cases.
+
+## TODOs
+There are no explicit TODOs in the code.
+
+This test suite provides comprehensive coverage of the `Invoices::SubscriptionService` functionality, including various scenarios and edge cases related to invoice creation, payment processing, and notification handling.

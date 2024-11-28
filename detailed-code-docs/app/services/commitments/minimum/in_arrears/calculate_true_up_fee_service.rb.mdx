@@ -1,0 +1,77 @@
+---
+title: "calculate_true_up_fee_service.rb"
+---
+
+## High-level description
+This code defines a service class `CalculateTrueUpFeeService` within the `Commitments::Minimum::InArrears` module. It is responsible for calculating true-up fees for minimum commitments in arrears billing scenarios. The service extends the base `Commitments::Minimum::CalculateTrueUpFeeService` and overrides several private methods to handle specific fee calculations.
+
+## Code Structure
+The main class `CalculateTrueUpFeeService` inherits from `Commitments::Minimum::CalculateTrueUpFeeService`. It contains several private methods that query different types of fees: `subscription_fees`, `charge_fees`, `charge_in_advance_fees`, and `charge_in_advance_recurring_fees`. These methods are used to calculate the total fees for comparison against the minimum commitment amount.
+
+## References
+- `Commitments::Minimum::CalculateTrueUpFeeService` (parent class)
+- `FetchInvoicesService`
+- `Commitments::DatesService`
+- `Fee` model
+- `Subscription` model
+- `Plan` model
+- `Charge` model
+- `BillableMetric` model
+
+## Symbols
+
+### `CalculateTrueUpFeeService`
+#### Description
+This service calculates the true-up fee for minimum commitments in arrears billing scenarios. It overrides several methods from its parent class to provide specific implementations for fee calculations.
+
+#### Internal Logic
+The service relies on four main methods to calculate different types of fees:
+1. `subscription_fees`: Retrieves subscription fees for the given commitment and invoice subscription.
+2. `charge_fees`: Calculates charge fees for the commitment period.
+3. `charge_in_advance_fees`: Calculates charge fees paid in advance for the commitment period.
+4. `charge_in_advance_recurring_fees`: Calculates recurring charge fees paid in advance for the commitment period.
+
+These methods use complex database queries to fetch and filter the relevant fees based on various criteria such as date ranges, subscription details, and charge properties.
+
+### `subscription_fees`
+#### Description
+Retrieves subscription fees for the given minimum commitment and invoice subscription.
+
+#### Internal Logic
+1. Calls `FetchInvoicesService` to get invoices for the commitment and invoice subscription.
+2. Queries the `Fee` model to find subscription fees matching the retrieved invoices and subscription details.
+
+### `charge_fees`
+#### Description
+Calculates charge fees for the commitment period that are not paid in advance.
+
+#### Internal Logic
+1. Uses `Commitments::DatesService` to determine the relevant date range.
+2. Queries the `Fee` model to find charge fees within the calculated date range, excluding fees paid in advance.
+
+### `charge_in_advance_fees`
+#### Description
+Calculates charge fees paid in advance for the commitment period.
+
+#### Internal Logic
+1. Uses `Commitments::DatesService` to determine the relevant date range.
+2. Queries the `Fee` model to find charge fees paid in advance within the calculated date range.
+
+### `charge_in_advance_recurring_fees`
+#### Description
+Calculates recurring charge fees paid in advance for the commitment period.
+
+#### Internal Logic
+1. Handles special cases for yearly plans with monthly charge billing.
+2. Uses `Commitments::Minimum::InArrears::DatesService` to determine the relevant date range.
+3. Queries the `Fee` model to find recurring charge fees paid in advance within the calculated date range.
+4. Applies additional filtering based on the plan's billing frequency and type.
+
+## Performance Considerations
+The service uses complex database queries with multiple joins and conditions. Proper indexing on the relevant columns (e.g., `subscription_id`, `invoice_id`, `charge_id`) is crucial for optimal performance, especially as the number of fees and invoices grows.
+
+## Error Handling
+The code doesn't implement explicit error handling. It relies on the underlying ActiveRecord error handling mechanisms for database queries.
+
+## TODOs
+The code includes a rubocop disable comment for the Style/ConditionalAssignment rule. This suggests that there might be room for refactoring the conditional assignment in the `charge_in_advance_recurring_fees` method to improve code style.

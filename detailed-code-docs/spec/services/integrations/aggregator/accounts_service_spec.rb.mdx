@@ -1,0 +1,80 @@
+---
+title: "accounts_service_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Integrations::Aggregator::AccountsService` class. It focuses on testing the `.call` method of the service, which is responsible for fetching account information from a NetSuite integration through the Nango API.
+
+## Code Structure
+The test file defines a single `describe` block for the `Integrations::Aggregator::AccountsService` class, with a nested `describe` block for the `.call` method. It uses let statements to set up test data and mock objects, and includes a single test example that verifies the successful fetching of accounts.
+
+## Symbols
+
+### `RSpec.describe Integrations::Aggregator::AccountsService`
+#### Description
+This is the main describe block that groups all tests for the `Integrations::Aggregator::AccountsService` class.
+
+### `subject(:accounts_service)`
+#### Description
+Defines the subject of the test, which is an instance of the `Integrations::Aggregator::AccountsService` class.
+
+### `let(:integration)`
+#### Description
+Creates a test NetSuite integration object using FactoryBot.
+
+### `describe '.call'`
+#### Description
+Groups tests specifically for the `.call` method of the `AccountsService` class.
+
+### `let(:lago_client)`
+#### Description
+Creates a double of the `LagoHttpClient::Client` class for mocking HTTP requests.
+
+### `let(:accounts_endpoint)`
+#### Description
+Defines the API endpoint URL for fetching accounts from Nango.
+
+### `let(:headers)`
+#### Description
+Defines the headers to be used in the API request, including the connection ID, authorization token, and provider config key.
+
+### `let(:params)`
+#### Description
+Defines the query parameters for the API request, including the limit and cursor.
+
+### `let(:aggregator_response)`
+#### Description
+Loads a mock API response from a JSON fixture file.
+
+### `before` block
+#### Description
+Sets up the test environment by mocking the `LagoHttpClient::Client` and its `get` method to return the mock response.
+
+### `it 'successfully fetches accounts'`
+#### Description
+The main test case that verifies the behavior of the `.call` method.
+
+#### Internal Logic
+1. Calls the `call` method on the `accounts_service` instance.
+2. Verifies that the `LagoHttpClient::Client` was initialized with the correct endpoint.
+3. Checks that the `get` method was called on the client with the correct headers and params.
+4. Asserts that the result contains the expected number of accounts (3).
+5. Verifies the details of the first account in the result, including its external ID, account code, and name.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used for creating test objects (NetSuite integration) |
+| LagoHttpClient::Client | HTTP client for making API requests |
+
+## Configuration
+The test relies on environment variables for configuration:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| ENV["NANGO_SECRET_KEY"] | String | N/A | Secret key for authenticating with the Nango API |
+
+## Notes
+- The test uses a fixture file (`spec/fixtures/integration_aggregator/accounts_response.json`) to simulate the API response.
+- The test focuses on the happy path scenario where accounts are successfully fetched and parsed.
+- Error scenarios and edge cases are not covered in this test file.

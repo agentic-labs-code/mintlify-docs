@@ -1,0 +1,71 @@
+---
+title: "pay_in_advance_kafka_job.rb"
+---
+
+## High-level description
+This code defines a Kafka job (`PayInAdvanceKafkaJob`) within the `Events` module. Its primary purpose is to act as an intermediary between a Kafka consumer and the actual processing job (`PayInAdvanceJob`). It receives an event from Kafka and enqueues it for processing by Sidekiq.
+
+## Code Structure
+The `PayInAdvanceKafkaJob` class inherits from `ApplicationJob` and defines two main methods: `queue_as` and `perform`. The `queue_as` method determines the queue for job processing, while the `perform` method enqueues the event for further processing.
+
+## References
+- `ApplicationJob`: The parent class from which `PayInAdvanceKafkaJob` inherits.
+- `Events::PayInAdvanceJob`: The job that is enqueued for actual event processing.
+
+## Symbols
+
+### `Events::PayInAdvanceKafkaJob`
+#### Description
+This class represents a Kafka job for handling pay-in-advance events. It serves as a bridge between the Kafka consumer and the Sidekiq processing job.
+
+#### Inputs
+None explicitly defined for the class.
+
+#### Outputs
+None explicitly defined for the class.
+
+### `queue_as`
+#### Description
+This method determines the queue in which the job will be processed. It checks an environment variable to decide between the 'events' queue and the 'default' queue.
+
+#### Inputs
+None
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queue_name | Symbol | Either `:events` or `:default` |
+
+#### Internal Logic
+1. Checks the `SIDEKIQ_EVENTS` environment variable.
+2. If `SIDEKIQ_EVENTS` is truthy, returns `:events`.
+3. Otherwise, returns `:default`.
+
+### `perform(event)`
+#### Description
+This method is called when the job is executed. It enqueues the `PayInAdvanceJob` with the provided event.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | Unknown | The event data received from Kafka |
+
+#### Outputs
+None
+
+#### Internal Logic
+Calls `Events::PayInAdvanceJob.perform_later(event)` to enqueue the event for processing by Sidekiq.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveJob | Provides the base job functionality |
+| ActiveModel | Used for boolean type casting |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| SIDEKIQ_EVENTS | Boolean | Unknown | Determines which queue to use for job processing |
+
+## Notes
+The code includes a comment indicating that this job is called from a Kafka consumer, and therefore doesn't need to worry about locking. Its sole purpose is to enqueue the `PayInAdvanceJob` for processing by Sidekiq, taking advantage of the "unique" logic implemented in that job.

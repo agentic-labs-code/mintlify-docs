@@ -1,0 +1,79 @@
+---
+title: "fee_error_service.rb"
+---
+
+## High-level description
+This code defines a service class `FeeErrorService` within the `Webhooks::Integrations::Taxes` module. It is responsible for handling webhook notifications related to tax provider fee errors. The service prepares and sends webhook payloads containing information about fee errors encountered during tax calculations.
+
+## Code Structure
+The `FeeErrorService` class inherits from `Webhooks::BaseService` and overrides several private methods to customize the webhook behavior for tax provider fee errors.
+
+## References
+- `Webhooks::BaseService`
+- `::V1::Integrations::Taxes::FeeErrorSerializer`
+
+## Symbols
+
+### `Webhooks::Integrations::Taxes::FeeErrorService`
+#### Description
+This class is responsible for preparing and sending webhook notifications when a tax provider encounters a fee error. It customizes the behavior of the base webhook service for this specific use case.
+
+#### Internal Logic
+The class overrides four private methods from the base service:
+1. `current_organization`: Retrieves the organization associated with the object.
+2. `object_serializer`: Creates a serializer for the fee error object.
+3. `webhook_type`: Defines the type of webhook as 'fee.tax_provider_error'.
+4. `object_type`: Defines the object type as 'tax_provider_fee_error'.
+
+These methods are used by the inherited `call` method from `Webhooks::BaseService` to construct and send the webhook payload.
+
+### `current_organization`
+#### Description
+Retrieves the organization associated with the object.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @current_organization | Organization | The organization associated with the object |
+
+### `object_serializer`
+#### Description
+Creates a serializer for the fee error object with additional options.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| serializer | ::V1::Integrations::Taxes::FeeErrorSerializer | Serializer instance for the fee error object |
+
+#### Internal Logic
+Creates a new instance of `::V1::Integrations::Taxes::FeeErrorSerializer` with the following parameters:
+- `object`: The fee error object
+- `root_name`: The object type
+- `event_transaction_id`: From options
+- `lago_charge_id`: From options
+- `provider_error`: From options
+
+### `webhook_type`
+#### Description
+Defines the type of webhook for fee tax provider errors.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_type | String | The type of webhook ('fee.tax_provider_error') |
+
+### `object_type`
+#### Description
+Defines the object type for fee tax provider errors.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object_type | String | The type of object ('tax_provider_fee_error') |
+
+## Dependencies
+This code depends on the following internal modules and classes:
+- `Webhooks::BaseService`
+- `::V1::Integrations::Taxes::FeeErrorSerializer`
+
+Note: The actual sending of the webhook is handled by the parent `Webhooks::BaseService` class, which is not shown in this file but is referenced in the related code snippets.

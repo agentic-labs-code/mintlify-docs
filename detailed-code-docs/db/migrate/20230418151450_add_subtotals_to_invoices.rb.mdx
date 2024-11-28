@@ -1,0 +1,43 @@
+---
+title: "20230418151450_add_subtotals_to_invoices.rb"
+---
+
+## High-level description
+This migration adds two new columns to the `invoices` table to store subtotal amounts with and without VAT. It also updates existing records with calculated subtotal values based on the invoice version number.
+
+## Code Structure
+The migration defines a single `change` method that adds new columns and updates existing records using SQL statements.
+
+## Symbols
+
+### AddSubtotalsToInvoices
+#### Description
+This is a Rails migration class that inherits from `ActiveRecord::Migration[7.0]`. It adds two new columns to the `invoices` table and populates them with calculated values for existing records.
+
+#### Internal Logic
+1. Uses `safety_assured` to bypass Strong Migrations checks.
+2. Adds two new columns to the `invoices` table:
+   - `sub_total_vat_excluded_amount_cents`
+   - `sub_total_vat_included_amount_cents`
+3. Uses a reversible block to update existing records:
+   - For invoices with `version_number = 1`, calculates subtotals based on `amount_cents`, `prepaid_credit_amount_cents`, and `total_amount_cents`.
+   - For invoices with `version_number = 2`, calculates subtotals based on `fees_amount_cents` and `vat_amount_cents`.
+
+## Side Effects
+- Adds two new columns to the `invoices` table.
+- Updates existing records in the `invoices` table with calculated subtotal values.
+
+## Performance Considerations
+- The migration uses `bulk: true` when changing the table, which can improve performance for adding multiple columns.
+- The `UPDATE` statements may take some time to execute if there are many records in the `invoices` table.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+
+## Error Handling
+The migration uses `safety_assured` to bypass Strong Migrations checks. This should be used with caution, as it may lead to potential issues if not handled properly.
+
+## TODOs
+There are no explicit TODOs in the code.

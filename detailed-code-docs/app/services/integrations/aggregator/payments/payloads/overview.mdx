@@ -1,0 +1,78 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains classes responsible for generating and managing payment payloads for different integration systems, specifically NetSuite and Xero. The code is organized within the `Integrations::Aggregator::Payments::Payloads` module, providing a structured approach to handling payment data for various external accounting and ERP systems.
+
+## What does it do?
+The code in this directory facilitates the creation of standardized payment payloads for different integration systems. It provides a base structure for payment data and specialized classes for specific integrations like NetSuite and Xero. The main functionalities include:
+
+1. Defining a common structure for payment payloads through the `BasePayload` class.
+2. Providing a factory pattern to create appropriate payload objects based on the integration type.
+3. Implementing specialized payload structures for NetSuite integrations.
+4. Preparing a structure for Xero integrations (currently a placeholder).
+
+These classes work together to format payment data in a way that can be easily transmitted to external systems, ensuring compatibility and consistency across different integrations.
+
+## Entry points
+The main entry point for this functionality is the `Factory` class in the `factory.rb` file. This class is responsible for instantiating the appropriate payload object based on the integration type. The workflow typically follows these steps:
+
+1. The `Factory` class is called with an integration and payment object.
+2. Based on the integration type, it creates an instance of either the `Netsuite` or `Xero` payload class.
+3. The created payload object's `body` method is then called to generate the formatted payment data.
+
+The data flow starts from the payment and integration objects, which are passed through the factory to create a payload object. This payload object then formats the data according to the specific integration's requirements.
+
+## Key Files
+1. `base_payload.rb`: Defines the `BasePayload` class, which provides the foundation for all payment payloads. It includes methods for initializing with integration and payment data, and a basic structure for the payload body.
+
+2. `factory.rb`: Contains the `Factory` class, which implements the factory pattern to create the appropriate payload object based on the integration type.
+
+3. `netsuite.rb`: Implements the `Netsuite` class, which extends `BasePayload` to provide NetSuite-specific payload formatting.
+
+4. `xero.rb`: Contains a placeholder `Xero` class for future implementation of Xero-specific payload formatting.
+
+## Dependencies
+The code in this directory relies on the following dependencies:
+
+1. Ruby: The programming language used for implementation.
+2. Rails: Implied by the module structure and coding conventions, likely used for the overall application framework.
+3. External Integration Libraries: While not directly visible in the provided code, the implementation suggests integration with NetSuite and Xero APIs or SDKs.
+
+## Configuration
+While there are no explicit configuration files in this directory, the code structure suggests that configuration for different integrations (such as NetSuite and Xero) is handled elsewhere in the application. The `Factory` class uses the integration type to determine which payload class to instantiate, implying that integration configurations are managed at a higher level in the application.
+
+Key configurable aspects include:
+
+1. Integration Types: The `Factory` class supports 'Integrations::NetsuiteIntegration' and 'Integrations::XeroIntegration'. Adding new integration types would require updating this class.
+
+2. Payload Structures: Each integration-specific class (e.g., `Netsuite`) defines its own payload structure. These structures can be modified or extended to meet specific integration requirements.
+
+Here's an example of how the `Netsuite` class structures its payload:
+
+```ruby
+def body
+  {
+    type: 'customerpayment',
+    isDynamic: true,
+    customer: {
+      externalId: integration_customer.external_id
+    },
+    apply: [
+      {
+        apply: true,
+        doc: integration_invoice.external_id,
+        amount: payment.amount.to_f
+      }
+    ],
+    options: {
+      ignoreMandatoryFields: false
+    }
+  }
+end
+```
+
+This structure can be adjusted as needed to accommodate changes in the NetSuite API or specific business requirements.
+
+In conclusion, this directory provides a flexible and extensible system for generating payment payloads for different accounting and ERP integrations. It allows for easy addition of new integration types and customization of payload structures, making it a crucial component in a larger financial integration system.

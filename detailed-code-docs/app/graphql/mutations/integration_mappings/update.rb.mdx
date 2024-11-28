@@ -1,0 +1,59 @@
+---
+title: "update.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for updating an integration mapping. It's part of a larger system that handles integrations between different services or systems, allowing for the modification of existing mappings.
+
+## Code Structure
+The `Update` class is defined within the `Mutations::IntegrationMappings` module. It inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. The class defines the GraphQL mutation structure, including input and output types, and implements the `resolve` method to handle the update operation.
+
+## References
+- `Types::IntegrationMappings::UpdateInput`
+- `Types::IntegrationMappings::Object`
+- `::IntegrationMappings::BaseMapping`
+- `::IntegrationMappings::UpdateService`
+
+## Symbols
+
+### `Mutations::IntegrationMappings::Update`
+#### Description
+This class defines a GraphQL mutation for updating an integration mapping. It ensures the user is authenticated and has the required organization permissions before processing the update.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | Contains the update parameters for the integration mapping |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Types::IntegrationMappings::Object | The updated integration mapping object |
+
+#### Internal Logic
+1. Defines the required permission as 'organization:integrations:update'.
+2. Sets up the GraphQL mutation name and description.
+3. Specifies the input object class and return type.
+4. In the `resolve` method:
+   - Finds the integration mapping based on the provided ID and current organization.
+   - Calls the `::IntegrationMappings::UpdateService` to perform the update.
+   - Returns the updated integration mapping if successful, or an error if not.
+
+## Side Effects
+This mutation may modify the database by updating an existing integration mapping record.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user has the required organization access |
+
+## Error Handling
+The code uses the `result_error` method (likely defined in a parent class) to handle and return errors from the update service.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| updateIntegrationMapping | Mutation | UpdateIntegrationMappingInput | IntegrationMapping | Updates an existing integration mapping |
+
+Note: The actual GraphQL endpoint might differ based on the overall API structure.

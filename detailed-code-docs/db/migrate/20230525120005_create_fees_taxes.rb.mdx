@@ -1,0 +1,59 @@
+---
+title: "20230525120005_create_fees_taxes.rb"
+---
+
+## High-level description
+This Ruby code defines an ActiveRecord migration to create a `fees_taxes` table in the database. The table is designed to store information about taxes associated with fees, including tax details and the corresponding amount.
+
+## Code Structure
+The code consists of a single class `CreateFeesTaxes` that inherits from `ActiveRecord::Migration[7.0]`. This class contains a `change` method that defines the structure of the new `fees_taxes` table.
+
+## Symbols
+
+### `CreateFeesTaxes`
+#### Description
+This class is an ActiveRecord migration that creates the `fees_taxes` table in the database. It defines the table's structure, including columns, data types, and constraints.
+
+#### Internal Logic
+The `change` method uses the `create_table` method to define the structure of the `fees_taxes` table:
+
+1. The table is created with a UUID as the primary key.
+2. It establishes foreign key relationships with the `fees` and `taxes` tables.
+3. It defines columns for tax information (description, code, name, and rate).
+4. It includes columns for the amount (in cents) and currency.
+5. It adds timestamp columns for record creation and update times.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the migration framework and database abstraction |
+
+## Symbols
+
+### `change`
+#### Description
+This method defines the structure of the `fees_taxes` table using ActiveRecord's table creation DSL.
+
+#### Internal Logic
+1. Creates the `fees_taxes` table with a UUID as the primary key.
+2. Adds foreign key references to the `fees` and `taxes` tables, both using UUID type.
+3. Defines columns for tax information:
+   - `tax_description` (string, nullable)
+   - `tax_code` (string, not null)
+   - `tax_name` (string, not null)
+   - `tax_rate` (float, not null, default: 0.0)
+4. Adds columns for the amount:
+   - `amount_cents` (bigint, not null, default: 0)
+   - `amount_currency` (string, not null)
+5. Includes timestamp columns (`created_at` and `updated_at`) automatically.
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| id | symbol | :uuid | Sets the primary key type to UUID |
+| null | boolean | false | Specifies that certain columns cannot be null |
+| foreign_key | boolean | true | Creates foreign key constraints for fee and tax references |
+| index | boolean | true | Creates indexes for fee and tax reference columns |
+| default | various | 0.0, 0 | Sets default values for tax_rate and amount_cents |
+
+This migration creates a table that links fees and taxes, storing detailed information about each tax applied to a fee. The use of UUIDs for primary and foreign keys suggests a distributed or high-scale system design. The table structure allows for flexible tax calculations with separate fields for tax rate and amount, supporting multiple currencies.

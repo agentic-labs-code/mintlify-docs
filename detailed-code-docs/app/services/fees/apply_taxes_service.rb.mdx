@@ -1,0 +1,70 @@
+---
+title: "apply_taxes_service.rb"
+---
+
+## High-level description
+This code defines the `ApplyTaxesService` class within the `Fees` module. Its primary purpose is to apply taxes to a given fee, calculating the tax amounts and rates based on applicable taxes for the customer or organization associated with the fee.
+
+## Code Structure
+The `ApplyTaxesService` class inherits from `BaseService` and contains a single public method `call`. It uses various methods to determine the applicable taxes and applies them to the fee.
+
+## Symbols
+
+### `ApplyTaxesService`
+#### Description
+This service is responsible for applying taxes to a given fee. It determines the applicable taxes based on various conditions and calculates the tax amounts and rates.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fee | Fee | The fee object to which taxes will be applied |
+| tax_codes | Array&lt;String&gt; (optional) | Specific tax codes to be applied |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Contains the applied taxes and any error information |
+
+#### Internal Logic
+1. Initialize the result's applied taxes array.
+2. Return if the fee already has applied taxes.
+3. Iterate through applicable taxes:
+   - Create a new `Fee::AppliedTax` for each tax.
+   - Calculate the tax amount and add it to the fee's applied taxes.
+   - Update the total applied taxes amount and rate.
+4. Set the fee's total taxes amount and rate.
+5. Handle any `ActiveRecord::RecordInvalid` errors.
+
+### `customer`
+#### Description
+A private method that retrieves the customer associated with the fee.
+
+#### Internal Logic
+Returns the customer from either the fee's invoice or the fee's subscription.
+
+### `applicable_taxes`
+#### Description
+A private method that determines which taxes should be applied to the fee.
+
+#### Internal Logic
+Determines applicable taxes based on the following priority:
+1. Specific tax codes (if provided)
+2. Taxes associated with the fee's add-on (if applicable)
+3. Taxes associated with the fee's charge (if applicable)
+4. Taxes associated with the fee's invoiceable (if it's a commitment)
+5. Taxes associated with the subscription's plan
+6. Taxes associated with the customer
+7. Taxes applied to the organization
+
+## Side Effects
+- Modifies the `fee` object by adding applied taxes and updating tax-related attributes.
+- Saves new `Fee::AppliedTax` records to the database if the fee is persisted.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseService | Parent class providing common service functionality |
+| Fee::AppliedTax | Model representing an applied tax on a fee |
+
+## Error Handling
+The service catches `ActiveRecord::RecordInvalid` errors and adds them to the result object using `result.record_validation_failure!`.

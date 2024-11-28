@@ -1,0 +1,54 @@
+---
+title: "unique_count_service.rb"
+---
+
+## High-level description
+This code defines a `UniqueCountService` class within the `BillableMetrics::Breakdown` module. It extends the `BillableMetrics::ProratedAggregations::UniqueCountService` and provides functionality to calculate a breakdown of unique count metrics for billing purposes, considering prorated values and different operation types.
+
+## Symbols
+
+### `BillableMetrics::Breakdown::UniqueCountService`
+#### Description
+This class is responsible for generating a breakdown of unique count metrics. It inherits from `BillableMetrics::ProratedAggregations::UniqueCountService` and overrides the `breakdown` method to provide custom logic for calculating the breakdown.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the calculated breakdown |
+
+#### Internal Logic
+The `breakdown` method performs the following steps:
+1. Retrieves prorated unique count breakdown from the event store.
+2. Groups the results by the 'property' field.
+3. Processes each group to create a breakdown entry:
+   - Determines the operation type and datetime based on the rows in the group.
+   - Handles cases where there are multiple rows (add then remove scenarios).
+   - Creates an OpenStruct object with date, action, amount, duration, and total_duration.
+4. Sorts the breakdown entries by date.
+5. Assigns the sorted breakdown to the result object.
+
+Key points:
+- The method considers the customer's timezone when setting the date.
+- It handles different operation types: 'add', 'remove', and 'add_and_removed'.
+- Prorated values are used for amount and duration calculations.
+- The breakdown is based only on the current period.
+
+## Dependencies
+The code relies on the following dependencies:
+| Dependency | Purpose |
+|:-----------|:--------|
+| BillableMetrics::ProratedAggregations::UniqueCountService | Parent class that this service extends |
+| OpenStruct | Used to create structured objects for breakdown entries |
+
+## Configuration
+The code uses several instance variables that are likely set in the parent class:
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| event_store | Object | Provides methods for retrieving prorated unique count breakdown |
+| from_datetime | DateTime | Start of the period for breakdown calculation |
+| to_datetime | DateTime | End of the period for breakdown calculation |
+| customer | Object | Contains information about the customer, including their timezone |
+| result | Object | Stores the final breakdown result |
+
+## Performance Considerations
+The code performs grouping and mapping operations on the data retrieved from the event store. For large datasets, this could potentially impact performance. The use of `group_by` and `map` suggests that the entire dataset is processed in memory, which might be a concern for very large datasets.

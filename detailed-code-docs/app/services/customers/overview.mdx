@@ -1,0 +1,59 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `app/services/customers` directory contains a collection of service classes responsible for managing various aspects of customer-related operations in the application. These services handle tasks such as creating, updating, and deleting customers, managing their metadata, applying taxes, generating checkout URLs, and terminating customer relations.
+
+## What does it do?
+This directory provides a set of services that:
+1. Create and update customer records, including handling API requests and internal operations.
+2. Apply and manage EU tax codes for customers based on their VAT information and location.
+3. Generate checkout URLs for customers to complete payments.
+4. Update and manage customer metadata.
+5. Handle the termination of customer relations, including subscriptions, invoices, and wallets.
+6. Update invoice grace periods and payment due dates for customers.
+7. Apply taxes to customers based on various criteria.
+
+These services work together to provide a comprehensive system for managing customer data and related operations within the application.
+
+## Entry points
+The main entry points for these services are:
+
+1. `Customers::CreateService`: Handles customer creation and updates from both API and internal requests.
+2. `Customers::UpdateService`: Manages updates to existing customer records.
+3. `Customers::DestroyService`: Handles the deletion of customer records and related data.
+4. `Customers::GenerateCheckoutUrlService`: Generates checkout URLs for customer payments.
+5. `Customers::TerminateRelationsService`: Manages the termination of all active customer relations.
+
+These services are likely called from controllers or background jobs to perform their respective operations.
+
+## Key Files
+1. `create_service.rb`: Handles customer creation and updates.
+2. `update_service.rb`: Manages customer information updates.
+3. `destroy_service.rb`: Handles customer deletion.
+4. `eu_auto_taxes_service.rb`: Determines appropriate EU tax codes for customers.
+5. `generate_checkout_url_service.rb`: Generates checkout URLs for customer payments.
+6. `terminate_relations_service.rb`: Terminates all active customer relations.
+7. `apply_taxes_service.rb`: Applies tax codes to customers.
+8. `update_invoice_grace_period_service.rb`: Updates invoice grace periods for customers.
+9. `update_invoice_payment_due_date_service.rb`: Updates payment due dates for customer invoices.
+
+## Dependencies
+These services rely on various external libraries and internal modules:
+
+1. ActiveRecord: For database operations and model interactions.
+2. BaseService: A custom base class providing common functionality for service objects.
+3. valvat: Used for performing VIES checks on VAT numbers.
+4. LagoEuVat: Used for retrieving EU VAT rates and country information.
+5. PaymentProviders::FindService: For locating appropriate payment providers.
+6. Various internal services for specific operations (e.g., Subscriptions::TerminateService, Invoices::RefreshDraftAndFinalizeService).
+
+## Configuration
+While there are no explicit configuration files mentioned, the services use environment-specific settings and feature flags:
+
+1. EU tax management can be enabled or disabled.
+2. Payment provider integrations (e.g., Stripe, GoCardless) are configurable.
+3. Segment analytics is used for tracking events.
+
+These services form a crucial part of the customer management system, handling complex logic for creating, updating, and managing customer data and related operations. They provide a modular and maintainable approach to handling various customer-related tasks within the application.

@@ -1,0 +1,69 @@
+---
+title: "credit_notes_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying credit notes in a Ruby on Rails application. It handles authentication, organization requirements, and provides filtering and pagination options for retrieving credit notes.
+
+## Code Structure
+The `CreditNotesResolver` class inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines arguments for the GraphQL query and uses the `CreditNotesQuery` service to fetch and return the credit notes.
+
+## References
+- `Types::CreditNotes::Object`: Used to define the return type of the resolver.
+- `CreditNotesQuery`: A service class used to fetch credit notes based on the provided arguments.
+
+## Symbols
+
+### `CreditNotesResolver`
+#### Description
+This class is a GraphQL resolver for querying credit notes. It ensures the user is authenticated and has the required organization access before resolving the query.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer_id | ID | Optional. Used to filter credit notes by customer. |
+| limit | Integer | Optional. Used for pagination to limit the number of results. |
+| page | Integer | Optional. Used for pagination to specify the page number. |
+| search_term | String | Optional. Used to search for specific credit notes. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_notes | [Types::CreditNotes::Object] | A collection of credit note objects. |
+
+#### Internal Logic
+1. The resolver checks for user authentication and organization access using the included modules.
+2. It defines the required permission as 'credit_notes:view'.
+3. The `resolve` method calls the `CreditNotesQuery` service with the provided arguments and the current organization.
+4. The method returns the credit notes from the query result.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated before resolving the query. |
+| RequiredOrganization | Ensures the user has access to the required organization. |
+
+## Error Handling
+The included modules (`AuthenticableApiUser` and `RequiredOrganization`) handle authentication and authorization errors, raising appropriate GraphQL execution errors if the user is unauthorized or lacks organization access.
+
+## API/Interface Reference
+This resolver is part of the GraphQL API and is likely referenced in the `QueryType` as a field:
+
+```ruby
+field :credit_notes, resolver: Resolvers::CreditNotesResolver
+```
+
+Users can query credit notes using this resolver with optional filtering and pagination arguments:
+
+```graphql
+query {
+  creditNotes(customerId: "123", limit: 10, page: 1, searchTerm: "invoice") {
+    id
+    number
+    totalAmountCents
+    # ... other fields
+  }
+}
+```
+
+This query would return a collection of credit note objects matching the specified criteria.

@@ -1,0 +1,36 @@
+---
+title: "20240628083654_add_membership_id_and_organization_id_to_data_exports.rb"
+---
+
+## High-level description
+This migration adds `membership_id` and `organization_id` columns to the `data_exports` table. These columns are implemented as foreign key references using UUID data type, enhancing the data model by associating data exports with memberships and organizations.
+
+## Symbols
+
+### `AddMembershipIdAndOrganizationIdToDataExports`
+#### Description
+This class is a Rails migration that adds two new reference columns to the `data_exports` table. It uses the `safety_assured` method to bypass certain safety checks, likely because the migration is considered safe to run.
+
+#### Internal Logic
+1. The migration uses `safety_assured` to wrap the column additions, indicating that the operation is considered safe.
+2. It adds a `membership_id` column to the `data_exports` table, creating a foreign key reference to the `memberships` table.
+3. It adds an `organization_id` column to the `data_exports` table, creating a foreign key reference to the `organizations` table.
+4. Both new columns are of type UUID, which is specified using the `type: :uuid` option.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the base class for database migrations in Rails |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| foreign_key | boolean | true | Automatically creates a foreign key constraint |
+| type | symbol | :uuid | Specifies the column type as UUID |
+
+## Performance Considerations
+Adding new columns and foreign key constraints may have a temporary impact on database performance during the migration, especially for large tables. However, using UUIDs as foreign keys can provide benefits in distributed systems and can help with data portability.
+
+---
+
+Note: This migration is part of a Rails application and follows Rails migration conventions. The use of `safety_assured` suggests that the application might be using a gem like `strong_migrations` to enforce safe migration practices.

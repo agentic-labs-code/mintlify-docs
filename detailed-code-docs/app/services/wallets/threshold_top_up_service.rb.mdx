@@ -1,0 +1,76 @@
+---
+title: "threshold_top_up_service.rb"
+---
+
+## High-level description
+The `ThresholdTopUpService` is a service class within the `Wallets` module that handles automatic top-ups for a wallet when its balance falls below a specified threshold. It checks various conditions and, if met, schedules a job to create a new wallet transaction to replenish the wallet's balance.
+
+## Code Structure
+The main class `ThresholdTopUpService` inherits from `BaseService` and contains a single public method `call` that performs the threshold check and initiates the top-up process if necessary. It also includes several private methods to handle specific calculations and data retrieval.
+
+## Symbols
+
+### `ThresholdTopUpService`
+#### Description
+This service class is responsible for checking if a wallet's balance is below a specified threshold and initiating a top-up transaction if necessary.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet | Wallet | The wallet object to be checked for top-up |
+
+#### Internal Logic
+1. Check if a threshold rule exists for the wallet
+2. Compare the wallet's ongoing balance with the threshold
+3. Check if pending transactions would bring the balance above the threshold
+4. If all conditions are met, schedule a job to create a new wallet transaction
+
+### `call`
+#### Description
+The main method that performs the threshold check and initiates the top-up process.
+
+#### Internal Logic
+1. Return early if any of the following conditions are met:
+   - No threshold rule exists
+   - Wallet's ongoing balance is above the threshold
+   - Pending transactions plus ongoing balance exceed the threshold
+2. Schedule a `WalletTransactions::CreateJob` to create a new wallet transaction
+
+### `threshold_rule`
+#### Description
+Retrieves the threshold rule associated with the wallet.
+
+#### Internal Logic
+Finds the first recurring transaction rule for the wallet with a trigger of `:threshold`.
+
+### `pending_transactions_amount`
+#### Description
+Calculates the total amount of pending transactions for the wallet.
+
+#### Internal Logic
+Sums the amounts of all pending wallet transactions.
+
+### `paid_credits`
+#### Description
+Determines the number of paid credits to be added in the top-up transaction.
+
+#### Internal Logic
+If the threshold rule is set to target mode, it calculates the difference between the target balance and the current ongoing balance. Otherwise, it returns the predefined paid credits amount from the threshold rule.
+
+### `granted_credits`
+#### Description
+Determines the number of granted credits to be added in the top-up transaction.
+
+#### Internal Logic
+Returns "0.0" if the threshold rule is in target mode, otherwise returns the predefined granted credits amount from the threshold rule.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| WalletTransactions::CreateJob | Used to schedule the creation of a new wallet transaction |
+
+## Error Handling
+This service does not implement explicit error handling. It relies on the underlying `BaseService` class for error management.
+
+## Performance Considerations
+The service uses memoization (`@threshold_rule` and `@pending_transactions_amount`) to avoid redundant database queries, which can improve performance when these values are accessed multiple times.

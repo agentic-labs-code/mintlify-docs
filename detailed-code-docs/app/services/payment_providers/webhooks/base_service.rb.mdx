@@ -1,0 +1,45 @@
+---
+title: "base_service.rb"
+---
+
+## High-level description
+This code defines a base service class for handling payment provider webhooks in a Ruby on Rails application. It is designed to be inherited by specific webhook services for different payment providers, providing a common structure for initializing the service with an organization ID and event JSON data.
+
+## Code Structure
+The `BaseService` class is nested within the `PaymentProviders::Webhooks` module, suggesting a hierarchical organization of payment-related services in the application. It inherits from another `BaseService` class, indicating a potential layered service architecture.
+
+## Symbols
+
+### `PaymentProviders::Webhooks::BaseService`
+#### Description
+This class serves as a foundation for webhook handling services related to payment providers. It initializes with an organization ID and event JSON data, setting up the basic structure for processing webhook events.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | String or UUID | The ID of the organization associated with the webhook event |
+| event_json | Hash or String | The JSON data of the webhook event |
+
+#### Internal Logic
+1. Finds the `Organization` record using the provided `organization_id`.
+2. Stores the `event_json` in an instance variable.
+3. Calls the superclass initializer with `super`.
+
+#### Side Effects
+- Queries the database to find the `Organization` record.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Organization | Used to find the organization record associated with the webhook event |
+
+## References
+- `BaseService`: The superclass from which this class inherits (not shown in the provided code).
+- `Organization`: The model class used to find the organization record (shown in the related code snippets).
+
+## Notes
+1. The class uses Ruby's `attr_reader` to create getter methods for `organization` and `event_json`, making them accessible within the class but private to external callers.
+2. The `initialize` method is marked as public (default in Ruby), while the attribute readers are explicitly marked as private.
+3. The use of `frozen_string_literal: true` at the top of the file indicates that string literals in this file are frozen, which can provide performance benefits and prevent accidental modification of strings.
+
+This base class provides a consistent starting point for handling webhook events from various payment providers, ensuring that each specific webhook service has access to the relevant organization and event data.

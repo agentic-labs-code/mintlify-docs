@@ -1,0 +1,65 @@
+---
+title: "billable_metrics_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying billable metrics of an organization. It handles authentication, organization validation, and applies various filters and pagination to the query results.
+
+## Code Structure
+The `BillableMetricsResolver` class inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines arguments for the GraphQL query and uses the `BillableMetricsQuery` service to fetch and filter the results.
+
+## References
+- `Types::BillableMetrics::Object`
+- `Types::BillableMetrics::AggregationTypeEnum`
+- `BillableMetricsQuery`
+
+## Symbols
+
+### `BillableMetricsResolver`
+#### Description
+This resolver handles GraphQL queries for billable metrics, applying authentication, organization validation, and query filters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| limit | Integer | Optional. Limits the number of results returned. |
+| page | Integer | Optional. Specifies the page number for pagination. |
+| recurring | Boolean | Optional. Filters metrics based on whether they are recurring. |
+| search_term | String | Optional. Used for searching metrics by name or code. |
+| aggregation_types | [Types::BillableMetrics::AggregationTypeEnum] | Optional. Filters metrics by aggregation types. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| billable_metrics | [Types::BillableMetrics::Object] | A collection of billable metric objects. |
+
+#### Internal Logic
+1. Validates user authentication and organization membership.
+2. Calls `BillableMetricsQuery` with the provided arguments and current organization.
+3. Returns the resulting billable metrics.
+
+## Side Effects
+This resolver doesn't have any notable side effects beyond querying the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication checks for API users. |
+| RequiredOrganization | Ensures the presence of a valid organization context. |
+| BillableMetricsQuery | Service object for querying and filtering billable metrics. |
+
+## Error Handling
+The resolver relies on the included modules (`AuthenticableApiUser` and `RequiredOrganization`) for handling authentication and organization-related errors. These modules raise `GraphQL::ExecutionError` instances for unauthorized access or missing organization context.
+
+## API/Interface Reference
+This resolver is part of the GraphQL API and is typically accessed through the `billable_metrics` field in the `QueryType`. It returns a collection of `Types::BillableMetrics::Object` instances.
+
+| Argument | Type | Required | Description |
+|:---------|:-----|:---------|:------------|
+| limit | Integer | No | Limits the number of results. |
+| page | Integer | No | Specifies the page for pagination. |
+| recurring | Boolean | No | Filters by recurring status. |
+| search_term | String | No | Searches metrics by name or code. |
+| aggregation_types | [AggregationTypeEnum] | No | Filters by aggregation types. |
+
+The resolver requires the 'billable_metrics:view' permission for access.

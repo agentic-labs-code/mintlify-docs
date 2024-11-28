@@ -1,0 +1,43 @@
+---
+title: "recurring_transaction_rules.rb"
+---
+
+## High-level description
+This code defines a factory for creating `RecurringTransactionRule` objects using FactoryBot, a popular Ruby gem for creating test data. The factory sets default values for key attributes of a recurring transaction rule, which can be used in tests to quickly create instances of this model with predefined data.
+
+## Symbols
+
+### `:recurring_transaction_rule`
+#### Description
+This is the main factory definition for creating `RecurringTransactionRule` objects. It sets up default values for several attributes of the model.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet | association | Associates a wallet with the rule |
+| paid_credits | string | The amount of credits paid, defaulted to "10.00" |
+| granted_credits | string | The amount of credits granted, defaulted to "10.00" |
+| interval | string | The frequency of the rule, defaulted to "monthly" |
+| trigger | string | The trigger type for the rule, defaulted to "interval" |
+
+#### Outputs
+The factory produces a `RecurringTransactionRule` object with the specified attributes.
+
+## References
+This factory references the `RecurringTransactionRule` model, which is defined in `app/models/recurring_transaction_rule.rb`. The model provides context for the attributes set in the factory:
+
+- It belongs to a `wallet`
+- It has enums for `interval`, `method`, and `trigger`
+- The `interval` can be weekly, monthly, quarterly, or yearly
+- The `trigger` can be interval or threshold
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| FactoryBot | Used to define factories for creating test data |
+
+## Notes
+1. The factory uses string values for decimal fields (`paid_credits` and `granted_credits`). In the actual model, these are stored as `decimal(30, 5)` fields.
+2. The factory sets only a subset of the available attributes for the `RecurringTransactionRule` model. Other attributes like `method`, `started_at`, `target_ongoing_balance`, etc., are not explicitly set in this factory definition.
+3. The `wallet` association is included, which means FactoryBot will also create (or use an existing) `Wallet` object when creating a `RecurringTransactionRule`.
+4. This factory provides a good starting point for creating `RecurringTransactionRule` objects in tests, but developers may need to override these defaults or add more attributes depending on specific test scenarios.

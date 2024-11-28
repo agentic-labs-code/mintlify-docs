@@ -1,0 +1,62 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains serializer classes for the V1 API of a customer-related functionality in a Ruby on Rails application. These serializers are responsible for formatting various aspects of customer data, including charge usage, metadata, past usage, and current usage, into JSON structures suitable for API responses.
+
+## What does it do?
+The serializers in this directory transform complex customer-related data structures into simplified, consistent JSON formats for API consumption. They handle various aspects of customer data:
+
+1. Charge Usage: Aggregates and formats detailed usage information for charges within an invoice.
+2. Metadata: Formats customer metadata for easy consumption and display.
+3. Past Usage: Provides a comprehensive view of a customer's past usage, including invoice details and charge breakdowns.
+4. Current Usage: Offers a snapshot of a customer's current usage within a specific period.
+
+These serializers ensure that the API can present customer data in a structured, consistent manner, making it easier for clients to consume and process the information.
+
+## Key Files
+
+1. `charge_usage_serializer.rb`:
+   - Serializes charge usage data, grouping fees by charge ID and calculating aggregated metrics.
+   - Handles complex data structures like filters and grouped usage.
+   - Provides detailed breakdowns of units consumed, event counts, and amounts for each charge.
+
+2. `metadata_serializer.rb`:
+   - Formats customer metadata into a simple key-value structure.
+   - Includes information about whether the metadata should be displayed on invoices.
+
+3. `past_usage_serializer.rb`:
+   - Serializes comprehensive past usage data for a customer's subscription.
+   - Includes invoice period details, charges, taxes, and optionally detailed charge usage.
+   - Utilizes the `ChargeUsageSerializer` for detailed charge breakdowns when requested.
+
+4. `usage_serializer.rb`:
+   - Serializes current usage data for a customer within a specific period.
+   - Provides a summary of usage including period, currency, and amounts.
+   - Optionally includes detailed charge usage information.
+
+## Dependencies
+- These serializers depend on a base `ModelSerializer` class, which is likely defined elsewhere in the application to provide common serialization functionality.
+- The `ChargeUsageSerializer` is used by both the `PastUsageSerializer` and `UsageSerializer` to provide detailed charge breakdowns.
+- The Ruby `BigDecimal` class is used in the `ChargeUsageSerializer` for precise decimal arithmetic.
+
+## Configuration
+These serializers don't appear to use any specific configuration files or environment variables. However, they do rely on the structure of the input models (e.g., `fee`, `charge`, `invoice`) to access the necessary data for serialization.
+
+Here's an example of how the `ChargeUsageSerializer` might be used in a controller action:
+
+```ruby
+def show_usage
+  customer = Customer.find(params[:id])
+  usage_data = customer.calculate_usage(params[:from], params[:to])
+  
+  serialized_data = V1::Customers::ChargeUsageSerializer.new(usage_data).serialize
+  
+  render json: serialized_data
+end
+```
+
+This would return a JSON response with the structured charge usage data for the specified customer and time period.
+
+The serializers in this directory play a crucial role in presenting complex customer data in a consistent and easily consumable format for API clients. They handle various aspects of customer information, from detailed usage breakdowns to simple metadata, ensuring that the API can provide comprehensive and well-structured responses to client requests.

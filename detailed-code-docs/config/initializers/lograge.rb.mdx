@@ -1,0 +1,66 @@
+---
+title: "lograge.rb"
+---
+
+## High-level description
+This code configures Lograge for a Rails application. It sets up JSON-formatted logging with custom options, including OpenTelemetry tracing information and organization-specific data.
+
+## Symbols
+
+### Rails.application.configure
+#### Description
+This method is used to configure the Rails application. In this case, it's specifically used to set up Lograge and customize logging options.
+
+#### Internal Logic
+1. Enables Lograge
+2. Sets the Lograge formatter to JSON
+3. Disables colorized logging
+4. Defines custom options for Lograge
+
+### config.lograge.custom_options
+#### Description
+This lambda function defines custom options to be included in each log entry.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | ActionController::LogSubscriber::Event | The event object containing information about the current request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Hash | Hash | A hash containing custom log data |
+
+#### Internal Logic
+1. Retrieves the current OpenTelemetry span
+2. Creates a hash with the following information:
+   - ddsource: Set to 'ruby'
+   - params: Request parameters, excluding 'controller' and 'action'
+   - organization_id: Extracted from the event payload
+   - trace_id: Hexadecimal trace ID from the OpenTelemetry span context
+   - span_id: Hexadecimal span ID from the OpenTelemetry span context
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Lograge | Provides structured logging for Rails applications |
+| OpenTelemetry | Used for distributed tracing |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| config.lograge.enabled | Boolean | true | Enables Lograge for the application |
+| config.lograge.formatter | Object | Lograge::Formatters::Json.new | Sets the log formatter to JSON |
+| config.colorize_logging | Boolean | false | Disables colorized logging output |
+
+## Logging
+This code configures Lograge to provide structured logging for the Rails application. It sets up JSON-formatted logs and includes custom information such as request parameters, organization ID, and OpenTelemetry tracing data in each log entry.
+
+The custom options added to each log entry include:
+- ddsource: Always set to 'ruby'
+- params: Request parameters (excluding 'controller' and 'action')
+- organization_id: Extracted from the event payload
+- trace_id: OpenTelemetry trace ID
+- span_id: OpenTelemetry span ID
+
+This configuration enhances the application's logging capabilities, making it easier to track requests, associate logs with specific organizations, and correlate logs with distributed traces.

@@ -1,0 +1,67 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying integration subsidiaries. It's part of a larger GraphQL API structure and handles the retrieval of subsidiaries for a given integration within an organization, ensuring proper authentication and authorization.
+
+## Code Structure
+The `SubsidiariesResolver` class is defined within the `Resolvers::Integrations` module. It inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. The resolver defines an argument, a return type, and a resolve method to fetch and return subsidiaries.
+
+## References
+- `Resolvers::BaseResolver`
+- `Types::Integrations::Subsidiaries::Object`
+- `::Integrations::Aggregator::SubsidiariesService`
+
+## Symbols
+
+### `SubsidiariesResolver`
+#### Description
+This class is a GraphQL resolver responsible for querying integration subsidiaries. It ensures that the user is authenticated and has the necessary permissions to access the data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration_id | ID | Optional. The ID of the integration to query subsidiaries for. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subsidiaries | [Types::Integrations::Subsidiaries::Object] | A collection of subsidiary objects. |
+
+#### Internal Logic
+1. Finds the integration using the provided `integration_id` within the current organization.
+2. Calls the `::Integrations::Aggregator::SubsidiariesService` with the found integration.
+3. Returns the subsidiaries from the service result.
+
+## Side Effects
+This resolver doesn't have any notable side effects beyond querying the database and potentially making external service calls through the `SubsidiariesService`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user has access to the current organization |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'organization:integrations:view' | The permission required to access this resolver |
+
+## Error Handling
+Error handling is primarily managed through the included modules:
+- `AuthenticableApiUser`: Raises an unauthorized error if the current user is not authenticated.
+- `RequiredOrganization`: Raises a forbidden error if the organization is missing or the user is not a member.
+
+Additionally, the resolver may raise standard ActiveRecord errors if the integration is not found.
+
+## API/Interface Reference
+This resolver is part of the GraphQL API and is likely accessed through a field in the `QueryType`:
+
+| Field | Resolver |
+|:------|:---------|
+| integration_subsidiaries | Resolvers::Integrations::SubsidiariesResolver |
+
+The resolver returns a collection of `Types::Integrations::Subsidiaries::Object`, which includes the following fields:
+- `external_id`: String (non-null)
+- `external_name`: String (nullable)

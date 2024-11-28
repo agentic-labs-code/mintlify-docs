@@ -1,0 +1,58 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions for handling error details in a Ruby on Rails application. It defines an enum for error codes and an object type for representing error details, providing a structured way to expose error information through a GraphQL API.
+
+## What does it do?
+The code in this directory sets up a system for standardized error reporting in GraphQL queries and mutations. It does this by:
+
+1. Defining a set of error codes as an enum, which allows for consistent error identification across the application.
+2. Creating an object type that represents detailed error information, including the error code, additional details, and a unique identifier.
+
+This structure allows developers to query error information in a consistent format, making it easier to handle and display errors in client applications consuming the GraphQL API.
+
+## Key Files
+
+### error_codes_enum.rb
+This file defines the `ErrorCodesEnum` class, which creates a GraphQL enum type for error codes. It dynamically generates enum values based on a predefined set of error codes stored in the `ErrorDetail::ERROR_CODES` constant. This approach ensures that all error codes used in the application are available as options in GraphQL queries and mutations.
+
+```ruby
+class Types::ErrorDetails::ErrorCodesEnum &lt; Types::BaseEnum
+  ErrorDetail::ERROR_CODES.each do |code|
+    value code
+  end
+end
+```
+
+### object.rb
+This file defines the `Object` class, which creates a GraphQL object type for representing error details. It includes fields for the error code, error details, and a unique identifier. The class also implements a custom resolver for the `error_details` field, which retrieves the details from the underlying object based on the error code.
+
+```ruby
+class Types::ErrorDetails::Object &lt; Types::BaseObject
+  field :error_code, Types::ErrorDetails::ErrorCodesEnum, null: false
+  field :error_details, String, null: false
+  field :id, ID, null: false
+
+  def error_details
+    object.details[object.error_code]
+  end
+end
+```
+
+## Dependencies
+The code in this directory relies on the following dependencies:
+
+1. `Types::BaseEnum`: A base class for GraphQL enum types, likely defined elsewhere in the application.
+2. `Types::BaseObject`: A base class for GraphQL object types, also likely defined elsewhere.
+3. `ErrorDetail::ERROR_CODES`: A constant containing predefined error codes, which is used to generate the enum values.
+
+These dependencies suggest that the error handling system is integrated into a larger GraphQL schema and potentially tied to an `ErrorDetail` model or service in the application.
+
+## Configuration
+While there are no explicit configuration files in this directory, the error codes used in the application are defined in the `ErrorDetail::ERROR_CODES` constant. This constant serves as a configuration point for the available error codes. To add or modify error codes, developers would need to update this constant, which would then automatically reflect in the GraphQL schema.
+
+The structure of the `Object` class also implies that there's an underlying object with a `details` hash and an `error_code` attribute. This suggests that there might be configuration or setup required in other parts of the application to ensure that error objects conform to this expected structure.
+
+In summary, this directory provides a flexible and extensible system for handling and exposing error details in a GraphQL API. It allows for standardized error reporting while maintaining the ability to provide detailed, context-specific error information.

@@ -1,0 +1,53 @@
+---
+title: "finalize_invoices_job.rb"
+---
+
+## High-level description
+The `FinalizeInvoicesJob` is a background job that processes invoices that are ready to be finalized. It iterates through all invoices in a ready-to-be-finalized state and enqueues individual finalization jobs for each invoice.
+
+## Code Structure
+The `FinalizeInvoicesJob` is defined within the `Clock` module and inherits from `ApplicationJob`. It includes the `SentryCronConcern` module for monitoring and logging purposes.
+
+## References
+- `Invoice` model (not provided in the snippets)
+- `Invoices::FinalizeJob` (defined in app/jobs/invoices/finalize_job.rb)
+
+## Symbols
+
+### `Clock::FinalizeInvoicesJob`
+#### Description
+This job is responsible for finding all invoices that are ready to be finalized and enqueuing individual finalization jobs for each of them.
+
+#### Inputs
+This job doesn't take any explicit inputs.
+
+#### Internal Logic
+1. The job queries the `Invoice` model for all invoices that are ready to be finalized using the `ready_to_be_finalized` scope (not provided in the snippets).
+2. For each invoice found, it enqueues an `Invoices::FinalizeJob` to process the invoice individually.
+
+#### Performance Considerations
+The performance of this job depends on the number of invoices ready to be finalized. If there are many invoices, it might take some time to process all of them.
+
+### `perform`
+#### Description
+This method is the entry point for the job execution. It retrieves the invoices ready to be finalized and enqueues individual finalization jobs.
+
+#### Internal Logic
+1. Calls `Invoice.ready_to_be_finalized` to get all invoices ready for finalization.
+2. Iterates through each invoice and enqueues an `Invoices::FinalizeJob` for it using `perform_later`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| SentryCronConcern | Provides monitoring and logging functionality for cron jobs |
+
+## Error Handling
+The job doesn't implement any specific error handling. However, it inherits from `ApplicationJob`, which might have global error handling mechanisms.
+
+## Logging
+The job includes the `SentryCronConcern`, which likely provides logging and monitoring capabilities through Sentry. This allows tracking of job execution and any potential issues.
+
+## TODOs
+There are no explicit TODOs in the provided code.
+
+Note: The effectiveness of this job relies on the correct implementation of the `Invoice.ready_to_be_finalized` scope and the `Invoices::FinalizeJob`. The `Invoices::FinalizeJob` uses the `Invoices::RefreshDraftAndFinalizeService` to process individual invoices, which suggests that the finalization process might involve refreshing the invoice before finalizing it.

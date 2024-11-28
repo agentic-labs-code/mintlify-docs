@@ -1,0 +1,82 @@
+---
+title: "terminated_service.rb"
+---
+
+## High-level description
+This code defines a `TerminatedService` class within the `Webhooks::Subscriptions` module. It is responsible for handling webhook events related to terminated subscriptions, providing necessary data and configuration for sending webhook notifications when a subscription is terminated.
+
+## Code Structure
+The `TerminatedService` class inherits from `Webhooks::BaseService` and defines methods to provide subscription-specific information for webhook processing.
+
+## Symbols
+
+### `Webhooks::Subscriptions::TerminatedService`
+#### Description
+This class is designed to handle webhook events for terminated subscriptions. It provides methods to retrieve the current organization, serialize the subscription object, and define the webhook type and object type.
+
+#### Internal Logic
+The class defines four methods:
+
+1. `current_organization`: Retrieves the organization associated with the subscription object.
+2. `object_serializer`: Creates a serializer for the subscription object, including related plan and customer data.
+3. `webhook_type`: Defines the specific webhook event type as 'subscription.terminated'.
+4. `object_type`: Specifies the object type as 'subscription'.
+
+### `current_organization`
+#### Description
+Retrieves the organization associated with the subscription object.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @current_organization | Organization | The organization associated with the subscription |
+
+#### Internal Logic
+This method uses memoization to store the organization, ensuring it's only retrieved once per instance.
+
+### `object_serializer`
+#### Description
+Creates a serializer for the subscription object, including related plan and customer data.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| serializer | V1::SubscriptionSerializer | A serializer instance for the subscription object |
+
+#### Internal Logic
+This method instantiates a `V1::SubscriptionSerializer` with the subscription object, specifying 'subscription' as the root name and including plan and customer data.
+
+### `webhook_type`
+#### Description
+Defines the specific webhook event type for terminated subscriptions.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_type | String | The webhook event type |
+
+### `object_type`
+#### Description
+Specifies the object type for the webhook event.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object_type | String | The object type for the webhook |
+
+## References
+This code references the following external components:
+1. `Webhooks::BaseService`: The parent class from which `TerminatedService` inherits.
+2. `V1::SubscriptionSerializer`: Used to serialize the subscription object.
+
+## Dependencies
+The code relies on the following internal dependencies:
+1. The `V1::SubscriptionSerializer` class for serializing subscription data.
+2. The `Webhooks::BaseService` class, which this service inherits from.
+
+Based on the related code snippets provided:
+
+1. This service is used in the `SendWebhookJob` (app/jobs/send_webhook_job.rb) as part of the `WEBHOOK_SERVICES` hash, mapped to the 'subscription.terminated' event type.
+2. The `V1::SubscriptionSerializer` (app/serializers/v1/subscription_serializer.rb) is used to serialize the subscription object, including various attributes and associated data like customer and plan information.
+
+This service plays a crucial role in the webhook system, specifically handling the event when a subscription is terminated, and preparing the necessary data for webhook notifications to external systems or services.

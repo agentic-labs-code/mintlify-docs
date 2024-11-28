@@ -1,0 +1,60 @@
+---
+title: "destroy_service_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `AddOns::DestroyService` class. It verifies the behavior of the service when destroying an add-on, including successful deletion and error handling for non-existent add-ons.
+
+## Symbols
+
+### `RSpec.describe AddOns::DestroyService`
+#### Description
+This is the main describe block for the `AddOns::DestroyService` test suite. It sets up the context for testing the service.
+
+### `subject(:destroy_service)`
+#### Description
+Defines the subject of the test, which is an instance of `AddOns::DestroyService` initialized with an `add_on`.
+
+### `let` blocks
+#### Description
+These blocks define the test data used throughout the specs:
+- `membership`: A factory-created membership
+- `organization`: The organization associated with the membership
+- `add_on`: A factory-created add-on associated with the organization
+
+### `describe '#call'`
+#### Description
+This block focuses on testing the `call` method of the `DestroyService`.
+
+#### Internal Logic
+1. Sets up the `add_on` before each test.
+2. Tests the successful soft deletion of an add-on.
+3. Tests the error handling when the add-on is not found.
+
+### `it 'soft deletes the add-on'`
+#### Description
+This test verifies that calling the service results in a soft delete of the add-on.
+
+#### Internal Logic
+1. Expects the `AddOn` count to decrease by 1.
+2. Expects the `deleted_at` attribute of the add-on to change from `nil` to a timestamp.
+
+### `context 'when add-on is not found'`
+#### Description
+This context block tests the behavior when the add-on is not found (set to `nil`).
+
+#### Internal Logic
+1. Sets `add_on` to `nil`.
+2. Calls the service and expects an unsuccessful result.
+3. Verifies that the error code is 'add_on_not_found'.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails and RSpec configuration |
+| FactoryBot | Used for creating test data |
+
+## Notes
+- The test uses `aggregate_failures` to group multiple expectations together, allowing all expectations to be evaluated even if one fails.
+- The service appears to implement soft deletion (setting a `deleted_at` timestamp) rather than hard deletion from the database.
+- The test coverage includes both the happy path (successful deletion) and an error case (add-on not found).

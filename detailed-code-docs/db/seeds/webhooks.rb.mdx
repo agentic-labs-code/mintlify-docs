@@ -1,0 +1,68 @@
+---
+title: "webhooks.rb"
+---
+
+## High-level description
+This Ruby script is a database seed file for creating sample webhook data. It generates a set of webhook records with various statuses for testing or development purposes, associated with a single organization and webhook endpoint.
+
+## Code Structure
+The script creates an organization, a webhook endpoint, and then uses FactoryBot to generate multiple webhook records with different statuses.
+
+## Symbols
+
+### Organization.find_or_create_by!
+#### Description
+Finds or creates an organization named 'Hooli'.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | String | The name of the organization |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The found or created organization |
+
+### WebhookEndpoint.find_or_create_by!
+#### Description
+Finds or creates a webhook endpoint associated with the 'Hooli' organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The associated organization |
+| webhook_url | String | The URL for the webhook endpoint |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_endpoint | WebhookEndpoint | The found or created webhook endpoint |
+
+### FactoryBot.create
+#### Description
+Creates webhook records with different statuses using FactoryBot.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| :webhook | Symbol | The factory name for creating webhooks |
+| status | Symbol | The status of the webhook (e.g., :succeeded, :failed, :pending) |
+| webhook_endpoint | WebhookEndpoint | The associated webhook endpoint |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook | Webhook | The created webhook record |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| faker | Generating fake data (though not explicitly used in this file) |
+| factory_bot_rails | Creating test data using factories |
+
+## Side Effects
+This script modifies the database by creating or updating records for an organization, a webhook endpoint, and multiple webhook records.
+
+## Performance Considerations
+The script creates 15 webhook records in total (5 types, 3 times each). For larger datasets, consider using bulk insert methods to improve performance.

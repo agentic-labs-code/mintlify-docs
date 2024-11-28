@@ -1,0 +1,62 @@
+---
+title: "invoice_fees.rb"
+---
+
+## High-level description
+This code defines a class `InvoiceFees` within the `DataExports::Csv` module, which is responsible for generating a CSV export of invoice fees. It processes invoices and their associated fees, serializing the data and writing it to a CSV file.
+
+## Code Structure
+The `InvoiceFees` class inherits from `Invoices` and uses several serializer classes to format the data. The main functionality is implemented in the `call` method, which iterates through invoices and their fees, writing the data to a CSV file.
+
+## Symbols
+
+### `InvoiceFees`
+#### Description
+This class is responsible for exporting invoice fees data to a CSV format. It initializes with various serializer classes and an output file, then processes invoices and their fees to generate the CSV content.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data_export | Object | The data export object containing export parameters |
+| invoice_serializer_klass | Class | Serializer class for invoices (default: V1::InvoiceSerializer) |
+| fee_serializer_klass | Class | Serializer class for fees (default: V1::FeeSerializer) |
+| subscription_serializer_klass | Class | Serializer class for subscriptions (default: V1::SubscriptionSerializer) |
+| output | File | The output file to write the CSV data (default: Tempfile.create) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| output | File | The file containing the generated CSV data |
+
+#### Internal Logic
+1. Opens a CSV file for writing
+2. Writes the headers to the CSV file
+3. Iterates through invoices in batches
+4. For each invoice, serializes the invoice data
+5. Iterates through the fees associated with each invoice
+6. Serializes the fee and subscription data
+7. Writes a row to the CSV file with the combined invoice, fee, and subscription data
+8. Rewinds the output file after processing all invoices and fees
+
+#### Performance Considerations
+The code uses `find_each` and `lazy` enumerators to process invoices and fees in batches, which helps to reduce memory usage when dealing with large datasets.
+
+### `headers`
+#### Description
+A private method that returns an array of header names for the CSV file.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| headers | Array | An array of strings representing the CSV column headers |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| csv | For CSV file manipulation |
+| forwardable | To extend the class with delegation methods |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| DEFAULT_BATCH_SIZE | Integer | 50 | The default batch size for processing invoices and fees |

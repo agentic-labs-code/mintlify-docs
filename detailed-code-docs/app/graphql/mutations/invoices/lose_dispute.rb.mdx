@@ -1,0 +1,55 @@
+---
+title: "lose_dispute.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation called `LoseDispute` within the `Mutations::Invoices` module. It allows marking a payment dispute as lost for a specific invoice, requiring user authentication and organization membership. The mutation updates the invoice's dispute status and triggers related actions.
+
+## Code Structure
+The `LoseDispute` class inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the mutation's name, description, input argument, and return type. The main logic is implemented in the `resolve` method.
+
+## References
+- `::Invoices::LoseDisputeService`: A service class that handles the business logic for marking an invoice dispute as lost.
+- `Types::Invoices::Object`: The GraphQL type representing an invoice object.
+
+## Symbols
+
+### `LoseDispute`
+#### Description
+This class defines a GraphQL mutation for marking an invoice payment dispute as lost. It ensures the user is authenticated and belongs to the required organization before processing the request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the invoice to mark as lost dispute (required) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Types::Invoices::Object | The updated invoice object if successful |
+
+#### Internal Logic
+1. Finds the invoice within the current organization's visible invoices using the provided ID.
+2. Calls the `::Invoices::LoseDisputeService` to mark the dispute as lost, passing the invoice and the current timestamp.
+3. Returns the updated invoice if successful, or an error result if the operation fails.
+
+## Side Effects
+- Updates the invoice's dispute status in the database.
+- May trigger webhook events and tax voiding jobs (as implemented in the `LoseDisputeService`).
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user belongs to the required organization |
+
+## Error Handling
+- If the user is not authenticated or doesn't belong to the required organization, an error will be raised (implemented in the included modules).
+- If the invoice is not found or the operation fails, an error result will be returned.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| LoseInvoiceDispute | Mutation | `{ id: ID! }` | Invoice object or error | Marks an invoice payment dispute as lost |
+
+This mutation is part of the GraphQL API and can be accessed through the standard GraphQL endpoint with the appropriate query structure.

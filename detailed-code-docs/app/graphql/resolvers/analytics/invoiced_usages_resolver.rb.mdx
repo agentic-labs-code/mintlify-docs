@@ -1,0 +1,57 @@
+---
+title: "invoiced_usages_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying invoiced usage of an organization. It's part of an analytics module and requires authentication, organization membership, and a premium license to access.
+
+## Code Structure
+The `InvoicedUsagesResolver` class is defined within the `Resolvers::Analytics` module. It inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`.
+
+## References
+- `Types::CurrencyEnum`
+- `Types::Analytics::InvoicedUsages::Object`
+- `License`
+- `::Analytics::InvoicedUsage`
+
+## Symbols
+
+### `InvoicedUsagesResolver`
+#### Description
+This resolver handles GraphQL queries for invoiced usage data of an organization. It ensures the user is authenticated, has the required permissions, and that the organization has a premium license.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| currency | Types::CurrencyEnum | Optional. The currency for the invoiced usage data. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoiced_usages | [Types::Analytics::InvoicedUsages::Object] | A collection of invoiced usage objects. |
+
+#### Internal Logic
+1. Checks if the user has a premium license.
+2. If licensed, calls `::Analytics::InvoicedUsage.find_all_by` with the current organization's ID, the provided currency (if any), and a fixed 12-month period.
+3. Returns the result of the `find_all_by` method.
+
+## Side Effects
+- Raises an unauthorized error if the license is not premium.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication checks |
+| RequiredOrganization | Ensures the user belongs to the required organization |
+| License | Checks if the user has a premium license |
+
+## Error Handling
+- Raises an unauthorized error if the license is not premium.
+- Inherits error handling from `AuthenticableApiUser` and `RequiredOrganization` modules.
+
+## API/Interface Reference
+| Argument | Type | Required | Description |
+|:---------|:-----|:---------|:------------|
+| currency | Types::CurrencyEnum | false | The currency for the invoiced usage data |
+
+This resolver is likely used as part of a larger GraphQL API, specifically for querying analytics data related to invoiced usage for an organization.

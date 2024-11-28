@@ -1,0 +1,65 @@
+---
+title: "invite_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the Invite model. It verifies the behavior of the Invite model, including its ability to be tracked by PaperTrail, methods for marking invites as revoked or accepted, and validation of the email attribute.
+
+## Code Structure
+The test suite is organized into several describe blocks, each focusing on a specific aspect of the Invite model. It uses RSpec's `let` and `subject` helpers to set up test data, and employs expectations to verify the model's behavior.
+
+## References
+- `rails_helper`: This file is required at the beginning of the spec, which likely sets up the testing environment.
+- `FactoryBot`: Used to create test data (`:invite` factory).
+- `PaperTrail`: Referenced in the shared example for traceability.
+
+## Symbols
+
+### RSpec.describe Invite
+#### Description
+This is the main describe block for the Invite model tests. It sets up the subject for the tests and includes shared examples.
+
+#### Internal Logic
+- Sets up the subject as a created invite using FactoryBot.
+- Includes shared examples for PaperTrail traceability.
+
+### #mark_as_revoked
+#### Description
+Tests the `mark_as_revoked!` method of the Invite model.
+
+#### Internal Logic
+- Uses `freeze_time` to control the current time during the test.
+- Expects the invite status to change from 'pending' to 'revoked'.
+- Expects the `revoked_at` attribute to change from nil to the current time.
+
+### #mark_as_accepted
+#### Description
+Tests the `mark_as_accepted!` method of the Invite model.
+
+#### Internal Logic
+- Uses `freeze_time` to control the current time during the test.
+- Expects the invite status to change from 'pending' to 'accepted'.
+- Expects the `accepted_at` attribute to change from nil to the current time.
+
+### Invite email
+#### Description
+Tests the validation of the email attribute of the Invite model.
+
+#### Internal Logic
+- Checks that a valid invite (built with FactoryBot) is valid by default.
+- Verifies that an invite with an incorrectly formatted email is invalid.
+- Ensures that an invite without an email (nil) is invalid.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Sets up the Rails testing environment |
+| FactoryBot | Creates test data |
+| PaperTrail | Tracks changes to the model |
+| RSpec | Testing framework |
+
+## Error Handling
+The tests implicitly check for error handling by verifying the validity of the model under different conditions (e.g., invalid email formats).
+
+## TODOs
+There are no explicit TODOs in this code.

@@ -1,0 +1,70 @@
+---
+title: "overdue_balances_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying overdue balances of an organization. It's part of an analytics module and provides a way to retrieve overdue balance information with optional filtering by currency, customer, and time range.
+
+## Code Structure
+The `OverdueBalancesResolver` class is defined within the `Resolvers::Analytics` module. It inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. The resolver defines arguments, sets the return type, and implements the `resolve` method to fetch the overdue balances.
+
+## References
+- `Types::CurrencyEnum`
+- `Types::Analytics::OverdueBalances::Object`
+- `::Analytics::OverdueBalance`
+
+## Symbols
+
+### `Resolvers::Analytics::OverdueBalancesResolver`
+#### Description
+This class is a GraphQL resolver for querying overdue balances of an organization. It includes authentication and organization checks, defines the query arguments, and specifies the return type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| currency | Types::CurrencyEnum | Optional. The currency to filter the overdue balances. |
+| external_customer_id | String | Optional. The external ID of a specific customer to filter the results. |
+| months | Integer | Optional. The number of months to include in the query. |
+| expire_cache | Boolean | Optional. Whether to expire the cache for this query. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | [Types::Analytics::OverdueBalances::Object] | A collection of OverdueBalances objects. |
+
+#### Internal Logic
+1. The resolver includes `AuthenticableApiUser` and `RequiredOrganization` modules, which likely handle authentication and organization-related checks.
+2. It sets a `REQUIRED_PERMISSION` constant to 'analytics:view'.
+3. The `resolve` method calls `::Analytics::OverdueBalance.find_all_by` with the current organization's ID and the provided arguments.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Handles API user authentication |
+| RequiredOrganization | Ensures the presence of a valid organization |
+| Types::CurrencyEnum | Defines the currency enum type |
+| Types::Analytics::OverdueBalances::Object | Defines the return type for overdue balances |
+
+## Error Handling
+Error handling is likely implemented in the included modules (`AuthenticableApiUser` and `RequiredOrganization`). These modules probably raise exceptions for unauthorized access or missing organization information.
+
+## API/Interface Reference
+This resolver is part of a GraphQL API. It can be queried using the following structure:
+
+```graphql
+query {
+  overdueBalances(
+    currency: CurrencyEnum
+    externalCustomerId: String
+    months: Int
+    expireCache: Boolean
+  ) {
+    amountCents
+    currency
+    lagoInvoiceIds
+    month
+  }
+}
+```
+
+Note: The actual field names in the response may differ slightly based on the implementation of `Types::Analytics::OverdueBalances::Object`.

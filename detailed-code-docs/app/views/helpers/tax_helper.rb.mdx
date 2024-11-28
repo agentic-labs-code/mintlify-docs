@@ -1,0 +1,48 @@
+---
+title: "tax_helper.rb"
+---
+
+## High-level description
+The `TaxHelper` class provides a utility method `applied_taxes` that generates HTML markup for displaying tax rates. It handles both cases where an object with tax information is provided and when it's nil, rendering the appropriate HTML structure using Slim templating.
+
+## Symbols
+
+### `TaxHelper`
+#### Description
+A helper class that contains a class method for rendering tax information in HTML format.
+
+### `TaxHelper.applied_taxes`
+#### Description
+A class method that generates HTML markup for displaying tax rates. It uses Slim templating to create the output.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object | Object or nil | An object containing tax information or nil if no object is available |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| rendered_html | String | HTML markup representing the tax rates |
+
+#### Internal Logic
+1. Determines the appropriate Slim template based on whether the input object is nil or not.
+2. If the object is nil, it uses a simple template that displays "0.0%".
+3. If an object is provided, it uses a more complex template that:
+   - Checks if `applied_taxes` are present on the object.
+   - If present, it orders the taxes by rate in descending order and plucks the tax rates.
+   - If not present, it uses [0.0] as a default.
+   - Iterates over the tax rates and generates a div for each rate.
+4. Renders the chosen template using Slim::Template and returns the result.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Slim | Used for templating and rendering HTML |
+
+## Performance Considerations
+The method uses `pluck(:tax_rate)` when fetching tax rates from the object, which is generally more efficient than loading full records when only the tax rate is needed.
+
+---
+
+This documentation provides a comprehensive overview of the `TaxHelper` class and its `applied_taxes` method. The class is designed to generate HTML markup for displaying tax rates, handling both cases where tax information is available and when it's not. The use of Slim templating allows for efficient and clean HTML generation.

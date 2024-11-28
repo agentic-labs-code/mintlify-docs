@@ -1,0 +1,55 @@
+---
+title: "terminate.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation called `TerminateCoupon` within the `Mutations::Coupons` module. It allows authenticated users with the 'coupons:update' permission to delete (terminate) a coupon by its ID.
+
+## Code Structure
+The `Terminate` class inherits from `BaseMutation` and includes the `AuthenticableApiUser` concern. It defines the mutation's name, description, input argument, and return type. The `resolve` method handles the actual termination logic.
+
+## References
+- `::Coupons::TerminateService`: Used to perform the coupon termination.
+- `Types::Coupons::Object`: The return type for the mutation.
+
+## Symbols
+
+### `Terminate`
+#### Description
+This class defines the GraphQL mutation for terminating a coupon.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the coupon to be terminated |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| coupon | Types::Coupons::Object | The terminated coupon object |
+
+#### Internal Logic
+1. The `resolve` method is called with the coupon ID.
+2. It uses the `::Coupons::TerminateService` to perform the termination.
+3. If successful, it returns the terminated coupon.
+4. If unsuccessful, it returns an error using the `result_error` method.
+
+## Side Effects
+The mutation terminates (deletes) the specified coupon in the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication functionality |
+| BaseMutation | Base class for GraphQL mutations |
+| Types::Coupons::Object | Defines the structure of the returned coupon object |
+
+## Error Handling
+The mutation uses the `result_error` method to handle and return errors if the termination is unsuccessful.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| TerminateCoupon | Mutation | `{ id: ID! }` | Coupon object or error | Terminates a coupon with the given ID |
+
+Note: This mutation is part of a GraphQL API, so it's not a REST endpoint but a GraphQL mutation.

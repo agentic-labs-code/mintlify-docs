@@ -1,0 +1,91 @@
+---
+title: "generate_service.rb"
+---
+
+## High-level description
+The `CreditNotes::GenerateService` is responsible for generating a PDF file for a credit note and optionally sending a webhook notification. It ensures that the credit note exists, is finalized, and generates the PDF if it doesn't already exist.
+
+## Code Structure
+The main class `GenerateService` inherits from `BaseService` and contains a `call` method that orchestrates the generation process. It uses helper methods like `generate_pdf` and `should_send_webhook?` to perform specific tasks.
+
+## References
+- `SendWebhookJob`
+- `Utils::PdfGenerator`
+- `I18n`
+
+## Symbols
+
+### `CreditNotes::GenerateService`
+#### Description
+This service class handles the generation of credit note PDFs and optionally sends a webhook notification.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_note | CreditNote | The credit note object to generate a PDF for |
+| context | String | Optional context for the generation process |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result object containing the generated credit note |
+
+#### Internal Logic
+1. Check if the credit note exists and is finalized.
+2. Generate the PDF if it doesn't exist.
+3. Send a webhook notification if the context is 'api'.
+4. Return the result with the credit note.
+
+### `call`
+#### Description
+The main method that orchestrates the credit note PDF generation process.
+
+#### Internal Logic
+1. Validate the credit note's existence and status.
+2. Generate the PDF if it doesn't exist.
+3. Send a webhook notification if required.
+4. Return the result with the updated credit note.
+
+### `generate_pdf`
+#### Description
+A private method that generates the PDF for the credit note.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_note | CreditNote | The credit note object to generate a PDF for |
+
+#### Internal Logic
+1. Set the locale based on the customer's preferred document locale.
+2. Use `Utils::PdfGenerator` to create the PDF.
+3. Attach the generated PDF to the credit note.
+4. Save the credit note.
+
+### `should_send_webhook?`
+#### Description
+A private method that determines if a webhook should be sent.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| should_send | Boolean | True if the context is 'api', false otherwise |
+
+## Side Effects
+- Generates and attaches a PDF file to the credit note.
+- Sends a webhook notification when the context is 'api'.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| SendWebhookJob | To send webhook notifications |
+| Utils::PdfGenerator | To generate PDF files |
+| I18n | For internationalization |
+
+## Error Handling
+The service uses the `result` object to handle and communicate errors, such as when the credit note is not found or not finalized.
+
+## Logging
+No explicit logging is implemented in this service.
+
+## API/Interface Reference
+This service is used by other parts of the application, such as the `CreditNotes::GeneratePdfJob` and the `CreditNotes::Download` GraphQL mutation. It doesn't expose a public API directly.

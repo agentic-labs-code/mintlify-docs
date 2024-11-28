@@ -1,0 +1,140 @@
+---
+title: "deprecation.rb"
+---
+
+## High-level description
+The `Deprecation` class provides a mechanism to track and report the usage of deprecated features within the application. It utilizes caching to store deprecation data, including the last seen timestamp and usage count, for each feature and organization.
+
+## Code Structure
+The `Deprecation` class uses a class (`&lt;&lt; self`) to define its methods, making them class methods. It primarily interacts with the Rails cache to store and retrieve deprecation data. The `cache_key` private method is used internally to generate cache keys.
+
+## References
+This class references the `Organization` model to retrieve organization IDs and details.
+
+## Symbols
+### `Deprecation`
+#### Description
+The `Deprecation` class provides a set of class methods for tracking and managing the deprecation of features.
+
+#### Inputs
+_This class does not have any inputs._
+
+#### Outputs
+_This class does not have any direct outputs. Its methods primarily interact with the Rails cache._
+
+#### Internal Logic
+This class uses a class (`&lt;&lt; self`) to define its methods, making them class methods. It uses Rails.cache to store and retrieve data.
+
+### `Deprecation.report`
+#### Description
+Records the usage of a deprecated feature for a specific organization. It updates the last seen timestamp and increments the usage count in the cache.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| feature_name | string | The name of the deprecated feature. |
+| organization_id | integer | The ID of the organization using the feature. |
+
+#### Outputs
+_This method does not have any explicit outputs._
+
+#### Side Effects
+- Updates the `last_seen_at` timestamp in the cache for the given feature and organization.
+- Increments the `count` value in the cache for the given feature and organization.
+
+### `Deprecation.get_all`
+#### Description
+Retrieves deprecation data for a specific feature across all organizations. It returns an array of hashes, each containing the organization ID, last seen timestamp, and usage count.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| feature_name | string | The name of the deprecated feature. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| deprecation_data | array | An array of hashes, each containing `organization_id`, `last_seen_at`, and `count` for the specified feature. |
+
+### `Deprecation.get_all_as_csv`
+#### Description
+Retrieves deprecation data for a specific feature across all organizations and formats it as a CSV string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| feature_name | string | The name of the deprecated feature. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| csv_data | string | A CSV formatted string containing deprecation data for the specified feature. |
+
+### `Deprecation.get`
+#### Description
+Retrieves deprecation data for a specific feature and organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| feature_name | string | The name of the deprecated feature. |
+| organization_id | integer | The ID of the organization. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| deprecation_data | hash | A hash containing `organization_id`, `last_seen_at`, and `count` for the specified feature and organization. |
+
+### `Deprecation.reset_all`
+#### Description
+Resets deprecation data for a specific feature across all organizations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| feature_name | string | The name of the deprecated feature. |
+
+#### Outputs
+_This method does not have any explicit outputs._
+
+#### Side Effects
+- Deletes the `count` and `last_seen_at` cache entries for the given feature for all organizations.
+
+### `Deprecation.reset`
+#### Description
+Resets deprecation data for a specific feature and organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| feature_name | string | The name of the deprecated feature. |
+| organization_id | integer | The ID of the organization. |
+
+#### Outputs
+_This method does not have any explicit outputs._
+
+#### Side Effects
+- Deletes the `count` and `last_seen_at` cache entries for the given feature and organization.
+
+### `Deprecation.cache_key`
+#### Description
+A private helper method to generate a consistent cache key for deprecation data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| feature_name | string | The name of the deprecated feature. |
+| organization_id | integer | The ID of the organization. |
+| suffix | string | A suffix to append to the key. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cache_key | string | The generated cache key. |
+
+## Dependencies
+- `rails`: This code uses the Rails framework, specifically `Rails.cache` for caching.
+- `csv`: This code uses the `CSV` library for generating CSV data.
+
+## Configuration
+- `EXPIRE_IN`: This constant defines the cache expiration time for deprecation data, set to 1 month.

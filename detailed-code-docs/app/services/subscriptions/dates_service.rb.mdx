@@ -1,0 +1,171 @@
+---
+title: "dates_service.rb"
+---
+
+## High-level description
+This code defines the `Subscriptions::DatesService` class, which is responsible for calculating and managing various date-related operations for subscriptions. It handles different subscription intervals (weekly, monthly, yearly, quarterly) and provides methods to compute billing dates, charge periods, and other time-related information for subscriptions.
+
+## Code Structure
+The `Subscriptions::DatesService` class serves as a factory and base class for interval-specific date services. It includes methods for creating instances of the appropriate date service based on the subscription's plan interval, as well as common date calculation methods used across different interval types.
+
+## Symbols
+
+### `Subscriptions::DatesService`
+#### Description
+This class is responsible for managing date-related operations for subscriptions. It provides methods to calculate billing periods, charge intervals, and other time-related information for subscriptions.
+
+#### Internal Logic
+- The class uses a factory method `new_instance` to create the appropriate date service based on the subscription's plan interval.
+- It provides methods for calculating various date ranges and intervals, such as `charge_pay_in_advance_interval`, `from_datetime`, `to_datetime`, `charges_from_datetime`, `charges_to_datetime`, etc.
+- The class handles different billing scenarios, including trials, terminations, and upgrades.
+
+### `self.new_instance(subscription, billing_at, current_usage: false)`
+#### Description
+A factory method that creates and returns an instance of the appropriate date service based on the subscription's plan interval.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription | Subscription | The subscription object |
+| billing_at | Time | The billing timestamp |
+| current_usage | Boolean | Flag to indicate if it's for current usage calculation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| date_service | Subscriptions::Dates::*Service | An instance of the appropriate date service |
+
+### `self.charge_pay_in_advance_interval(timestamp, subscription)`
+#### Description
+Calculates the charge interval for pay-in-advance subscriptions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| timestamp | Integer | The timestamp for calculation |
+| subscription | Subscription | The subscription object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| interval | Hash | A hash containing `charges_from_date` and `charges_to_date` |
+
+### `from_datetime`
+#### Description
+Calculates the start datetime of the billing period.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| from_datetime | Time | The start datetime of the billing period |
+
+### `to_datetime`
+#### Description
+Calculates the end datetime of the billing period.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| to_datetime | Time | The end datetime of the billing period |
+
+### `charges_from_datetime`
+#### Description
+Calculates the start datetime for charges in the billing period.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charges_from_datetime | Time | The start datetime for charges |
+
+### `charges_to_datetime`
+#### Description
+Calculates the end datetime for charges in the billing period.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charges_to_datetime | Time | The end datetime for charges |
+
+### `next_end_of_period`
+#### Description
+Calculates the end of the next billing period.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| next_end_of_period | Time | The end datetime of the next billing period |
+
+### `end_of_period`
+#### Description
+Calculates the end of the current billing period.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| end_of_period | Time | The end datetime of the current billing period |
+
+### `previous_beginning_of_period(current_period: false)`
+#### Description
+Calculates the beginning of the previous billing period.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| current_period | Boolean | Flag to use the current period as reference |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| previous_beginning | Time | The start datetime of the previous billing period |
+
+### `single_day_price(optional_from_date: nil, plan_amount_cents: nil)`
+#### Description
+Calculates the price for a single day of the subscription.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| optional_from_date | Date | Optional start date for calculation |
+| plan_amount_cents | Integer | Optional plan amount in cents |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| price | Float | The price for a single day |
+
+### `charge_single_day_price(charge:)`
+#### Description
+Calculates the price for a single day of a specific charge.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Charge | The charge object |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| price | Float | The price for a single day of the charge |
+
+### `charges_duration_in_days`
+#### Description
+Calculates the duration of charges in days.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| duration | Integer | The duration of charges in days |
+
+## Dependencies
+This class depends on the following modules and classes:
+- `Subscriptions::Dates::WeeklyService`
+- `Subscriptions::Dates::MonthlyService`
+- `Subscriptions::Dates::YearlyService`
+- `Subscriptions::Dates::QuarterlyService`
+
+## Notes
+- The class handles various edge cases, such as timezone changes, trial periods, and subscription terminations.
+- It provides a flexible framework for calculating dates and prices for different subscription intervals and billing scenarios.
+- The class uses customer-specific timezones for accurate date calculations.
+
+This class plays a crucial role in managing the complex date-related operations required for subscription billing and management in the Lago system.

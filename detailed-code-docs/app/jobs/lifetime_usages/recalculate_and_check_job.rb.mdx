@@ -1,0 +1,50 @@
+---
+title: "recalculate_and_check_job.rb"
+---
+
+## High-level description
+This code defines a background job class `RecalculateAndCheckJob` within the `LifetimeUsages` module. The job is responsible for recalculating and checking lifetime usage for a given `lifetime_usage` object, utilizing the `LifetimeUsages::RecalculateAndCheckService`.
+
+## Code Structure
+The `RecalculateAndCheckJob` class inherits from `ApplicationJob` and defines a single `perform` method that calls the `RecalculateAndCheckService`.
+
+## Symbols
+
+### `LifetimeUsages::RecalculateAndCheckJob`
+#### Description
+This class represents a background job for recalculating and checking lifetime usage. It uses the Sidekiq job queue system and ensures job uniqueness.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lifetime_usage | Object | An instance of a lifetime usage object to be recalculated and checked |
+
+#### Internal Logic
+1. The job is queued in the 'billing' queue.
+2. It uses the `unique` method to ensure the job is unique until executed, logging conflicts.
+3. The `perform` method calls the `LifetimeUsages::RecalculateAndCheckService.call` method with the provided `lifetime_usage`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ApplicationJob | Base job class that this job inherits from |
+| LifetimeUsages::RecalculateAndCheckService | Service class used to perform the actual recalculation and checking |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| queue_as | Symbol/String | 'billing' | Specifies the queue for this job |
+| unique | Symbol, Hash | :until_executed, on_conflict: :log | Ensures job uniqueness and defines conflict behavior |
+
+## References
+The job relies on the `LifetimeUsages::RecalculateAndCheckService` class, which is defined in a separate file. This service performs the following actions:
+
+1. Calculates the lifetime usage using `LifetimeUsages::CalculateService`.
+2. Checks usage thresholds using `LifetimeUsages::UsageThresholds::CheckService`.
+3. If any thresholds are passed:
+   - Sends webhooks for each passed threshold.
+   - Performs progressive billing using `Invoices::ProgressiveBillingService`.
+
+The service also calculates the progressive billed amount based on finalized progressive billing invoices for the associated subscription.
+
+This background job serves as an entry point for the recalculation and checking process, delegating the main logic to the `RecalculateAndCheckService`.

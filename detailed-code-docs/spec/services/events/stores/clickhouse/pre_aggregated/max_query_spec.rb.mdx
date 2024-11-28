@@ -1,0 +1,59 @@
+---
+title: "max_query_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Events::Stores::Clickhouse::PreAggregated::MaxQuery` service. It tests the functionality of aggregating max units for charges based on pre-aggregated events stored in ClickHouse, including scenarios with grouped_by and filters.
+
+## Code Structure
+The test suite is organized around the `described_class.new(subscription:, boundaries:).call` method. It sets up various scenarios with different combinations of pre-aggregated events, charges, and billable metrics, then verifies the correct aggregation of max units.
+
+## Symbols
+
+### `RSpec.describe Events::Stores::Clickhouse::PreAggregated::MaxQuery`
+#### Description
+This is the main describe block for the test suite, focusing on the `MaxQuery` class within the `Events::Stores::Clickhouse::PreAggregated` module.
+
+### `describe '.call'`
+#### Description
+This describe block focuses on testing the `call` method of the `MaxQuery` class.
+
+#### Internal Logic
+1. Sets up test data including organizations, customers, subscriptions, billable metrics, charges, and pre-aggregated events.
+2. Calls the `pre_aggregated_query.call` method.
+3. Verifies the returned result for correctness of aggregated max units.
+
+### Various `context` blocks
+#### Description
+These blocks set up different scenarios for testing, including:
+- Basic aggregation
+- Handling of enriched events before and after boundaries
+- Grouped-by scenarios
+- Filtered scenarios
+- Combinations of grouped-by and filters
+
+#### Internal Logic
+For each context:
+1. Sets up specific test data relevant to the scenario.
+2. Calls the `pre_aggregated_query.call` method.
+3. Verifies the returned result matches the expected outcome for the specific scenario.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides the testing environment and configurations |
+| FactoryBot | Used for creating test data |
+
+## Configuration
+The test suite uses ClickHouse for data storage, as indicated by the `clickhouse: true` metadata on the main describe block.
+
+## Error Handling
+The tests implicitly check for error handling by expecting successful results (`expect(result).to be_success`).
+
+## Performance Considerations
+While not explicitly tested, the use of pre-aggregated data suggests an optimization for query performance in production scenarios.
+
+## TODOs
+There are no explicit TODOs in the code.
+
+This test suite thoroughly covers various scenarios for the `MaxQuery` class, ensuring it correctly handles different combinations of pre-aggregated events, grouping, and filtering when calculating max units for charges.

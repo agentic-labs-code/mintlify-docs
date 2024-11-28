@@ -1,0 +1,53 @@
+---
+title: "billable_metric_serializer.rb"
+---
+
+## High-level description
+The `V1::BillableMetricSerializer` class is responsible for serializing a `BillableMetric` object into a JSON representation for API responses. It includes details about the billable metric, such as its name, code, description, and associated counts for active subscriptions, draft invoices, and plans.
+
+## Code Structure
+The `V1::BillableMetricSerializer` inherits from `ModelSerializer` and overrides the `serialize` method to customize the JSON output. It uses several private methods (`active_subscriptions_count`, `draft_invoices_count`, `plans_count`, `filters`) to calculate and format specific attributes for the serialized representation.
+
+## References
+- `ModelSerializer`: Parent class defining basic serialization behavior.
+- `CollectionSerializer`: Used to serialize the collection of `filters` associated with the `BillableMetric`.
+- `V1::BillableMetricFilterSerializer`: Used to serialize individual `BillableMetricFilter` objects within the `filters` collection.
+
+## Symbols
+
+### `V1::BillableMetricSerializer`
+#### Description
+This class serializes a `BillableMetric` object into a JSON representation.
+
+#### Inputs
+The `initialize` method (inherited from `ModelSerializer`) takes the following inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| model | `BillableMetric` | The `BillableMetric` object to be serialized. |
+| options | `Hash` | Optional parameters for serialization (e.g., `root_name`, `includes`). |
+
+#### Outputs
+The `serialize` method returns a `Hash` representing the serialized `BillableMetric` object.
+
+#### Internal Logic
+The `serialize` method constructs a hash containing the following attributes of the `BillableMetric`:
+- `lago_id`: The ID of the billable metric.
+- `name`: The name of the billable metric.
+- `code`: The unique code of the billable metric.
+- `description`: The description of the billable metric.
+- `aggregation_type`: The type of aggregation used for the metric.
+- `weighted_interval`: The weighted interval for the metric.
+- `recurring`: Whether the metric is recurring.
+- `created_at`: The creation timestamp of the metric (in ISO8601 format).
+- `field_name`: The name of the field associated with the metric.
+- `active_subscriptions_count`: The count of active subscriptions related to the metric.
+- `draft_invoices_count`: The count of draft invoices related to the metric.
+- `plans_count`: The count of plans related to the metric.
+- `filters`: An array of serialized `BillableMetricFilter` objects associated with the metric.
+
+The private methods (`active_subscriptions_count`, `draft_invoices_count`, `plans_count`) calculate the respective counts by querying associated models and applying relevant filters. The `filters` method uses the `CollectionSerializer` to serialize the collection of `BillableMetricFilter` objects associated with the `BillableMetric`.
+
+## Dependencies
+- `ModelSerializer`: Provides base serialization functionality.
+- `CollectionSerializer`: Used for serializing collections of objects.
+- `V1::BillableMetricFilterSerializer`: Used for serializing individual `BillableMetricFilter` objects. 

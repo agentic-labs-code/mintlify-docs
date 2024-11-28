@@ -1,0 +1,51 @@
+---
+title: "update_service.rb"
+---
+
+## High-level description
+This code defines a service class `UpdateService` within the `CreditNotes` module. Its primary purpose is to update the refund status of a credit note and track this change using Segment analytics.
+
+## Code Structure
+The `UpdateService` class inherits from `BaseService` and contains a single public method `call` that performs the update operation. It uses the `result` object (likely defined in the `BaseService`) to handle the operation's outcome.
+
+## Symbols
+
+### `CreditNotes::UpdateService`
+#### Description
+This service class is responsible for updating a credit note, specifically its refund status.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_note | CreditNote | The credit note to be updated |
+| params | Hash | A hash of parameters for the update operation |
+
+#### Internal Logic
+1. Checks if the credit note exists and is not in draft status.
+2. Updates the refund status if provided in the params.
+3. Sets the `refunded_at` timestamp if the status is "succeeded".
+4. Saves the credit note.
+5. Tracks the refund status change using Segment analytics.
+6. Handles potential `ArgumentError` for invalid refund status.
+
+#### Error Handling
+- Returns a not found failure if the credit note is nil or in draft status.
+- Rescues `ArgumentError` and returns a validation failure for invalid refund status.
+
+## Side Effects
+- Updates the credit note in the database.
+- Tracks the refund status change event using Segment analytics.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Utils::SegmentTrack | Used to track the refund status change event |
+
+## References
+- `BaseService`: The parent class from which `UpdateService` inherits.
+- `Utils::SegmentTrack`: Used for tracking analytics events.
+
+## Notes
+- The service uses `result` object for returning the operation's outcome, which is likely defined in the `BaseService` class.
+- The service assumes the existence of a `refund_status` attribute on the `CreditNote` model.
+- The code uses Ruby's safe navigation operator (`&.`) when accessing `params`, indicating that `params` might be nil.

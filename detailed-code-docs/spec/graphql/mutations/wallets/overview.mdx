@@ -1,0 +1,109 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL mutations related to wallet operations in a customer management system. The tests cover the creation, termination, and updating of customer wallets, ensuring that these operations function correctly while adhering to proper authentication and authorization protocols.
+
+## What does it do?
+The test suite in this directory verifies the functionality of three main wallet-related operations:
+
+1. Creating a new wallet for a customer: This includes setting various attributes such as name, expiration date, and recurring transaction rules.
+
+2. Terminating an existing customer wallet: This operation changes the status of a wallet to 'terminated' and sets a termination timestamp.
+
+3. Updating an existing customer wallet: This allows for modifications to wallet attributes, including name, expiration date, invoice requirements, and recurring transaction rules.
+
+Each of these operations is tested to ensure they work as expected, handle different scenarios correctly, and maintain proper security measures through authentication and authorization checks.
+
+## Key Files
+
+1. `create_spec.rb`: Tests the `Mutations::Wallets::Create` GraphQL mutation.
+   - Verifies successful wallet creation with various attributes.
+   - Checks behavior when certain attributes (e.g., name) are not provided.
+   - Ensures proper authentication and authorization.
+
+2. `terminate_spec.rb`: Tests the `Mutations::Wallets::Terminate` GraphQL mutation.
+   - Verifies successful wallet termination.
+   - Checks that the wallet status is updated correctly and a termination timestamp is set.
+   - Ensures proper authentication and authorization.
+
+3. `update_spec.rb`: Tests the `Mutations::Wallets::Update` GraphQL mutation.
+   - Verifies successful updating of wallet attributes.
+   - Checks that all modifiable fields (name, expiration date, invoice requirements, recurring transaction rules) are updated correctly.
+   - Ensures proper authentication and authorization.
+
+## Dependencies
+The test files rely on the following key dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data objects (e.g., memberships, customers, wallets).
+3. GraphQL: The query language being tested, specifically mutations for wallet operations.
+
+## Configuration
+While not explicitly shown in the provided summaries, the test files likely use a `rails_helper` or similar configuration file to set up the Rails testing environment and load necessary dependencies.
+
+The tests also use shared examples for authentication and authorization checks, which are likely defined in a separate file within the test suite.
+
+Code snippet demonstrating the structure of a typical test case:
+
+```ruby
+RSpec.describe Mutations::Wallets::Create do
+  let(:required_permission) { 'create_wallet' }
+  let(:membership) { create(:membership) }
+  let(:customer) { create(:customer) }
+  let(:expiration_at) { 1.year.from_now }
+
+  let(:mutation) do
+    &lt;&lt;-GQL
+      mutation createCustomerWallet($input: CreateCustomerWalletInput!) {
+        createCustomerWallet(input: $input) {
+          wallet {
+            id
+            name
+            status
+            expirationAt
+            invoiceRequirements
+            recurringTransactionRules {
+              id
+              amount
+              frequency
+            }
+          }
+        }
+      }
+    GQL
+  end
+
+  it 'creates a wallet' do
+    result = execute_graphql(
+      mutation,
+      variables: {
+        input: {
+          customerId: customer.id,
+          name: 'My Wallet',
+          expirationAt: expiration_at.iso8601,
+          invoiceRequirements: ['INVOICE_NUMBER'],
+          recurringTransactionRules: [
+            { amount: 100, frequency: 'WEEKLY' }
+          ]
+        }
+      },
+      permissions: [required_permission]
+    )
+
+    expect(result['data']['createCustomerWallet']['wallet']).to include(
+      'name' =&gt; 'My Wallet',
+      'status' =&gt; 'active',
+      'expirationAt' =&gt; expiration_at.iso8601,
+      'invoiceRequirements' =&gt; ['INVOICE_NUMBER']
+    )
+
+    expect(result['data']['createCustomerWallet']['wallet']['recurringTransactionRules']).to contain_exactly(
+      include('amount' =&gt; 100, 'frequency' =&gt; 'WEEKLY')
+    )
+  end
+end
+```
+
+This structure is similar across all three test files, with variations in the specific mutation being tested and the assertions made.

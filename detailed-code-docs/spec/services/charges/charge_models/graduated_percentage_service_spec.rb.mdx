@@ -1,0 +1,70 @@
+---
+title: "graduated_percentage_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Charges::ChargeModels::GraduatedPercentageService` class. It tests the `apply` method of the service with various aggregation scenarios to ensure correct calculation of charges based on graduated percentage ranges.
+
+## Code Structure
+The test suite defines multiple contexts, each representing a different aggregation value. Each context tests the service's output for a specific scenario, verifying the calculated amount, unit amount, and amount details.
+
+## Symbols
+
+### `RSpec.describe Charges::ChargeModels::GraduatedPercentageService`
+#### Description
+This is the main describe block for the `Charges::ChargeModels::GraduatedPercentageService` tests.
+
+### `apply_graduated_percentage_service`
+#### Description
+This is the subject of the tests, which calls the `apply` method of the `GraduatedPercentageService` with the specified charge, aggregation result, and properties.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Object | The charge object with properties |
+| aggregation_result | BaseService::Result | Contains aggregation and count |
+| properties | Hash | Properties of the charge |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Result | Object | Contains amount, unit_amount, and amount_details |
+
+### `let(:aggregation_result)`
+#### Description
+Defines the aggregation result used in the tests, containing aggregation and count.
+
+### `let(:charge)`
+#### Description
+Defines the charge object used in the tests, with graduated percentage ranges in its properties.
+
+### Contexts
+The file defines several contexts, each testing a different aggregation scenario:
+
+1. `when aggregation is 0`
+2. `when aggregation is 1`
+3. `when aggregation is 10`
+4. `when aggregation is 11`
+5. `when aggregation is 12`
+6. `when aggregation is 21`
+
+Each context sets specific `aggregation` and `aggregation_count` values and tests the service's output for that scenario.
+
+#### Internal Logic
+Each test verifies:
+1. The calculated `amount`
+2. The calculated `unit_amount`
+3. The structure and values of `amount_details`
+
+The tests ensure that the service correctly applies flat amounts, rates, and calculates totals based on the defined graduated percentage ranges.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides Rails-specific configuration for RSpec |
+| FactoryBot | Used to create test objects (`:graduated_percentage_charge`) |
+
+## Notes
+- The tests use the `:aggregate_failures` option to group multiple expectations.
+- The service handles various edge cases, including zero aggregation and aggregations that span multiple ranges.
+- The tests verify both the total amount calculation and the detailed breakdown of charges across different ranges.

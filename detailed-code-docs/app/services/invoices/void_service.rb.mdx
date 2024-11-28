@@ -1,0 +1,65 @@
+---
+title: "void_service.rb"
+---
+
+## High-level description
+The `Invoices::VoidService` is responsible for voiding an invoice in the system. It handles the process of marking the invoice as void, recrediting associated credits and wallet transactions, and triggering related jobs and webhooks.
+
+## Code Structure
+The `VoidService` is part of the `Invoices` module and inherits from `BaseService`. It interacts with various other services and models, including `CreditNotes::RecreditService`, `WalletTransactions::RecreditService`, and `LifetimeUsages::FlagRefreshFromInvoiceService`.
+
+## Symbols
+
+### `Invoices::VoidService`
+#### Description
+This service handles the process of voiding an invoice, including updating its status, recrediting associated credits and wallet transactions, and triggering related jobs and webhooks.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice to be voided |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the result of the operation, including the voided invoice or error information |
+
+#### Internal Logic
+1. Check if the invoice exists and return a not found error if it doesn't.
+2. Set the invoice in the result object.
+3. Within a transaction:
+   - Set `payment_overdue` to false if it was previously true.
+   - Call the `void!` method on the invoice.
+   - Flag lifetime usage for refresh.
+4. Recredit associated credits and wallet transactions.
+5. Enqueue a webhook job for the voided invoice.
+6. Enqueue a job to void provider taxes.
+7. Return the result.
+
+#### Error Handling
+If an invalid transition occurs (e.g., the invoice cannot be voided), a not allowed failure is returned with the code 'not_voidable'.
+
+## Side Effects
+- Updates the invoice status and payment_overdue flag.
+- Recredits associated credits and wallet transactions.
+- Triggers a webhook for the voided invoice.
+- Enqueues a job to void provider taxes.
+- Flags lifetime usage for refresh.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | For database transactions and ORM |
+| AASM | For handling invoice state transitions |
+| Rails.logger | For logging warnings |
+| SendWebhookJob | For sending webhooks |
+| Invoices::ProviderTaxes::VoidJob | For voiding provider taxes |
+| CreditNotes::RecreditService | For recrediting associated credits |
+| WalletTransactions::RecreditService | For recrediting wallet transactions |
+| LifetimeUsages::FlagRefreshFromInvoiceService | For flagging lifetime usage for refresh |
+
+## Logging
+The service logs warnings when recrediting credits or wallet transactions fails.
+
+## API/Interface Reference
+This service is used in the `InvoicesController` and the GraphQL `Invoices::Void` mutation to handle invoice voiding requests.

@@ -1,0 +1,48 @@
+---
+title: "event_error_serializer_spec.rb"
+---
+
+## High-level description
+This code defines a RSpec test for the `V1::EventErrorSerializer` class. It verifies that the serializer correctly formats and structures event error data, including both the error details and associated event information.
+
+## Symbols
+
+### `RSpec.describe ::V1::EventErrorSerializer`
+#### Description
+This is the main test suite for the `V1::EventErrorSerializer` class. It sets up the test environment and defines the test cases for the serializer.
+
+### `subject(:serializer)`
+#### Description
+Defines the subject of the test, which is an instance of `V1::EventErrorSerializer` initialized with an `event_error` and a root name of 'event_error'.
+
+### `let(:event_error)`
+#### Description
+Creates a test double for an event error using OpenStruct. It includes an error hash and an associated event created using FactoryBot.
+
+### `let(:result)`
+#### Description
+Parses the JSON output of the serializer for easy assertion in the tests.
+
+### `it 'serializes object'`
+#### Description
+The main test case that verifies the correct serialization of the event error object.
+
+#### Internal Logic
+1. Uses `aggregate_failures` to group multiple expectations.
+2. Checks the structure and content of the serialized 'event_error' object.
+3. Verifies the presence and correctness of error details (status, error message, etc.).
+4. Validates the associated event data, including various attributes like `lago_id`, `transaction_id`, `code`, `timestamp`, etc.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used to create test data (`:received_event`) |
+
+## Notes
+1. The test uses `OpenStruct` to create a mock event error object, which allows for flexible attribute definition.
+2. The serializer is expected to handle both the error information and the associated event data.
+3. The test checks for specific formatting of timestamps (ISO 8601 with millisecond precision).
+4. Some fields (like `lago_customer_id` and `lago_subscription_id`) are expected to be nil in this test case.
+
+This test ensures that the `V1::EventErrorSerializer` correctly formats error data and associated event information, which is crucial for maintaining consistent API responses in the application.

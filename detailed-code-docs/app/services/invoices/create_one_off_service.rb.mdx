@@ -1,0 +1,74 @@
+---
+title: "create_one_off_service.rb"
+---
+
+## High-level description
+This code defines the `CreateOneOffService` class within the `Invoices` module. Its primary purpose is to create a one-off invoice for a customer, including the creation of associated fees, computation of amounts, and triggering various post-creation actions such as sending webhooks and generating PDFs.
+
+## Code Structure
+The `CreateOneOffService` class inherits from `BaseService` and contains a single public method `call`. It interacts with several other services and jobs to complete the invoice creation process, including `Customers::UpdateService`, `Invoices::CreateGeneratingService`, `Fees::OneOffService`, and various background jobs for post-creation tasks.
+
+## Symbols
+
+### `CreateOneOffService`
+#### Description
+This service class is responsible for creating a one-off invoice for a customer, including all necessary steps from creation to finalization and post-creation actions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Customer | The customer for whom the invoice is being created |
+| currency | String | The currency for the invoice |
+| fees | Array | An array of fee details to be added to the invoice |
+| timestamp | Integer | The timestamp for the invoice creation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the created invoice and success/failure status |
+
+#### Internal Logic
+1. Validates the presence of customer, fees, and add-ons.
+2. Updates the customer's currency if necessary.
+3. Creates a generating invoice using `Invoices::CreateGeneratingService`.
+4. Creates one-off fees using `Fees::OneOffService`.
+5. Computes amounts from fees.
+6. Sets the payment status based on the total amount.
+7. Finalizes the invoice.
+8. Triggers various post-creation actions (tracking, webhooks, PDF generation, etc.).
+9. Creates a payment for the invoice.
+
+#### Error Handling
+The service uses a `rescue` block to catch and handle various exceptions, including `ActiveRecord::RecordInvalid`, `Sequenced::SequenceError`, `BaseService::FailedResult`, and general exceptions.
+
+## Side Effects
+- Creates a new invoice in the database
+- Updates customer currency
+- Sends webhook notifications
+- Generates PDF for the invoice
+- Creates payment for the invoice
+- Triggers various background jobs
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | For database transactions and error handling |
+| Customers::UpdateService | To update customer currency |
+| Invoices::CreateGeneratingService | To create the initial invoice |
+| Fees::OneOffService | To create one-off fees for the invoice |
+| Invoices::ComputeAmountsFromFees | To calculate invoice amounts |
+| Utils::SegmentTrack | For tracking invoice creation |
+| SendWebhookJob | To send webhook notifications |
+| GeneratePdfAndNotifyJob | To generate PDF and notify |
+| Integrations::Aggregator::Invoices::CreateJob | To sync invoice with aggregator |
+| Integrations::Aggregator::SalesOrders::CreateJob | To sync sales order with aggregator |
+| Invoices::Payments::CreateService | To create payment for the invoice |
+
+## Logging
+The code doesn't implement explicit logging mechanisms, but it uses various background jobs which may include their own logging.
+
+## API/Interface Reference
+This service is used internally and doesn't expose a direct API. It's typically called from controller actions or other services that need to create one-off invoices.
+
+## TODOs
+There are no explicit TODOs in the code.

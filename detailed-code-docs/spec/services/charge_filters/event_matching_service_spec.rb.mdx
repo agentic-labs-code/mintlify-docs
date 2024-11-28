@@ -1,0 +1,78 @@
+---
+title: "event_matching_service_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `ChargeFilters::EventMatchingService` class. It tests the service's ability to match events with charge filters based on event properties and filter criteria.
+
+## Code Structure
+The test file defines a set of shared contexts and examples to test different scenarios for the `ChargeFilters::EventMatchingService`. It uses FactoryBot to create test data and RSpec expectations to verify the service's behavior.
+
+## Symbols
+
+### `RSpec.describe ChargeFilters::EventMatchingService`
+#### Description
+This is the main describe block for the `ChargeFilters::EventMatchingService` test suite.
+
+#### Internal Logic
+The test suite sets up various objects (organization, event, billable metric, charge, filters) and then tests the service's ability to match events with the most appropriate charge filter.
+
+### `subject(:service_result)`
+#### Description
+Defines the subject of the test, which is the result of calling the `ChargeFilters::EventMatchingService`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Charge | The charge object to match against |
+| event | Event | The event object to be matched |
+
+### `let` blocks
+#### Description
+These blocks define various test data used throughout the specs, including:
+- `organization`
+- `event_properties`
+- `event`
+- `billable_metric`
+- `charge`
+- `payment_method`, `card_location`, `scheme`, `card_type` (billable metric filters)
+- `filter1`, `filter2` (charge filters)
+- `filter1_values`, `filter2_values` (charge filter values)
+
+### `before` block
+#### Description
+Sets up the test data by creating the filter values for both `filter1` and `filter2`.
+
+### `it 'returns the filter matching the most properties'`
+#### Description
+Tests that the service returns the filter that matches the most properties of the event.
+
+#### Internal Logic
+1. Arrange: Set up the test data with two filters, where `filter2` matches more properties than `filter1`.
+2. Act: Call the service with the charge and event.
+3. Assert: Expect the returned charge filter to be `filter2`.
+
+### `context 'when event does not match any filter'`
+#### Description
+Tests the scenario where the event doesn't match any of the defined filters.
+
+#### Internal Logic
+1. Arrange: Set the event properties to an empty hash.
+2. Act: Call the service with the charge and event.
+3. Assert: Expect the returned charge filter to be nil.
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Creates test data |
+| RSpec | Testing framework |
+
+## Configuration
+The test uses the following RSpec configuration:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| type: :service | Symbol | N/A | Specifies that this is a service test |
+
+This test file provides comprehensive coverage for the `ChargeFilters::EventMatchingService`, ensuring that it correctly matches events to the most appropriate charge filter based on the event properties and filter criteria.

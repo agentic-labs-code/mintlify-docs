@@ -1,0 +1,71 @@
+---
+title: "accept_invite_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Mutations::Auth::Google::AcceptInvite` GraphQL mutation. It tests the functionality of accepting an invite using Google authentication, including successful scenarios and error cases such as email mismatch and non-existent invites.
+
+## Code Structure
+The test suite is organized into a main describe block for the `Mutations::Auth::Google::AcceptInvite` mutation. It uses let blocks to set up test data and mocks, and contains multiple test cases (it blocks) to cover different scenarios.
+
+## Symbols
+
+### RSpec.describe Mutations::Auth::Google::AcceptInvite
+#### Description
+This is the main describe block that groups all the tests for the `AcceptInvite` mutation.
+
+### let blocks
+#### Description
+These blocks set up the test data and mocks used across the test cases.
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| google_service | instance_double(Auth::GoogleService) | A mock of the GoogleService |
+| user | User | A factory-created user |
+| invite | Invite | A factory-created invite |
+| accept_invite_result | BaseService::Result | A mock result object for the accept_invite method |
+| mutation | String | The GraphQL mutation query |
+
+### before block
+#### Description
+This block sets up the mocks for the GoogleService before each test.
+
+### it 'returns token and user'
+#### Description
+This test case verifies that the mutation returns the expected token and user data when successful.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with mock data
+2. Checks if the response contains the expected token and user information
+
+### context 'when invite email and google email are different'
+#### Description
+This context block tests the scenario where the invite email doesn't match the Google account email.
+
+#### Internal Logic
+1. Sets up a mock result indicating an email mismatch error
+2. Executes the GraphQL mutation
+3. Checks if the response contains the expected error status and details
+
+### context 'when invite does not exist'
+#### Description
+This context block tests the scenario where the provided invite token is invalid or the invite doesn't exist.
+
+#### Internal Logic
+1. Sets up a mock result indicating a not found error
+2. Executes the GraphQL mutation
+3. Checks if the response contains the expected error status and details
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| Auth::GoogleService | The service being tested (mocked in this spec) |
+| BaseService::Result | Used to create mock result objects |
+
+## Error Handling
+The test suite covers two main error scenarios:
+1. Email mismatch between the invite and the Google account
+2. Non-existent or invalid invite
+
+These are tested by mocking the `accept_invite_result` with appropriate error states and verifying the returned error responses.

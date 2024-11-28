@@ -1,0 +1,79 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions related to wallet transactions within the application. It defines various GraphQL objects and enums that represent the structure and possible values for wallet transaction data in the GraphQL API.
+
+## What does it do?
+This directory provides the necessary type definitions for handling wallet transactions in a GraphQL API. It defines:
+
+1. A main `WalletTransaction` object type that represents a transaction associated with a wallet, including details like amount, status, timestamps, and related objects.
+2. Enum types for transaction statuses and types, which define the possible values for these fields in the API.
+
+These type definitions allow the API to handle queries and mutations related to wallet transactions with proper structure and validation. They ensure that the data returned by the API or accepted as input follows a consistent format and contains only valid values for fields like status and transaction type.
+
+## Key Files
+
+1. `object.rb`: Defines the main `WalletTransaction` GraphQL object type.
+   - This file outlines all the fields available for a wallet transaction, including scalar values (like amount and timestamps) and relationships to other objects (like the associated wallet).
+   - It uses other custom types defined in this directory and elsewhere in the application to represent complex fields.
+
+2. `status_enum.rb`: Defines the `WalletTransactionStatusEnum` GraphQL enum type.
+   - This enum represents the possible statuses of a wallet transaction.
+   - It uses the `STATUSES` constant from the `WalletTransaction` model to ensure consistency between the API and the underlying data model.
+
+3. `transaction_status_enum.rb`: Defines the `TransactionStatusEnum` GraphQL enum type.
+   - This enum represents the possible transaction statuses for a wallet transaction.
+   - It uses the `TRANSACTION_STATUSES` constant from the `WalletTransaction` model.
+
+4. `transaction_type_enum.rb`: Defines the `TransactionTypeEnum` GraphQL enum type.
+   - This enum represents the different types of transactions that can be associated with a wallet.
+   - It uses the `TRANSACTION_TYPES` constant from the `WalletTransaction` model.
+
+These files work together to provide a complete representation of wallet transactions in the GraphQL API. The main object type uses the enum types to ensure that status and type fields only contain valid values.
+
+## Dependencies
+The code in this directory relies on the following dependencies:
+
+1. GraphQL Ruby gem: This is evident from the use of GraphQL-specific classes and methods like `Types::BaseObject` and `field`.
+   - Version: Not specified in the provided code snippets.
+   - Chosen for its robust implementation of GraphQL for Ruby applications.
+
+2. Application-specific types:
+   - `Types::BaseObject` and `Types::BaseEnum`: These are likely custom base classes for GraphQL types in the application.
+   - `Types::Wallets::Object`: Represents a wallet object associated with transactions.
+
+3. `WalletTransaction` model: The enum types rely on constants defined in this model (`STATUSES`, `TRANSACTION_STATUSES`, `TRANSACTION_TYPES`) to define their values.
+
+These dependencies allow the GraphQL types to integrate seamlessly with the rest of the application, ensuring consistency between the API layer and the underlying data models.
+
+## Configuration
+While there are no explicit configuration files in this directory, the code does rely on constants defined in the `WalletTransaction` model:
+
+1. `WalletTransaction::STATUSES`: Defines the possible statuses for a wallet transaction.
+2. `WalletTransaction::TRANSACTION_STATUSES`: Defines the possible transaction statuses.
+3. `WalletTransaction::TRANSACTION_TYPES`: Defines the possible types of transactions.
+
+These constants serve as a form of configuration, determining the possible values for the respective enum types. If these values need to be changed or extended, it should be done in the `WalletTransaction` model to ensure consistency throughout the application.
+
+Example usage of these enums in a GraphQL query might look like:
+
+```graphql
+query {
+  walletTransaction(id: "123") {
+    id
+    amount
+    status
+    transactionStatus
+    transactionType
+    createdAt
+    wallet {
+      id
+      balance
+    }
+  }
+}
+```
+
+This query would return a wallet transaction with its associated data, where `status`, `transactionStatus`, and `transactionType` would be constrained to the values defined in their respective enums.

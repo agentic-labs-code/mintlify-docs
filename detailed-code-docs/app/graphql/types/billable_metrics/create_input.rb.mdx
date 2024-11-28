@@ -1,0 +1,57 @@
+---
+title: "create_input.rb"
+---
+
+## High-level description
+This code defines a GraphQL input type `CreateInput` for creating billable metrics. It specifies the structure and requirements for the input arguments needed to create a new billable metric in the system.
+
+## Code Structure
+The `CreateInput` class is defined within the `Types::BillableMetrics` module and inherits from `BaseInputObject`. It defines several arguments that correspond to the attributes of a billable metric.
+
+## References
+This code references:
+- `Types::BillableMetrics::AggregationTypeEnum`
+- `Types::BillableMetrics::WeightedIntervalEnum`
+- `Types::BillableMetricFilters::Input`
+
+## Symbols
+
+### `Types::BillableMetrics::CreateInput`
+#### Description
+This class defines the input structure for creating a billable metric. It specifies the required and optional arguments that clients need to provide when creating a new billable metric through the GraphQL API.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| aggregation_type | Types::BillableMetrics::AggregationTypeEnum | The type of aggregation for the billable metric (required) |
+| code | String | A unique code for the billable metric (required) |
+| description | String | A description of the billable metric (optional) |
+| field_name | String | The name of the field to be measured (optional) |
+| name | String | The name of the billable metric (required) |
+| recurring | Boolean | Indicates if the metric is recurring (optional) |
+| weighted_interval | Types::BillableMetrics::WeightedIntervalEnum | The weighted interval for the metric (optional) |
+| filters | [Types::BillableMetricFilters::Input] | An array of filters to apply to the metric (optional) |
+
+#### Internal Logic
+The class uses the `argument` method to define each input field. Each argument specifies its name, type, and whether it's required. The `description` method provides a brief explanation of the input object's purpose.
+
+## Dependencies
+This code depends on the following custom types:
+| Dependency | Purpose |
+|:-----------|:--------|
+| Types::BillableMetrics::AggregationTypeEnum | Defines the allowed values for the aggregation_type argument |
+| Types::BillableMetrics::WeightedIntervalEnum | Defines the allowed values for the weighted_interval argument |
+| Types::BillableMetricFilters::Input | Defines the structure for the filters argument |
+
+## Related Code Insights
+1. The `AggregationTypeEnum` is defined based on the keys of `BillableMetric::AGGREGATION_TYPES`, suggesting that the allowed aggregation types are defined in the `BillableMetric` model.
+
+2. Similarly, the `WeightedIntervalEnum` is based on the values of `BillableMetric::WEIGHTED_INTERVAL`, indicating that the allowed weighted intervals are also defined in the `BillableMetric` model.
+
+3. The `BillableMetricFilters::Input` type defines the structure for filters, which include a `key` and an array of `values`.
+
+4. The `Mutations::BillableMetrics::Create` mutation uses this `CreateInput` type as its input object, suggesting that this input structure is used directly in the GraphQL API for creating billable metrics.
+
+5. The creation process is handled by a `BillableMetrics::CreateService`, which takes the input arguments along with the current user and organization information to create the billable metric.
+
+These insights provide context on how the `CreateInput` type is used within the larger system for creating and managing billable metrics.

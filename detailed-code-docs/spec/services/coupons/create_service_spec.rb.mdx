@@ -1,0 +1,60 @@
+---
+title: "create_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Coupons::CreateService` class. It tests various scenarios for creating coupons, including different coupon types, validation errors, and limitations based on plans and billable metrics.
+
+## Code Structure
+The test suite is organized into a main `describe` block for the `Coupons::CreateService`, with nested `context` blocks for different scenarios. Each test case uses the `it` block to describe the expected behavior.
+
+## Symbols
+
+### `RSpec.describe Coupons::CreateService`
+#### Description
+This is the main describe block for the `Coupons::CreateService` tests.
+
+### `subject(:create_service)`
+#### Description
+Defines the subject of the tests as an instance of `Coupons::CreateService`.
+
+### `describe 'create'`
+#### Description
+This block contains all the tests related to the `create` method of the service.
+
+### `it 'creates a coupon'`
+#### Description
+Tests that calling the `create` method increases the count of `Coupon` records by 1.
+
+### `it 'calls SegmentTrackJob'`
+#### Description
+Verifies that the `SegmentTrackJob` is called with the correct parameters after creating a coupon.
+
+### Various `context` blocks
+#### Description
+These blocks test different scenarios such as:
+- Creating a coupon with a code already used by a deleted coupon
+- Creating a percentage-based coupon
+- Handling validation errors
+- Testing plan and billable metric limitations in different contexts (GraphQL and API)
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| FactoryBot | Used for creating test data |
+| SegmentTrackJob | Mocked to verify it's called after coupon creation |
+
+## Error Handling
+The tests cover various error scenarios, including:
+- Validation errors for duplicate coupon codes
+- Invalid expiration dates
+- Attempts to create coupons with multiple limitation types
+
+## Notes
+1. The tests use `let` statements to define variables and factory objects used across multiple tests.
+2. The `before` blocks are used to set up test conditions, such as mocking the `SegmentTrackJob`.
+3. The tests cover both successful and error scenarios for coupon creation.
+4. The spec file tests the service's behavior in different contexts (GraphQL and API) and with different types of limitations (plans and billable metrics).
+
+This comprehensive test suite ensures that the `Coupons::CreateService` behaves correctly under various conditions and handles errors appropriately.

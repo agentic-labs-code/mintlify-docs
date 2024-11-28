@@ -1,0 +1,70 @@
+---
+title: "stripe.rb"
+---
+
+## High-level description
+This code defines a GraphQL type for the Stripe payment provider in a Ruby on Rails application. It represents the structure and fields of a Stripe provider object, including sensitive information handling for the secret key.
+
+## Code Structure
+The `Types::PaymentProviders::Stripe` class inherits from `Types::BaseObject` and defines the GraphQL fields for a Stripe payment provider. It includes both basic and sensitive information fields, with special handling for the secret key.
+
+## References
+- `Types::BaseObject`
+- `PaymentProviders::StripeProvider` (implied)
+
+## Symbols
+
+### `Types::PaymentProviders::Stripe`
+#### Description
+This class defines the GraphQL type for a Stripe payment provider. It includes fields for basic information like code, id, and name, as well as sensitive information like the secret key and success redirect URL.
+
+#### Inputs
+This class doesn't have explicit inputs as it's a GraphQL type definition.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | The code of the Stripe provider |
+| id | ID | The unique identifier of the Stripe provider |
+| name | String | The name of the Stripe provider |
+| secret_key | String | The obfuscated secret key of the Stripe provider |
+| success_redirect_url | String | The URL to redirect after successful payment |
+
+#### Internal Logic
+The class defines GraphQL fields using the `field` method. It sets permissions for sensitive fields using the `permission` option. The `secret_key` method is overridden to return an obfuscated version of the actual secret key.
+
+### `secret_key`
+#### Description
+This method returns an obfuscated version of the Stripe provider's secret key for security purposes.
+
+#### Inputs
+None (implicitly uses `object.secret_key`)
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (return value) | String | Obfuscated secret key |
+
+#### Internal Logic
+1. Creates a string of 8 bullet points (•)
+2. Appends an ellipsis (…)
+3. Appends the last 3 characters of the actual secret key
+4. Returns the combined string
+
+## Side Effects
+None
+
+## Dependencies
+None explicitly defined in this file.
+
+## Configuration
+No specific configuration options are defined in this code.
+
+## Error Handling
+No explicit error handling is implemented in this code.
+
+## Logging
+No logging mechanisms are implemented in this code.
+
+## API/Interface Reference
+This code defines part of the GraphQL API for the application, specifically the Stripe payment provider type. The fields defined here will be available for querying through the GraphQL API, subject to the specified permissions.

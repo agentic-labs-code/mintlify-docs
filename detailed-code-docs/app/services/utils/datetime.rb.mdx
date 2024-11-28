@@ -1,0 +1,56 @@
+---
+title: "datetime.rb"
+---
+
+## High-level description
+This code defines a `Utils::Datetime` module with two class methods: `valid_format?` and `date_diff_with_timezone`. These methods provide utility functions for validating datetime formats and calculating date differences while considering timezones.
+
+## Symbols
+
+### `Utils::Datetime.valid_format?(datetime)`
+#### Description
+This method checks if the given `datetime` is in a valid format.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| datetime | Object | The datetime object or string to validate |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Boolean | True if the format is valid, false otherwise |
+
+#### Internal Logic
+1. Checks if the input responds to `strftime` (indicating it's a valid datetime object).
+2. If not, checks if it's a string that can be parsed into a valid datetime.
+3. Returns false if an `ArgumentError` is raised during parsing.
+
+### `Utils::Datetime.date_diff_with_timezone(from_datetime, to_datetime, timezone)`
+#### Description
+Calculates the difference in days between two datetimes, considering the given timezone.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| from_datetime | DateTime/String | The start datetime |
+| to_datetime | DateTime/String | The end datetime |
+| timezone | String | The timezone to consider |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Integer | The number of days between the two datetimes |
+
+#### Internal Logic
+1. Converts input datetimes to `ActiveSupport::TimeWithZone` objects if they're not already.
+2. Adjusts the end datetime by adding 1 second if it's at the beginning of a day.
+3. Calculates the UTC offset difference between the start and end datetimes in the given timezone.
+4. Computes the difference in days, accounting for the timezone offset, and rounds up to the nearest integer.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveSupport::TimeWithZone | Used for timezone-aware datetime operations |
+
+This utility module is used in various parts of the application for datetime validations and calculations, especially in subscription and billing-related services.

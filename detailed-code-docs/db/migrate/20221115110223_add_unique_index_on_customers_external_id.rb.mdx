@@ -1,0 +1,44 @@
+---
+title: "20221115110223_add_unique_index_on_customers_external_id.rb"
+---
+
+## High-level description
+This migration file adds a unique composite index on the `customers` table for the `external_id` and `organization_id` columns. It first removes an existing index on `external_id` and then creates a new unique index combining `external_id` and `organization_id`.
+
+## Symbols
+
+### `AddUniqueIndexOnCustomersExternalId`
+#### Description
+This class is a Rails migration that modifies the indexing structure of the `customers` table. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0 migrations.
+
+#### Internal Logic
+The migration performs two main actions within a `safety_assured` block:
+1. Removes the existing index on the `external_id` column of the `customers` table.
+2. Adds a new unique composite index on both `external_id` and `organization_id` columns of the `customers` table.
+
+The `safety_assured` method is likely from a gem like `strong_migrations`, which is used to ensure potentially dangerous migrations are executed safely.
+
+### `change`
+#### Description
+This method defines the changes to be applied (or rolled back) when the migration is run.
+
+#### Internal Logic
+1. Calls `remove_index` to remove the existing index on `external_id`.
+2. Calls `add_index` to create a new unique composite index on `external_id` and `organization_id`.
+
+## Side Effects
+- Removes the existing index on `external_id` in the `customers` table.
+- Adds a new unique composite index on `external_id` and `organization_id` in the `customers` table.
+- This change will enforce uniqueness of `external_id` within each `organization_id`, preventing duplicate `external_id` values for the same organization.
+
+## Performance Considerations
+- Removing and adding indexes can be a time-consuming operation, especially on large tables.
+- The new composite index may improve query performance for lookups using both `external_id` and `organization_id`.
+- However, queries only using `external_id` might become slower after this change, as the previous single-column index is removed.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the migration framework |
+
+Note: The use of `safety_assured` suggests there might be a dependency on a gem like `strong_migrations`, but this is not explicitly shown in the provided code.

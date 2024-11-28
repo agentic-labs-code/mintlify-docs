@@ -1,0 +1,76 @@
+---
+title: "subscriptions_to_be_terminated_job_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Clock::SubscriptionsToBeTerminatedJob` class. It tests the job's functionality of sending termination alert webhooks for subscriptions that are about to end, based on various time conditions and configurations.
+
+## Symbols
+
+### `describe Clock::SubscriptionsToBeTerminatedJob, job: true`
+#### Description
+This is the main describe block for the `Clock::SubscriptionsToBeTerminatedJob` class, with the `job: true` metadata.
+
+### `.perform`
+#### Description
+This describe block focuses on testing the `.perform` class method of the `Clock::SubscriptionsToBeTerminatedJob` class.
+
+#### Internal Logic
+1. Sets up test data with three subscriptions and their corresponding 'subscription.started' webhooks.
+2. Tests various scenarios for sending termination alert webhooks based on the subscription's ending date and the current date.
+3. Checks if the `SendWebhookJob` is enqueued with the correct parameters under different conditions.
+
+### `it 'sends webhook that subscription is going to be terminated for the right subscriptions'`
+#### Description
+This test checks if the job sends a termination alert webhook for subscriptions ending in 15 days.
+
+#### Internal Logic
+1. Sets the current date to 2 months from now.
+2. Expects the `SendWebhookJob` to be enqueued once with the correct parameters.
+
+### `context 'when current date is 45 before subscription ending_at'`
+#### Description
+This context tests the behavior when the current date is 45 days before the subscription's ending date.
+
+#### Internal Logic
+1. Sets the current date to 45 days before the subscription's ending date.
+2. Expects the `SendWebhookJob` to be enqueued once with the correct parameters.
+
+### `context 'when current date is 1 day before subscription ending_at'`
+#### Description
+This context tests the behavior when the current date is 1 day before the subscription's ending date, considering different configurations.
+
+#### Internal Logic
+1. Sets the current date to 1 day before the subscription's ending date.
+2. Tests that no job is enqueued with the default configuration.
+3. Overrides the configuration and tests that the job is enqueued once with the correct parameters.
+
+### `context 'when the same alert webhook had been already triggered on the same day'`
+#### Description
+This context tests the behavior when a termination alert webhook has already been sent on the same day.
+
+#### Internal Logic
+1. Creates a webhook alert for the subscription on the same day.
+2. Expects no `SendWebhookJob` to be enqueued when the job is performed.
+
+### `context 'when the same alert webhook has already been triggered 30 days ago'`
+#### Description
+This context tests the behavior when a termination alert webhook was sent 30 days ago.
+
+#### Internal Logic
+1. Creates a webhook alert for the subscription 45 days before its ending date.
+2. Sets the current date to 15 days before the subscription's ending date.
+3. Expects the `SendWebhookJob` to be enqueued once with the correct parameters.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and RSpec configurations |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LAGO_SUBSCRIPTION_TERMINATION_ALERT_SENT_AT_DAYS | String | '15,45' | Configures the days before subscription end when alerts should be sent |
+
+## TODOs
+There are no explicit TODOs in the code.

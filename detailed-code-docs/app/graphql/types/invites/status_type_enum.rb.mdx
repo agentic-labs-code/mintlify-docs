@@ -1,0 +1,50 @@
+---
+title: "status_type_enum.rb"
+---
+
+## High-level description
+This code defines a GraphQL enum type for invite statuses in a Ruby on Rails application. It creates a mapping between the invite statuses defined in the `Invite` model and the GraphQL schema, allowing clients to query and mutate invite statuses using predefined values.
+
+## Code Structure
+The `StatusTypeEnum` class is nested within the `Types::Invites` module and inherits from `Types::BaseEnum`. It uses the `graphql_name` method to set the GraphQL type name and dynamically generates enum values based on the `INVITE_STATUS` constant from the `Invite` model.
+
+## References
+- `Types::BaseEnum`: The base class for GraphQL enum types in the application.
+- `Invite::INVITE_STATUS`: A constant defined in the `Invite` model that contains the possible invite statuses.
+
+## Symbols
+
+### `Types::Invites::StatusTypeEnum`
+#### Description
+This class defines a GraphQL enum type for invite statuses. It automatically generates enum values based on the `INVITE_STATUS` constant from the `Invite` model.
+
+#### Internal Logic
+1. Sets the GraphQL name for this type to 'InviteStatusTypeEnum'.
+2. Iterates through each status in `Invite::INVITE_STATUS`.
+3. For each status, it creates a corresponding enum value using the `value` method provided by `Types::BaseEnum`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| GraphQL-Ruby | Provides the base functionality for defining GraphQL types |
+
+## Related Information
+From the related code snippets, we can see that:
+
+1. The `Invite` model (`app/models/invite.rb`) defines the `INVITE_STATUS` constant with the following values:
+   ```ruby
+   INVITE_STATUS = %i[
+     pending
+     accepted
+     revoked
+   ].freeze
+   ```
+   These are the values that will be used to generate the enum in the `StatusTypeEnum` class.
+
+2. The `Types::Invites::Object` class (`app/graphql/types/invites/object.rb`) uses this enum type in its `status` field:
+   ```ruby
+   field :status, Types::Invites::StatusTypeEnum, null: false
+   ```
+   This shows how the `StatusTypeEnum` is used within the GraphQL schema to represent the status of an invite.
+
+This enum type allows the GraphQL API to enforce that only valid status values are used when querying or mutating invite statuses, providing type safety and clear documentation of the possible values for invite statuses in the API.

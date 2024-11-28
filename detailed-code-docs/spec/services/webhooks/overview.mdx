@@ -1,0 +1,60 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various webhook services related to different entities and events in a Rails application. The tests cover webhook creation for events such as customer actions, invoice operations, payment provider interactions, subscription changes, wallet transactions, and more.
+
+## What does it do?
+The tests in this directory verify that the webhook services correctly create and send webhook events for various actions and state changes within the application. These services are responsible for notifying external systems or other parts of the application about important events, such as:
+
+1. Customer-related events (creation, errors, VIES checks)
+2. Invoice operations (creation, updates, payment status changes)
+3. Payment provider interactions (customer checkout, errors)
+4. Subscription lifecycle events (start, termination, trial end)
+5. Wallet and transaction events
+6. Credit note operations
+7. Fee-related events
+
+The tests ensure that each service creates the appropriate webhook with the correct event type, resource type, and payload structure when triggered by specific actions or state changes.
+
+## Entry points
+The main entry point for each service is typically the `.call` method, which is tested in most of the spec files. The general structure of these tests is:
+
+1. Set up the necessary test data (e.g., organizations, customers, invoices)
+2. Initialize the service with the relevant object
+3. Call the service's `.call` method
+4. Verify that a webhook is created with the correct attributes
+
+Many of the test files use shared examples to reduce code duplication and maintain consistency across different webhook service tests.
+
+## Key Files
+1. `base_service_spec.rb`: Tests the base webhook service functionality.
+2. `customers/`: Contains tests for customer-related webhook services.
+3. `invoices/`: Includes tests for invoice-related webhook services.
+4. `payment_providers/`: Tests for payment provider-related webhook services.
+5. `subscriptions/`: Contains tests for subscription-related webhook services.
+6. `wallet_transactions/`: Tests for wallet transaction webhook services.
+7. `credit_notes/`: Includes tests for credit note-related webhook services.
+8. `fees/`: Contains tests for fee-related webhook services.
+9. `events/`: Tests for general event-related webhook services.
+10. `send_http_service_spec.rb`: Tests the service responsible for sending HTTP webhooks.
+11. `retry_service_spec.rb`: Tests the webhook retry service.
+
+## Dependencies
+The test files in this directory rely on the following key dependencies:
+
+1. RSpec: The testing framework used throughout the test suite.
+2. FactoryBot: A library for creating test data, used extensively to generate test objects.
+3. Rails: The tests are part of a Rails application, as evidenced by the use of `rails_helper`.
+4. WebMock: Used in some tests to stub HTTP requests for webhook sending.
+
+## Configuration
+While there are no explicit configuration files in this directory, the tests follow several important conventions and configurations:
+
+1. Use of `frozen_string_literal: true` pragma in many files.
+2. Reliance on shared examples for common webhook creation testing logic.
+3. Use of FactoryBot factories for creating test data.
+4. RSpec configuration, likely defined in `rails_helper.rb`, which sets up the testing environment.
+
+The tests in this directory play a crucial role in ensuring the reliability and correctness of the webhook system within the application. They verify that various parts of the system can correctly notify external services or internal components about important events and state changes, which is essential for maintaining data consistency and enabling real-time integrations.

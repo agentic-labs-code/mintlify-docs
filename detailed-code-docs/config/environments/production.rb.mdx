@@ -1,0 +1,127 @@
+---
+title: "production.rb"
+---
+
+## High-level description
+This file configures the Rails application for the production environment. It sets up various Rails configurations, including middleware, caching, logging, active storage, SSL, and email settings. The configuration is heavily dependent on environment variables, allowing for flexible deployment options.
+
+## Configuration
+
+### Middleware and Session
+```ruby
+config.middleware.use(ActionDispatch::Cookies)
+config.middleware.use(ActionDispatch::Session::CookieStore, key: '_lago_production')
+```
+These lines configure the middleware to use cookies and set up a cookie-based session store with the key '_lago_production'.
+
+### Environment Settings
+```ruby
+config.enable_reloading = false
+config.eager_load = true
+config.consider_all_requests_local = false
+config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
+```
+These settings disable code reloading, enable eager loading, disable local request consideration, and conditionally enable the public file server based on an environment variable.
+
+### Active Storage
+```ruby
+config.active_storage.service = if ENV['LAGO_USE_AWS_S3'].present? && ENV['LAGO_USE_AWS_S3'] == 'true'
+  # ... (AWS S3 configuration)
+elsif ENV['LAGO_USE_GCS'].present? && ENV['LAGO_USE_GCS'] == 'true'
+  :google
+else
+  :local
+end
+```
+This section configures Active Storage based on environment variables, supporting AWS S3, Google Cloud Storage, or local storage.
+
+### Logging
+```ruby
+config.log_level = if ENV['LAGO_LOG_LEVEL'].present? && ENV['LAGO_LOG_LEVEL'] != ''
+  ENV['LAGO_LOG_LEVEL'].downcase.to_sym
+else
+  :info
+end
+```
+Sets the log level based on an environment variable, defaulting to `:info` if not specified.
+
+### SSL Configuration
+```ruby
+config.assume_ssl = true
+config.force_ssl = false
+```
+Assumes SSL is being used but doesn't force it.
+
+### Miscellaneous Settings
+```ruby
+config.log_tags = [:request_id]
+config.action_mailer.perform_caching = false
+config.i18n.fallbacks = true
+config.active_support.report_deprecations = false
+config.log_formatter = ::Logger::Formatter.new
+```
+These lines configure various Rails settings, including log tags, mailer caching, I18n fallbacks, and log formatting.
+
+### Stdout Logging
+```ruby
+if ENV['RAILS_LOG_TO_STDOUT'].present? && ENV['RAILS_LOG_TO_STDOUT'] == 'true'
+  # ... (stdout logging configuration)
+end
+```
+Configures logging to stdout if the corresponding environment variable is set.
+
+### Database Schema
+```ruby
+config.active_record.dump_schema_after_migration = false
+```
+Disables schema dumping after migrations in the production environment.
+
+### Caching
+```ruby
+if ENV['LAGO_MEMCACHE_SERVERS'].present?
+  # ... (Memcached configuration)
+elsif ENV['LAGO_REDIS_CACHE_URL'].present?
+  # ... (Redis configuration)
+end
+```
+Configures the cache store using either Memcached or Redis, based on environment variables.
+
+### License URL
+```ruby
+config.license_url = if ENV['LAGO_CLOUD'] == 'true' && ENV['RAILS_ENV'] == 'staging'
+  'http://license-web.default.svc.cluster.local'
+else
+  'https://license.getlago.com'
+end
+```
+Sets the license URL based on environment variables.
+
+### SMTP Configuration
+```ruby
+if ENV['LAGO_SMTP_ADDRESS'].present? && !ENV['LAGO_SMTP_ADDRESS'].empty?
+  # ... (SMTP configuration)
+end
+```
+Configures SMTP settings for email delivery if the SMTP address is provided in the environment variables.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| active_support/core_ext/integer/time | Extends Integer class with time-related methods |
+| opentelemetry/sdk | OpenTelemetry SDK for observability |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| RAILS_SERVE_STATIC_FILES | boolean | - | Enables serving of static files |
+| LAGO_USE_AWS_S3 | boolean | - | Enables AWS S3 for Active Storage |
+| LAGO_USE_GCS | boolean | - | Enables Google Cloud Storage for Active Storage |
+| LAGO_LOG_LEVEL | string | 'info' | Sets the log level |
+| RAILS_LOG_TO_STDOUT | boolean | - | Enables logging to stdout |
+| LAGO_MEMCACHE_SERVERS | string | - | Configures Memcached servers |
+| LAGO_REDIS_CACHE_URL | string | - | Configures Redis cache URL |
+| LAGO_REDIS_CACHE_PASSWORD | string | - | Sets Redis cache password |
+| LAGO_CLOUD | boolean | - | Indicates if running in Lago Cloud |
+| LAGO_SMTP_* | various | - | Configures SMTP settings |
+
+This configuration file is crucial for setting up the Rails application in a production environment, with a focus on flexibility through environment variables and support for various external services like AWS S3, Google Cloud Storage, Memcached, and Redis.

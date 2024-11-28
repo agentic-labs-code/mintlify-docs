@@ -1,0 +1,57 @@
+---
+title: "20230719100256_migrate_recurring_count_and_unique_count_aggregation.rb"
+---
+
+## High-level description
+This migration file, `MigrateRecurringCountAndUniqueCountAggregation`, is designed to update and populate data for unique count events and pay-in-advance charges in the database. It creates quantified events for unique count events and sets metadata for pay-in-advance charges with SUM and UNIQUE COUNT aggregation types.
+
+## Code Structure
+The migration defines several ActiveRecord models at the top to prevent future schema issues. The main functionality is implemented in the `change` method, which contains a reversible block with an `up` direction. The `up` method performs two main tasks: creating quantified events for unique count events and updating metadata for pay-in-advance charges.
+
+## Symbols
+
+### `MigrateRecurringCountAndUniqueCountAggregation`
+#### Description
+This is the main migration class that inherits from `ActiveRecord::Migration[7.0]`. It defines the migration logic for updating and populating data related to recurring count and unique count aggregations.
+
+#### Internal Logic
+1. Defines ActiveRecord models to prevent schema issues.
+2. Implements a reversible `change` method with an `up` direction.
+3. In the `up` method:
+   a. Creates quantified events for unique count events.
+   b. Updates metadata for pay-in-advance charges with SUM aggregation type.
+   c. Updates metadata for pay-in-advance charges with UNIQUE COUNT aggregation type.
+
+### `change`
+#### Description
+This method defines the main migration logic using a reversible block.
+
+#### Internal Logic
+1. Uses a `reversible` block to define the migration logic.
+2. Implements the `up` direction with three main operations:
+   a. Creating quantified events for unique count events.
+   b. Updating metadata for pay-in-advance charges with SUM aggregation type.
+   c. Updating metadata for pay-in-advance charges with UNIQUE COUNT aggregation type.
+
+## Side Effects
+- Creates new `QuantifiedEvent` records in the database.
+- Updates `Event` records with `quantified_event_id`.
+- Modifies the `metadata` field of `Event` records for pay-in-advance charges.
+
+## Performance Considerations
+- The migration uses raw SQL queries for better performance when dealing with large datasets.
+- It processes events in batches using `each_with_object` to avoid loading all records into memory at once.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | ORM for database interactions |
+
+## Error Handling
+The migration uses `safety_assured` to bypass certain safety checks, which should be used with caution. It's important to ensure that the migration is thoroughly tested before running it in production.
+
+## Logging
+No explicit logging is implemented in this migration. However, ActiveRecord will log the SQL queries executed during the migration process.
+
+## TODOs
+There are no explicit TODOs in the code. However, it's worth noting that this migration makes significant changes to the database and should be carefully reviewed and tested before deployment.

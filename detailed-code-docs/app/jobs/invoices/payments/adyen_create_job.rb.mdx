@@ -1,0 +1,48 @@
+---
+title: "adyen_create_job.rb"
+---
+
+## High-level description
+This code defines a background job class `AdyenCreateJob` within the `Invoices::Payments` module. Its purpose is to asynchronously process Adyen payment creation for a given invoice, utilizing the `Invoices::Payments::AdyenService`.
+
+## Code Structure
+The `AdyenCreateJob` class inherits from `ApplicationJob` and is configured to run in the 'providers' queue. It uses the `unique` method to ensure the job is only executed once, and implements retry logic for connection failures.
+
+## Symbols
+
+### `Invoices::Payments::AdyenCreateJob`
+#### Description
+This class represents a background job for creating Adyen payments for invoices. It encapsulates the logic for asynchronous payment processing using the Adyen payment service.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice object for which the Adyen payment is to be created |
+
+#### Internal Logic
+1. The job is configured to run in the 'providers' queue.
+2. It uses the `unique` method to ensure the job is only executed once until it's completed.
+3. The job is set to retry up to 6 times with a polynomial backoff strategy in case of `Faraday::ConnectionFailed` errors.
+4. In the `perform` method, it creates an instance of `Invoices::Payments::AdyenService` with the given invoice and calls its `create` method.
+5. If the service call results in an error, it raises an exception.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ApplicationJob | Base job class that this job inherits from |
+| Invoices::Payments::AdyenService | Service class used to create the Adyen payment |
+
+## Error Handling
+The job implements retry logic specifically for `Faraday::ConnectionFailed` errors, which are likely to occur due to network issues when communicating with the Adyen API. It will attempt to retry the job up to 6 times with increasing delays between attempts.
+
+## Performance Considerations
+The use of the `unique` method ensures that multiple instances of this job for the same invoice are not executed concurrently, preventing potential race conditions or duplicate payments.
+
+## Related Code
+The `AdyenCreateJob` is part of a larger payment processing system:
+
+1. It is called by the `Invoices::Payments::CreateService` when the payment provider for a customer is Adyen.
+2. It utilizes the `Invoices::Payments::AdyenService` to perform the actual payment creation logic.
+3. The `AdyenService` handles the communication with the Adyen API, manages payment statuses, and updates the invoice accordingly.
+
+This job serves as an important asynchronous bridge between the invoice creation process and the actual payment processing through the Adyen payment gateway.

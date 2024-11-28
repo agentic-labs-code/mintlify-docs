@@ -1,0 +1,77 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains background job classes for creating payments using different payment providers: Adyen, GoCardless, and Stripe. These jobs are part of the `PaymentRequests::Payments` module and are designed to handle the asynchronous creation of payments for various payable objects.
+
+## What does it do?
+The jobs in this directory are responsible for initiating payment creation processes with different payment providers. When a payment needs to be created, the appropriate job is enqueued based on the chosen payment provider. These jobs run asynchronously, which means they operate independently of the main application process, allowing for better performance and scalability.
+
+Each job class (AdyenCreateJob, GocardlessCreateJob, and StripeCreateJob) follows a similar pattern:
+1. It receives a payable object as input.
+2. It creates an instance of the corresponding service class (e.g., AdyenService, GocardlessService, StripeService).
+3. It calls the `create` method on the service to initiate the payment creation process.
+4. It handles any errors that may occur during the process, including implementing retry mechanisms for certain types of failures.
+
+This approach allows the application to offload time-consuming payment processing tasks to background workers, improving the overall responsiveness of the system.
+
+## Key Files
+
+### AdyenCreateJob
+This job is responsible for creating payments using the Adyen payment provider. It includes a retry mechanism for handling connection failures, attempting up to 6 times with a polynomial backoff strategy.
+
+Key features:
+- Runs in the 'providers' queue
+- Ensures job uniqueness to prevent duplicate payment creations
+- Uses `PaymentRequests::Payments::AdyenService` to perform the actual payment creation
+- Implements retry logic for `Faraday::ConnectionFailed` errors
+
+### GocardlessCreateJob
+This job handles payment creation for the GoCardless payment provider. It's simpler than the Adyen job but follows a similar pattern.
+
+Key features:
+- Runs in the 'providers' queue
+- Ensures job uniqueness
+- Uses `PaymentRequests::Payments::GocardlessService` for payment creation
+- Raises an error if the payment creation fails
+
+### StripeCreateJob
+This job is designed to create payments using the Stripe payment provider. It includes specific error handling and retry logic for Stripe-related errors.
+
+Key features:
+- Runs in the 'providers' queue
+- Ensures job uniqueness, logging conflicts if they occur
+- Uses `PaymentRequests::Payments::StripeService` for payment creation
+- Implements retry logic for `Stripe::RateLimitError` and `Stripe::APIConnectionError`, with up to 6 attempts and polynomial backoff
+
+## Dependencies
+These jobs rely on several external libraries and frameworks:
+
+1. ActiveJob: Provides the base functionality for background job processing. All jobs inherit from `ApplicationJob`, which is likely an extension of `ActiveJob::Base`.
+
+2. Sidekiq: Inferred as the backend for ActiveJob, used for job queuing and processing.
+
+3. SidekiqUniqueJobs: Used to ensure job uniqueness, preventing duplicate job executions.
+
+4. Stripe: The StripeCreateJob specifically handles Stripe-related errors, indicating a dependency on the Stripe library.
+
+5. Faraday: The AdyenCreateJob handles `Faraday::ConnectionFailed` errors, suggesting that Faraday is used for HTTP communications, likely in the AdyenService.
+
+Each job also depends on its corresponding service class (AdyenService, GocardlessService, StripeService) which are not defined in this directory but are crucial for the actual payment creation process.
+
+## Configuration
+While there are no explicit configuration files in this directory, the jobs are configured through their class definitions:
+
+1. Queue Configuration: All jobs are set to run in the 'providers' queue. This can be changed by modifying the `queue_as :providers` line in each job class.
+
+2. Uniqueness: All jobs use the `unique` method to ensure they are only executed once. This behavior can be adjusted by modifying the `unique` method call or its options.
+
+3. Retry Configuration: 
+   - AdyenCreateJob and StripeCreateJob have specific retry configurations for certain errors. 
+   - They both use a polynomial backoff strategy with up to 6 attempts. 
+   - This can be adjusted by modifying the `retry_on` method calls in these job classes.
+
+4. Error Handling: Each job class has its own error handling approach. This can be modified within the `perform` method of each job or by adjusting the `retry_on` configurations.
+
+These jobs play a crucial role in the payment processing workflow of the application, providing a robust and scalable way to handle payments across multiple providers. They are designed to be resilient to common issues like network failures and API rate limits, ensuring that payment creation attempts have a high chance of success even in non-ideal conditions.

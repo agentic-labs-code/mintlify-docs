@@ -1,0 +1,90 @@
+---
+title: "unique_count_service.rb"
+---
+
+## High-level description
+This code defines the `UniqueCountService` class within the `BillableMetrics::Aggregations` module. It is responsible for computing aggregations for unique count metrics in a billing system. The service handles various scenarios including pay-in-advance, current usage, and grouped aggregations.
+
+## Code Structure
+The `UniqueCountService` inherits from `BillableMetrics::Aggregations::BaseService` and implements methods for computing aggregations, handling grouped-by aggregations, and calculating pay-in-advance aggregations. It interacts with an event store to retrieve and process event data.
+
+## Symbols
+
+### `UniqueCountService`
+#### Description
+This class provides methods to compute aggregations for unique count metrics.
+
+#### Internal Logic
+- Initializes with event store configuration and sets aggregation property.
+- Computes aggregations for regular and grouped-by scenarios.
+- Handles pay-in-advance and current usage calculations.
+- Calculates running totals based on free units.
+
+### `compute_aggregation`
+#### Description
+Computes the aggregation for the unique count metric.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| options | Hash | Configuration options for the aggregation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | Object containing aggregation results |
+
+#### Internal Logic
+- Retrieves unique count from event store.
+- Handles pay-in-advance and current usage scenarios.
+- Calculates pay-in-advance aggregation and running total.
+
+### `compute_grouped_by_aggregation`
+#### Description
+Computes aggregations grouped by specific attributes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| options | Hash | Configuration options for the aggregation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | Object containing grouped aggregation results |
+
+#### Internal Logic
+- Retrieves grouped unique counts from event store.
+- Processes each group and applies relevant calculations.
+- Handles pay-in-advance and current usage scenarios for each group.
+
+### `compute_pay_in_advance_aggregation`
+#### Description
+Calculates the pay-in-advance aggregation for the unique count metric.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| aggregation | Integer | The calculated pay-in-advance aggregation |
+
+#### Internal Logic
+- Determines if a new unique property is being added or removed.
+- Retrieves and updates cached aggregation data.
+- Calculates the new aggregation based on previous data and current event.
+
+## Side Effects
+- Modifies the `result` object to store aggregation data.
+- Updates cached aggregation data for pay-in-advance scenarios.
+
+## Dependencies
+- Relies on an event store (e.g., PostgresStore or ClickhouseStore) for retrieving event data.
+- Interacts with `CachedAggregation` model for pay-in-advance calculations.
+
+## Error Handling
+The code doesn't implement explicit error handling, relying on inherited error handling mechanisms.
+
+## Performance Considerations
+- Uses database queries to retrieve event data, which may impact performance for large datasets.
+- Caches aggregation data for pay-in-advance scenarios to improve performance in subsequent calculations.
+
+This service is crucial for calculating unique count metrics in the billing system, handling various scenarios including grouped aggregations and pay-in-advance calculations. It interacts closely with the event store and caching mechanisms to provide accurate and efficient aggregations.

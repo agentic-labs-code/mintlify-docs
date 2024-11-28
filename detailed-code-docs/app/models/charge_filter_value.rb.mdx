@@ -1,0 +1,44 @@
+---
+title: "charge_filter_value.rb"
+---
+
+## High-level description
+The `ChargeFilterValue` model represents a specific value or a set of values for a given filter applied to a charge. It ensures that the selected values are valid against the allowed values defined in the `BillableMetricFilter`.
+
+## Code Structure
+The `ChargeFilterValue` model belongs to both `ChargeFilter` and `BillableMetricFilter`. It validates the presence and inclusion of `values` within the allowed values of the associated `BillableMetricFilter`.
+
+## References
+- `ChargeFilter`: Represents a filter applied to a charge.
+- `BillableMetricFilter`: Defines the available filter values for a specific billable metric.
+
+## Symbols
+
+### `ChargeFilterValue`
+#### Description
+This class represents a value or a set of values for a specific filter applied to a charge. It ensures data integrity by validating the selected values against the allowed values defined in the `BillableMetricFilter`.
+
+#### Inputs
+This class doesn't define any specific input parameters.
+
+#### Outputs
+This class doesn't define any specific output parameters.
+
+#### Internal Logic
+- `ALL_FILTER_VALUES`: A constant representing a special case where all values are allowed for the filter.
+- `validate_values`: A private method that validates the `values` attribute. It checks if:
+    - The `values` array is not empty.
+    - If it contains only one element and that element is `ALL_FILTER_VALUES`.
+    - If all the elements in the `values` array are present in the allowed `values` of the associated `BillableMetricFilter`.
+    - If any of the above conditions are not met, it adds an error to the `values` attribute.
+
+## Side Effects
+This class doesn't have any notable side effects.
+
+## Dependencies
+- `ActiveRecord::Base`: Provides the ORM framework for database interactions.
+- `PaperTrailTraceable`: Includes the `PaperTrail` gem for model versioning.
+- `Discard::Model`: Includes the `Discard` gem for soft deleting records.
+
+## Error Handling
+The `validate_values` method adds an error to the `values` attribute if the validation fails. This prevents invalid data from being persisted to the database.

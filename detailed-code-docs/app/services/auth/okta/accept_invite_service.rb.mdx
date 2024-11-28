@@ -1,0 +1,62 @@
+---
+title: "accept_invite_service.rb"
+---
+
+## High-level description
+This code defines the `AcceptInviteService` class within the `Auth::Okta` module. It handles the process of accepting an invitation using Okta OAuth authentication. The service validates the invite, checks Okta integration, and performs necessary authentication steps before accepting the invite.
+
+## Code Structure
+The `AcceptInviteService` class inherits from `BaseService` and contains a single public method `call` that orchestrates the invite acceptance process. It uses several private methods from the `BaseService` class to perform various checks and API calls.
+
+## References
+- `Invites::AcceptService`
+- `LagoHttpClient::HttpError`
+
+## Symbols
+
+### `Auth::Okta::AcceptInviteService`
+#### Description
+This service class handles the process of accepting an invitation using Okta OAuth authentication.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invite_token | String | Token associated with the invitation |
+| code | String | Authorization code from Okta OAuth flow |
+| state | String | State parameter from Okta OAuth flow |
+
+#### Outputs
+The method returns the result of `Invites::AcceptService.new.call` or a `result` object with validation failures.
+
+#### Internal Logic
+1. Checks the state parameter
+2. Verifies Okta integration for the user's email domain
+3. Validates the invitation
+4. Queries Okta for an access token
+5. Verifies user information from Okta
+6. Calls `Invites::AcceptService` to accept the invitation
+7. Handles errors and returns appropriate validation failures
+
+## Side Effects
+- Modifies the `result` object with various attributes during the process
+- Deletes the state from Rails cache
+- Creates a new user account and accepts the invitation if successful
+
+## Error Handling
+The service uses a `rescue` block to catch `ValidationError` and `LagoHttpClient::HttpError` exceptions. It sets validation failures on the `result` object for these errors.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| SecureRandom | Generates a random password for the new user account |
+| Invites::AcceptService | Handles the final step of accepting the invitation |
+
+### Configuration
+The service relies on configuration from the Okta integration settings, which are stored in the database.
+
+## API/Interface Reference
+This service is likely called by the `Mutations::Auth::Okta::AcceptInvite` GraphQL mutation, as seen in the related code snippets.
+
+| Method | Inputs | Outputs | Description |
+|:-------|:-------|:--------|:------------|
+| call | None (uses initialized attributes) | Result of invite acceptance or validation failure | Processes the Okta OAuth invite acceptance flow |

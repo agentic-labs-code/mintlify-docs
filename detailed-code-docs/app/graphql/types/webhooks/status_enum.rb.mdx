@@ -1,0 +1,45 @@
+---
+title: "status_enum.rb"
+---
+
+## High-level description
+This code defines a GraphQL enum type `StatusEnum` for webhook statuses within the `Types::Webhooks` module. It dynamically generates enum values based on the `STATUS` constant defined in the `Webhook` model, ensuring consistency between the GraphQL schema and the application's data model.
+
+## Code Structure
+The `StatusEnum` class is nested within the `Types::Webhooks` module and inherits from `Types::BaseEnum`. It uses the `graphql_name` method to set a custom name for the GraphQL type and dynamically generates enum values using the `Webhook::STATUS` constant.
+
+## References
+- `Types::BaseEnum`: The base class for GraphQL enum types in the application.
+- `Webhook::STATUS`: A constant defined in the `Webhook` model that contains the possible status values.
+
+## Symbols
+
+### `Types::Webhooks::StatusEnum`
+#### Description
+This class defines a GraphQL enum type for webhook statuses. It dynamically generates enum values based on the `Webhook::STATUS` constant, ensuring that the GraphQL schema always reflects the current set of valid webhook statuses defined in the application.
+
+#### Internal Logic
+The class uses a loop to iterate over each status type defined in `Webhook::STATUS` and creates a corresponding GraphQL enum value using the `value` method. This approach ensures that any changes to the `STATUS` constant in the `Webhook` model are automatically reflected in the GraphQL schema without requiring manual updates to this enum type.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| GraphQL | The GraphQL library used to define the schema types |
+
+## Related Information
+From the related code snippets, we can see that:
+
+1. The `WebhooksResolver` in `app/graphql/resolvers/webhooks_resolver.rb` uses this enum type as an argument for filtering webhooks by status.
+
+2. The `Webhook` model in `app/models/webhook.rb` defines the `STATUS` constant as:
+   ```ruby
+   STATUS = %i[pending succeeded failed].freeze
+   ```
+   This constant is used to generate the enum values in the `StatusEnum` class.
+
+3. The `Types::Webhooks::Object` in `app/graphql/types/webhooks/object.rb` includes a field that uses this enum type:
+   ```ruby
+   field :status, Types::Webhooks::StatusEnum, null: false
+   ```
+
+This enum type plays a crucial role in maintaining consistency between the database model, the GraphQL schema, and the API responses for webhook statuses throughout the application.

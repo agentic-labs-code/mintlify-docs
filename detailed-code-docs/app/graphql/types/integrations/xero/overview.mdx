@@ -1,0 +1,65 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL input types for the Xero integration within the application. It defines the structure for creating and updating Xero integrations, specifying the required and optional fields for these operations.
+
+## What does it do?
+The code in this directory facilitates the creation and modification of Xero integrations through GraphQL mutations. It provides a structured way to input data when setting up a new Xero integration or updating an existing one. This allows the application to interact with Xero's API in a controlled manner, specifying which aspects of the integration should be active (such as syncing invoices, credit notes, or payments).
+
+## Key Files
+1. `create_input.rb`: Defines the `CreateXeroIntegrationInput` GraphQL input object type for creating a new Xero integration.
+2. `update_input.rb`: Defines the `UpdateXeroIntegrationInput` GraphQL input object type for updating an existing Xero integration.
+
+Both files play crucial roles in structuring the data input for Xero integration operations:
+
+### create_input.rb
+This file defines the required and optional fields for creating a new Xero integration:
+
+```ruby
+class CreateInput &lt; Types::BaseInputObject
+  argument :code, String, required: true
+  argument :name, String, required: true
+  argument :connection_id, String, required: true
+  argument :sync_credit_notes, Boolean, required: false
+  argument :sync_invoices, Boolean, required: false
+  argument :sync_payments, Boolean, required: false
+end
+```
+
+### update_input.rb
+This file defines the fields that can be updated for an existing Xero integration:
+
+```ruby
+class UpdateInput &lt; Types::BaseInputObject
+  argument :id, ID, required: false
+  argument :code, String, required: false
+  argument :name, String, required: false
+  argument :connection_id, String, required: false
+  argument :sync_credit_notes, Boolean, required: false
+  argument :sync_invoices, Boolean, required: false
+  argument :sync_payments, Boolean, required: false
+end
+```
+
+The main difference between the two is that the `create_input.rb` has some required fields (code, name, and connection_id), while in `update_input.rb`, all fields are optional, allowing for partial updates.
+
+## Dependencies
+Both files depend on the GraphQL gem, specifically utilizing the `Types::BaseInputObject` as the parent class for defining GraphQL input object types. This suggests that the application is using GraphQL for its API, which provides a flexible and efficient way to query and mutate data.
+
+The use of GraphQL allows for precise control over what data is sent and received, reducing over-fetching and under-fetching of data that can occur with traditional REST APIs.
+
+## Configuration
+While there are no explicit configuration files in this directory, the structure of the input types implies certain configuration choices for the Xero integration:
+
+1. The integration is identified by a `code` and a `name`.
+2. It's associated with a `connection_id`, likely referring to the connection with the Xero API.
+3. There are three synchronization options that can be toggled:
+   - `sync_credit_notes`
+   - `sync_invoices`
+   - `sync_payments`
+
+These fields suggest that the application allows fine-grained control over what data is synchronized between the application and Xero, which can be important for performance and data management purposes.
+
+In conclusion, this directory provides the GraphQL input type definitions necessary for creating and updating Xero integrations within the application. It structures the data input in a way that allows for flexible and precise control over the integration's properties and synchronization settings.

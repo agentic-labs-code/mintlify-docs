@@ -1,0 +1,51 @@
+---
+title: "prepaid_credit_job.rb"
+---
+
+## High-level description
+This code defines a background job `PrepaidCreditJob` within the `Invoices` module. Its primary purpose is to process prepaid credits for an invoice, applying the paid credits to the wallet and finalizing the open credit invoice.
+
+## Code Structure
+The `PrepaidCreditJob` class inherits from `ApplicationJob` and contains a single `perform` method. It interacts with two service classes: `Wallets::ApplyPaidCreditsService` and `Invoices::FinalizeOpenCreditService`.
+
+## Symbols
+
+### `Invoices::PrepaidCreditJob`
+#### Description
+This job is responsible for processing prepaid credits associated with an invoice. It applies the paid credits to the wallet and finalizes the open credit invoice.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice object to be processed |
+
+#### Internal Logic
+1. Finds the wallet transaction associated with the invoice's credit fee.
+2. Calls the `Wallets::ApplyPaidCreditsService` to apply the paid credits to the wallet.
+3. Calls the `Invoices::FinalizeOpenCreditService` to finalize the open credit invoice.
+
+#### Performance Considerations
+The job is queued as 'wallets' and uses the `unique` method to ensure it's only executed once, logging conflicts if they occur.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ApplicationJob | Base job class that this job inherits from |
+| Wallets::ApplyPaidCreditsService | Service to apply paid credits to the wallet |
+| Invoices::FinalizeOpenCreditService | Service to finalize the open credit invoice |
+
+## References
+- `Invoices::UpdateService`: This service calls `Invoices::PrepaidCreditJob.perform_later(invoice)` when handling prepaid credits for a succeeded payment status.
+- `Wallets::ApplyPaidCreditsService`: This service is called within the `perform` method to apply paid credits to the wallet.
+- `Invoices::FinalizeOpenCreditService`: This service is called within the `perform` method to finalize the open credit invoice.
+
+## Side Effects
+- Modifies the wallet balance by applying paid credits.
+- Updates the invoice status to finalized.
+- May trigger webhook notifications, email notifications, and integration jobs as part of the finalization process.
+
+## Error Handling
+The job doesn't implement explicit error handling. It relies on the error handling mechanisms of the called services and the default behavior of `ApplicationJob`.
+
+## Logging
+The job uses the `unique` method with `on_conflict: :log`, which will log conflicts if the job is attempted to be executed more than once.

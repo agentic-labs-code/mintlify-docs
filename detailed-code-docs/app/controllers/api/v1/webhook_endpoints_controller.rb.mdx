@@ -1,0 +1,136 @@
+---
+title: "webhook_endpoints_controller.rb"
+---
+
+## High-level description
+This code defines the `WebhookEndpointsController` within the `Api::V1` namespace, which handles CRUD operations for webhook endpoints. It provides endpoints for creating, updating, listing, showing, and destroying webhook endpoints for a given organization.
+
+## Code Structure
+The controller inherits from `Api::BaseController` and defines five main actions: `create`, `update`, `index`, `show`, and `destroy`. Each action interacts with corresponding service objects or directly with the database to perform the requested operations on webhook endpoints.
+
+## References
+- `::WebhookEndpoints::CreateService`
+- `::WebhookEndpoints::UpdateService`
+- `::WebhookEndpoints::DestroyService`
+- `::CollectionSerializer`
+- `::V1::WebhookEndpointSerializer`
+
+## Symbols
+
+### `create`
+#### Description
+Creates a new webhook endpoint for the current organization using the `WebhookEndpoints::CreateService`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| create_params | Hash | Parameters for creating a webhook endpoint |
+
+#### Internal Logic
+1. Initializes a `CreateService` with the current organization and create parameters.
+2. Calls the service and checks the result.
+3. If successful, renders the created webhook endpoint.
+4. If unsuccessful, renders an error response.
+
+### `update`
+#### Description
+Updates an existing webhook endpoint for the current organization using the `WebhookEndpoints::UpdateService`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:id] | String | ID of the webhook endpoint to update |
+| update_params | Hash | Parameters for updating the webhook endpoint |
+
+#### Internal Logic
+1. Initializes an `UpdateService` with the webhook endpoint ID, current organization, and update parameters.
+2. Calls the service and checks the result.
+3. If successful, renders the updated webhook endpoint.
+4. If unsuccessful, renders an error response.
+
+### `index`
+#### Description
+Lists webhook endpoints for the current organization with pagination support.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:page] | Integer | Page number for pagination |
+| params[:per_page] | Integer | Number of items per page (default: PER_PAGE) |
+
+#### Internal Logic
+1. Retrieves paginated webhook endpoints for the current organization.
+2. Renders the collection using `CollectionSerializer` with `V1::WebhookEndpointSerializer`.
+
+### `show`
+#### Description
+Displays a specific webhook endpoint for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:id] | String | ID of the webhook endpoint to show |
+
+#### Internal Logic
+1. Finds the webhook endpoint by ID for the current organization.
+2. If found, renders the webhook endpoint.
+3. If not found, renders a not found error.
+
+### `destroy`
+#### Description
+Deletes a specific webhook endpoint for the current organization using the `WebhookEndpoints::DestroyService`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:id] | String | ID of the webhook endpoint to destroy |
+
+#### Internal Logic
+1. Finds the webhook endpoint by ID for the current organization.
+2. Calls the `DestroyService` with the found webhook endpoint.
+3. If successful, renders the destroyed webhook endpoint.
+4. If unsuccessful, renders an error response.
+
+### `create_params`
+#### Description
+Permits and requires specific parameters for creating a webhook endpoint.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| permitted_params | ActionController::Parameters | Permitted parameters for creating a webhook endpoint |
+
+### `update_params`
+#### Description
+Permits and requires specific parameters for updating a webhook endpoint.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| permitted_params | ActionController::Parameters | Permitted parameters for updating a webhook endpoint |
+
+### `render_webhook_endpoint`
+#### Description
+Renders a webhook endpoint using the `V1::WebhookEndpointSerializer`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_endpoint | WebhookEndpoint | The webhook endpoint to render |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| WebhookEndpoints::CreateService | Handles the creation of webhook endpoints |
+| WebhookEndpoints::UpdateService | Handles the updating of webhook endpoints |
+| WebhookEndpoints::DestroyService | Handles the deletion of webhook endpoints |
+| CollectionSerializer | Serializes collections of webhook endpoints |
+| V1::WebhookEndpointSerializer | Serializes individual webhook endpoints |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| PER_PAGE | Integer | Not specified in the provided code | Default number of items per page for pagination |
+
+## Error Handling
+The controller uses `render_error_response` method to handle and render errors from service objects. It also uses `not_found_error` method to handle cases where a webhook endpoint is not found.

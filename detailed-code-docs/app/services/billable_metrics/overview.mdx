@@ -1,0 +1,52 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `app/services/billable_metrics` directory contains services responsible for managing billable metrics within a billing system. These services handle various aspects of billable metrics, including creation, updating, destruction, aggregation, and breakdown calculations. The directory includes specialized services for different types of aggregations and prorated calculations, as well as factories for creating appropriate aggregation instances.
+
+## What does it do?
+This directory provides a set of services that collectively manage the lifecycle and calculations of billable metrics:
+
+1. Creation and Management:
+   - `CreateService`: Creates new billable metrics with associated filters.
+   - `UpdateService`: Updates existing billable metrics, handling various scenarios and filter updates.
+   - `DestroyService`: Deletes billable metrics and associated data, including charges and filters.
+
+2. Aggregation and Calculation:
+   - `AggregationFactory`: Creates appropriate aggregation service instances based on metric type and parameters.
+   - Various aggregation services (e.g., CountService, SumService, UniqueCountService) calculate different types of metrics.
+   - Prorated aggregation services handle partial billing periods and pay-in-advance scenarios.
+
+3. Breakdown Calculations:
+   - Services like `SumService` and `UniqueCountService` in the `breakdown` subdirectory provide detailed breakdowns of metric usage over time.
+
+These services work together to provide a flexible and powerful system for managing and calculating billable metrics, supporting various billing scenarios and metric types.
+
+## Key Files
+1. `aggregation_factory.rb`: Creates appropriate aggregation service instances based on metric type and parameters.
+2. `create_service.rb`: Handles the creation of new billable metrics.
+3. `update_service.rb`: Manages updates to existing billable metrics.
+4. `destroy_service.rb`: Handles the deletion of billable metrics and associated data.
+5. `aggregations/` directory: Contains various aggregation services for different metric types.
+6. `prorated_aggregations/` directory: Includes services for calculating prorated aggregations.
+7. `breakdown/` directory: Contains services for generating detailed breakdowns of metric usage.
+
+## Dependencies
+The services in this directory rely on several key dependencies:
+
+1. Database models: `BillableMetric`, `BillableMetricFilter`, `Charge`, etc.
+2. Event stores: `Events::Stores::PostgresStore` and `Events::Stores::ClickhouseStore` for data retrieval.
+3. External libraries: `ActiveRecord` for database interactions, `BigDecimal` for precise calculations.
+4. Internal services: `BillableMetricFilters::CreateOrUpdateBatchService`, `Subscriptions::DatesService`, etc.
+5. Background jobs: `SegmentTrackJob` for analytics tracking, `BillableMetrics::DeleteEventsJob` for asynchronous event deletion.
+
+## Configuration
+The services are configured through various parameters passed during initialization or method calls. Key configuration points include:
+
+1. Event store selection: Determined by environment variables (e.g., `LAGO_CLICKHOUSE_ENABLED`) and organization settings.
+2. Aggregation type: Specified in the billable metric model and used to determine the appropriate aggregation service.
+3. Time boundaries: Used in aggregation and breakdown calculations to define the relevant time period.
+4. Filters: Applied to events during aggregation calculations.
+
+These services form the core of the billable metrics system, providing flexible and powerful capabilities for managing and calculating various types of usage-based billing metrics. They handle complex scenarios such as prorated billing, pay-in-advance calculations, and custom aggregations, making them suitable for a wide range of billing needs in a SaaS or usage-based pricing model.

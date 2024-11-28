@@ -1,0 +1,103 @@
+---
+title: "customer_usage_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Invoices::CustomerUsageService` class. It tests various scenarios related to customer usage calculation, including caching, invoice initialization, and handling different subscription types and edge cases.
+
+## Code Structure
+The test suite is organized around the `#call` method of the `Invoices::CustomerUsageService` class. It sets up various test scenarios using let statements and describes different contexts for the service's behavior.
+
+## Symbols
+
+### `RSpec.describe Invoices::CustomerUsageService`
+#### Description
+This is the main describe block for the `Invoices::CustomerUsageService` test suite. It sets up the subject and various test data using `let` statements.
+
+#### Internal Logic
+- Sets up test data including membership, organization, customer, subscription, plan, billable metric, charge, and events.
+- Defines the subject as an instance of `Invoices::CustomerUsageService` with specific parameters.
+
+### `describe '#call'`
+#### Description
+This describe block focuses on testing the `#call` method of the `Invoices::CustomerUsageService`.
+
+#### Internal Logic
+- Sets up necessary data before each test using a `before` block.
+- Tests various scenarios including caching, invoice initialization, and different subscription types.
+
+#### Performance Considerations
+The tests use caching, which is an important performance aspect of the service being tested.
+
+### Test: "uses the Rails cache"
+#### Description
+Verifies that the service uses Rails cache for storing charge usage data.
+
+#### Internal Logic
+- Constructs a cache key based on charge, subscription, and timestamp.
+- Checks if the cache key exists after calling the service.
+
+### Test: "initializes an invoice"
+#### Description
+Ensures that the service correctly initializes an invoice with the expected attributes.
+
+#### Internal Logic
+- Calls the service and checks the result for success.
+- Verifies various attributes of the resulting usage object, including dates, currency, and amounts.
+
+### Context: "with subscription started in current billing period"
+#### Description
+Tests the service's behavior when a subscription starts in the current billing period.
+
+#### Internal Logic
+- Updates the subscription's start date to the current day.
+- Verifies that the invoice's from date matches the subscription start date.
+
+### Context: "when subscription is billed on anniversary date"
+#### Description
+Tests the service's behavior for subscriptions billed on their anniversary date.
+
+#### Internal Logic
+- Sets up specific dates for the current date and subscription start.
+- Verifies that the invoice dates and amounts are calculated correctly based on the anniversary billing.
+
+### Context: "when customer is not found"
+#### Description
+Tests the service's error handling when an invalid customer ID is provided.
+
+#### Internal Logic
+- Sets an invalid customer ID.
+- Verifies that the service returns an error with the correct error code.
+
+### Context: "when no_active_subscription"
+#### Description
+Tests the service's behavior when there is no active subscription.
+
+#### Internal Logic
+- Sets the subscription to nil.
+- Verifies that the service fails with the correct error type and code.
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides the necessary setup for Rails-specific testing |
+| RSpec | The testing framework used |
+| FactoryBot | Used for creating test data |
+
+## Configuration
+The test suite uses the following RSpec configuration:
+| Option | Value | Description |
+|:-------|:------|:------------|
+| type | :service | Specifies that this is a service test |
+| cache | :memory | Uses in-memory caching for tests |
+
+## Error Handling
+The tests cover various error scenarios, including:
+- Customer not found
+- No active subscription
+
+These are handled by checking the service result for success and verifying the error codes and types.
+
+## Logging
+No specific logging mechanisms are implemented in this test file.

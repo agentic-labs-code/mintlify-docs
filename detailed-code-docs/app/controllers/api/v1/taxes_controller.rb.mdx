@@ -1,0 +1,140 @@
+---
+title: "taxes_controller.rb"
+---
+
+## High-level description
+This code defines the `TaxesController` within the `Api::V1` namespace, which handles CRUD operations for tax-related actions in an API. It provides endpoints for creating, updating, deleting, showing, and listing taxes for an organization, utilizing various service objects for business logic and serializers for response formatting.
+
+## Code Structure
+The `TaxesController` inherits from `Api::BaseController` and defines five main actions: `create`, `update`, `destroy`, `show`, and `index`. Each action interacts with corresponding service objects (`Taxes::CreateService`, `Taxes::UpdateService`, `Taxes::DestroyService`) to perform operations on tax records. The controller also uses `V1::TaxSerializer` and `CollectionSerializer` for formatting responses.
+
+## References
+- `Api::BaseController`
+- `Taxes::CreateService`
+- `Taxes::UpdateService`
+- `Taxes::DestroyService`
+- `V1::TaxSerializer`
+- `CollectionSerializer`
+
+## Symbols
+
+### `TaxesController`
+#### Description
+This controller handles API requests related to taxes for an organization. It provides endpoints for CRUD operations on tax records.
+
+#### Internal Logic
+- Uses `current_organization` to scope operations to the authenticated organization.
+- Utilizes service objects for create, update, and destroy operations.
+- Renders responses using serializers.
+- Implements pagination for the index action.
+
+### `create`
+#### Description
+Creates a new tax record for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| input_params | Hash | Tax parameters (code, description, name, rate, applied_to_organization) |
+
+#### Internal Logic
+1. Calls `Taxes::CreateService` with the current organization and input parameters.
+2. Renders the created tax if successful, or an error response if not.
+
+### `update`
+#### Description
+Updates an existing tax record for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | The code of the tax to update |
+| input_params | Hash | Tax parameters to update |
+
+#### Internal Logic
+1. Finds the tax by code for the current organization.
+2. Calls `Taxes::UpdateService` with the found tax and input parameters.
+3. Renders the updated tax if successful, or an error response if not.
+
+### `destroy`
+#### Description
+Deletes an existing tax record for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | The code of the tax to delete |
+
+#### Internal Logic
+1. Finds the tax by code for the current organization.
+2. Calls `Taxes::DestroyService` with the found tax.
+3. Renders the deleted tax if successful, or an error response if not.
+
+### `show`
+#### Description
+Retrieves and displays a single tax record for the current organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | The code of the tax to show |
+
+#### Internal Logic
+1. Finds the tax by code for the current organization.
+2. Renders a not found error if the tax doesn't exist.
+3. Renders the tax using the serializer if found.
+
+### `index`
+#### Description
+Lists all tax records for the current organization with pagination.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| page | Integer | The page number for pagination |
+| per_page | Integer | The number of items per page |
+
+#### Internal Logic
+1. Retrieves taxes for the current organization, ordered by creation date.
+2. Applies pagination using `page` and `per_page` parameters.
+3. Renders the collection of taxes using `CollectionSerializer` with pagination metadata.
+
+### `input_params` (private)
+#### Description
+Defines and permits the allowed parameters for tax operations.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| permitted_params | ActionController::Parameters | Permitted tax parameters |
+
+### `render_tax` (private)
+#### Description
+Renders a single tax object using the `V1::TaxSerializer`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tax | Tax | The tax object to render |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Api::BaseController | Parent controller providing authentication and common functionality |
+| Taxes::CreateService | Service object for creating taxes |
+| Taxes::UpdateService | Service object for updating taxes |
+| Taxes::DestroyService | Service object for destroying taxes |
+| V1::TaxSerializer | Serializer for formatting tax objects in responses |
+| CollectionSerializer | Serializer for formatting collections of objects in responses |
+
+## Error Handling
+The controller uses `render_error_response` method (likely defined in a parent controller) to handle and render errors from service objects. It also implements a specific not found error handling in the `show` action.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /api/v1/taxes | POST | Tax parameters | Created tax | Creates a new tax |
+| /api/v1/taxes/:code | PUT | Tax parameters | Updated tax | Updates an existing tax |
+| /api/v1/taxes/:code | DELETE | - | Deleted tax | Deletes an existing tax |
+| /api/v1/taxes/:code | GET | - | Tax details | Retrieves a single tax |
+| /api/v1/taxes | GET | page, per_page | List of taxes | Lists all taxes with pagination |

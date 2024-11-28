@@ -1,0 +1,74 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL resolvers for a Ruby on Rails application. These resolvers handle various queries related to different entities such as add-ons, analytics, authentication, billable metrics, customers, invoices, organizations, plans, subscriptions, taxes, wallets, and webhooks. They form the backbone of the GraphQL API, providing data retrieval and filtering capabilities for the application.
+
+## What does it do?
+The resolvers in this directory perform the following key functions:
+
+1. Authentication and Authorization: Many resolvers include modules for authenticating users and ensuring they have the necessary permissions to access specific data.
+
+2. Data Retrieval: Each resolver is responsible for fetching data for a specific entity or set of entities from the database, often using dedicated query objects or ActiveRecord relations.
+
+3. Filtering and Pagination: Many resolvers support filtering of results based on various criteria and implement pagination to manage large datasets efficiently.
+
+4. Error Handling: The resolvers include error handling for scenarios such as record not found, unauthorized access, or invalid input.
+
+5. Integration with GraphQL Types: Each resolver specifies the GraphQL type it returns, ensuring proper data structure in the API responses.
+
+## Entry points
+The main entry point for these resolvers is likely the `QueryType` defined elsewhere in the application. Each resolver corresponds to a field in the `QueryType`, allowing clients to query specific data. For example:
+
+- `AddOnResolver` and `AddOnsResolver` handle queries for individual add-ons and collections of add-ons.
+- `CustomerResolver` and `CustomersResolver` manage queries related to customer data.
+- `InvoiceResolver` and `InvoicesResolver` handle invoice-related queries.
+- `OrganizationResolver` provides access to the current organization's data.
+
+## Key Files
+1. `base_resolver.rb`: Defines the `BaseResolver` class that other resolvers inherit from, providing common functionality.
+
+2. `analytics/` directory: Contains resolvers for analytics-related queries, such as invoice collections and overdue balances.
+
+3. `auth/google/auth_url_resolver.rb`: Handles authentication URL generation for Google OAuth.
+
+4. `customers/` directory: Includes resolvers for customer-specific data like invoices, subscriptions, and usage.
+
+5. `integrations/` directory: Contains resolvers for integration-related queries, such as collection mappings and items.
+
+6. `invoice_resolver.rb` and `invoices_resolver.rb`: Handle queries for individual invoices and collections of invoices.
+
+7. `subscription_resolver.rb` and `subscriptions_resolver.rb`: Manage queries related to subscriptions.
+
+8. `wallet_resolver.rb` and `wallets_resolver.rb`: Handle queries for wallet-related data.
+
+9. `webhook_endpoint_resolver.rb` and `webhook_endpoints_resolver.rb`: Manage queries for webhook endpoints.
+
+## Dependencies
+The resolvers in this directory rely on several shared dependencies:
+
+1. GraphQL: The core library used for defining and implementing the GraphQL API.
+
+2. ActiveRecord: Used for database interactions and querying.
+
+3. Custom modules:
+   - `AuthenticableApiUser`: Provides authentication functionality.
+   - `RequiredOrganization`: Ensures the presence of a valid organization context.
+
+4. Custom query objects: Many resolvers use dedicated query objects (e.g., `InvoicesQuery`, `CustomersQuery`) to handle complex data retrieval and filtering logic.
+
+5. GraphQL types: Each resolver references specific GraphQL types (e.g., `Types::Invoices::Object`, `Types::Customers::Object`) to define the structure of returned data.
+
+## Configuration
+While there's no explicit configuration file for the resolvers, they often include configurable elements:
+
+1. Permissions: Many resolvers define a `REQUIRED_PERMISSION` constant, specifying the permission needed to access the data.
+
+2. Pagination: Most collection resolvers support `limit` and `page` arguments for pagination.
+
+3. Filtering: Many resolvers accept various filter arguments (e.g., `status`, `search_term`) to refine query results.
+
+4. Error messages: Resolvers often include custom error messages for different scenarios, which could be considered a form of configuration.
+
+These resolvers form a crucial part of the application's GraphQL API, providing a flexible and powerful interface for clients to query and retrieve data across various domains of the application.

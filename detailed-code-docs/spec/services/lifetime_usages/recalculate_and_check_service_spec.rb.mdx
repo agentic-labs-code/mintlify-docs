@@ -1,0 +1,85 @@
+---
+title: "recalculate_and_check_service_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `LifetimeUsages::RecalculateAndCheckService` service. It focuses on testing the service's functionality related to recalculating usage, checking usage thresholds, sending webhooks, and creating invoices based on usage thresholds.
+
+## Code Structure
+The test file is organized into several contexts, each testing different scenarios of usage threshold handling. The main symbols are the `described_class` (RecalculateAndCheckService) and various factory-created objects like `lifetime_usage`, `subscription`, `billable_metric`, `charge`, and `usage_threshold`.
+
+## Symbols
+
+### `LifetimeUsages::RecalculateAndCheckService`
+#### Description
+This is the main service being tested. It recalculates usage and checks for threshold breaches.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lifetime_usage | LifetimeUsage | The lifetime usage object to be recalculated and checked |
+
+#### Internal Logic
+The service recalculates current and invoiced usage, checks for threshold breaches, sends webhooks, and creates invoices as needed.
+
+### `create_thresholds`
+#### Description
+A helper method to create usage thresholds for a subscription.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription | Subscription | The subscription to create thresholds for |
+| amounts | Array | List of threshold amounts |
+| recurring | Integer | Optional recurring threshold amount |
+
+## Test Contexts
+
+### "when we pass a threshold"
+#### Description
+Tests the behavior when a single usage threshold is passed.
+
+#### Internal Logic
+1. Sets up a usage threshold and events
+2. Checks if recalculation flags are cleared
+3. Verifies that a webhook is sent
+4. Ensures an invoice is created
+
+### "when we pass multiple thresholds"
+#### Description
+Tests the behavior when multiple usage thresholds are passed.
+
+#### Internal Logic
+1. Sets up multiple usage thresholds and events
+2. Checks if recalculation flags are cleared
+3. Verifies that webhooks are sent for each threshold
+4. Ensures an invoice is created
+
+### "when we pass a threshold with already progressive_billing invoices present"
+#### Description
+Tests the behavior when a threshold is passed with existing progressive billing invoices.
+
+#### Internal Logic
+1. Sets up thresholds, events, and existing progressive billing invoice
+2. Checks if recalculation flags are cleared
+3. Verifies that a webhook is sent for the last threshold
+4. Ensures an additional invoice is created
+
+### "when we pass no thresholds"
+#### Description
+Tests the behavior when no thresholds are passed.
+
+#### Internal Logic
+1. Sets up a high usage threshold and events
+2. Checks if recalculation flags are cleared
+3. Verifies that no webhook is sent
+4. Ensures no invoice is created
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| FactoryBot | Used for creating test objects |
+
+## Error Handling
+The test file doesn't explicitly test error handling scenarios. It focuses on the expected behavior of the service under different usage threshold conditions.

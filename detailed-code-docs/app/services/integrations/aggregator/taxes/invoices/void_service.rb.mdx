@@ -1,0 +1,73 @@
+---
+title: "void_service.rb"
+---
+
+## High-level description
+This code defines a `VoidService` class within the `Integrations::Aggregator::Taxes::Invoices` module. Its primary purpose is to void invoices through an integration, specifically for the Anrok integration. The service sends a POST request to void invoices and processes the response.
+
+## Code Structure
+The `VoidService` class inherits from `BaseService` and defines two main methods: `action_path` and `call`. The `call` method contains the core logic for voiding invoices, while `action_path` defines the API endpoint for the request.
+
+## References
+This code references the `BaseService` class, `LagoHttpClient::HttpError`, and potentially an `AnrokIntegration` class.
+
+## Symbols
+
+### `VoidService`
+#### Description
+A service class responsible for voiding invoices through an integration, specifically designed for the Anrok integration.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice to be voided (inferred from the payload method) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An instance of the Result class containing the operation outcome |
+
+#### Internal Logic
+1. Checks if the integration exists and is of type 'Integrations::AnrokIntegration'.
+2. Sends a POST request to void the invoice.
+3. Processes the void response.
+4. Handles any HTTP errors that may occur during the request.
+
+### `action_path`
+#### Description
+Defines the API endpoint for voiding invoices.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| path | String | The API endpoint path for voiding invoices |
+
+### `call`
+#### Description
+The main method that executes the void invoice operation.
+
+#### Internal Logic
+1. Validates the presence of the integration and its type.
+2. Sends a POST request with the invoice payload.
+3. Processes the response.
+4. Handles any HTTP errors, setting appropriate error codes and messages.
+
+### `payload`
+#### Description
+A private method that constructs the payload for the void invoice request.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payload | Array | An array containing a hash with the invoice ID |
+
+## Error Handling
+The service uses a `rescue` block to catch `LagoHttpClient::HttpError` exceptions. When an error occurs, it sets the error code and message on the result object using `result.service_failure!`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| LagoHttpClient | Used for making HTTP requests and handling HTTP errors |
+| JSON | Used for parsing the response body |
+
+This service is part of a larger system for handling invoice operations and integrations. It specifically targets the Anrok integration for voiding invoices, demonstrating a modular approach to managing different integration types within the application.

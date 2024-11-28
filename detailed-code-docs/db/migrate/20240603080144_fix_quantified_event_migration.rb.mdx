@@ -1,0 +1,52 @@
+---
+title: "20240603080144_fix_quantified_event_migration.rb"
+---
+
+## High-level description
+This migration file, `FixQuantifiedEventMigration`, is designed to correct or update the data related to quantified events in a billing system. It creates cached aggregations for specific quantified events based on a complex SQL query that joins multiple tables and applies certain conditions.
+
+## Code Structure
+The migration defines two nested classes, `QuantifiedEvent` and `CachedAggregation`, both inheriting from `ApplicationRecord`. The main logic is contained within the `change` method, which executes an SQL query and processes the results to create or update `CachedAggregation` records.
+
+## Symbols
+
+### `FixQuantifiedEventMigration`
+#### Description
+This is the main migration class that inherits from `ActiveRecord::Migration[7.0]`. It defines the migration logic to fix or update quantified event data.
+
+#### Internal Logic
+1. Defines an SQL query that joins multiple tables (`quantified_events`, `billable_metrics`, `charges`, `plans`, `subscriptions`) with specific conditions.
+2. Executes the SQL query using `QuantifiedEvent.find_by_sql(sql)`.
+3. Iterates through the results and creates or updates `CachedAggregation` records for each quantified event.
+
+### `QuantifiedEvent`
+#### Description
+A nested class representing the `quantified_events` table in the database. It inherits from `ApplicationRecord`.
+
+### `CachedAggregation`
+#### Description
+A nested class representing the `cached_aggregations` table in the database. It inherits from `ApplicationRecord`.
+
+### `change`
+#### Description
+The main method of the migration that performs the data update.
+
+#### Internal Logic
+1. Defines and executes a complex SQL query to retrieve relevant quantified events.
+2. For each retrieved quantified event:
+   - Finds or creates a `CachedAggregation` record with specific attributes.
+   - Sets the `current_aggregation` value based on the `total_aggregated_units` property of the quantified event.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Used for database operations and migrations |
+
+## Performance Considerations
+The migration performs a complex SQL query that joins multiple tables, which may be slow on large datasets. It also iterates through the results and performs database operations for each record, which could be time-consuming for a large number of records.
+
+## TODOs
+There are no explicit TODOs in the code, but it might be worth considering the following:
+1. Adding error handling for potential issues during the migration process.
+2. Considering batch processing for large datasets to improve performance and reduce memory usage.
+3. Adding logging to track the progress of the migration, especially for large datasets.

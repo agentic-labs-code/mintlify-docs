@@ -1,0 +1,61 @@
+---
+title: "charge_dispute_closed_service.rb"
+---
+
+## High-level description
+This code defines a service class `ChargeDisputeClosedService` within the `PaymentProviders::Webhooks::Stripe` module. It handles the processing of a Stripe charge dispute closed event, determining whether the dispute was lost and, if so, invoking a service to handle the lost dispute for the associated invoice.
+
+## Code Structure
+The `ChargeDisputeClosedService` class inherits from `BaseService` and contains a main `call` method along with two private helper methods: `event` and `payment_dispute_lost_at`.
+
+## Symbols
+
+### `ChargeDisputeClosedService`
+#### Description
+This service processes a Stripe charge dispute closed event. It retrieves the dispute status, reason, and associated payment, then handles the case where the dispute is lost by invoking the `Invoices::LoseDisputeService`.
+
+#### Inputs
+This service doesn't explicitly define input parameters, but it likely receives the event data through initialization or a instance variable.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result object from the BaseService, potentially modified with failure information |
+
+#### Internal Logic
+1. Extract status, reason, and provider_payment_id from the Stripe event object.
+2. Find the associated Payment record using the provider_payment_id.
+3. If the payment is not found, return a not_found_failure result.
+4. If the dispute status is 'lost', call the `Invoices::LoseDisputeService` with the payment's payable (invoice), dispute lost timestamp, and reason.
+5. Return the result object.
+
+### `event` (private method)
+#### Description
+This method parses the JSON representation of the Stripe event and constructs a Stripe::Event object.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @event | Stripe::Event | The constructed Stripe event object |
+
+### `payment_dispute_lost_at` (private method)
+#### Description
+This method calculates the timestamp when the payment dispute was lost.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (unnamed) | Time | The timestamp of when the dispute was lost, based on the event's creation time |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Stripe | Used to construct and work with Stripe event objects |
+| JSON | Used to parse the event JSON string |
+| Time | Used to create a timestamp from the event's creation time |
+
+## Error Handling
+The service uses the `result` object (likely from `BaseService`) to handle and communicate errors, such as when a payment is not found.
+
+## References
+This service is referenced in the `PaymentProviders::StripeService` class, specifically in the `handle_event` method when processing a 'charge.dispute.closed' event type.

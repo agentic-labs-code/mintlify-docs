@@ -1,0 +1,96 @@
+---
+title: "image_validator.rb"
+---
+
+## High-level description
+The `ImageValidator` class is a custom validator for ActiveRecord models in Ruby on Rails. It validates image attachments based on their size and content type, ensuring that uploaded images meet specified criteria for maximum file size and allowed file types.
+
+## Code Structure
+The `ImageValidator` class inherits from `ActiveModel::EachValidator` and implements the `validate_each` method along with two helper methods: `valid_size?` and `valid_extension?`.
+
+## Symbols
+
+### `ImageValidator`
+#### Description
+This class is a custom validator for image attachments in ActiveRecord models. It checks both the size and content type of attached images.
+
+#### Internal Logic
+The validator performs two main checks:
+1. File size: Ensures the image size is within the specified limit.
+2. Content type: Verifies that the image's content type is among the authorized types.
+
+### `validate_each`
+#### Description
+This method is called for each validation and adds errors to the record if the image fails either the size or content type validation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| record | ActiveRecord::Base | The record being validated |
+| attribute | Symbol | The attribute being validated |
+| _value | Object | The value of the attribute (unused in this implementation) |
+
+#### Internal Logic
+1. Calls `valid_size?` to check the image size.
+2. Calls `valid_extension?` to check the image content type.
+3. Adds appropriate error messages to the record if either check fails.
+
+### `valid_size?`
+#### Description
+Checks if the attached image's size is within the specified maximum size.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| record | ActiveRecord::Base | The record being validated |
+| attribute | Symbol | The attribute being validated |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Boolean | True if the image size is valid, false otherwise |
+
+#### Internal Logic
+Compares the byte size of the attached file's blob with the `:max_size` option provided to the validator.
+
+### `valid_extension?`
+#### Description
+Checks if the attached image's content type is among the authorized content types.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| record | ActiveRecord::Base | The record being validated |
+| attribute | Symbol | The attribute being validated |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Boolean | True if the image content type is valid, false otherwise |
+
+#### Internal Logic
+Retrieves the content type of the attached file's blob and checks if it's included in the `:authorized_content_type` option provided to the validator.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveModel::EachValidator | Base class for custom validators in Rails |
+
+## Configuration
+The validator accepts two configuration options:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| max_size | Integer | N/A | Maximum allowed file size in bytes |
+| authorized_content_type | Array | N/A | List of allowed content types |
+
+These options should be provided when the validator is used in a model, for example:
+```ruby
+validates :image, image: { max_size: 5.megabytes, authorized_content_type: ['image/jpeg', 'image/png'] }
+```
+
+## Error Handling
+The validator adds error messages to the record's errors collection:
+- `:invalid_size` if the file size exceeds the maximum allowed size.
+- `:invalid_content_type` if the file's content type is not in the list of authorized types.
+
+These error messages can be customized in the application's localization files.

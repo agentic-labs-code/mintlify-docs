@@ -1,0 +1,54 @@
+---
+title: "fetch_items.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation called `FetchItems` within the `Mutations::IntegrationItems` module. It's designed to fetch integration items for a given integration ID, synchronize the items, and return the fetched items as a collection.
+
+## Code Structure
+The `FetchItems` class inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the mutation's name, description, arguments, and return type. The main logic is implemented in the `resolve` method.
+
+## References
+- `Types::IntegrationItems::Object`
+- `::Integrations::Aggregator::SyncService`
+- `::Integrations::Aggregator::ItemsService`
+
+## Symbols
+
+### `FetchItems`
+#### Description
+This class represents a GraphQL mutation for fetching integration items. It ensures the user is authenticated and has the required organization permissions before executing the fetch operation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration_id | ID | The ID of the integration to fetch items for |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| items | [Types::IntegrationItems::Object] | A collection of fetched integration items |
+
+#### Internal Logic
+1. Find the integration using the provided `integration_id` within the current organization.
+2. Call the `SyncService` to synchronize the integration items.
+3. Use the `ItemsService` to fetch the items for the integration.
+4. Return the fetched items if successful, or return an error if the operation fails.
+
+## Side Effects
+- Synchronizes integration items using `::Integrations::Aggregator::SyncService`.
+- Fetches and potentially updates integration items using `::Integrations::Aggregator::ItemsService`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user has the required organization permissions |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class) to handle and return errors if the `ItemsService` call is not successful.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| FetchIntegrationItems | GraphQL Mutation | `{ integration_id: ID! }` | Collection of IntegrationItems | Fetches integration items for the given integration ID |

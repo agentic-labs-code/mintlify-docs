@@ -1,0 +1,74 @@
+---
+title: "invoice_mailer.rb"
+---
+
+## High-level description
+This code defines an `InvoiceMailer` class, which is responsible for sending finalized invoice emails to customers. It handles the generation of PDF attachments, sets up email content based on customer preferences, and manages the email sending process with proper localization.
+
+## Code Structure
+The `InvoiceMailer` class inherits from `ApplicationMailer` and defines two main methods: `finalized` and `ensure_pdf`. The `finalized` method is the primary email composition and sending logic, while `ensure_pdf` is a private method that generates the PDF attachment.
+
+## Symbols
+
+### InvoiceMailer
+#### Description
+A mailer class for sending finalized invoice emails to customers.
+
+#### Internal Logic
+1. Uses a `before_action` to ensure the PDF is generated before sending the email.
+2. Sets up instance variables for invoice, organization, and customer.
+3. Checks for necessary email addresses and invoice amount.
+4. Sets the locale based on customer preferences.
+5. Attaches the invoice PDF to the email.
+6. Composes and sends the email with proper localization.
+
+### finalized
+#### Description
+Composes and sends the finalized invoice email to the customer.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:invoice] | Invoice | The invoice object to be sent |
+
+#### Internal Logic
+1. Sets up instance variables for invoice, organization, and customer.
+2. Performs early returns if necessary email addresses are missing or if the invoice amount is zero.
+3. Sets the locale based on customer preferences.
+4. Attaches the invoice PDF to the email.
+5. Composes the email with proper sender, recipient, and subject information.
+6. Sends the email using the configured mailer settings.
+
+### ensure_pdf (private)
+#### Description
+Generates the PDF for the invoice before the email is sent.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params[:invoice] | Invoice | The invoice object for which to generate the PDF |
+
+#### Internal Logic
+Calls the `Invoices::GeneratePdfService` to create the PDF for the given invoice.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ApplicationMailer | Base mailer class |
+| I18n | Internationalization support |
+| ENV | Environment variables for email configuration |
+| Invoices::GeneratePdfService | Service for generating invoice PDFs |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LAGO_FROM_EMAIL | String | N/A | The email address used as the sender |
+
+## Error Handling
+The code implements basic error handling by checking for the presence of necessary email addresses and non-zero invoice amounts before attempting to send the email.
+
+## Logging
+No explicit logging is implemented in this code.
+
+## TODOs
+There are no explicit TODOs in the code.

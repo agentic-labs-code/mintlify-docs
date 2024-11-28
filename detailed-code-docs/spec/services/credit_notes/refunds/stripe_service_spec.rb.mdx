@@ -1,0 +1,59 @@
+---
+title: "stripe_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `CreditNotes::Refunds::StripeService` class. It tests the functionality of creating and updating refunds through Stripe, including error handling and various edge cases.
+
+## Code Structure
+The test suite is organized into two main describe blocks: `#create` and `#update_status`, each testing a different method of the `StripeService` class. Within these blocks, various scenarios are tested using different contexts and expectations.
+
+## Symbols
+
+### RSpec.describe CreditNotes::Refunds::StripeService
+#### Description
+This is the main describe block for the `CreditNotes::Refunds::StripeService` class. It sets up the necessary test data and contains all the test cases.
+
+### #create
+#### Description
+This describe block tests the `create` method of the `StripeService` class. It verifies that the method correctly creates a Stripe refund and a corresponding refund record in the system.
+
+#### Internal Logic
+1. Sets up test data including a customer, invoice, payment, and credit note.
+2. Mocks the Stripe::Refund.create method to return a successful response.
+3. Tests the successful creation of a refund, including checking all relevant attributes.
+4. Tests the calling of SegmentTrackJob for tracking the refund status change.
+5. Tests error handling when Stripe raises an error.
+6. Tests edge cases such as when there's no refund amount or no payment.
+
+### #update_status
+#### Description
+This describe block tests the `update_status` method of the `StripeService` class. It verifies that the method correctly updates the status of an existing refund.
+
+#### Internal Logic
+1. Sets up a refund associated with a credit note.
+2. Tests the successful updating of a refund status.
+3. Verifies that SegmentTrackJob is called with the correct parameters.
+4. Tests scenarios where the refund is not found or the status is invalid.
+5. Tests the handling of a 'failed' status, including the delivery of an error webhook.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides the necessary setup for Rails testing |
+| FactoryBot | Used for creating test data |
+| Stripe | Mocked for simulating Stripe API responses |
+| SegmentTrackJob | Mocked to verify tracking calls |
+| SendWebhookJob | Verified to be enqueued for error scenarios |
+
+## Error Handling
+The test suite covers various error scenarios:
+1. Stripe API errors (using `Stripe::InvalidRequestError`)
+2. Invalid refund statuses
+3. Refund not found scenarios
+4. Failed refund status handling
+
+## Logging
+The test suite doesn't explicitly test logging, but it does verify that certain jobs (SegmentTrackJob, SendWebhookJob) are called or enqueued, which may involve logging in the actual implementation.
+
+This test suite provides comprehensive coverage of the `CreditNotes::Refunds::StripeService` class, ensuring that it correctly handles refund creation and status updates, including various edge cases and error scenarios.

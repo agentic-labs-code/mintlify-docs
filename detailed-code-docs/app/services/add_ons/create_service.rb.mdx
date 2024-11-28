@@ -1,0 +1,94 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines the `AddOns::CreateService` class, which is responsible for creating new add-ons in the system. It handles the creation process, including applying taxes if specified, and tracks the creation event using Segment analytics.
+
+## Code Structure
+The `AddOns::CreateService` class inherits from `BaseService` and contains a single public method `create`. It uses a transaction to ensure data consistency and handles various error cases.
+
+## Symbols
+
+### `AddOns::CreateService`
+#### Description
+This service class is responsible for creating new add-ons in the system. It handles the creation process, applies taxes if specified, and tracks the creation event.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | A hash containing the attributes for the new add-on |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the created add-on and any error information |
+
+#### Internal Logic
+1. Starts a database transaction
+2. Creates a new `AddOn` record with the provided attributes
+3. Applies taxes to the add-on if tax codes are provided
+4. Tracks the add-on creation event using Segment analytics
+5. Handles various error cases, including validation errors and service failures
+
+#### Side Effects
+- Creates a new `AddOn` record in the database
+- Potentially creates `AddOn::AppliedTax` records if tax codes are provided
+- Enqueues a `SegmentTrackJob` to track the add-on creation event
+
+### `create`
+#### Description
+This method is the main entry point for creating a new add-on. It handles the entire creation process, including error handling and tracking.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | A hash containing the attributes for the new add-on |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the created add-on and any error information |
+
+#### Internal Logic
+1. Starts a database transaction
+2. Creates a new `AddOn` record with the provided attributes
+3. Applies taxes to the add-on if tax codes are provided
+4. Tracks the add-on creation event
+5. Handles errors and returns the result
+
+### `track_add_on_created`
+#### Description
+This private method is responsible for tracking the add-on creation event using Segment analytics.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| add_on | AddOn | The newly created add-on object |
+
+#### Internal Logic
+Enqueues a `SegmentTrackJob` with the relevant add-on information for tracking purposes.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Base | Used for database transactions |
+| AddOns::ApplyTaxesService | Service for applying taxes to the add-on |
+| SegmentTrackJob | Job for tracking events using Segment analytics |
+| CurrentContext | Module for accessing the current membership context |
+
+## Error Handling
+The service handles two main types of errors:
+1. `ActiveRecord::RecordInvalid`: Handled when there are validation errors on the `AddOn` model
+2. `BaseService::FailedResult`: Handled when the `ApplyTaxesService` fails
+
+In both cases, the error information is added to the result object, which can be used by the caller to determine the success or failure of the operation.
+
+## Logging
+This service does not implement any explicit logging mechanisms.
+
+## Performance Considerations
+The service uses a database transaction to ensure data consistency when creating the add-on and applying taxes. This approach guarantees atomicity but may impact performance for long-running operations.
+
+## TODOs
+There are no explicit TODOs in the code.

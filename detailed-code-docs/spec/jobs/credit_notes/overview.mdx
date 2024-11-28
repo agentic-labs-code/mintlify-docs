@@ -1,0 +1,56 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various jobs related to credit notes in a Rails application. The tests cover functionality for generating PDFs and creating refunds through different payment providers (Adyen, GoCardless, and Stripe).
+
+## What does it do?
+The tests in this directory ensure that:
+
+1. The PDF generation job correctly delegates the task to the appropriate service.
+2. The refund creation jobs for different payment providers (Adyen, GoCardless, and Stripe) properly initialize their respective services and call the create method.
+
+These tests verify that the jobs act as expected, delegating tasks to the appropriate services and handling the results correctly. This approach helps maintain the integrity of credit note-related operations across different functionalities and payment providers.
+
+## Key Files
+1. `generate_pdf_job_spec.rb`: Tests the `CreditNotes::GeneratePdfJob`.
+2. `refunds/adyen_create_job_spec.rb`: Tests the `CreditNotes::Refunds::AdyenCreateJob`.
+3. `refunds/gocardless_create_job_spec.rb`: Tests the `CreditNotes::Refunds::GocardlessCreateJob`.
+4. `refunds/stripe_create_job_spec.rb`: Tests the `CreditNotes::Refunds::StripeCreateJob`.
+
+Each file follows a similar structure:
+
+```ruby
+RSpec.describe SomeJob, type: :job do
+  let(:credit_note) { create(:credit_note) }
+  let(:service) { instance_double(SomeService) }
+
+  it 'delegates to the appropriate service' do
+    expect(SomeService).to receive(:new).with(credit_note).and_return(service)
+    expect(service).to receive(:some_method).and_return(BaseService::Result.new)
+
+    described_class.perform_now(credit_note)
+  end
+end
+```
+
+This structure is consistent across all test files, with variations in the specific job and service being tested.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test objects, specifically the `credit_note` in these tests.
+3. Rails: The tests are written for a Rails application, as indicated by the use of `type: :job` in the RSpec descriptions.
+
+## Configuration
+These test files assume the existence of:
+
+1. A `rails_helper` file that sets up the Rails testing environment.
+2. FactoryBot factories for creating `credit_note` objects.
+3. The actual job classes (`CreditNotes::GeneratePdfJob`, `CreditNotes::Refunds::AdyenCreateJob`, `CreditNotes::Refunds::GocardlessCreateJob`, and `CreditNotes::Refunds::StripeCreateJob`) in the main application code.
+4. The corresponding service classes (`CreditNotes::GenerateService`, `CreditNotes::Refunds::AdyenService`, `CreditNotes::Refunds::GocardlessService`, and `CreditNotes::Refunds::StripeService`) in the main application code.
+5. A `BaseService::Result` class that is returned by the service methods.
+
+These tests play a crucial role in ensuring the correct behavior of the credit note-related jobs. They verify that each job correctly delegates its tasks to the appropriate service, maintaining a consistent interface across different functionalities and payment providers while allowing for specific implementations in the services themselves.

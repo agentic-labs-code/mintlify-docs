@@ -1,0 +1,46 @@
+---
+title: "20240823092643_create_applied_usage_thresholds.rb"
+---
+
+## High-level description
+This migration creates a new table called `applied_usage_thresholds` in the database. It establishes a relationship between usage thresholds and invoices, storing the lifetime usage amount for each combination. The table uses UUID as the primary key and includes timestamps for record creation and updates.
+
+## Symbols
+
+### `CreateAppliedUsageThresholds`
+#### Description
+This is a Rails migration class that defines the structure for the `applied_usage_thresholds` table. It uses the `change` method to specify the table creation and its columns.
+
+#### Internal Logic
+The migration performs the following steps:
+1. Creates a new table named `applied_usage_thresholds` with UUID as the primary key.
+2. Adds a foreign key reference to the `usage_thresholds` table.
+3. Adds a foreign key reference to the `invoices` table.
+4. Includes a `lifetime_usage_amount_cents` column to store the usage amount.
+5. Adds timestamp columns for record creation and updates.
+6. Creates a unique index on the combination of `usage_threshold_id` and `invoice_id`.
+
+## Code Structure
+
+The migration defines a single `change` method that uses the `create_table` method to set up the new table structure. It utilizes various column types and options to define the table's schema.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the migration framework for database schema changes |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| id | symbol | :uuid | Specifies UUID as the primary key type for the table |
+
+## API/Interface Reference
+| Column | Type | Constraints | Description |
+|:-------|:-----|:------------|:------------|
+| usage_threshold_id | uuid | null: false, foreign_key: true | References the usage_thresholds table |
+| invoice_id | uuid | null: false, foreign_key: true | References the invoices table |
+| lifetime_usage_amount_cents | bigint | null: false, default: 0 | Stores the lifetime usage amount in cents |
+| created_at | datetime | | Timestamp for record creation |
+| updated_at | datetime | | Timestamp for record updates |
+
+Note: The table also includes a unique index on the combination of `usage_threshold_id` and `invoice_id`.

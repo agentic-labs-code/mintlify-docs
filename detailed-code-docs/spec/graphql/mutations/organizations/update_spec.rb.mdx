@@ -1,0 +1,75 @@
+---
+title: "update_spec.rb"
+---
+
+## High-level description
+This RSpec test file describes the behavior of the `Mutations::Organizations::Update` GraphQL mutation. It verifies that the mutation correctly updates an organization's details, handles permissions, and supports premium features.
+
+## Code Structure
+The test file contains several examples that test different aspects of the `updateOrganization` mutation. It uses shared examples for common checks and defines specific test cases for various scenarios.
+
+## Symbols
+
+### RSpec.describe Mutations::Organizations::Update
+#### Description
+This is the main describe block for the `Mutations::Organizations::Update` GraphQL mutation tests.
+
+#### Internal Logic
+1. Defines the GraphQL mutation query
+2. Sets up shared examples for user and organization requirements
+3. Tests the basic update functionality
+4. Tests behavior with limited permissions
+5. Tests premium features
+
+### let(:membership)
+#### Description
+Creates a test membership using FactoryBot.
+
+### let(:mutation)
+#### Description
+Defines the GraphQL mutation query string for updating an organization.
+
+### it 'updates an organization'
+#### Description
+Tests the basic functionality of updating an organization with various fields.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with a set of input parameters
+2. Verifies that the returned data matches the input
+
+### context 'without necessary permissions'
+#### Description
+Tests the behavior of the mutation when the user lacks certain permissions.
+
+#### Internal Logic
+1. Executes the mutation with limited permissions
+2. Verifies that permission-protected fields are ignored while others are updated
+
+### context 'with premium features'
+#### Description
+Tests the behavior of the mutation when premium features are enabled.
+
+#### Internal Logic
+1. Enables premium features using `lago_premium!`
+2. Tests updating premium-specific fields like timezone and invoice grace period
+3. Includes a specific test for the 'Etc/GMT+12' timezone
+
+## Side Effects
+The tests may create and modify database records for organizations and memberships.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides the testing environment and configuration |
+| FactoryBot | Creates test data |
+| GraphQL | Executes and tests GraphQL queries |
+
+## Error Handling
+The tests implicitly check for error handling by verifying the correct behavior in various scenarios, including limited permissions.
+
+## API/Interface Reference
+| Mutation | Input | Response | Description |
+|:---------|:------|:---------|:------------|
+| updateOrganization | UpdateOrganizationInput | Organization fields | Updates an organization's details |
+
+The mutation accepts various organization fields as input and returns the updated organization data.

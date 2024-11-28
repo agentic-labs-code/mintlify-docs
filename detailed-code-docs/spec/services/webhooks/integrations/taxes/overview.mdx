@@ -1,0 +1,71 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for the `Webhooks::Integrations::Taxes` namespace, specifically focusing on error handling services. The tests cover the `ErrorService` and `FeeErrorService` classes, which are responsible for creating webhooks in response to tax provider errors and fee errors, respectively.
+
+## What does it do?
+The code in this directory tests the functionality of services that handle errors related to tax integrations in a webhook system. When a tax provider encounters an error or a fee-related error occurs, these services are responsible for creating appropriate webhooks to notify the system or external services about these errors. The tests ensure that:
+
+1. For general tax provider errors, the `ErrorService` creates a webhook with the correct event name and type.
+2. For fee-specific tax provider errors, the `FeeErrorService` creates a webhook with the specific type 'fee.tax_provider_error' and name 'tax_provider_fee_error'.
+
+These tests help maintain the reliability of the error handling and notification system for tax-related issues in the application.
+
+## Key Files
+1. `error_service_spec.rb`: This file contains tests for the `Webhooks::Integrations::Taxes::ErrorService` class. It verifies that the service creates the correct webhook when handling general tax provider errors for a customer.
+
+2. `fee_error_service_spec.rb`: This file tests the `Webhooks::Integrations::Taxes::FeeErrorService` class. It ensures that the service creates the appropriate webhook when dealing with tax provider fee errors.
+
+Both files use shared examples for testing webhook creation, indicating a common pattern in webhook-related tests across the application.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: A library for creating test data. It's used to generate test instances of `customer`, `organization`, and `anrok_integration`.
+3. Rails: The tests are part of a Rails application, as evidenced by the use of `rails_helper`.
+
+## Configuration
+While there are no explicit configuration files in this directory, the tests use several important configurations and conventions:
+
+1. `frozen_string_literal: true`: This Ruby magic comment is used at the top of the files to freeze string literals, potentially improving performance and preventing unintended string mutations.
+
+2. RSpec configuration: The tests use RSpec's `describe`, `context`, and `it` blocks to structure the test cases. They also use `let` statements for defining memoized helper methods.
+
+3. Shared examples: Both test files reference a shared example `'creates webhook'`, which is likely defined in a separate support file. This shared example encapsulates common webhook creation testing logic.
+
+4. Test doubles: The `fee_error_service_spec.rb` file uses test doubles (created with FactoryBot) for `anrok_integration` and `organization`, simulating the behavior of these objects without using actual database records.
+
+Here's an example of how the `ErrorService` is tested:
+
+```ruby
+RSpec.describe Webhooks::Integrations::Taxes::ErrorService do
+  subject(:webhook_service) do
+    described_class.new(customer: customer, webhook_options: webhook_options)
+  end
+
+  let(:customer) { create(:customer, organization: organization) }
+  let(:organization) { create(:organization) }
+  let(:webhook_options) do
+    {
+      provider_error: {
+        code: 'error_code',
+        message: 'error_message'
+      }
+    }
+  end
+
+  describe '.call' do
+    it_behaves_like 'creates webhook' do
+      let(:webhook_type) { 'tax_provider_error' }
+      let(:webhook_name) { 'tax_provider_error' }
+    end
+  end
+end
+```
+
+This test structure ensures that the `ErrorService` creates the correct webhook when called with a customer and error details. The use of shared examples (`it_behaves_like 'creates webhook'`) suggests that webhook creation is a common behavior tested across multiple services.
+
+Overall, these tests play a crucial role in maintaining the reliability and correctness of the tax-related error handling system within the application's webhook infrastructure.

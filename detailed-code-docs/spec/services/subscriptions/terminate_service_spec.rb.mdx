@@ -1,0 +1,74 @@
+---
+title: "terminate_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Subscriptions::TerminateService` class. It tests various scenarios related to terminating subscriptions, including regular termination, upgrading, downgrading, and handling different subscription states and billing types.
+
+## Code Structure
+The test suite is organized into two main describe blocks: `.terminate` and `.terminate_and_start_next`. Each block contains multiple test cases (it blocks) that cover different scenarios and edge cases for subscription termination.
+
+## Symbols
+
+### `RSpec.describe Subscriptions::TerminateService`
+#### Description
+This is the main describe block for the `Subscriptions::TerminateService` class. It sets up the subject for the tests and contains all the test cases.
+
+### `describe '.terminate'`
+#### Description
+This describe block focuses on testing the `terminate` method of the `TerminateService`.
+
+#### Internal Logic
+The tests in this block cover various scenarios such as:
+- Terminating a regular subscription
+- Handling subscriptions starting in the future
+- Dealing with downgrade subscriptions
+- Managing subscriptions paid in advance
+- Handling non-existent subscriptions
+- Canceling pending next subscriptions
+
+### `describe '.terminate_and_start_next'`
+#### Description
+This describe block tests the `terminate_and_start_next` method of the `TerminateService`.
+
+#### Internal Logic
+The tests in this block cover scenarios such as:
+- Terminating the current subscription and starting the next one
+- Handling billing for the terminated and new subscriptions
+- Managing different payment schedules (in arrear vs. in advance)
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| FactoryBot | Used for creating test data |
+
+## Notable Test Cases
+
+1. Terminating a regular subscription:
+   - Checks if the subscription is marked as terminated
+   - Verifies that appropriate jobs are enqueued (BillSubscriptionJob and BillNonInvoiceableFeesJob)
+   - Ensures a webhook is sent for the termination
+
+2. Handling subscriptions starting in the future:
+   - Verifies that the subscription is canceled instead of terminated
+   - Checks that billing jobs are not enqueued
+
+3. Managing subscriptions paid in advance:
+   - Tests the creation of a credit note for unused days
+   - Verifies the correct calculation of the credit amount
+
+4. Terminating and starting the next subscription:
+   - Checks if the current subscription is terminated and the next one is activated
+   - Verifies that appropriate billing jobs are enqueued for both subscriptions
+   - Ensures webhooks are sent for both termination and start events
+
+## Error Handling
+The tests cover error scenarios such as:
+- Attempting to terminate a non-existent subscription
+- Handling validation errors during the termination process
+
+## Performance Considerations
+The tests use `travel_to` helper to manipulate time, which is important for testing time-sensitive operations like subscription termination and billing.
+
+This test suite provides comprehensive coverage for the `Subscriptions::TerminateService`, ensuring that subscription termination, upgrading, and downgrading scenarios are handled correctly in various situations.

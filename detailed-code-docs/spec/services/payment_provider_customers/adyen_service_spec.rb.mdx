@@ -1,0 +1,69 @@
+---
+title: "adyen_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `PaymentProviderCustomers::AdyenService` class. It tests various scenarios related to creating and managing Adyen customer payment links, handling errors, and sending webhooks.
+
+## Code Structure
+The test suite is organized into several describe blocks, each focusing on a specific method of the `AdyenService` class. The main methods tested are `#create`, `#update`, `#success_redirect_url`, and `#generate_checkout_url`.
+
+## Symbols
+
+### `RSpec.describe PaymentProviderCustomers::AdyenService`
+#### Description
+This is the main describe block for the `PaymentProviderCustomers::AdyenService` class.
+
+### `describe '#create'`
+#### Description
+Tests the `create` method of the `AdyenService` class.
+
+#### Internal Logic
+- Tests the behavior when a customer does not have an Adyen customer ID yet.
+- Checks if the Adyen API client is called and a payment link is created.
+- Verifies that a success webhook is delivered.
+- Tests the behavior when a customer already has an Adyen customer ID.
+- Handles error scenarios when generating the checkout link fails.
+
+### `describe '#update'`
+#### Description
+Tests the `update` method of the `AdyenService` class.
+
+#### Internal Logic
+- Verifies that the method returns a `BaseService::Result` object.
+
+### `describe '#success_redirect_url'`
+#### Description
+Tests the `success_redirect_url` private method of the `AdyenService` class.
+
+#### Internal Logic
+- Checks if the correct URL is returned when the payment provider has a success redirect URL.
+- Verifies that the default success redirect URL is returned when the payment provider doesn't have one.
+
+### `describe '#generate_checkout_url'`
+#### Description
+Tests the `generate_checkout_url` method of the `AdyenService` class.
+
+#### Internal Logic
+- Handles the case when the Adyen payment provider is nil.
+- Tests the successful generation of a checkout URL.
+- Verifies that a success webhook is delivered upon generating a checkout URL.
+
+## Dependencies
+The test file depends on the following:
+- RSpec Rails helper
+- FactoryBot for creating test data
+- Adyen gem for mocking Adyen API responses
+
+## Error Handling
+The test suite covers various error scenarios, including:
+- Failing to generate a checkout link due to an error response from Adyen.
+- Handling Adyen::AdyenError exceptions.
+
+## Logging
+The test suite doesn't explicitly test logging, but it does verify that certain webhooks are enqueued in response to various scenarios.
+
+## TODOs
+There are no explicit TODOs in the code.
+
+This test suite provides comprehensive coverage for the `PaymentProviderCustomers::AdyenService` class, ensuring that it correctly handles various scenarios related to Adyen payment processing and customer management.

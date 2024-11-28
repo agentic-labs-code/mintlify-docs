@@ -1,0 +1,59 @@
+---
+title: "create.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for creating a tax within an organization. It's part of a larger application that handles various aspects of billing and taxation, likely for a SaaS or e-commerce platform.
+
+## Code Structure
+The `Mutations::Taxes::Create` class inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the structure and behavior of the "CreateTax" GraphQL mutation.
+
+## References
+- `Types::Taxes::CreateInput`
+- `Types::Taxes::Object`
+- `::Taxes::CreateService`
+
+## Symbols
+
+### `Mutations::Taxes::Create`
+#### Description
+This class represents a GraphQL mutation for creating a tax. It authenticates the user, ensures the presence of an organization, and delegates the tax creation to a service object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | Arguments for creating a tax, defined in `Types::Taxes::CreateInput` |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tax | Types::Taxes::Object | The created tax object |
+
+#### Internal Logic
+1. Authenticates the API user and checks for a required organization (via included modules).
+2. Delegates tax creation to `::Taxes::CreateService`.
+3. Returns the created tax if successful, or an error if not.
+
+## Side Effects
+- Creates a new tax record in the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the presence of an organization |
+| Types::Taxes::CreateInput | Defines the input structure for the mutation |
+| Types::Taxes::Object | Defines the return type for the mutation |
+| ::Taxes::CreateService | Handles the business logic of creating a tax |
+
+## Error Handling
+The mutation handles errors by calling `result_error(result)` if the service call is not successful. This likely transforms the error into a GraphQL-friendly format.
+
+## TODOs
+There's a commented-out `REQUIRED_PERMISSION` constant, suggesting that permission checks might be implemented in the future.
+
+```ruby
+# REQUIRED_PERMISSION = 'taxes:create'
+```
+
+This indicates that the developers may plan to add more granular permission controls for tax creation in the future.

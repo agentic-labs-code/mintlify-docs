@@ -1,0 +1,75 @@
+---
+title: "invoice_subscription_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `InvoiceSubscription` model. It tests various methods related to fees, charge amounts, subscription amounts, and total amounts, as well as the functionality to find the previous invoice subscription.
+
+## Code Structure
+The test suite is organized into several `describe` blocks, each focusing on a specific method of the `InvoiceSubscription` model. Within each block, there are one or more test cases (`it` blocks) that verify the expected behavior of the method.
+
+## Symbols
+
+### `InvoiceSubscription`
+#### Description
+This is the main model being tested. It represents a subscription associated with an invoice and includes methods for calculating various amounts and retrieving related data.
+
+### `#fees`
+#### Description
+This method returns the fees associated with both the subscription and the invoice of the `InvoiceSubscription`.
+
+#### Internal Logic
+The test creates three fees: one associated with both the subscription and invoice, one with only the subscription, and one with only the invoice. It then verifies that only the fee associated with both is returned.
+
+### `#charge_amount_cents`
+#### Description
+This method calculates the sum of charge fees related to the `InvoiceSubscription`.
+
+#### Internal Logic
+The test creates multiple fees, including charge fees and a regular fee, and verifies that only the charge fees are summed up correctly.
+
+### `#subscription_amount_cents`
+#### Description
+This method returns the amount of subscription fees (excluding charge fees).
+
+#### Internal Logic
+The test creates both a regular fee and a charge fee, then verifies that only the regular fee amount is returned.
+
+### `#total_amount_cents`
+#### Description
+This method calculates the total amount of all fees associated with the `InvoiceSubscription`.
+
+#### Internal Logic
+The test creates multiple fees of different types and verifies that their total is calculated correctly.
+
+### `#total_amount_currency`, `#charge_amount_currency`, `#subscription_amount_currency`
+#### Description
+These methods return the currency of the respective amounts.
+
+#### Internal Logic
+Each test verifies that the returned currency matches the currency of the subscription's plan.
+
+### `#previous_invoice_subscription`
+#### Description
+This method finds the previous invoice subscription for the same subscription.
+
+#### Internal Logic
+The test covers three scenarios:
+1. When there is a previous invoice subscription for the same subscription.
+2. When there is a previous invoice subscription, but for a different subscription.
+3. When there is no previous invoice subscription.
+
+In each case, it verifies that the method returns the expected result (either the correct previous invoice subscription or nil).
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides the necessary setup for Rails-specific testing |
+| FactoryBot | Used for creating test data |
+
+## Error Handling
+This test file does not explicitly test error handling scenarios. It focuses on the happy path and expected behavior of the `InvoiceSubscription` model methods.
+
+## Performance Considerations
+The tests create multiple database records for each test case. While this is typical for unit tests, it's worth noting that in a large test suite, this could potentially impact test execution time.

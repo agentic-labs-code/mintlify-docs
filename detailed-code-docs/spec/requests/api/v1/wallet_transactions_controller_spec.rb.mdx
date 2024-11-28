@@ -1,0 +1,73 @@
+---
+title: "wallet_transactions_controller_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Api::V1::WalletTransactionsController`. It tests the creation and retrieval of wallet transactions, including various scenarios such as creating transactions with different credit types, handling metadata, and pagination.
+
+## Code Structure
+The test suite is organized into two main describe blocks: 'create' and 'index', each testing different endpoints of the controller. Within these blocks, various contexts and scenarios are tested using RSpec's `it` blocks.
+
+## Symbols
+
+### RSpec.describe Api::V1::WalletTransactionsController
+#### Description
+This is the main describe block for the `Api::V1::WalletTransactionsController` tests. It sets up the necessary test data and contains all the test cases for the controller.
+
+#### Internal Logic
+- Creates test data using FactoryBot (organization, customer, subscription, wallet)
+- Tests the 'create' and 'index' actions of the controller
+
+### describe 'create'
+#### Description
+Tests the creation of wallet transactions through the API.
+
+#### Internal Logic
+- Tests successful creation of wallet transactions
+- Tests creation with voided credits
+- Tests creation with metadata
+- Tests error handling for non-existent wallets
+
+### describe 'index'
+#### Description
+Tests the retrieval of wallet transactions through the API.
+
+#### Internal Logic
+- Tests successful retrieval of wallet transactions
+- Tests pagination of results
+- Tests filtering by status and transaction type
+- Tests error handling for non-existent wallets
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and RSpec configuration |
+| FactoryBot | Used for creating test data (implied by the use of `create` method) |
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /api/v1/wallet_transactions | POST | wallet_transaction params | Wallet transactions data | Creates new wallet transactions |
+| /api/v1/wallets/:wallet_id/wallet_transactions | GET | Query params (optional) | List of wallet transactions | Retrieves wallet transactions |
+
+## Error Handling
+The tests check for appropriate error responses:
+- Returns `:unprocessable_entity` status when trying to create a transaction for a non-existent wallet
+- Returns `:not_found` status when trying to retrieve transactions for a non-existent wallet
+
+## Notable Test Cases
+
+### create
+1. Creates wallet transactions with paid and granted credits
+2. Creates a wallet transaction with voided credits
+3. Creates wallet transactions with metadata
+4. Handles errors for non-existent wallets
+
+### index
+1. Retrieves wallet transactions
+2. Implements pagination
+3. Filters transactions by status
+4. Filters transactions by transaction type
+5. Handles errors for non-existent wallets
+
+These tests ensure that the `Api::V1::WalletTransactionsController` correctly handles various scenarios for creating and retrieving wallet transactions, including proper error handling and adherence to API specifications.

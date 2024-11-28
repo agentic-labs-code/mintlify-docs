@@ -1,0 +1,71 @@
+---
+title: "charge_cache_service.rb"
+---
+
+## High-level description
+The `ChargeCacheService` is a Ruby module within the `Subscriptions` namespace that manages the caching and expiration of charge-related data for subscriptions. It provides methods to generate cache keys and expire cache entries for specific charge and subscription combinations.
+
+## Code Structure
+The `ChargeCacheService` class inherits from `BaseService` and contains class methods and instance methods for managing the cache. The main functionality revolves around creating and expiring cache entries for charge usage data.
+
+## Symbols
+
+### `ChargeCacheService`
+#### Description
+This class provides methods to manage the caching of charge-related data for subscriptions.
+
+#### Class Methods
+
+### `expire_for_subscription`
+#### Description
+Expires the cache for all charges associated with a given subscription.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription | Subscription | The subscription object for which to expire charge caches |
+
+#### Internal Logic
+- Iterates through all charges associated with the subscription's plan
+- For each charge, creates a new instance of `ChargeCacheService` and calls `expire_cache`
+
+### `initialize`
+#### Description
+Initializes a new instance of `ChargeCacheService` with a subscription and charge.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription | Subscription | The subscription object |
+| charge | Charge | The charge object |
+
+### `cache_key`
+#### Description
+Generates a unique cache key for the charge-subscription combination.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cache_key | String | A unique identifier for the cache entry |
+
+#### Internal Logic
+- Combines 'charge-usage', charge ID, subscription ID, and charge's updated timestamp to create a unique key
+
+### `expire_cache`
+#### Description
+Deletes the cache entry for the current charge-subscription combination.
+
+#### Internal Logic
+- Uses `Rails.cache.delete` to remove the cache entry identified by the `cache_key`
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Rails.cache | Used for caching and expiring cache entries |
+
+## References
+This service is referenced and used in:
+1. `Invoices::CustomerUsageService`: Uses `ChargeCacheService` to generate cache keys for charge usage.
+2. `Events::PostProcessService`: Calls `ChargeCacheService` to expire cache entries when processing events.
+
+These references indicate that the `ChargeCacheService` plays a crucial role in managing charge-related caches across the application, particularly in the context of customer usage calculations and event processing.

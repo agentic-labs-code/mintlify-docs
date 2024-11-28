@@ -1,0 +1,55 @@
+---
+title: "20240718105718_create_integration_error_details.rb"
+---
+
+## High-level description
+This migration file creates a new table called `error_details` in the database. The table is designed to store detailed information about errors related to integrations, including references to the owner, integration, and organization involved, along with error codes and additional details.
+
+## Symbols
+
+### `CreateIntegrationErrorDetails`
+#### Description
+This is a Rails migration class that defines the structure for the `error_details` table. It inherits from `ActiveRecord::Migration[7.1]`, indicating it's compatible with Rails 7.1.
+
+#### Internal Logic
+The migration uses the `change` method to define the table structure. It creates a new table named `error_details` with the following columns:
+
+1. `id`: A UUID primary key
+2. `owner`: A polymorphic reference to the owner of the error
+3. `integration`: A polymorphic reference to the integration (optional)
+4. `organization`: A reference to the organization
+5. `error_code`: A string to store the error code
+6. `details`: A JSONB column to store additional error details
+7. `deleted_at`: A datetime column for soft deletion
+8. `created_at` and `updated_at`: Timestamp columns (added automatically by `t.timestamps`)
+
+#### Performance Considerations
+The migration adds indexes to several columns (`owner`, `integration`, `organization`, `error_code`, and `deleted_at`) to improve query performance.
+
+## Dependencies
+This migration relies on the following Rails/ActiveRecord features:
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations |
+| create_table | Method to create a new database table |
+| references | Method to create foreign key columns and indexes |
+| index | Method to add indexes to columns |
+| foreign_key | Method to add a foreign key constraint |
+
+## Configuration
+The migration defines the following configuration for the `error_details` table:
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| id | uuid | N/A | Uses UUID as the primary key type |
+| owner_id | uuid | N/A | Polymorphic reference to the error owner |
+| owner_type | string | N/A | Polymorphic type for the error owner |
+| integration_id | uuid | N/A | Optional polymorphic reference to the integration |
+| integration_type | string | N/A | Optional polymorphic type for the integration |
+| organization_id | uuid | N/A | Reference to the organization |
+| error_code | string | 'not_provided' | Stores the error code |
+| details | jsonb | {} | Stores additional error details as JSON |
+| deleted_at | datetime | N/A | Timestamp for soft deletion |
+
+Note: The `created_at` and `updated_at` timestamps are automatically added by `t.timestamps`.
+
+This migration sets up a flexible structure for storing detailed error information related to integrations, with proper indexing and foreign key relationships to improve data integrity and query performance.

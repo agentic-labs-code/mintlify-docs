@@ -1,0 +1,96 @@
+---
+title: "pdf_generator.rb"
+---
+
+## High-level description
+This code defines a `PdfGenerator` class within the `Utils` module. It is responsible for generating PDF documents from HTML templates, utilizing external services for PDF conversion. The class is designed to be flexible, allowing different templates and contexts to be used for PDF generation.
+
+## Code Structure
+The `PdfGenerator` class inherits from `BaseService` and includes `ActiveSupport::NumberHelper`. It has methods for initializing with a template and context, rendering HTML, and generating PDFs. The class uses external services for PDF conversion and handles file preparation and HTTP requests.
+
+## Symbols
+
+### `Utils::PdfGenerator`
+#### Description
+A service class for generating PDF documents from HTML templates.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| template | String | The name of the template file to be used |
+| context | Object | The context object containing data for the template |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the generated PDF as an IO object |
+
+#### Internal Logic
+1. Initializes with a template and context.
+2. Renders HTML from the template using Slim.
+3. Converts the HTML to PDF using an external service.
+4. Prepares and sends HTTP requests with the HTML and logo files.
+5. Returns the PDF content as an IO object.
+
+### `call`
+#### Description
+The main method to generate the PDF document.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the generated PDF as an IO object |
+
+### `render_html`
+#### Description
+Renders the HTML content from the Slim template.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| html | String | The rendered HTML content |
+
+### `render_pdf` (private)
+#### Description
+Converts the HTML to PDF using an external service.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| pdf_content | String | The generated PDF content |
+
+### `prepare_http_files` (private)
+#### Description
+Prepares files for HTTP multipart requests.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| content | String | The file content |
+| type | String | The MIME type of the file |
+| name | String | The filename |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| upload_io | UploadIO | An object representing the file for multipart requests |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveSupport::NumberHelper | Provides number formatting helpers |
+| Slim::Template | Used for rendering HTML templates |
+| LagoHttpClient::Client | Handles HTTP requests to the PDF conversion service |
+| StringIO | Used for handling PDF content as IO objects |
+| URI | Used for handling URLs |
+| UploadIO | Used for preparing files for multipart HTTP requests |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| LAGO_PDF_URL | String | N/A | The URL of the PDF conversion service |
+
+## Error Handling
+The class relies on the error handling mechanisms provided by the `LagoHttpClient::Client` class for HTTP-related errors.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

@@ -1,0 +1,54 @@
+---
+title: "past_usage_serializer.rb"
+---
+
+## High-level description
+The `PastUsageSerializer` class is responsible for serializing past usage data for a customer's subscription. It formats the data into a JSON structure suitable for API responses, including details like invoice period, charges, taxes, and optionally, detailed charge usage.
+
+## Code Structure
+The `PastUsageSerializer` inherits from `ModelSerializer` and leverages methods from both its own class and the delegated `invoice_subscription`, `fees`, and `invoice` objects to construct the serialized payload. It utilizes the `ChargeUsageSerializer` to represent detailed charge usage when requested.
+
+## References
+- `ModelSerializer`: This serializer class provides the base structure and functionality for serialization.
+- `ChargeUsageSerializer`: Used to serialize detailed charge usage information.
+
+## Symbols
+### `PastUsageSerializer`
+#### Description
+This serializer formats past usage data for a customer's subscription into a JSON-serializable format.
+
+#### Inputs
+The `PastUsageSerializer` itself doesn't define explicit input parameters. However, it implicitly receives the data to be serialized via the `model` attribute inherited from `ModelSerializer`. The `model` is expected to be an object containing information about the customer's past usage, including invoice, subscription, and fee details.
+
+#### Outputs
+The `serialize` method returns a hash representing the serialized past usage data. The hash includes:
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `from_datetime` | String | Start datetime of the invoice period (ISO 8601 format). |
+| `to_datetime` | String | End datetime of the invoice period (ISO 8601 format). |
+| `issuing_date` | String | Date when the invoice was issued (ISO 8601 format). |
+| `currency` | String | Currency code for the invoice amount. |
+| `amount_cents` | Integer | Total fees amount in cents, excluding taxes. |
+| `total_amount_cents` | Integer | Total invoice amount in cents, including fees and taxes. |
+| `taxes_amount_cents` | Integer | Total taxes amount in cents. |
+| `lago_invoice_id` | String | Unique identifier of the invoice in Lago. |
+| `charges_usage` | Array | (Optional) Detailed usage information for each charge, serialized using `ChargeUsageSerializer`. Included only if requested via the `includes` option. |
+
+#### Internal Logic
+1. **Initialization:** The serializer is initialized with the `model` object containing the past usage data.
+2. **Serialization (`serialize` method):**
+    - It extracts relevant information from the `model`, `invoice_subscription`, `fees`, and `invoice` objects.
+    - It formats datetimes into ISO 8601 strings.
+    - It calculates the `taxes_amount_cents` by summing the `taxes_amount_cents` of all fees.
+    - It conditionally includes the `charges_usage` if requested, using the `ChargeUsageSerializer`.
+3. **Helper Methods:**
+    - `taxes_amount_cents`: Calculates the total taxes amount in cents.
+    - `charges_usage`:  Serializes the detailed charge usage information using the `ChargeUsageSerializer`.
+
+## Dependencies
+- `ModelSerializer`: Provides the base serialization functionality.
+- `V1::Customers::ChargeUsageSerializer`: Serializes detailed charge usage data.
+
+## Error Handling
+The code doesn't implement specific error handling beyond what's provided by the Ruby language and Rails framework. Any exceptions raised during data access or serialization will propagate up the call stack.

@@ -1,0 +1,62 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various webhook services related to subscription events in a SaaS-like application. The services being tested are responsible for creating webhooks when specific subscription-related events occur, such as subscription start, termination, trial end, and usage threshold reached.
+
+## What does it do?
+These test files ensure that the webhook services correctly create webhook events for different subscription-related scenarios. Each service is responsible for a specific event type:
+
+1. Started Service: Creates a webhook when a subscription is started.
+2. Terminated Service: Creates a webhook when a subscription is terminated.
+3. Termination Alert Service: Creates a webhook to alert about an upcoming subscription termination.
+4. Trial Ended Service: Creates a webhook when a subscription's trial period ends.
+5. Usage Thresholds Reached Service: Creates a webhook when a subscription reaches a usage threshold.
+
+The tests verify that each service creates the appropriate webhook with the correct event type, object type, and any additional required data.
+
+## Key Files
+1. `started_service_spec.rb`: Tests the `Webhooks::Subscriptions::StartedService` class.
+2. `terminated_service_spec.rb`: Tests the `Webhooks::Subscriptions::TerminatedService` class.
+3. `termination_alert_service_spec.rb`: Tests the `Webhooks::Subscriptions::TerminationAlertService` class.
+4. `trial_ended_service_spec.rb`: Tests the `Webhooks::Subscriptions::TrialEndedService` class.
+5. `usage_thresholds_reached_service_spec.rb`: Tests the `Webhooks::Subscriptions::UsageThresholdsReachedService` class.
+
+Each file follows a similar structure:
+
+```ruby
+RSpec.describe Webhooks::Subscriptions::SomeService do
+  subject(:webhook_service) { described_class.new(object: subscription) }
+
+  let(:subscription) { create(:subscription, ...) }
+  let(:organization) { subscription.organization }
+
+  describe '.call' do
+    it_behaves_like 'creates webhook', 'event.type', 'object_type', additional_data: { ... }
+  end
+end
+```
+
+## Dependencies
+The test files depend on the following:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test objects (subscriptions, organizations, plans, etc.).
+3. Rails helper: Loads the Rails testing environment and configuration.
+4. Shared examples: Used for testing common webhook creation behavior across multiple services.
+
+## Configuration
+While there are no explicit configuration files mentioned, the tests imply the existence of:
+
+1. FactoryBot factories for creating test objects (subscriptions, organizations, plans, customers, usage thresholds).
+2. Shared examples for testing webhook creation, likely defined in a support file.
+
+## Notes
+1. The tests use a shared example 'creates webhook' to verify webhook creation across different services, suggesting a common pattern in webhook handling.
+2. The actual implementation of the webhook services is not included in these test files.
+3. The tests focus on ensuring that the correct event types and object types are used when creating webhooks for various subscription-related events.
+4. The application seems to have a complex subscription system with features like trial periods, usage thresholds, and termination alerts.
+5. The use of webhooks indicates that the application likely integrates with external systems or provides real-time notifications for subscription events.
+
+These tests play a crucial role in ensuring the reliability and correctness of the webhook system, which is essential for maintaining accurate communication about subscription states and events in the application.

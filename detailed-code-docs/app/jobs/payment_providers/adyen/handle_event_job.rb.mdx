@@ -1,0 +1,41 @@
+---
+title: "handle_event_job.rb"
+---
+
+## High-level description
+This code defines a background job class `HandleEventJob` within the `PaymentProviders::Adyen` module. Its purpose is to asynchronously process Adyen payment provider events by delegating the event handling to the `PaymentProviders::AdyenService`.
+
+## Symbols
+
+### `PaymentProviders::Adyen::HandleEventJob`
+#### Description
+This class is a subclass of `ApplicationJob` and is responsible for processing Adyen payment provider events asynchronously.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization associated with the event |
+| event_json | String | JSON representation of the Adyen event |
+
+#### Internal Logic
+1. The job is queued in the 'providers' queue using `queue_as 'providers'`.
+2. The `perform` method is called with the given `organization` and `event_json`.
+3. It creates a new instance of `PaymentProviders::AdyenService` and calls its `handle_event` method with the provided arguments.
+4. The result of the `handle_event` method is checked for errors using `raise_if_error!`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ApplicationJob | Base job class that this job inherits from |
+| PaymentProviders::AdyenService | Service class used to handle the Adyen event |
+
+## References
+- `PaymentProviders::AdyenService`: This service class is instantiated and its `handle_event` method is called to process the Adyen event.
+
+## Error Handling
+The job uses the `raise_if_error!` method on the result object returned by `PaymentProviders::AdyenService#handle_event`. This suggests that any errors occurring during event handling will be raised, potentially triggering job retries or logging depending on the application's job configuration.
+
+## Related Code Context
+The related `PaymentProviders::AdyenService` class contains the actual logic for handling different types of Adyen events, such as authorizations, refunds, and chargebacks. The `HandleEventJob` serves as an asynchronous wrapper for this service, allowing event processing to be performed in the background.
+
+The provided test file (`spec/jobs/payment_providers/adyen/handle_event_job_spec.rb`) verifies that the job correctly instantiates the `PaymentProviders::AdyenService` and calls its `handle_event` method with the provided arguments.

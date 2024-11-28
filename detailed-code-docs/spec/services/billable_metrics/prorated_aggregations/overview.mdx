@@ -1,0 +1,66 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for two services within the `BillableMetrics::ProratedAggregations` namespace: `SumService` and `UniqueCountService`. These services are responsible for calculating prorated aggregations for billable metrics, specifically for sum-based and unique count-based metrics.
+
+## What does it do?
+The tests in this directory ensure that the prorated aggregation services correctly calculate billable metrics under various scenarios. These scenarios include:
+
+1. Aggregating events over different time periods
+2. Handling pay-in-advance charges
+3. Applying filters to events
+4. Performing grouped aggregations
+5. Calculating current usage
+6. Handling prorated calculations for partial periods
+7. Managing different subscription statuses (e.g., terminated or upgraded)
+
+The tests simulate real-world situations where a business might need to calculate usage-based charges for their customers, taking into account factors like proration, unique counts, and time-based aggregations.
+
+## Key Files
+
+1. `sum_service_spec.rb`:
+   This file tests the `BillableMetrics::ProratedAggregations::SumService` class. It focuses on sum-based aggregations, ensuring that the service correctly calculates total sums of events, applies prorations, and handles various edge cases.
+
+   Key methods tested:
+   - `#aggregate`: Calculates the prorated sum aggregation
+   - `#per_event_aggregation`: Provides aggregations on a per-event basis
+
+2. `unique_count_service_spec.rb`:
+   This file tests the `BillableMetrics::ProratedAggregations::UniqueCountService` class. It verifies the correct calculation of unique count aggregations, including prorated counts and grouped aggregations.
+
+   Key methods tested:
+   - `#aggregate`: Calculates the prorated unique count aggregation
+   - `#grouped_by_aggregation`: Calculates grouped prorated unique count aggregations
+   - `#per_event_aggregation`: Calculates per-event aggregations for unique counts
+
+Both files cover a wide range of scenarios, including full periods, partial periods, terminated subscriptions, upgraded subscriptions, and various filtering and grouping options.
+
+## Dependencies
+Both test files rely on the following dependencies:
+
+1. Rails testing framework (RSpec)
+2. FactoryBot for creating test data
+3. Application models and services:
+   - Subscription
+   - BillableMetric
+   - Charge
+   - Event
+   - Events::Stores::PostgresStore (default event store)
+
+## Configuration
+The tests use RSpec's configuration, which is likely set up in a `rails_helper` or `spec_helper` file (not present in this directory). They also rely on FactoryBot configurations for creating test data.
+
+No specific environment variables or configuration files are mentioned in the provided summaries.
+
+Both services accept similar inputs:
+- `event_store_class`: The class used for event storage (default: Events::Stores::PostgresStore)
+- `charge`: The charge object associated with the billable metric
+- `subscription`: The subscription object
+- `boundaries`: A hash containing time boundaries for the aggregation period
+- `filters`: A hash containing filtering options for events
+
+These inputs allow the services to be flexible and adaptable to different scenarios and requirements.
+
+In summary, this directory contains comprehensive test coverage for two critical services in the billing system, ensuring accurate calculation of prorated aggregations for sum-based and unique count-based billable metrics across a wide range of scenarios.

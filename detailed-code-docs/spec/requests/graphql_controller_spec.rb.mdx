@@ -1,0 +1,70 @@
+---
+title: "graphql_controller_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the GraphqlController, specifically focusing on the POST /graphql endpoint. It tests various scenarios including user login, JWT token handling, and customer portal token authentication.
+
+## Code Structure
+The main structure is an RSpec describe block for GraphqlController, with nested contexts for different scenarios. Each scenario is tested with individual it blocks that make POST requests to the /graphql endpoint and assert the expected responses.
+
+## Symbols
+
+### RSpec.describe GraphqlController
+#### Description
+This is the main describe block for testing the GraphqlController.
+
+### describe 'POST /graphql'
+#### Description
+This nested describe block focuses on testing the POST /graphql endpoint.
+
+### let(:membership), let(:user), let(:mutation)
+#### Description
+These let blocks define shared resources used across multiple tests. They set up a membership, associated user, and a GraphQL mutation for user login.
+
+### it 'returns GraphQL response'
+#### Description
+This test verifies that a successful GraphQL login mutation returns the expected response.
+
+#### Internal Logic
+1. Sends a POST request to /graphql with login mutation and user credentials.
+2. Checks for a 200 status response.
+3. Verifies that CurrentContext.source is set to 'graphql'.
+4. Parses the JSON response and checks for the presence of a token and correct user data.
+
+### context 'with JWT token'
+#### Description
+This context block tests scenarios involving JWT tokens.
+
+#### Internal Logic
+- Defines methods to create valid and expired JWT tokens.
+- Tests token refresh on valid requests.
+- Tests handling of expired tokens.
+- Tests retrieval of current organization based on headers.
+
+### context 'with customer portal token'
+#### Description
+This context block tests scenarios involving customer portal tokens.
+
+#### Internal Logic
+- Sets up a customer and a GraphQL query for customer portal invoices.
+- Generates a customer portal token.
+- Tests that the correct end user is retrieved and a success status is returned.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| FactoryBot | Used for creating test data (membership, user, customer) |
+| JWT | Used for encoding and decoding JWT tokens |
+| ActiveSupport::MessageVerifier | Used for generating customer portal tokens |
+
+## Error Handling
+The tests check for proper error handling in case of an expired JWT token. It verifies that the response includes an error message with the correct code and status.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /graphql | POST | GraphQL query/mutation with variables | JSON response with data or errors | Handles GraphQL requests for various operations including user login and customer portal data retrieval |
+
+This test file provides comprehensive coverage for the GraphQL endpoint, ensuring proper functionality for user authentication, token handling, and customer portal access. It verifies both successful scenarios and error cases, contributing to the overall reliability of the GraphQL API.

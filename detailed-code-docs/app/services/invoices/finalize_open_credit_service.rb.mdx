@@ -1,0 +1,76 @@
+---
+title: "finalize_open_credit_service.rb"
+---
+
+## High-level description
+This code defines the `FinalizeOpenCreditService` class within the `Invoices` module. Its primary purpose is to finalize an open credit invoice, updating its status, dates, and triggering various related actions such as sending webhooks, generating PDFs, and creating integration jobs.
+
+## Code Structure
+The `FinalizeOpenCreditService` class inherits from `BaseService` and contains a single public method `call` that orchestrates the finalization process. It also includes private helper methods for determining the current date in the customer's timezone and whether an email should be delivered.
+
+## Symbols
+
+### `FinalizeOpenCreditService`
+#### Description
+This service class is responsible for finalizing an open credit invoice. It updates the invoice's status, sets the issuing and payment due dates, and triggers various follow-up actions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice to be finalized |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the finalized invoice and any error information |
+
+#### Internal Logic
+1. Check if the invoice exists and is not already finalized.
+2. Update the invoice's issuing date, payment due date, and status within a transaction.
+3. Trigger various jobs and actions:
+   - Send a webhook for the paid credit addition
+   - Generate a PDF and notify the customer (if applicable)
+   - Create integration jobs for invoice and sales order synchronization (if applicable)
+   - Track the invoice creation event
+
+### `call`
+#### Description
+The main method that executes the invoice finalization process.
+
+#### Internal Logic
+1. Return a not found failure if the invoice is nil.
+2. Return early if the invoice is already finalized.
+3. Update the invoice details within a transaction.
+4. Trigger various follow-up actions and jobs.
+5. Return the result object containing the updated invoice.
+
+### `today_in_tz`
+#### Description
+A private method that returns the current date in the customer's applicable timezone.
+
+### `should_deliver_email?`
+#### Description
+A private method that determines whether an email should be sent based on the license status and organization settings.
+
+## Side Effects
+- Updates the invoice record in the database
+- Enqueues multiple background jobs
+- Sends a webhook
+- Potentially sends an email
+- Tracks an event using Segment
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| SendWebhookJob | To send a webhook notification about the paid credit addition |
+| GeneratePdfAndNotifyJob | To generate a PDF of the invoice and potentially notify the customer |
+| Integrations::Aggregator::Invoices::CreateJob | To synchronize the invoice with an external aggregator |
+| Integrations::Aggregator::SalesOrders::CreateJob | To synchronize the sales order with an external aggregator |
+| Utils::SegmentTrack | To track the invoice creation event |
+| License | To check if the premium features are available |
+
+## Error Handling
+The service uses the `result` object to handle and communicate errors. If the invoice is not found, it sets a not found failure on the result object.
+
+## Performance Considerations
+The service uses a database transaction to ensure atomicity when updating the invoice details. This helps maintain data integrity but may impact performance for long-running transactions.

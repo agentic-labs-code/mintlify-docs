@@ -1,0 +1,99 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains service classes responsible for managing adjusted fees within an invoicing system. The main components are the `CreateService` and `DestroyService`, which handle the creation and deletion of adjusted fees, respectively. These services are designed to work within a larger invoicing ecosystem, likely part of a premium feature set for an organization.
+
+## What does it do?
+The services in this directory manage the lifecycle of adjusted fees, which are modifications to original fees in an invoice. Here's a breakdown of the main processes:
+
+1. Creating an adjusted fee:
+   - Validates that the organization has the necessary premium license.
+   - Checks if the invoice is in a draft state.
+   - Ensures that the fee doesn't already have an adjusted fee.
+   - Validates the charge model for the adjustment.
+   - Creates a new adjusted fee record.
+   - Refreshes the draft invoice to reflect the changes.
+
+2. Destroying an adjusted fee:
+   - Verifies the existence of the fee and its associated adjusted fee.
+   - Removes the adjusted fee from the system.
+   - Refreshes the draft invoice to update the totals and related information.
+
+Both services handle error cases and return structured results, allowing the calling code to easily determine the success or failure of the operations.
+
+## Key Files
+
+1. `create_service.rb`:
+   This file contains the `CreateService` class, which is responsible for creating new adjusted fees. It handles various validations, creates the adjusted fee record, and ensures the invoice is updated accordingly.
+
+   Key features:
+   - Premium license validation
+   - Draft invoice state check
+   - Charge model validation
+   - Adjusted fee creation within a database transaction
+   - Invoice refresh after creation
+
+2. `destroy_service.rb`:
+   This file defines the `DestroyService` class, which manages the removal of adjusted fees from the system. It verifies the existence of the fee and adjusted fee, performs the deletion, and updates the invoice.
+
+   Key features:
+   - Fee and adjusted fee existence checks
+   - Adjusted fee deletion
+   - Invoice refresh after deletion
+
+Both services inherit from a `BaseService` class, which likely provides common functionality for service objects in the application.
+
+## Dependencies
+The services rely on several external dependencies and internal components:
+
+1. ActiveRecord: Used for database operations and validations (implied by the use of `ActiveRecord::RecordInvalid`).
+2. `BaseService`: A parent class providing common service object functionality.
+3. `License`: Used to check if the premium feature is available for the organization.
+4. `AdjustedFee`: The model representing an adjusted fee in the system.
+5. `Invoices::RefreshDraftService`: A service responsible for updating the draft invoice after changes to adjusted fees.
+
+## Configuration
+While there are no explicit configuration files mentioned, the services may rely on environment variables or application-wide settings for:
+
+1. Premium feature flags
+2. Invoice states (e.g., draft, finalized)
+3. Charge model configurations
+
+The `disabled_charge_model?` method in `CreateService` suggests that there might be specific rules or configurations for different charge models (percentage, prorated, graduated) that determine whether they can be adjusted.
+
+## Code Examples
+
+Here's an example of how the `CreateService` might be used:
+
+```ruby
+fee = Fee.find(1)
+params = { unit_amount: 100 }
+result = AdjustedFees::CreateService.new(organization: current_organization, fee: fee, params: params).call
+
+if result.success?
+  adjusted_fee = result.adjusted_fee
+  # Handle successful creation
+else
+  errors = result.error
+  # Handle errors
+end
+```
+
+And an example of using the `DestroyService`:
+
+```ruby
+fee = Fee.find(1)
+result = AdjustedFees::DestroyService.new(fee).call
+
+if result.success?
+  updated_fee = result.fee
+  # Handle successful deletion
+else
+  errors = result.error
+  # Handle errors
+end
+```
+
+These services provide a clean and encapsulated way to manage adjusted fees within the invoicing system, ensuring that all necessary validations and updates are performed consistently.

@@ -1,0 +1,68 @@
+---
+title: "en.yml"
+---
+
+## High-level description
+This YAML file (`config/locales/en.yml`) contains English language translations and configurations for various error messages, date formats, and money formatting options. It serves as a centralized location for managing localized text and settings in an application, particularly for handling ActiveRecord errors and formatting dates and monetary values.
+
+## Symbols
+
+### `en`
+#### Description
+The root key for English translations and configurations.
+
+### `activerecord`
+#### Description
+Contains translations related to ActiveRecord, primarily error messages.
+
+### `errors`
+#### Description
+Defines various error messages for ActiveRecord validations and other error scenarios.
+
+#### Internal Logic
+The error messages are organized as key-value pairs, where the key represents a specific error condition, and the value is the corresponding error message. These messages are likely used throughout the application to provide consistent and localized error feedback.
+
+### `date`
+#### Description
+Configures date formatting options.
+
+#### Internal Logic
+Currently, it only defines a default date format (`"%b %d, %Y"`), which represents dates as "Month Day, Year" (e.g., "Jan 01, 2023").
+
+### `money`
+#### Description
+Defines formatting options for monetary values.
+
+#### Internal Logic
+- `decimal_mark`: Specifies the character used as a decimal separator (`.`)
+- `format`: Defines the overall format for displaying monetary values (`"%u%n"`, where `%u` is likely the currency symbol and `%n` is the number)
+- `thousands_separator`: Specifies the character used to separate thousands (`,`)
+
+## Dependencies
+This file is likely used by the I18n (Internationalization) gem in a Ruby on Rails application. It provides translations and configurations that can be accessed throughout the application using the `I18n.t()` method.
+
+## References
+The `Credit` model in `app/models/credit.rb` references this configuration file for money formatting:
+
+```ruby
+applied_coupon.amount.format(
+  format: I18n.t('money.format'),
+  decimal_mark: I18n.t('money.decimal_mark'),
+  thousands_separator: I18n.t('money.thousands_separator')
+)
+```
+
+This demonstrates how the money formatting configurations are used in the application to ensure consistent display of monetary values.
+
+## Configuration
+The entire file serves as a configuration for localization and formatting. Key configurations include:
+
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| `activerecord.errors.messages` | Hash | Various | Defines error messages for different validation scenarios |
+| `date.formats.default` | String | `"%b %d, %Y"` | Sets the default date format |
+| `money.decimal_mark` | String | `"."` | Specifies the decimal separator for monetary values |
+| `money.format` | String | `"%u%n"` | Defines the overall format for displaying monetary values |
+| `money.thousands_separator` | String | `","` | Specifies the thousands separator for monetary values |
+
+These configurations can be easily modified to change the application's behavior regarding error messages, date formatting, and money formatting without altering the application code.

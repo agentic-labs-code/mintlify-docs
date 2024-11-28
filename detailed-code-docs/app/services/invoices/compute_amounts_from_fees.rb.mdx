@@ -1,0 +1,47 @@
+---
+title: "compute_amounts_from_fees.rb"
+---
+
+## High-level description
+This code defines a service class `ComputeAmountsFromFees` within the `Invoices` module. Its primary purpose is to calculate and update various amounts on an invoice based on its associated fees, taxes, and credits. It handles both regular invoices and invoices with provider taxes.
+
+## Code Structure
+The main class `ComputeAmountsFromFees` inherits from `BaseService`. It contains a single public method `call` that performs all the calculations and updates the invoice. The class uses several other services to apply taxes and handle provider taxes when necessary.
+
+## Symbols
+
+### ComputeAmountsFromFees
+#### Description
+This class is responsible for computing various amounts on an invoice based on its fees, taxes, and credits.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice object to be processed |
+| provider_taxes | Array | Optional. Provider taxes to be applied |
+
+#### Internal Logic
+1. Checks if the invoice is one-off or failed.
+2. If not, it applies taxes to each fee using either `ApplyProviderTaxesService` or `ApplyTaxesService`.
+3. Calculates the total fees amount, coupons amount, and sub-total excluding taxes.
+4. Applies taxes to the invoice using either `ApplyProviderTaxesService` or `ApplyTaxesService`.
+5. Calculates the sub-total including taxes and the total amount.
+6. Updates the invoice object with the calculated amounts.
+
+#### Side Effects
+- Modifies the `invoice` object, updating various amount fields.
+- Saves changes to fees in the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Fees::ApplyProviderTaxesService | Applies provider taxes to fees |
+| Fees::ApplyTaxesService | Applies regular taxes to fees |
+| Invoices::ApplyProviderTaxesService | Applies provider taxes to the invoice |
+| Invoices::ApplyTaxesService | Applies regular taxes to the invoice |
+
+## Error Handling
+The service uses the `raise_if_error!` method to handle errors from the tax application services. If an error occurs, it will be propagated up the call stack.
+
+## Performance Considerations
+This service performs multiple database operations, including saving fees and calculating sums. For large invoices with many fees, this could potentially be a performance bottleneck. Consider optimizing database queries or using batch operations if performance issues arise.

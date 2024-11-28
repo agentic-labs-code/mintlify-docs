@@ -1,0 +1,74 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL resolvers for various analytics-related queries within an application. These resolvers are responsible for fetching and processing data related to gross revenues, invoice collections, invoiced usages, monthly recurring revenue (MRR), and overdue balances. They are part of a larger analytics module and are designed to work with a GraphQL API.
+
+## What does it do?
+The resolvers in this directory provide a way for authenticated users to query financial and usage data for their organization. Here's a breakdown of the main functionalities:
+
+1. Gross Revenues: Allows querying gross revenue data for an organization, with optional filtering by currency and customer.
+2. Invoice Collections: Provides data on invoice collections over a 12-month period, with optional currency filtering.
+3. Invoiced Usages: Fetches invoiced usage data for an organization over a 12-month period, with optional currency filtering.
+4. Monthly Recurring Revenue (MRR): Retrieves MRR data for an organization over a 12-month period, with optional currency filtering.
+5. Overdue Balances: Allows querying overdue balance information with optional filtering by currency, customer, and time range.
+
+These resolvers implement authentication checks, organization membership verification, and in some cases, premium license requirements before providing access to the requested data.
+
+## Key Files
+1. `gross_revenues_resolver.rb`: Handles queries for gross revenue data.
+2. `invoice_collections_resolver.rb`: Manages queries for invoice collection data.
+3. `invoiced_usages_resolver.rb`: Processes queries for invoiced usage data.
+4. `mrrs_resolver.rb`: Handles queries for Monthly Recurring Revenue (MRR) data.
+5. `overdue_balances_resolver.rb`: Manages queries for overdue balance information.
+
+Each of these files defines a resolver class that inherits from `Resolvers::BaseResolver` and includes modules for authentication and organization checks.
+
+## Dependencies
+The resolvers in this directory rely on several shared dependencies:
+
+1. `Resolvers::BaseResolver`: A base class for all resolvers, likely providing common functionality.
+2. `AuthenticableApiUser`: A module for handling API user authentication.
+3. `RequiredOrganization`: A module for ensuring the presence of a valid organization and user membership.
+4. `Types::CurrencyEnum`: An enum type for currency options used in queries.
+5. `License`: Used in some resolvers to check for premium license status.
+
+Additionally, each resolver depends on a corresponding analytics service class (e.g., `::Analytics::GrossRevenue`, `::Analytics::InvoiceCollection`) to fetch and process the actual data.
+
+## Configuration
+The resolvers use a `REQUIRED_PERMISSION` constant, typically set to 'analytics:view', to define the permission needed to access the data. This is likely used in conjunction with the authentication and organization checks to ensure proper access control.
+
+Some resolvers, such as `InvoiceCollectionsResolver` and `InvoicedUsagesResolver`, require a premium license to access the data. This is checked within the resolver before processing the query.
+
+Most of the resolvers use a fixed 12-month period for data retrieval, which is hardcoded in the implementation. If more flexibility is needed, this could be adjusted or made configurable in the future.
+
+The `OverdueBalancesResolver` allows for more flexible time range querying through its `months` argument.
+
+Here's an example of how these resolvers might be used in a GraphQL query:
+
+```graphql
+query {
+  grossRevenues(currency: USD, externalCustomerId: "CUST123") {
+    amountCents
+    currency
+    invoicesCount
+    month
+  }
+  
+  mrrs(currency: EUR) {
+    amountCents
+    currency
+    month
+  }
+  
+  overdueBalances(currency: GBP, months: 6) {
+    amountCents
+    currency
+    lagoInvoiceIds
+    month
+  }
+}
+```
+
+This query would fetch gross revenue data in USD for a specific customer, MRR data in EUR, and overdue balances in GBP for the last 6 months, assuming the user has the necessary permissions and license status.

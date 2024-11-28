@@ -1,0 +1,61 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions related to Okta authentication within the application. It includes two main components: an input type for accepting invites and a type for representing Okta authorization results.
+
+## What does it do?
+The code in this directory facilitates two key processes in the Okta authentication flow:
+
+1. Accepting membership invites: It defines the structure for the input data required when a user accepts an invitation to join the system using Okta OAuth. This includes the authorization code from Okta, the invitation token, and a state parameter for security.
+
+2. Okta authorization: It provides a type definition for the result of an Okta authorization request, which essentially consists of a URL that the user needs to visit to complete the authorization process.
+
+These types are likely used in conjunction with other parts of the application to handle user authentication and invitation acceptance through Okta's OAuth system.
+
+## Key Files
+
+1. `accept_invite_input.rb`:
+   This file defines the `AcceptInviteInput` GraphQL input type. It specifies the structure of the data required when a user accepts an invitation using Okta OAuth. The input includes three required string fields:
+   - `code`: The authorization code returned by Okta after successful user authentication.
+   - `invite_token`: The token associated with the membership invitation.
+   - `state`: A security parameter used in the Okta OAuth flow.
+
+   Example usage:
+   ```graphql
+   mutation {
+     oktaAcceptInvite(input: {
+       code: "auth_code_from_okta",
+       invite_token: "invitation_token",
+       state: "security_state_parameter"
+     }) {
+       # ... fields returned by the mutation
+     }
+   }
+   ```
+
+2. `authorize.rb`:
+   This file defines the `Authorize` GraphQL type, which represents the result of an Okta authorization request. It contains a single non-nullable string field:
+   - `url`: The URL for Okta authorization.
+
+   This type is likely used as the return type for a mutation or query that initiates the Okta authorization process. The returned URL is where the user should be directed to complete the Okta authentication.
+
+   Example usage:
+   ```graphql
+   query {
+     oktaAuthorize {
+       url
+     }
+   }
+   ```
+
+## Dependencies
+Both files depend on the `graphql` gem, which is used for defining GraphQL types in Ruby. They also rely on custom base classes (`Types::BaseInputObject` and `Types::BaseObject`) which are likely defined elsewhere in the application to provide common functionality for GraphQL types.
+
+The actual implementation of the Okta authentication logic is not present in these files. They only define the structure of the data used in the Okta authentication process. The implementation is likely handled by separate service objects or mutations within the application.
+
+## Configuration
+There are no explicit configuration files or environment variables mentioned in these files. However, the Okta integration likely requires configuration elsewhere in the application, such as Okta client ID, client secret, and redirect URIs.
+
+In conclusion, this directory provides the GraphQL type definitions necessary for handling Okta authentication in the application, specifically for accepting invitations and initiating the authorization process. These types work in conjunction with other parts of the application to implement the complete Okta OAuth flow.

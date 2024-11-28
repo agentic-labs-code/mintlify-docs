@@ -1,0 +1,52 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for the `Events::Stores::Clickhouse::PreAggregated` module, which is responsible for querying and aggregating pre-aggregated event data stored in ClickHouse. The tests cover various query types including count, latest, max, and sum operations on pre-aggregated events.
+
+## What does it do?
+The code in this directory tests the functionality of different query services that work with pre-aggregated event data in ClickHouse. These services are designed to efficiently retrieve and aggregate event data for billing purposes. The tests ensure that:
+
+1. Count queries correctly aggregate event counts for different charges and billable metrics.
+2. Latest queries accurately retrieve the most recent units for charges.
+3. Max queries properly calculate the maximum units for charges based on pre-aggregated events.
+4. Sum queries correctly aggregate the total units for sum billable metrics.
+
+Each query type is tested under various scenarios, including basic aggregation, grouped events, filtered events, and combinations of grouping and filtering. The tests also verify that these queries handle enriched events at the boundaries of the specified time periods correctly.
+
+## Key Files
+1. `count_query_spec.rb`: Tests the `CountQuery` service, which aggregates pre-aggregated event counts and enriched events for different charges and billable metrics.
+
+2. `latest_query_spec.rb`: Tests the `LatestQuery` service, which retrieves the latest units for charges, including scenarios with grouped_by and filters.
+
+3. `max_query_spec.rb`: Tests the `MaxQuery` service, which aggregates max units for charges based on pre-aggregated events stored in ClickHouse.
+
+4. `sum_query_spec.rb`: Tests the `SumQuery` service, which aggregates pre-aggregated and enriched events for sum billable metrics.
+
+Each of these files follows a similar structure, setting up test data using FactoryBot, calling the respective query service, and asserting the expected results.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test objects and data.
+3. Rails helper methods and configurations: Utilized for setting up the testing environment.
+
+## Configuration
+All test files are configured to use ClickHouse as the data store, indicated by the `clickhouse: true` metadata on the main describe blocks. The tests typically use a specific time range for queries:
+
+- From: '2024-07-01T03:42:00'
+- To: '2024-07-31T22:47:00'
+
+This time range is used consistently across the test files to ensure consistency in testing scenarios.
+
+The tests are structured to cover various scenarios, including:
+
+1. Basic aggregation without grouping or filters
+2. Handling of enriched events at the boundaries of the time period
+3. Grouped-by scenarios
+4. Filtered scenarios
+5. Combinations of grouped-by and filtered scenarios
+
+These comprehensive test scenarios ensure that the query services can handle a wide range of real-world use cases and edge cases in the billing system.

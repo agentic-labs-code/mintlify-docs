@@ -1,0 +1,72 @@
+---
+title: "add_on_resolver_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Resolvers::AddOnResolver` GraphQL resolver. It tests the functionality of querying a single add-on, including its associated data like customer count and applied add-ons count, while also verifying proper authentication and authorization.
+
+## Code Structure
+The test suite is organized around a main query and several test cases. It uses factory methods to create test data and shared examples for common authorization checks.
+
+## Symbols
+
+### RSpec.describe Resolvers::AddOnResolver
+#### Description
+This is the main test suite for the `AddOnResolver`. It sets up the necessary test data and defines various test cases to ensure the resolver functions correctly.
+
+#### Internal Logic
+1. Sets up test data including memberships, organizations, add-ons, customers, and applied add-ons.
+2. Defines a GraphQL query to fetch a single add-on.
+3. Includes shared examples for authorization checks.
+4. Tests the successful retrieval of an add-on and its associated data.
+5. Tests error handling for non-existent add-ons.
+
+### let(:query)
+#### Description
+Defines the GraphQL query used in the tests to fetch a single add-on.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| query | String | GraphQL query for fetching an add-on |
+
+### let(:membership), let(:organization), let(:add_on), let(:customer), let(:customer2), let(:applied_add_on_list), let(:applied_add_on)
+#### Description
+These `let` blocks define the test data used across the test suite, including memberships, organizations, add-ons, customers, and applied add-ons.
+
+### before
+#### Description
+Sets up additional test data, including creating subscriptions for a customer.
+
+### it_behaves_like 'requires current user', 'requires current organization', 'requires permission'
+#### Description
+These shared examples ensure that the resolver properly checks for user authentication, organization context, and specific permissions.
+
+### it 'returns a single add-on'
+#### Description
+Tests the successful retrieval of an add-on and verifies the returned data.
+
+#### Internal Logic
+1. Executes the GraphQL query with proper authentication and authorization.
+2. Verifies the returned add-on data, including id, name, customer count, and applied add-ons count.
+
+### context 'when add-on is not found'
+#### Description
+Tests the error handling when an invalid add-on ID is provided.
+
+#### Internal Logic
+1. Executes the GraphQL query with an invalid add-on ID.
+2. Verifies that the appropriate error message is returned.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| factory_bot | Used for creating test data (implied by the use of `create` method) |
+
+## Error Handling
+The test suite includes a specific test case for handling the scenario when an add-on is not found, expecting a "Resource not found" error message.
+
+___
+
+This test file ensures that the `AddOnResolver` correctly handles queries for individual add-ons, including proper data retrieval, authorization checks, and error handling. It verifies that the resolver returns the correct add-on details, including derived data like customer count and applied add-ons count, and properly handles cases where the requested add-on doesn't exist.

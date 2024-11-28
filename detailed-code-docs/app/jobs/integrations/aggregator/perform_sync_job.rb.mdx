@@ -1,0 +1,51 @@
+---
+title: "perform_sync_job.rb"
+---
+
+## High-level description
+This code defines a job class `PerformSyncJob` within the `Integrations::Aggregator` module. The job is responsible for synchronizing data between an integration and an aggregator service, including standard items and optionally tax items.
+
+## Code Structure
+The `PerformSyncJob` class inherits from `ApplicationJob` and defines a single `perform` method. It uses three service classes: `SyncService`, `ItemsService`, and `TaxItemsService` to perform the synchronization tasks.
+
+## Symbols
+
+### `Integrations::Aggregator::PerformSyncJob`
+#### Description
+This job class handles the synchronization process for an integration, including syncing standard items and optionally tax items.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Object | The integration object to be synchronized |
+| sync_tax_items | Boolean | Flag to determine if tax items should be synced (default: false) |
+
+#### Internal Logic
+1. Sets the job queue to 'integrations'
+2. Configures retry behavior for `LagoHttpClient::HttpError`
+3. Calls `SyncService` to perform the main synchronization
+4. Calls `ItemsService` to sync standard items
+5. If `sync_tax_items` is true, calls `TaxItemsService` to sync tax items
+6. Raises any errors encountered during the process
+
+#### Performance Considerations
+The job is designed to be run asynchronously and includes retry logic for HTTP errors, which helps in handling temporary network issues or service unavailability.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ApplicationJob | Base job class |
+| LagoHttpClient::HttpError | Custom HTTP error class for retry handling |
+| Integrations::Aggregator::SyncService | Service for main synchronization |
+| Integrations::Aggregator::ItemsService | Service for syncing standard items |
+| Integrations::Aggregator::TaxItemsService | Service for syncing tax items |
+
+## Error Handling
+The job uses the `retry_on` method to handle `LagoHttpClient::HttpError` with a polynomial backoff strategy, attempting up to 3 retries. Each service call uses the `raise_if_error!` method to propagate any errors encountered during the synchronization process.
+
+## API/Interface Reference
+| Method | Parameters | Description |
+|:-------|:-----------|:------------|
+| perform | integration:, sync_tax_items: false | Executes the synchronization process for the given integration |
+
+This job is typically called from other parts of the application, such as the `Integrations::Netsuite::UpdateService` and `Integrations::Netsuite::CreateService`, where it's scheduled to run after a short delay (2 seconds) when certain conditions are met.

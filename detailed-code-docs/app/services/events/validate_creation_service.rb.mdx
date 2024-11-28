@@ -1,0 +1,74 @@
+---
+title: "validate_creation_service.rb"
+---
+
+## High-level description
+This code defines the `ValidateCreationService` class within the `Events` module. Its primary purpose is to validate the parameters for creating a new event in the system, ensuring that all necessary information is present and valid before proceeding with the event creation.
+
+## Code Structure
+The `ValidateCreationService` class is structured with a class method `call` and an instance method `call`. The main validation logic is contained in the private `validate_create` method, which checks various conditions and returns appropriate error messages if validation fails.
+
+## Symbols
+
+### `Events::ValidateCreationService`
+#### Description
+This class is responsible for validating the parameters required to create a new event. It checks for the presence and validity of customer, subscription, transaction ID, event code, and properties.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization associated with the event |
+| params | Hash | Parameters for creating the event |
+| result | Object | An object to store the result of the validation |
+| customer | Customer | The customer associated with the event |
+| subscriptions | Array | An array of subscriptions (default: empty array) |
+
+#### Internal Logic
+1. Validates the presence of a customer if an external customer ID is provided.
+2. Checks for the presence and validity of a subscription.
+3. Validates the uniqueness of the transaction ID.
+4. Verifies the validity of the event code (billable metric).
+5. Checks the validity of the event properties, especially for aggregation-type billable metrics.
+
+### `validate_create`
+#### Description
+This private method performs the main validation logic for event creation.
+
+#### Internal Logic
+1. Checks for the presence of a customer if an external customer ID is provided.
+2. Validates the subscription information.
+3. Checks the uniqueness of the transaction ID.
+4. Verifies the validity of the event code.
+5. Validates the event properties.
+
+### `valid_transaction_id?`
+#### Description
+Checks if the provided transaction ID is unique for the given organization and subscription.
+
+### `valid_code?`
+#### Description
+Verifies if the provided event code corresponds to an existing billable metric.
+
+### `valid_properties?`
+#### Description
+Validates the properties of the event, particularly for aggregation-type billable metrics (max, sum, or latest).
+
+### `valid_number?`
+#### Description
+Checks if a given value can be converted to a float, used for validating numeric properties.
+
+## Error Handling
+The service uses a result object to handle and return various error states:
+- Missing or invalid customer
+- Missing or invalid subscription
+- Duplicate or missing transaction ID
+- Invalid event code (billable metric not found)
+- Invalid properties for aggregation-type metrics
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| LagoTracer | Used for tracing the execution of the service |
+
+## Performance Considerations
+The service performs database queries to check for existing events and billable metrics. These queries are optimized using scopes and indexes, but they should be monitored for performance in high-volume scenarios.

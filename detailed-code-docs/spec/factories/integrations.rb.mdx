@@ -1,0 +1,94 @@
+---
+title: "integrations.rb"
+---
+
+## High-level description
+This file defines factories for various integration types using FactoryBot. It creates test data for NetSuite, Okta, Anrok, and Xero integrations, each with specific attributes and settings.
+
+## Symbols
+
+### `FactoryBot.define`
+#### Description
+This method is used to define a group of factories for creating test objects.
+
+### `factory :netsuite_integration`
+#### Description
+Defines a factory for creating NetSuite integration objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | association | Associated organization |
+| type | string | Type of integration |
+| code | string | Unique code for the integration |
+| name | string | Name of the integration |
+| secrets | json | JSON string containing connection_id and client_secret |
+| settings | hash | Hash containing account_id, client_id, script_endpoint_url, and legacy_script |
+
+#### Internal Logic
+- Generates a unique code using `SecureRandom.uuid`
+- Creates JSON secrets with random UUIDs
+- Sets up settings with predefined values and a fake URL
+
+### `factory :okta_integration`
+#### Description
+Defines a factory for creating Okta integration objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | association | Associated organization |
+| type | string | Type of integration |
+| code | string | Code for the integration |
+| name | string | Name of the integration |
+| settings | hash | Hash containing client_id, domain, and organization_name |
+| secrets | json | JSON string containing client_secret |
+
+#### Internal Logic
+- Sets a fixed code 'okta'
+- Creates settings with a random UUID for client_id
+- Generates JSON secrets with a random UUID for client_secret
+
+### `factory :anrok_integration`
+#### Description
+Defines a factory for creating Anrok integration objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | association | Associated organization |
+| type | string | Type of integration |
+| code | string | Code for the integration |
+| name | string | Name of the integration |
+| secrets | json | JSON string containing connection_id and api_key |
+
+#### Internal Logic
+- Sets a fixed code 'anrok'
+- Generates JSON secrets with random UUIDs for connection_id and api_key
+
+### `factory :xero_integration`
+#### Description
+Defines a factory for creating Xero integration objects.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | association | Associated organization |
+| type | string | Type of integration |
+| code | string | Code for the integration |
+| name | string | Name of the integration |
+| secrets | json | JSON string containing connection_id |
+
+#### Internal Logic
+- Sets a fixed code 'xero'
+- Generates JSON secrets with a random UUID for connection_id
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| FactoryBot | Used for defining factories for test data creation |
+| SecureRandom | Used for generating random UUIDs |
+| Faker | Used for generating fake URLs |
+
+## References
+This factory file is likely used in conjunction with the `IntegrationCustomers::Factory` class from the related code snippet. The integration types defined here (`NetsuiteIntegration`, `AnrokIntegration`, `XeroIntegration`) correspond to the cases handled in the `service_class` method of the `IntegrationCustomers::Factory` class.

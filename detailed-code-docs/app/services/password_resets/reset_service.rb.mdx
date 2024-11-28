@@ -1,0 +1,51 @@
+---
+title: "reset_service.rb"
+---
+
+## High-level description
+The `PasswordResets::ResetService` is responsible for resetting a user's password using a provided token and new password. It validates the input, finds the corresponding password reset record, updates the user's password, logs the user in, and then destroys the password reset record.
+
+## Code Structure
+The `ResetService` class inherits from `BaseService` and contains a single public method `call` that orchestrates the password reset process. It uses private attributes to store the token and new password.
+
+## References
+- `PasswordReset` model
+- `UsersService` class
+
+## Symbols
+
+### `PasswordResets::ResetService`
+#### Description
+This service class handles the password reset process for users.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| token | String | The token associated with the password reset request |
+| new_password | String | The new password to be set for the user |
+
+#### Outputs
+The method returns a `result` object, which contains information about the success or failure of the operation, including any error messages or the logged-in user data.
+
+#### Internal Logic
+1. Validates the presence of `new_password` and `token`.
+2. Finds a valid `PasswordReset` record using the provided token.
+3. Within a transaction:
+   - Updates the user's password.
+   - Logs in the user using `UsersService`.
+   - Destroys the `PasswordReset` record.
+4. Returns the result of the login operation.
+
+## Error Handling
+The service uses the `result` object to handle and return errors:
+- Missing password: `result.single_validation_failure!(field: :new_password, error_code: 'missing_password')`
+- Missing token: `result.single_validation_failure!(field: :token, error_code: 'missing_token')`
+- Invalid or expired token: `result.not_found_failure!(resource: 'password_reset')`
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | For database operations and transactions |
+
+## TODOs
+There are no explicit TODOs in the code.

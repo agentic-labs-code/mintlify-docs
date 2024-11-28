@@ -1,0 +1,84 @@
+---
+title: "sync_credit_note_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Mutations::Integrations::SyncCreditNote` GraphQL mutation. It verifies the behavior of syncing a credit note through an integration, specifically focusing on permission checks and the correct invocation of the underlying service.
+
+## Code Structure
+The test suite is organized around a single `describe` block for the `Mutations::Integrations::SyncCreditNote` mutation. It uses various let statements to set up the test environment and a subject block to define the execution of the GraphQL mutation. The main test cases are defined using RSpec's `it` blocks and shared examples.
+
+## References
+This test file references:
+- `Mutations::Integrations::SyncCreditNote` (the GraphQL mutation being tested)
+- `Integrations::Aggregator::CreditNotes::CreateService` (the service being mocked)
+- Various factory-created models (credit_note, customer, organization, membership, integration_customer, integration)
+
+## Symbols
+
+### `execute_graphql_call` (subject)
+#### Description
+Executes the GraphQL mutation with the specified parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| current_user | User | The user executing the mutation |
+| current_organization | Organization | The organization context |
+| permissions | String | The required permission |
+| query | String | The GraphQL mutation query |
+| variables | Hash | Input variables for the mutation |
+
+#### Internal Logic
+Sets up the GraphQL execution environment with the necessary context and executes the mutation.
+
+### `mutation` (let block)
+#### Description
+Defines the GraphQL mutation query string.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| mutation | String | The GraphQL mutation query |
+
+### `service` (let block)
+#### Description
+Creates a double of the `Integrations::Aggregator::CreditNotes::CreateService`.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| service | Double | A test double of the CreateService |
+
+### `result` (let block)
+#### Description
+Creates a mock result object for the service call.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | A mock result object |
+
+### Main test block
+#### Description
+Sets up the test environment, executes the GraphQL call, and defines the expectations.
+
+#### Internal Logic
+1. Sets up the integration customer
+2. Mocks the `CreateService` and its `call_async` method
+3. Executes the GraphQL call
+4. Defines shared examples for permission checks
+5. Verifies that the service is called with the correct parameters
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| RSpec | Testing framework |
+| FactoryBot | Used for creating test data |
+
+## Error Handling
+This test suite doesn't explicitly test error handling scenarios. It focuses on the happy path and permission checks.
+
+## TODOs
+There are no explicit TODOs in this code.

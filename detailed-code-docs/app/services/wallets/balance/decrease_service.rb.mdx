@@ -1,0 +1,66 @@
+---
+title: "decrease_service.rb"
+---
+
+## High-level description
+This code defines a service class `DecreaseService` within the `Wallets::Balance` module. Its primary purpose is to decrease the balance of a wallet by a specified amount of credits, updating various wallet attributes in the process.
+
+## Code Structure
+The `DecreaseService` class inherits from `BaseService` and contains an initializer and a `call` method. It interacts with a `Wallet` object and uses the `Wallets::Balance::RefreshOngoingService` to refresh the wallet's ongoing balance after the decrease operation.
+
+## References
+- `Wallets::Balance::RefreshOngoingService`
+- `BaseService` (not shown in the provided code)
+
+## Symbols
+
+### `Wallets::Balance::DecreaseService`
+#### Description
+This service class is responsible for decreasing the balance of a wallet by a specified amount of credits. It updates various wallet attributes and refreshes the ongoing balance.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet | Wallet | The wallet object to be updated |
+| credits_amount | Numeric | The amount of credits to decrease from the wallet |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the updated wallet |
+
+#### Internal Logic
+1. Calculate the amount in cents based on the wallet's rate and the credits amount.
+2. Update the wallet with new values for balance, credits balance, last sync time, consumed credits, consumed amount, and last consumed credit time.
+3. Call the `RefreshOngoingService` to update the ongoing balance.
+4. Set the updated wallet in the result object.
+
+## Side Effects
+- Updates the wallet object in the database with new balance and related information.
+- Triggers a refresh of the wallet's ongoing balance through `RefreshOngoingService`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseService | Parent class for the DecreaseService |
+| Wallets::Balance::RefreshOngoingService | Used to refresh the ongoing balance after the decrease operation |
+
+## Error Handling
+The code doesn't implement explicit error handling. It relies on Rails' built-in error raising for invalid operations (e.g., `update!` method).
+
+## API/Interface Reference
+| Method | Inputs | Outputs | Description |
+|:-------|:-------|:--------|:------------|
+| call | None (uses initialized values) | result object with updated wallet | Decreases the wallet balance and updates related attributes |
+
+## Performance Considerations
+The service performs a single database update operation on the wallet object, which should be relatively efficient. However, it also calls `RefreshOngoingService`, which may involve additional database queries and calculations. The performance impact of this call should be considered, especially for high-frequency operations.
+
+---
+
+Based on the related code snippets provided, we can see that the `DecreaseService` is used in other parts of the application:
+
+1. In `WalletTransactions::VoidService`, it's used to decrease the wallet balance when voiding a transaction.
+2. In `Credits::AppliedPrepaidCreditService`, it's used to decrease the wallet balance when applying prepaid credits to an invoice.
+
+These usages demonstrate that the `DecreaseService` is a crucial component in managing wallet balances across different operations in the application.

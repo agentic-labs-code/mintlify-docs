@@ -1,0 +1,59 @@
+---
+title: "destroy.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for deleting a coupon in a Ruby on Rails application. It's part of a larger GraphQL API and includes authentication and permission checks before allowing the deletion of a coupon.
+
+## Code Structure
+The `Destroy` class is nested within the `Mutations::Coupons` module and inherits from `BaseMutation`. It includes the `AuthenticableApiUser` concern for authentication purposes.
+
+## References
+- `AuthenticableApiUser` concern
+- `::Coupons::DestroyService`
+- `context[:current_user]`
+
+## Symbols
+
+### `Mutations::Coupons::Destroy`
+#### Description
+This class represents a GraphQL mutation for deleting a coupon. It authenticates the user, checks for the required permission, and uses a service object to perform the actual deletion.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the coupon to be deleted |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the deleted coupon (if successful) |
+
+#### Internal Logic
+1. Authenticates the user using the `AuthenticableApiUser` concern.
+2. Defines the required permission as 'coupons:delete'.
+3. In the `resolve` method:
+   - Finds the coupon belonging to the current user using the provided ID.
+   - Calls the `::Coupons::DestroyService` to delete the coupon.
+   - Returns the deleted coupon if successful, or an error if not.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication functionality |
+| ::Coupons::DestroyService | Service object for deleting coupons |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class) to handle and return errors from the `DestroyService`.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| DestroyCoupon | Mutation | `{ id: ID! }` | `{ id: ID }` | Deletes a coupon with the given ID |
+
+## Additional Notes
+1. The mutation is named 'DestroyCoupon' in the GraphQL schema.
+2. It requires the 'coupons:delete' permission to be executed.
+3. The mutation is scoped to the current user's coupons, ensuring users can only delete their own coupons.
+4. The actual deletion logic is encapsulated in the `::Coupons::DestroyService`, which is called within the `resolve` method.
+5. The `AuthenticableApiUser` concern likely provides the `ready?` method to check for user authentication before the mutation is executed.

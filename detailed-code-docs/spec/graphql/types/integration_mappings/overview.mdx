@@ -1,0 +1,87 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL types related to integration mappings. The tests focus on verifying the structure and field types of input and object types used in the GraphQL schema for creating, updating, and representing integration mappings.
+
+## What does it do?
+These test files ensure that the GraphQL types for integration mappings are correctly defined and maintain their expected structure. They verify that:
+
+1. The `CreateInput` type has the correct fields for creating new integration mappings.
+2. The `UpdateInput` type has the correct fields for updating existing integration mappings.
+3. The `Object` type correctly represents an integration mapping with all its attributes.
+
+By maintaining these tests, developers can ensure that any changes to the GraphQL schema related to integration mappings are intentional and don't break the expected structure.
+
+## Key Files
+1. `create_input_spec.rb`: Tests the structure of the `Types::IntegrationMappings::CreateInput` GraphQL input type.
+2. `update_input_spec.rb`: Tests the structure of the `Types::IntegrationMappings::UpdateInput` GraphQL input type.
+3. `object_spec.rb`: Tests the structure of the `Types::IntegrationMappings::Object` GraphQL object type.
+
+Each file focuses on a specific GraphQL type and verifies its fields and their respective types.
+
+## Dependencies
+The test files depend on the following:
+
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration for RSpec tests |
+
+Additionally, the tests indirectly reference the following GraphQL types:
+
+1. `Types::IntegrationMappings::CreateInput`
+2. `Types::IntegrationMappings::UpdateInput`
+3. `Types::IntegrationMappings::Object`
+4. `MappableTypeEnum`
+
+## Configuration
+The test files use the following RSpec configuration:
+
+```ruby
+RSpec.describe Types::IntegrationMappings::SomeType do
+  subject { described_class }
+  # ... test cases ...
+end
+```
+
+This configuration sets up the subject of the tests to be the described class, allowing for more concise test cases using `is_expected.to`.
+
+## Code Examples
+
+Here's an example of how the tests verify field types in the `object_spec.rb` file:
+
+```ruby
+RSpec.describe Types::IntegrationMappings::Object do
+  subject { described_class }
+
+  it { is_expected.to have_field(:id).of_type('ID!') }
+  it { is_expected.to have_field(:integration_id).of_type('ID!') }
+  it { is_expected.to have_field(:mappable_id).of_type('ID!') }
+  it { is_expected.to have_field(:mappable_type).of_type('MappableTypeEnum!') }
+  it { is_expected.to have_field(:external_account_code).of_type('String') }
+  it { is_expected.to have_field(:external_id).of_type('String!') }
+  it { is_expected.to have_field(:external_name).of_type('String') }
+end
+```
+
+And here's an example from the `create_input_spec.rb` file:
+
+```ruby
+RSpec.describe Types::IntegrationMappings::CreateInput do
+  subject { described_class }
+
+  it { is_expected.to accept_argument(:integration_id).of_type('ID!') }
+  it { is_expected.to accept_argument(:mappable_id).of_type('ID!') }
+  it { is_expected.to accept_argument(:mappable_type).of_type('MappableTypeEnum!') }
+  it { is_expected.to accept_argument(:external_account_code).of_type('String') }
+  it { is_expected.to accept_argument(:external_id).of_type('String!') }
+  it { is_expected.to accept_argument(:external_name).of_type('String') }
+end
+```
+
+These tests ensure that the GraphQL types have the correct structure and field types, which is crucial for maintaining the integrity of the GraphQL API schema.
+
+The use of `!` in some field types (e.g., `ID!`, `String!`) indicates that these fields are non-nullable in the GraphQL schema. The `MappableTypeEnum` type suggests that there's a custom enum type defined elsewhere in the codebase for the different types of mappable entities.
+
+By maintaining these tests, developers can catch any unintended changes to the GraphQL schema related to integration mappings, ensuring the stability and reliability of the API.

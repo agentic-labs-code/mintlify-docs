@@ -1,0 +1,72 @@
+---
+title: "range_graduated_percentage_service.rb"
+---
+
+## High-level description
+The `RangeGraduatedPercentageService` is a service class within the `Charges::AmountDetails` module that calculates the details of a graduated percentage charge for a specific range. It computes various attributes such as the number of units, flat amount, rate, and total amounts based on the given range and total units.
+
+## Code Structure
+This service inherits from `::BaseService` and contains a single public method `call` that returns a hash of calculated values. The class uses several private methods to compute different aspects of the charge.
+
+## References
+This service is used by the `GraduatedPercentageService` in the `Charges::ChargeModels` module to calculate the amount details for each range in a graduated percentage charge model.
+
+## Symbols
+
+### `RangeGraduatedPercentageService`
+#### Description
+This service calculates the details of a graduated percentage charge for a specific range.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| range | Hash | A hash containing the range details (from_value, to_value, flat_amount, rate) |
+| total_units | Numeric | The total number of units to be charged |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Hash | Hash | A hash containing calculated values for the charge |
+
+#### Internal Logic
+1. Initializes instance variables with the input parameters.
+2. Calculates various attributes such as `from_value`, `to_value`, `flat_unit_amount`, `rate`, `units`, `per_unit_total_amount`, and `total_with_flat_amount`.
+3. Returns a hash with all calculated values.
+
+### `call`
+#### Description
+The main method that performs the calculations and returns the result hash.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Hash | Hash | A hash containing all calculated values for the charge |
+
+### `units`
+#### Description
+Calculates the number of units to bill within the given range.
+
+#### Internal Logic
+1. Checks if the total units exceed the range's upper limit (to_value).
+2. Handles cases where the total units are within the range or exceed it.
+3. Adjusts the calculation based on whether the range starts from zero or not.
+
+### `per_unit_total_amount`
+#### Description
+Calculates the total amount for the units in the range, excluding the flat amount.
+
+#### Internal Logic
+Multiplies the number of units by the rate and divides by 100 (as the rate is a percentage).
+
+### `total_with_flat_amount`
+#### Description
+Calculates the total amount including the flat amount, if applicable.
+
+#### Internal Logic
+Adds the per-unit total amount to the flat unit amount, but only if the total units are not zero.
+
+## Dependencies
+This service depends on the `BigDecimal` class for precise decimal arithmetic.
+
+## Performance Considerations
+The service uses memoization (@variable ||=) for several calculations to avoid redundant computations, which can improve performance when these values are accessed multiple times.

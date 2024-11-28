@@ -1,0 +1,79 @@
+---
+title: "graduated_percentage_service.rb"
+---
+
+## High-level description
+This code defines the `GraduatedPercentageService` class within the `Charges::ChargeModels` module. It implements a graduated percentage charge model, which calculates charges based on graduated ranges with percentage rates and flat amounts.
+
+## Code Structure
+The `GraduatedPercentageService` class inherits from `Charges::ChargeModels::BaseService` and overrides several methods to implement the graduated percentage charge model logic.
+
+## Symbols
+
+### `GraduatedPercentageService`
+#### Description
+This class implements the graduated percentage charge model, calculating charges based on graduated ranges with percentage rates and flat amounts.
+
+#### Internal Logic
+1. `ranges`: Retrieves and processes the graduated percentage ranges from the properties.
+2. `amount_details`: Calculates the details for each range using the `RangeGraduatedPercentageService`.
+3. `compute_amount`: Sums up the total charges from all applicable ranges.
+4. `unit_amount`: Calculates the per-unit amount based on the total charge and units.
+
+### `ranges`
+#### Description
+Retrieves the graduated percentage ranges from the properties and converts them to hashes with indifferent access.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ranges | Array | An array of hashes representing the graduated percentage ranges |
+
+### `amount_details`
+#### Description
+Calculates the charge details for each applicable range using the `RangeGraduatedPercentageService`.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| amount_details | Hash | A hash containing the graduated percentage ranges with their calculated details |
+
+#### Internal Logic
+1. Iterates through the ranges.
+2. Calls `RangeGraduatedPercentageService` for each range.
+3. Stops processing when the total units are covered or when a range with no upper limit is reached.
+
+### `compute_amount`
+#### Description
+Calculates the total charge amount by summing up the `total_with_flat_amount` from all applicable ranges.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| total_amount | Numeric | The total charge amount |
+
+### `unit_amount`
+#### Description
+Calculates the per-unit charge amount by dividing the total charge by the number of units.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| unit_amount | Numeric | The per-unit charge amount |
+
+#### Internal Logic
+1. Retrieves the total units from the aggregation result or uses the default units.
+2. Returns 0 if there are no units.
+3. Calculates the unit amount by dividing the total charge by the number of units.
+
+## Dependencies
+This class depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| Charges::ChargeModels::BaseService | Parent class providing common functionality |
+| Charges::AmountDetails::RangeGraduatedPercentageService | Service for calculating details for each range |
+
+## Performance Considerations
+The `amount_details` method uses `each_with_object` to build the result array, which is generally more efficient than using `map` and then filtering the results. The method also breaks the loop early when all units are accounted for, avoiding unnecessary calculations.
+
+This implementation allows for efficient calculation of graduated percentage charges, with the ability to handle multiple ranges and early termination when all units are accounted for.

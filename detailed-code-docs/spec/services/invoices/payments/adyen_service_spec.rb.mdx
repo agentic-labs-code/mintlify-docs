@@ -1,0 +1,74 @@
+---
+title: "adyen_service_spec.rb"
+---
+
+## High-level description
+This RSpec file contains tests for the `Invoices::Payments::AdyenService` class, which is responsible for handling Adyen payment processing for invoices. The tests cover various scenarios including creating payments, updating payment statuses, and generating payment URLs.
+
+## Code Structure
+The test file is organized into several describe blocks, each focusing on a specific method of the `AdyenService` class. The main methods tested are `#create`, `#update_payment_status`, and `#generate_payment_url`. The tests use mocks and stubs to simulate Adyen API responses and interactions.
+
+## Symbols
+
+### `Invoices::Payments::AdyenService`
+#### Description
+This is the main class being tested. It handles Adyen payment processing for invoices.
+
+### `#create`
+#### Description
+This method creates an Adyen payment for an invoice.
+
+#### Internal Logic
+1. Checks if payment should be processed
+2. Creates an Adyen payment
+3. Handles the Adyen response
+4. Creates a new Payment record
+5. Updates the invoice payment status
+6. Enqueues a job to sync the payment if necessary
+
+### `#update_payment_status`
+#### Description
+This method updates the status of an existing payment.
+
+#### Inputs
+- `provider_payment_id`: String
+- `status`: String
+- `metadata`: Hash (optional)
+
+#### Internal Logic
+1. Finds or creates the payment based on the provider payment ID
+2. Updates the payment status
+3. Updates the invoice payment status
+
+### `#generate_payment_url`
+#### Description
+This method generates a payment URL for the invoice.
+
+#### Internal Logic
+1. Checks if payment should be processed
+2. Calls the Adyen API to create a payment link
+3. Handles the Adyen response
+4. Returns the generated payment URL
+
+## Dependencies
+The test file depends on several external libraries and modules:
+- RSpec
+- FactoryBot
+- Adyen API client
+
+## Error Handling
+The tests cover various error scenarios, including:
+- Adyen API errors
+- Validation errors
+- Missing payment provider
+
+## Side Effects
+The tests mock several external interactions, including:
+- Adyen API calls
+- Database operations
+- Job enqueuing
+
+## Performance Considerations
+The tests use mocks and stubs to avoid making actual API calls, which helps in keeping the test suite fast and isolated.
+
+This test file provides comprehensive coverage for the `Invoices::Payments::AdyenService` class, ensuring that it correctly handles various scenarios in Adyen payment processing for invoices.

@@ -1,0 +1,72 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL mutations for managing add-ons in a SaaS application. It includes operations for creating, updating, and deleting add-ons, with each operation implemented as a separate mutation class. These mutations are part of a larger GraphQL API and incorporate authentication, permission checks, and organization-specific logic.
+
+## What does it do?
+The code in this directory enables the following workflows:
+
+1. Creating new add-ons: Users can create new add-ons by providing necessary details such as name, description, and pricing information. The system checks for authentication and organization membership before processing the request.
+
+2. Updating existing add-ons: Authenticated users can modify the properties of existing add-ons they have access to. This could include changing the name, description, or pricing details of an add-on.
+
+3. Deleting add-ons: Users with the appropriate permissions can remove add-ons from the system. The deletion process is secured and scoped to the user's organization.
+
+Each of these operations is implemented as a GraphQL mutation, allowing clients to interact with the add-on management system through a standardized GraphQL API. The mutations handle input validation, authentication, and delegate the actual business logic to separate service classes.
+
+## Key Files
+
+1. `create.rb`:
+   - Defines the `Mutations::AddOns::Create` class for creating new add-ons.
+   - Utilizes `Types::AddOns::CreateInput` for input structure and `Types::AddOns::Object` for output.
+   - Delegates creation logic to `::AddOns::CreateService`.
+   - Includes authentication and organization checks.
+
+2. `update.rb`:
+   - Implements the `Mutations::AddOns::Update` class for modifying existing add-ons.
+   - Uses `Types::AddOns::UpdateInput` for input and `Types::AddOns::Object` for output.
+   - Delegates update logic to `AddOns::UpdateService`.
+   - Includes user authentication and add-on ownership verification.
+
+3. `destroy.rb`:
+   - Defines the `Mutations::AddOns::Destroy` class for deleting add-ons.
+   - Takes an add-on ID as input and returns the ID of the deleted add-on.
+   - Uses `AddOns::DestroyService` for deletion logic.
+   - Implements permission checking ('addons:delete') and user authentication.
+
+## Dependencies
+The mutations in this directory rely on several shared components and external services:
+
+1. GraphQL-related:
+   - `BaseMutation`: A base class for all mutations, likely providing common functionality.
+   - `Types::AddOns::CreateInput`, `Types::AddOns::UpdateInput`: Input type definitions for create and update operations.
+   - `Types::AddOns::Object`: Output type definition for add-on objects.
+
+2. Authentication and Authorization:
+   - `AuthenticableApiUser`: A module providing user authentication logic.
+   - `RequiredOrganization`: A module ensuring the user belongs to a valid organization (used in create mutation).
+
+3. Service Classes:
+   - `::AddOns::CreateService`: Handles the business logic for creating add-ons.
+   - `AddOns::UpdateService`: Manages the update logic for add-ons.
+   - `AddOns::DestroyService`: Implements the deletion logic for add-ons.
+
+These dependencies suggest a well-structured application with separation of concerns, where authentication, data validation, and business logic are handled by specialized components.
+
+## Configuration
+While there are no explicit configuration files mentioned in the provided code, the mutations use several configuration-like elements:
+
+1. Permissions:
+   - The `destroy.rb` file defines a `REQUIRED_PERMISSION` constant set to 'addons:delete', indicating a permission-based access control system.
+
+2. GraphQL Schema Configuration:
+   - Each mutation class defines its structure using GraphQL-specific methods like `argument`, `field`, and `type`, which contribute to the overall GraphQL schema configuration.
+
+3. Error Handling:
+   - The mutations use a `result_error` method for standardized error reporting, suggesting a configured error handling mechanism.
+
+These configuration elements indicate that the add-on mutations are part of a larger, well-organized GraphQL API with standardized approaches to permissions, input/output types, and error handling.
+
+In summary, this directory contains a set of GraphQL mutations that provide a complete CRUD (Create, Read, Update, Delete) interface for managing add-ons in a SaaS application. The mutations are designed with security, modularity, and extensibility in mind, leveraging shared components for authentication, authorization, and business logic implementation.

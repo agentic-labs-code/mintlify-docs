@@ -1,0 +1,73 @@
+---
+title: "retry_payment_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Mutations::Invoices::RetryPayment` GraphQL mutation. It verifies the behavior of retrying a payment for a failed invoice, including permission checks and the expected response format.
+
+## Code Structure
+The test suite is organized using RSpec's `describe` and `context` blocks. It sets up necessary test data using FactoryBot and defines shared examples for common checks. The main test case focuses on executing the GraphQL mutation and verifying its output.
+
+## References
+- `rails_helper`: This file is required at the beginning, which sets up the testing environment.
+- `Mutations::Invoices::RetryPayment`: The GraphQL mutation being tested.
+- Various FactoryBot factories: Used to create test data.
+
+## Symbols
+
+### `RSpec.describe Mutations::Invoices::RetryPayment, type: :graphql`
+#### Description
+This is the main describe block for the test suite, focusing on the `RetryPayment` mutation.
+
+### `let` blocks
+#### Description
+These blocks define the test data and setup required for the tests.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| required_permission | String | The permission required to perform the mutation |
+| membership | Membership | A factory-created membership object |
+| organization | Organization | The organization associated with the membership |
+| customer | Customer | A factory-created customer with GoCardless as the payment provider |
+| gocardless_payment_provider | GoCardlessProvider | A factory-created GoCardless provider for the organization |
+| gocardless_customer | GoCardlessCustomer | A factory-created GoCardless customer associated with the customer |
+| user | User | The user associated with the membership |
+| invoice | Invoice | A factory-created invoice with specific attributes |
+| mutation | String | The GraphQL mutation query |
+
+### `before` block
+#### Description
+Sets up the GoCardless payment provider and customer before running the tests.
+
+### Shared examples
+#### Description
+The test suite includes shared examples for common checks:
+- `requires current user`
+- `requires current organization`
+- `requires permission`
+
+These shared examples likely check for proper authentication and authorization.
+
+### `context 'with valid preconditions'`
+#### Description
+This context block contains the main test case for the mutation.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with the necessary inputs and context.
+2. Verifies that the returned data contains the expected invoice ID.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Sets up the testing environment |
+| FactoryBot | Creates test data |
+| GraphQL | Defines and executes the mutation |
+
+## Error Handling
+The test suite doesn't explicitly test error handling, but it does check for proper authorization through shared examples.
+
+## TODOs
+There are no explicit TODOs in the code.
+
+This test suite provides a comprehensive check for the `RetryInvoicePayment` mutation, ensuring it works correctly when given valid inputs and proper authorization. It sets up a realistic scenario with a failed invoice and attempts to retry the payment, verifying the response contains the expected data.

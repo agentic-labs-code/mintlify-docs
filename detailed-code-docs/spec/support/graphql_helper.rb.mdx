@@ -1,0 +1,124 @@
+---
+title: "graphql_helper.rb"
+---
+
+## High-level description
+This code defines a `GraphQLHelper` module that provides utility methods for testing GraphQL queries and mutations in a Ruby on Rails application. It includes methods for executing GraphQL queries, setting up the test environment, and asserting various types of GraphQL errors.
+
+## Symbols
+
+### `GraphQLHelper`
+#### Description
+A module that encapsulates helper methods for GraphQL testing.
+
+### `controller`
+#### Description
+A method that initializes and returns a `GraphqlController` instance for testing purposes.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @controller | GraphqlController | An instance of GraphqlController with a mock request |
+
+#### Internal Logic
+- Creates a new instance of `GraphqlController`
+- Sets up a mock `ActionDispatch::Request`
+
+### `execute_graphql`
+#### Description
+Executes a GraphQL query with the provided parameters and context.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| current_user | User | The current user for the query context |
+| query | String | The GraphQL query to execute |
+| current_organization | Organization | The current organization for the query context |
+| customer_portal_user | User | The customer portal user for the query context |
+| request | ActionDispatch::Request | The request object for the query context |
+| permissions | Hash/String/Array | The permissions for the query context |
+| **kwargs | Hash | Additional arguments to pass to the query execution |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | GraphQL::Query::Result | The result of the executed GraphQL query |
+
+#### Internal Logic
+- Processes the `permissions` input, converting it to a hash if necessary
+- Validates the provided permissions against `Permission::DEFAULT_PERMISSIONS_HASH`
+- Sets up the context for the GraphQL query
+- Executes the query using `LagoApiSchema.execute`
+
+### `expect_graphql_error`
+#### Description
+Asserts that a GraphQL result contains a specific error message.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | GraphQL::Query::Result | The result of a GraphQL query |
+| message | String/Symbol | The expected error message or code |
+
+#### Internal Logic
+- Converts the result to a hash and symbolizes keys
+- Checks for the presence of errors in the result
+- Searches for an error matching the provided message or code
+- Raises an expectation error if the specific error is not found
+
+### `expect_unauthorized_error`
+#### Description
+Asserts that a GraphQL result contains an unauthorized error.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | GraphQL::Query::Result | The result of a GraphQL query |
+
+### `expect_forbidden_error`
+#### Description
+Asserts that a GraphQL result contains a forbidden error.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | GraphQL::Query::Result | The result of a GraphQL query |
+
+### `expect_unprocessable_entity`
+#### Description
+Asserts that a GraphQL result contains an unprocessable entity error.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | GraphQL::Query::Result | The result of a GraphQL query |
+
+### `expect_not_found`
+#### Description
+Asserts that a GraphQL result contains a not found error.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | GraphQL::Query::Result | The result of a GraphQL query |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| GraphqlController | Used to create a controller instance for testing |
+| ActionDispatch::Request | Used to create a mock request for the controller |
+| LagoApiSchema | The GraphQL schema used to execute queries |
+| Permission::DEFAULT_PERMISSIONS_HASH | Used to validate provided permissions |
+
+## Error Handling
+The module implements specific error handling for GraphQL queries:
+- Raises an error for unknown permissions
+- Provides methods to assert various types of GraphQL errors (unauthorized, forbidden, unprocessable entity, not found)
+
+## References
+This helper module references the following parts of the codebase:
+- `GraphqlController`
+- `LagoApiSchema`
+- `Permission::DEFAULT_PERMISSIONS_HASH`
+
+The related `LagoApiSchema` class defines the GraphQL schema and includes configuration for query execution, such as max depth and complexity, as well as methods for object identification and type resolution.

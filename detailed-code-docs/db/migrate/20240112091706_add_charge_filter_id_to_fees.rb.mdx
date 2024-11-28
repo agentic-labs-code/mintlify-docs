@@ -1,0 +1,47 @@
+---
+title: "20240112091706_add_charge_filter_id_to_fees.rb"
+---
+
+## High-level description
+This migration adds a new column `charge_filter_id` to the `fees` table and creates an index on this column. The purpose is to associate fees with charge filters, potentially enabling more granular control or categorization of fees based on specific charge criteria.
+
+## Symbols
+
+### `AddChargeFilterIdToFees`
+#### Description
+This class is an ActiveRecord migration that modifies the `fees` table by adding a new column and an index.
+
+#### Internal Logic
+1. Adds a new column `charge_filter_id` to the `fees` table.
+2. Creates an index on the newly added `charge_filter_id` column.
+
+## Side Effects
+- Modifies the database schema by adding a new column to the `fees` table.
+- Creates a new index in the database, which may impact query performance for operations involving the `charge_filter_id` column.
+
+### `change`
+#### Description
+This method defines the changes to be applied to the database schema.
+
+#### Internal Logic
+1. Adds a new column `charge_filter_id` to the `fees` table with the following characteristics:
+   - Data type: `uuid`
+   - Nullable: `true` (allows null values)
+2. Creates an index on the `charge_filter_id` column using `safety_assured`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for defining database schema changes |
+
+## Performance Considerations
+- Adding an index on `charge_filter_id` may improve query performance for operations that filter or join on this column.
+- The index creation is wrapped in `safety_assured`, which bypasses certain safety checks. This should be used cautiously, especially on large tables, as it might impact database performance during migration.
+
+## Error Handling
+The migration does not include explicit error handling. If an error occurs during the migration, it will be handled by the ActiveRecord migration framework, typically resulting in a rollback of the changes.
+
+## TODOs
+- Consider adding a foreign key constraint to ensure referential integrity if `charge_filter_id` refers to a `charge_filters` table.
+- Evaluate the need for data backfilling if existing fees should be associated with charge filters.
+- Review the decision to allow null values for `charge_filter_id` and consider if it should be mandatory in the future.

@@ -1,0 +1,76 @@
+---
+title: "last_hour_events_mv_v04.sql"
+---
+
+## High-level description
+This SQL code defines a materialized view named `last_hour_events_mv_v04`. It retrieves and processes event data from the last hour, joining it with billable metrics and their associated filters. The view is designed to facilitate the analysis of billable events based on specific metrics and filter criteria.
+
+## Code Structure
+The code consists of two main parts: a Common Table Expression (CTE) named `billable_metric_filters` and the main SELECT statement. The CTE prepares the filter data for billable metrics, which is then used in the main query to join with events and apply the filtering logic.
+
+## Symbols
+
+### billable_metric_filters (CTE)
+#### Description
+This CTE retrieves and prepares filter data for billable metrics.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| billable_metrics | table | Contains information about billable metrics |
+| billable_metric_filters | table | Contains filter information for billable metrics |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bm_organization_id | integer | Organization ID associated with the billable metric |
+| bm_id | integer | ID of the billable metric |
+| bm_code | string | Code of the billable metric |
+| filter_key | string | Key of the filter |
+| filter_values | array | Array of valid values for the filter |
+
+#### Internal Logic
+1. Joins `billable_metrics` with `billable_metric_filters` based on the billable metric ID.
+2. Filters out deleted billable metrics and filters.
+3. Selects relevant columns for further processing in the main query.
+
+### Main SELECT statement
+#### Description
+This query retrieves and processes event data from the last hour, combining it with billable metric information and applying filters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| events | table | Contains event data |
+| billable_metrics | table | Contains information about billable metrics |
+| billable_metric_filters | CTE | Prepared filter data for billable metrics |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | integer | Organization ID associated with the event |
+| transaction_id | string | Transaction ID of the event |
+| properties | jsonb | JSON object containing event properties |
+| billable_metric_code | string | Code of the associated billable metric |
+| field_name_mandatory | boolean | Indicates if the field name is mandatory based on aggregation type |
+| numeric_field_mandatory | boolean | Indicates if a numeric field is mandatory based on aggregation type |
+| field_value | string | Value of the specified field from event properties |
+| is_numeric_field_value | boolean | Indicates if the field value is numeric |
+| has_filter_keys | boolean | Indicates if the event properties contain the filter key |
+| has_valid_filter_values | boolean | Indicates if the event property value matches any of the valid filter values |
+
+#### Internal Logic
+1. Joins `events` with `billable_metrics` based on the event code and organization ID.
+2. Left joins the result with the `billable_metric_filters` CTE.
+3. Filters events from the last hour and excludes deleted events and billable metrics.
+4. Calculates various boolean flags and extracts relevant data from event properties.
+
+## Performance Considerations
+1. The materialized view is likely refreshed periodically to maintain up-to-date data for the last hour of events.
+2. Indexes on `events.created_at`, `events.organization_id`, `events.code`, and `billable_metrics.code` would improve query performance.
+3. The use of a CTE for `billable_metric_filters` may impact performance for large datasets; consider using a subquery or temporary table if performance issues arise.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| PostgreSQL | This SQL code uses PostgreSQL-specific features such as JSON operators (`-&gt;&gt;`, `?`) and the `ANY` function. |

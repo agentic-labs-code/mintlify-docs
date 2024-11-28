@@ -1,0 +1,34 @@
+---
+title: "20240716153753_add_index_on_fees_pay_in_advance_event_transaction_id.rb"
+---
+
+## High-level description
+This migration adds a conditional index on the `pay_in_advance_event_transaction_id` column of the `fees` table. The index is created only for non-deleted records and is added concurrently to minimize the impact on database performance during the migration.
+
+## Symbols
+
+### `AddIndexOnFeesPayInAdvanceEventTransactionId`
+#### Description
+This class is an ActiveRecord migration that adds an index to the `fees` table. It inherits from `ActiveRecord::Migration[7.1]`, indicating it's compatible with Rails 7.1 migration framework.
+
+#### Internal Logic
+1. The migration disables DDL transactions using `disable_ddl_transaction!` to allow for concurrent index creation.
+2. The `change` method defines the migration operation:
+   - It adds an index on the `pay_in_advance_event_transaction_id` column of the `fees` table.
+   - The index is conditional, only including rows where `deleted_at IS NULL`.
+   - The index is created concurrently to minimize locks on the table during creation.
+   - The `if_not_exists: true` option prevents errors if the index already exists.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the migration framework for database schema modifications |
+
+## Performance Considerations
+- The use of `algorithm: :concurrently` allows the index to be built without locking the table for writes, which is crucial for maintaining application availability during the migration.
+- The conditional index (`where: 'deleted_at IS NULL'`) optimizes query performance by indexing only non-deleted records, potentially reducing the index size and improving lookup speed for active records.
+
+## Error Handling
+The `if_not_exists: true` option prevents the migration from failing if the index already exists, making the migration more robust and idempotent.
+
+Note: This migration is designed to be run in a production environment with minimal impact on the running application, thanks to the concurrent index creation and the conditional clause that only indexes non-deleted records.

@@ -1,0 +1,63 @@
+---
+title: "graduated_service_spec.rb"
+---
+
+## High-level description
+This RSpec test file is designed to validate the functionality of the `Charges::ChargeModels::GraduatedService` class. It tests the application of graduated pricing models for different aggregation values, ensuring that the service correctly calculates charges based on predefined graduated ranges.
+
+## Symbols
+
+### `Charges::ChargeModels::GraduatedService.apply`
+#### Description
+This is the main method being tested. It applies a graduated pricing model to calculate charges based on the given charge properties and aggregation result.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charge | Object | The charge object containing properties for the graduated ranges |
+| aggregation_result | BaseService::Result | The result object containing the aggregation value |
+| properties | Hash | The properties of the charge, including graduated ranges |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| Result | Object | An object containing the calculated amount, unit amount, and amount details |
+
+#### Internal Logic
+The method calculates the charge based on the aggregation value and the defined graduated ranges. It determines which range(s) the aggregation falls into and applies the corresponding per-unit and flat amounts.
+
+## Test Structure
+
+The test file is organized into several contexts, each testing a different aggregation value:
+
+1. When aggregation is 0
+2. When aggregation is 1
+3. When aggregation is 10
+4. When aggregation is 11
+5. When aggregation is 12
+6. When aggregation is 21
+
+For each context, the test checks:
+- The total amount calculated
+- The unit amount (total amount divided by the aggregation value)
+- The detailed breakdown of the calculation (amount_details)
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used to create test data (graduated_charge) |
+
+## Configuration
+The test uses a predefined charge with the following graduated ranges:
+1. 0-10 units: $10 per unit with a $2 flat fee
+2. 11-20 units: $5 per unit with a $3 flat fee
+3. 21+ units: $5 per unit with a $3 flat fee
+
+## Key Observations
+1. The service handles edge cases correctly, such as when the aggregation is 0 or when it falls exactly on a range boundary.
+2. The calculation includes both per-unit amounts and flat amounts for each range.
+3. The amount_details provide a comprehensive breakdown of how the charge was calculated, including the units used in each range.
+4. The unit_amount is calculated by dividing the total amount by the aggregation value, providing an average cost per unit.
+
+This test suite ensures that the `GraduatedService` correctly applies the graduated pricing model across various scenarios, validating its accuracy and reliability in calculating charges.

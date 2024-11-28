@@ -1,0 +1,88 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines a service class `CreateService` within the `PaymentRequests::Payments` module. Its primary purpose is to initiate payment creation for different payment providers (Adyen, GoCardless, and Stripe) by enqueuing provider-specific background jobs based on the customer's payment provider.
+
+## Code Structure
+The `CreateService` class inherits from `BaseService` and contains a `call` method that determines the appropriate payment provider and enqueues the corresponding job. It also includes error handling for job uniqueness conflicts.
+
+## Symbols
+
+### `CreateService`
+#### Description
+This class is responsible for creating payments by delegating the task to provider-specific background jobs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payable | Object | An object representing the item to be paid for |
+
+#### Internal Logic
+1. Initializes the service with a `payable` object.
+2. In the `call` method, it determines the payment provider using the `payment_provider` method.
+3. Based on the provider, it enqueues the corresponding background job (Adyen, GoCardless, or Stripe).
+4. Handles `ActiveJob::Uniqueness::JobNotUnique` exceptions by capturing them in Sentry.
+
+#### Side Effects
+- Enqueues background jobs for payment creation.
+- Logs exceptions to Sentry.
+
+### `initialize`
+#### Description
+Initializes the service with a payable object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payable | Object | An object representing the item to be paid for |
+
+### `call`
+#### Description
+Determines the payment provider and enqueues the appropriate background job for payment creation.
+
+#### Internal Logic
+1. Uses a case statement to check the payment provider.
+2. Enqueues the corresponding job (`AdyenCreateJob`, `GocardlessCreateJob`, or `StripeCreateJob`) with the payable object.
+3. Rescues `ActiveJob::Uniqueness::JobNotUnique` exceptions and captures them in Sentry.
+
+#### Side Effects
+- Enqueues background jobs.
+- Logs exceptions to Sentry.
+
+### `payment_provider`
+#### Description
+A private method that determines the payment provider for the customer associated with the payable object.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| provider | Symbol | The payment provider symbol (e.g., `:adyen`, `:gocardless`, `:stripe`) |
+
+## TODOs
+- Handle cases when no payment provider is set, or decide whether to leave it to the caller.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveJob | For background job functionality |
+| Sentry | For error logging |
+
+## Error Handling
+The service rescues `ActiveJob::Uniqueness::JobNotUnique` exceptions, which occur when trying to enqueue a job that is already in the queue. These exceptions are captured and logged in Sentry.
+
+## Related Jobs
+The service interacts with three background jobs:
+
+1. `PaymentRequests::Payments::AdyenCreateJob`
+2. `PaymentRequests::Payments::GocardlessCreateJob`
+3. `PaymentRequests::Payments::StripeCreateJob`
+
+These jobs are responsible for creating payments with their respective payment providers. They all:
+- Use the 'providers' queue
+- Implement job uniqueness to prevent duplicate job execution
+- Call their corresponding service classes to create the payment
+- Raise errors if the payment creation fails
+
+The Adyen and Stripe jobs also implement retry mechanisms for specific errors, using polynomial backoff.

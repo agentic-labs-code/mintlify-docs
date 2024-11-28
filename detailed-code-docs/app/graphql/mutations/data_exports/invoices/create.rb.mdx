@@ -1,0 +1,59 @@
+---
+title: "create.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for creating a data export of invoices. It's part of a larger GraphQL API and handles the request to export invoice data based on specified filters and format.
+
+## Code Structure
+The `Create` class is nested within the `Mutations::DataExports::Invoices` module. It inherits from `BaseMutation` and includes two concerns: `AuthenticableApiUser` and `RequiredOrganization`. The class defines the GraphQL mutation structure and delegates the actual export creation to a service object.
+
+## References
+- `Types::DataExports::Invoices::CreateInput`
+- `Types::DataExports::Object`
+- `::DataExports::CreateService`
+
+## Symbols
+
+### `Mutations::DataExports::Invoices::Create`
+#### Description
+This class defines a GraphQL mutation for creating a data export of invoices. It authenticates the user, ensures they have the required organization access, and then calls a service to create the export.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| format | Enum | The format of the export (defined in `Types::DataExports::FormatTypeEnum`) |
+| filters | Object | Filters for the invoice export (defined in `Types::DataExports::Invoices::FiltersInput`) |
+| resource_type | Enum | The type of resource to export (defined in `Types::DataExports::Invoices::ExportTypeEnum`) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data_export | Types::DataExports::Object | The created data export object |
+
+#### Internal Logic
+1. The mutation requires the 'invoices:export' permission.
+2. It uses the `input_object_class` to define the input structure.
+3. The `resolve` method is called with the input parameters.
+4. It calls the `::DataExports::CreateService` to create the export.
+5. If successful, it returns the created data export; otherwise, it returns an error.
+
+## Side Effects
+- Creates a new data export record in the database.
+- Triggers an asynchronous job (`ExportResourcesJob`) to perform the actual export.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user has access to the required organization |
+
+## Error Handling
+The mutation uses the `result_error` method (likely defined in a parent class) to handle and return errors from the service call.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| createInvoicesDataExport | POST | CreateDataExportsInvoicesInput | DataExport | Creates a new invoice data export |
+
+This mutation is part of the larger GraphQL API and is registered in the `MutationType` as `create_invoices_data_export`.

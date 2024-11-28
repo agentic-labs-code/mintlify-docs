@@ -1,0 +1,78 @@
+---
+title: "override_service.rb"
+---
+
+## High-level description
+This code defines the `OverrideService` class within the `Commitments` module. Its primary purpose is to create a new commitment by duplicating an existing one and applying specified changes, such as updating the amount, invoice display name, and plan ID. It also handles applying taxes to the new commitment if tax codes are provided.
+
+## Code Structure
+The `OverrideService` class inherits from `BaseService` and contains a single public method `call`. It uses a transaction to ensure data consistency when creating the new commitment and applying taxes.
+
+## References
+- `BaseService`: The parent class that provides common functionality for service objects.
+- `Commitments::ApplyTaxesService`: Used to apply taxes to the new commitment.
+- `License`: Used to check if the premium features are available.
+
+## Symbols
+
+### `Commitments::OverrideService`
+#### Description
+This service class is responsible for creating a new commitment based on an existing one, with optional modifications.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| commitment | Commitment | The existing commitment to be overridden |
+| params | Hash | Parameters for modifying the new commitment |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result object containing the new commitment or error information |
+
+#### Internal Logic
+1. Check if the premium license is active and the commitment exists.
+2. Within a transaction:
+   a. Duplicate the existing commitment.
+   b. Update the new commitment with provided parameters.
+   c. Save the new commitment.
+   d. Apply taxes if tax codes are provided.
+3. Handle any validation errors that occur during the process.
+
+### `initialize`
+#### Description
+Initializes the service with the required commitment and parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| commitment | Commitment | The existing commitment to be overridden |
+| params | Hash | Parameters for modifying the new commitment |
+
+### `call`
+#### Description
+Executes the main logic of the service, creating a new commitment based on the existing one and applying modifications.
+
+#### Internal Logic
+1. Check for premium license and commitment existence.
+2. Create a new commitment by duplicating the existing one.
+3. Update the new commitment with provided parameters.
+4. Save the new commitment.
+5. Apply taxes if tax codes are provided.
+6. Handle any errors that occur during the process.
+
+## Side Effects
+- Creates a new `Commitment` record in the database.
+- May create new `AppliedTax` records if tax codes are provided.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | For database operations and transactions |
+| License | To check for premium features availability |
+
+## Error Handling
+The service handles `ActiveRecord::RecordInvalid` errors, which may occur during the saving of the new commitment or when applying taxes. These errors are captured and added to the result object using the `record_validation_failure!` method.
+
+## Performance Considerations
+The service uses a database transaction to ensure data consistency when creating the new commitment and applying taxes. This approach guarantees atomicity but may impact performance for long-running operations.

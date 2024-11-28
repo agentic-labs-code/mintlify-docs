@@ -1,0 +1,110 @@
+---
+title: "client.rb"
+---
+
+## High-level description
+This code defines a `Client` class within the `LagoHttpClient` module, which provides methods for making HTTP requests to external services. It supports various HTTP methods like POST, PUT, and GET, with options for handling JSON payloads, multipart form data, and URL-encoded data.
+
+## Code Structure
+The `Client` class contains several methods for different types of HTTP requests. These methods use the Ruby standard library's `Net::HTTP` to perform the actual HTTP communication. The class also includes error handling and response parsing functionality.
+
+## Symbols
+
+### `Client`
+#### Description
+The main class that encapsulates HTTP client functionality.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| url | String | The base URL for the HTTP requests |
+| read_timeout | Integer | Optional timeout for read operations |
+
+#### Internal Logic
+- Initializes an HTTP client with the given URL and optional read timeout
+- Sets up SSL if the URL uses HTTPS
+
+### `post`
+#### Description
+Sends a POST request with a JSON payload.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| body | Hash | The request payload |
+| headers | Array of Hashes | Additional headers for the request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Hash | Parsed JSON response |
+
+#### Internal Logic
+- Creates a POST request with the given body and headers
+- Sends the request and handles the response
+- Raises an error for non-success status codes
+- Parses and returns the JSON response
+
+### `post_with_response`
+#### Description
+Similar to `post`, but returns the raw response object.
+
+### `put_with_response`
+#### Description
+Sends a PUT request and returns the raw response object.
+
+### `post_multipart_file`
+#### Description
+Sends a POST request with multipart form data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | Hash | The multipart form data parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Net::HTTPResponse | The raw HTTP response |
+
+### `post_url_encoded`
+#### Description
+Sends a POST request with URL-encoded form data.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | Hash | The form data parameters |
+| headers | Hash | Additional headers for the request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Hash | Parsed JSON response |
+
+### `get`
+#### Description
+Sends a GET request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| headers | Hash | Additional headers for the request |
+| params | Hash | Query parameters for the request |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| response | Hash | Parsed JSON response |
+
+## Error Handling
+The class uses a private `raise_error` method to handle non-success HTTP status codes. It raises a `LagoHttpClient::HttpError` with details about the failed request.
+
+## Dependencies
+- `net/http/post/multipart`: Used for multipart form data requests
+- `json`: Used for JSON parsing and generation
+
+## Configuration
+The class uses a constant `RESPONSE_SUCCESS_CODES` to define the HTTP status codes considered as successful responses.
+
+This client class provides a flexible and reusable way to make various types of HTTP requests, with built-in error handling and response parsing. It's designed to be used across different parts of the application that need to communicate with external HTTP services.

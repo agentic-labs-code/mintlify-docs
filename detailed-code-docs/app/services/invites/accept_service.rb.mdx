@@ -1,0 +1,55 @@
+---
+title: "accept_service.rb"
+---
+
+## High-level description
+The `Invites::AcceptService` is responsible for accepting an invitation to join an organization. It finds the invite by token, registers the user from the invite, marks the invite as accepted, and associates the new membership with the invite, all within a single database transaction.
+
+## Code Structure
+The `AcceptService` is part of the `Invites` module and inherits from `BaseService`. It contains a single public method `call` that orchestrates the invite acceptance process.
+
+## References
+This service is used by the `Mutations::Invites::Accept` GraphQL mutation and the `Auth::Okta::AcceptInviteService`.
+
+## Symbols
+
+### `Invites::AcceptService#call`
+#### Description
+This method handles the process of accepting an invitation. It finds the invite, registers the user, and marks the invite as accepted.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | A hash containing the invite details |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result of the operation |
+
+#### Internal Logic
+1. Find the invite using the provided token or invite object.
+2. If the invite is not found, return a not_found_failure.
+3. Within a transaction:
+   - Register the user from the invite using `UsersService`.
+   - Associate the new membership with the invite.
+   - Mark the invite as accepted.
+4. Return the result of the operation.
+
+## Side Effects
+- Creates a new user account if one doesn't exist.
+- Creates a new membership for the user in the organization.
+- Updates the invite status to 'accepted'.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Invite | To find and update the invitation |
+| UsersService | To register the user from the invite |
+| ActiveRecord::Base | For database transactions |
+
+## Error Handling
+The service uses the `result` object from `BaseService` to handle and return errors. If the invite is not found, it returns a `not_found_failure`.
+
+## Performance Considerations
+The entire operation is wrapped in a database transaction to ensure data consistency and atomicity of the invite acceptance process.

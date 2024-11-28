@@ -1,0 +1,86 @@
+---
+title: "revoke_service_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Memberships::RevokeService` class. It tests various scenarios of revoking memberships, including attempting to revoke one's own membership, revoking non-existent memberships, revoking another user's membership, and attempting to remove the last admin.
+
+## Code Structure
+The test suite is organized into a single `describe` block for the `Memberships::RevokeService` class, with nested `context` blocks for different scenarios. Each scenario is tested with individual `it` blocks that verify the expected behavior of the `call` method.
+
+## Symbols
+
+### `RSpec.describe Memberships::RevokeService`
+#### Description
+This is the main describe block for the `Memberships::RevokeService` class tests.
+
+### `subject(:revoke_service)`
+#### Description
+Defines the subject of the test, which is an instance of `Memberships::RevokeService` initialized with the user of the membership.
+
+### `let(:membership)`
+#### Description
+Creates a test membership using FactoryBot.
+
+### `describe '#call'`
+#### Description
+Groups all tests for the `call` method of the `RevokeService`.
+
+### Context: "when revoking my own membership"
+#### Description
+Tests the scenario where a user attempts to revoke their own membership.
+
+#### Internal Logic
+1. Calls the `revoke_service` with the user's own membership ID.
+2. Expects the result to be unsuccessful.
+3. Checks for the specific error code 'cannot_revoke_own_membership'.
+
+### Context: "when membership is not found"
+#### Description
+Tests the scenario where the provided membership ID doesn't exist.
+
+#### Internal Logic
+1. Calls the `revoke_service` with a `nil` membership ID.
+2. Expects the result to be unsuccessful.
+3. Checks for the specific error code 'membership_not_found'.
+
+### Context: "when revoking another membership"
+#### Description
+Tests the successful scenario of revoking another user's membership.
+
+#### Internal Logic
+1. Creates another membership in the same organization.
+2. Calls the `revoke_service` with the new membership ID.
+3. Expects the result to be successful.
+4. Verifies that the membership status is set to 'revoked' and the revocation time is set correctly.
+
+### Context: "when removing the last admin"
+#### Description
+Tests the scenario where an attempt is made to revoke the last admin membership.
+
+#### Internal Logic
+1. Creates a finance role membership and an admin role membership.
+2. Attempts to revoke the admin membership.
+3. Expects the result to be unsuccessful.
+4. Checks for the specific error code 'last_admin'.
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| FactoryBot | Used for creating test data (memberships) |
+| RSpec | The testing framework used |
+
+## Error Handling
+The test suite checks for various error scenarios:
+1. Attempting to revoke one's own membership
+2. Attempting to revoke a non-existent membership
+3. Attempting to remove the last admin
+
+These are handled by checking the success status of the result and verifying the specific error codes returned.
+
+## TODOs
+There are no explicit TODOs in the code.
+
+This test suite provides comprehensive coverage for the `Memberships::RevokeService` class, ensuring that it behaves correctly in various scenarios, including error cases and successful revocation of memberships.

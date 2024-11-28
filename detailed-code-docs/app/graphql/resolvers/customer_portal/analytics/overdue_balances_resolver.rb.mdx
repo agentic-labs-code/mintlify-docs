@@ -1,0 +1,58 @@
+---
+title: "overdue_balances_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying overdue balances of a customer portal user. It's part of the CustomerPortal module and uses authentication to ensure only authorized users can access the data.
+
+## Code Structure
+The `OverdueBalancesResolver` class is nested within the `Resolvers::CustomerPortal::Analytics` module. It inherits from `Resolvers::BaseResolver` and includes the `AuthenticableCustomerPortal` concern for user authentication.
+
+## References
+- `Types::Analytics::OverdueBalances::Object`
+- `::Analytics::OverdueBalance`
+- `AuthenticableCustomerPortalUser` concern
+
+## Symbols
+
+### `OverdueBalancesResolver`
+#### Description
+This resolver handles GraphQL queries for overdue balances of a customer portal user. It authenticates the user and retrieves the overdue balance data based on the provided arguments.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| months | Integer | Optional. Number of months to consider for overdue balances. |
+| expire_cache | Boolean | Optional. Flag to expire the cache. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| collection | [Types::Analytics::OverdueBalances::Object] | A collection of OverdueBalance objects. |
+
+#### Internal Logic
+1. The resolver uses the `AuthenticableCustomerPortalUser` concern to ensure the user is authenticated.
+2. It defines the query arguments and return type.
+3. In the `resolve` method, it calls `::Analytics::OverdueBalance.find_all_by` with the following parameters:
+   - The organization ID of the authenticated customer portal user
+   - The provided arguments (months and expire_cache)
+   - The currency of the authenticated customer portal user
+   - The external ID of the authenticated customer portal user
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableCustomerPortalUser | Provides authentication for customer portal users |
+| Types::Analytics::OverdueBalances::Object | Defines the GraphQL type for overdue balance objects |
+| ::Analytics::OverdueBalance | Model for retrieving overdue balance data |
+
+## Error Handling
+The `AuthenticableCustomerPortalUser` concern handles unauthorized access by raising a GraphQL execution error if the user is not authenticated.
+
+## API/Interface Reference
+This resolver is part of the GraphQL API and can be queried using the following field:
+| Field | Arguments | Return Type |
+|:------|:----------|:------------|
+| customerPortalOverdueBalances | months: Int, expireCache: Boolean | [OverdueBalance!]! |
+
+Note: The actual field name in the API is defined in the `Types::QueryType` class as `customer_portal_overdue_balances`.

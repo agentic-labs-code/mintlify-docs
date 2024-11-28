@@ -1,0 +1,91 @@
+---
+title: "update_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Fees::UpdateService` class. It tests various scenarios for updating a fee's payment status, including successful updates, error handling for invalid inputs, and specific behavior for different payment statuses.
+
+## Code Structure
+The test suite is organized around the `call` method of the `Fees::UpdateService` class. It uses RSpec's `describe` and `context` blocks to group related tests and `let` statements to set up test data.
+
+## Symbols
+
+### `RSpec.describe Fees::UpdateService`
+#### Description
+This is the main describe block for the `Fees::UpdateService` test suite.
+
+#### Internal Logic
+- Sets up the subject of the tests as an instance of `Fees::UpdateService`
+- Defines common test data using `let` statements
+- Contains nested `describe` and `context` blocks for different test scenarios
+
+### `describe 'call'`
+#### Description
+This block focuses on testing the `call` method of the `Fees::UpdateService`.
+
+#### Internal Logic
+- Tests successful fee updates
+- Tests error handling for various scenarios
+- Checks specific behavior for different payment statuses
+
+### `it 'updates the fee'`
+#### Description
+This test checks if the service successfully updates a fee's payment status.
+
+#### Internal Logic
+- Calls the update service
+- Verifies that the result is successful
+- Checks that the fee's payment status is updated correctly
+- Ensures that the `succeeded_at` timestamp is set
+
+### `context 'when fee is nil'`
+#### Description
+This context tests the behavior when the fee is not found.
+
+#### Internal Logic
+- Sets up a scenario with a nil fee
+- Verifies that the service returns a not found failure
+- Checks the error type and message
+
+### `context 'when fee is part of an invoice'`
+#### Description
+This context tests the behavior when trying to update a fee that's already part of an invoice.
+
+#### Internal Logic
+- Creates a fee associated with an invoice
+- Verifies that the service returns a method not allowed failure
+- Checks the error type and code
+
+### `context 'when payment_status is invalid'`
+#### Description
+This context tests the behavior when an invalid payment status is provided.
+
+#### Internal Logic
+- Sets up a scenario with an invalid payment status
+- Verifies that the service returns a validation failure
+- Checks the error type and messages
+
+### `context 'when payment_status is failed'`
+#### Description
+This context tests the behavior when updating a fee's status to 'failed'.
+
+#### Internal Logic
+- Sets up a scenario with a 'failed' payment status
+- Verifies that the service successfully updates the fee
+- Checks that the `failed_at` timestamp is set
+
+### `context 'when payment_status is refunded'`
+#### Description
+This context tests the behavior when updating a fee's status to 'refunded'.
+
+#### Internal Logic
+- Sets up a scenario with a 'refunded' payment status
+- Verifies that the service successfully updates the fee
+- Checks that the `refunded_at` timestamp is set
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+
+Note: The `rails_helper` file includes additional dependencies and configurations for the test environment, such as SimpleCov for code coverage, DatabaseCleaner, and various RSpec configurations.

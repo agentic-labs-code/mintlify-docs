@@ -1,0 +1,83 @@
+---
+title: "fees_query_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `FeesQuery` class. It tests various scenarios of querying fees, including pagination and different types of filters such as subscription, customer, currency, billable metric code, fee type, payment status, and date ranges.
+
+## Code Structure
+The test suite is organized around the `FeesQuery` class, with multiple contexts testing different aspects of the query functionality. Each context focuses on a specific filter or feature of the query.
+
+## Symbols
+
+### `RSpec.describe FeesQuery`
+#### Description
+This is the main describe block for the `FeesQuery` class tests. It sets up the basic structure for all the tests related to this class.
+
+#### Internal Logic
+- Sets up the subject (`fees_query`) and common let variables (`organization`, `pagination`, `filters`).
+- Contains multiple contexts for different scenarios and filters.
+
+### `describe 'call'`
+#### Description
+This describe block focuses on testing the `call` method of the `FeesQuery` class.
+
+#### Internal Logic
+- Sets up common variables (`customer`, `subscription`, `fee`) for the tests.
+- Contains multiple test cases for different scenarios and filters.
+
+### Various `context` blocks
+#### Description
+Each context block tests a specific scenario or filter for the `FeesQuery`.
+
+#### Internal Logic
+- Sets up specific variables or filters for the context.
+- Contains one or more test cases (`it` blocks) to verify the behavior.
+
+### Various `it` blocks
+#### Description
+Each `it` block represents a specific test case for the `FeesQuery`.
+
+#### Internal Logic
+- Calls the `fees_query.call` method.
+- Uses `aggregate_failures` to group multiple expectations.
+- Checks for success/failure of the query and verifies the returned fees or error messages.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used for creating test data (organizations, customers, subscriptions, fees, etc.) |
+
+## Error Handling
+The tests check for proper error handling in cases of invalid input, such as:
+- Invalid fee_type
+- Invalid payment_status
+- Invalid date formats for various date filters
+
+## API/Interface Reference
+The tests imply that the `FeesQuery` class has the following interface:
+| Method | Inputs | Outputs | Description |
+|:-------|:-------|:--------|:------------|
+| call | None | Result object | Executes the query and returns a result containing fees or error information |
+
+The `FeesQuery` constructor accepts:
+- `organization`
+- `pagination` (optional)
+- `filters` (optional)
+
+Filters can include:
+- `external_subscription_id`
+- `external_customer_id`
+- `currency`
+- `billable_metric_code`
+- `fee_type`
+- `payment_status`
+- Date range filters (created_at, succeeded_at, failed_at, refunded_at)
+
+The result object seems to have the following properties:
+- `success?`: Boolean indicating if the query was successful
+- `fees`: Collection of fee objects
+- `error`: Error object (when the query fails)
+
+This test file provides comprehensive coverage for the `FeesQuery` class, testing various scenarios and edge cases to ensure robust functionality.

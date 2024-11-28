@@ -1,0 +1,74 @@
+---
+title: "login_service.rb"
+---
+
+## High-level description
+This code defines the `LoginService` class within the `Auth::Okta` module, which handles the Okta authentication process for users. It validates the authentication state, checks Okta integration, retrieves access tokens, and creates or finds users and memberships in the system.
+
+## Code Structure
+The `LoginService` class inherits from `BaseService` and contains a main `call` method that orchestrates the login process. It also includes private methods for finding or creating users and memberships.
+
+## References
+- `BaseService`: The parent class that provides common functionality for services.
+- `User`: The model representing users in the system.
+- `UsersService`: A service class that handles user-related operations, including token generation.
+
+## Symbols
+
+### `Auth::Okta::LoginService`
+#### Description
+This class handles the Okta authentication process, including state validation, Okta integration checks, access token retrieval, and user/membership management.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | The authentication code received from Okta |
+| state | String | The state parameter for CSRF protection |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the authentication result, including user and token information |
+
+#### Internal Logic
+1. Validate the authentication state
+2. Check Okta integration for the user's email
+3. Query Okta for an access token
+4. Verify user information
+5. Find or create a user in the system
+6. Find or create a membership for the user
+7. Generate a new authentication token for the user
+8. Handle any validation errors that occur during the process
+
+### `find_or_create_user`
+#### Description
+This private method finds an existing user or creates a new one based on the email address obtained from Okta.
+
+#### Internal Logic
+1. Look for a user with the given email
+2. If the user doesn't exist, create a new one with a random password
+3. Save the user to the database
+4. Store the user in the result object
+
+### `find_or_create_membership`
+#### Description
+This private method finds or creates a membership for the authenticated user in the organization associated with the Okta integration.
+
+#### Internal Logic
+1. Find or create a membership for the user in the organization linked to the Okta integration
+2. Return the membership object
+
+## Error Handling
+The service uses a `rescue` block to catch `ValidationError` exceptions and add them to the result object using `result.single_validation_failure!`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| SecureRandom | Used to generate a random password for new users |
+
+## API/Interface Reference
+| Method | Description |
+|:-------|:------------|
+| call | Executes the Okta login process and returns the authentication result |
+
+This service is likely called by a controller or another service that handles the initial Okta authentication request and provides the necessary `code` and `state` parameters.

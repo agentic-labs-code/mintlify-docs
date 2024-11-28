@@ -1,0 +1,33 @@
+---
+title: "required_organization.rb"
+---
+
+## High-level description
+This code defines a Ruby module called `RequiredOrganization` that is used as a concern in GraphQL resolvers and mutations. It ensures that the current user has access to a valid organization before executing the GraphQL operation.
+
+## Code Structure
+The `RequiredOrganization` module extends `ActiveSupport::Concern` and defines private methods that are used to check the user's organization access and handle errors.
+
+## Symbols
+
+### RequiredOrganization
+#### Description
+This module is designed to be included in GraphQL resolvers and mutations to enforce organization-level access control.
+
+#### Internal Logic
+1. The `ready?` method is overridden to perform checks before executing the GraphQL operation:
+   - It checks if there's a current organization.
+   - It verifies if the current user is a member of the organization.
+   - If either check fails, it raises an appropriate error.
+2. The `current_organization` method retrieves the current organization from the context.
+3. The `organization_error` method creates a GraphQL execution error with a forbidden status.
+4. The `organization_member?` method checks if the current user is a member of the current organization.
+
+## Side Effects
+When included in a GraphQL resolver or mutation, this module will prevent the operation from executing if the user doesn't have access to a valid organization.
+
+## Error Handling
+The module raises GraphQL execution errors with a forbidden status when organization-related checks fail.
+
+## Usage
+This module is widely used across various GraphQL resolvers and mutations in the application to ensure that operations are only performed within the context of a valid organization that the user has access to.

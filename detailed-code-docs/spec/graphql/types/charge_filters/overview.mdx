@@ -1,0 +1,66 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL types related to charge filters in the application. It specifically includes tests for two GraphQL types: `Types::ChargeFilters::Input` and `Types::ChargeFilters::Object`. These tests ensure that the GraphQL schema for charge filters is correctly defined and maintains its expected structure.
+
+## What does it do?
+The tests in this directory verify the structure and field definitions of GraphQL types used for charge filtering in the application. They ensure that:
+
+1. The input type (`Types::ChargeFilters::Input`) accepts the correct arguments with their corresponding types, allowing users to provide filtering criteria for charges.
+
+2. The object type (`Types::ChargeFilters::Object`) has the correct fields with their respective types, defining the structure of charge filter objects returned by the API.
+
+These tests play a crucial role in maintaining the integrity and consistency of the GraphQL API, particularly for charge-related operations. They act as a safeguard against unintended changes to the API schema and help prevent regressions that could affect client applications consuming the API.
+
+## Key Files
+1. `input_spec.rb`:
+   This file contains tests for the `Types::ChargeFilters::Input` GraphQL type. It verifies that the input type accepts specific arguments:
+   - `invoice_display_name` (String)
+   - `properties` (PropertiesInput!, non-nullable)
+   - `values` (ChargeFilterValues!, non-nullable)
+
+   Example test:
+   ```ruby
+   RSpec.describe Types::ChargeFilters::Input do
+     it { is_expected.to accept_argument(:invoice_display_name).of_type('String') }
+     it { is_expected.to accept_argument(:properties).of_type('PropertiesInput!') }
+     it { is_expected.to accept_argument(:values).of_type('ChargeFilterValues!') }
+   end
+   ```
+
+2. `object_spec.rb`:
+   This file contains tests for the `Types::ChargeFilters::Object` GraphQL type. It checks that the object type has the following fields with correct types:
+   - `id` (ID!, non-nullable)
+   - `invoice_display_name` (String, nullable)
+   - `properties` (Properties!, non-nullable)
+   - `values` (ChargeFilterValues!, non-nullable)
+
+   Example test:
+   ```ruby
+   RSpec.describe Types::ChargeFilters::Object do
+     it { is_expected.to have_field(:id).of_type('ID!') }
+     it { is_expected.to have_field(:invoice_display_name).of_type('String') }
+     it { is_expected.to have_field(:properties).of_type('Properties!') }
+     it { is_expected.to have_field(:values).of_type('ChargeFilterValues!') }
+   end
+   ```
+
+## Dependencies
+Both test files depend on the `rails_helper`, which loads the Rails testing environment and RSpec configuration. This suggests that the application is built using Ruby on Rails and uses RSpec as its testing framework.
+
+The tests also implicitly depend on the following GraphQL types, which are likely defined elsewhere in the application:
+- `Types::ChargeFilters::Input`
+- `Types::ChargeFilters::Object`
+- `PropertiesInput`
+- `Properties`
+- `ChargeFilterValues`
+
+## Notes
+1. Both test files use the `frozen_string_literal: true` pragma, which is a Ruby optimization that makes all string literals in the file frozen (immutable).
+2. The tests are concise and focused, testing only the structure of the GraphQL types without diving into complex logic or edge cases.
+3. The use of `!` in field types (e.g., `ID!`, `Properties!`) indicates that these fields are non-nullable in the GraphQL schema.
+4. The `invoice_display_name` field is nullable in the object type but accepts a nullable string in the input type, providing flexibility in how charge filters are created and queried.
+
+These tests play a crucial role in maintaining the stability and consistency of the GraphQL API for charge filtering functionality. They ensure that any changes to the schema are intentional and help prevent breaking changes that could affect client applications relying on this API.

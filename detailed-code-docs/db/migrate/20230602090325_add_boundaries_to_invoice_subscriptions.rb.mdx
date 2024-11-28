@@ -1,0 +1,44 @@
+---
+title: "20230602090325_add_boundaries_to_invoice_subscriptions.rb"
+---
+
+## High-level description
+This migration adds new datetime columns to the `invoice_subscriptions` table and populates them with data from the existing `properties` JSON field or related `fees` table. It also updates the `fees` table to ensure consistent timestamp formatting.
+
+## Code Structure
+The migration consists of two main parts: adding new columns to the `invoice_subscriptions` table and updating these columns with data from existing fields. The update process includes a complex SQL query to handle various data formats and sources.
+
+## Symbols
+
+### AddBoundariesToInvoiceSubscriptions
+#### Description
+This is a Rails migration class that adds new datetime columns to the `invoice_subscriptions` table and populates them with data from existing fields.
+
+#### Internal Logic
+1. Adds new datetime columns to the `invoice_subscriptions` table.
+2. Updates the `fees` table to ensure consistent timestamp formatting in the `properties` JSON field.
+3. Updates the `invoice_subscriptions` table, populating the new columns with data from either the `properties` JSON field or related `fees` records.
+
+## Side Effects
+- Modifies the structure of the `invoice_subscriptions` table by adding new columns.
+- Updates existing data in both the `fees` and `invoice_subscriptions` tables.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+
+## Error Handling
+The migration uses `safety_assured` to bypass Strong Migrations checks, indicating that the migration has been manually reviewed for safety.
+
+## API/Interface Reference
+| Column | Type | Description |
+|:-------|:-----|:------------|
+| timestamp | datetime | Timestamp of the invoice subscription |
+| from_datetime | datetime | Start date of the subscription period |
+| to_datetime | datetime | End date of the subscription period |
+| charges_from_datetime | datetime | Start date for charges |
+| charges_to_datetime | datetime | End date for charges |
+
+## Performance Considerations
+The migration uses a bulk update for adding columns to the `invoice_subscriptions` table, which can be more efficient for large tables. However, the data update process involves complex SQL queries with subqueries, which may be slow for large datasets.

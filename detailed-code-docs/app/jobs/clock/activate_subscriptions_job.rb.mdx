@@ -1,0 +1,70 @@
+---
+title: "activate_subscriptions_job.rb"
+---
+
+## High-level description
+This code defines a background job `ActivateSubscriptionsJob` within the `Clock` module. Its primary purpose is to activate pending subscriptions that are due for activation based on the current timestamp.
+
+## Code Structure
+The `ActivateSubscriptionsJob` class inherits from `ApplicationJob` and includes the `SentryCronConcern` module. It uses the `Subscriptions::ActivateService` to perform the actual activation of pending subscriptions.
+
+## References
+- `ApplicationJob`: The base job class (not shown in the provided code)
+- `SentryCronConcern`: A module for Sentry monitoring of cron jobs
+- `Subscriptions::ActivateService`: A service class responsible for activating subscriptions
+
+## Symbols
+
+### `Clock::ActivateSubscriptionsJob`
+#### Description
+This class defines a background job for activating pending subscriptions. It is designed to run periodically as a clock job.
+
+#### Inputs
+This job doesn't take any explicit inputs. It uses the current timestamp when executing.
+
+#### Outputs
+This job doesn't return any explicit outputs. Its effects are side effects on the database and potentially triggering other jobs.
+
+#### Internal Logic
+1. The job is queued in the 'clock' queue.
+2. It uses the `unique` method to ensure only one instance of this job is executed at a time, logging conflicts if they occur.
+3. In the `perform` method, it creates a new instance of `Subscriptions::ActivateService` with the current timestamp and calls the `activate_all_pending` method on it.
+
+## Side Effects
+- Activates pending subscriptions in the database
+- May trigger webhook jobs and billing jobs for activated subscriptions
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| SentryCronConcern | Provides Sentry monitoring for cron jobs |
+| Subscriptions::ActivateService | Handles the logic for activating subscriptions |
+
+## Error Handling
+This job relies on the error handling provided by `ApplicationJob` and `SentryCronConcern`. No specific error handling is implemented in this job class.
+
+## Logging
+Logging is handled by the `unique` method, which logs conflicts when the job is already running.
+
+## Performance Considerations
+The job uses `unique :until_executed` to prevent multiple instances from running simultaneously, which helps avoid race conditions and unnecessary database operations.
+
+---
+
+### `Subscriptions::ActivateService#activate_all_pending`
+#### Description
+This method, called by the job, is responsible for finding and activating all pending subscriptions that are due for activation.
+
+#### Internal Logic
+1. Queries the database for pending subscriptions that meet the activation criteria.
+2. For each qualifying subscription:
+   - Marks it as active
+   - Triggers a webhook job for the 'subscription.started' event
+   - If the subscription plan requires payment in advance and is not in a trial period, it schedules a billing job
+
+## Side Effects
+- Updates subscription statuses in the database
+- Triggers webhook jobs
+- May schedule billing jobs
+
+This service is crucial for the functioning of the `ActivateSubscriptionsJob`, as it contains the core logic for subscription activation.

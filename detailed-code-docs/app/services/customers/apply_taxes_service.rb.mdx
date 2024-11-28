@@ -1,0 +1,74 @@
+---
+title: "apply_taxes_service.rb"
+---
+
+## High-level description
+The `ApplyTaxesService` is a Ruby service class within the `Customers` module that applies tax codes to a customer. It manages the customer's applied taxes by adding new ones, removing those that are no longer applicable, and updating related invoices.
+
+## Code Structure
+The `ApplyTaxesService` inherits from `BaseService` and contains a single public method `call`. It interacts with the `customer` and `tax_codes` attributes to manage the customer's applied taxes.
+
+## Symbols
+
+### `ApplyTaxesService`
+#### Description
+This service applies tax codes to a customer, manages the customer's applied taxes, and updates related invoices.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Customer | The customer object to apply taxes to |
+| tax_codes | Array | An array of tax code strings to apply |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An instance of `BaseService::Result` containing the operation result |
+
+#### Internal Logic
+1. Validate the existence of the customer and tax codes.
+2. Remove applied taxes that are no longer in the provided tax codes.
+3. Create or find applied taxes for each provided tax code.
+4. Mark draft invoices as ready to be refreshed.
+5. Handle any record validation errors.
+
+### `call`
+#### Description
+The main method that executes the tax application process.
+
+#### Internal Logic
+1. Check if the customer exists, return a not found failure if not.
+2. Verify all tax codes exist, return a not found failure if any are missing.
+3. Remove applied taxes that are no longer in the provided tax codes.
+4. Create or find applied taxes for each provided tax code.
+5. Mark all draft invoices as ready to be refreshed.
+6. Return the result object with applied taxes.
+7. Handle any `ActiveRecord::RecordInvalid` errors.
+
+### `taxes`
+#### Description
+A private method that retrieves taxes for the customer's organization based on the provided tax codes.
+
+## Side Effects
+- Modifies the customer's applied taxes in the database.
+- Updates the `ready_to_be_refreshed` status of the customer's draft invoices.
+
+## Error Handling
+The service handles two main types of errors:
+1. Not found errors for customer or taxes (using `result.not_found_failure!`).
+2. Record validation errors (using `result.record_validation_failure!`).
+
+## Performance Considerations
+The service uses `find_or_create_by!` which can be less efficient for bulk operations. However, it ensures data consistency by avoiding duplicate records.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | For database operations and error handling |
+
+## TODOs
+There is a TODO comment related to the use of `update_all`:
+```ruby
+customer.invoices.draft.update_all(ready_to_be_refreshed: true) # rubocop:disable Rails/SkipsModelValidations
+```
+This suggests that the use of `update_all` bypasses model validations, which might need to be addressed in the future for better data integrity.

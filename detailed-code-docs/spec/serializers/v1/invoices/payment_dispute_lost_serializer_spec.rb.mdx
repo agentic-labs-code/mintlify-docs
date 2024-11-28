@@ -1,0 +1,53 @@
+---
+title: "payment_dispute_lost_serializer_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `V1::Invoices::PaymentDisputeLostSerializer` class. It verifies that the serializer correctly handles invoices with payment disputes that have been lost, both with and without additional provider error information.
+
+## Symbols
+
+### `RSpec.describe ::V1::Invoices::PaymentDisputeLostSerializer`
+#### Description
+This is the main RSpec describe block that groups all tests for the `V1::Invoices::PaymentDisputeLostSerializer` class.
+
+### `subject(:serializer)`
+#### Description
+Defines the subject of the test, which is an instance of the `V1::Invoices::PaymentDisputeLostSerializer` class, initialized with an invoice and options.
+
+### `let(:invoice)`
+#### Description
+Creates a test invoice using FactoryBot with the `:dispute_lost` trait.
+
+### Context: "when options are present"
+#### Description
+Tests the serializer's behavior when provider error options are provided.
+
+#### Internal Logic
+1. Sets up options with provider error information.
+2. Serializes the invoice using the serializer.
+3. Parses the JSON result.
+4. Checks that the serialized data includes the invoice's lago_id and the provided provider error information.
+
+### Context: "when options are not present"
+#### Description
+Tests the serializer's behavior when no options are provided.
+
+#### Internal Logic
+1. Sets up an empty options hash.
+2. Serializes the invoice using the serializer.
+3. Parses the JSON result.
+4. Checks that the serialized data includes the invoice's lago_id and does not include a provider_error key.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and RSpec configuration |
+| FactoryBot | Used to create test data (invoice) |
+
+## Notes
+- The test uses `aggregate_failures` to group multiple expectations together, allowing all expectations to be evaluated even if one fails.
+- The serializer is tested with both present and absent options to ensure it handles different scenarios correctly.
+- The test checks for the presence of specific keys in the serialized data and verifies their values.
+
+This test file ensures that the `V1::Invoices::PaymentDisputeLostSerializer` correctly serializes invoices with lost payment disputes, handling additional provider error information when present and omitting it when not provided.

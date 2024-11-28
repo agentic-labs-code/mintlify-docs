@@ -1,0 +1,79 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL mutations related to coupon management in a software application. The tests cover various operations on coupons, including creation, updating, termination, and deletion. These tests ensure that the GraphQL API correctly handles coupon-related operations with proper authentication, authorization, and data manipulation.
+
+## What does it do?
+The test suite in this directory verifies the functionality of coupon-related GraphQL mutations. Here's a breakdown of what each test file covers:
+
+1. Creation of coupons: Tests the ability to create new coupons with various attributes, including plan-specific and billable metric-specific limitations.
+2. Updating coupons: Verifies that existing coupons can be updated with new attributes, including changes to associated plans or billable metrics.
+3. Termination of coupons: Ensures that coupons can be terminated, changing their status and recording the termination timestamp.
+4. Deletion of coupons: Checks that coupons can be permanently removed from the system.
+
+Each test file ensures that the respective mutation requires proper authentication (current user) and authorization (specific permissions). The tests also verify that the mutations return the expected data structure and values after performing the requested operations.
+
+## Key Files
+1. `create_spec.rb`: Tests the creation of coupons with various attributes and limitations.
+2. `update_spec.rb`: Verifies the updating of coupon attributes, including plan and billable metric associations.
+3. `terminate_spec.rb`: Checks the termination process for coupons.
+4. `destroy_spec.rb`: Tests the deletion of coupons from the system.
+
+## Dependencies
+The test suite relies on the following key dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data (e.g., memberships, organizations, coupons, plans, and billable metrics).
+3. GraphQL: The API query language used for defining and executing the mutations.
+
+## Configuration
+The test files use several common configuration elements:
+
+1. `rails_helper`: Loads Rails-specific test configurations and helpers.
+2. `type: :graphql`: Specifies that these are GraphQL-related tests.
+3. Shared examples: Used for common checks like requiring a current user or specific permissions.
+
+Each test file sets up necessary test data using `let` statements, typically including:
+
+- `required_permission`: The permission required to perform the coupon operation.
+- `membership`: A test membership object.
+- `organization`: The organization associated with the test membership.
+- `coupon`: A test coupon object.
+- `plan` and `billable_metric`: Test objects for plan and billable metric limitations.
+
+The GraphQL mutation queries are defined as strings within each test file, specifying the input fields and expected return values for each operation.
+
+Here's an example of how the create mutation is structured:
+
+```graphql
+mutation($input: CreateCouponInput!) {
+  createCoupon(input: $input) {
+    coupon {
+      id
+      name
+      code
+      description
+      status
+      amountCents
+      amountCurrency
+      expiration
+      expirationAt
+      limitedPlans
+      plans {
+        id
+      }
+      limitedBillableMetrics
+      billableMetrics {
+        id
+      }
+      reusable
+    }
+  }
+}
+```
+
+This structure allows the tests to verify that the API correctly handles the input and returns the expected coupon data after the operation.
+
+The test suite provides comprehensive coverage of coupon-related operations, ensuring that the GraphQL API behaves correctly and maintains data integrity throughout various coupon management scenarios.

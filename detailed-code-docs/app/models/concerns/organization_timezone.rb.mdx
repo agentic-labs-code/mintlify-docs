@@ -1,0 +1,40 @@
+---
+title: "organization_timezone.rb"
+---
+
+## High-level description
+The `OrganizationTimezone` module provides a mechanism for accessing time-sensitive methods of an object in the context of an organization's timezone. It achieves this by intercepting method calls ending with `_in_organization_timezone` and adjusting the returned time values to the organization's timezone.
+
+## Code Structure
+The `OrganizationTimezone` module defines three main methods: `method_missing`, `respond_to_missing?`, and `included`. The `method_missing` method intercepts calls to methods ending with `_in_organization_timezone`, extracts the original method name, and calls it on the target object. The `respond_to_missing?` method checks if the module responds to a method call, specifically those ending with `_in_organization_timezone`. The `included` method extends the base class with the module's methods when it's included.
+
+## Symbols
+
+### `OrganizationTimezone`
+#### Description
+This module provides methods for handling time-sensitive operations within the context of an organization's timezone.
+
+#### Inputs
+N/A - This is a module, not a method.
+
+#### Outputs
+N/A - This is a module, not a method.
+
+#### Internal Logic
+The module uses Ruby's `method_missing` and `respond_to_missing?` methods to intercept calls to methods ending with `_in_organization_timezone`. 
+1. When a method ending with `_in_organization_timezone` is called, the `method_missing` method is triggered.
+2. It extracts the original method name by removing the `_in_organization_timezone` suffix.
+3. It then calls the original method on the target object (either the organization itself or the organization associated with the object).
+4. The returned time value is then adjusted to the organization's timezone using the `in_time_zone` method.
+
+The `respond_to_missing?` method ensures that the module correctly reports its ability to handle methods with the `_in_organization_timezone` suffix.
+
+#### Example
+Let's say you have an `Event` model with a `created_at` attribute. You can use this module to get the `created_at` time in the organization's timezone:
+
+```ruby
+event = Event.find(1)
+event.created_at_in_organization_timezone
+```
+
+This would return the `created_at` time adjusted to the timezone of the organization associated with the event.

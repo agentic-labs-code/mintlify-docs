@@ -1,0 +1,60 @@
+---
+title: "20240506085424_migrate_quantified_events_to_cached_aggregations.rb"
+---
+
+## High-level description
+This migration script is designed to transfer data from the `QuantifiedEvent` model to the `CachedAggregation` model. It specifically targets events related to billable metrics with an aggregation type of 5, ensuring that the events fall within the active period of their associated subscriptions.
+
+## Code Structure
+The migration defines two temporary class models, `QuantifiedEvent` and `CachedAggregation`, which are used to interact with their respective database tables. The main logic is contained within a single `change` method that performs the data migration.
+
+## Symbols
+
+### `MigrateQuantifiedEventsToCachedAggregations`
+#### Description
+This is the main migration class that inherits from `ActiveRecord::Migration[7.0]`. It defines the process of migrating data from `QuantifiedEvent` to `CachedAggregation`.
+
+### `change`
+#### Description
+This method contains the core logic for the migration. It executes a complex SQL query to retrieve relevant `QuantifiedEvent` records and then creates corresponding `CachedAggregation` records.
+
+#### Internal Logic
+1. Executes a SQL query to select `QuantifiedEvent` records along with their associated `charge_id`.
+2. The query joins several tables (`billable_metrics`, `charges`, `plans`, `subscriptions`) to ensure only relevant events are selected.
+3. Filters the results based on specific conditions:
+   - Billable metrics with aggregation_type 5
+   - Events that occurred after the subscription start date
+   - Events that occurred before the subscription termination date (if applicable)
+4. Iterates through the selected `QuantifiedEvent` records.
+5. For each record, creates a new `CachedAggregation` record with data mapped from the `QuantifiedEvent`.
+
+## SQL Query Explanation
+The SQL query in the `change` method is crucial for understanding this migration:
+
+1. It selects all columns from `quantified_events` along with the `charge_id` from the `charges` table.
+2. It joins several tables to establish relationships between events, billable metrics, charges, plans, and subscriptions.
+3. The `WHERE` clause ensures that:
+   - Only events related to billable metrics with aggregation_type 5 are selected.
+   - The event's `added_at` timestamp is after the subscription's `started_at` date.
+   - The event's `added_at` timestamp is before the subscription's `terminated_at` date (if the subscription has been terminated).
+
+## Data Mapping
+The migration maps data from `QuantifiedEvent` to `CachedAggregation` as follows:
+
+- `organization_id`: Directly copied
+- `charge_id`: Obtained from the SQL query join
+- `timestamp`: Set to the `added_at` value of the `QuantifiedEvent`
+- `external_subscription_id`: Directly copied
+- `charge_filter_id`: Directly copied
+- `current_aggregation`: Extracted from the `properties` JSON field, specifically the `total_aggregated_units` key, defaulting to '0' if not present
+- `grouped_by`: Directly copied
+- `created_at` and `updated_at`: Directly copied from the `QuantifiedEvent`
+
+## Performance Considerations
+This migration could potentially be slow if there are a large number of `QuantifiedEvent` records to process. The use of `find_by_sql` followed by individual inserts might not be the most efficient for large datasets. Consider using bulk insert techniques for better performance in such cases.
+
+## Dependencies
+This migration relies on the ActiveRecord framework, which is part of Ruby on Rails.
+
+## Error Handling
+There is no explicit error handling in this migration. If any issues occur during the process (e.g., database constraints violations), the migration will fail and need to be rolled back.

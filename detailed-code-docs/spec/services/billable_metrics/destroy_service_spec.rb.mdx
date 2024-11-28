@@ -1,0 +1,68 @@
+---
+title: "destroy_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `BillableMetrics::DestroyService` class. It verifies the behavior of the service when destroying a billable metric, including soft deletion of related entities, enqueuing jobs, and tracking events.
+
+## Code Structure
+The test suite is organized around the `#call` method of the `BillableMetrics::DestroyService` class. It sets up various related objects and mocks certain behaviors before testing different aspects of the destroy operation.
+
+## Symbols
+
+### `RSpec.describe BillableMetrics::DestroyService`
+#### Description
+This is the main describe block for the `BillableMetrics::DestroyService` test suite.
+
+### `describe '#call'`
+#### Description
+This describe block focuses on testing the `#call` method of the `BillableMetrics::DestroyService`.
+
+#### Internal Logic
+The tests in this block cover various aspects of the destroy operation:
+1. Soft deletion of the billable metric
+2. Soft deletion of related charges
+3. Soft deletion of related filters
+4. Enqueuing of `BillableMetrics::DeleteEventsJob`
+5. Marking invoices as ready to be refreshed
+6. Calling `SegmentTrackJob` for event tracking
+7. Handling the case when the billable metric is not found
+
+### `subject(:destroy_service)`
+#### Description
+This defines the subject of the test, which is an instance of `BillableMetrics::DestroyService` initialized with a billable metric.
+
+### `let` statements
+#### Description
+These statements set up the test environment by creating various objects and relationships needed for the tests:
+- `membership`, `organization`, `billable_metric`, `subscription`, `charge`, `filters`, `charge_filter`, and `filter_value`
+
+### `before` block
+#### Description
+This block sets up the test environment by:
+1. Creating a charge
+2. Creating a filter value
+3. Mocking `SegmentTrackJob`, `BillableMetrics::DeleteEventsJob`, and `Invoices::RefreshDraftService`
+
+### Individual test cases (e.g., `it 'soft deletes the billable metric'`)
+#### Description
+Each test case verifies a specific aspect of the `DestroyService`'s behavior.
+
+#### Internal Logic
+Most test cases follow this pattern:
+1. Arrange: Set up any additional necessary objects or state
+2. Act: Call the `destroy_service.call` method
+3. Assert: Check that the expected changes have occurred, such as soft deletion of objects, enqueuing of jobs, or calling of specific methods
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| SegmentTrackJob | Mocked to verify event tracking |
+| BillableMetrics::DeleteEventsJob | Mocked to verify job enqueuing |
+| Invoices::RefreshDraftService | Mocked to verify invoice refresh |
+
+## Error Handling
+The test suite includes a case for handling the scenario when the billable metric is not found, expecting an error result with the code 'billable_metric_not_found'.
+
+This comprehensive test suite ensures that the `BillableMetrics::DestroyService` correctly handles the destruction of a billable metric and its related entities, while also verifying proper job enqueuing and event tracking.

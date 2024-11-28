@@ -1,0 +1,79 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for the CSV data export functionality of the application, specifically focusing on invoice and invoice fee exports. The tests ensure that the CSV generation process works correctly, applying the appropriate filters and serializing the data as expected.
+
+## What does it do?
+These tests verify that the application can generate CSV exports for invoices and invoice fees. They simulate the export process by:
+
+1. Setting up mock data and objects to represent invoices, fees, and export configurations.
+2. Calling the export generation method.
+3. Checking that the resulting CSV file contains the correct data in the expected format.
+
+This ensures that when users request exports of invoice or fee data, they receive accurate and properly formatted CSV files containing the information they've requested, based on any filters or parameters they've specified.
+
+## Key Files
+1. `invoice_fees_spec.rb`: This file tests the `DataExports::Csv::InvoiceFees` class, which is responsible for generating CSV exports of invoice fees. It verifies that:
+   - The correct filters are applied to the data query.
+   - The appropriate serializers are used for invoices, fees, and subscriptions.
+   - The resulting CSV contains the expected data in the correct format.
+
+2. `invoices_spec.rb`: This file tests the `DataExports::Csv::Invoices` class, which generates CSV exports of invoices. It ensures that:
+   - The invoice query is correctly filtered based on the provided parameters.
+   - The invoice serializer is used properly to format the data.
+   - The generated CSV file contains the expected invoice information.
+
+Both files use similar testing structures, setting up mock objects and data, then verifying the output of the CSV generation process.
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used to structure and run the tests.
+2. FactoryBot: Used to create test objects, although not explicitly required in the provided code snippets.
+3. Rails: The tests are part of a Rails application, as evidenced by the `require 'rails_helper'` statement.
+
+These dependencies are typical for a Rails application using RSpec for testing.
+
+## Configuration
+The tests use various `let` blocks to set up the test environment and mock objects. These configurations include:
+
+1. `data_export`: Represents the export configuration, including status and query parameters.
+2. `resource_query` and `filters`: Define the filtering parameters for the data export.
+3. `tempfile`: A temporary file used to store the generated CSV output.
+4. Various serializer mocks: Used to simulate the serialization of invoices, fees, and subscriptions.
+
+These configurations allow the tests to simulate different export scenarios and verify the correct behavior of the export classes.
+
+Here's an example of how the configuration is set up in the `invoices_spec.rb` file:
+
+```ruby
+let(:data_export) do
+  create(:data_export,
+         status: :processing,
+         resource_query: resource_query)
+end
+
+let(:resource_query) do
+  {
+    from_date: '2022-01-01',
+    to_date: '2022-03-31',
+    customer_id: 'cus_123456789',
+    status: 'finalized'
+  }
+end
+
+let(:filters) do
+  {
+    from_date: Date.parse('2022-01-01'),
+    to_date: Date.parse('2022-03-31'),
+    customer_id: 'cus_123456789',
+    status: 'finalized'
+  }
+end
+```
+
+This configuration sets up a test data export with specific date ranges, customer ID, and invoice status, which are then used to test the filtering and export process.
+
+The tests in this directory play a crucial role in ensuring the reliability and accuracy of the application's data export functionality, particularly for invoice and fee-related data.

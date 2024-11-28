@@ -1,0 +1,66 @@
+---
+title: "unique_count_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `BillableMetrics::Breakdown::UniqueCountService` class. It tests various scenarios related to the breakdown of unique count metrics for billing purposes, including different subscription types, time periods, and event patterns.
+
+## Code Structure
+The test suite is organized around the `#breakdown` method of the `UniqueCountService`. It uses various let statements to set up the test environment, including creating organizations, billable metrics, plans, subscriptions, and events. The tests then verify the behavior of the service under different conditions.
+
+## Symbols
+
+### `described_class` (BillableMetrics::Breakdown::UniqueCountService)
+#### Description
+This is the main class being tested. It's responsible for calculating the breakdown of unique count metrics.
+
+#### Inputs
+- `event_store_class`: The class used for storing events (set to `Events::Stores::PostgresStore`)
+- `charge`: The charge associated with the billable metric
+- `subscription`: The subscription being analyzed
+- `boundaries`: A hash containing `from_datetime`, `to_datetime`, and `charges_duration`
+- `filters`: A hash containing `matching_filters` and `ignored_filters`
+
+#### Internal Logic
+The service calculates the breakdown of unique count metrics based on the provided inputs. It handles various scenarios such as persisted metrics, metrics added or removed during the period, and different subscription types (e.g., terminated, upgraded).
+
+### `#breakdown`
+#### Description
+This is the main method being tested. It returns the breakdown of unique count metrics.
+
+#### Outputs
+Returns a breakdown object containing details about the unique count metrics, including dates, actions, amounts, and durations.
+
+## Test Cases
+
+The test suite covers various scenarios, including:
+
+1. Persisted metrics on full period
+2. Metrics added during the period
+3. Metrics removed during the period
+4. Metrics added and removed during the period
+5. Different subscription types (e.g., terminated, upgraded)
+6. Different billing times (anniversary, calendar)
+7. Pay in advance scenarios
+
+Each test case sets up a specific scenario using let statements and then verifies the expected output of the `#breakdown` method.
+
+## Dependencies
+The test file depends on:
+- Rails testing framework (RSpec)
+- FactoryBot for creating test data
+- Various model classes (Organization, BillableMetric, Plan, Charge, Subscription, Event)
+
+## Configuration
+The tests use a variety of configuration options to set up different scenarios, including:
+- Different time periods
+- Various event timestamps
+- Different subscription and plan settings
+
+## Error Handling
+The tests don't explicitly cover error handling scenarios. They focus on verifying the correct behavior of the service under various normal operating conditions.
+
+## Performance Considerations
+There are no explicit performance tests in this file. However, the service's ability to handle different time periods and event patterns implicitly tests its performance under various conditions.
+
+In summary, this test file provides comprehensive coverage of the `BillableMetrics::Breakdown::UniqueCountService`, ensuring it correctly calculates unique count metric breakdowns under a wide range of scenarios relevant to billing and subscription management.

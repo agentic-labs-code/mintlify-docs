@@ -1,0 +1,92 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains a collection of background jobs that are part of the Clock module. These jobs are designed to run periodically to perform various maintenance, billing, and data processing tasks within the application. The jobs handle tasks such as activating subscriptions, refreshing invoices, terminating expired coupons and wallets, and cleaning up old data.
+
+## What does it do?
+The Clock jobs in this directory perform several important background processes:
+
+1. Subscription management:
+   - Activate pending subscriptions
+   - Bill subscriptions and free trials
+   - Terminate ended subscriptions
+   - Send termination alerts for subscriptions approaching their end date
+
+2. Invoice handling:
+   - Refresh draft invoices
+   - Finalize invoices
+   - Mark invoices as payment overdue
+
+3. Wallet management:
+   - Create interval wallet transactions
+   - Refresh ongoing wallet balances
+   - Terminate expired wallets
+
+4. Coupon management:
+   - Terminate expired coupons
+
+5. Usage and event processing:
+   - Refresh lifetime usages for premium license holders
+   - Validate and post-process events
+
+6. Data cleanup:
+   - Remove old webhook records
+
+These jobs work together to ensure that the application's data remains up-to-date, billing processes run smoothly, and expired or outdated information is properly handled.
+
+## Entry points
+The main entry point for each job is its `perform` method. These jobs are typically scheduled to run at regular intervals using a job scheduling system (likely Sidekiq, based on the use of the `unique` method in some jobs).
+
+The jobs are organized as follows:
+
+1. Subscription-related jobs:
+   - `ActivateSubscriptionsJob`
+   - `FreeTrialSubscriptionsBillerJob`
+   - `SubscriptionsBillerJob`
+   - `SubscriptionsToBeTerminatedJob`
+   - `TerminateEndedSubscriptionsJob`
+
+2. Invoice-related jobs:
+   - `FinalizeInvoicesJob`
+   - `MarkInvoicesAsPaymentOverdueJob`
+   - `RefreshDraftInvoicesJob`
+
+3. Wallet-related jobs:
+   - `CreateIntervalWalletTransactionsJob`
+   - `RefreshWalletsOngoingBalanceJob`
+   - `TerminateWalletsJob`
+
+4. Other maintenance jobs:
+   - `EventsValidationJob`
+   - `RefreshLifetimeUsagesJob`
+   - `TerminateCouponsJob`
+   - `WebhooksCleanupJob`
+
+Each job is responsible for a specific task and often interacts with corresponding service objects to perform the actual business logic.
+
+## Dependencies
+The jobs in this directory rely on several shared dependencies:
+
+1. `ApplicationJob`: The base job class that all these jobs inherit from.
+2. `SentryCronConcern`: A module included in all jobs for monitoring and error tracking with Sentry.
+3. Various service objects (e.g., `Subscriptions::ActivateService`, `Invoices::RefreshDraftAndFinalizeService`) that encapsulate the business logic for each operation.
+4. ActiveRecord models such as `Subscription`, `Invoice`, `Wallet`, and `Coupon`.
+
+External libraries and frameworks used include:
+
+1. Sidekiq: For job queuing and processing (inferred from the use of `unique` method).
+2. Sentry: For error tracking and monitoring (via `SentryCronConcern`).
+3. ActiveJob: The Rails job framework that these jobs are built upon.
+
+## Configuration
+Most of the jobs are configured to run on the 'clock' queue, which suggests they are part of a scheduled task system. Some jobs use Sidekiq's `unique` feature to prevent duplicate job execution.
+
+Key configuration options include:
+
+1. Queue selection: `queue_as 'clock'`
+2. Job uniqueness: `unique :until_executed, on_conflict: :log`
+3. Environment variables: Some jobs use environment variables for configuration, such as `LAGO_SUBSCRIPTION_TERMINATION_ALERT_SENT_AT_DAYS` in `SubscriptionsToBeTerminatedJob`.
+
+The jobs are designed to work within a larger application ecosystem, interacting with various models and services to perform their tasks. They play a crucial role in maintaining data integrity, processing billing cycles, and managing the lifecycle of various entities within the application.

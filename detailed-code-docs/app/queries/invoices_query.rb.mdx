@@ -1,0 +1,61 @@
+---
+title: "invoices_query.rb"
+---
+
+## High-level description
+The `InvoicesQuery` class is responsible for querying and filtering invoices based on various criteria. It extends the `BaseQuery` class and provides a flexible way to retrieve invoices with different filters, pagination, and sorting options.
+
+## Code Structure
+The `InvoicesQuery` class contains a main `call` method that applies various filters to the invoice scope. It uses private methods to implement specific filtering logic for each criterion.
+
+## Symbols
+
+### `InvoicesQuery#call`
+#### Description
+This method is the main entry point for querying invoices. It applies various filters and sorting to the invoice scope based on the provided parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (implicit) | BaseQuery parameters | Inherited from BaseQuery, including organization, pagination, filters, and search_term |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | Contains the filtered and paginated invoices |
+
+#### Internal Logic
+1. Initializes the base scope with visible invoices for the organization.
+2. Applies pagination to the scope.
+3. Orders the invoices by issuing date and creation date in descending order.
+4. Applies various filters based on the provided parameters (currency, customer, invoice type, issuing date range, status, payment status, payment dispute, and payment overdue).
+5. Returns the result with the filtered invoices.
+
+### Private Methods
+The class includes several private methods for applying specific filters:
+
+- `base_scope`: Initializes the base query scope.
+- `search_params`: Builds search parameters for the Ransack gem.
+- `with_currency`: Filters invoices by currency.
+- `with_customer_external_id`: Filters invoices by customer external ID.
+- `with_customer_id`: Filters invoices by customer ID.
+- `with_invoice_type`: Filters invoices by invoice type.
+- `with_status`: Filters invoices by status.
+- `with_payment_status`: Filters invoices by payment status.
+- `with_payment_dispute_lost`: Filters invoices by payment dispute status.
+- `with_payment_overdue`: Filters invoices by payment overdue status.
+- `with_issuing_date_range`: Filters invoices by issuing date range.
+- `issuing_date_from` and `issuing_date_to`: Parse and memoize date filters.
+
+## Dependencies
+- Inherits from `BaseQuery`
+- Uses `BaseService::Result` for error handling
+
+## Error Handling
+The class uses the error handling mechanism provided by `BaseService::Result`. It can raise a `BaseService::FailedResult` error if there's an issue with date parsing.
+
+## Performance Considerations
+- The query uses `includes(:customer)` to eager load customer data, which can improve performance when accessing customer information for multiple invoices.
+- The use of scopes and chained queries allows for efficient database querying.
+
+This class provides a flexible and extensible way to query invoices with various filtering options, making it suitable for use in different contexts such as API endpoints and data exports.

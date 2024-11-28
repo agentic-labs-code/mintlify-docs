@@ -1,0 +1,40 @@
+---
+title: "20220817092945_remove_invoice_from_wallet_transaction.rb"
+---
+
+## High-level description
+This migration removes the `invoice` reference from the `wallet_transactions` table in a Rails application. It's designed to safely remove the foreign key and index associated with the `invoice` column.
+
+## Symbols
+
+### `RemoveInvoiceFromWalletTransaction`
+#### Description
+This class is an ActiveRecord migration that inherits from `ActiveRecord::Migration[7.0]`. It defines a change to the database schema, specifically removing the `invoice` reference from the `wallet_transactions` table.
+
+#### Internal Logic
+The migration uses the `change` method, which is reversible by default in Rails migrations. Inside this method:
+
+1. It wraps the operation in a `safety_assured` block, which is likely provided by a gem like `strong_migrations` to bypass certain safety checks.
+2. It calls `remove_reference` to remove the `invoice` reference from the `wallet_transactions` table.
+
+The `remove_reference` method is called with the following parameters:
+- `:wallet_transactions`: The table name
+- `:invoice`: The name of the reference to remove
+- `index: true`: Indicates that the associated index should also be removed
+- `foreign_key: true`: Specifies that the foreign key constraint should be removed as well
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for modifying the database schema |
+
+## Error Handling
+This migration does not implement any explicit error handling. It relies on the default behavior of ActiveRecord migrations, which will roll back changes if an error occurs during the migration process.
+
+## Performance Considerations
+Removing a reference (especially with an index and foreign key) can be a potentially slow operation on large tables. The actual impact will depend on the size of the `wallet_transactions` table and the database system being used.
+
+## TODOs
+There are no explicit TODOs in this migration file.
+
+Note: The use of `safety_assured` suggests that this migration might be bypassing some safety checks. It's important to ensure that removing this reference doesn't break any existing functionality or data integrity in the application.

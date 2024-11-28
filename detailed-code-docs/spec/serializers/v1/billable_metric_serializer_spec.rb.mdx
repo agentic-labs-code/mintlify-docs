@@ -1,0 +1,67 @@
+---
+title: "billable_metric_serializer_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `V1::BillableMetricSerializer`. It verifies that the serializer correctly formats and includes all necessary attributes of a billable metric, including counts of active subscriptions, draft invoices, and associated plans.
+
+## Symbols
+
+### `RSpec.describe ::V1::BillableMetricSerializer`
+#### Description
+This is the main describe block for the test suite, focusing on the `V1::BillableMetricSerializer`.
+
+### `subject(:serializer)`
+#### Description
+Defines the subject of the test, which is an instance of the `V1::BillableMetricSerializer` with a `weighted_sum_billable_metric` and the root name set to 'billable_metric'.
+
+### `let(:billable_metric)`
+#### Description
+Creates a factory instance of a `weighted_sum_billable_metric` for use in the tests.
+
+### `let(:result)`
+#### Description
+Parses the JSON output of the serializer for easy access in the tests.
+
+### `it 'serializes the object'`
+#### Description
+This test ensures that the serializer correctly includes all expected attributes of the billable metric in the JSON output.
+
+#### Internal Logic
+- Uses `aggregate_failures` to group multiple expectations
+- Checks various attributes of the serialized billable metric, including `lago_id`, `name`, `code`, `description`, `aggregation_type`, `field_name`, `created_at`, `weighted_interval`, `active_subscriptions_count`, `draft_invoices_count`, `plans_count`, and `filters`
+
+### `it 'returns the count number of active subscriptions'`
+#### Description
+This test verifies that the serializer correctly counts only active subscriptions associated with the billable metric.
+
+#### Internal Logic
+- Creates a terminated subscription (which should not be counted)
+- Creates an active subscription
+- Checks that the `active_subscriptions_count` is 1
+
+### `it 'returns the count number of draft invoices'`
+#### Description
+This test ensures that the serializer correctly counts the number of draft invoices associated with the billable metric.
+
+#### Internal Logic
+- Creates a customer, two subscriptions, and two charges
+- Creates a regular invoice and a draft invoice
+- Adds fees to the invoices
+- Checks that the `draft_invoices_count` is 1
+
+### `it 'returns the number of plans'`
+#### Description
+This test verifies that the serializer correctly counts the number of plans associated with the billable metric.
+
+#### Internal Logic
+- Creates a plan and associates it with the billable metric
+- Checks that the `plans_count` is 1
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used for creating test data (e.g., `create(:weighted_sum_billable_metric)`) |
+
+Note: The `rails_helper` file includes various configurations and helper modules that are used throughout the test suite, such as database cleaner settings, SimpleCov for code coverage, and custom helper modules.

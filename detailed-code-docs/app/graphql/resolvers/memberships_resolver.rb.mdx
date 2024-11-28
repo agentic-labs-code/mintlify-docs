@@ -1,0 +1,58 @@
+---
+title: "memberships_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying memberships of an organization. It includes authentication and organization checks, and returns a paginated list of active memberships for the current organization.
+
+## Code Structure
+The `MembershipsResolver` class inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the resolver's arguments, return type, and the main `resolve` method.
+
+## References
+- `Types::MembershipType`
+- `Types::Memberships::Metadata`
+
+## Symbols
+
+### `MembershipsResolver`
+#### Description
+This class is a GraphQL resolver for querying memberships of an organization. It ensures the user is authenticated and belongs to the organization before resolving the query.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| page | Integer | Optional. The page number for pagination. |
+| limit | Integer | Optional. The number of items per page. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| memberships | Types::MembershipType.collection_type | A paginated collection of membership objects. |
+
+#### Internal Logic
+1. Checks for user authentication and organization membership (via included modules).
+2. Retrieves active memberships for the current organization.
+3. Includes associated user data.
+4. Applies pagination based on the provided `page` and `limit` arguments.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user belongs to the organization |
+
+## Error Handling
+Error handling is primarily managed by the included modules:
+- `AuthenticableApiUser`: Raises an unauthorized error if the user is not authenticated.
+- `RequiredOrganization`: Raises a forbidden error if the organization is missing or the user is not a member.
+
+## API/Interface Reference
+| Argument | Type | Required | Description |
+|:---------|:-----|:---------|:------------|
+| limit | Integer | No | Number of items per page |
+| page | Integer | No | Page number for pagination |
+
+The resolver returns a collection of `Types::MembershipType` objects, with metadata of type `Types::Memberships::Metadata`.
+
+## Performance Considerations
+The resolver uses `includes(:user)` to eager load user data, which can help reduce the number of database queries when accessing user information for each membership.

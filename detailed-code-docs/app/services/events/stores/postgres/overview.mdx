@@ -1,0 +1,64 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains classes for generating complex SQL queries to perform various calculations on event data stored in a PostgreSQL database. The main components are the `UniqueCountQuery` and `WeightedSumQuery` classes, which are designed to work with event data and provide methods for generating SQL queries for different types of calculations and aggregations.
+
+## What does it do?
+The code in this directory is responsible for creating SQL queries that analyze event data in sophisticated ways. Here's a breakdown of the main functionalities:
+
+1. Unique Count Calculations: It can generate queries to count unique events, both with and without prorating (adjusting for partial time periods).
+
+2. Weighted Sum Calculations: It creates queries that calculate weighted sums of event data, taking into account the duration of events and their timing within a given period.
+
+3. Grouped Queries: Both unique counts and weighted sums can be calculated for groups of data, allowing for more detailed analysis.
+
+4. Debugging Queries: There are methods to generate queries that provide detailed breakdowns of the calculations, useful for debugging and verification.
+
+These queries are designed to handle complex scenarios such as events that span multiple time periods, prorated calculations, and aggregations across different groupings of data.
+
+## Key Files
+
+1. unique_count_query.rb
+   - Contains the `UniqueCountQuery` class
+   - Generates SQL queries for calculating unique counts of events
+   - Supports both prorated and non-prorated calculations
+   - Provides methods for grouped and non-grouped queries
+
+2. weighted_sum_query.rb
+   - Contains the `WeightedSumQuery` class
+   - Generates SQL queries for calculating weighted sums of event data
+   - Supports complex time-based weighting of events
+   - Provides methods for grouped and non-grouped queries, as well as detailed breakdowns
+
+Both files work together to provide a comprehensive set of tools for analyzing event data stored in a PostgreSQL database. They use advanced SQL features such as Common Table Expressions (CTEs) and window functions to perform complex calculations efficiently within the database.
+
+## Dependencies
+The code in this directory is designed to work specifically with PostgreSQL databases. It relies heavily on PostgreSQL-specific SQL features, including:
+
+- Common Table Expressions (CTEs)
+- Window functions
+- Advanced aggregation functions
+
+The classes also depend on a `store` object that is passed to their constructors. This object is expected to provide methods such as:
+
+- `events`: Likely returns a base query or table name for event data
+- `charges_duration`: Probably provides information about the duration of charges or events
+- `sanitized_property_name`: Likely returns sanitized column or property names for use in SQL queries
+
+## Configuration
+While there are no explicit configuration files mentioned, the behavior of the queries can be customized through the `store` object passed to the constructors of the `UniqueCountQuery` and `WeightedSumQuery` classes. This object seems to provide context and configuration for the queries, such as:
+
+- The base table or query for event data
+- Duration information for charges or events
+- Property names used in the queries
+
+The exact configuration options would depend on the implementation of the `store` object, which is not provided in the given code.
+
+Additionally, some methods accept parameters that can modify the behavior of the generated queries:
+
+- In `UniqueCountQuery`, the `prorated_breakdown_query` method accepts a `with_remove` parameter to include or exclude removed events.
+- In `WeightedSumQuery`, the `grouped_query` method accepts an `initial_values` parameter to set initial values for each group.
+
+These classes provide a flexible and powerful way to generate complex SQL queries for analyzing event data, with a focus on performance and accuracy in calculations involving time-based events and prorated values.

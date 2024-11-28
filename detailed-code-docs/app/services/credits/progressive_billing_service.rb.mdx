@@ -1,0 +1,72 @@
+---
+title: "progressive_billing_service.rb"
+---
+
+## High-level description
+This code defines a `ProgressiveBillingService` within the `Credits` module. Its primary purpose is to handle progressive billing credits for invoices. It calculates and applies credits based on previously issued progressive billing invoices, adjusting the current invoice's amounts accordingly.
+
+## Code Structure
+The main class `ProgressiveBillingService` inherits from `BaseService`. It contains a single public method `call` that performs the core logic, and two private helper methods: `should_create_progressive_billing_credit?` and `apply_credit_to_fees`.
+
+## Symbols
+
+### `Credits::ProgressiveBillingService`
+#### Description
+This service calculates and applies progressive billing credits to an invoice. It iterates through invoice subscriptions, finds relevant progressive billing invoices, and creates credits accordingly.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice to which progressive billing credits will be applied |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the applied credits and any error information |
+
+#### Internal Logic
+1. Check if progressive billing credits should be created.
+2. For each invoice subscription:
+   - Fetch relevant progressive billing invoices.
+   - Calculate the total subscription amount.
+   - For each progressive billing invoice:
+     - Determine the amount to credit.
+     - Create a credit note if necessary.
+     - Create and apply a credit.
+     - Update invoice amounts.
+3. Return the result with applied credits.
+
+### `should_create_progressive_billing_credit?` (private)
+#### Description
+Determines if progressive billing credits should be created for the invoice.
+
+#### Internal Logic
+Checks if any invoice subscription has finalized progressive billing invoices within the relevant date range.
+
+### `apply_credit_to_fees` (private)
+#### Description
+Applies the created credit to the invoice fees, adjusting their amounts proportionally.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit | Credit | The credit to be applied to the fees |
+
+#### Internal Logic
+1. Reload invoice fees.
+2. For each charge fee:
+   - Calculate and update the precise coupons amount.
+   - Ensure the coupons amount doesn't exceed the fee amount.
+   - Save the updated fee.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Credit | Used to create credit records |
+| CreditNotes::CreateFromProgressiveBillingInvoice | Called to create credit notes when necessary |
+
+## Error Handling
+The service uses the `raise_if_error!` method to propagate errors from the `CreditNotes::CreateFromProgressiveBillingInvoice` service.
+
+## Performance Considerations
+The service performs database queries within loops, which could potentially lead to N+1 query issues for invoices with many subscriptions or progressive billing invoices. Consider optimizing these queries if performance becomes a concern with large datasets.

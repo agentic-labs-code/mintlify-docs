@@ -1,0 +1,40 @@
+---
+title: "20221013140147_update_graduated_properties_to_hash.rb"
+---
+
+## High-level description
+This migration file is designed to update graduated properties to a hash format. It schedules a background job to perform this update task after a short delay, ensuring that the necessary workers are loaded with the required tasks before execution.
+
+## Symbols
+
+### `UpdateGraduatedPropertiesToHash`
+#### Description
+This class is an ActiveRecord migration that schedules a background job to update graduated properties to a hash format.
+
+#### Internal Logic
+1. The migration uses `MigrationTaskJob` to schedule a background job.
+2. The job is set to run after a 20-second delay using `set(wait: 20.seconds)`.
+3. The job will perform the task named 'charges:update_graduated_properties_to_hash'.
+
+## Side Effects
+- Schedules a background job that will run after the migration is executed.
+- The scheduled job will modify data related to graduated properties, converting them to a hash format.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations |
+| MigrationTaskJob | Executes the scheduled task for updating graduated properties |
+
+## References
+- `MigrationTaskJob`: This job class is used to schedule and execute the update task.
+
+## Performance Considerations
+The migration itself is lightweight, as it only schedules a job. The actual data update is performed asynchronously, which helps to minimize the impact on database performance during the migration process.
+
+## TODOs
+The code includes a note:
+```
+# NOTE: Wait to ensure workers are loaded with the added tasks
+```
+This suggests that the 20-second delay is intentional and important for the proper execution of the task.

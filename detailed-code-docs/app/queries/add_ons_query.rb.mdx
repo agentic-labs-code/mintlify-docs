@@ -1,0 +1,77 @@
+---
+title: "add_ons_query.rb"
+---
+
+## High-level description
+The `AddOnsQuery` class is responsible for querying and filtering add-ons for a specific organization. It provides functionality to search add-ons by name or code, paginate the results, and order them by creation date in descending order.
+
+## Code Structure
+The `AddOnsQuery` class inherits from `BaseQuery` and overrides the `call` method to implement its specific querying logic. It also defines private methods `base_scope` and `search_params` to support the main querying functionality.
+
+## References
+This code references the `AddOn` model and uses methods from the `BaseQuery` class.
+
+## Symbols
+
+### `AddOnsQuery`
+#### Description
+This class encapsulates the logic for querying add-ons within an organization, including searching, pagination, and ordering.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization to query add-ons for |
+| search_term | String | Optional search term for filtering add-ons |
+| pagination | Hash | Optional pagination parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | OpenStruct | An object containing the queried add-ons |
+
+#### Internal Logic
+1. Builds the base scope for querying add-ons
+2. Applies search parameters if a search term is provided
+3. Paginates the results
+4. Orders the results by creation date in descending order
+5. Assigns the final add-ons to the result object
+
+### `call`
+#### Description
+The main method that executes the query and returns the result.
+
+#### Internal Logic
+1. Calls `base_scope.result` to get the initial set of add-ons
+2. Applies pagination using the `paginate` method from `BaseQuery`
+3. Orders the add-ons by `created_at` in descending order
+4. Assigns the final set of add-ons to `result.add_ons`
+5. Returns the result object
+
+### `base_scope` (private)
+#### Description
+Builds the base scope for querying add-ons, including organization filtering and search functionality.
+
+#### Internal Logic
+1. Uses `AddOn.where(organization:)` to filter add-ons by the given organization
+2. Applies `ransack` with `search_params` to enable searching
+
+### `search_params` (private)
+#### Description
+Generates the search parameters for the Ransack gem based on the provided search term.
+
+#### Internal Logic
+1. Returns `nil` if `search_term` is blank
+2. Otherwise, returns a hash with Ransack search options:
+   - `m: 'or'`: Indicates that any of the conditions can match
+   - `name_cont: search_term`: Searches for add-ons with names containing the search term
+   - `code_cont: search_term`: Searches for add-ons with codes containing the search term
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| BaseQuery | Parent class providing common querying functionality |
+| AddOn | The model class for add-ons |
+| ransack | Used for searching add-ons |
+
+## Performance Considerations
+The query uses pagination to limit the number of results returned, which can help with performance when dealing with large datasets. The ordering by `created_at` in descending order may benefit from an index on the `created_at` column in the `add_ons` table.

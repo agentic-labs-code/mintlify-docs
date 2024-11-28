@@ -1,0 +1,74 @@
+---
+title: "refresh_draft_service.rb"
+---
+
+## High-level description
+This code defines a `RefreshDraftService` class within the `CreditNotes` module. Its primary purpose is to refresh a draft credit note by recalculating its items, taxes, and amounts based on updated fee information. This service is crucial for maintaining accurate credit note data when related fees or invoices are modified.
+
+## Code Structure
+The `RefreshDraftService` class inherits from `BaseService` and contains a single public method `call` that orchestrates the refresh process. It also includes a private method `calculate_item_value` for recalculating item values based on fee changes.
+
+## References
+- `CreditNotes::ApplyTaxesService`
+- `CreditNote` model
+- `BaseService` class
+
+## Symbols
+
+### `RefreshDraftService`
+#### Description
+This service refreshes a draft credit note by updating its items, recalculating taxes, and adjusting amounts based on new fee information.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_note | CreditNote | The credit note to be refreshed |
+| fee | Fee | The updated fee associated with the credit note |
+| old_fee_values | Array | An array of hashes containing old fee values for comparison |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result object containing the updated credit note |
+
+#### Internal Logic
+1. Check if the credit note is in draft status.
+2. Destroy all applied taxes.
+3. Update each credit note item with the new fee ID and recalculate its value if old fee values are present.
+4. Apply taxes using the `CreditNotes::ApplyTaxesService`.
+5. Update credit note attributes with new tax and amount calculations.
+6. Save the updated credit note.
+
+### `calculate_item_value`
+#### Description
+This private method recalculates the value of a credit note item based on the ratio between the old and new fee amounts.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| item | CreditNoteItem | The credit note item to be recalculated |
+| old_fee_amount_cents | Integer | The old fee amount in cents |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| new_amount | Float | The recalculated item amount |
+
+#### Internal Logic
+1. Return 0 if the old fee amount is zero to avoid division by zero.
+2. Calculate the new amount using the ratio of the item's precise amount to the old fee amount, multiplied by the new fee amount.
+
+## Side Effects
+- Modifies the `credit_note` object and its associated records in the database.
+- Destroys and recreates applied taxes for the credit note.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| CreditNotes::ApplyTaxesService | Used to recalculate and apply taxes to the credit note |
+
+## Error Handling
+The service relies on the error handling mechanisms provided by the `BaseService` class. It uses `raise_if_error!` to propagate errors from the `ApplyTaxesService`.
+
+## Performance Considerations
+The service performs multiple database operations, including destroying and recreating applied taxes. For large credit notes with many items, this could potentially impact performance. Consider optimizing by updating existing records instead of destroying and recreating them if possible.

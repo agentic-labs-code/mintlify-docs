@@ -1,0 +1,63 @@
+---
+title: "gross_revenue_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Analytics::GrossRevenue` model, specifically focusing on its `cache_key` class method. The tests verify that the `cache_key` method generates the correct cache key string based on various input parameters.
+
+## Symbols
+
+### `Analytics::GrossRevenue.cache_key`
+#### Description
+This class method generates a cache key string for gross revenue analytics. It combines various parameters to create a unique identifier for caching purposes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | String (UUID) | The ID of the organization |
+| external_customer_id | String (optional) | The external ID of the customer |
+| currency | String (optional) | The currency code |
+| months | Integer (optional) | The number of months for the analysis |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cache_key | String | A formatted string representing the cache key |
+
+#### Internal Logic
+The method constructs a cache key string using the following format:
+```
+"gross-revenue/[date]/[organization_id]/[external_customer_id]/[currency]/[months]"
+```
+Where:
+- `[date]` is the current date in 'YYYY-MM-DD' format
+- Optional parameters are included if provided, otherwise replaced with empty strings
+
+## Test Structure
+
+The test suite uses RSpec to describe the behavior of the `cache_key` method under different scenarios:
+
+1. With no arguments
+2. With customer external ID, currency, and months
+3. With only customer external ID
+4. With only currency
+
+Each test case:
+1. Arranges the input parameters
+2. Acts by calling the `cache_key` method
+3. Asserts that the returned cache key matches the expected format
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configurations |
+| rspec | Testing framework used for writing and running the tests |
+| securerandom | Used to generate a random UUID for the organization_id |
+
+## Notes
+- The tests use `let` statements to define variables, promoting DRY (Don't Repeat Yourself) principles in the test suite.
+- The `described_class` refers to `Analytics::GrossRevenue`, allowing for easier refactoring if the class name changes.
+- The tests cover various combinations of input parameters to ensure the method behaves correctly in different scenarios.
+
+This test suite ensures that the `cache_key` method of the `Analytics::GrossRevenue` model generates consistent and correct cache keys, which is crucial for proper caching behavior in the analytics system.

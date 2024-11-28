@@ -1,0 +1,80 @@
+---
+title: "create_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Mutations::PaymentProviders::Adyen::Create` GraphQL mutation. It verifies the functionality of creating an Adyen payment provider, including permission checks and correct data handling.
+
+## Code Structure
+The test suite is organized as a single RSpec describe block for the `Mutations::PaymentProviders::Adyen::Create` mutation. It includes shared examples for common checks and a main test case for creating an Adyen provider.
+
+## Symbols
+
+### RSpec.describe Mutations::PaymentProviders::Adyen::Create
+#### Description
+This is the main describe block for the test suite, focusing on the Adyen payment provider creation mutation.
+
+#### Internal Logic
+1. Sets up necessary test data using `let` statements.
+2. Defines the GraphQL mutation query.
+3. Includes shared examples for common checks.
+4. Contains a main test case for creating an Adyen provider.
+
+### let statements
+#### Description
+These statements define the test data used throughout the spec.
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| required_permission | String | The permission required to create an integration |
+| membership | Object | A factory-created membership object |
+| api_key | String | The API key for the Adyen provider |
+| hmac_key | String | The HMAC key for the Adyen provider |
+| code | String | The code for the Adyen provider |
+| name | String | The name for the Adyen provider |
+| live_prefix | String | The live prefix for the Adyen provider |
+| merchant_account | String | The merchant account for the Adyen provider |
+| success_redirect_url | String | A randomly generated URL for successful redirects |
+
+### mutation
+#### Description
+Defines the GraphQL mutation query used in the test.
+
+### Shared Examples
+#### Description
+The test includes shared examples for common checks:
+
+1. `requires current user`
+2. `requires current organization`
+3. `requires permission`
+
+These shared examples likely check for proper authentication and authorization.
+
+### Main Test Case: 'creates an adyen provider'
+#### Description
+This test case verifies the creation of an Adyen payment provider using the GraphQL mutation.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with the necessary input data.
+2. Retrieves the result data from the mutation response.
+3. Uses `aggregate_failures` to group multiple expectations.
+4. Checks various fields of the created Adyen provider, including:
+   - Presence of an ID
+   - Masked API key and HMAC key
+   - Correct code, name, live prefix, merchant account, and success redirect URL
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| RSpec | Testing framework used for writing the specs |
+| FactoryBot | Implied usage for creating test data (e.g., `create(:membership)`) |
+| Faker | Used for generating random URLs |
+
+## Notes
+- The test assumes the existence of a `execute_graphql` helper method for running GraphQL queries.
+- The spec uses FactoryBot for creating test data, as evidenced by the `create(:membership)` call.
+- The test checks for proper masking of sensitive data (API key and HMAC key) in the response.
+- The spec includes both the 'create' and 'view' permissions, noting that 'view' is necessary to retrieve the created record in the response.
+
+This spec ensures that the Adyen payment provider creation mutation works correctly, handles permissions appropriately, and returns the expected data structure with properly masked sensitive information.

@@ -1,0 +1,138 @@
+---
+title: "execution_error_responder.rb"
+---
+
+## High-level description
+The `ExecutionErrorResponder` module provides a set of methods for generating standardized GraphQL execution errors. It's designed to be included in GraphQL mutations and resolvers, offering a consistent way to handle and format various types of errors that may occur during GraphQL operations.
+
+## Code Structure
+The module defines several private methods, each corresponding to a specific type of error (e.g., not found, forbidden, validation). These methods utilize a common `execution_error` method to create `GraphQL::ExecutionError` objects with standardized payloads.
+
+## Symbols
+
+### `ExecutionErrorResponder`
+#### Description
+This module encapsulates methods for creating standardized GraphQL execution errors. It's designed to be included in other classes, particularly GraphQL mutations and resolvers.
+
+#### Internal Logic
+The module defines several private methods, each handling a specific error scenario:
+
+1. `execution_error`: A generic method for creating `GraphQL::ExecutionError` objects with a standardized payload.
+2. `not_found_error`: Generates a 404 error for missing resources.
+3. `not_allowed_error`: Creates a 405 Method Not Allowed error.
+4. `forbidden_error`: Produces a 403 Forbidden error.
+5. `validation_error`: Handles validation errors with detailed messages.
+6. `result_error`: A more complex method that maps service result errors to appropriate GraphQL errors.
+
+### `execution_error`
+#### Description
+This private method creates a `GraphQL::ExecutionError` with a standardized payload structure.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| error | String | The error message |
+| status | Integer | HTTP status code |
+| code | String | Error code |
+| details | Hash | Additional error details |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | GraphQL::ExecutionError | A GraphQL execution error object |
+
+#### Internal Logic
+1. Constructs a payload hash with status and code.
+2. If details are provided as a hash, it transforms the keys to camelCase.
+3. Creates and returns a `GraphQL::ExecutionError` with the given error message and payload as extensions.
+
+### `not_found_error`
+#### Description
+Generates a not found (404) error for a specific resource.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| resource | Symbol | The type of resource not found |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | GraphQL::ExecutionError | A 404 GraphQL execution error |
+
+### `not_allowed_error`
+#### Description
+Creates a method not allowed (405) error.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | The error code |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | GraphQL::ExecutionError | A 405 GraphQL execution error |
+
+### `forbidden_error`
+#### Description
+Produces a forbidden (403) error.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| code | String | The error code |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | GraphQL::ExecutionError | A 403 GraphQL execution error |
+
+### `validation_error`
+#### Description
+Handles validation errors with detailed messages.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| messages | Hash | Validation error messages |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | GraphQL::ExecutionError | A 422 GraphQL execution error with validation details |
+
+### `result_error`
+#### Description
+Maps service result errors to appropriate GraphQL errors.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| service_result | BaseService::Result | The result object from a service call |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| return | GraphQL::ExecutionError | An appropriate GraphQL execution error based on the service result |
+
+#### Internal Logic
+Uses a case statement to match the error type from the service result and calls the appropriate error method:
+- `NotFoundFailure` → `not_found_error`
+- `MethodNotAllowedFailure` → `not_allowed_error`
+- `ValidationFailure` → `validation_error`
+- `ForbiddenFailure` → `forbidden_error`
+- For any other error, it returns a generic internal error.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveSupport::Concern | Used to define the module as a concern |
+| GraphQL::ExecutionError | Used to create GraphQL-specific error objects |
+
+## References
+This module is included in:
+- `Mutations::BaseMutation`
+- `Resolvers::BaseResolver`
+
+These inclusions allow all mutations and resolvers in the application to use the standardized error handling methods provided by `ExecutionErrorResponder`.

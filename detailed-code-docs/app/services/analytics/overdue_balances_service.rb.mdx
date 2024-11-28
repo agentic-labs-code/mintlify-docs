@@ -1,0 +1,53 @@
+---
+title: "overdue_balances_service.rb"
+---
+
+## High-level description
+The `Analytics::OverdueBalancesService` is a service class responsible for retrieving overdue balance records for a given organization. It extends the `BaseService` class and provides a method to fetch and return overdue balance data, which can be filtered based on various parameters.
+
+## Code Structure
+The `OverdueBalancesService` is part of the `Analytics` module and inherits from `BaseService`. It has a single public method `call` that retrieves the overdue balance records and returns the result.
+
+## References
+This service relies on the `Analytics::OverdueBalance` model to fetch the actual data.
+
+## Symbols
+
+### `Analytics::OverdueBalancesService`
+#### Description
+This service class is responsible for retrieving overdue balance records for an organization. It uses the `Analytics::OverdueBalance` model to fetch the data and applies filters if provided.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization for which to retrieve overdue balances |
+| filters | Hash | Optional filters to apply to the query (inherited from BaseService) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An object containing the retrieved records and success status |
+
+#### Internal Logic
+1. Calls `Analytics::OverdueBalance.find_all_by` with the organization's ID and any provided filters.
+2. Assigns the retrieved records to the `@records` instance variable.
+3. Sets the `records` attribute of the `result` object to the retrieved records.
+4. Returns the `result` object.
+
+## Dependencies
+The service depends on the `Analytics::OverdueBalance` model for data retrieval.
+
+## Error Handling
+This service doesn't implement any specific error handling. It relies on the error handling mechanisms provided by the `BaseService` class.
+
+## API/Interface Reference
+This service is used in the `Api::V1::Analytics::OverdueBalancesController` to handle the index action for the overdue balances API endpoint. The controller passes the following filters:
+
+| Parameter | Description |
+|:----------|:------------|
+| external_customer_id | Filter by external customer ID |
+| currency | Filter by currency (automatically upcased) |
+| months | Filter by number of months |
+
+## TODOs
+There are no explicit TODOs in the code.

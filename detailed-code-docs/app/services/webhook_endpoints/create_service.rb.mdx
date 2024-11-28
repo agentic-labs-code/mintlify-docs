@@ -1,0 +1,75 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines a `CreateService` class within the `WebhookEndpoints` module, responsible for creating new webhook endpoints for an organization. It handles the creation process, including data validation, persistence, and tracking the creation event.
+
+## Code Structure
+The `CreateService` class inherits from `BaseService` and contains a main `call` method that orchestrates the webhook endpoint creation process. It also includes a private method for tracking the creation event.
+
+## References
+- `CurrentContext`: Used to access the current membership ID.
+- `SegmentTrackJob`: Used to track the webhook endpoint creation event.
+
+## Symbols
+
+### `WebhookEndpoints::CreateService`
+#### Description
+This service class is responsible for creating a new webhook endpoint for an organization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization for which the webhook endpoint is being created |
+| params | Hash | Parameters for creating the webhook endpoint |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the created webhook endpoint or error information |
+
+#### Internal Logic
+1. Initializes a new webhook endpoint with the provided URL and signature algorithm.
+2. Attempts to save the webhook endpoint to the database.
+3. If successful, sets the webhook endpoint in the result and tracks the creation event.
+4. If validation fails, records the validation failure in the result.
+
+### `call`
+#### Description
+The main method that executes the webhook endpoint creation process.
+
+#### Internal Logic
+1. Creates a new webhook endpoint associated with the organization.
+2. Sets the webhook URL and signature algorithm (defaulting to `:jwt` if not provided).
+3. Attempts to save the webhook endpoint to the database.
+4. If successful, updates the result with the created webhook endpoint and tracks the creation event.
+5. If a validation error occurs, records the failure in the result.
+
+### `track_webhook_webdpoint_created`
+#### Description
+A private method that tracks the webhook endpoint creation event using the SegmentTrackJob.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_endpoint | WebhookEndpoint | The newly created webhook endpoint |
+
+#### Internal Logic
+Enqueues a SegmentTrackJob with the following information:
+- Membership ID from the current context
+- Event name: 'webhook_endpoint_created'
+- Properties including the webhook endpoint ID, organization ID, and webhook URL
+
+## Side Effects
+- Creates a new webhook endpoint record in the database.
+- Enqueues a background job to track the webhook endpoint creation event.
+
+## Error Handling
+The service catches `ActiveRecord::RecordInvalid` exceptions, which occur when the webhook endpoint fails validation. In this case, it records the validation failure in the result object.
+
+## Logging
+This code does not implement any explicit logging mechanisms.
+
+## TODOs
+There is a typo in the method name `track_webhook_webdpoint_created`. It should be `track_webhook_endpoint_created`.

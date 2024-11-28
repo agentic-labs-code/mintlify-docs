@@ -1,0 +1,62 @@
+---
+title: "plan_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying a single plan within an organization. It ensures that the user is authenticated and has the necessary permissions to view plans before resolving the query.
+
+## Code Structure
+The `PlanResolver` class inherits from `BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the resolver's description, arguments, return type, and the main `resolve` method.
+
+## References
+- `Resolvers::BaseResolver`
+- `Types::Plans::Object`
+- `AuthenticableApiUser` module
+- `RequiredOrganization` module
+
+## Symbols
+
+### `PlanResolver`
+#### Description
+This class resolves GraphQL queries for a single plan within an organization. It ensures proper authentication and authorization before fetching the requested plan.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | Unique identifier of the plan |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| plan | Types::Plans::Object | The requested plan object, or null if not found |
+
+#### Internal Logic
+1. Checks for user authentication and organization membership (via included modules)
+2. Attempts to find the plan by ID within the current organization
+3. Returns the plan if found, or raises a not found error if the plan doesn't exist
+
+## Side Effects
+This resolver may raise exceptions for authentication, authorization, or if the requested plan is not found.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user belongs to the required organization |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'plans:view' | The permission required to view plans |
+
+## Error Handling
+- Raises an unauthorized error if the user is not authenticated
+- Raises a forbidden error if the user is not a member of the required organization
+- Raises a not found error if the requested plan doesn't exist in the organization
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| plan | GET | \{ id: ID! \} | Types::Plans::Object | Retrieves a single plan by ID |
+
+This resolver is part of the larger GraphQL API and is used in the `QueryType` to provide access to individual plan data.

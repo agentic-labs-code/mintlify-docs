@@ -1,0 +1,64 @@
+---
+title: "commitment_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the Commitment model in a Ruby on Rails application. It tests various aspects of the Commitment model, including its associations, validations, and specific methods like `invoice_name`.
+
+## Code Structure
+The test suite is organized into several describe and context blocks, each focusing on different aspects of the Commitment model. It uses RSpec's expectation syntax and FactoryBot for creating test objects.
+
+## Symbols
+
+### RSpec.describe Commitment
+#### Description
+This is the main describe block for the Commitment model tests. It groups all the tests related to the Commitment model.
+
+### Association Tests
+#### Description
+These tests verify the associations of the Commitment model with other models.
+
+#### Internal Logic
+The tests use RSpec's `is_expected.to` syntax to check for the following associations:
+- `belong_to(:plan)`
+- `have_many(:applied_taxes).dependent(:destroy)`
+- `have_many(:taxes)`
+
+### Validation Tests
+#### Description
+These tests verify the validations applied to the Commitment model.
+
+#### Internal Logic
+The test checks for the numericality validation of the `amount_cents` attribute using RSpec's `validate_numericality_of` matcher.
+
+### #invoice_name
+#### Description
+This describe block tests the `invoice_name` method of the Commitment model.
+
+#### Internal Logic
+The test is divided into two contexts:
+1. When `invoice_display_name` is blank: It expects the method to return 'Minimum commitment'.
+2. When `invoice_display_name` is present: It expects the method to return the value of `invoice_display_name`.
+
+### Validations
+#### Description
+This describe block focuses on testing the uniqueness validation of the `commitment_type` attribute.
+
+#### Internal Logic
+The test is divided into two contexts:
+1. When the commitment type is unique within the scope of a plan: It expects no errors.
+2. When the commitment type is not unique within the scope of a plan: It expects an error to be present.
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used for creating test objects |
+| RSpec | The testing framework used for writing and running the tests |
+
+## Error Handling
+The test suite doesn't explicitly handle errors but expects certain validations to raise errors when conditions are not met.
+
+## TODOs
+There are no explicit TODOs in this code.

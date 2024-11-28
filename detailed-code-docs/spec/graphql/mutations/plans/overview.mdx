@@ -1,0 +1,74 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for GraphQL mutations related to plan management in a subscription or billing system. The tests cover the creation, updating, and destruction of plans, including various configurations such as charges, taxes, and usage thresholds.
+
+## What does it do?
+These test files ensure that the GraphQL mutations for plan management work correctly. They verify that:
+
+1. New plans can be created with various configurations, including multiple charges, taxes, and usage thresholds.
+2. Existing plans can be updated, modifying their attributes, charges, minimum commitments, and other settings.
+3. Plans can be marked for deletion (pending_deletion) when requested.
+
+The tests also check for proper permission handling, ensuring that only users with the correct permissions can perform these operations. Additionally, they verify the behavior of certain features (like minimum commitment) when premium licenses are or are not active.
+
+## Key Files
+1. `create_spec.rb`: Tests the creation of new plans with various configurations.
+2. `update_spec.rb`: Verifies the updating of existing plans, including changes to charges, minimum commitments, and other attributes.
+3. `destroy_spec.rb`: Ensures that plans can be marked for deletion correctly.
+
+Each file focuses on a specific mutation (`Mutations::Plans::Create`, `Mutations::Plans::Update`, and `Mutations::Plans::Destroy` respectively) and tests various scenarios and edge cases.
+
+## Dependencies
+The test files rely on the following key dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test data and fixtures.
+3. GraphQL: The API technology being tested, used for defining and executing the mutations.
+
+These dependencies are likely managed through the project's Gemfile, though specific versions are not mentioned in the test files.
+
+## Configuration
+While not explicitly shown in the test files, the tests likely rely on configuration from the `rails_helper`, which is required at the beginning of each spec file. This helper typically sets up the testing environment, including loading necessary support files and configurations.
+
+The tests also use shared examples for common behaviors, such as permission checks. These shared examples are likely defined in separate support files.
+
+Example of a shared example usage:
+
+```ruby
+it_behaves_like 'requires permission', 'plans:delete'
+```
+
+The tests make use of FactoryBot for creating test data. While the factory definitions are not shown in these files, they are crucial for setting up the test environment. For example:
+
+```ruby
+let(:membership) { create(:membership) }
+let(:organization) { membership.organization }
+let(:plan) { create(:plan, organization:) }
+```
+
+The GraphQL mutations are defined as strings within the test files. For example:
+
+```ruby
+let(:mutation) do
+  &lt;&lt;-GQL
+    mutation($input: UpdatePlanInput!) {
+      updatePlan(input: $input) {
+        plan {
+          id
+          name
+          # ... other fields ...
+        }
+      }
+    }
+  GQL
+end
+```
+
+These mutation strings define the structure of the GraphQL requests being tested, including the input parameters and the expected response fields.
+
+The tests cover various scenarios, including different charge models, tax configurations, and feature availability based on license status (e.g., premium vs. non-premium). This suggests that the application has a flexible pricing model and potentially offers different feature sets based on licensing or subscription levels.
+
+Overall, these test files provide comprehensive coverage of the plan management functionality, ensuring that the GraphQL API behaves correctly under various conditions and with different input configurations.

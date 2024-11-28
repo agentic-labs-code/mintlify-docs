@@ -1,0 +1,57 @@
+---
+title: "destroy.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for deleting an add-on in a Ruby on Rails application. It's part of a larger GraphQL API and handles the authentication, permission checking, and execution of the delete operation for add-ons.
+
+## Code Structure
+The `Destroy` class is nested within the `Mutations::AddOns` module and inherits from `BaseMutation`. It includes the `AuthenticableApiUser` concern for authentication. The class defines the GraphQL mutation structure, including arguments and return fields, and implements the `resolve` method to execute the deletion.
+
+## References
+- `AuthenticableApiUser` concern
+- `AddOns::DestroyService`
+- `BaseMutation` class (not shown in the provided code)
+
+## Symbols
+
+### `Mutations::AddOns::Destroy`
+#### Description
+This class defines a GraphQL mutation for deleting an add-on. It authenticates the user, checks for the required permission, and uses the `AddOns::DestroyService` to perform the actual deletion.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the add-on to be deleted |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the deleted add-on (if successful) |
+
+#### Internal Logic
+1. Authenticates the user using the `AuthenticableApiUser` concern.
+2. Checks for the required permission 'addons:delete'.
+3. Finds the add-on by ID, scoped to the current user's add-ons.
+4. Calls the `AddOns::DestroyService` to delete the add-on.
+5. Returns the result of the operation or an error if unsuccessful.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides authentication functionality |
+| AddOns::DestroyService | Handles the actual deletion of the add-on |
+
+## Error Handling
+The code uses a `result_error` method (not shown) to handle and return errors from the `DestroyService`. If the deletion is unsuccessful, it will return an error instead of the deleted add-on's ID.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| destroyAddOn | Mutation | `{ id: ID! }` | `{ id: ID }` | Deletes an add-on with the given ID |
+
+## Additional Notes
+1. The `REQUIRED_PERMISSION` constant suggests that there's a permission system in place, and users need the 'addons:delete' permission to perform this action.
+2. The mutation is named 'DestroyAddOn' in the GraphQL schema, which clients will use to refer to this mutation.
+3. The `resolve` method uses Ruby 2.7+ syntax for keyword arguments (e.g., `id:`).
+4. The mutation is scoped to the current user's add-ons, ensuring users can only delete their own add-ons.

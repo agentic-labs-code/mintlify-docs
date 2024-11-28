@@ -1,0 +1,119 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `app/graphql/concerns` directory contains a collection of Ruby modules that provide reusable functionality for GraphQL resolvers and mutations in the application. These modules focus on authentication, authorization, error handling, and organization-level access control. They are designed to be included in GraphQL operations to enforce consistent behavior and security measures across the API.
+
+## What does it do?
+This directory contains modules that:
+
+1. Authenticate API users and customer portal users before allowing access to GraphQL operations.
+2. Enforce permission checks for GraphQL mutations and resolvers.
+3. Provide standardized error responses for various scenarios (e.g., not found, forbidden, validation errors).
+4. Ensure that users have access to a valid organization before executing certain GraphQL operations.
+
+These modules work together to create a secure and consistent GraphQL API by handling common concerns such as authentication, authorization, and error handling in a centralized and reusable manner.
+
+## Key Files
+
+1. `authenticable_api_user.rb`: Provides authentication for API users in GraphQL operations.
+2. `authenticable_customer_portal_user.rb`: Handles authentication for customer portal users in GraphQL operations.
+3. `can_require_permissions.rb`: Enforces permission checks for GraphQL mutations and resolvers.
+4. `execution_error_responder.rb`: Offers standardized methods for generating GraphQL execution errors.
+5. `required_organization.rb`: Ensures users have access to a valid organization before executing GraphQL operations.
+
+## Dependencies
+These modules rely on the following dependencies:
+
+1. `ActiveSupport::Concern`: Used to create reusable modules that can be included in other classes.
+2. `GraphQL`: Used for creating and raising GraphQL-specific execution errors.
+
+## Configuration
+These modules do not require specific configuration files or environment variables. They are designed to be included in GraphQL resolvers and mutations as needed, and their behavior is typically controlled by the including class or the GraphQL context.
+
+Here's a more detailed look at each key file:
+
+### authenticable_api_user.rb
+
+This module provides authentication functionality for API users in a GraphQL context. It defines a `ready?` method that checks for the presence of a `current_user` in the GraphQL context before allowing the operation to proceed. If no user is found, it raises an unauthorized error.
+
+Example usage:
+
+```ruby
+class SomeResolver &lt; Resolvers::BaseResolver
+  include AuthenticableApiUser
+
+  # resolver implementation
+end
+```
+
+### authenticable_customer_portal_user.rb
+
+Similar to `authenticable_api_user.rb`, this module handles authentication for customer portal users. It checks for the presence of a customer portal user in the context and raises an unauthorized error if none is found.
+
+This module is used in various resolvers and mutations within the `CustomerPortal` namespace, such as:
+
+```ruby
+module Resolvers
+  module CustomerPortal
+    class InvoicesResolver &lt; BaseResolver
+      include AuthenticableCustomerPortalUser
+
+      # resolver implementation
+    end
+  end
+end
+```
+
+### can_require_permissions.rb
+
+This module enforces permission checks in GraphQL mutations and resolvers. It allows for the definition of required permissions using a `REQUIRED_PERMISSION` constant in the including class. The module then checks if the user has any of the required permissions before allowing the operation to proceed.
+
+Example usage:
+
+```ruby
+class SomeMutation &lt; Mutations::BaseMutation
+  include CanRequirePermissions
+
+  REQUIRED_PERMISSION = [:admin, :manager]
+
+  # mutation implementation
+end
+```
+
+### execution_error_responder.rb
+
+This module provides a set of methods for generating standardized GraphQL execution errors. It includes methods for handling common error scenarios such as not found, forbidden, and validation errors. The module uses a consistent format for error responses, including status codes and additional details.
+
+Example usage within a resolver:
+
+```ruby
+class SomeResolver &lt; Resolvers::BaseResolver
+  include ExecutionErrorResponder
+
+  def resolve
+    resource = find_resource
+    return not_found_error(:resource) unless resource
+    # resolver logic
+  end
+end
+```
+
+### required_organization.rb
+
+This module ensures that the current user has access to a valid organization before executing a GraphQL operation. It checks for the presence of a current organization and verifies if the user is a member of that organization. If either check fails, it raises an appropriate error.
+
+Example usage:
+
+```ruby
+class OrganizationSpecificResolver &lt; Resolvers::BaseResolver
+  include RequiredOrganization
+
+  def resolve
+    # resolver logic that requires a valid organization context
+  end
+end
+```
+
+These modules work together to create a robust and secure GraphQL API by handling common concerns in a centralized and reusable manner. They can be easily included in resolvers and mutations throughout the application to enforce consistent behavior and security measures.

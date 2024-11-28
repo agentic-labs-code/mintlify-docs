@@ -1,0 +1,57 @@
+---
+title: "wallet_serializer.rb"
+---
+
+## High-level description
+The `V1::WalletSerializer` class is responsible for serializing `Wallet` model objects into a JSON representation for API responses. It includes various attributes of the wallet, such as its ID, customer information, status, balances, and timestamps. 
+
+The serializer also handles the inclusion of nested `recurring_transaction_rules` data when requested.
+
+## Code Structure
+The `V1::WalletSerializer` class defines a `serialize` method that constructs a hash representing the serialized wallet object. It uses the `model` attribute to access the `Wallet` instance being serialized and includes logic for conditionally including `recurring_transaction_rules`. The `recurring_transaction_rules` data is serialized using the `::CollectionSerializer` and `::V1::Wallets::RecurringTransactionRuleSerializer`.
+
+## References
+- `ModelSerializer` (parent class)
+- `Wallet` (model being serialized)
+- `::CollectionSerializer`
+- `::V1::Wallets::RecurringTransactionRuleSerializer`
+
+## Symbols
+
+### `V1::WalletSerializer`
+#### Description
+Serializes a `Wallet` object into a JSON-compatible hash representation.
+
+#### Inputs
+This class does not define any explicit input parameters. It operates on the `model` attribute, which is assumed to be set to a `Wallet` instance.
+
+#### Outputs
+Returns a hash representing the serialized `Wallet` object.
+
+#### Internal Logic
+1. **Initialize payload hash:** Creates a hash `payload` containing the basic attributes of the `Wallet` object, including IDs, status, currency, balances, and timestamps.
+2. **Conditional inclusion of recurring transaction rules:** If the `include?(:recurring_transaction_rules)` condition is true, it merges the serialized `recurring_transaction_rules` data into the `payload` hash.
+3. **Return payload:** Returns the constructed `payload` hash.
+
+### `serialize`
+#### Description
+This method is responsible for serializing the `Wallet` object into a hash.
+
+#### Inputs
+This method does not accept any arguments.
+
+#### Outputs
+Returns a hash representing the serialized `Wallet` object.
+
+#### Internal Logic
+The logic is described in the `V1::WalletSerializer` section above.
+
+### `recurring_transaction_rules`
+#### Description
+This private method serializes the associated `recurring_transaction_rules` of the `Wallet` object using the `::CollectionSerializer` and `::V1::Wallets::RecurringTransactionRuleSerializer`.
+
+#### Inputs
+This method does not accept any arguments.
+
+#### Outputs
+Returns a hash representing the serialized `recurring_transaction_rules` data.

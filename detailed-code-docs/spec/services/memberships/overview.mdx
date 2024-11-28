@@ -1,0 +1,69 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for the `Memberships` services, specifically focusing on the creation, revocation, and updating of memberships between users and organizations. The tests cover various scenarios, including successful operations and error cases, ensuring the robustness of the membership management system.
+
+## What does it do?
+The tests in this directory verify the functionality of three main services:
+
+1. CreateService: This service is responsible for creating new memberships. The tests ensure that memberships are created correctly when valid user and organization data is provided, and that appropriate errors are returned in cases such as when the user or organization doesn't exist, or when the user already has a membership in the organization.
+
+2. RevokeService: This service handles the revocation of memberships. The tests verify that memberships can be successfully revoked, and that the system prevents users from revoking their own memberships or removing the last admin from an organization.
+
+3. UpdateService: This service manages the updating of membership roles. The tests check that roles can be updated when appropriate, and that the system prevents the last admin's role from being changed.
+
+These tests ensure that the membership management system works as expected, handling various edge cases and maintaining the integrity of the organization's structure.
+
+## Key Files
+
+1. `create_service_spec.rb`:
+   This file tests the `Memberships::CreateService` class. It verifies that memberships are created correctly when valid data is provided, and that appropriate errors are returned for invalid scenarios such as non-existent users or organizations, or attempts to create duplicate memberships.
+
+2. `revoke_service_spec.rb`:
+   This file contains tests for the `Memberships::RevokeService` class. It ensures that memberships can be revoked properly, and checks for error cases such as attempting to revoke one's own membership or trying to remove the last admin from an organization.
+
+3. `update_service_spec.rb`:
+   This file tests the `Memberships::UpdateService` class. It verifies that membership roles can be updated correctly, and checks for scenarios such as attempting to change the role of the last admin in an organization.
+
+## Dependencies
+The test files depend on the following:
+
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides the Rails testing environment and configurations |
+| FactoryBot | Used for creating test data (users, organizations, memberships) |
+| RSpec | The testing framework used for writing and running the tests |
+
+## Configuration
+The tests use RSpec's `let` helper to define shared resources and FactoryBot to create test data. For example:
+
+```ruby
+let(:membership) { create(:membership, role: 'admin') }
+let(:organization) { membership.organization }
+let(:params) { {role: 'manager'} }
+```
+
+These configurations allow for consistent and easily maintainable test setups across different test cases.
+
+The tests make use of RSpec's `aggregate_failures` to group multiple expectations together, allowing all expectations to be evaluated even if one fails. This provides more comprehensive test results and makes debugging easier.
+
+```ruby
+aggregate_failures do
+  expect(result.success?).to be true
+  expect(result.membership).to be_persisted
+  expect(result.membership.user).to eq user
+  expect(result.membership.organization).to eq organization
+end
+```
+
+Error handling is tested extensively across all services. The tests verify that appropriate error codes are returned in various scenarios, such as:
+
+- 'cannot_revoke_own_membership' when a user attempts to revoke their own membership
+- 'membership_not_found' when attempting to operate on a non-existent membership
+- 'last_admin' when trying to remove or change the role of the last admin in an organization
+
+These error codes are expected to be part of the result object returned by the respective services.
+
+Overall, these tests provide comprehensive coverage for the Memberships services, ensuring they behave correctly in various scenarios, including both successful operations and error cases. This helps maintain the integrity and reliability of the membership management system within the application.

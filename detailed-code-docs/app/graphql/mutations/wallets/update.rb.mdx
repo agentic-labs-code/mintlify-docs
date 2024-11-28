@@ -1,0 +1,59 @@
+---
+title: "update.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for updating a customer wallet in a Ruby on Rails application. It's part of a larger GraphQL API and includes authentication and organization checks before allowing the update operation.
+
+## Code Structure
+The `Update` class is nested within the `Mutations::Wallets` module and inherits from `BaseMutation`. It includes two concerns: `AuthenticableApiUser` and `RequiredOrganization`. The class defines the GraphQL mutation structure, including its name, description, input type, and return type.
+
+## References
+- `Types::Wallets::UpdateInput`
+- `Types::Wallets::Object`
+- `::Wallets::UpdateService`
+
+## Symbols
+
+### `Mutations::Wallets::Update`
+#### Description
+This class defines a GraphQL mutation for updating a customer wallet. It ensures the user is authenticated and belongs to the required organization before processing the update.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | Arguments passed to the mutation, including wallet ID and update parameters |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| wallet | Types::Wallets::Object | The updated wallet object |
+
+#### Internal Logic
+1. Finds the wallet by ID for the current user
+2. Calls the `::Wallets::UpdateService` to perform the update
+3. Returns the updated wallet if successful, or an error if the update fails
+
+## Side Effects
+- Updates the wallet in the database if the operation is successful
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user belongs to the required organization |
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'wallets:update' | The permission required to perform this mutation |
+
+## Error Handling
+The mutation uses the `result_error` method to handle and return errors from the `::Wallets::UpdateService`.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| updateCustomerWallet | POST | UpdateInput | Wallet Object | Updates a customer wallet |
+
+This GraphQL mutation is part of a larger API and would be accessed through a GraphQL endpoint, typically via a POST request. The specific endpoint URL would depend on the application's routing configuration.

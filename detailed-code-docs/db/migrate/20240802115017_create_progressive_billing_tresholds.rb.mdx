@@ -1,0 +1,53 @@
+---
+title: "20240802115017_create_progressive_billing_tresholds.rb"
+---
+
+## High-level description
+This migration file creates a new table called `progressive_billing_tresholds` in the database. It defines the structure for storing progressive billing thresholds associated with plans, including amount information, recurrence status, and timestamps.
+
+## Code Structure
+The code defines a single class `CreateProgressiveBillingTresholds` that inherits from `ActiveRecord::Migration[7.1]`. This class contains a `change` method that specifies the table creation and index additions.
+
+### CreateProgressiveBillingTresholds
+#### Description
+This class is an ActiveRecord migration that creates the `progressive_billing_tresholds` table and adds necessary indexes.
+
+#### Internal Logic
+1. Creates the `progressive_billing_tresholds` table with specified columns.
+2. Adds two indexes to the table for optimizing queries.
+
+## Symbols
+
+### change
+#### Description
+This method defines the changes to be applied to the database schema, including creating the table and adding indexes.
+
+#### Internal Logic
+1. Creates the `progressive_billing_tresholds` table with the following columns:
+   - `id`: UUID primary key
+   - `plan_id`: UUID foreign key referencing the `plans` table
+   - `treshold_display_name`: string
+   - `amount_cents`: bigint (not null)
+   - `amount_currency`: string (not null)
+   - `recurring`: boolean (not null, default: false)
+   - `created_at` and `updated_at`: timestamps
+2. Adds a composite index on `amount_cents`, `plan_id`, and `recurring` columns with a unique constraint.
+3. Adds another composite index on `plan_id` and `recurring` columns with a unique constraint, only for records where `recurring` is true.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for defining database schema changes |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| id | symbol | :uuid | Specifies the primary key type for the table |
+
+## Performance Considerations
+The added indexes are designed to optimize query performance:
+1. The composite index on `amount_cents`, `plan_id`, and `recurring` allows for efficient lookups based on these three columns.
+2. The partial index on `plan_id` and `recurring` (where `recurring` is true) optimizes queries specifically for recurring thresholds.
+
+## TODOs
+- The migration file name and class name contain a typo: "treshold" should be "threshold". This should be corrected to maintain consistency and avoid potential issues.

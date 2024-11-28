@@ -1,0 +1,62 @@
+---
+title: "create.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for creating an integration mapping. It's part of a larger GraphQL API and handles the creation of integration mappings with proper authentication and organization checks.
+
+## Code Structure
+The `Create` class is nested within the `Mutations::IntegrationMappings` module. It inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. The class defines the GraphQL mutation structure and delegates the actual creation logic to a service object.
+
+## References
+- `Types::IntegrationMappings::CreateInput`
+- `Types::IntegrationMappings::Object`
+- `::IntegrationMappings::CreateService`
+
+## Symbols
+
+### `Mutations::IntegrationMappings::Create`
+#### Description
+This class defines a GraphQL mutation for creating an integration mapping. It ensures the user is authenticated and belongs to the required organization before processing the request.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | Arguments for creating the integration mapping, as defined in `Types::IntegrationMappings::CreateInput` |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration_mapping | Types::IntegrationMappings::Object | The created integration mapping object |
+
+#### Internal Logic
+1. The class includes `AuthenticableApiUser` and `RequiredOrganization` modules for authentication and organization checks.
+2. It sets the required permission to 'organization:integrations:update'.
+3. The `resolve` method:
+   - Calls the `::IntegrationMappings::CreateService` with the current user and provided arguments.
+   - Merges the `organization_id` from the current organization into the arguments.
+   - Returns the created integration mapping if successful, or an error result if not.
+
+## Side Effects
+- Creates a new integration mapping in the database if successful.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user belongs to the required organization |
+| Types::IntegrationMappings::CreateInput | Defines the input structure for the mutation |
+| Types::IntegrationMappings::Object | Defines the output structure for the mutation |
+| ::IntegrationMappings::CreateService | Handles the actual creation of the integration mapping |
+
+## Error Handling
+- If authentication fails, an `unauthorized_error` is raised (defined in `AuthenticableApiUser`).
+- If organization checks fail, an `organization_error` is raised (defined in `RequiredOrganization`).
+- If the creation service returns a failure result, it's returned as a GraphQL error.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| createIntegrationMapping | POST | CreateIntegrationMappingInput | Mapping | Creates a new integration mapping |
+
+This mutation is part of the larger GraphQL API defined in the `Types::MutationType` class, which includes various other mutations for different parts of the application.

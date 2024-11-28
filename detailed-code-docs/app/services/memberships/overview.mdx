@@ -1,0 +1,64 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains service classes responsible for managing memberships within an organization. The services handle the creation, revocation, and updating of memberships, encapsulating the business logic for these operations.
+
+## What does it do?
+The services in this directory manage the lifecycle of memberships in an organization:
+
+1. Creating new memberships: It allows adding a user to an organization by creating a new membership.
+2. Revoking memberships: It provides functionality to remove a user's membership from an organization, with checks to prevent leaving an organization without admins.
+3. Updating memberships: It allows changing a member's role within an organization, with safeguards to ensure at least one admin remains.
+
+These services handle various scenarios and edge cases, such as preventing users from revoking their own membership or removing the last admin of an organization. They also manage error handling and return appropriate results based on the success or failure of operations.
+
+## Key Files
+
+1. `create_service.rb`:
+   - Responsible for creating new memberships.
+   - Validates the presence of both user and organization.
+   - Creates a new membership associating the user with the organization.
+   - Handles validation errors during creation.
+
+2. `revoke_service.rb`:
+   - Handles the revocation of memberships.
+   - Performs checks to ensure the revocation is valid (e.g., not revoking own membership, not leaving the organization without admins).
+   - Marks the membership as revoked if all conditions are met.
+
+3. `update_service.rb`:
+   - Manages updates to membership roles.
+   - Includes checks to prevent removing the last admin of an organization.
+   - Handles the actual update of the membership role.
+   - Manages validation errors during the update process.
+
+## Dependencies
+These services depend on the `BaseService` class, which is likely defined elsewhere in the application. This base class provides common functionality for service objects, including error handling and result management.
+
+The services also interact with ActiveRecord models, specifically `Membership` and `Organization`, to perform database operations and validations.
+
+Here's an example of how the `CreateService` might be used:
+
+```ruby
+user = User.find(user_id)
+organization = Organization.find(org_id)
+service = Memberships::CreateService.new(user: user, organization: organization)
+result = service.call
+
+if result.success?
+  membership = result.membership
+  # Handle successful creation
+else
+  # Handle error based on result.error
+end
+```
+
+These services are designed to be used in controllers or other parts of the application where membership management is required. They encapsulate the business logic, making it easier to maintain and test this functionality separately from the rest of the application.
+
+The error handling in these services is consistent, using a `result` object to communicate success or failure, along with any relevant error messages or data. This approach allows for uniform error handling across the application when dealing with membership operations.
+
+## Configuration
+These services don't appear to use any specific configuration files or environment variables. However, they rely on the structure and validations defined in the `Membership` and `Organization` models, which may have their own configurations.
+
+In summary, this directory contains a set of service classes that provide a clean and organized way to manage the creation, revocation, and updating of memberships within an organization, ensuring data integrity and proper error handling throughout these processes.

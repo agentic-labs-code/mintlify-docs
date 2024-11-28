@@ -1,0 +1,44 @@
+---
+title: "20240111155133_create_charge_filter_values.rb"
+---
+
+## High-level description
+This migration file creates a new table called `charge_filter_values` in the database. It defines the structure for storing charge filter values, including associations with charge filters and billable metric filters, along with a value field and timestamps for record-keeping.
+
+## Symbols
+
+### `CreateChargeFilterValues`
+#### Description
+This class is an ActiveRecord migration that defines the structure for the `charge_filter_values` table. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0.
+
+#### Internal Logic
+The migration uses the `change` method to define the table structure:
+
+1. Creates a new table named `charge_filter_values` with UUID as the primary key.
+2. Adds foreign key references to `charge_filter` and `billable_metric_filter` tables.
+3. Includes a `value` field to store the actual filter value.
+4. Adds standard timestamp fields (`created_at` and `updated_at`).
+5. Includes a `deleted_at` field for soft delete functionality.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Provides the migration framework and database abstraction |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| id | symbol | :uuid | Sets the primary key type to UUID |
+
+## API/Interface Reference
+| Column | Type | Constraints | Description |
+|:-------|:-----|:------------|:------------|
+| id | uuid | primary key | Unique identifier for each record |
+| charge_filter_id | uuid | null: false, foreign key, indexed | Reference to the associated charge filter |
+| billable_metric_filter_id | uuid | null: false, foreign key, indexed | Reference to the associated billable metric filter |
+| value | string | null: false | The actual value of the charge filter |
+| created_at | datetime | | Timestamp of record creation |
+| updated_at | datetime | | Timestamp of last record update |
+| deleted_at | datetime | indexed | Timestamp for soft delete functionality |
+
+This migration creates a table that likely serves as a junction table between charge filters and billable metric filters, storing specific filter values. The use of UUID for the primary key and foreign keys suggests a distributed or high-scale system design. The inclusion of a `deleted_at` field indicates the use of soft delete functionality, allowing for logical deletion of records without physical removal from the database.

@@ -1,0 +1,44 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This file contains a RSpec test for the `Fees::CreatePayInAdvanceJob` job. It verifies that the job correctly delegates its work to the `Fees::CreatePayInAdvanceService`.
+
+## Symbols
+
+### `RSpec.describe Fees::CreatePayInAdvanceJob, type: :job`
+#### Description
+This is the main RSpec test suite for the `Fees::CreatePayInAdvanceJob` job. It sets up the context for testing the job's behavior.
+
+### `it 'delegates to the pay_in_advance aggregation service'`
+#### Description
+This test case verifies that the `CreatePayInAdvanceJob` correctly delegates its work to the `CreatePayInAdvanceService`.
+
+#### Internal Logic
+1. Arrange:
+   - Creates a `standard_charge` with `pay_in_advance` trait.
+   - Creates an `event`.
+   - Sets up a mock for `Fees::CreatePayInAdvanceService.call` method to return a `BaseService::Result`.
+2. Act:
+   - Calls `described_class.perform_now` with the created charge and event.
+3. Assert:
+   - Verifies that `Fees::CreatePayInAdvanceService.call` was called with the expected arguments.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and RSpec configuration |
+| FactoryBot | Implied usage for creating test data (`:standard_charge` and `:event` factories) |
+
+## References
+- `Fees::CreatePayInAdvanceJob`: The job being tested
+- `Fees::CreatePayInAdvanceService`: The service that the job is expected to delegate to
+- `BaseService::Result`: A result object returned by the service
+
+## Notes
+- The test uses RSpec's `allow` and `receive` methods for mocking the service call.
+- The test doesn't verify the actual creation of fees or any side effects, only that the correct service is called with the right parameters.
+- The `billing_at` parameter is explicitly set to `nil` in the service call expectation.
+
+This test ensures that the `CreatePayInAdvanceJob` acts as an intermediary, correctly passing its arguments to the `CreatePayInAdvanceService` without modifying them. It's a focused unit test that isolates the job's behavior from the actual implementation of the service.

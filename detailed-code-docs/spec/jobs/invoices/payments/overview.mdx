@@ -1,0 +1,58 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for various payment-related jobs in an invoicing system. The jobs are responsible for creating payments using different payment providers (Adyen, GoCardless, and Stripe) and retrying failed payments. These tests ensure that the jobs correctly delegate tasks to their respective services.
+
+## What does it do?
+The test files in this directory verify the behavior of background jobs that handle payment processing for invoices. Here's a breakdown of the functionality being tested:
+
+1. Adyen payment creation: Ensures that the job initializes the Adyen service and calls its create method with the correct invoice.
+2. GoCardless payment creation: Verifies that the job properly sets up the GoCardless service and invokes its create method for a given invoice.
+3. Stripe payment creation: Checks that the job correctly instantiates the Stripe service and calls its create method with the provided invoice.
+4. Payment retry: Tests that the job responsible for retrying failed payments correctly calls the retry batch service with the appropriate organization and invoice IDs.
+
+These tests are crucial for maintaining the reliability and correctness of the payment processing system, especially when dealing with multiple payment providers and complex retry logic.
+
+## Key Files
+
+1. `adyen_create_job_spec.rb`:
+   - Tests the `Invoices::Payments::AdyenCreateJob`
+   - Verifies that the job correctly initializes and calls the `Invoices::Payments::AdyenService`
+
+2. `gocardless_create_job_spec.rb`:
+   - Tests the `Invoices::Payments::GocardlessCreateJob`
+   - Ensures that the job properly sets up and calls the `Invoices::Payments::GocardlessService`
+
+3. `stripe_create_job_spec.rb`:
+   - Tests the `Invoices::Payments::StripeCreateJob`
+   - Checks that the job correctly instantiates and calls the `Invoices::Payments::StripeService`
+
+4. `retry_all_job_spec.rb`:
+   - Tests the `Invoices::Payments::RetryAllJob`
+   - Verifies that the job calls the `Invoices::Payments::RetryBatchService` with the correct parameters
+
+Each of these files follows a similar structure:
+1. Setting up test data using FactoryBot
+2. Creating doubles (mocks) for the respective services
+3. Defining expectations for service initialization and method calls
+4. Executing the job
+5. Verifying that the expectations were met
+
+## Dependencies
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: Used for creating test objects (invoices and organizations).
+3. Rails: The tests are written for a Rails application, as evidenced by the use of `rails_helper`.
+
+## Configuration
+While there are no explicit configuration files mentioned in the provided summaries, the tests likely rely on the broader RSpec and Rails test configurations. These would typically be found in files like:
+
+- `spec/rails_helper.rb`
+- `spec/spec_helper.rb`
+
+These files would set up the testing environment, including FactoryBot configurations and any necessary test database setup.
+
+In conclusion, this directory contains a comprehensive set of tests for the payment processing jobs in the invoicing system. These tests ensure that each job correctly interacts with its corresponding service, which is crucial for maintaining the integrity and reliability of the payment processing workflow across multiple payment providers.

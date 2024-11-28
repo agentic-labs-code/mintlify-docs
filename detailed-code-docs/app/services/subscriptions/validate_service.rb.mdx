@@ -1,0 +1,108 @@
+---
+title: "validate_service.rb"
+---
+
+## High-level description
+This code defines the `ValidateService` class within the `Subscriptions` module. Its primary purpose is to validate the inputs for creating or updating a subscription, ensuring that the customer, plan, subscription date, and ending date (if provided) are valid.
+
+## Code Structure
+The `ValidateService` class inherits from `BaseValidator` and contains a main `valid?` method that orchestrates the validation process. It calls several private methods to perform specific validations and aggregates the results.
+
+## Symbols
+
+### `ValidateService`
+#### Description
+This class is responsible for validating subscription-related data. It checks the presence of a customer and plan, and validates the format of subscription and ending dates.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object to store the validation result |
+| args | Hash | A hash containing the subscription data to be validated |
+
+#### Internal Logic
+1. Checks for the presence of a valid customer and plan.
+2. Validates the format of the subscription date.
+3. If provided, validates the format and logic of the ending date.
+4. Aggregates errors and updates the result object if any validations fail.
+
+### `valid?`
+#### Description
+The main method that orchestrates the validation process.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid | Boolean | Returns true if all validations pass, false otherwise |
+
+#### Internal Logic
+1. Checks for a valid customer and plan.
+2. Validates the subscription and ending dates.
+3. If any errors are found, updates the result object with a validation failure.
+
+### `valid_customer?`
+#### Description
+Checks if a customer is present in the args.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid | Boolean | Returns true if a customer is present, false otherwise |
+
+### `valid_plan?`
+#### Description
+Checks if a plan is present in the args.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid | Boolean | Returns true if a plan is present, false otherwise |
+
+### `valid_subscription_at?`
+#### Description
+Validates the format of the subscription date.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid | Boolean | Returns true if the subscription date format is valid, false otherwise |
+
+### `valid_ending_at?`
+#### Description
+Validates the format and logic of the ending date if provided.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| valid | Boolean | Returns true if the ending date is valid or not provided, false otherwise |
+
+#### Internal Logic
+1. Returns true if ending_at is blank (not provided).
+2. Checks if both ending_at and subscription_at have valid formats.
+3. Ensures ending_at is in the future and after the subscription_at date.
+
+### `ending_at`
+#### Description
+A helper method to parse the ending_at date from args.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ending_at | DateTime | The parsed ending_at date |
+
+### `subscription_at`
+#### Description
+A helper method to parse the subscription_at date from args.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription_at | DateTime | The parsed subscription_at date |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Utils::Datetime | Used for validating date formats |
+
+## Error Handling
+The class uses the `add_error` method (inherited from `BaseValidator`) to accumulate errors during validation. If any errors are found, the `result` object is updated with a validation failure.

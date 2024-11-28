@@ -1,0 +1,66 @@
+---
+title: "retry_service_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Webhooks::RetryService` class. It verifies the behavior of the retry service, including its ability to enqueue jobs, handle different webhook states, and return appropriate results.
+
+## Symbols
+
+### `RSpec.describe Webhooks::RetryService, type: :service`
+#### Description
+This is the main describe block for the `Webhooks::RetryService` test suite. It groups all the tests related to this service.
+
+### `subject(:retry_service)`
+#### Description
+Defines the subject of the tests, which is an instance of `Webhooks::RetryService` initialized with a webhook.
+
+### `let(:webhook)`
+#### Description
+Creates a test double for a failed webhook using FactoryBot.
+
+### `it 'enqueues a SendWebhookJob'`
+#### Description
+Tests if calling the retry service enqueues a `SendHttpWebhookJob` with the webhook as an argument.
+
+#### Internal Logic
+- Expects that calling `retry_service.call` will enqueue a `SendHttpWebhookJob` with the webhook as an argument.
+
+### `it 'assigns webhook to result'`
+#### Description
+Verifies that the result of calling the retry service contains the correct webhook ID.
+
+#### Internal Logic
+- Calls the retry service and checks if the returned result's webhook ID matches the original webhook ID.
+
+### `context 'when webhook is not found'`
+#### Description
+Tests the behavior of the retry service when the webhook is nil.
+
+#### Internal Logic
+- Sets the webhook to nil
+- Expects the result to be unsuccessful
+- Checks if the error code is 'webhook_not_found'
+
+### `context 'when webhook is succeeded'`
+#### Description
+Tests the behavior of the retry service when the webhook has already succeeded.
+
+#### Internal Logic
+- Creates a succeeded webhook using FactoryBot
+- Expects the result to be unsuccessful
+- Checks if the error code is 'is_succeeded'
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Used for creating test data (webhooks) |
+
+## Notes
+1. The test suite uses RSpec's `let` helper to define the webhook, allowing for easy overriding in nested contexts.
+2. The tests cover different scenarios: successful job enqueuing, result assignment, and error handling for missing and already succeeded webhooks.
+3. The test file follows Ruby style guidelines, using frozen string literal pragma and two-space indentation.
+4. The related `rails_helper.rb` file sets up the testing environment, including SimpleCov for code coverage, database cleaner configuration, and various RSpec configurations.
+
+This test suite ensures that the `Webhooks::RetryService` behaves correctly under different conditions, providing confidence in its functionality within the larger application.

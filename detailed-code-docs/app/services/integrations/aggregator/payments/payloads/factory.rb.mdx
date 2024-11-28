@@ -1,0 +1,64 @@
+---
+title: "factory.rb"
+---
+
+## High-level description
+This code defines a Factory class within the Integrations::Aggregator::Payments::Payloads module. The Factory class is responsible for creating instances of payment payload objects based on the type of integration provided. It supports two types of integrations: Netsuite and Xero.
+
+## Symbols
+
+### `Factory`
+#### Description
+The Factory class is designed to create instances of payment payload objects. It uses the factory method pattern to instantiate the appropriate payload object based on the integration type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Object | An object representing the integration, which has a `type` attribute |
+| payment | Object | An object representing the payment |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payload_object | Object | An instance of either Netsuite or Xero payload class |
+
+#### Internal Logic
+The `new_instance` class method uses a case statement to determine which payload class to instantiate based on the integration type:
+1. If the integration type is 'Integrations::NetsuiteIntegration', it creates a new instance of `Integrations::Aggregator::Payments::Payloads::Netsuite`.
+2. If the integration type is 'Integrations::XeroIntegration', it creates a new instance of `Integrations::Aggregator::Payments::Payloads::Xero`.
+3. If the integration type doesn't match either of these, it raises a `NotImplementedError`.
+
+## Error Handling
+The Factory class implements basic error handling by raising a `NotImplementedError` when an unsupported integration type is provided.
+
+## References
+The Factory class references two other classes:
+1. `Integrations::Aggregator::Payments::Payloads::Netsuite`
+2. `Integrations::Aggregator::Payments::Payloads::Xero`
+
+These classes are not defined in the provided code but are expected to exist in the project structure.
+
+## Dependencies
+The code relies on the existence of the following modules and classes:
+- `Integrations::Aggregator::Payments::Payloads::Netsuite`
+- `Integrations::Aggregator::Payments::Payloads::Xero`
+
+## Performance Considerations
+The Factory class uses a simple case statement for determining the appropriate payload class, which is efficient for a small number of integration types. If the number of supported integrations grows significantly, a more scalable approach (such as a lookup table or dynamic class loading) might be considered.
+
+## Related Code Context
+The provided related code snippet (`app/services/integrations/aggregator/payments/create_service.rb`) shows how the Factory class is used in a broader context:
+
+1. The `CreateService` class uses the Factory in its `payload` method:
+   ```ruby
+   def payload
+     Integrations::Aggregator::Payments::Payloads::Factory.new_instance(integration:, payment:).body
+   end
+   ```
+   This suggests that the payload objects created by the Factory are expected to have a `body` method that returns the actual payload data.
+
+2. The `CreateService` class handles the creation of payments for different integrations, including error handling and asynchronous processing.
+
+3. The Factory is used as part of a larger payment creation and synchronization process, which includes making HTTP requests, parsing responses, and creating `IntegrationResource` records.
+
+This context indicates that the Factory plays a crucial role in generating the correct payload format for different integration types within the payment creation process.

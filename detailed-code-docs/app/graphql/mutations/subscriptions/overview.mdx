@@ -1,0 +1,109 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL mutations related to subscription management in a SaaS billing system. It includes three main operations: creating, updating, and terminating subscriptions. These mutations are designed to work within a larger GraphQL API structure, providing authenticated access to subscription-related functionality.
+
+## What does it do?
+The code in this directory enables the following workflows:
+
+1. Creating a new subscription:
+   - Allows users to create a subscription by specifying a customer, plan, and various subscription details.
+   - Validates the customer and plan, and uses a service object to handle the creation process.
+   - Generates a unique external ID if not provided.
+
+2. Updating an existing subscription:
+   - Enables users to modify subscription details such as name, billing time, or plan overrides.
+   - Authenticates the user and checks for the required permissions before processing the update.
+
+3. Terminating a subscription:
+   - Provides a way for users to end a subscription by specifying its ID.
+   - Ensures the user has the necessary permissions and belongs to the correct organization before processing the termination.
+
+These operations are designed to be used by authenticated API users within the context of their organization, ensuring data security and proper access control.
+
+## Key Files
+
+1. `create.rb`:
+   - Defines the `Mutations::Subscriptions::Create` class for creating new subscriptions.
+   - Handles customer and plan validation, and uses the `::Subscriptions::CreateService` to perform the actual creation.
+   - Supports various input parameters like customer_id, plan_id, external_id, name, subscription_at, billing_time, ending_at, and plan_overrides.
+
+2. `update.rb`:
+   - Contains the `Mutations::Subscriptions::Update` class for modifying existing subscriptions.
+   - Uses the `::Subscriptions::UpdateService` to handle the update logic.
+   - Requires the 'subscriptions:update' permission for access.
+
+3. `terminate.rb`:
+   - Implements the `Mutations::Subscriptions::Terminate` class for ending subscriptions.
+   - Utilizes the `::Subscriptions::TerminateService` to process the termination.
+   - Requires the 'subscriptions:update' permission and validates the user's organization.
+
+## Dependencies
+These mutations rely on several shared components and external services:
+
+1. GraphQL Types:
+   - `Types::Subscriptions::CreateSubscriptionInput`
+   - `Types::Subscriptions::UpdateSubscriptionInput`
+   - `Types::Subscriptions::Object`
+
+2. Service Objects:
+   - `::Subscriptions::CreateService`
+   - `::Subscriptions::UpdateService`
+   - `::Subscriptions::TerminateService`
+
+3. Authentication and Authorization:
+   - `AuthenticableApiUser` module for user authentication
+   - `RequiredOrganization` module for organization validation
+
+4. Models:
+   - `Customer` model
+   - `Plan` model
+
+5. Ruby Standard Library:
+   - `SecureRandom` for generating UUIDs
+
+## Configuration
+The mutations use the following configuration:
+
+1. Permissions:
+   - 'subscriptions:update' permission is required for both update and terminate operations.
+
+2. GraphQL Structure:
+   - Each mutation defines its own input and output types, adhering to the GraphQL schema structure.
+
+3. Error Handling:
+   - Mutations use a `result_error` method to handle and return errors from their respective service objects.
+
+Here's an example of how the Create mutation might be used in a GraphQL query:
+
+```graphql
+mutation CreateSubscription($input: CreateSubscriptionInput!) {
+  createSubscription(input: $input) {
+    subscription {
+      id
+      name
+      status
+      billingTime
+      startedAt
+      endingAt
+    }
+  }
+}
+```
+
+Variables:
+```json
+{
+  "input": {
+    "customerId": "customer_123",
+    "planId": "plan_456",
+    "name": "Premium Subscription",
+    "billingTime": "CALENDAR",
+    "subscriptionAt": "2023-06-01T00:00:00Z"
+  }
+}
+```
+
+This structure allows for flexible and secure management of subscriptions within the SaaS billing system, providing a clear API for client applications to interact with the subscription-related functionality.

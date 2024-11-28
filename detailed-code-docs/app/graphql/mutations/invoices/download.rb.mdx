@@ -1,0 +1,46 @@
+---
+title: "download.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for downloading an invoice PDF. It's part of the Invoices module and includes authentication and organization checks. The mutation takes an invoice ID as input and returns an Invoice object.
+
+## Code Structure
+The `Download` class inherits from `BaseMutation` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the mutation's name, description, input argument, and return type. The main logic is in the `resolve` method.
+
+## Symbols
+
+### Mutations::Invoices::Download
+#### Description
+This class represents a GraphQL mutation for downloading an invoice PDF. It authenticates the user, checks for organization access, and uses the `Invoices::GeneratePdfService` to generate and return the invoice.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | The ID of the invoice to be downloaded |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Types::Invoices::Object | The downloaded invoice object |
+
+#### Internal Logic
+1. Finds the invoice using the provided ID and the current organization.
+2. Calls the `Invoices::GeneratePdfService` to generate the PDF.
+3. Returns the invoice if successful, otherwise returns an error.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Provides user authentication functionality |
+| RequiredOrganization | Ensures the user has access to the required organization |
+
+## Error Handling
+The mutation uses the `result_error` method to handle and return errors from the `GeneratePdfService`.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| downloadInvoice | POST | \{ id: "invoice_id" \} | Invoice object | Downloads an invoice PDF |
+
+This mutation is part of the larger GraphQL API and can be accessed through the standard GraphQL endpoint.

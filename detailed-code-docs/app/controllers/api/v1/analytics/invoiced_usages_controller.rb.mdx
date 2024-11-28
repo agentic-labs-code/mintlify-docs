@@ -1,0 +1,70 @@
+---
+title: "invoiced_usages_controller.rb"
+---
+
+## High-level description
+This code defines the `InvoicedUsagesController` within the `Api::V1::Analytics` module. It handles the index action for invoiced usages, utilizing a service object to fetch and process the data, and inherits rendering logic from a base controller.
+
+## Code Structure
+The `InvoicedUsagesController` inherits from `BaseController` and defines an `index` action. It uses the `InvoicedUsagesService` to fetch data and relies on the parent class for rendering the response.
+
+## References
+- `::Analytics::InvoicedUsagesService`
+- `Api::V1::Analytics::BaseController`
+
+## Symbols
+
+### `Api::V1::Analytics::InvoicedUsagesController`
+#### Description
+This controller handles requests for invoiced usage data. It processes the request, applies filters, and delegates the data fetching to a service object.
+
+#### Internal Logic
+1. Defines an `index` action that:
+   - Instantiates an `InvoicedUsagesService` with the current organization and filters
+   - Calls the service to fetch the result
+   - Invokes the parent class's `index` method for rendering
+
+2. Defines a private `filters` method to process and return request parameters
+
+### `index`
+#### Description
+Handles the index action for invoiced usages by fetching data and preparing it for rendering.
+
+#### Inputs
+No direct inputs, but uses `current_organization` and `filters`
+
+#### Outputs
+No direct outputs, but sets `@result` instance variable
+
+#### Internal Logic
+1. Creates a new `InvoicedUsagesService` instance with `current_organization` and `filters`
+2. Calls the service to fetch the result and assigns it to `@result`
+3. Calls `super` to trigger the parent class's `index` method for rendering
+
+### `filters` (private)
+#### Description
+Processes and returns request parameters as a hash for filtering invoiced usages.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filters | Hash | Contains currency and months parameters |
+
+#### Internal Logic
+1. Creates a hash with:
+   - `currency`: Uppercase version of the `currency` parameter (if present)
+   - `months`: The `months` parameter as-is
+
+## Dependencies
+The controller depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| `::Analytics::InvoicedUsagesService` | Service object for fetching invoiced usage data |
+| `Api::V1::Analytics::BaseController` | Parent controller providing common functionality |
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| /api/v1/analytics/invoiced_usages | GET | Optional query parameters: currency, months | JSON array of invoiced usage objects | Retrieves invoiced usage data |
+
+Note: The exact response format is determined by the serializer specified in the `BaseController`.

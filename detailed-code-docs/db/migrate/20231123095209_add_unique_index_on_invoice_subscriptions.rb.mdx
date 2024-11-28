@@ -1,0 +1,34 @@
+---
+title: "20231123095209_add_unique_index_on_invoice_subscriptions.rb"
+---
+
+## High-level description
+This migration adds a unique index to the `invoice_subscriptions` table in a Ruby on Rails application. The index is created on the combination of `invoice_id` and `subscription_id` columns, but only for records created on or after November 23, 2023.
+
+## Symbols
+
+### `AddUniqueIndexOnInvoiceSubscriptions`
+#### Description
+This class is a Rails migration that adds a unique index to the `invoice_subscriptions` table. It inherits from `ActiveRecord::Migration[7.0]`, indicating it's compatible with Rails 7.0.
+
+#### Internal Logic
+The migration uses the `change` method, which is automatically reversible in Rails. Inside this method:
+
+1. It wraps the index creation in a `safety_assured` block, which is likely provided by a gem like `strong_migrations` to bypass certain safety checks.
+2. It calls `add_index` to create the new index with the following parameters:
+   - Table name: `:invoice_subscriptions`
+   - Columns: `%i[invoice_id subscription_id]` (an array of symbols representing the columns)
+   - `unique: true` to ensure uniqueness
+   - `where: "created_at &gt;= '2023-11-23'"` to apply the index only to records created on or after November 23, 2023
+
+## Performance Considerations
+Adding this unique index will improve query performance for lookups on the combination of `invoice_id` and `subscription_id` for records created after the specified date. However, it may slightly slow down insert and update operations on the table due to the uniqueness constraint.
+
+## Dependencies
+This migration likely depends on a gem like `strong_migrations` for the `safety_assured` method, although this is not explicitly shown in the provided code.
+
+## Configuration
+The migration is configured to work with Rails 7.0, as indicated by `ActiveRecord::Migration[7.0]`.
+
+## TODOs
+There are no explicit TODOs in this code.

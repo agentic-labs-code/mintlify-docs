@@ -1,0 +1,48 @@
+---
+title: "20230301122720_create_invoice_metadata.rb"
+---
+
+## High-level description
+This migration file creates a new table called `invoice_metadata` in the database. It establishes a relationship between invoices and their metadata, allowing for the storage of key-value pairs associated with each invoice.
+
+## Code Structure
+The code defines a single class `CreateInvoiceMetadata` that inherits from `ActiveRecord::Migration[7.0]`. This class contains a `change` method that specifies the structure of the new table.
+
+## Symbols
+
+### CreateInvoiceMetadata
+#### Description
+This class is an ActiveRecord migration that defines the structure for the `invoice_metadata` table. It creates the table with specific columns and indexes to store metadata related to invoices.
+
+#### Internal Logic
+The `change` method uses the `create_table` method to define the structure of the `invoice_metadata` table:
+
+1. Creates a table named `invoice_metadata` with UUID as the primary key.
+2. Adds a foreign key reference to the `invoices` table.
+3. Defines `key` and `value` columns to store metadata.
+4. Adds timestamps for record creation and update times.
+5. Creates a unique composite index on `invoice_id` and `key`.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| id | symbol | :uuid | Specifies UUID as the primary key type for the table |
+
+## API/Interface Reference
+| Column | Type | Constraints | Description |
+|:-------|:-----|:------------|:------------|
+| id | uuid | primary key | Unique identifier for each metadata record |
+| invoice_id | uuid | null: false, foreign_key: true, index: true | References the associated invoice |
+| key | string | null: false | The metadata key |
+| value | string | null: false | The metadata value |
+| created_at | datetime | | Timestamp of record creation |
+| updated_at | datetime | | Timestamp of last record update |
+
+| Index | Columns | Options | Description |
+|:------|:--------|:--------|:------------|
+| index_invoice_metadata_on_invoice_id_and_key | [invoice_id, key] | unique: true | Ensures uniqueness of key per invoice |

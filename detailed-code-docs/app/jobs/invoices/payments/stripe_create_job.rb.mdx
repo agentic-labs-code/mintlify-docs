@@ -1,0 +1,37 @@
+---
+title: "stripe_create_job.rb"
+---
+
+## High-level description
+This code defines a background job class `StripeCreateJob` within the `Invoices::Payments` module. The job is responsible for creating a Stripe payment for a given invoice using the `Invoices::Payments::StripeService`.
+
+## Code Structure
+The `StripeCreateJob` class inherits from `ApplicationJob` and is configured to run in the 'providers' queue. It uses the `unique` method to ensure job uniqueness and defines retry behavior for specific Stripe errors.
+
+## Symbols
+
+### `StripeCreateJob`
+#### Description
+This class represents a background job for creating Stripe payments for invoices.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice for which the Stripe payment should be created |
+
+#### Internal Logic
+1. The job calls the `create` method of `Invoices::Payments::StripeService` with the given invoice.
+2. If the service call results in an error, it raises an exception.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Stripe | Used for handling Stripe-specific errors and retrying the job |
+
+## Error Handling
+The job is configured to retry on specific Stripe errors:
+- `Stripe::RateLimitError`: Retried with polynomial backoff, up to 6 attempts
+- `Stripe::APIConnectionError`: Retried with polynomial backoff, up to 6 attempts
+
+## Performance Considerations
+The job uses the `unique` method with the `:until_executed` option, which ensures that only one job with the same arguments is enqueued or executed at a time. This helps prevent duplicate payment creation attempts for the same invoice.

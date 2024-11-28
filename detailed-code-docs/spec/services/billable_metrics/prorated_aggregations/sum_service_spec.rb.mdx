@@ -1,0 +1,65 @@
+---
+title: "sum_service_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `BillableMetrics::ProratedAggregations::SumService` class. It tests various scenarios for aggregating and prorating sum-based billable metrics, including handling different time periods, filters, and grouped aggregations.
+
+## Code Structure
+The test file defines a `describe` block for the `BillableMetrics::ProratedAggregations::SumService` class. Within this block, it sets up various let statements to define test data and scenarios. The tests cover different aspects of the service's functionality, including basic aggregation, handling of pay-in-advance charges, filtering, and grouped aggregations.
+
+## Symbols
+
+### `BillableMetrics::ProratedAggregations::SumService`
+#### Description
+This is the main class being tested. It is responsible for calculating prorated sum aggregations for billable metrics.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event_store_class | Class | The class used for event storage (default: Events::Stores::PostgresStore) |
+| charge | Object | The charge object associated with the billable metric |
+| subscription | Object | The subscription object |
+| boundaries | Hash | Contains from_datetime and to_datetime for the aggregation period |
+| filters | Hash | Contains filtering options for events |
+
+#### Internal Logic
+The tests cover various scenarios:
+1. Basic aggregation of events
+2. Handling of pay-in-advance charges
+3. Filtering events
+4. Grouped aggregations
+5. Current usage calculations
+6. Prorated calculations
+
+### `#aggregate`
+#### Description
+This method is tested for its ability to aggregate events and apply prorations correctly.
+
+#### Internal Logic
+The tests check if the method:
+1. Correctly aggregates events within the given time period
+2. Applies prorations for partial periods
+3. Handles pay-in-advance scenarios
+4. Calculates current usage correctly
+
+### `#per_event_aggregation`
+#### Description
+This method is tested for its ability to provide aggregations on a per-event basis.
+
+#### Internal Logic
+The test checks if the method returns correct event aggregations and prorated aggregations for individual events.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides Rails-specific test configurations |
+| billable_metrics/prorated_aggregations/sum_service | The service being tested |
+
+## Error Handling
+The tests include scenarios to check if the service handles invalid data gracefully, such as events with non-numeric properties.
+
+## Performance Considerations
+The tests include scenarios with multiple events and grouped aggregations, which implicitly test the performance of the aggregation logic for larger datasets.
+
+This test file provides comprehensive coverage of the `BillableMetrics::ProratedAggregations::SumService` class, ensuring its correct behavior in various scenarios related to sum-based billable metric aggregations.

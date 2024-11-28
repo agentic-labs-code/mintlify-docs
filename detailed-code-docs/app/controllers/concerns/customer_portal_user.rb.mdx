@@ -1,0 +1,56 @@
+---
+title: "customer_portal_user.rb"
+---
+
+## High-level description
+This code defines a Ruby module named `CustomerPortalUser` that provides functionality to authenticate and retrieve a customer portal user based on a token provided in the request headers. It is designed to be included in controllers that need to handle customer portal authentication.
+
+## Code Structure
+The `CustomerPortalUser` module contains two main methods: `customer_portal_user` (public) and `customer_portal_token` (private). The `customer_portal_user` method uses the `customer_portal_token` to verify and retrieve the corresponding customer.
+
+## Symbols
+
+### `CustomerPortalUser`
+#### Description
+This module is designed to be included in controllers that need to authenticate and retrieve customer portal users. It uses ActiveSupport::Concern to extend its functionality.
+
+### `customer_portal_user`
+#### Description
+This method authenticates and retrieves a customer portal user based on a token provided in the request headers.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @customer_portal_user | Customer or nil | The authenticated customer or nil if authentication fails |
+
+#### Internal Logic
+1. Check if a customer portal token is present in the request headers.
+2. If present, create a `MessageVerifier` using the `SECRET_KEY_BASE` environment variable.
+3. Verify the token and extract the customer ID.
+4. Find and return the corresponding Customer record.
+5. If verification fails or no customer is found, return nil.
+
+### `customer_portal_token` (private)
+#### Description
+This private method retrieves the customer portal token from the request headers.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| token | String or nil | The customer portal token from the request headers |
+
+## Error Handling
+The `customer_portal_user` method rescues from `ActiveSupport::MessageVerifier::InvalidSignature` errors, returning nil in case of an invalid token.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveSupport::Concern | Extends module functionality |
+| ActiveSupport::MessageVerifier | Provides secure message signing and verification |
+| Customer (model) | Used to find the authenticated customer |
+
+## Configuration
+The module relies on the `SECRET_KEY_BASE` environment variable for token verification.
+
+## References
+This module is included in the `GraphqlController` (as seen in the related code snippets), where it's used to provide the `customer_portal_user` in the GraphQL context.

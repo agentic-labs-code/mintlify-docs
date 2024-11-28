@@ -1,0 +1,64 @@
+---
+title: "charge.rb"
+---
+
+## High-level description
+The `Charge` model represents a pricing rule associated with a subscription plan. It defines how the charge is calculated based on different pricing models like standard, graduated, package, percentage, volume, graduated percentage, or a custom model. It also handles aspects like taxes, fees, and filters for applying charges under specific conditions.
+
+## Code Structure
+The `Charge` model utilizes several enums and modules to define its behavior. It uses `CHARGE_MODELS` enum to list available charge models and `REGROUPING_PAID_FEES_OPTIONS` to define options for regrouping paid fees. It includes modules like `PaperTrailTraceable`, `Currencies`, and `Discard::Model` for tracking changes, handling currencies, and managing soft deletion respectively. The model has several associations with other models like `Plan`, `BillableMetric`, `Fee`, `GroupProperty`, `Filter`, `FilterValue`, `AppliedTax`, and `Tax`. It also defines various validations to ensure data integrity.
+
+## References
+- `Charge::CHARGE_MODELS`: Defines the available charge models.
+- `Charge::REGROUPING_PAID_FEES_OPTIONS`: Defines options for regrouping paid fees.
+- `Charges::Validators`: Namespace for various charge model validators.
+- `ChargeFilter`: Represents a filter applied to a charge.
+- `ChargeFilterValue`: Represents a value for a charge filter.
+- `GroupProperty`: Represents a property associated with a group.
+
+## Symbols
+
+### `Charge`
+#### Description
+The `Charge` class represents a pricing rule within a subscription plan. It defines how the cost is calculated based on the chosen pricing model and associated properties.
+
+#### Inputs
+N/A - This is a class definition, not a method.
+
+#### Outputs
+N/A - This is a class definition, not a method.
+
+#### Internal Logic
+The class defines several validations to ensure the integrity of the charge data:
+- `validate_amount`, `validate_graduated`, `validate_package`, `validate_percentage`, `validate_volume`, `validate_graduated_percentage`: These methods validate the properties of the charge based on the selected charge model using dedicated validator services.
+- `validate_pay_in_advance`: Ensures that the `pay_in_advance` flag is compatible with the chosen billable metric and charge model.
+- `validate_regroup_paid_fees`: Validates the `regroup_paid_fees` option, ensuring it's only used with pay-in-advance and non-invoiceable charges.
+- `validate_min_amount_cents`: Checks if the minimum amount is compatible with the `pay_in_advance` setting.
+- `validate_prorated`: Validates if the `prorated` flag is compatible with the chosen billable metric and charge model.
+- `validate_custom_model`: Ensures that the custom charge model is only used with a custom aggregation type.
+
+The class also defines scopes for querying charges:
+- `default_scope`: Returns only non-deleted charges.
+- `pay_in_advance`: Returns charges that are billed in advance.
+
+## Side Effects
+- Creating or updating a `Charge` instance will create a record in the `paper_trail_versions` table due to the `PaperTrailTraceable` concern.
+
+## Dependencies
+- `ActiveRecord::Base`: Provides the base functionality for the model.
+- `PaperTrailTraceable`: Adds paper trail functionality for tracking changes.
+- `Currencies`: Provides currency-related functionality.
+- `Discard::Model`: Enables soft deletion of charges.
+- `Charges::Validators`: Provides validation services for different charge models.
+
+## Configuration
+N/A - This class doesn't define any specific configuration options.
+
+## Error Handling
+The class uses ActiveRecord validations to handle errors. Validation errors are added to the `errors` object and can be accessed to display error messages.
+
+## Logging
+N/A - This class doesn't implement any specific logging mechanisms.
+
+## API/Interface Reference
+N/A - This class doesn't expose any API endpoints.

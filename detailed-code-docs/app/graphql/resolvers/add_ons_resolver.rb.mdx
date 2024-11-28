@@ -1,0 +1,61 @@
+---
+title: "add_ons_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying add-ons of an organization. It handles authentication, organization validation, and provides pagination and search functionality for retrieving add-ons.
+
+## Code Structure
+The `AddOnsResolver` class inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. It defines the resolver's arguments, return type, and the main `resolve` method.
+
+## References
+- `Types::AddOns::Object`
+- `::AddOnsQuery`
+
+## Symbols
+
+### `Resolvers::AddOnsResolver`
+#### Description
+This class is a GraphQL resolver for querying add-ons of an organization. It ensures the user is authenticated and has the required permissions to view add-ons.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| limit | Integer | Optional. Limits the number of results returned. |
+| page | Integer | Optional. Specifies the page number for pagination. |
+| search_term | String | Optional. Used to filter add-ons based on name or code. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| add_ons | [Types::AddOns::Object] | A collection of add-on objects. |
+
+#### Internal Logic
+1. The resolver first checks for authentication and organization membership using the included modules.
+2. It then calls the `::AddOnsQuery` service with the current organization, search term, and pagination parameters.
+3. The query result's `add_ons` are returned as the resolver's output.
+
+## Side Effects
+This resolver does not have any notable side effects beyond querying the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Validates the user's organization membership |
+| Types::AddOns::Object | Defines the structure of the returned add-on objects |
+| ::AddOnsQuery | Handles the database query for add-ons |
+
+## Error Handling
+The included modules (`AuthenticableApiUser` and `RequiredOrganization`) handle authentication and organization-related errors, raising appropriate GraphQL execution errors if the user is unauthorized or not a member of the required organization.
+
+## API/Interface Reference
+This resolver is part of the GraphQL API and is typically accessed through the `add_ons` field in the `QueryType`. It supports the following arguments:
+
+| Argument | Type | Required | Description |
+|:---------|:-----|:---------|:------------|
+| limit | Integer | No | Limits the number of results |
+| page | Integer | No | Specifies the page number for pagination |
+| search_term | String | No | Filters add-ons based on name or code |
+
+The response is a collection of `Types::AddOns::Object` representing the queried add-ons.

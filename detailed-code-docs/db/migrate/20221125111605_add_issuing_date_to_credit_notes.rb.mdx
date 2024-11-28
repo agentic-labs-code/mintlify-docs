@@ -1,0 +1,34 @@
+---
+title: "20221125111605_add_issuing_date_to_credit_notes.rb"
+---
+
+## High-level description
+This migration adds an `issuing_date` column to the `credit_notes` table, populates it with the date part of the `created_at` timestamp, and then makes the new column non-nullable. It uses safety measures to ensure the migration can be reversed if needed.
+
+## Symbols
+
+### `AddIssuingDateToCreditNotes`
+#### Description
+This class is a Rails migration that adds and populates a new `issuing_date` column in the `credit_notes` table.
+
+#### Internal Logic
+1. Adds a new `issuing_date` column of type `date` to the `credit_notes` table.
+2. Uses `safety_assured` block to bypass certain safety checks.
+3. Within a reversible block:
+   - For the `up` direction, executes SQL to update the `issuing_date` column with the date part of `created_at`.
+4. Changes the `issuing_date` column to be non-nullable.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Base class for database migrations in Rails |
+
+## Error Handling
+The migration uses `safety_assured` to bypass certain safety checks, which should be used cautiously. The `reversible` block ensures that the migration can be rolled back if needed.
+
+## Performance Considerations
+The SQL update operation on all rows in the `credit_notes` table could be slow for large datasets. Consider the impact on production systems with a large number of credit notes.
+
+## TODOs
+- Consider adding an index on the `issuing_date` column if it will be frequently queried.
+- Ensure that future inserts into the `credit_notes` table properly set the `issuing_date` field.

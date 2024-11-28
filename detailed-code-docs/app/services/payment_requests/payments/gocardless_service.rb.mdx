@@ -1,0 +1,86 @@
+---
+title: "gocardless_service.rb"
+---
+
+## High-level description
+This code defines a `GocardlessService` class within the `PaymentRequests::Payments` module. It handles the creation of GoCardless payments for a given payable object, managing the payment process, error handling, and updating the payment status for the payable and associated invoices.
+
+## Code Structure
+The `GocardlessService` class inherits from `BaseService` and includes the `Customers::PaymentProviderFinder` module. It contains methods for creating payments, handling errors, and updating payment statuses. The class interacts with the GoCardless API client and manages the payment flow.
+
+## Symbols
+
+### `GocardlessService`
+#### Description
+This class is responsible for creating GoCardless payments and managing the payment process for a given payable object.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| payable | Object | The object for which the payment is being created |
+
+#### Internal Logic
+1. Initializes the service with a payable object
+2. Checks if the payment should be processed
+3. Creates a GoCardless payment using the client
+4. Creates a new Payment record
+5. Updates the payment status for the payable and associated invoices
+6. Handles errors and delivers error webhooks if necessary
+
+### `create`
+#### Description
+This method creates a GoCardless payment for the payable object.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result of the payment creation process |
+
+#### Internal Logic
+1. Checks if the payment should be processed
+2. Creates a GoCardless payment using the client
+3. Creates a new Payment record
+4. Updates the payment status for the payable and associated invoices
+5. Handles errors and delivers error webhooks if necessary
+
+### `create_gocardless_payment`
+#### Description
+This private method creates a GoCardless payment using the GoCardless API client.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| gocardless_result | GoCardlessPro::Resources::Payment | The result of the GoCardless payment creation |
+
+#### Internal Logic
+1. Calls the GoCardless API to create a payment
+2. Sets the payment amount, currency, and metadata
+3. Uses an idempotency key to prevent duplicate payments
+
+### `mandate_id`
+#### Description
+This private method retrieves or creates a mandate ID for the customer.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| mandate_id | String | The mandate ID for the customer |
+
+#### Internal Logic
+1. Retrieves the list of mandates for the customer from GoCardless
+2. Selects the first active mandate
+3. Raises a `MandateNotFoundError` if no mandate is found
+4. Updates the customer's GoCardless information with the mandate ID
+
+## Error Handling
+The service includes custom error handling for cases where no mandate is found (`MandateNotFoundError`). It also handles GoCardless API errors and updates the payable status accordingly.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| GoCardlessPro | Interacting with the GoCardless API |
+
+## Performance Considerations
+The service uses transactions to ensure data consistency when creating payments and updating statuses. It also uses an idempotency key when creating GoCardless payments to prevent duplicate transactions.
+
+This service is crucial for processing payments through GoCardless and should be optimized for performance and reliability, especially when handling a large volume of payments.

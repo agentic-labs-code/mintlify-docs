@@ -1,0 +1,67 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions for Netsuite integration operations within the application. It specifically includes input types for creating and updating Netsuite integrations, which are crucial for managing the integration between the application and Netsuite, a cloud-based business management suite.
+
+## What does it do?
+The code in this directory defines the structure and requirements for data input when creating or updating a Netsuite integration within the application. It specifies what information is needed to establish or modify a connection with Netsuite, including account details, authentication credentials, and synchronization preferences. 
+
+For instance, when creating a new Netsuite integration, the system requires information such as the integration's name, Netsuite account ID, client ID and secret, token information, and endpoint URL. It also allows specifying which types of data (like invoices, payments, or sales orders) should be synchronized between the systems.
+
+When updating an existing integration, similar fields are available for modification, allowing users to change connection details or adjust synchronization settings as needed.
+
+## Key Files
+
+1. `create_input.rb`
+   - Defines the `CreateNetsuiteIntegrationInput` type
+   - Used for specifying input data when creating a new Netsuite integration
+   - Includes required fields like `code`, `name`, `account_id`, `client_id`, `client_secret`, `connection_id`, `script_endpoint_url`, `token_id`, and `token_secret`
+   - Also includes optional boolean fields for specifying which data types to synchronize
+
+2. `update_input.rb`
+   - Defines the `UpdateNetsuiteIntegrationInput` type
+   - Used for specifying input data when updating an existing Netsuite integration
+   - Includes similar fields to the create input, but all fields are optional, allowing partial updates
+
+Both files inherit from `Types::BaseInputObject`, indicating they are part of a larger GraphQL schema structure.
+
+## Dependencies
+The code relies on the `graphql` gem for Ruby, which provides the GraphQL implementation. This is evident from the use of GraphQL-specific types like `ID`, `String`, and `Boolean`.
+
+## Configuration
+While there are no explicit configuration files in this directory, the input types themselves serve as a form of configuration for the Netsuite integration. They define what information is required and optional when setting up or modifying a Netsuite integration within the application.
+
+Key configurable fields include:
+- Authentication details: `account_id`, `client_id`, `client_secret`, `token_id`, `token_secret`
+- Connection details: `connection_id`, `script_endpoint_url`
+- Synchronization preferences: `sync_credit_notes`, `sync_invoices`, `sync_payments`, `sync_sales_orders`
+
+These input types are likely used by corresponding mutation resolvers (probably located in a separate `mutations` directory) to perform the actual creation or update operations for Netsuite integrations.
+
+Here's an example of how the `CreateNetsuiteIntegrationInput` might be used in a GraphQL mutation:
+
+```graphql
+mutation CreateNetsuiteIntegration($input: CreateNetsuiteIntegrationInput!) {
+  createNetsuiteIntegration(input: $input) {
+    id
+    name
+    # other fields...
+  }
+}
+```
+
+And similarly for the update mutation:
+
+```graphql
+mutation UpdateNetsuiteIntegration($input: UpdateNetsuiteIntegrationInput!) {
+  updateNetsuiteIntegration(input: $input) {
+    id
+    name
+    # other updated fields...
+  }
+}
+```
+
+These input types play a crucial role in maintaining a clean and well-defined API for managing Netsuite integrations within the application, ensuring that all necessary data is provided when creating or updating integrations.

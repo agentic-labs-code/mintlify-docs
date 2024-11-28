@@ -1,0 +1,68 @@
+---
+title: "sync_invoice_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Mutations::Integrations::SyncInvoice` GraphQL mutation. It verifies the behavior of syncing an invoice through an integration, specifically focusing on permission checks and the correct invocation of the synchronization service.
+
+## Code Structure
+The test suite is organized around a single `describe` block for the `Mutations::Integrations::SyncInvoice` mutation. It uses RSpec's `let` statements to set up the necessary test data and mocks, and defines a subject that executes the GraphQL mutation. The main test cases check for required permissions and verify the correct invocation of the synchronization service.
+
+## Symbols
+
+### `RSpec.describe Mutations::Integrations::SyncInvoice`
+#### Description
+This is the main describe block for the test suite, focusing on the `SyncInvoice` mutation.
+
+### `execute_graphql_call`
+#### Description
+This is the subject of the test, which executes the GraphQL mutation with the specified parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| current_user | User | The user executing the mutation |
+| current_organization | Organization | The organization context for the mutation |
+| permissions | String | The required permission for the mutation |
+| query | String | The GraphQL mutation query |
+| variables | Hash | The input variables for the mutation |
+
+### `mutation`
+#### Description
+This is a GraphQL mutation query string for syncing an integration invoice.
+
+### `service`
+#### Description
+This is a double of the `Integrations::Aggregator::Invoices::CreateService`, used to mock the service behavior.
+
+### `result`
+#### Description
+This represents the expected result of the service call, containing an `invoice_id`.
+
+### `before` block
+#### Description
+This block sets up the test environment by creating necessary objects, mocking the service, and executing the GraphQL call.
+
+### Test cases
+#### Description
+The test suite includes several test cases:
+1. Shared examples for checking required user, organization, and permissions.
+2. A specific test case to verify that the invoice is synced correctly.
+
+#### Internal Logic
+The main test case checks that:
+1. The `Integrations::Aggregator::Invoices::CreateService` is instantiated with the correct invoice.
+2. The `call_async` method of the service is called.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails and RSpec configuration |
+| RSpec | Testing framework |
+| FactoryBot | Used for creating test data |
+
+## Error Handling
+This test suite doesn't explicitly test error handling scenarios. It focuses on the happy path where the sync operation succeeds.
+
+## TODOs
+There are no explicit TODOs in this code.

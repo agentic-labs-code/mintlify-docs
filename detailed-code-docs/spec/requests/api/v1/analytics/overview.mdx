@@ -1,0 +1,56 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for the Analytics API endpoints in version 1 of the API. The tests cover various controllers related to analytics, including gross revenues, invoice collections, invoiced usages, monthly recurring revenue (MRR), and overdue balances. These tests ensure that the API behaves correctly under different license conditions (premium and non-premium) and returns the expected data structures.
+
+## What does it do?
+The test suite in this directory verifies the functionality of several analytics-related API endpoints. Here's a breakdown of what each test file checks:
+
+1. Gross Revenues: Ensures that the API returns an empty array for gross revenues, regardless of the license type.
+2. Invoice Collections: Verifies that the API returns detailed invoice collection data for premium licenses and forbids access for non-premium licenses.
+3. Invoiced Usages: Checks that the API returns an empty array for invoiced usages with a premium license and forbids access for non-premium licenses.
+4. Monthly Recurring Revenue (MRR): Confirms that the API returns MRR data for premium licenses and forbids access for non-premium licenses.
+5. Overdue Balances: Validates that the API correctly calculates and returns overdue balance information grouped by month for a given organization.
+
+These tests simulate HTTP requests to the application and verify the responses, ensuring that the analytics endpoints behave as expected under various conditions.
+
+## Key Files
+1. `gross_revenues_controller_spec.rb`: Tests the gross revenue endpoint.
+2. `invoice_collections_controller_spec.rb`: Tests the invoice collection analytics endpoint.
+3. `invoiced_usages_controller_spec.rb`: Tests the invoiced usage analytics endpoint.
+4. `mrrs_controller_spec.rb`: Tests the Monthly Recurring Revenue (MRR) endpoint.
+5. `overdue_balances_controller_spec.rb`: Tests the overdue balances endpoint.
+
+Each file focuses on a specific analytics feature and ensures that the corresponding API endpoint functions correctly.
+
+## Dependencies
+The test suite relies on the following dependencies:
+
+| Dependency | Purpose |
+|:-----------|:--------|
+| RSpec | Testing framework used for writing and running the tests |
+| FactoryBot | Used for creating test data (customers, organizations, invoices) |
+| Rails | The web application framework that the API is built on |
+
+Additionally, the tests use custom helper methods:
+
+- `lago_premium!`: Sets up a premium license environment for testing.
+- `get_with_token`: Makes authenticated GET requests in tests.
+
+## Configuration
+The tests are configured as request specs (`type: :request`), which simulate HTTP requests to the application. They use the `rails_helper` to load the Rails testing environment and configuration.
+
+Some tests use time manipulation with the `travel_to` method to set specific date contexts for testing time-sensitive functionality.
+
+The tests also use `aggregate_failures` in some cases to group multiple expectations together, allowing all expectations to be evaluated even if one fails.
+
+## Notes
+1. The tests cover both premium and non-premium license scenarios, ensuring that the API behaves correctly in both cases.
+2. Some tests intentionally ignore RuboCop conventions for file paths, as indicated by the `# rubocop:disable RSpec/FilePath` comments.
+3. The overdue balances test creates a complex scenario with multiple invoices to verify correct aggregation and calculation of overdue amounts.
+4. The tests generally expect empty arrays or specific data structures in the responses, depending on the endpoint and license type.
+5. Error handling is primarily tested by checking for forbidden status codes when accessing premium features with a non-premium license.
+
+This test suite provides comprehensive coverage of the analytics API endpoints, ensuring that they return the correct data structures and respect license restrictions.

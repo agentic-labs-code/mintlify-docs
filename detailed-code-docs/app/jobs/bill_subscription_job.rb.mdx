@@ -1,0 +1,49 @@
+---
+title: "bill_subscription_job.rb"
+---
+
+## High-level description
+This code defines a `BillSubscriptionJob` class that handles the billing process for subscriptions. It is responsible for creating invoices, calculating fees, and triggering various actions related to subscription billing.
+
+## Code Structure
+The `BillSubscriptionJob` class inherits from `ApplicationJob` and defines a single `perform` method. It uses the `Invoices::SubscriptionService` to handle the actual billing process and implements retry logic for specific error cases.
+
+## Symbols
+
+### `BillSubscriptionJob`
+#### Description
+This class is an Active Job that handles the billing process for subscriptions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscriptions | Array | An array of subscription objects to be billed |
+| timestamp | Integer | Unix timestamp representing the billing time |
+| invoicing_reason | Symbol | Reason for invoicing (e.g., :subscription_periodic) |
+| invoice | Invoice (optional) | An existing invoice object, if any |
+| skip_charges | Boolean (optional) | Flag to skip charging, defaulting to false |
+
+#### Internal Logic
+1. Calls the `Invoices::SubscriptionService` to handle the billing process.
+2. If successful, the method returns.
+3. If an error occurs and an invoice was passed as an argument, it raises the error.
+4. If the invoice is in a generating state, it re-enqueues the job with a delay.
+5. The delay is set to 5 minutes on billing dates and 3 seconds otherwise.
+
+## Side Effects
+- May create or update invoices
+- May trigger webhook events
+- May re-enqueue itself with a delay
+
+## Error Handling
+- Retries on `Sequenced::SequenceError` and `ActiveJob::DeserializationError`
+- Raises errors if the invoice was passed as an argument
+- Re-enqueues the job if the invoice is in a retryable state
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Invoices::SubscriptionService | Handles the core billing logic |
+
+## Performance Considerations
+The job implements a custom retry mechanism with different delays based on the billing scenario, which helps manage system load during high-volume periods.

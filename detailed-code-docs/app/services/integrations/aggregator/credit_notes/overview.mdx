@@ -1,0 +1,77 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains services and payload generators for creating and managing credit notes within an aggregator system. It provides functionality to create credit notes in external systems and generate structured payloads for different integration types such as NetSuite, Xero, and Anrok.
+
+## What does it do?
+The code in this directory performs the following main functions:
+
+1. Creates credit notes in external aggregator systems through HTTP requests.
+2. Handles both synchronous and asynchronous credit note creation processes.
+3. Generates structured payloads for credit notes based on different integration types (e.g., NetSuite, Xero, Anrok).
+4. Processes credit note information, including customer details, status, dates, currency, and line items for fees and coupons.
+5. Manages tax calculations and adjustments for credit note items.
+6. Provides error handling and webhook delivery for failed operations.
+
+This functionality allows the system to interact with various external accounting or financial systems while maintaining a consistent internal structure for credit notes.
+
+## Entry points
+The main entry points for this directory are:
+
+1. `CreateService` class in `create_service.rb`: This class is responsible for initiating the credit note creation process in external systems. It provides two main methods:
+   - `call`: For synchronous credit note creation
+   - `call_async`: For asynchronous credit note creation via background jobs
+
+2. `Factory` class in `payloads/factory.rb`: This class serves as the entry point for generating credit note payloads. It creates the appropriate payload object based on the integration type.
+
+The typical workflow involves:
+1. Calling `CreateService` to initiate credit note creation.
+2. Using the `Factory` class to generate the appropriate payload for the integration type.
+3. Sending the generated payload to the external system via HTTP requests.
+
+## Key Files
+1. `create_service.rb`: Contains the `CreateService` class for creating credit notes in external systems.
+
+2. `payloads/base_payload.rb`: Defines the `BasePayload` class, which provides core functionality for generating credit note payloads.
+
+3. `payloads/factory.rb`: Implements the `Factory` class for creating integration-specific payload objects.
+
+4. `payloads/netsuite.rb`: Contains the `Netsuite` class for NetSuite-specific payload formatting.
+
+5. `payloads/xero.rb` and `payloads/anrok.rb`: Placeholder files for Xero and Anrok integrations, respectively.
+
+## Dependencies
+The code in this directory relies on several dependencies:
+
+1. `LagoHttpClient`: Used for making HTTP requests to external systems.
+2. `IntegrationResource`: Model for storing integration resource information.
+3. `Integrations::Aggregator::CreditNotes::CreateJob`: Background job for asynchronous credit note creation.
+4. `Integrations::Aggregator::CreditNotes::Payloads::Factory`: Factory for creating credit note payloads.
+5. `ActiveSupport`: Implied by the use of nested modules and likely used for various utility functions.
+
+## Configuration
+While there are no explicit configuration files, the code structure allows for easy extension to support new integration types. To add a new integration:
+
+1. Create a new class file in the `payloads` directory (e.g., `new_integration.rb`) that inherits from `BasePayload`.
+2. Implement any necessary overrides or custom methods in the new class.
+3. Update the `Factory` class in `payloads/factory.rb` to include the new integration type.
+
+The `CreateService` class also uses configuration to determine if credit note syncing is enabled for a given integration.
+
+Example code snippet for creating a credit note:
+
+```ruby
+service = Integrations::Aggregator::CreditNotes::CreateService.new(credit_note)
+result = service.call
+
+if result.success?
+  external_id = result.external_id
+  # Process successful creation
+else
+  # Handle error
+end
+```
+
+This directory provides a flexible and extensible system for creating credit notes and generating payloads for various integration types, centralizing the logic while allowing for customization based on specific integration requirements.

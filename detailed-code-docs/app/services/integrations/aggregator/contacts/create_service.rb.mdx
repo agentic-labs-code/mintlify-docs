@@ -1,0 +1,74 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines a service class `CreateService` within the `Integrations::Aggregator::Contacts` module. Its primary purpose is to create a contact in an external integration system using HTTP requests and handle the response, including error handling and webhook delivery.
+
+## Code Structure
+The `CreateService` class inherits from `BaseService` and contains a single public method `call` that orchestrates the contact creation process. It uses private methods and attributes to manage the creation parameters and process the response.
+
+## References
+- `BaseService`: The parent class from which `CreateService` inherits.
+- `LagoHttpClient`: Used for making HTTP requests and handling errors.
+- `Integrations::Aggregator::Contacts::Payloads::Factory`: Used to generate the payload for contact creation.
+
+## Symbols
+
+### `CreateService`
+#### Description
+This class is responsible for creating a contact in an external system through an HTTP API call.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Object | The integration object to be used for the API call |
+| customer | Object | The customer object for which the contact is being created |
+| subsidiary_id | String | The ID of the subsidiary (if applicable) |
+
+#### Internal Logic
+1. Initializes the service with the given parameters.
+2. Makes an HTTP POST request to create the contact.
+3. Parses the response and processes it based on its type (Hash or String).
+4. Delivers a success webhook if the contact is created successfully.
+5. Handles errors by delivering an error webhook and updating the result.
+
+### `call`
+#### Description
+The main method that executes the contact creation process.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result object containing the outcome of the operation |
+
+#### Internal Logic
+1. Makes an HTTP POST request using the `http_client`.
+2. Parses the response body as JSON.
+3. Processes the result based on whether it's a Hash or String.
+4. Delivers a success webhook if a contact ID is present in the result.
+5. Handles any `LagoHttpClient::HttpError` exceptions by delivering an error webhook and updating the result.
+
+### `params`
+#### Description
+A private method that generates the payload for the contact creation request.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | Hash | The payload for the contact creation request |
+
+## Error Handling
+The service uses a `rescue` block to catch `LagoHttpClient::HttpError` exceptions. When an error occurs, it extracts the error code and message, delivers an error webhook, and updates the result with the failure information.
+
+## Side Effects
+- Makes an HTTP POST request to an external API.
+- Delivers success or error webhooks based on the operation outcome.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| LagoHttpClient | Used for making HTTP requests and handling errors |
+| JSON | Used for parsing JSON responses |
+
+This service class is crucial for integrating with external systems to create contacts, handling both successful and failed operations, and communicating the results through webhooks.

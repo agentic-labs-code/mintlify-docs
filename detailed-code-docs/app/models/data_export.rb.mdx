@@ -1,0 +1,57 @@
+---
+title: "data_export.rb"
+---
+
+## High-level description
+The `DataExport` class represents a data export request within the application. It handles the lifecycle of an export, from creation and processing to completion and expiration. It also manages the storage and retrieval of the exported file.
+
+## Code Structure
+The `DataExport` class is an `ApplicationRecord` that interacts with other parts of the application through relationships and methods. It belongs to an `Organization` and a `Membership`, indicating the organization and user associated with the export. It also has a relationship with an attached file, representing the exported data. The class uses enums for its `format` and `status` attributes, providing a controlled vocabulary for these properties. It delegates the `user` method to its associated `Membership`, providing a convenient way to access the user who initiated the export.
+
+## References
+- `ApplicationRecord`: The `DataExport` class inherits from `ApplicationRecord`, providing database interaction capabilities.
+- `Organization`: Represents an organization in the system.
+- `Membership`: Represents a user's membership within an organization.
+- `File`: Represents the attached file containing the exported data.
+- `ExportResourcesJob`: A background job responsible for exporting resources.
+
+## Symbols
+
+### `DataExport`
+#### Description
+This class represents a data export request and manages its lifecycle, including processing, completion, and expiration. It also handles the storage and retrieval of the exported file.
+
+#### Inputs
+This class doesn't have any explicitly defined input parameters. However, it receives data through its associations and during initialization.
+
+#### Outputs
+This class doesn't have any explicitly defined output parameters. However, its methods return data based on the object's state and attributes.
+
+#### Internal Logic
+The class defines several methods to manage the lifecycle of a data export:
+
+- `processing!`: Updates the status to 'processing' and sets the `started_at` timestamp.
+- `completed!`: Updates the status to 'completed', sets the `completed_at` timestamp, and sets the `expires_at` timestamp to 7 days from now.
+- `expired?`: Checks if the export has expired based on the `expires_at` timestamp.
+- `filename`: Generates a filename for the export based on the creation timestamp, resource type, and format.
+- `file_url`: Generates a URL for accessing the exported file.
+
+## Side Effects
+- Modifies the `DataExport` record in the database when methods like `processing!` and `completed!` are called.
+- Creates a background job `ExportResourcesJob` when a new `DataExport` is created.
+
+## Dependencies
+- `Rails`: The code uses Rails framework components like `ApplicationRecord`, `ActiveSupport::CurrentAttributes`, and `ActiveStorage` for file attachments.
+- `ActiveJob`: Used for scheduling the `ExportResourcesJob` background job.
+
+## Configuration
+- `EXPORT_FORMATS`: Defines the allowed formats for data exports (currently only 'csv').
+- `STATUSES`: Defines the possible statuses for a data export ('pending', 'processing', 'completed', 'failed').
+- `EXPIRATION_PERIOD`: Defines the expiration period for completed exports (7 days).
+- `LAGO_API_URL`: Environment variable used to construct the file URL.
+
+## Error Handling
+The code uses Rails' built-in validation mechanisms to ensure data integrity. For example, it validates the presence and inclusion of attributes like `resource_type`, `format`, and `status`.
+
+## Logging
+The code doesn't include explicit logging statements. However, it's likely that Rails logs database queries and other relevant events.

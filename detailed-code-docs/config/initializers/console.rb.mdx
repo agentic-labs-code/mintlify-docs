@@ -1,0 +1,75 @@
+---
+title: "console.rb"
+---
+
+## High-level description
+This code defines custom methods for the Rails console, enhancing its functionality with a `find` method for locating objects by Global ID or email, and a `hard_delete_invoice` method for permanently deleting invoices and their associated records. These methods are added to the `Rails::ConsoleMethods` module, making them available in the Rails console environment.
+
+## Symbols
+
+### `find(id)`
+#### Description
+This method provides a flexible way to locate objects in the Rails console, supporting both Global IDs and email addresses.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | String | A Global ID or email address |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object | ActiveRecord::Base | The located object (User or any GlobalID-supported object) |
+
+#### Internal Logic
+1. Checks if the input matches a Global ID pattern.
+2. If it's a Global ID, uses `GlobalID::Locator.locate` to find the object.
+3. If it's an email, uses `User.find_by email:` to find the user.
+4. Raises an error if the input doesn't match either pattern.
+
+### `hard_delete_invoice(id)`
+#### Description
+This method permanently deletes an invoice and its associated records from the database, with a confirmation step to prevent accidental deletions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | Integer | The ID of the invoice to be deleted |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| None | - | The method doesn't return a value, but prints status messages |
+
+#### Internal Logic
+1. Finds the invoice by ID.
+2. Displays information about the invoice and prompts for confirmation.
+3. If confirmed, begins a transaction to delete associated records:
+   - Destroys invoice subscriptions, credit notes, true-up fees, fees, taxes, and credits.
+   - Finally destroys the invoice itself.
+4. Attempts to reload the invoice to verify deletion.
+5. Prints a success or failure message based on the deletion result.
+
+## Side Effects
+- Permanently deletes database records related to the specified invoice.
+- Outputs status messages to the console.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| GlobalID | Used for locating objects by their Global ID |
+| ActiveRecord | Used for database operations and transactions |
+
+## Error Handling
+- Raises a custom error message if the `find` method can't resolve the input.
+- Uses `ActiveRecord::RecordNotFound` to verify invoice deletion.
+
+## Logging
+The code uses `puts` statements to log information and prompts to the console. Note that these are disabled by Rubocop but allowed in this context.
+
+## Performance Considerations
+The `hard_delete_invoice` method uses a database transaction to ensure all related records are deleted atomically, which is important for maintaining data integrity but may impact performance for large invoices with many associated records.
+
+## TODOs
+- Consider replacing `puts` statements with a proper logging mechanism.
+- Evaluate the need for additional error handling or validation in the `hard_delete_invoice` method.

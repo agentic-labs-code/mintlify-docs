@@ -1,0 +1,52 @@
+---
+title: "webhooks_cleanup_job.rb"
+---
+
+## High-level description
+This code defines a job class `WebhooksCleanupJob` within the `Clock` module. Its primary purpose is to periodically clean up old webhook records from the database by deleting webhooks that haven't been updated in the last 90 days.
+
+## Code Structure
+The `WebhooksCleanupJob` class inherits from `ApplicationJob` and includes the `SentryCronConcern` module. It defines a single method `perform` that carries out the cleanup operation.
+
+## References
+- `ApplicationJob`: The base job class that `WebhooksCleanupJob` inherits from.
+- `Webhook`: The model class representing webhook records in the database.
+
+## Symbols
+
+### `Clock::WebhooksCleanupJob`
+#### Description
+This job class is responsible for cleaning up old webhook records. It's designed to run periodically as part of a clock process.
+
+#### Inputs
+This job doesn't take any explicit inputs.
+
+#### Outputs
+This job doesn't return any explicit outputs. Its effect is to delete old webhook records from the database.
+
+#### Internal Logic
+The `perform` method executes a single database query to delete all `Webhook` records that have not been updated in the last 90 days. This is accomplished using the `where` method to filter records and the `destroy_all` method to delete the filtered records.
+
+```ruby
+Webhook.where('updated_at &lt; ?', 90.days.ago).destroy_all
+```
+
+## Side Effects
+This job has the side effect of permanently deleting webhook records from the database. It modifies the database state by removing old records.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| `SentryCronConcern` | Includes functionality for monitoring cron jobs with Sentry |
+
+## Error Handling
+This job doesn't implement any explicit error handling. Any exceptions raised during the execution of the `perform` method will be handled by the job framework (likely ActiveJob).
+
+## Logging
+No explicit logging is implemented in this job. However, the inclusion of `SentryCronConcern` suggests that job execution may be monitored and logged through Sentry.
+
+## Performance Considerations
+The `destroy_all` method is used to delete records, which can be slower for large datasets as it instantiates each record before deletion. For very large numbers of old webhooks, this could potentially be a long-running operation. If performance becomes an issue, consider using `delete_all` instead, which performs a single SQL DELETE operation without instantiating objects.
+
+## TODOs
+There are no explicit TODOs in this file. However, the related `webhook.rb` file contains a TODO comment about using a relation to enable eager loading, which might be relevant for future optimizations of webhook-related operations.

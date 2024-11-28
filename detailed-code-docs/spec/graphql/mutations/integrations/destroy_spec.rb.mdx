@@ -1,0 +1,69 @@
+---
+title: "destroy_spec.rb"
+---
+
+## High-level description
+This code defines a RSpec test suite for the `Mutations::Integrations::Destroy` GraphQL mutation. It verifies that the mutation correctly deletes an integration while enforcing proper authentication, authorization, and permission checks.
+
+## Code Structure
+The test suite is organized as a single RSpec describe block, containing several shared examples and a specific test case. It sets up necessary test data and defines a GraphQL mutation query for testing.
+
+## Symbols
+
+### RSpec.describe Mutations::Integrations::Destroy
+#### Description
+This is the main describe block for the test suite, focusing on the `Mutations::Integrations::Destroy` GraphQL mutation.
+
+#### Internal Logic
+1. Sets up test data using let statements.
+2. Defines a GraphQL mutation query.
+3. Includes shared examples for common checks.
+4. Implements a specific test case for deleting an integration.
+
+### let statements
+#### Description
+These statements define the test data and setup required for the tests.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| required_permission | String | The permission required to delete an integration |
+| membership | Membership | A factory-created membership object |
+| organization | Organization | The organization associated with the membership |
+| integration | Integration | A factory-created NetSuite integration associated with the organization |
+| mutation | String | The GraphQL mutation query for destroying an integration |
+
+### Shared examples
+#### Description
+These are reusable test cases that check common requirements for the mutation.
+
+#### Internal Logic
+- `requires current user`: Ensures the mutation requires a current user.
+- `requires current organization`: Verifies the mutation requires a current organization.
+- `requires permission`: Checks if the mutation requires the specified permission.
+
+### it 'deletes an integration'
+#### Description
+This test case verifies that the mutation successfully deletes an integration.
+
+#### Internal Logic
+1. Arrange: Sets up the test environment with necessary data.
+2. Act: Executes the GraphQL mutation with required parameters.
+3. Assert: Checks that the count of `Integrations::BaseIntegration` decreases by 1 after the mutation is executed.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment and configuration |
+| FactoryBot | Used for creating test data (membership, integration) |
+| GraphQL | The mutation being tested is a GraphQL mutation |
+
+## Error Handling
+The test suite doesn't explicitly test error handling, but it implicitly checks for proper authorization and permission handling through shared examples.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| destroyIntegration | Mutation | `{input: {id: ID!}}` | `{id: ID}` | Deletes the specified integration |
+
+This test suite ensures that the `destroyIntegration` mutation works correctly, requiring proper authentication, authorization, and permissions before successfully deleting an integration.

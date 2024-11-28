@@ -1,0 +1,72 @@
+---
+title: "Overview"
+---
+
+## High-level description
+
+This directory contains RSpec test files for the `ChargeFilters` services in a Ruby on Rails application. The services being tested are responsible for creating, updating, and matching charge filters, which are used to apply specific pricing rules based on event properties in a billing system.
+
+## What does it do?
+
+The tests in this directory ensure that the charge filter services work correctly. These services handle the following tasks:
+
+1. Creating and updating charge filters in batches
+2. Matching events to the most appropriate charge filter based on event properties
+3. Identifying matching and ignored filters for different charge scenarios
+
+The tests cover various scenarios, including:
+- Creating new filters with different parameters
+- Updating existing filters
+- Handling empty filter parameters
+- Matching events to filters based on multiple properties
+- Identifying which filters match and which are ignored in complex filter configurations
+
+These tests help ensure that the billing system can correctly apply different pricing rules based on specific event characteristics, which is crucial for accurate and flexible pricing in a complex billing system.
+
+## Key Files
+
+1. `create_or_update_batch_service_spec.rb`:
+   This file tests the `ChargeFilters::CreateOrUpdateBatchService` class. It ensures that the service can correctly create new filters, update existing ones, and handle empty filter parameters. It also tests the behavior of discarding existing filters when necessary.
+
+2. `event_matching_service_spec.rb`:
+   This file tests the `ChargeFilters::EventMatchingService` class. It verifies that the service can correctly match events to the most appropriate charge filter based on event properties and filter criteria. It includes tests for scenarios where an event matches multiple filters or doesn't match any filter.
+
+3. `matching_and_ignored_service_spec.rb`:
+   This file tests the `ChargeFilters::MatchingAndIgnoredService` class. It ensures that the service can correctly identify which filters match and which are ignored for different charge scenarios. This is important for handling complex filter configurations in the billing system.
+
+## Dependencies
+
+The test files rely on the following dependencies:
+
+1. RSpec: The testing framework used for writing and running the tests.
+2. FactoryBot: A library for creating test data. It's used extensively in these tests to create objects like charges, events, and filters.
+3. Rails testing environment: The tests use `rails_helper`, indicating that they are part of a Rails application and use the Rails testing setup.
+
+## Configuration
+
+The test files use RSpec configuration to specify that they are testing services:
+
+```ruby
+RSpec.describe SomeService, type: :service do
+  # Test code
+end
+```
+
+This configuration helps organize the tests and may be used for filtering or applying specific behaviors to service tests.
+
+The tests also make use of RSpec's `let` statements and `before` blocks to set up test data and contexts. This approach helps in reducing duplication and improving the readability and maintainability of the tests.
+
+For example:
+
+```ruby
+let(:organization) { create(:organization) }
+let(:event_properties) { { payment_method: 'card', card_location: 'US' } }
+let(:event) { create(:event, organization:, properties: event_properties) }
+
+before do
+  create(:charge_filter_value, charge_filter: filter1, values: filter1_values)
+  create(:charge_filter_value, charge_filter: filter2, values: filter2_values)
+end
+```
+
+These tests provide comprehensive coverage for the charge filter services, ensuring that they behave correctly in various scenarios. This is crucial for maintaining the integrity and reliability of the billing system, especially when dealing with complex pricing rules and event matching.

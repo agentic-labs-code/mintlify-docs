@@ -1,0 +1,71 @@
+---
+title: "webhook_endpoint_resolver.rb"
+---
+
+## High-level description
+This code defines a GraphQL resolver for querying a single webhook endpoint. It's part of a larger GraphQL API and includes authentication and organization-specific access controls.
+
+## Code Structure
+The `WebhookEndpointResolver` class inherits from `Resolvers::BaseResolver` and includes two modules: `AuthenticableApiUser` and `RequiredOrganization`. These modules provide authentication and organization-related functionality.
+
+## References
+- `Types::WebhookEndpoints::Object`
+- `Resolvers::BaseResolver`
+- `AuthenticableApiUser` module
+- `RequiredOrganization` module
+
+## Symbols
+
+### `WebhookEndpointResolver`
+#### Description
+This resolver is responsible for querying a single webhook endpoint for a given organization. It ensures that the user is authenticated and has the necessary permissions to access the webhook endpoint.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| id | ID | Unique identifier of the webhook endpoint |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_endpoint | Types::WebhookEndpoints::Object | The requested webhook endpoint object, or null if not found |
+
+#### Internal Logic
+1. The resolver checks for user authentication and organization membership using the included modules.
+2. It verifies that the user has the 'developers:manage' permission.
+3. The `resolve` method attempts to find the webhook endpoint using the provided ID within the current organization's scope.
+4. If the webhook endpoint is not found, it raises a not found error.
+
+## Side Effects
+This resolver does not have any side effects. It only reads data from the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord | Used for database querying (implied by the use of `find` method) |
+| GraphQL | The underlying framework for the API |
+
+## Error Handling
+- Raises an unauthorized error if the user is not authenticated (handled by `AuthenticableApiUser` module)
+- Raises a forbidden error if the user is not a member of the organization or if the organization is missing (handled by `RequiredOrganization` module)
+- Returns a not found error if the webhook endpoint with the given ID doesn't exist in the current organization
+
+## API/Interface Reference
+This resolver is part of the GraphQL API and can be queried as follows:
+
+```graphql
+query {
+  webhookEndpoint(id: "webhook_endpoint_id") {
+    id
+    organization {
+      # organization fields
+    }
+    signatureAlgo
+    webhookUrl
+    createdAt
+    updatedAt
+  }
+}
+```
+
+Note: The actual available fields depend on the implementation of `Types::WebhookEndpoints::Object`.

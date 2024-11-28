@@ -1,0 +1,74 @@
+---
+title: "export_resources_service_spec.rb"
+---
+
+## High-level description
+This RSpec file contains unit tests for the `DataExports::ExportResourcesService` class. It tests various scenarios of exporting data, including successful exports, handling of expired or already processed exports, and error cases.
+
+## Code Structure
+The test suite is organized around the `#call` method of the `DataExports::ExportResourcesService` class. It uses RSpec's `describe` and `context` blocks to group related tests and set up different scenarios.
+
+## Symbols
+
+### `DataExports::ExportResourcesService.call`
+#### Description
+This is the main method being tested. It processes a data export request, generates the export file, and updates the export status.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data_export | DataExport | The data export object to be processed |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | ServiceResult | The result of the export operation |
+
+#### Internal Logic
+1. Updates the data export status to "processing"
+2. Generates the export file
+3. Attaches the file to the data export
+4. Updates the status to "completed"
+5. Sends a completion email
+6. Returns a success result with the updated data export
+
+## Side Effects
+- Modifies the `data_export` object's status and file attachment
+- Enqueues an email to be sent
+
+## Tests
+
+### Successful export
+- Checks if the export status is updated to "processing"
+- Verifies that the generated file is attached to the data export
+- Ensures the export status is updated to "completed"
+- Confirms that a completion email is enqueued
+- Validates the success result and its properties
+
+### Error cases
+- Tests handling of expired data exports
+- Checks behavior for already processed exports
+- Verifies error handling during processing
+- Tests handling of unsupported resource types
+
+### Resource-specific tests
+- Verifies correct exporter is called for "invoices" resource type
+- Checks correct exporter is called for "invoice_fees" resource type
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails testing environment |
+| DataExports::Csv::Invoices | Handles CSV export for invoices |
+| DataExports::Csv::InvoiceFees | Handles CSV export for invoice fees |
+| DataExportMailer | Sends completion email |
+
+## Error Handling
+The tests cover various error scenarios, including expired exports, already processed exports, and general processing errors. Each error case is expected to return a service failure result with an appropriate error code.
+
+## Notes
+- The tests use RSpec's `let` helper for setting up test data and mocks
+- `aggregate_failures` is used to group related expectations
+- The tests mock external dependencies like `Tempfile` and the specific CSV exporters to isolate the service's behavior
+
+This test suite provides comprehensive coverage of the `DataExports::ExportResourcesService` functionality, ensuring it handles various scenarios correctly and maintains the expected behavior for data exports.

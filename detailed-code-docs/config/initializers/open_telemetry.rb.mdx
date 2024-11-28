@@ -1,0 +1,59 @@
+---
+title: "open_telemetry.rb"
+---
+
+## High-level description
+This code initializes and configures OpenTelemetry for the Lago application. It sets up tracing functionality and creates a global tracer instance for use throughout the application, particularly when the 'OTEL_EXPORTER' environment variable is present.
+
+## Code Structure
+The code is relatively simple, consisting of require statements, a conditional configuration block, and the creation of a global tracer instance.
+
+## Symbols
+
+### OpenTelemetry::SDK.configure
+#### Description
+Configures the OpenTelemetry SDK to use all available instrumentations when the 'OTEL_EXPORTER' environment variable is set.
+
+#### Internal Logic
+The configuration is only applied if the 'OTEL_EXPORTER' environment variable is present, allowing for conditional setup of OpenTelemetry based on the deployment environment.
+
+### LagoTracer
+#### Description
+A global constant that holds an instance of the OpenTelemetry tracer for the 'lago' service.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| LagoTracer | OpenTelemetry::Tracer | An instance of the OpenTelemetry tracer for the 'lago' service |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| opentelemetry/sdk | Provides the core OpenTelemetry SDK functionality |
+| opentelemetry/instrumentation/all | Includes all available OpenTelemetry instrumentations |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| OTEL_EXPORTER | Environment Variable | None | When present, enables OpenTelemetry configuration |
+
+## References
+The `LagoTracer` is used in other parts of the application, such as:
+
+1. In `app/services/base_service.rb`, it's used to create spans for service method calls:
+   ```ruby
+   def self.call(*, **, &)
+     LagoTracer.in_span("#{name}#call") do
+       new(*, **).call(&)
+     end
+   end
+   ```
+
+2. In `app/controllers/graphql_controller.rb`, it's used to create a span for GraphQL query execution:
+   ```ruby
+   result = LagoTracer.in_span("LagoApiSchema.execute") do
+     LagoApiSchema.execute(query, variables:, context:, operation_name:)
+   end
+   ```
+
+These usages demonstrate that the `LagoTracer` is utilized throughout the application to provide distributed tracing capabilities, helping to monitor and debug the application's performance and behavior.

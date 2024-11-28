@@ -1,0 +1,61 @@
+---
+title: "register_webhook_job_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test file for the `PaymentProviders::Stripe::RegisterWebhookJob` job. It verifies that the job correctly calls the `PaymentProviders::Stripe::RegisterWebhookService` when performed.
+
+## Symbols
+
+### `RSpec.describe PaymentProviders::Stripe::RegisterWebhookJob, type: :job`
+#### Description
+This is the main RSpec describe block that groups all the tests for the `PaymentProviders::Stripe::RegisterWebhookJob` job.
+
+### `let(:result)`
+#### Description
+This line creates a `let` block that defines a `result` variable, which is an instance of `BaseService::Result`.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | An instance of BaseService::Result used to mock the service call result |
+
+### `let(:stripe_provider)`
+#### Description
+This `let` block creates a `stripe_provider` variable using FactoryBot to create a new `stripe_provider` instance.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| stripe_provider | StripeProvider | A newly created instance of StripeProvider using FactoryBot |
+
+### `before` block
+#### Description
+This block sets up a stub for the `PaymentProviders::Stripe::RegisterWebhookService.call` method to return the `result` variable.
+
+#### Internal Logic
+1. Uses RSpec's `allow` method to stub the `PaymentProviders::Stripe::RegisterWebhookService.call` method.
+2. Configures the stub to return the `result` variable when called.
+
+### `it 'calls the register webhook service'`
+#### Description
+This is the main test case that verifies the job's behavior.
+
+#### Internal Logic
+1. Calls `described_class.perform_now(stripe_provider)` to execute the job.
+2. Expects that `PaymentProviders::Stripe::RegisterWebhookService.call` was called during the job execution.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and RSpec configuration |
+| FactoryBot | Used to create test data (stripe_provider) |
+| RSpec | The testing framework used for writing and running the tests |
+
+## References
+- `PaymentProviders::Stripe::RegisterWebhookJob`: The job class being tested
+- `PaymentProviders::Stripe::RegisterWebhookService`: The service class expected to be called by the job
+- `BaseService::Result`: Used to create a mock result object
+- `StripeProvider`: The model class for the stripe provider
+
+This test file ensures that the `PaymentProviders::Stripe::RegisterWebhookJob` correctly interacts with the `PaymentProviders::Stripe::RegisterWebhookService` when performed. It uses RSpec's mocking and stubbing capabilities to isolate the job's behavior and verify that it calls the expected service.

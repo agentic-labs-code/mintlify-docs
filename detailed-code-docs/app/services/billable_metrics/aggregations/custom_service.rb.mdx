@@ -1,0 +1,107 @@
+---
+title: "custom_service.rb"
+---
+
+## High-level description
+This code defines a `CustomService` class within the `BillableMetrics::Aggregations` module. It is responsible for computing custom aggregations for billable metrics, handling both in-arrears and pay-in-advance scenarios, and supporting grouped-by aggregations.
+
+## Code Structure
+The `CustomService` class inherits from `BillableMetrics::Aggregations::BaseService` and implements methods for computing aggregations, handling grouped-by aggregations, and performing custom aggregations using a Ruby sandbox.
+
+## Symbols
+
+### `CustomService`
+#### Description
+This class handles custom aggregations for billable metrics, supporting both in-arrears and pay-in-advance scenarios.
+
+#### Internal Logic
+1. Computes aggregations using custom logic defined in the billable metric.
+2. Handles grouped-by aggregations.
+3. Manages caching of aggregations for performance optimization.
+4. Supports pay-in-advance aggregations with special handling.
+
+### `compute_aggregation`
+#### Description
+Computes the aggregation for the billable metric, including both in-arrears and pay-in-advance scenarios.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| options | Hash | Additional options for the aggregation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the aggregation results |
+
+#### Internal Logic
+1. Computes the custom aggregation.
+2. Handles pay-in-advance aggregation if applicable.
+3. Sets various result attributes, including aggregation, current usage units, and custom aggregation.
+4. Computes refresh time for cached aggregation if the billable metric is recurring.
+
+### `compute_grouped_by_aggregation`
+#### Description
+Computes aggregations grouped by specific values.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| options | Hash | Additional options for the aggregation |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the grouped aggregation results |
+
+#### Internal Logic
+1. Retrieves grouped counts from the event store.
+2. For each group, computes custom aggregation.
+3. Sets aggregation results for each group.
+4. Handles recurring billable metrics by setting the `recurring_updated_at` timestamp.
+
+### `perform_custom_aggregation`
+#### Description
+Performs the custom aggregation logic using a Ruby sandbox.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| target_result | Result | The result object to update (optional) |
+| grouped_by_values | Hash | Grouped-by values for filtering (optional) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| state | Hash | The final state of the aggregation |
+
+#### Internal Logic
+1. Retrieves the current state (initial or latest, depending on whether the metric is recurring).
+2. Processes events in batches.
+3. Runs the custom aggregation logic in a sandboxed environment.
+4. Returns the final aggregation state.
+
+### `compute_pay_in_advance_aggregation`
+#### Description
+Computes the aggregation for pay-in-advance scenarios.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Hash | The pay-in-advance aggregation result |
+
+#### Internal Logic
+1. Checks for existing cached aggregation.
+2. If no cache exists, performs a full aggregation and caches it.
+3. If cache exists, computes the aggregation for the current event using the previous state.
+4. Updates the cached metadata.
+5. Returns the units and amount to be charged for the current event.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| LagoUtils::RubySandbox | Used to run custom aggregation logic in a sandboxed environment |
+| CachedAggregation | Model used for caching aggregation results |
+
+## Performance Considerations
+The code uses batching (BATCH_SIZE = 1000) when processing events to optimize performance for large datasets. It also utilizes caching to improve performance for recurring billable metrics and pay-in-advance scenarios.

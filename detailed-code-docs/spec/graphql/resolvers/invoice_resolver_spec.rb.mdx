@@ -1,0 +1,84 @@
+---
+title: "invoice_resolver_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Resolvers::InvoiceResolver` GraphQL resolver. It tests various scenarios for retrieving invoice data, including handling of permissions, different invoice types, and deleted resources.
+
+## Code Structure
+The test suite is organized into several contexts, each testing different aspects of the invoice resolver. It uses shared examples for common behaviors and sets up necessary test data using FactoryBot.
+
+## Symbols
+
+### RSpec.describe Resolvers::InvoiceResolver
+#### Description
+This is the main describe block for the InvoiceResolver tests. It sets up the GraphQL query and common test data used across multiple test cases.
+
+#### Internal Logic
+1. Defines the GraphQL query for fetching invoice data
+2. Sets up test data including membership, organization, customer, invoice, and related objects
+3. Includes shared examples for permission checks
+4. Defines various test cases for different scenarios
+
+### it 'returns a single invoice'
+#### Description
+Tests the basic functionality of fetching a single invoice with its associated data.
+
+#### Internal Logic
+1. Executes the GraphQL query with necessary permissions and variables
+2. Verifies that the returned data matches the expected invoice details
+
+### it 'includes filters for each fee'
+#### Description
+Tests that the resolver correctly includes charge filter information for fees.
+
+#### Internal Logic
+1. Creates billable metric filter, charge filter, and charge filter value
+2. Updates the fee with the charge filter
+3. Executes the GraphQL query and verifies the presence of filter information in the response
+
+### context 'when invoice is not found'
+#### Description
+Tests the error handling when an invoice is not found.
+
+#### Internal Logic
+1. Executes the GraphQL query with an invalid invoice ID
+2. Verifies that an appropriate error message is returned
+
+### context 'with a deleted billable metric'
+#### Description
+Tests that the resolver can handle and return information for invoices with deleted billable metrics.
+
+#### Internal Logic
+1. Sets up test data with deleted billable metric, charge, and related objects
+2. Executes the GraphQL query and verifies that the invoice data is returned correctly
+
+### context 'with an add on invoice'
+#### Description
+Tests the resolver's handling of invoices with add-ons, including deleted add-ons.
+
+#### Internal Logic
+1. Sets up test data for an invoice with an add-on
+2. Executes the GraphQL query and verifies the presence of add-on information in the response
+3. Includes a nested context for testing with a deleted add-on
+
+### context 'with a deleted customer'
+#### Description
+Tests that the resolver can handle and return information for invoices with deleted customers.
+
+#### Internal Logic
+1. Sets up test data with a deleted customer
+2. Executes the GraphQL query and verifies that the invoice data, including the deleted customer information, is returned correctly
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Provides the testing environment and configuration |
+| FactoryBot | Used for creating test data |
+| GraphQL | The query language being tested |
+
+## Error Handling
+The test suite includes scenarios for handling errors, such as when an invoice is not found. It uses the `expect_graphql_error` helper to verify the error response.
+
+Your response should not exceed 3000 words or 4000 tokens. Focus on providing clear, concise information that can be directly inferred from the code. Include optional sections only when they provide significant value for understanding the code.

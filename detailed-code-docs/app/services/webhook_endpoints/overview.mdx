@@ -1,0 +1,87 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains service classes responsible for managing webhook endpoints within an organization. The services handle the creation, updating, and destruction of webhook endpoints, as well as tracking these events for analytics purposes.
+
+## What does it do?
+The services in this directory provide the following functionality:
+
+1. Create new webhook endpoints for an organization, including validation and event tracking.
+2. Update existing webhook endpoints, handling potential errors and validation issues.
+3. Destroy webhook endpoints, ensuring proper cleanup and event tracking.
+
+These services act as an intermediary layer between the application's controllers (or GraphQL resolvers) and the database models, encapsulating the business logic for webhook endpoint management.
+
+## Key Files
+
+### 1. create_service.rb
+This file contains the `WebhookEndpoints::CreateService` class, which is responsible for creating new webhook endpoints. It performs the following tasks:
+- Initializes a new webhook endpoint with the provided URL and signature algorithm.
+- Attempts to save the webhook endpoint to the database.
+- Tracks the creation event using a background job.
+- Handles validation errors and returns appropriate results.
+
+### 2. update_service.rb
+The `WebhookEndpoints::UpdateService` class in this file handles the updating of existing webhook endpoints. Its main functions include:
+- Finding the webhook endpoint by ID within the given organization.
+- Updating the webhook endpoint with the provided parameters.
+- Handling cases where the webhook endpoint is not found or validation errors occur.
+
+### 3. destroy_service.rb
+This file contains the `WebhookEndpoints::DestroyService` class, which manages the deletion of webhook endpoints. Its responsibilities include:
+- Verifying the existence of the webhook endpoint before deletion.
+- Destroying the webhook endpoint in the database.
+- Tracking the deletion event using a background job.
+
+## Dependencies
+These services rely on the following external dependencies:
+
+1. ActiveRecord: Used for database operations and error handling (version not specified).
+2. SegmentTrackJob: A background job system used for tracking events (version not specified).
+
+These dependencies were likely chosen for the following reasons:
+- ActiveRecord: Provides a robust ORM for database interactions and built-in validation mechanisms.
+- SegmentTrackJob: Allows for asynchronous tracking of important events, which is crucial for analytics and monitoring without impacting the main application's performance.
+
+## Configuration
+While there are no explicit configuration files mentioned, the services use environment-specific settings through the `CurrentContext` module. This likely includes:
+
+- Database connection settings (implicitly through ActiveRecord)
+- Segment tracking configuration (for the SegmentTrackJob)
+
+The configurable fields in these services include:
+
+1. Webhook URL: The endpoint where webhook notifications will be sent.
+2. Signature Algorithm: The algorithm used for signing webhook payloads (defaults to `:jwt` in the create service).
+
+Here's an example of how these services might be used in a controller or GraphQL resolver:
+
+```ruby
+# Creating a new webhook endpoint
+result = WebhookEndpoints::CreateService.new(organization: current_organization, params: webhook_params).call
+if result.success?
+  # Handle successful creation
+else
+  # Handle errors
+end
+
+# Updating an existing webhook endpoint
+result = WebhookEndpoints::UpdateService.new(id: webhook_id, organization: current_organization, params: update_params).call
+if result.success?
+  # Handle successful update
+else
+  # Handle errors
+end
+
+# Destroying a webhook endpoint
+result = WebhookEndpoints::DestroyService.new(webhook_endpoint: webhook_endpoint).call
+if result.success?
+  # Handle successful deletion
+else
+  # Handle errors
+end
+```
+
+These services provide a clean and consistent interface for managing webhook endpoints, encapsulating the business logic and error handling in a reusable manner. They also ensure that important events are tracked for analytics purposes, which is crucial for monitoring and improving the webhook system over time.

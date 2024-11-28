@@ -1,0 +1,60 @@
+---
+title: "Overview"
+---
+
+## High-level description
+
+This directory contains RSpec test suites for the API controllers of a Rails application. It includes tests for both the base API controller and specific endpoints of the v1 API. The tests cover authentication, parameter validation, error handling, and various CRUD operations for different resources such as add-ons, analytics, customers, invoices, and more.
+
+## What does it do?
+
+The test suites in this directory verify the behavior of the API endpoints by simulating HTTP requests and checking the responses. They ensure that:
+
+1. The API properly authenticates requests using API keys.
+2. Required parameters are validated and appropriate error responses are returned when they're missing.
+3. CRUD operations for various resources (e.g., add-ons, billable metrics, plans) function correctly.
+4. Analytics data is retrieved accurately.
+5. Customer management operations work as expected.
+6. Invoice and credit note operations are handled correctly.
+7. Subscription management functions properly.
+8. Wallet and payment-related operations are executed correctly.
+9. Webhook endpoints are managed appropriately.
+
+These tests help maintain the integrity and reliability of the API as the application evolves, ensuring that changes don't inadvertently break existing functionality.
+
+## Key Files
+
+1. `base_controller_spec.rb`: Tests the base API controller, focusing on authentication and parameter validation.
+
+2. `v1/` directory: Contains tests for specific v1 API endpoints, including:
+   - `add_ons_controller_spec.rb`: Tests add-on management.
+   - `analytics/` directory: Tests various analytics endpoints.
+   - `billable_metrics_controller_spec.rb`: Tests billable metric operations.
+   - `customers/` directory: Tests customer-related operations.
+   - `invoices_controller_spec.rb`: Tests invoice management.
+   - `plans_controller_spec.rb`: Tests plan management.
+   - `subscriptions_controller_spec.rb`: Tests subscription operations.
+   - `wallets_controller_spec.rb` and `wallet_transactions_controller_spec.rb`: Test wallet-related operations.
+   - `webhook_endpoints_controller_spec.rb` and `webhooks_controller_spec.rb`: Test webhook-related functionality.
+
+## Dependencies
+
+The test suites rely on several key dependencies:
+
+1. RSpec: The primary testing framework used.
+2. FactoryBot: Used for creating test data.
+3. Rails: The web application framework that the API is built on.
+4. SimpleCov: Used for code coverage analysis.
+5. DatabaseCleaner: Used for managing test database state.
+
+## Configuration
+
+The tests are configured as request specs (`type: :request`), simulating HTTP requests to the application. They use the `rails_helper` to load the Rails testing environment and configuration. Some tests use time manipulation with the `travel_to` method for testing time-sensitive functionality.
+
+Many tests use `aggregate_failures` to group multiple expectations together, allowing all expectations to be evaluated even if one fails. The tests also make extensive use of factories to create test data, which helps in maintaining consistent and easily modifiable test scenarios.
+
+Error handling is thoroughly tested, including cases like non-existent resources, invalid parameters, and unauthorized access. Pagination is tested for endpoints that support it, ensuring proper behavior with different page sizes and page numbers.
+
+Some tests mock external services or API calls (e.g., Stripe API) to isolate the behavior of the application's API endpoints. The tests also cover both standard and premium features, often using a `lago_premium!` method to enable premium functionality for specific tests.
+
+This comprehensive test suite ensures that the API endpoints function correctly, handle various scenarios appropriately, and maintain the expected behavior as the application evolves.

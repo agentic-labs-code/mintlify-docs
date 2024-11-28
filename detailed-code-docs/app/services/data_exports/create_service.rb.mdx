@@ -1,0 +1,76 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines a `CreateService` class within the `DataExports` module, responsible for creating a new data export record and initiating an asynchronous job to perform the actual export. It encapsulates the logic for initializing a data export with the provided parameters and queuing the export process.
+
+## Code Structure
+The `CreateService` class inherits from `BaseService` and contains two main methods: `initialize` and `call`. The `initialize` method sets up the necessary attributes, while the `call` method creates the `DataExport` record and enqueues the export job.
+
+## References
+- `DataExport` model
+- `ExportResourcesJob` job
+
+## Symbols
+
+### `DataExports::CreateService`
+#### Description
+This service class is responsible for creating a new data export and initiating the export process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization associated with the data export |
+| user | User | The user initiating the data export |
+| format | String | The format of the export (e.g., 'csv') |
+| resource_type | String | The type of resource being exported |
+| resource_query | Hash | Query parameters for filtering the exported data |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the created DataExport and success status |
+
+#### Internal Logic
+1. Initialize the service with the provided parameters
+2. Create a new `DataExport` record with the given attributes
+3. Enqueue an `ExportResourcesJob` to process the export asynchronously
+4. Set the created `DataExport` in the result object and return it
+
+### `initialize`
+#### Description
+Initializes the service with the provided parameters and calls the superclass initializer.
+
+#### Inputs
+(Same as the class-level inputs)
+
+### `call`
+#### Description
+Creates the `DataExport` record, enqueues the export job, and returns the result.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the created DataExport and success status |
+
+### `membership`
+#### Description
+A private method that finds the user's membership in the given organization.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| membership | Membership | The user's membership in the organization |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| DataExport | Model for storing data export information |
+| ExportResourcesJob | Job for processing the data export asynchronously |
+
+## Error Handling
+The code doesn't implement explicit error handling. It relies on the `create!` method to raise an exception if the `DataExport` creation fails.
+
+## Performance Considerations
+The actual export process is offloaded to a background job (`ExportResourcesJob`) to prevent blocking the main thread and improve responsiveness.

@@ -1,0 +1,59 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains service classes responsible for handling webhook notifications related to tax provider errors in the context of customer and fee operations. The services are part of a larger webhook integration system for tax-related functionalities.
+
+## What does it do?
+The services in this directory prepare and send webhook notifications when errors occur during tax-related operations. Specifically:
+
+1. It handles errors related to customer tax operations, such as when a tax provider encounters issues processing customer data.
+2. It manages errors that occur during fee calculations, particularly when a tax provider fails to compute taxes for a specific fee.
+
+These services ensure that the system can communicate tax-related errors to external systems or listeners, allowing for proper error handling and logging in integrated applications.
+
+## Key Files
+
+1. `error_service.rb`:
+   - Handles webhooks for customer-related tax provider errors.
+   - Customizes the webhook payload to include specific customer error information.
+   - Uses a custom serializer to format the error data.
+
+2. `fee_error_service.rb`:
+   - Manages webhooks for fee-related tax provider errors.
+   - Prepares webhook payloads with detailed information about fee calculation errors.
+   - Utilizes a specialized serializer for formatting fee error data.
+
+Both services inherit from a base webhook service and override specific methods to tailor the webhook behavior for their respective error types.
+
+## Dependencies
+The services in this directory rely on the following internal dependencies:
+
+1. `Webhooks::BaseService`: A parent class that provides the core functionality for webhook handling.
+2. `::V1::Integrations::CustomerErrorSerializer`: Used by `ErrorService` to serialize customer error data.
+3. `::V1::Integrations::Taxes::FeeErrorSerializer`: Used by `FeeErrorService` to serialize fee error data.
+
+These dependencies suggest that the project uses a structured approach to handling webhooks and serializing data, with specific implementations for different types of errors.
+
+## Configuration
+While there are no explicit configuration files mentioned, the services use several key configurations:
+
+1. Webhook Types:
+   - `customer.tax_provider_error` for customer-related errors
+   - `fee.tax_provider_error` for fee-related errors
+
+2. Object Types:
+   - `tax_provider_customer_error` for customer errors
+   - `tax_provider_fee_error` for fee errors
+
+These configurations are hardcoded in the respective service classes and are used to identify the type of webhook and the nature of the error being reported.
+
+The services also expect certain options to be passed when instantiated, such as:
+- `event_transaction_id`
+- `lago_charge_id`
+- `provider_error`
+
+These options are used to provide additional context in the serialized error data.
+
+In summary, this directory contains specialized services for handling tax-related error webhooks, providing a structured way to communicate issues encountered during tax calculations for customers and fees. The services are designed to integrate with a larger webhook system and use custom serializers to format the error data appropriately for external consumption.

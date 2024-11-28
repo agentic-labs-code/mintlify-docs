@@ -1,0 +1,71 @@
+---
+title: "create_service.rb"
+---
+
+## High-level description
+This code defines the `Events::CreateService` class, which is responsible for creating and processing events in the application. It handles event creation, validation, persistence, and optional Kafka message production.
+
+## Code Structure
+The `Events::CreateService` class inherits from `BaseService` and contains a single public method `call` that orchestrates the event creation process. It also includes a private method `produce_kafka_event` for handling Kafka message production.
+
+## Symbols
+
+### `Events::CreateService`
+#### Description
+This service class is responsible for creating and processing events in the application.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | The organization associated with the event |
+| params | Hash | Parameters for creating the event |
+| timestamp | Float | Timestamp for the event |
+| metadata | Hash | Additional metadata for the event |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | ServiceResult | Result object containing the created event and any errors |
+
+#### Internal Logic
+1. Initializes a new `Event` object and sets its attributes based on the input parameters.
+2. Saves the event to the database unless the organization uses ClickHouse aggregation.
+3. Produces a Kafka event if Kafka is configured.
+4. Enqueues a post-processing job unless the organization uses ClickHouse aggregation.
+5. Handles validation errors and uniqueness constraints.
+
+### `produce_kafka_event`
+#### Description
+A private method that produces a Kafka event if Kafka is configured.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| event | Event | The event to be produced to Kafka |
+
+#### Internal Logic
+1. Checks if Kafka is configured by verifying the presence of required environment variables.
+2. If configured, produces an asynchronous Kafka message with event details.
+
+## Side Effects
+- Creates and saves an `Event` record in the database.
+- Enqueues an `Events::PostProcessJob` for the created event.
+- Produces a Kafka message if Kafka is configured.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Karafka | Used for producing Kafka messages |
+
+## Error Handling
+- Handles `ActiveRecord::RecordInvalid` errors by recording validation failures.
+- Handles `ActiveRecord::RecordNotUnique` errors by recording a single validation failure for the `transaction_id` field.
+
+## Configuration
+The service relies on the following environment variables for Kafka configuration:
+| Option | Type | Description |
+|:-------|:-----|:------------|
+| LAGO_KAFKA_BOOTSTRAP_SERVERS | String | Kafka bootstrap servers |
+| LAGO_KAFKA_RAW_EVENTS_TOPIC | String | Kafka topic for raw events |
+
+Note: This service is designed to work with or without Kafka, adapting its behavior based on the presence of these environment variables.

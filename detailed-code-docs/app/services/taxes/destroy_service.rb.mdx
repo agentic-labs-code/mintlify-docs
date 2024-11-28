@@ -1,0 +1,75 @@
+---
+title: "destroy_service.rb"
+---
+
+## High-level description
+This code defines a `DestroyService` class within the `Taxes` module, responsible for deleting a tax and updating related draft invoices. It handles the deletion process, ensuring that affected draft invoices are marked for refresh.
+
+## Code Structure
+The `DestroyService` class inherits from `BaseService` and contains a single public method `call` that orchestrates the tax deletion process. It also includes a private method `draft_invoice_ids` to retrieve relevant invoice IDs.
+
+## References
+- `BaseService`: The parent class that provides common functionality for service objects.
+- `Invoice`: Referenced to update draft invoices affected by the tax deletion.
+
+## Symbols
+
+### `Taxes::DestroyService`
+#### Description
+This service class handles the deletion of a tax and updates related draft invoices.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tax | Tax | The tax object to be deleted |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result object containing the operation outcome and deleted tax |
+
+#### Internal Logic
+1. Check if the tax exists, return a not found failure if it doesn't.
+2. Retrieve draft invoice IDs affected by the tax.
+3. Delete the tax.
+4. Update affected draft invoices to mark them for refresh.
+5. Set the deleted tax in the result object.
+
+### `call`
+#### Description
+The main method that executes the tax deletion process.
+
+#### Internal Logic
+1. Validates the existence of the tax.
+2. Retrieves draft invoice IDs (calls `draft_invoice_ids` method).
+3. Destroys the tax.
+4. Updates affected draft invoices to be refreshed.
+5. Sets the result with the deleted tax.
+
+### `draft_invoice_ids`
+#### Description
+A private method that retrieves the IDs of draft invoices affected by the tax deletion.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @draft_invoice_ids | Array | IDs of affected draft invoices |
+
+#### Internal Logic
+1. Queries the organization's invoices.
+2. Filters invoices by applicable customers of the tax.
+3. Selects only draft invoices.
+4. Plucks the IDs of these invoices.
+
+## Side Effects
+- Deletes the specified tax from the database.
+- Updates the `ready_to_be_refreshed` flag for affected draft invoices.
+
+## Performance Considerations
+The service uses `pluck(:id)` to efficiently retrieve only the IDs of affected invoices, which is more performant than loading full invoice objects.
+
+## Error Handling
+The service returns a not found failure if the specified tax doesn't exist. Other potential errors (e.g., database errors) are not explicitly handled in this service and would likely be managed by the calling code or global error handlers.
+
+## TODOs
+- The code includes a Rubocop disable comment for `Rails/SkipsModelValidations`. This suggests that the bulk update of invoices bypasses model validations, which might need to be addressed in the future for data integrity.

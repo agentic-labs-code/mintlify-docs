@@ -1,0 +1,52 @@
+---
+title: "invoice_collection_spec.rb"
+---
+
+## High-level description
+This code defines RSpec tests for the `Analytics::InvoiceCollection` model, specifically focusing on its `cache_key` class method. The tests verify that the method generates the correct cache key string based on various input parameters.
+
+## Symbols
+
+### `RSpec.describe Analytics::InvoiceCollection, type: :model`
+#### Description
+This is the main RSpec describe block for testing the `Analytics::InvoiceCollection` model.
+
+### `.cache_key`
+#### Description
+This describe block focuses on testing the `cache_key` class method of the `Analytics::InvoiceCollection` model.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization_id | String (UUID) | The ID of the organization |
+| args | Hash | Optional arguments including external_customer_id, currency, and months |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cache_key | String | The generated cache key |
+
+#### Internal Logic
+The test cases cover different scenarios for generating the cache key:
+1. With no arguments
+2. With customer external ID, currency, and months
+3. With only months
+4. With only currency
+
+Each test case sets up the necessary input parameters and expects the `cache_key` method to return a specific string format.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| SecureRandom | Used to generate a random UUID for the organization_id |
+
+## Error Handling
+This test file does not implement specific error handling mechanisms. It relies on RSpec's built-in assertion methods to verify the correctness of the `cache_key` method's output.
+
+## Notes
+1. The tests use `let` statements to define variables used across multiple test cases, promoting DRY (Don't Repeat Yourself) principles.
+2. The `subject` is defined as `invoice_collection_cache_key`, which calls the `cache_key` method with the specified parameters.
+3. The tests use the `described_class` method to refer to the `Analytics::InvoiceCollection` class, making the tests more maintainable if the class name changes.
+4. The cache key format includes the current date, which is obtained using `Date.current.strftime("%Y-%m-%d")`. This ensures that the cache key changes daily, potentially affecting cache invalidation strategies.
+5. The tests cover various combinations of input parameters to ensure the `cache_key` method handles different scenarios correctly.

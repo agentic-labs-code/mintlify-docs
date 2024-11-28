@@ -1,0 +1,82 @@
+---
+title: "create_service_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Invites::CreateService` class. It tests the functionality of creating invites within an organization, including various scenarios such as successful creation, validation errors, and handling of existing invites or members.
+
+## Code Structure
+The test suite is organized around the `#call` method of the `Invites::CreateService` class. It uses RSpec's `describe` and `context` blocks to group related tests and set up different scenarios.
+
+## Symbols
+
+### `RSpec.describe Invites::CreateService`
+#### Description
+This is the main describe block for the `Invites::CreateService` test suite. It sets up the subject of the tests and defines common let variables used across multiple tests.
+
+#### Internal Logic
+- Sets up `create_service` as the subject of the tests
+- Defines `membership` and `organization` variables used in the tests
+
+### `describe '#call'`
+#### Description
+This describe block focuses on testing the `#call` method of the `Invites::CreateService`.
+
+#### Internal Logic
+- Defines `create_args` with sample data for creating an invite
+- Contains multiple test cases for different scenarios
+
+### `it 'creates an invite'`
+#### Description
+Tests the successful creation of an invite.
+
+#### Internal Logic
+- Expects the count of `Invite` records to increase by 1 when calling the service
+
+### `context 'with validation error'`
+#### Description
+Tests the behavior when there's a validation error due to missing email.
+
+#### Internal Logic
+- Calls the service without providing an email
+- Expects the result to be unsuccessful and contain specific error messages
+
+### `context 'with missing role'`
+#### Description
+Tests the behavior when the role is not provided.
+
+#### Internal Logic
+- Calls the service without providing a role
+- Expects the result to be unsuccessful and contain specific error messages
+
+### `context 'with already existing invite'`
+#### Description
+Tests the behavior when trying to create an invite that already exists.
+
+#### Internal Logic
+- Creates an invite before calling the service
+- Expects the result to be unsuccessful and contain specific error messages
+
+### `context 'with already existing member'`
+#### Description
+Tests the behavior when trying to invite a user who is already a member of the organization.
+
+#### Internal Logic
+- Creates a user and membership before calling the service
+- Expects the result to be unsuccessful and contain specific error messages
+
+## Dependencies
+The test suite depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails and RSpec configuration |
+| FactoryBot | Used for creating test data |
+| Faker | Used for generating fake data |
+
+## Error Handling
+The test suite checks for various error scenarios, including:
+- Validation errors (missing email, invalid role)
+- Duplicate invite attempts
+- Inviting existing members
+
+These are handled by checking the success status of the service call and examining the error messages.

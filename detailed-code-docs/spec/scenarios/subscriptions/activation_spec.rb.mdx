@@ -1,0 +1,102 @@
+---
+title: "activation_spec.rb"
+---
+
+## High-level description
+This code defines a RSpec test scenario for the activation of subscriptions in a Rails application. It verifies that a subscription created with a future activation date transitions from a pending state to an active state when the activation service is run at the specified time.
+
+## Code Structure
+The test is structured as a single example within a describe block, using RSpec's `let` statements to set up the necessary objects and time-related variables. The test uses time travel to simulate the creation and activation of a subscription at specific points in time.
+
+## Symbols
+
+### `describe 'Subscriptions Activation Scenario'`
+#### Description
+This is the main describe block that groups the subscription activation test scenario.
+
+#### Internal Logic
+1. Sets up the test environment with necessary objects (organization, customer, plan).
+2. Creates a subscription with a future activation date.
+3. Verifies the subscription is initially in a pending state.
+4. Advances time to the activation date.
+5. Runs the activation service.
+6. Verifies the subscription has transitioned to an active state.
+
+### `let(:organization)`
+#### Description
+Creates an organization without a webhook URL.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | An organization instance without a webhook URL |
+
+### `let(:timezone)`
+#### Description
+Defines a timezone string.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| timezone | String | A string representing the 'America/Bogota' timezone |
+
+### `let(:customer)`
+#### Description
+Creates a customer associated with the organization and timezone.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| customer | Customer | A customer instance associated with the organization and timezone |
+
+### `let(:plan)`
+#### Description
+Creates a monthly plan associated with the organization, set to not pay in advance.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| plan | Plan | A plan instance with monthly interval and pay_in_advance set to false |
+
+### `let(:subscription_at)`
+#### Description
+Defines the future date and time for subscription activation.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription_at | DateTime | A DateTime object representing the future activation time |
+
+### `let(:creation_time)`
+#### Description
+Defines the date and time for subscription creation.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| creation_time | DateTime | A DateTime object representing the creation time |
+
+### `it 'activates the subscription when it reaches its subscription date'`
+#### Description
+The main test example that verifies the subscription activation process.
+
+#### Internal Logic
+1. Uses `travel_to` to set the current time to the creation time.
+2. Creates a subscription using the `create_subscription` method (not defined in this file).
+3. Verifies that the created subscription is in a pending state.
+4. Uses `travel_to` to advance time to the subscription activation date.
+5. Runs the `Subscriptions::ActivateService` to activate pending subscriptions.
+6. Verifies that the subscription has transitioned to an active state.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and RSpec configuration |
+
+## Error Handling
+This test does not implement specific error handling beyond the standard RSpec expectations.
+
+## Notes
+- The test relies on factory methods (e.g., `create(:organization)`) which are not defined in this file.
+- The `create_subscription` method used in the test is not defined in this file and is likely a helper method defined elsewhere in the test suite.
+- The test uses RSpec's `travel_to` method to manipulate time, which is crucial for testing time-dependent behavior.

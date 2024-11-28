@@ -1,0 +1,107 @@
+---
+title: "generate_pdf_service.rb"
+---
+
+## High-level description
+The `Invoices::GeneratePdfService` is responsible for generating PDF files for invoices. It handles the process of creating, attaching, and saving the PDF file for a given invoice, as well as sending a webhook notification upon completion.
+
+## Code Structure
+The main class `GeneratePdfService` inherits from `BaseService` and contains methods for initializing the service, calling the main functionality, rendering HTML, and generating the PDF. It also includes private helper methods for determining the template and checking if the PDF should be generated.
+
+## References
+- `Utils::PdfGenerator`: Used for rendering HTML and generating the PDF file.
+- `SendWebhookJob`: Used to send a webhook notification after PDF generation.
+- `I18n`: Used for localization during PDF generation.
+
+## Symbols
+
+### `Invoices::GeneratePdfService`
+#### Description
+This service class handles the generation of PDF files for invoices.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice object for which the PDF will be generated |
+| context | String | Optional context for the PDF generation (default: nil) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | The result object containing the invoice and any error information |
+
+#### Internal Logic
+1. Check if the invoice exists and is not a draft.
+2. Generate the PDF if necessary (based on context or if the file is not already attached).
+3. Send a webhook notification.
+4. Return the result with the updated invoice.
+
+### `call`
+#### Description
+The main method that orchestrates the PDF generation process.
+
+#### Internal Logic
+1. Validate the invoice existence and status.
+2. Generate the PDF if needed.
+3. Send a webhook notification.
+4. Return the result.
+
+### `render_html`
+#### Description
+Renders the HTML content for the invoice using the appropriate template.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| html | String | The rendered HTML content for the invoice |
+
+### `generate_pdf` (private)
+#### Description
+Generates the PDF file for the invoice and attaches it to the invoice record.
+
+#### Internal Logic
+1. Set the locale based on the customer's preferred document locale.
+2. Use `Utils::PdfGenerator` to generate the PDF content.
+3. Attach the generated PDF to the invoice.
+4. Save the invoice.
+
+### `template` (private)
+#### Description
+Determines the appropriate template to use for the invoice based on its type and version.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| template_path | String | The path to the template file |
+
+### `should_generate_pdf?` (private)
+#### Description
+Determines whether the PDF should be generated based on the context and the existence of an attached file.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| should_generate | Boolean | Whether the PDF should be generated |
+
+### `charge?` (private)
+#### Description
+Checks if the invoice is for a charge (all fees are pay-in-advance).
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| is_charge | Boolean | Whether the invoice is for a charge |
+
+## Side Effects
+- Generates and attaches a PDF file to the invoice record.
+- Sends a webhook notification.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Utils::PdfGenerator | Used for rendering HTML and generating PDF files |
+| SendWebhookJob | Used to send webhook notifications |
+| I18n | Used for localization during PDF generation |
+
+## Error Handling
+The service uses the `result` object to handle and return errors, such as when the invoice is not found or is in draft status.

@@ -1,0 +1,77 @@
+---
+title: "customers_query.rb"
+---
+
+## High-level description
+The `CustomersQuery` class is responsible for querying and filtering customer records. It extends the `BaseQuery` class and provides functionality to search, order, and paginate customer data based on specified criteria.
+
+## Code Structure
+The `CustomersQuery` class contains a main `call` method and two private helper methods: `base_scope` and `search_params`. These methods work together to build and execute the query for retrieving customer data.
+
+## Symbols
+
+### `CustomersQuery`
+#### Description
+This class encapsulates the logic for querying customer records. It inherits from `BaseQuery` and implements a custom query process.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| organization | Organization | Implicitly used to scope the query to a specific organization |
+| search_term | String | Used to filter customers based on name, external ID, or email |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Object | An object containing the queried and paginated customer records |
+
+#### Internal Logic
+1. Builds the base scope using `base_scope` method
+2. Applies the search filter using Ransack
+3. Paginates the results
+4. Orders the results by creation date (descending)
+5. Assigns the final customer list to `result.customers`
+
+### `call`
+#### Description
+The main method that orchestrates the customer querying process.
+
+#### Internal Logic
+1. Calls `base_scope.result` to get the initial set of customers
+2. Applies pagination using the `paginate` method (likely defined in `BaseQuery`)
+3. Orders the results by `created_at` in descending order
+4. Assigns the final customer list to `result.customers`
+5. Returns the `result` object
+
+### `base_scope` (private)
+#### Description
+Builds the initial scope for the customer query, applying organization filter and search parameters.
+
+#### Internal Logic
+1. Starts with `Customer.where(organization:)` to scope customers to the current organization
+2. Applies search parameters using Ransack's `ransack` method
+
+### `search_params` (private)
+#### Description
+Generates the search parameters for Ransack based on the `search_term`.
+
+#### Internal Logic
+1. Returns `nil` if `search_term` is blank
+2. Otherwise, returns a hash with search conditions:
+   - Matches `search_term` against `name`, `external_id`, and `email` fields
+   - Uses the `cont` (contains) matcher
+   - Combines conditions with `OR` logic
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| Ransack | Used for building complex search queries |
+
+## Performance Considerations
+- The query uses pagination, which helps with performance when dealing with large datasets
+- The search is performed using Ransack, which generally provides efficient querying, but may impact performance for very large datasets or complex searches
+
+## Notes
+- The class assumes the existence of a `BaseQuery` class, which likely provides common querying functionality
+- The `organization` and `search_term` attributes are not explicitly defined in this file, suggesting they might be inherited from `BaseQuery` or mixed in from another module
+- The `paginate` method is not defined in this file, indicating it's likely provided by `BaseQuery` or a pagination library

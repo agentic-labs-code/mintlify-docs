@@ -1,0 +1,50 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions for webhooks in a Ruby on Rails application. It includes two main components: an object type representing a webhook and an enum type for webhook statuses. These types are crucial for defining the structure and possible values of webhook-related data in the GraphQL schema.
+
+## What does it do?
+The code in this directory defines how webhook data is represented and queried through the GraphQL API. It allows clients to request specific information about webhooks, such as their ID, endpoint, status, payload, and associated webhook endpoint. The status enum ensures that only valid status values can be used when querying or mutating webhook data.
+
+The webhook object type provides a structured way to access various properties of a webhook, including its creation and update timestamps, retry information, and response data. This allows API consumers to retrieve detailed information about webhooks in a flexible and efficient manner.
+
+The status enum dynamically generates valid status values based on the application's webhook model, ensuring consistency between the database and the API layer.
+
+## Key Files
+
+1. `object.rb`:
+   This file defines the `Types::Webhooks::Object` class, which represents the structure of a webhook in the GraphQL schema. It specifies all the queryable fields of a webhook, including its properties and associations. Notable features include:
+   - A custom resolver for the `payload` field, which converts the payload to JSON format.
+   - Use of various GraphQL types, including custom types like `Types::WebhookEndpoints::Object` and `Types::Webhooks::StatusEnum`.
+   - Fields for tracking webhook execution, such as `retries`, `status`, and `http_status`.
+
+2. `status_enum.rb`:
+   This file defines the `Types::Webhooks::StatusEnum` class, which represents the possible status values for a webhook. Key aspects include:
+   - Dynamic generation of enum values based on the `Webhook::STATUS` constant.
+   - Ensures that the GraphQL schema always reflects the current set of valid webhook statuses defined in the application.
+
+## Dependencies
+The code in this directory relies on the following dependencies:
+
+1. GraphQL (version not specified): Used for defining GraphQL types and fields. This library is fundamental to the entire GraphQL implementation in the application.
+
+2. Ruby on Rails (version not specified): While not directly visible in the provided code, the structure and naming conventions suggest that this is part of a Rails application.
+
+These dependencies were likely chosen to provide a robust and flexible API layer using GraphQL within a Ruby on Rails application.
+
+## Configuration
+While there are no explicit configuration files in this directory, the code does rely on configuration defined elsewhere in the application:
+
+1. The `Webhook::STATUS` constant, defined in the `Webhook` model, is used to generate the values for the `StatusEnum`. This constant is defined as:
+
+   ```ruby
+   STATUS = %i[pending succeeded failed].freeze
+   ```
+
+   Any changes to this constant will automatically be reflected in the GraphQL schema.
+
+2. The `Types::BaseObject` and `Types::BaseEnum` classes, which are likely defined in a parent directory, serve as base classes for the types defined here. These base classes may include shared configuration or behavior for all GraphQL types in the application.
+
+In summary, this directory plays a crucial role in defining the structure and behavior of webhook-related data in the application's GraphQL API. It ensures type safety, provides clear documentation of available fields, and maintains consistency between the database model and the API layer.

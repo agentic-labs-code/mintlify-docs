@@ -1,0 +1,252 @@
+---
+title: "yearly_service.rb"
+---
+
+## High-level description
+This code defines the `YearlyService` class within the `Subscriptions::Dates` module, which handles date calculations for yearly subscription billing periods. It extends the `Subscriptions::DatesService` class and provides specific implementations for yearly subscription scenarios, including handling calendar-based and anniversary-based subscriptions.
+
+## Code Structure
+The `YearlyService` class inherits from `Subscriptions::DatesService` and implements various methods to calculate billing dates, charge periods, and other time-related operations for yearly subscriptions. It also utilizes a `MonthlyService` instance for some calculations.
+
+## References
+- `Subscriptions::DatesService`: The parent class that `YearlyService` extends.
+- `Subscriptions::Dates::MonthlyService`: Used for some monthly-based calculations within the yearly service.
+
+## Symbols
+
+### `YearlyService`
+#### Description
+This class handles date calculations for yearly subscription billing periods, supporting both calendar-based and anniversary-based subscriptions.
+
+#### Internal Logic
+The class implements various methods to calculate billing dates, charge periods, and other time-related operations specific to yearly subscriptions. It uses a combination of date arithmetic and conditional logic to handle different subscription scenarios.
+
+### `first_month_in_yearly_period?`
+#### Description
+Determines if the current billing date is in the first month of the yearly billing period.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| billing_date | Date | The current billing date |
+| subscription_at | Date | The subscription start date |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Boolean | True if it's the first month in the yearly period, false otherwise |
+
+#### Internal Logic
+- For calendar-based subscriptions, checks if the billing month is January.
+- For anniversary-based subscriptions, compares the billing month with the subscription start month.
+
+### `first_month_in_first_yearly_period?`
+#### Description
+Determines if the current billing date is in the first month of the first yearly billing period.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| billing_date | Date | The current billing date |
+| subscription_at | Date | The subscription start date |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Boolean | True if it's the first month in the first yearly period, false otherwise |
+
+#### Internal Logic
+- For calendar-based subscriptions, checks if the billing month is January and the year matches the subscription start year.
+- For anniversary-based subscriptions, compares both month and year of the billing date with the subscription start date.
+
+### `compute_base_date`
+#### Description
+Calculates the base date for billing calculations.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| base_date | Date | The calculated base date |
+
+#### Internal Logic
+Subtracts one year from the billing date.
+
+### `monthly_service`
+#### Description
+Creates or returns a cached instance of `MonthlyService` for the current subscription.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| monthly_service | MonthlyService | An instance of MonthlyService |
+
+### `compute_from_date`
+#### Description
+Calculates the start date of the billing period.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| from_date | Date | The calculated start date of the billing period |
+
+#### Internal Logic
+- Handles different scenarios based on payment terms (advance/arrear) and subscription type (anniversary/calendar).
+- Uses `previous_anniversary_day` or `beginning_of_year` depending on the subscription type.
+
+### `compute_to_date`
+#### Description
+Calculates the end date of the billing period.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| from_date | Date | The start date of the billing period (optional) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| to_date | Date | The calculated end date of the billing period |
+
+#### Internal Logic
+- For calendar-based or January 1st anniversary subscriptions, returns the end of the year.
+- For other cases, calculates the date based on the subscription anniversary, adjusting for leap years.
+
+### `compute_charges_from_date`
+#### Description
+Calculates the start date for charging in the billing period.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charges_from_date | Date | The calculated start date for charges |
+
+#### Internal Logic
+- Handles different scenarios based on billing frequency, termination status, and subscription type.
+- Uses `monthly_service` for monthly billed charges.
+
+### `compute_charges_to_date`
+#### Description
+Calculates the end date for charging in the billing period.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| charges_to_date | Date | The calculated end date for charges |
+
+#### Internal Logic
+- Uses `monthly_service` for monthly billed charges.
+- For calendar-based subscriptions, returns the end of the year.
+- Otherwise, calls `compute_to_date` with the charges from date.
+
+### `compute_next_end_of_period`
+#### Description
+Calculates the end date of the next billing period.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| next_end_of_period | Date | The calculated end date of the next billing period |
+
+#### Internal Logic
+- For calendar-based subscriptions, returns the end of the current year.
+- For anniversary-based subscriptions, calculates based on the subscription anniversary date, adjusting the year if necessary.
+
+### `compute_previous_beginning_of_period`
+#### Description
+Calculates the start date of the previous billing period.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| date | Date | The reference date |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| previous_beginning | Date | The calculated start date of the previous period |
+
+#### Internal Logic
+- For calendar-based subscriptions, returns the beginning of the year.
+- For anniversary-based subscriptions, calls `previous_anniversary_day`.
+
+### `previous_anniversary_day`
+#### Description
+Calculates the previous anniversary day based on a given date.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| date | Date | The reference date |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| previous_anniversary | Date | The calculated previous anniversary date |
+
+#### Internal Logic
+Determines the correct year and builds the date using the subscription's anniversary month and day.
+
+### `compute_duration`
+#### Description
+Calculates the duration of the billing period in days.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| from_date | Date | The start date of the period |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| duration | Integer | The number of days in the billing period |
+
+#### Internal Logic
+- For calendar-based subscriptions, returns the number of days in the year.
+- For anniversary-based subscriptions, determines the correct year to use based on the start date.
+
+### `compute_charges_duration`
+#### Description
+Calculates the duration for charges in the billing period.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| from_date | Date | The start date of the charges period |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| duration | Integer | The number of days in the charges period |
+
+#### Internal Logic
+- Uses `monthly_service` for monthly billed charges.
+- Otherwise, calls `compute_duration`.
+
+### `period_started_in_last_year?`
+#### Description
+Determines if the billing period started in the previous year.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| date | Date | The reference date |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Boolean | True if the period started in the last year, false otherwise |
+
+#### Internal Logic
+Compares the given date with the subscription anniversary date to determine if it's in the previous year.
+
+## Dependencies
+This code relies on the Ruby standard library for date and time operations.
+
+## Configuration
+The code doesn't define specific configuration options but relies on the subscription and plan settings.
+
+## Error Handling
+The code doesn't implement explicit error handling beyond what's inherited from the parent class.
+
+## Performance Considerations
+The code uses memoization (@monthly_service ||=) to avoid redundant instantiation of the MonthlyService, which can improve performance when multiple calculations are needed.

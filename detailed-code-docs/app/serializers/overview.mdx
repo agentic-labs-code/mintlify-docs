@@ -1,0 +1,135 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `app/serializers` directory contains classes responsible for serializing various data models into JSON format for API responses. It includes a base `ModelSerializer` class, a `CollectionSerializer` for handling collections of models, and a `v1` subdirectory with specific serializers for different entities in the application's V1 API.
+
+## What does it do?
+This directory provides a structured approach to converting complex model objects into simplified JSON structures suitable for API responses. The serializers handle various tasks such as:
+
+1. Transforming model attributes into a consistent JSON format
+2. Including or excluding associated data based on specified options
+3. Formatting dates and times into ISO8601 strings
+4. Calculating and including derived attributes or counts
+5. Handling nested or associated data serialization
+6. Providing a uniform interface for serializing different types of objects across the API
+
+These serializers ensure that the API responses are consistent, well-structured, and easily consumable by API clients, regardless of the underlying complexity of the data models.
+
+## Key Files
+1. `model_serializer.rb`: Defines the base `ModelSerializer` class, which provides common serialization logic and is intended to be subclassed for specific model serializers.
+
+2. `collection_serializer.rb`: Implements the `CollectionSerializer` class, responsible for serializing collections of models into a JSON structure suitable for API responses.
+
+3. `v1/` directory: Contains specific serializer classes for various entities in the V1 API, including:
+   - `add_on_serializer.rb`
+   - `applied_coupon_serializer.rb`
+   - `billable_metric_serializer.rb`
+   - `charge_serializer.rb`
+   - `customer_serializer.rb`
+   - `invoice_serializer.rb`
+   - `plan_serializer.rb`
+   - `subscription_serializer.rb`
+   - `tax_serializer.rb`
+   - `wallet_serializer.rb`
+
+Each of these serializers in the `v1/` directory is responsible for converting its respective model into a JSON-compatible hash structure, handling associated data, and applying any necessary transformations or calculations.
+
+## Dependencies
+The serializers in this directory rely on:
+
+1. Ruby's built-in `JSON` module for JSON parsing and generation
+2. The base `ModelSerializer` class, which provides fundamental serialization functionality
+3. The `CollectionSerializer` class for handling collections of associated objects
+
+## Configuration
+While there are no explicit configuration files, the serializers follow consistent patterns and conventions:
+
+1. Use of `lago_` prefixes for IDs to maintain consistency across the API
+2. Consistent date formatting using ISO8601
+3. Handling of monetary values in cents with separate currency fields
+4. Use of the `include?` method to conditionally include associated data based on serialization options
+
+Here's an example of how the `ModelSerializer` base class is structured:
+
+```ruby
+class ModelSerializer
+  def initialize(model, options = {})
+    @model = model
+    @options = options
+  end
+
+  def serialize
+    { id: @model.id }
+  end
+
+  def to_json(options = {})
+    { root_name =&gt; serialize }.to_json(options)
+  end
+
+  def root_name
+    @options[:root_name] || :data
+  end
+
+  def include?(value)
+    @options[:includes]&.any? && @options[:includes].include?(value)
+  end
+end
+```
+
+This base class provides a foundation for all other serializers, defining common methods like `serialize`, `to_json`, and `include?`. Specific serializers in the `v1/` directory would then subclass `ModelSerializer` and override the `serialize` method to provide custom serialization logic for each model type.
+
+For example, a simplified version of the `CustomerSerializer` might look like this:
+
+```ruby
+module V1
+  class CustomerSerializer &lt; ModelSerializer
+    def serialize
+      {
+        lago_id: @model.lago_id,
+        external_id: @model.external_id,
+        name: @model.name,
+        created_at: @model.created_at.iso8601,
+        metadata: serialize_metadata,
+        billing_configuration: serialize_billing_configuration
+      }.merge(serialize_taxes)
+    end
+
+    private
+
+    def serialize_metadata
+      @model.metadata.map do |metadata|
+        {
+          key: metadata.key,
+          value: metadata.value
+        }
+      end
+    end
+
+    def serialize_billing_configuration
+      {
+        invoice_grace_period: @model.invoice_grace_period,
+        payment_provider: @model.payment_provider,
+        provider_customer_id: @model.provider_customer_id,
+        sync_with_provider: @model.sync_with_provider,
+        document_locale: @model.document_locale
+      }
+    end
+
+    def serialize_taxes
+      return {} unless include?(:taxes)
+
+      {
+        taxes: CollectionSerializer.new(
+          @model.taxes,
+          V1::TaxSerializer,
+          @options
+        ).serialize
+      }
+    end
+  end
+end
+```
+
+This structure allows for a clean separation between the internal data models and their external API representations, providing flexibility in evolving the API without necessarily changing the underlying data structures.

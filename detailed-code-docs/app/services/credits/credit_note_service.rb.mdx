@@ -1,0 +1,78 @@
+---
+title: "credit_note_service.rb"
+---
+
+## High-level description
+The `CreditNoteService` is responsible for applying credit notes to an invoice. It calculates and applies credits from available credit notes to reduce the invoice amount, updating both the invoice and the credit notes accordingly.
+
+## Code Structure
+The main class `CreditNoteService` inherits from `BaseService`. It contains a single public method `call` which orchestrates the credit note application process. Private methods are used to handle specific tasks such as fetching credit notes, computing credit amounts, and updating records.
+
+## Symbols
+
+### `CreditNoteService`
+#### Description
+This service applies credit notes to an invoice, reducing the invoice amount and updating the credit notes' balances.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice to which credit notes will be applied |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | Result | An object containing the operation result and applied credits |
+
+#### Internal Logic
+1. Check if credit notes have already been applied to the invoice.
+2. Fetch available credit notes for the customer.
+3. Iterate through credit notes, applying them to the invoice until the invoice amount is covered or all credit notes are used.
+4. Create new credit entries for each applied credit note.
+5. Update the remaining balance of used credit notes.
+6. Handle any record validation errors.
+
+### `credit_notes`
+#### Description
+Fetches available credit notes for the customer, ordered by creation date.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_notes | ActiveRecord::Relation | A collection of available credit notes |
+
+### `compute_credit_amount`
+#### Description
+Calculates the amount of credit to apply from a credit note to the remaining invoice amount.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_note | CreditNote | The credit note to apply |
+| remaining_invoice_amount | Integer | The remaining amount to be covered on the invoice |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_amount | Integer | The amount of credit to apply |
+
+### `update_remaining_credit`
+#### Description
+Updates the balance of a credit note after applying credit to an invoice.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| credit_note | CreditNote | The credit note to update |
+| consumed_credit | Integer | The amount of credit consumed |
+
+## Side Effects
+- Creates new `Credit` records for each applied credit note.
+- Updates the `balance_amount_cents` of credit notes.
+- Updates the `credit_notes_amount_cents` of the invoice.
+
+## Dependencies
+This service relies on the `BaseService` class and interacts with `Invoice`, `CreditNote`, and `Credit` models.
+
+## Error Handling
+The service uses a transaction to ensure data consistency and handles `ActiveRecord::RecordInvalid` errors, adding them to the result object.

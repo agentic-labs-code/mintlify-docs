@@ -1,0 +1,64 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for the `AdjustedFees` services, specifically the `CreateService` and `DestroyService`. These services are responsible for managing adjusted fees for invoices, including creation and deletion operations. The tests ensure that these services function correctly under various scenarios, handle errors appropriately, and integrate properly with other parts of the system, such as the `Invoices::RefreshDraftService`.
+
+## What does it do?
+The code in this directory tests two main functionalities:
+
+1. Creating adjusted fees: It verifies that the `CreateService` can correctly create adjusted fees for invoices, taking into account factors like premium licenses, charge models, and existing adjusted fees. It also checks that the service handles various error conditions properly, such as non-premium licenses or invalid inputs.
+
+2. Destroying adjusted fees: It ensures that the `DestroyService` can successfully remove adjusted fees from invoices, handle cases where the fee or adjusted fee is not found, and properly trigger the invoice refresh process after deletion.
+
+Both services are crucial for managing the financial aspects of invoices, allowing for customization of fees and ensuring that changes are reflected accurately in the system.
+
+## Key Files
+
+1. `create_service_spec.rb`:
+   This file contains tests for the `AdjustedFees::CreateService`. It verifies the service's behavior when creating adjusted fees under different conditions, such as premium and non-premium licenses, various charge models, and existing adjusted fees. It also tests error handling for invalid scenarios.
+
+   Key aspects tested:
+   - Creation of adjusted fees for premium licenses
+   - Handling of non-premium licenses (forbidden access)
+   - Validation of invoice status (draft only)
+   - Integration with `Invoices::RefreshDraftService`
+   - Error handling for invalid inputs or conditions
+
+2. `destroy_service_spec.rb`:
+   This file contains tests for the `AdjustedFees::DestroyService`. It verifies the service's behavior when destroying adjusted fees, including successful deletion, error handling for non-existent fees, and integration with the invoice refresh process.
+
+   Key aspects tested:
+   - Successful destruction of adjusted fees
+   - Handling of cases where the adjusted fee or fee is not found
+   - Integration with `Invoices::RefreshDraftService`
+   - Proper result and error code returns
+
+Both files use RSpec's `describe` and `context` blocks to organize tests, along with `let` statements for setting up test data and dependencies. They also use mocks and stubs to isolate the services' behavior and control external dependencies.
+
+## Dependencies
+The test files depend on the following:
+
+1. Rails testing environment (via `rails_helper`)
+2. RSpec testing framework
+3. Factory methods (likely FactoryBot) for generating test data
+4. `AdjustedFees::CreateService` and `AdjustedFees::DestroyService` (the services being tested)
+5. `Invoices::RefreshDraftService` (mocked in the tests)
+
+## Configuration
+While there are no explicit configuration files in this directory, the tests rely on the broader RSpec and Rails test configuration. This likely includes:
+
+1. RSpec configuration (probably in a `spec_helper.rb` or similar file)
+2. Rails test environment settings
+3. Factory definitions for creating test data (e.g., memberships, organizations, invoices, fees)
+
+The tests use various RSpec features and best practices, including:
+
+- `let` statements for lazy-loaded test data
+- `before` blocks for setting up test environments
+- `expect` syntax for assertions
+- `change` matcher to verify state changes
+- `aggregate_failures` blocks to group related assertions
+
+These configuration choices and testing practices ensure that the tests are efficient, readable, and maintainable.

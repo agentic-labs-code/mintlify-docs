@@ -1,0 +1,63 @@
+---
+title: "finalize_job_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test file for the `Invoices::FinalizeJob` job. It verifies that the job correctly delegates its work to the `Invoices::RefreshDraftAndFinalizeService` service.
+
+## Symbols
+
+### `RSpec.describe Invoices::FinalizeJob, type: :job`
+#### Description
+This is the main RSpec describe block that groups all tests related to the `Invoices::FinalizeJob` job.
+
+### `let(:invoice)`
+#### Description
+Creates a test invoice using FactoryBot.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | A test invoice instance |
+
+### `let(:result)`
+#### Description
+Creates a new instance of `BaseService::Result`.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | BaseService::Result | A new result object |
+
+### `let(:finalize_service)`
+#### Description
+Creates a test double for the `Invoices::RefreshDraftAndFinalizeService`.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| finalize_service | Double | A test double of Invoices::RefreshDraftAndFinalizeService |
+
+### `it 'delegates to the Generate service'`
+#### Description
+This is the main test case that verifies the job's behavior.
+
+#### Internal Logic
+1. Sets up expectations for the `Invoices::RefreshDraftAndFinalizeService`:
+   - Expects the service to be initialized with the test invoice.
+   - Expects the `call` method to be called on the service instance.
+2. Performs the job using `described_class.perform_now(invoice)`.
+3. Verifies that the service was initialized and called as expected.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails and RSpec configuration |
+| FactoryBot | Used for creating test data (invoice) |
+| RSpec | Testing framework |
+
+## References
+- `Invoices::RefreshDraftAndFinalizeService`: The service that the job delegates to.
+- `BaseService::Result`: Used to represent the result of the service call.
+
+This test file ensures that the `Invoices::FinalizeJob` correctly initializes and calls the `Invoices::RefreshDraftAndFinalizeService` with the provided invoice. It uses RSpec's mocking capabilities to isolate the job's behavior and verify its interactions with the service.

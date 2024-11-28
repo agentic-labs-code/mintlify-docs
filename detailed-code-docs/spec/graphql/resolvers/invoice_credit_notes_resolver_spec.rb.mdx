@@ -1,0 +1,91 @@
+---
+title: "invoice_credit_notes_resolver_spec.rb"
+---
+
+## High-level description
+This file contains RSpec tests for the `Resolvers::InvoiceCreditNotesResolver` GraphQL resolver. It verifies the resolver's behavior in retrieving credit notes associated with a specific invoice, including permission checks and error handling.
+
+## Code Structure
+The test suite is organized as an RSpec describe block for the `Resolvers::InvoiceCreditNotesResolver`. It includes several test cases and shared examples to cover different scenarios and requirements.
+
+## Symbols
+
+### RSpec.describe Resolvers::InvoiceCreditNotesResolver
+#### Description
+This is the main describe block for the test suite, focusing on the `InvoiceCreditNotesResolver`.
+
+#### Internal Logic
+1. Sets up necessary test data (membership, organization, customer, invoice, subscription, and credit notes).
+2. Defines a GraphQL query to fetch invoice credit notes.
+3. Includes shared examples for common requirements.
+4. Tests the main functionality of retrieving finalized credit notes for an invoice.
+5. Tests error handling for non-existent invoices.
+
+### let blocks
+#### Description
+These blocks define the test data and query used throughout the test suite.
+
+#### Inputs
+N/A (These are variable definitions)
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| required_permission | String | The permission required to access credit notes |
+| query | String | The GraphQL query used to fetch invoice credit notes |
+| membership | Membership | A test membership object |
+| organization | Organization | The organization associated with the membership |
+| customer | Customer | A test customer object |
+| invoice | Invoice | A test invoice object |
+| subscription | Subscription | A test subscription object |
+| credit_note | CreditNote | A test credit note object |
+
+### before block
+#### Description
+Sets up additional test data before running the tests.
+
+#### Internal Logic
+1. Ensures the subscription object is created.
+2. Creates a finalized credit note.
+3. Creates a draft credit note.
+
+### it_behaves_like shared examples
+#### Description
+These shared examples test common requirements for the resolver.
+
+#### Internal Logic
+- Checks if the resolver requires a current user.
+- Checks if the resolver requires a current organization.
+- Checks if the resolver requires the 'credit_notes:view' permission.
+
+### 'returns a list of finalized credit_notes for an invoice' test
+#### Description
+Tests the main functionality of the resolver in retrieving finalized credit notes for a given invoice.
+
+#### Internal Logic
+1. Executes the GraphQL query with necessary context and variables.
+2. Verifies the response structure and content:
+   - Checks the number of credit notes returned.
+   - Verifies the ID of the returned credit note.
+   - Checks the metadata (current page and total count).
+
+### 'when invoice does not exists' context
+#### Description
+Tests the error handling when an invalid invoice ID is provided.
+
+#### Internal Logic
+1. Executes the GraphQL query with an invalid invoice ID.
+2. Verifies that the appropriate error message is returned.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment |
+| GraphQL | The GraphQL query language used for defining the test query |
+
+## Error Handling
+The test suite includes a specific test case for handling non-existent invoices, expecting a "Resource not found" error message.
+
+___
+
+This documentation provides a comprehensive overview of the test suite for the `InvoiceCreditNotesResolver`, covering its structure, test data setup, and various test cases. It highlights the main functionality being tested and the error handling scenario included in the suite.

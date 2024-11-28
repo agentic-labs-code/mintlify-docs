@@ -1,0 +1,59 @@
+---
+title: "update.rb"
+---
+
+## High-level description
+This code defines a GraphQL mutation for updating an Okta integration within an organization. It's part of a larger GraphQL API and handles the process of updating Okta integration details while ensuring proper authentication and authorization.
+
+## Code Structure
+The `Update` class is nested within the `Mutations::Integrations::Okta` module. It inherits from `BaseMutation` and includes two concerns: `AuthenticableApiUser` and `RequiredOrganization`. The class defines the GraphQL mutation structure and delegates the actual update logic to a separate service class.
+
+## References
+- `Types::Integrations::Okta::UpdateInput`
+- `Types::Integrations::Okta`
+- `::Integrations::Okta::UpdateService`
+
+## Symbols
+
+### `Mutations::Integrations::Okta::Update`
+#### Description
+This class defines a GraphQL mutation for updating an Okta integration. It ensures the user is authenticated and has the required organization permissions before processing the update.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| args | Hash | GraphQL input arguments for updating the Okta integration |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| integration | Types::Integrations::Okta | Updated Okta integration object |
+
+#### Internal Logic
+1. Finds the integration in the current organization using the provided ID.
+2. Calls the `::Integrations::Okta::UpdateService` to perform the update.
+3. Returns the updated integration if successful, or an error result if not.
+
+## Side Effects
+- Updates the Okta integration record in the database if the operation is successful.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| AuthenticableApiUser | Ensures the user is authenticated |
+| RequiredOrganization | Ensures the user has access to the required organization |
+
+## Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| REQUIRED_PERMISSION | String | 'organization:integrations:update' | Permission required to perform this mutation |
+
+## Error Handling
+The mutation uses the `result_error` method to handle and return errors from the update service.
+
+## API/Interface Reference
+| Endpoint | Method | Request | Response | Description |
+|:---------|:-------|:--------|:---------|:------------|
+| updateOktaIntegration | POST | UpdateOktaIntegrationInput | OktaIntegration | Updates an existing Okta integration |
+
+This GraphQL mutation is part of a larger API for managing integrations within an organization. It specifically handles the update operation for Okta integrations, ensuring proper authentication and authorization before processing the update.

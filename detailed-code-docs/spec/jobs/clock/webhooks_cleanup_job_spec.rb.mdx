@@ -1,0 +1,43 @@
+---
+title: "webhooks_cleanup_job_spec.rb"
+---
+
+## High-level description
+This code defines a test suite for the `Clock::WebhooksCleanupJob` class using RSpec. It verifies that the job successfully removes old webhooks from the database.
+
+## Symbols
+
+### `Clock::WebhooksCleanupJob`
+#### Description
+This is the main class being tested. It's a job responsible for cleaning up old webhooks.
+
+### `describe Clock::WebhooksCleanupJob, job: true do`
+#### Description
+This RSpec describe block sets up the context for testing the `Clock::WebhooksCleanupJob` class. The `job: true` metadata suggests that this is a job-specific test.
+
+### `.perform`
+#### Description
+This describes block focuses on testing the `perform` class method of `Clock::WebhooksCleanupJob`.
+
+#### Internal Logic
+1. **Arrange**: Creates a webhook with a 'succeeded' status and an `updated_at` timestamp of 100 days ago.
+2. **Act**: Calls the `perform_now` method on the `webhooks_cleanup_job`.
+3. **Assert**: Checks that all webhooks have been removed from the database.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads the Rails testing environment and configuration |
+| FactoryBot | Used to create test data (webhooks) |
+
+## References
+- `Webhook` model: The test interacts with this model to create and query webhook records.
+- `FactoryBot`: Used to create a webhook record with specific attributes.
+
+## Notes
+1. The test is using `FactoryBot` to create a webhook with specific attributes (`:succeeded` status and `updated_at` set to 100 days ago).
+2. The job is executed using `perform_now`, which runs the job immediately instead of enqueuing it.
+3. The assertion checks if all webhooks have been removed, implying that the job is expected to delete webhooks older than a certain age.
+4. The specific age threshold for webhook deletion is not explicitly stated in this test file. It's likely defined in the actual job implementation.
+
+This test ensures that the `Clock::WebhooksCleanupJob` effectively removes old webhooks from the system, which is crucial for maintaining database efficiency and removing unnecessary data.

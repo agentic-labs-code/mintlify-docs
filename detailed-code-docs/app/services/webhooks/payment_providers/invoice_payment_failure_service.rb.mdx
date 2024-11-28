@@ -1,0 +1,79 @@
+---
+title: "invoice_payment_failure_service.rb"
+---
+
+## High-level description
+This code defines the `InvoicePaymentFailureService` class within the `Webhooks::PaymentProviders` module. It is responsible for handling webhook events related to invoice payment failures, preparing the necessary data for the webhook payload, and initiating the webhook sending process.
+
+## Code Structure
+The `InvoicePaymentFailureService` class inherits from `Webhooks::BaseService` and overrides several private methods to customize the webhook behavior for invoice payment failures.
+
+## References
+This code references the following:
+- `Webhooks::BaseService`
+- `V1::PaymentProviders::InvoicePaymentErrorSerializer`
+
+## Symbols
+
+### `Webhooks::PaymentProviders::InvoicePaymentFailureService`
+#### Description
+This class is responsible for handling the webhook event when an invoice payment fails. It prepares the necessary data and initiates the webhook sending process.
+
+#### Internal Logic
+The class overrides four private methods from the `BaseService` class:
+1. `current_organization`: Retrieves the organization associated with the invoice.
+2. `object_serializer`: Creates a serializer for the invoice payment error.
+3. `webhook_type`: Defines the type of webhook event.
+4. `object_type`: Specifies the type of object being sent in the webhook.
+
+### `current_organization`
+#### Description
+Retrieves and memoizes the organization associated with the invoice.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @current_organization | Organization | The organization associated with the invoice |
+
+### `object_serializer`
+#### Description
+Creates and returns a serializer for the invoice payment error.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| serializer | V1::PaymentProviders::InvoicePaymentErrorSerializer | Serializer for the invoice payment error |
+
+#### Internal Logic
+Creates a new instance of `V1::PaymentProviders::InvoicePaymentErrorSerializer` with the following parameters:
+- `object`: The invoice object
+- `root_name`: The object type
+- `provider_error`: The error from the payment provider
+- `provider_customer_id`: The customer ID from the payment provider
+
+### `webhook_type`
+#### Description
+Defines the type of webhook event.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_type | String | The type of webhook event |
+
+### `object_type`
+#### Description
+Specifies the type of object being sent in the webhook.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object_type | String | The type of object in the webhook payload |
+
+## Dependencies
+This code depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| Webhooks::BaseService | Parent class providing the base webhook functionality |
+| V1::PaymentProviders::InvoicePaymentErrorSerializer | Serializer for formatting the invoice payment error data |
+
+The `InvoicePaymentFailureService` is designed to work within a larger webhook system, as evidenced by its inclusion in the `WEBHOOK_SERVICES` hash in the `SendWebhookJob` class. When an invoice payment failure occurs, this service is responsible for preparing the necessary data and initiating the webhook sending process to notify external systems about the failure.

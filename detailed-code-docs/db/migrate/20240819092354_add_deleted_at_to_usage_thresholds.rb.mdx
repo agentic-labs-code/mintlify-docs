@@ -1,0 +1,36 @@
+---
+title: "20240819092354_add_deleted_at_to_usage_thresholds.rb"
+---
+
+## High-level description
+This migration adds a `deleted_at` column to the `usage_thresholds` table, implementing soft delete functionality. It also updates the existing unique indexes to account for the new `deleted_at` column, ensuring uniqueness only for non-deleted records.
+
+## Symbols
+
+### `AddDeletedAtToUsageThresholds`
+#### Description
+This class is an ActiveRecord migration that modifies the `usage_thresholds` table by adding a `deleted_at` column and updating the unique indexes.
+
+#### Internal Logic
+1. Adds a `deleted_at` column of type `datetime` to the `usage_thresholds` table.
+2. Removes existing unique indexes on the `usage_thresholds` table.
+3. Adds new unique indexes that include the `deleted_at` condition, ensuring uniqueness only for non-deleted records.
+
+## Side Effects
+- Modifies the schema of the `usage_thresholds` table by adding a new column.
+- Changes the uniqueness constraints on the `usage_thresholds` table.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration | Provides the framework for database migrations in Rails |
+
+## Performance Considerations
+The `safety_assured` block is used when adding new indexes, which suggests that this migration might be using the `strong_migrations` gem to ensure safe database migrations. This is important for performance, especially on large tables, as it allows the migration to bypass certain safety checks that might otherwise prevent the operation.
+
+## Error Handling
+No explicit error handling is implemented in this migration. Rails will handle any database-related errors during the migration process.
+
+___
+
+This migration is a typical example of implementing soft delete functionality and updating indexes accordingly. It's important to note that this change allows for logical deletion of records without physically removing them from the database, which can be useful for data retention and recovery purposes.

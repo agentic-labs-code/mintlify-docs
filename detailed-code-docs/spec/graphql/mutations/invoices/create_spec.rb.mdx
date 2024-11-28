@@ -1,0 +1,65 @@
+---
+title: "create_spec.rb"
+---
+
+## High-level description
+This code is a RSpec test suite for the `Mutations::Invoices::Create` GraphQL mutation. It verifies the behavior of creating a one-off invoice, including permission checks, input validation, and the correct calculation of invoice amounts and taxes.
+
+## Code Structure
+The test suite is organized as an RSpec describe block for the `Mutations::Invoices::Create` mutation. It includes several let statements to set up test data, a GraphQL mutation query, and a main test case for creating a one-off invoice.
+
+## Symbols
+
+### RSpec.describe Mutations::Invoices::Create
+#### Description
+This is the main describe block for the test suite, focusing on the `Mutations::Invoices::Create` GraphQL mutation.
+
+### let statements
+#### Description
+These statements define test data and variables used throughout the test suite, including:
+- `required_permission`: The permission required to create invoices
+- `membership`, `organization`, `currency`, `customer`, `tax`, `add_on_first`, `add_on_second`: Test models and data
+- `fees`: An array of fee data for the invoice
+- `mutation`: The GraphQL mutation query string
+
+### before block
+#### Description
+This block ensures that the `tax` object is created before running the tests.
+
+### Shared examples
+#### Description
+The test suite includes shared example groups for common checks:
+- `requires current user`
+- `requires current organization`
+- `requires permission`
+
+These likely check for proper authentication and authorization.
+
+### it 'creates one-off invoice'
+#### Description
+This is the main test case that verifies the creation of a one-off invoice using the GraphQL mutation.
+
+#### Internal Logic
+1. Executes the GraphQL mutation with test data
+2. Retrieves the result data
+3. Uses `aggregate_failures` to group multiple expectations
+4. Checks various attributes of the created invoice, including:
+   - Presence of an ID
+   - Correct issuing date
+   - Invoice type (one-off)
+   - Correct calculation of fees, taxes, and total amounts
+   - Currency
+   - Applied taxes
+   - Fee details (units and precise unit amount)
+
+## Dependencies
+The test file depends on the following:
+| Dependency | Purpose |
+|:-----------|:--------|
+| rails_helper | Loads Rails and RSpec configuration |
+| RSpec | Testing framework |
+| FactoryBot | Test data generation |
+| GraphQL | API query language |
+
+## Configuration
+The test suite uses RSpec configuration, which is likely defined in the `rails_helper.rb` file. This includes setting up the test environment, database cleaner, and various RSpec helpers.

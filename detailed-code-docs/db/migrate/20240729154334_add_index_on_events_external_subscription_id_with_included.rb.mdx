@@ -1,0 +1,35 @@
+---
+title: "20240729154334_add_index_on_events_external_subscription_id_with_included.rb"
+---
+
+## High-level description
+This migration adds a new index to the `events` table in a PostgreSQL database. The index is designed to improve query performance for specific columns, with additional conditions and included columns for covering index optimization.
+
+## Symbols
+
+### `AddIndexOnEventsExternalSubscriptionIdWithIncluded`
+#### Description
+This class is an ActiveRecord migration that adds a new index to the `events` table. It uses the `change` method to define the migration, which allows for automatic rollback if needed.
+
+#### Internal Logic
+1. The migration disables DDL transactions using `disable_ddl_transaction!` to allow for concurrent index creation.
+2. It adds a new index on the `events` table using the `add_index` method with the following characteristics:
+   - Indexed columns: `external_subscription_id`, `code`, and `timestamp`
+   - Index name: `'index_events_on_external_subscription_id_with_included'`
+   - Partial index condition: `'deleted_at IS NULL'`
+   - Concurrent index creation: `algorithm: :concurrently`
+   - Idempotent creation: `if_not_exists: true`
+   - Included columns: `organization_id` and `properties`
+
+## Performance Considerations
+1. The index is created concurrently (`algorithm: :concurrently`), which allows for index creation without blocking writes to the table.
+2. It's a partial index (`where: 'deleted_at IS NULL'`), which can improve performance and reduce index size by only indexing non-deleted records.
+3. The index includes additional columns (`include: %i[organization_id properties]`), making it a covering index for queries that also need these columns, potentially eliminating the need for table lookups.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| ActiveRecord::Migration[7.1] | Provides the migration framework for database schema changes |
+
+## Error Handling
+The migration uses `if_not_exists: true` to prevent errors if the index already exists, making the migration idempotent and safe to run multiple times.

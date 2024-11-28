@@ -1,0 +1,97 @@
+---
+title: "calculate_fees_service.rb"
+---
+
+## High-level description
+This code defines the `CalculateFeesService` class within the `Invoices` module. Its primary purpose is to calculate and create fees for an invoice based on the subscriptions and charges associated with it. It handles various scenarios such as recurring billing, prorated fees, and different types of charges.
+
+## Code Structure
+The main class `CalculateFeesService` inherits from `BaseService`. It contains a `call` method that orchestrates the fee calculation process. The class interacts with several other services and models to perform its calculations and create the necessary fee records.
+
+## Symbols
+
+### `CalculateFeesService`
+#### Description
+This service calculates fees for an invoice based on its associated subscriptions and charges. It handles various billing scenarios and creates the appropriate fee records.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice | Invoice | The invoice for which fees are being calculated |
+| recurring | Boolean | Indicates if this is a recurring billing process |
+| context | Symbol | The context of the fee calculation (e.g., :finalize) |
+
+#### Internal Logic
+1. Iterates through each invoice subscription
+2. Calculates fees for subscription, charges, and commitments
+3. Applies credits and coupons
+4. Computes final amounts
+5. Creates credit note credits and applied prepaid credits if necessary
+6. Updates the invoice status and saves it
+
+### `call`
+#### Description
+The main method that orchestrates the fee calculation process.
+
+#### Internal Logic
+1. Starts a database transaction
+2. Iterates through invoice subscriptions
+3. Creates fees for subscriptions, charges, and commitments
+4. Applies credits and coupons
+5. Computes final amounts
+6. Creates credit note credits and applied prepaid credits if necessary
+7. Updates the invoice status and saves it
+
+### `create_subscription_fee`
+#### Description
+Creates a fee for the subscription if necessary.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription | Subscription | The subscription for which the fee is being created |
+| boundaries | Hash | Time boundaries for the fee calculation |
+
+### `create_charges_fees`
+#### Description
+Creates fees for the charges associated with a subscription.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription | Subscription | The subscription for which charge fees are being created |
+| boundaries | Hash | Time boundaries for the fee calculation |
+
+### `create_recurring_non_invoiceable_fees`
+#### Description
+Creates recurring non-invoiceable fees for a subscription.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subscription | Subscription | The subscription for which non-invoiceable fees are being created |
+| boundaries | Hash | Time boundaries for the fee calculation |
+
+### `create_minimum_commitment_true_up_fee`
+#### Description
+Creates a true-up fee for minimum commitment if necessary.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| invoice_subscription | InvoiceSubscription | The invoice subscription for which the true-up fee is being calculated |
+
+## Side Effects
+- Creates and updates fee records in the database
+- Updates the invoice's amounts and status
+- Triggers webhook events for fee creation
+
+## Dependencies
+- Various service classes (e.g., `Fees::SubscriptionService`, `Fees::ChargeService`, `Credits::ProgressiveBillingService`)
+- ActiveRecord models (e.g., `Fee`, `Invoice`, `Subscription`)
+
+## Error Handling
+The service uses a `result` object to handle errors and return the calculated fees. If any step fails, it sets an error on the result object and returns it.
+
+## Performance Considerations
+This service performs multiple database operations within a transaction, which could impact performance for invoices with many subscriptions or charges. Optimization might be needed for handling large-scale billing operations.

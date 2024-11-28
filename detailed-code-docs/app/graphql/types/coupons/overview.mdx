@@ -1,0 +1,122 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions related to coupons in the application. It includes various enum types, input types, and an object type that define the structure and behavior of coupon-related data in the GraphQL schema.
+
+## What does it do?
+This directory provides the necessary type definitions for handling coupon-related operations in the GraphQL API. It allows the API to:
+
+1. Define different types of coupons (fixed amount, percentage, etc.)
+2. Specify coupon frequencies (once, recurring, etc.)
+3. Set expiration types for coupons
+4. Create and update coupons with specific attributes
+5. Apply limitations to coupons (e.g., restricting to specific billable metrics or plans)
+6. Represent coupon statuses
+7. Query coupon information, including usage statistics
+
+These type definitions enable the API to handle coupon-related queries and mutations in a structured and type-safe manner.
+
+## Key Files
+
+1. `coupon_type_enum.rb`: Defines the `CouponTypeEnum` which represents different types of coupons (e.g., fixed amount, percentage).
+
+2. `create_input.rb`: Defines the `CreateCouponInput` type, which specifies the structure for creating new coupons.
+
+3. `expiration_enum.rb`: Defines the `ExpirationEnum` type, representing different expiration types for coupons.
+
+4. `frequency_enum.rb`: Defines the `FrequencyEnum` type, representing how often a coupon can be applied.
+
+5. `limitation_input.rb`: Defines the `LimitationInput` type, used to specify restrictions on coupon usage.
+
+6. `object.rb`: Defines the `Types::Coupons::Object` type, which represents a coupon in the GraphQL schema and includes various fields and methods for querying coupon data.
+
+7. `status_enum.rb`: Defines the `StatusEnum` type, representing possible statuses of a coupon.
+
+8. `update_input.rb`: Defines the `UpdateCouponInput` type, which extends `CreateCouponInput` for updating existing coupons.
+
+## Dependencies
+The code in this directory relies on the following main dependencies:
+
+1. `graphql` gem: This is the core dependency for defining GraphQL types and schemas in Ruby.
+
+2. `Types::BaseEnum` and `Types::BaseObject`: These are likely custom base classes for GraphQL enums and objects, respectively, providing common functionality.
+
+3. `Coupon` model: Many of the enum types reference constants defined in the `Coupon` model (e.g., `Coupon::COUPON_TYPES`, `Coupon::FREQUENCIES`, `Coupon::EXPIRATION_TYPES`, `Coupon::STATUSES`).
+
+## Configuration
+The types defined in this directory don't have explicit configuration options. However, they rely on constants defined in the `Coupon` model for enum values. This approach allows for easy modification of coupon types, frequencies, expiration types, and statuses by updating the corresponding constants in the `Coupon` model.
+
+Here's an example of how the `CouponTypeEnum` is defined using the `Coupon::COUPON_TYPES` constant:
+
+```ruby
+class CouponTypeEnum &lt; Types::BaseEnum
+  Coupon::COUPON_TYPES.each do |type|
+    value type
+  end
+end
+```
+
+This pattern is repeated for other enum types, allowing for centralized management of these values in the `Coupon` model.
+
+The `CreateCouponInput` and `UpdateCouponInput` types define the structure for creating and updating coupons, respectively. These input types include various fields that determine how coupons can be configured:
+
+```ruby
+class CreateInput &lt; Types::BaseInputObject
+  argument :amount_cents, GraphQL::Types::BigInt, required: false
+  argument :amount_currency, Types::CurrencyEnum, required: false
+  argument :code, String, required: true
+  argument :coupon_type, Types::Coupons::CouponTypeEnum, required: true
+  argument :description, String, required: false
+  argument :frequency, Types::Coupons::FrequencyEnum, required: true
+  argument :frequency_duration, Integer, required: false
+  argument :name, String, required: true
+  argument :percentage_rate, Float, required: false
+  argument :reusable, Boolean, required: true
+  argument :applies_to, Types::Coupons::LimitationInput, required: false
+  argument :expiration, Types::Coupons::ExpirationEnum, required: false
+  argument :expiration_at, GraphQL::Types::ISO8601DateTime, required: false
+end
+```
+
+This structure defines the possible attributes for a coupon, including its type, amount, frequency, limitations, and expiration.
+
+The `Types::Coupons::Object` type defines the structure of a coupon in the GraphQL schema, including various fields for querying coupon data:
+
+```ruby
+class Types::Coupons::Object &lt; Types::BaseObject
+  field :id, ID, null: false
+  field :organization, Types::Organizations::OrganizationType, null: false
+  field :name, String, null: false
+  field :code, String, null: false
+  field :amount_cents, GraphQL::Types::BigInt, null: true
+  field :amount_currency, Types::CurrencyEnum, null: true
+  field :percentage_rate, Float, null: true
+  field :coupon_type, Types::Coupons::CouponTypeEnum, null: false
+  field :frequency, Types::Coupons::FrequencyEnum, null: false
+  field :frequency_duration, Integer, null: true
+  field :reusable, Boolean, null: false
+  field :created_at, GraphQL::Types::ISO8601DateTime, null: false
+  field :expiration, Types::Coupons::ExpirationEnum, null: true
+  field :expiration_at, GraphQL::Types::ISO8601DateTime, null: true
+  field :status, Types::Coupons::StatusEnum, null: false
+  field :description, String, null: true
+  field :customers_count, Integer, null: false
+  field :applied_coupons_count, Integer, null: false
+  field :billable_metrics, [Types::BillableMetrics::Object], null: true
+  field :plans, [Types::Plans::Object], null: true
+
+  def customers_count
+    object.applied_coupons.active.distinct.count(:customer_id)
+  end
+
+  def applied_coupons_count
+    object.applied_coupons.count
+  end
+end
+```
+
+This structure allows for querying various attributes of a coupon, including its usage statistics and associated billable metrics and plans.
+
+In summary, this directory provides a comprehensive set of GraphQL type definitions for handling coupon-related operations in the application's API, allowing for flexible and type-safe coupon management.

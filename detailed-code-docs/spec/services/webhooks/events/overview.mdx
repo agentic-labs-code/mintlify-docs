@@ -1,0 +1,73 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains RSpec test files for the Webhooks::Events services, specifically focusing on error handling and validation error scenarios. The tests are designed to verify the behavior of two main services: ErrorService and ValidationErrorsService.
+
+## What does it do?
+These test files ensure that the webhook services correctly handle and process different types of errors in the context of event processing. They verify that:
+
+1. The ErrorService properly creates a webhook when an error event occurs, with the correct event name, type, and payload structure.
+2. The ValidationErrorsService correctly generates webhooks for various validation error types associated with an organization.
+
+Both services are tested to confirm they create webhooks with the appropriate parameters and payload structures when called with specific inputs.
+
+## Key Files
+1. error_service_spec.rb
+   - Tests the Webhooks::Events::ErrorService
+   - Verifies the creation of a webhook for the 'event.error' scenario
+   - Ensures the correct event name, webhook type, and payload structure
+
+2. validation_errors_service_spec.rb
+   - Tests the Webhooks::Events::ValidationErrorsService
+   - Verifies the creation of webhooks for various validation error types
+   - Ensures the correct event name, webhook name, and error structure
+
+## Dependencies
+Both test files rely on the following dependencies:
+
+1. RSpec: The testing framework used to structure and run the tests.
+2. FactoryBot: Used to create test objects, such as organizations and received events.
+3. rails_helper: Loads the Rails testing environment and configuration.
+
+## Configuration
+The tests use shared examples, which are likely defined in a separate support file. These shared examples are used to verify the creation of webhooks with specific parameters across different services.
+
+Both test files use `let` statements to set up test data and options:
+
+```ruby
+let(:organization) { create(:organization) }
+let(:options) { { errors: { ... } } }
+```
+
+In the ErrorService test, an additional `let` statement is used to create a test event:
+
+```ruby
+let(:event) { create(:received_event, organization: organization) }
+```
+
+The tests focus on the `.call` method of each service, using the subject syntax to initialize the service with the appropriate parameters:
+
+```ruby
+subject(:webhook_service) { described_class.new(object: object, options: options) }
+```
+
+Where `object` is either an organization or a received event, depending on the service being tested.
+
+The tests use shared examples to verify the creation of webhooks with specific parameters:
+
+```ruby
+it_behaves_like 'creates webhook', event_name: 'event.error', webhook_type: 'event_error' do
+  let(:expected_payload) do
+    {
+      'error' =&gt; String,
+      'event' =&gt; Hash
+    }
+  end
+end
+```
+
+This structure allows for consistent testing of webhook creation across different services while allowing for service-specific parameters and payload structures.
+
+In summary, these test files ensure that the ErrorService and ValidationErrorsService correctly handle and process different types of errors by creating appropriate webhooks with the correct event names, types, and payload structures. This is crucial for maintaining the integrity and reliability of the webhook system in handling various error scenarios.

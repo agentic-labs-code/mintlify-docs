@@ -1,0 +1,80 @@
+---
+title: "vies_check_service.rb"
+---
+
+## High-level description
+This code defines a service class `ViesCheckService` within the `Webhooks::Customers` module. It is responsible for handling webhook events related to VIES (VAT Information Exchange System) checks for customers. The service extends the `Webhooks::BaseService` class and provides specific implementations for webhook handling related to customer VIES checks.
+
+## Code Structure
+The `ViesCheckService` class is part of a larger webhook handling system. It inherits from `Webhooks::BaseService` and overrides specific methods to customize the behavior for customer VIES check events. The class interacts with the `Organization` model and uses the `V1::CustomerSerializer` for object serialization.
+
+## Symbols
+
+### `Webhooks::Customers::ViesCheckService`
+#### Description
+This class is responsible for processing webhook events related to customer VIES checks. It provides specific implementations for serializing customer data and defining the webhook type.
+
+#### Internal Logic
+The class overrides four private methods from its parent class:
+
+1. `current_organization`: Retrieves the organization associated with the customer.
+2. `object_serializer`: Creates a serializer for the customer object, including VIES check information.
+3. `webhook_type`: Defines the type of webhook as 'customer.vies_check'.
+4. `object_type`: Specifies the object type as 'customer'.
+
+### `current_organization`
+#### Description
+Retrieves the organization associated with the customer object.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| @current_organization | Organization | The organization associated with the customer |
+
+### `object_serializer`
+#### Description
+Creates a serializer for the customer object, including VIES check information.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| serializer | V1::CustomerSerializer | Serializer for the customer object |
+
+#### Internal Logic
+Creates a new `V1::CustomerSerializer` instance with the following parameters:
+- `object`: The customer object
+- `root_name`: Set to 'customer'
+- `includes`: An array containing `:vies_check`
+- `vies_check`: The VIES check data from the `options` hash
+
+### `webhook_type`
+#### Description
+Defines the type of webhook for this service.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| webhook_type | String | The type of webhook ('customer.vies_check') |
+
+### `object_type`
+#### Description
+Specifies the type of object being processed.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| object_type | String | The type of object ('customer') |
+
+## Dependencies
+The code relies on the following dependencies:
+| Dependency | Purpose |
+|:-----------|:--------|
+| Webhooks::BaseService | Parent class providing base functionality for webhook services |
+| Organization | Model representing the organization associated with the customer |
+| V1::CustomerSerializer | Serializer for customer objects |
+
+## References
+This code is referenced by:
+- `SendWebhookJob`: This job uses the `ViesCheckService` to process 'customer.vies_check' webhook events.
+
+The `ViesCheckService` interacts with the `Organization` model and uses the `V1::CustomerSerializer` for object serialization. The serializer includes VIES check information in the serialized customer data.

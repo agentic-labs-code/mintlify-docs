@@ -1,0 +1,89 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains service classes for managing Xero integrations within an application. It includes functionality for creating and updating Xero integrations for organizations. The services handle various aspects such as validation, database operations, and error handling related to Xero integrations.
+
+## What does it do?
+The code in this directory provides two main services:
+
+1. Creating a new Xero integration:
+   - It checks if an organization is eligible for a Xero integration.
+   - Creates a new integration with specified parameters (e.g., name, code, connection ID).
+   - Sets up synchronization options for credit notes, invoices, and payments.
+   - Schedules a synchronization job to run shortly after creation.
+
+2. Updating an existing Xero integration:
+   - Validates the existence of the integration and the organization's access to premium features.
+   - Updates the integration's attributes based on provided parameters.
+   - Handles any validation errors that may occur during the update process.
+
+These services work together to allow organizations to set up and manage their Xero integrations, controlling what data is synchronized and when.
+
+## Key Files
+
+### create_service.rb
+This file contains the `Integrations::Xero::CreateService` class, which is responsible for creating new Xero integrations. Key features include:
+
+- Validating the organization's eligibility for Xero integration
+- Creating a new `Integrations::XeroIntegration` record
+- Setting up synchronization options
+- Scheduling an initial synchronization job
+
+Example usage:
+```ruby
+result = Integrations::Xero::CreateService.call(
+  organization_id: 123,
+  name: "My Xero Integration",
+  code: "XERO001",
+  connection_id: "conn_123",
+  sync_credit_notes: true,
+  sync_invoices: true,
+  sync_payments: false
+)
+```
+
+### update_service.rb
+This file contains the `Integrations::Xero::UpdateService` class, which handles updating existing Xero integrations. Key features include:
+
+- Validating the existence of the integration
+- Checking for premium integration access
+- Updating integration attributes
+- Handling validation errors
+
+Example usage:
+```ruby
+integration = Integrations::XeroIntegration.find(456)
+result = Integrations::Xero::UpdateService.new(integration, {
+  name: "Updated Xero Integration",
+  sync_credit_notes: false
+}).call
+```
+
+## Dependencies
+The services in this directory rely on the following dependencies:
+
+1. ActiveRecord: Used for database operations and model validations.
+2. ActiveModel::Type::Boolean: Utilized for casting boolean values for sync options.
+
+## Configuration
+The Xero integration services use the following configuration options:
+
+1. For creating a new integration:
+   - `sync_credit_notes` (Boolean): Determines if credit notes should be synced
+   - `sync_invoices` (Boolean): Determines if invoices should be synced
+   - `sync_payments` (Boolean): Determines if payments should be synced
+
+2. For updating an existing integration:
+   - Any attributes of the `Integrations::XeroIntegration` model can be updated through the `params` hash
+
+These configuration options allow for fine-grained control over what data is synchronized between the application and Xero.
+
+The services also interact with other parts of the application:
+
+- `Organization` model: Used to check for premium integration access
+- `Integrations::XeroIntegration` model: Represents the Xero integration in the database
+- `Integrations::Aggregator::PerformSyncJob`: A background job scheduled to perform the initial synchronization
+
+Both services use a `BaseService` class, which likely provides common functionality for error handling and result management across different services in the application.

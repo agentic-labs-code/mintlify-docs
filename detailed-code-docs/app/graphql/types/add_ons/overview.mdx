@@ -1,0 +1,71 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains GraphQL type definitions related to add-ons in the application. It includes input types for creating and updating add-ons, as well as an object type for representing add-ons in queries and mutations. These types are crucial for managing add-ons through the GraphQL API.
+
+## What does it do?
+This directory defines the structure and behavior of add-ons in the GraphQL API. It allows developers to:
+
+1. Create new add-ons by specifying details like amount, currency, code, name, and optional attributes.
+2. Update existing add-ons with new information.
+3. Query add-on information, including related data such as the associated organization, applied add-ons count, and customer count.
+
+These types enable the API to handle operations related to add-ons, ensuring that the correct data is provided when creating or updating add-ons, and that the appropriate information is available when querying add-on details.
+
+## Key Files
+
+1. `create_input.rb`:
+   - Defines the `CreateAddOnInput` type used for creating new add-ons.
+   - Specifies required fields like `amount_cents`, `amount_currency`, `code`, and `name`.
+   - Includes optional fields like `description`, `invoice_display_name`, and `tax_codes`.
+
+2. `object.rb`:
+   - Defines the `Types::AddOns::Object` type representing an add-on in the system.
+   - Includes fields for all add-on attributes, such as ID, organization, code, name, amount, and timestamps.
+   - Provides methods for calculating derived data like `customers_count` and `applied_add_ons_count`.
+   - Allows filtering of `integration_mappings` based on `integration_id`.
+
+3. `update_input.rb`:
+   - Defines the `UpdateAddOnInput` type used for updating existing add-ons.
+   - Similar to `CreateAddOnInput`, but includes an `id` field to specify which add-on to update.
+
+## Dependencies
+The code in this directory relies on several GraphQL-related dependencies and custom types:
+
+1. `graphql` gem: Provides the core GraphQL functionality.
+2. `Types::BaseInputObject` and `Types::BaseObject`: Custom base classes for input and object types.
+3. `GraphQL::Types::BigInt`: Used for representing large integer values (e.g., `amount_cents`).
+4. `Types::CurrencyEnum`: Custom enum type for currency codes.
+5. `Types::Organizations::OrganizationType`: Represents the organization associated with an add-on.
+6. `Types::Taxes::Object`: Represents taxes associated with an add-on.
+7. `Types::IntegrationMappings::Object`: Represents integration mappings for an add-on.
+
+These dependencies are used to ensure type safety and provide a rich, well-structured API for managing add-ons.
+
+## Configuration
+This directory does not contain any specific configuration files. However, the types defined here may be used in conjunction with other parts of the application that handle GraphQL schema configuration and API setup.
+
+The `Types::AddOns::Object` type includes several fields that may require configuration or customization based on the application's needs:
+
+```ruby
+field :id, ID, null: false
+field :organization, Types::Organizations::OrganizationType, null: false
+field :code, String, null: false
+field :description, String
+field :invoice_display_name, String
+field :name, String, null: false
+field :amount_cents, GraphQL::Types::BigInt, null: false
+field :amount_currency, Types::CurrencyEnum, null: false
+field :created_at, GraphQL::Types::ISO8601DateTime, null: false
+field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
+field :customers_count, Integer, null: false
+field :applied_add_ons_count, Integer, null: false
+field :taxes, [Types::Taxes::Object], null: false
+field :integration_mappings, [Types::IntegrationMappings::Object], null: false
+```
+
+These field definitions determine what data is available when querying add-ons through the GraphQL API. Any changes to the add-on model or related business logic may require updates to this type definition.
+
+In summary, this directory provides a comprehensive set of GraphQL types for managing add-ons, enabling create, update, and query operations through a well-defined API structure. The types ensure data consistency and provide a clear interface for interacting with add-ons in the application.

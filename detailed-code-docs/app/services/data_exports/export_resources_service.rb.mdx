@@ -1,0 +1,90 @@
+---
+title: "export_resources_service.rb"
+---
+
+## High-level description
+This code defines the `ExportResourcesService` class within the `DataExports` module. Its primary purpose is to generate and process data exports for different resource types (e.g., invoices, invoice fees) in CSV format. The service handles the export process, including file generation, attachment, and email notification.
+
+## Code Structure
+The `ExportResourcesService` class inherits from `BaseService` and uses delegation to access `data_export` attributes. It interacts with other services like `Csv::Invoices` and `Csv::InvoiceFees` to generate the actual export data.
+
+## References
+- `DataExportMailer`: Used to send completion notifications.
+- `Csv::Invoices` and `Csv::InvoiceFees`: Used to generate CSV data for specific resource types.
+
+## Symbols
+
+### `ExportResourcesService`
+#### Description
+This service class manages the process of exporting resources based on the provided `data_export` object. It handles the export lifecycle, including status checks, file generation, attachment, and email notification.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| data_export | DataExport | The data export object containing export details |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| result | ServiceResult | The result of the export operation |
+
+#### Internal Logic
+1. Check if the data export is expired or already processed.
+2. Set the data export status to processing.
+3. Create a temporary file and generate the export data.
+4. Attach the generated file to the data export object.
+5. Set the data export status to completed.
+6. Send a completion email notification.
+7. Handle any errors and set the data export status to failed if necessary.
+
+### `call`
+#### Description
+The main method that orchestrates the export process.
+
+#### Internal Logic
+1. Perform initial checks (expiration and processing status).
+2. Create a temporary file and generate the export.
+3. Attach the file to the data export object.
+4. Update the data export status and send a notification.
+5. Handle any errors that occur during the process.
+
+### `generate_export`
+#### Description
+A private method that generates the export data based on the resource type.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| file | File | The temporary file to write the export data |
+
+#### Internal Logic
+- Use a case statement to determine the appropriate export service based on the resource type.
+- Call the corresponding service (e.g., `Csv::Invoices` or `Csv::InvoiceFees`) to generate the export data.
+- Raise a `ResourceTypeNotSupportedError` if the resource type is not supported.
+
+### `filename`
+#### Description
+A private method that generates the filename for the export file.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filename | String | The generated filename for the export |
+
+### `content_type`
+#### Description
+A private method that returns the content type for the export file.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| content_type | String | The content type of the export file (always 'text/csv') |
+
+## Error Handling
+The service uses a `rescue` block to catch any errors that occur during the export process. If an error occurs, it sets the data export status to failed and returns a service failure result with the error details.
+
+## Logging
+No explicit logging is implemented in this service.
+
+## TODOs
+There are no TODOs or notes left in the code.

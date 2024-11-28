@@ -1,0 +1,82 @@
+---
+title: "test.rb"
+---
+
+## High-level description
+This file configures the Rails application for the test environment. It sets various configuration options to optimize the application for testing, including disabling reloading, configuring caching, setting up Active Record encryption, and configuring the logger and mailer.
+
+## Configuration
+The file uses `Rails.application.configure` to set up the test environment configuration. Here are the key configuration options:
+
+### General Settings
+| Option | Type | Value | Description |
+|:-------|:-----|:------|:------------|
+| `config.enable_reloading` | Boolean | `false` | Disables code reloading during tests |
+| `config.eager_load` | Boolean | `ENV['CI'].present?` | Enables eager loading only in CI environments |
+| `config.license_url` | String | `'http://license.lago'` | Sets the license URL for the application |
+
+### Public File Server
+| Option | Type | Value | Description |
+|:-------|:-----|:------|:------------|
+| `config.public_file_server.enabled` | Boolean | `true` | Enables the public file server |
+| `config.public_file_server.headers` | Hash | `{ "Cache-Control" =&gt; "public, max-age=#{1.hour.to_i}" }` | Sets cache headers for public files |
+
+### Logging
+| Option | Type | Value | Description |
+|:-------|:-----|:------|:------------|
+| `config.logger` | Logger | `Logger.new(nil)` | Sets up a null logger |
+| `config.log_level` | Symbol | `:fatal` | Sets the log level to fatal |
+
+### Action Controller and Dispatch
+| Option | Type | Value | Description |
+|:-------|:-----|:------|:------------|
+| `config.consider_all_requests_local` | Boolean | `true` | Treats all requests as local |
+| `config.action_controller.perform_caching` | Boolean | `false` | Disables caching in controllers |
+| `config.action_dispatch.show_exceptions` | Symbol | `:rescuable` | Shows only rescuable exceptions |
+| `config.action_controller.allow_forgery_protection` | Boolean | `false` | Disables CSRF protection |
+| `config.action_controller.raise_on_missing_callback_actions` | Boolean | `true` | Raises an error for missing callback actions |
+
+### Active Storage and Action Mailer
+| Option | Type | Value | Description |
+|:-------|:-----|:------|:------------|
+| `config.active_storage.service` | Symbol | `:test` | Sets Active Storage service to test mode |
+| `config.action_mailer.perform_caching` | Boolean | `false` | Disables caching in mailers |
+| `config.action_mailer.delivery_method` | Symbol | `:test` | Sets mailer delivery method to test mode |
+
+### Active Record Encryption
+| Option | Type | Value | Description |
+|:-------|:-----|:------|:------------|
+| `config.active_record.encryption.primary_key` | String | `'test'` | Sets the primary encryption key |
+| `config.active_record.encryption.deterministic_key` | String | `'test'` | Sets the deterministic encryption key |
+| `config.active_record.encryption.key_derivation_salt` | String | `'test'` | Sets the key derivation salt |
+
+### Active Support
+| Option | Type | Value | Description |
+|:-------|:-----|:------|:------------|
+| `config.active_support.deprecation` | Symbol | `:stderr` | Outputs deprecation warnings to stderr |
+| `config.active_support.disallowed_deprecation` | Symbol | `:raise` | Raises an error for disallowed deprecations |
+| `config.active_support.disallowed_deprecation_warnings` | Array | `[]` | Sets an empty array for disallowed deprecation warnings |
+
+### Active Job
+| Option | Type | Value | Description |
+|:-------|:-----|:------|:------------|
+| `config.active_job.queue_adapter` | Symbol | `:test` | Sets the job queue adapter to test mode |
+
+### Caching
+The configuration sets up Redis cache store if `LAGO_REDIS_CACHE_URL` environment variable is present. Otherwise, it uses a null store.
+
+| Option | Type | Value | Description |
+|:-------|:-----|:------|:------------|
+| `config.cache_store` | Symbol | `:null_store` or `:redis_cache_store` | Sets the cache store type |
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| `active_support/core_ext/integer/time` | Extends Integer class with time-related methods |
+| `Dotenv` | Loads environment variables from a .env file |
+
+## Side Effects
+- Loads environment variables using `Dotenv.load`
+- Configures Redis cache store if `LAGO_REDIS_CACHE_URL` is present in the environment
+
+This configuration file sets up a Rails application for testing, focusing on performance and isolation by disabling unnecessary features and configuring components specifically for the test environment.

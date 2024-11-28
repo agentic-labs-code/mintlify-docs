@@ -1,0 +1,44 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains JSON fixtures used for integration testing of a payment aggregator service. The fixtures simulate various response scenarios from an external payment processing system, including successful and failed payment attempts.
+
+## What does it do?
+These fixtures are used to mock responses from an external payment processing system during integration testing. They allow developers to test how their application handles different scenarios without actually making calls to the real payment system. The fixtures cover three main scenarios:
+
+1. A successful payment with a hash response
+2. A successful payment with a string response
+3. A failed payment attempt
+
+By using these fixtures, developers can ensure that their payment integration service correctly handles various response types and error conditions, improving the robustness and reliability of the payment processing functionality.
+
+## Key Files
+
+1. `success_hash_response.json`: This file simulates a successful payment response in a structured format. It contains:
+   - A `succeededPayment` array with one payment object, including details like payment ID, status, invoice ID, account code, date, and amount.
+   - An empty `failedPayments` array.
+
+   This fixture is used to test if the application correctly processes a successful payment response with detailed information.
+
+2. `success_string_response.json`: This file contains a simple string value "999", representing a successful payment response where only an external ID is returned. It's used to test if the application can handle simpler success responses.
+
+3. `failure_hash_response.json`: This file simulates a failed payment scenario. It includes:
+   - An empty `succeededPayment` array.
+   - A `failedPayments` array with one object, containing details about the failed payment attempt, including error messages.
+
+   This fixture is crucial for testing error handling in the payment processing service.
+
+These fixtures are referenced in the test file `spec/services/integrations/aggregator/payments/create_service_spec.rb`, where they are used to test different scenarios for the `Integrations::Aggregator::Payments::CreateService`.
+
+## Dependencies
+While these JSON fixtures don't have direct dependencies, they are used in conjunction with:
+
+- RSpec testing framework
+- Rails application (evidenced by the use of `Rails.root` in the test file)
+- The `Integrations::Aggregator::Payments::CreateService` being tested
+
+The fixtures are designed to work with the specific structure expected by this service, simulating responses from an external payment aggregator API.
+
+By providing these varied response scenarios, the fixtures enable comprehensive testing of the payment integration service, ensuring it can handle different response formats and error conditions effectively. This approach allows developers to verify the robustness of their payment processing logic without relying on actual API calls during testing, leading to more reliable and predictable test outcomes.
