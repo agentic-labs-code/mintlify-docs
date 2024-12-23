@@ -1,0 +1,55 @@
+---
+title: "Overview"
+---
+
+## High-level description
+The `solver` directory contains implementations of various phylogenetic tree reconstruction algorithms used in the Cassiopeia framework. It includes different solver classes that employ diverse strategies for inferring evolutionary relationships between samples based on their mutation profiles.
+
+## What does it do?
+This directory provides a collection of algorithms for reconstructing phylogenetic trees from character matrices representing mutation data. The solvers use different approaches, including:
+
+1. Greedy algorithms (e.g., VanillaGreedySolver, MaxCutGreedySolver)
+2. Distance-based methods (e.g., NeighborJoiningSolver, UPGMASolver)
+3. Spectral methods (e.g., SpectralSolver, SpectralNeighborJoiningSolver)
+4. Integer Linear Programming (ILPSolver)
+5. Hybrid approaches (HybridSolver)
+
+These solvers take as input a character matrix representing mutation profiles of samples and optional prior probabilities. They output a reconstructed phylogenetic tree showing the evolutionary relationships between the samples.
+
+## Entry points
+The main entry point for using these solvers is through the `solve` method implemented by each solver class. This method takes a `CassiopeiaTree` object containing the character matrix and other relevant data, and populates it with the reconstructed tree.
+
+The `__init__.py` file serves as the main interface for importing the various solver classes and utility functions.
+
+## Key Files
+1. `CassiopeiaSolver.py`: Defines the abstract base class for all solvers.
+2. `DistanceSolver.py`: Implements the base class for distance-based solvers.
+3. `GreedySolver.py`: Provides the framework for greedy top-down solvers.
+4. `HybridSolver.py`: Implements a hybrid approach combining top-down and bottom-up strategies.
+5. `ILPSolver.py`: Implements the Integer Linear Programming-based solver.
+6. `NeighborJoiningSolver.py` and `UPGMASolver.py`: Implement specific distance-based algorithms.
+7. `SpectralSolver.py` and related files: Implement spectral methods for tree reconstruction.
+8. `VanillaGreedySolver.py` and `MaxCutGreedySolver.py`: Implement specific greedy algorithms.
+9. `dissimilarity_functions.py`: Provides various functions for calculating dissimilarity between samples.
+10. `graph_utilities.py`: Offers utility functions for graph construction and manipulation used in some solvers.
+11. `solver_utilities.py`: Contains general utility functions used across different solvers.
+
+## Dependencies
+The solver module relies on several external libraries:
+- networkx: For graph representation and manipulation
+- numpy and pandas: For numerical operations and data handling
+- scipy: For scientific computing and optimization
+- ete3: For tree manipulation and visualization
+- gurobipy: Used in the ILPSolver for solving optimization problems
+
+## Configuration
+Some solvers, particularly the `ILPSolver` and fast implementations of distance-based solvers, may require additional configuration:
+
+- The `ILPSolver` uses Gurobi, which requires a separate license and installation.
+- Fast implementations of some distance-based solvers (e.g., NeighborJoiningSolver) use CCPhylo, which needs to be installed and configured separately.
+
+These configurations are typically specified in a `config.ini` file, which is read by the relevant solver classes.
+
+The solvers also support various parameters for customization, such as dissimilarity functions, prior transformations, and algorithm-specific thresholds. These can be set when initializing the solver objects.
+
+In summary, the `solver` directory provides a comprehensive toolkit for phylogenetic tree reconstruction, offering multiple algorithms and utilities to handle various types of mutation data and reconstruction scenarios.

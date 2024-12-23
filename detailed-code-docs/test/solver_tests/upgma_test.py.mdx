@@ -1,0 +1,129 @@
+---
+title: "upgma_test.py"
+---
+
+Here's a detailed documentation of the `test/solver_tests/upgma_test.py` file:
+
+## High-level description
+This file contains unit tests for the UPGMASolver class in Cassiopeia's solver module. It tests various aspects of the UPGMA (Unweighted Pair Group Method with Arithmetic Mean) algorithm implementation, including basic functionality, handling of lineage tracing data, and dealing with duplicates and missing data.
+
+## Code Structure
+The main class `TestUPGMASolver` inherits from `unittest.TestCase` and contains multiple test methods. The `setUp` method initializes various test scenarios, and each test method focuses on a specific aspect of the UPGMASolver.
+
+## Symbols
+
+### TestUPGMASolver
+#### Description
+A test class for the UPGMASolver, containing multiple test methods to verify the correctness of the UPGMA algorithm implementation.
+
+#### Internal Logic
+The class sets up various test scenarios in the `setUp` method and then tests different aspects of the UPGMASolver in separate test methods.
+
+### setUp
+#### Description
+Initializes test data and solver instances for various scenarios.
+
+#### Internal Logic
+1. Sets up a basic character matrix and dissimilarity map
+2. Creates a basic CassiopeiaTree
+3. Initializes UPGMASolver instances
+4. Sets up additional test scenarios for lineage tracing and handling duplicates/missing data
+
+### test_constructor
+#### Description
+Tests the initialization of the UPGMASolver.
+
+#### Internal Logic
+Checks that the dissimilarity function and dissimilarity map are properly set.
+
+### test_find_cherry
+#### Description
+Tests the `find_cherry` method of UPGMASolver.
+
+#### Internal Logic
+1. Calls `find_cherry` on the basic dissimilarity map
+2. Verifies that the returned cherry is either ("a", "b") or ("b", "a")
+
+### test_update_dissimilarity_map
+#### Description
+Tests the `update_dissimilarity_map` method of UPGMASolver.
+
+#### Internal Logic
+1. Finds a cherry in the basic dissimilarity map
+2. Updates the dissimilarity map with the found cherry
+3. Verifies the updated dissimilarity map against expected values
+4. Repeats the process for a second update
+
+### test_basic_solver
+#### Description
+Tests the basic functionality of the UPGMASolver.
+
+#### Internal Logic
+1. Solves the basic tree using UPGMASolver
+2. Checks that all leaves exist in the tree
+3. Verifies the number of edges in the tree
+4. Compares the tree structure with an expected tree structure
+5. Compares tree distances between leaves
+
+### test_upgma_solver_weights
+#### Description
+Tests the UPGMASolver with weighted Hamming distance and prior probabilities.
+
+#### Internal Logic
+1. Solves the tree with priors using UPGMASolver
+2. Verifies the dissimilarity between specific nodes
+3. Compares the resulting tree structure with an expected structure
+4. Repeats the test with collapsing mutationless edges
+
+### test_pp_solver
+#### Description
+Tests the UPGMASolver with a lineage tracing scenario.
+
+#### Internal Logic
+1. Solves the lineage tracing tree using UPGMASolver
+2. Verifies the dissimilarity between specific nodes
+3. Compares the resulting tree structure with an expected structure
+
+### test_duplicate
+#### Description
+Tests the UPGMASolver with a scenario containing duplicates and missing data.
+
+#### Internal Logic
+1. Solves the tree with duplicates and missing data using UPGMASolver
+2. Verifies the dissimilarity between specific nodes
+3. Compares the resulting tree structure with an expected structure
+
+## Dependencies
+- unittest
+- typing
+- itertools
+- networkx
+- numpy
+- pandas
+- cassiopeia.data.CassiopeiaTree
+- cassiopeia.solver.UPGMASolver
+- cassiopeia.solver.dissimilarity_functions
+
+## Helper Functions
+
+### find_triplet_structure
+#### Description
+Determines the structure of a triplet in a given tree.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| triplet | tuple | A tuple of three node names |
+| T | networkx.DiGraph | The tree to analyze |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| structure | str | The structure of the triplet ("ab", "ac", "bc", or "-") |
+
+#### Internal Logic
+1. Finds the ancestors of each node in the triplet
+2. Compares the number of common ancestors between pairs
+3. Returns the structure based on which pair has the most common ancestors
+
+This file provides a comprehensive test suite for the UPGMASolver, covering various scenarios and edge cases to ensure the correctness of the UPGMA algorithm implementation in Cassiopeia.

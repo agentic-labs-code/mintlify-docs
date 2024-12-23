@@ -1,0 +1,144 @@
+---
+title: "sfs_py3.py"
+---
+
+## High-level description
+The code defines a class `SFS` that simulates the evolution of genetic sequences under a beta coalescent model and calculates the Site Frequency Spectrum (SFS) from the generated genealogical trees. The SFS represents the distribution of allele frequencies in a sample of DNA sequences.
+
+## Code Structure
+The `SFS` class inherits from the `betatree` class, which is responsible for generating the beta coalescent trees. The `SFS` class extends this functionality by accumulating allele frequency information from multiple trees to calculate and analyze the SFS.
+
+## References
+- `betatree`: The `SFS` class inherits from the `betatree` class, which is defined in the `.betatree` module.
+
+## Symbols
+
+### Symbol Name: `SFS`
+#### Description:
+This class simulates the evolution of genetic sequences under a beta coalescent model and calculates the Site Frequency Spectrum (SFS).
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sample_size | int | The number of individuals in the sample. |
+| alpha | float | The alpha parameter of the beta coalescent model (default: 2). |
+
+#### Outputs:
+The class does not have a dedicated output method. Instead, it stores the calculated SFS in the `self.sfs` attribute.
+
+#### Internal Logic:
+1. **Tree Generation:** The class utilizes the inherited `coalesce()` method from the `betatree` class to generate multiple beta coalescent trees.
+2. **Allele Frequency Calculation:** For each tree, the code traverses the branches and records the number of descendants (weight) and branch length for each node. This information represents the allele frequency and time to coalescence, respectively.
+3. **SFS Calculation:** The `getSFS()` method accumulates the branch lengths for each allele frequency across all generated trees, resulting in the SFS.
+4. **SFS Binning:** The `binSFS()` method allows for binning the SFS using different modes (linear, log, logit) and bin numbers or custom bin edges.
+
+#### Side Effects:
+- Modifies the `self.alleles` and `self.sfs` attributes during the SFS calculation.
+
+### Symbol Name: `glob_trees`
+#### Description:
+Generates multiple beta coalescent trees and stores the allele frequency information for each tree.
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ntrees | int | The number of trees to generate (default: 10). |
+
+#### Outputs:
+The method does not return any value. It updates the `self.alleles` attribute with the allele frequency information from the generated trees.
+
+#### Internal Logic:
+1. **Iterative Tree Generation:** The method iterates `ntrees` times, generating a new tree in each iteration using the `coalesce()` method.
+2. **Allele Information Extraction:** For each tree, it extracts the weight (number of descendants) and branch length for all nodes (terminal and non-terminal) and appends this information to the `self.alleles` list.
+
+### Symbol Name: `getSFS`
+#### Description:
+Calculates the Site Frequency Spectrum (SFS) based on the generated trees.
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ntrees | int | The number of trees to use for SFS calculation (default: 10). |
+
+#### Outputs:
+The method does not return any value. It updates the `self.sfs` attribute with the calculated SFS.
+
+#### Internal Logic:
+1. **Initialization:** Creates a NumPy array `self.sfs` filled with zeros and a length equal to the sample size plus one.
+2. **SFS Accumulation:** Iterates through the specified number of trees (`ntrees`) and for each tree:
+    - Generates a new tree using the `coalesce()` method.
+    - Traverses the tree nodes and increments the corresponding element in the `self.sfs` array based on the node's weight (allele frequency) and branch length (time to coalescence).
+3. **Normalization:** Divides the `self.sfs` array by the number of trees to obtain the average SFS.
+
+### Symbol Name: `binSFS`
+#### Description:
+Bins the pre-calculated SFS using different modes and bin numbers or custom bin edges.
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| mode | str | The binning mode. Options: "logit" (default), "linear", "log". |
+| bins | int or array-like | The number of bins or an array-like object specifying the bin edges. |
+
+#### Outputs:
+The method does not return any value. It updates the `self.binned_sfs`, `self.bin_center`, and `self.bin_width` attributes based on the chosen binning parameters.
+
+#### Internal Logic:
+1. **Bin Edge Determination:** Determines the bin edges based on the chosen `mode` and `bins` parameters.
+    - If `bins` is an iterable, it is used directly as bin edges.
+    - Otherwise, bin edges are calculated based on the chosen `mode`:
+        - "logit": Logit-spaced bins.
+        - "linear": Linearly spaced bins.
+        - "log": Logarithmically spaced bins.
+2. **SFS Binning:** Uses the `np.histogram()` function to bin the pre-calculated SFS (`self.sfs`) based on the determined bin edges.
+3. **Normalization:** Divides the binned SFS by the bin widths to obtain the density.
+
+### Symbol Name: `saveSFS`
+#### Description:
+Saves the calculated SFS to a file.
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fname | str | The filename to save the SFS to. If the filename ends with ".gz", the file will be gzipped. |
+
+#### Outputs:
+The method does not return any value. It saves the SFS to the specified file.
+
+#### Internal Logic:
+1. **SFS Calculation (if necessary):** If the SFS has not been calculated yet (`self.sfs` is None), it calls the `getSFS()` method to calculate it.
+2. **File Saving:** Uses the `np.savetxt()` function to save the SFS to the specified file.
+
+### Symbol Name: `loadSFS`
+#### Description:
+Loads a previously saved SFS from a file.
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fname | str | The filename to load the SFS from. |
+| alpha | float | The alpha parameter of the beta coalescent model (optional). |
+
+#### Outputs:
+The method does not return any value. It updates the `self.n`, `self.sfs`, and `self.alpha` attributes based on the loaded SFS.
+
+#### Internal Logic:
+1. **File Loading:** Attempts to load the SFS from the specified file using the `np.loadtxt()` function.
+2. **Data Validation:** Checks if the loaded data is a one-dimensional vector. If not, it prints an error message and sets `self.sfs` to None.
+3. **Attribute Update:** If the loaded data is valid, it updates the `self.n` (sample size), `self.sfs`, and `self.alpha` attributes accordingly.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| numpy | Numerical computations, array operations, and file I/O. |
+| scipy.special | Special functions, including the gamma function used in the beta distribution. |
+| Bio.Phylo | Phylogenetic tree manipulation and analysis. |
+
+## Error Handling
+The code includes basic error handling for file loading in the `loadSFS` method. If the specified file does not exist or the loaded data is not a one-dimensional vector, it prints an error message and sets the `self.sfs` attribute to None.
+
+## Logging
+The code does not implement any specific logging mechanisms.
+
+## API/Interface Reference
+The code does not explicitly define an API or public interface.

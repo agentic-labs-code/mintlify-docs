@@ -1,0 +1,63 @@
+---
+title: "SpectralGreedySolver.py"
+---
+
+## High-level description
+The `SpectralGreedySolver` class, inheriting from `GreedySolver`, implements a phylogenetic tree solver that combines a greedy splitting strategy with a spectral heuristic for optimizing partitions. It aims to construct a more accurate tree by refining the initial greedy splits using spectral methods to maximize the similarity within partitions based on a mutation similarity graph.
+
+## Code Structure
+The `SpectralGreedySolver` class inherits from `GreedySolver` and overrides the `perform_split` method. It utilizes functions from `graph_utilities` for graph construction and optimization. The key logic lies in how it first performs a greedy split based on mutation frequencies and then refines this split using spectral methods on a similarity graph.
+
+## References
+This code references the following symbols from other files:
+- `GreedySolver` (from `cassiopeia.solver.GreedySolver`)
+- `missing_data_methods` (from `cassiopeia.solver.missing_data_methods`)
+- `dissimilarity_functions` (from `cassiopeia.solver.dissimilarity_functions`)
+- `graph_utilities` (from `cassiopeia.solver.graph_utilities`)
+- `solver_utilities` (from `cassiopeia.solver.solver_utilities`)
+
+## Symbols
+
+### `SpectralGreedySolver`
+#### Description
+This class implements a phylogenetic tree solver that combines a greedy splitting strategy with a spectral heuristic for optimizing partitions.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| missing_data_classifier | Callable | A function to handle missing data during partition. Defaults to `assign_missing_average`. |
+| similarity_function | Optional[Callable] | A function to calculate similarity between samples. Defaults to `hamming_similarity_without_missing`. |
+| threshold | Optional[int] | Minimum similarity threshold for edge inclusion in the similarity graph. Defaults to 0. |
+| prior_transformation | str | Transformation method for converting priors to weights. Defaults to "negative_log". |
+
+#### Outputs
+The class itself doesn't have direct outputs. It's meant to be used to solve a `CassiopeiaTree` object.
+
+#### Internal Logic
+The solver first identifies the most frequent mutation to perform an initial greedy split. Then, it constructs a similarity graph based on the provided `similarity_function` and refines the partition using the `spectral_improve_cut` function from `graph_utilities`. This iterative optimization aims to minimize a modified normalized cut, effectively grouping samples with similar mutations.
+
+### `perform_split`
+#### Description
+This method overrides the parent class's method and performs a partition of samples using both greedy and spectral criteria.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| character_matrix | pd.DataFrame | Character matrix representing the mutation profiles of samples. |
+| samples | List[int] | List of samples to be partitioned. |
+| weights | Optional[Dict[int, Dict[int, float]]] | Weights for each (character, state) pair, often derived from priors. |
+| missing_state_indicator | int | Character representing missing data in the character matrix. Defaults to -1. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| improved_left_set | List[str] | List of samples in the left partition after spectral improvement. |
+| improved_right_set | List[str] | List of samples in the right partition after spectral improvement. |
+
+#### Internal Logic
+1. **Identify Splitting Point:** The method first identifies the most frequent (character, state) pair based on the input `character_matrix` and `weights`. This pair will be used to perform the initial split.
+2. **Initial Split:** Samples are divided into `left_set` and `right_set` based on the presence or absence of the chosen character state. Samples with missing data for this character are placed in the `missing` list.
+3. **Handle Missing Data:** The `missing_data_classifier` function is applied to impute the missing data and assign the `missing` samples to either `left_set` or `right_set`.
+4. **Construct Similarity Graph:** A similarity graph is constructed using the `construct_similarity_graph` function from `graph_utilities`. This graph represents the similarity between samples based on their mutation profiles.
+5. **Spectral Improvement:** The `spectral_improve_cut` function from `graph_utilities` is applied to optimize the initial split by minimizing a modified normalized cut on the similarity graph. This step refines the partition by moving samples between `left_set` and `right_set` to maximize the similarity within each partition.
+6. **Return Improved Partitions:** The method returns the optimized `improved_left_set` and `improved_right_set` lists.

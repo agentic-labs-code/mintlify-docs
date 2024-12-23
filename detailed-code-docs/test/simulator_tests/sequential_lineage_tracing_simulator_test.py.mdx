@@ -1,0 +1,82 @@
+---
+title: "sequential_lineage_tracing_simulator_test.py"
+---
+
+## High-level description
+This file contains unit tests for the `SequentialLineageTracingDataSimulator` class in the Cassiopeia library. It tests various aspects of the simulator, including basic setup, error handling, data overlay functionality, and specific scenarios like handling missing data and multiple edits on a branch.
+
+## Code Structure
+The code defines a test class `TestSequentialLineageTracingDataSimulator` that inherits from `unittest.TestCase`. It contains several test methods, each focusing on a specific aspect of the simulator's functionality. The `setUp` method initializes common objects used across multiple tests.
+
+## Symbols
+
+### TestSequentialLineageTracingDataSimulator
+#### Description
+This class contains unit tests for the `SequentialLineageTracingDataSimulator` class.
+
+#### Internal Logic
+1. Sets up a basic tree structure and simulator instances in the `setUp` method.
+2. Tests basic setup, error handling, and data overlay functionality.
+3. Verifies the simulator's behavior with and without missing data.
+4. Checks for correct handling of multiple edits on a branch.
+
+### setUp
+#### Description
+Initializes the test environment by creating a basic tree structure and two simulator instances.
+
+#### Internal Logic
+1. Creates a directed graph representing a tree topology.
+2. Sets up a `CassiopeiaTree` with the topology and node times.
+3. Initializes two `SequentialLineageTracingDataSimulator` instances, one without missing data and one with missing data.
+
+### test_basic_setup
+#### Description
+Tests the basic setup of the simulator, verifying that the initialization parameters are correctly set.
+
+#### Internal Logic
+Checks various attributes of the simulator, such as the number of characters, silencing rates, state priors, and initiation/continuation rates.
+
+### test_setup_errors
+#### Description
+Tests error handling for invalid initialization parameters of the simulator.
+
+#### Internal Logic
+Attempts to create simulator instances with invalid parameters and checks that the appropriate `DataSimulatorError` is raised.
+
+### test_simulator_basic
+#### Description
+Tests the basic functionality of the simulator by overlaying data on the tree and verifying the results.
+
+#### Internal Logic
+1. Overlays data on the basic tree.
+2. Compares the resulting character matrix with an expected matrix.
+3. Checks inheritance patterns in the tree after reconstructing ancestral characters.
+
+### test_simulator_with_missing
+#### Description
+Tests the simulator's behavior when dealing with missing data (i.e., when heritable and stochastic silencing rates are non-zero).
+
+#### Internal Logic
+Overlays data on the basic tree using the simulator with missing data and compares the resulting character matrix with an expected matrix containing missing values (-1).
+
+### test_branch_multiple_edits
+#### Description
+Tests the simulator's ability to handle multiple edits on a single branch.
+
+#### Internal Logic
+1. Creates a simple tree with a long branch.
+2. Overlays data using a simulator with specific parameters.
+3. Verifies that the resulting character matrix contains multiple edits along the branch.
+
+## Dependencies
+The code relies on the following external libraries and modules:
+| Dependency | Purpose |
+|:-----------|:--------|
+| unittest | Provides the testing framework |
+| networkx | Used for creating and manipulating graph structures |
+| numpy | Not directly used in the test file, but likely used in the simulator |
+| pandas | Used for creating and comparing DataFrames |
+| cassiopeia | The library being tested, including its simulator and data structures |
+
+## Error Handling
+The code tests for various error conditions in the `test_setup_errors` method, ensuring that the simulator raises appropriate `DataSimulatorError` exceptions when given invalid input parameters.

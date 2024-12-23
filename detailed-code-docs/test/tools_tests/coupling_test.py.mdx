@@ -1,0 +1,54 @@
+---
+title: "coupling_test.py"
+---
+
+## High-level description
+This file contains unit tests for the coupling estimators implemented in `cassiopeia/tools/coupling.py`, specifically focusing on the `compute_evolutionary_coupling` function. These tests ensure the correctness of the evolutionary coupling calculations under various scenarios, including different input parameters and data configurations.
+
+## Code Structure
+The code consists of a single test class, `TestDataUtilities`, which houses multiple test methods. Each test method focuses on a specific aspect of the `compute_evolutionary_coupling` function, such as its basic functionality, handling of custom dissimilarity maps, minimum proportion thresholds, and potential error cases.
+
+## Symbols
+### `TestDataUtilities`
+#### Description
+This class contains unit tests for data utility functions, specifically focusing on the `compute_evolutionary_coupling` function.
+
+#### Inputs
+* **None**
+
+#### Outputs
+* **None**
+
+#### Internal Logic
+This class utilizes the `unittest` framework to define and execute test methods. Each test method sets up a specific scenario using a predefined tree structure and cell metadata, then calls the `compute_evolutionary_coupling` function with specific parameters. The expected output is then compared to the actual output to verify the correctness of the function.
+
+##### `test_evolutionary_coupling_basic`
+* **Description:** Tests the basic functionality of the `compute_evolutionary_coupling` function with default parameters.
+* **Inputs:** None
+* **Outputs:** None
+* **Internal Logic:**
+    1. Sets up a `CassiopeiaTree` with predefined tree topology and cell metadata.
+    2. Calls `compute_evolutionary_coupling` with the tree, "CellType" as the meta variable, a fixed random state, minimum proportion of 0, and 10 shuffles.
+    3. Computes the expected inter-cluster distances and evolutionary coupling matrix based on the predefined data and parameters.
+    4. Asserts that the calculated evolutionary coupling matrix matches the expected matrix.
+    5. Asserts that a `CassiopeiaError` is raised when attempting to compute evolutionary coupling with a numerical meta variable ("nUMI").
+
+##### `test_evolutionary_coupling_custom_dissimilarity_map`
+* **Description:** Tests the functionality of `compute_evolutionary_coupling` with a custom dissimilarity map.
+* **Inputs:** None
+* **Outputs:** None
+* **Internal Logic:**
+    1. Sets up a `CassiopeiaTree` and a custom weight matrix representing the dissimilarity map.
+    2. Calls `compute_evolutionary_coupling` with the tree, "CellType" as the meta variable, a fixed random state, minimum proportion of 0, 10 shuffles, and the custom dissimilarity map.
+    3. Computes the expected inter-cluster distances and evolutionary coupling matrix based on the predefined data, parameters, and custom dissimilarity map.
+    4. Asserts that the calculated evolutionary coupling matrix matches the expected matrix.
+
+##### `test_evolutionary_coupling_minimum_proportion`
+* **Description:** Tests the functionality of `compute_evolutionary_coupling` with a minimum proportion threshold for categories.
+* **Inputs:** None
+* **Outputs:** None
+* **Internal Logic:**
+    1. Sets up a `CassiopeiaTree` and modifies the cell metadata to include a category ("TypeD") that falls below the minimum proportion threshold.
+    2. Calls `compute_evolutionary_coupling` with the tree, "CellType" as the meta variable, a fixed random state, a minimum proportion of 1/6 (which excludes "TypeC" and "TypeD"), and 10 shuffles.
+    3. Asserts that the resulting evolutionary coupling matrix does not include the excluded categories ("TypeC" and "TypeD").
+    4. Computes the expected inter-cluster distances and evolutionary coupling matrix based on the remaining categories and asserts that the calculated matrix matches the expected matrix.

@@ -1,0 +1,57 @@
+---
+title: "cassiopeia_preprocess.py"
+---
+
+## High-level description
+This script orchestrates the preprocessing of sequencing data for phylogenetic inference using the Cassiopeia pipeline. It takes a configuration file as input, which specifies the desired preprocessing steps and their parameters, and executes them sequentially. The script supports various functionalities such as converting FASTQ files to BAM format, filtering reads, error-correcting barcodes and UMIs, collapsing UMIs, aligning sequences, calling alleles, and filtering molecule tables.
+
+## Code Structure
+The `main` function serves as the entry point for the script. It parses command-line arguments, reads the configuration file, sets up the output directory, and creates a pipeline plan based on the specified entry and exit points. It then iterates through the pipeline stages, executing each stage's corresponding function with the appropriate parameters. The `STAGES` dictionary maps stage names to their respective functions defined in the `cassiopeia.preprocess.pipeline` module.
+
+## References
+This script references functions from the `cassiopeia.preprocess.pipeline` and `cassiopeia.preprocess.setup_utilities` modules.
+
+## Symbols
+### `main`
+#### Description
+This function is the main entry point for the Cassiopeia preprocessing script. It parses the configuration file, sets up the pipeline, and executes the preprocessing stages.
+
+#### Inputs
+This function takes no direct inputs. It uses command-line arguments to obtain the path to the configuration file.
+
+#### Outputs
+This function has no direct outputs. It writes the processed data to files in the specified output directory.
+
+#### Internal Logic
+1. **Parse command-line arguments:** Retrieves the path to the configuration file.
+2. **Read configuration file:** Parses the configuration file and extracts pipeline parameters.
+3. **Validate configuration:** Checks if all specified stages are valid.
+4. **Setup output directory:** Creates the output directory if it doesn't exist.
+5. **Create pipeline plan:** Determines the stages to execute based on the entry and exit points defined in the configuration.
+6. **Load input data:** Loads the input data based on the entry point.
+7. **Execute pipeline stages:** Iterates through the pipeline stages, executing each stage's function with the corresponding parameters.
+8. **Write output data:** Writes the processed data for each stage to a separate file in the output directory.
+
+## Side Effects
+This script modifies the file system by creating directories and writing output files. It also logs information and errors to the console and log files.
+
+## Dependencies
+This script depends on the following external libraries:
+| Dependency | Purpose |
+|:-----------|:--------|
+| argparse | Parsing command-line arguments |
+| logging | Logging information and errors |
+| pandas | Data manipulation and analysis |
+| typing | Type hinting |
+| cassiopeia.mixins | Cassiopeia-specific mixins |
+| cassiopeia.preprocess.pipeline | Preprocessing pipeline functions |
+| cassiopeia.preprocess.setup_utilities | Setup utilities for the pipeline |
+
+### Configuration
+The script relies on a configuration file to define the pipeline parameters. The configuration file should be in INI format and contain sections for each stage, as well as a "general" section for global parameters. See `cassiopeia/preprocess/constants.py` for the default pipeline parameters and their descriptions.
+
+## Error Handling
+The script raises `PreprocessError` exceptions for invalid configuration parameters or pipeline stages. It also logs errors to the console and error log file.
+
+## Logging
+The script uses the `logging` module to log information and errors to the console and log files. The verbosity of the logging can be controlled using the `verbose` parameter in the configuration file.

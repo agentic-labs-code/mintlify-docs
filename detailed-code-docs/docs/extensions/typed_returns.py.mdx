@@ -1,0 +1,78 @@
+---
+title: "typed_returns.py"
+---
+
+## High-level description
+This code provides a Sphinx extension that customizes the parsing of the "Returns" section in NumPy-style docstrings. It specifically formats the return values to include hyperlinks to their types using the `:class:` role.
+
+## References
+This code references the `NumpyDocstring` class from the `sphinx.ext.napoleon` module.
+
+## Symbols
+
+### `process_return`
+#### Description
+This function iterates through a list of lines (presumably from a docstring's "Returns" section) and reformats lines that match a specific pattern. 
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lines | list[str] | A list of strings representing lines in a docstring's "Returns" section. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | generator[str] | Yields reformatted lines or the original line if no match is found. |
+
+#### Internal Logic
+1. Iterates through each line in the input `lines`.
+2. Attempts to match the line with the regular expression `r"(?P&lt;param&gt;\w+)\s+:\s+(?P&lt;type&gt;[\w.]+)"`. This pattern captures a "parameter" and its "type" separated by a colon.
+3. If a match is found:
+    - It reformats the line to `f'-{m["param"]} (:class:`~{m["type"]}`)'`, which creates a hyperlink for the type using the `:class:` role.
+4. If no match is found, it yields the original line.
+
+### `scanpy_parse_returns_section`
+#### Description
+This function overrides the `_parse_returns_section` method of the `NumpyDocstring` class. It processes the "Returns" section of a docstring to format return values with hyperlinks to their types.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| self | NumpyDocstring | The `NumpyDocstring` instance. |
+| section | str | The content of the "Returns" section from the docstring. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | list[str] | Returns a list of strings representing the formatted "Returns" section. |
+
+#### Internal Logic
+1. Calls `process_return` to reformat the lines of the "Returns" section.
+2. Formats the processed lines using `_format_block` with ":returns: " as the prefix.
+3. Appends an empty line if the formatted lines are not empty.
+4. Returns the formatted lines.
+
+### `setup`
+#### Description
+This function is the entry point for the Sphinx extension. It modifies the behavior of the `NumpyDocstring` class to use the custom `scanpy_parse_returns_section` method.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| app | Sphinx | The Sphinx application object. |
+
+#### Internal Logic
+Sets the `_parse_returns_section` attribute of the `NumpyDocstring` class to the custom `scanpy_parse_returns_section` function.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| sphinx | Used for interacting with Sphinx and its components. |
+| sphinx.ext.napoleon | Used for parsing NumPy-style docstrings. |
+| re | Used for regular expression matching. |
+
+## TODOs
+```python
+# code from https://github.com/theislab/scanpy/blob/master/docs/extensions/typed_returns.py
+# with some minor adjustment
+```

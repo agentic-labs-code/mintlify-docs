@@ -1,0 +1,190 @@
+---
+title: "small_parsimony.py"
+---
+
+## High-level description
+This file provides tools for analyzing phylogenies using small-parsimony. It includes functions for Fitch-Hartigan reconstruction, parsimony scoring, and the FitchCount algorithm. These tools are used to infer ancestral states and quantify transitions between states in a phylogenetic tree.
+
+## Code Structure
+The code consists of several functions that work together to perform small-parsimony analysis on a `CassiopeiaTree` object. The main functions are `fitch_hartigan`, `score_small_parsimony`, and `fitch_count`. `fitch_hartigan` is further divided into `fitch_hartigan_bottom_up` and `fitch_hartigan_top_down` for the two phases of the algorithm. `fitch_count` uses two helper functions, `_N_fitch_count` and `_C_fitch_count`, to implement the dynamic programming algorithm.
+
+## References
+This code references the `CassiopeiaTree` class from `cassiopeia.data` and several exception classes from `cassiopeia.mixins.errors`.
+
+## Symbols
+
+### `fitch_hartigan`
+#### Description
+Runs the full Fitch-Hartigan small parsimony algorithm to infer the most-parsimonious set of ancestral states for a given categorical variable in a `CassiopeiaTree`. It first performs the bottom-up phase to determine the optimal set of states for each node, and then the top-down phase to select a random solution that satisfies the maximum-parsimony criterion.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | CassiopeiaTree | The tree object containing cell meta data. |
+| meta_item | str | The name of the column in the cell meta data representing the categorical variable. |
+| root | Optional[str] | The root node from which to start the refinement. If None, the tree's root is used. |
+| state_key | str | The attribute key to store the ancestral states from the bottom-up phase. Defaults to "S1". |
+| label_key | str | The attribute key to store the maximum-parsimony assignment from the top-down phase. Defaults to "label". |
+| copy | bool | Whether to modify the tree in place or return a copy. Defaults to False. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | Optional[CassiopeiaTree] | The modified tree object with inferred ancestral states, or a copy if `copy=True`. Returns None if `copy=False`. |
+
+#### Internal Logic
+1. Copies the tree if `copy=True`.
+2. Runs `fitch_hartigan_bottom_up` to perform the bottom-up phase of the algorithm.
+3. Runs `fitch_hartigan_top_down` to perform the top-down phase of the algorithm.
+4. Returns the modified tree or a copy.
+
+### `fitch_hartigan_bottom_up`
+#### Description
+Performs the bottom-up phase of the Fitch-Hartigan algorithm. It traverses the tree in post-order and infers the optimal set of ancestral states for each node based on the states of its children.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | CassiopeiaTree | The tree object containing cell meta data. |
+| meta_item | str | The name of the column in the cell meta data representing the categorical variable. |
+| add_key | str | The attribute key to store the inferred ancestral states. Defaults to "S1". |
+| copy | bool | Whether to modify the tree in place or return a copy. Defaults to False. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | Optional[CassiopeiaTree] | The modified tree object with inferred ancestral states, or a copy if `copy=True`. Returns None if `copy=False`. |
+
+#### Internal Logic
+1. Copies the tree if `copy=True`.
+2. For each node in the tree, traversed in post-order:
+    - If the node is a leaf, its state is taken from the cell meta data.
+    - If the node is internal, the intersection of the states of its children is taken as the optimal set of states. If the intersection is empty, the union of the states is taken.
+3. Returns the modified tree or a copy.
+
+### `fitch_hartigan_top_down`
+#### Description
+Performs the top-down phase of the Fitch-Hartigan algorithm. It traverses the tree from the root and selects a random solution from the optimal set of states for each node, ensuring consistency with the state assigned to its parent.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | CassiopeiaTree | The tree object with ancestral states inferred from the bottom-up phase. |
+| root | Optional[str] | The root node from which to start the refinement. If None, the tree's root is used. |
+| state_key | str | The attribute key storing the ancestral states from the bottom-up phase. Defaults to "S1". |
+| label_key | str | The attribute key to store the maximum-parsimony assignment. Defaults to "label". |
+| copy | bool | Whether to modify the tree in place or return a copy. Defaults to False. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | Optional[CassiopeiaTree] | The modified tree object with a maximum-parsimony assignment, or a copy if `copy=True`. Returns None if `copy=False`. |
+
+#### Internal Logic
+1. Copies the tree if `copy=True`.
+2. For each node in the tree, traversed from the root:
+    - If the node is the root, a random state is chosen from its optimal set of states.
+    - If the node is not the root, the state assigned to its parent is checked. If the parent's state is in the node's optimal set of states, it is assigned to the node. Otherwise, a random state is chosen from the node's optimal set.
+3. Returns the modified tree or a copy.
+
+### `score_small_parsimony`
+#### Description
+Computes the small-parsimony score of a tree, which is the number of state changes along the edges of the tree.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | CassiopeiaTree | The tree object containing cell meta data. |
+| meta_item | str | The name of the column in the cell meta data representing the categorical variable. |
+| root | Optional[str] | The root node from which to start the score calculation. If None, the tree's root is used. |
+| infer_ancestral_states | bool | Whether to infer ancestral states using `fitch_hartigan` before scoring. Defaults to True. |
+| label_key | Optional[str] | The attribute key storing the inferred ancestral states if `infer_ancestral_states=False`. Defaults to "label". |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| parsimony | int | The parsimony score of the tree. |
+
+#### Internal Logic
+1. Copies the tree.
+2. If `infer_ancestral_states=True`, runs `fitch_hartigan` to infer ancestral states.
+3. Traverses the edges of the tree and increments the parsimony score for each edge where the parent and child nodes have different states.
+4. Returns the parsimony score.
+
+### `fitch_count`
+#### Description
+Implements the FitchCount algorithm to infer the number of transitions between states across all equally-parsimonious solutions returned by the Fitch-Hartigan algorithm.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | CassiopeiaTree | The tree object containing cell meta data. |
+| meta_item | str | The name of the column in the cell meta data representing the categorical variable. |
+| root | Optional[str] | The root node from which to start the count. If None, the tree's root is used. |
+| infer_ancestral_states | bool | Whether to infer ancestral states using `fitch_hartigan_bottom_up` before counting. Defaults to True. |
+| state_key | str | The attribute key storing the inferred ancestral states if `infer_ancestral_states=False`. Defaults to "S1". |
+| unique_states | Optional[List[str]] | The state space for the categorical variable. If None, the unique values in the cell meta data are used. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| M | pd.DataFrame | An MxM count matrix, where M is the number of unique states. The value at (i, j) indicates the number of times state i transitioned to state j across all equally-parsimonious solutions. |
+
+#### Internal Logic
+1. Copies the tree.
+2. Determines the state space based on `unique_states` or the unique values in the cell meta data.
+3. If `infer_ancestral_states=True`, runs `fitch_hartigan_bottom_up` to infer ancestral states.
+4. Creates mappings from nodes and states to unique integers.
+5. Calls `_N_fitch_count` to compute the dynamic programming table N, which stores the number of solutions below a node given its state.
+6. Calls `_C_fitch_count` to compute the dynamic programming table C, which stores the number of transitions between states below a node given its state.
+7. Constructs the count matrix M from the values in C.
+8. Returns the count matrix M.
+
+### `_N_fitch_count`
+#### Description
+Helper function for `fitch_count` that computes the dynamic programming table N.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | CassiopeiaTree | The tree object. |
+| unique_states | List[str] | The state space for the categorical variable. |
+| node_to_i | Dict[str, int] | A mapping from nodes to unique integers. |
+| label_to_j | Dict[str, int] | A mapping from states to unique integers. |
+| state_key | str | The attribute key storing the inferred ancestral states. Defaults to "S1". |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N | np.array(int) | A 2-dimensional array storing N[v, s], the number of equally-parsimonious solutions below node v given v takes on state s. |
+
+#### Internal Logic
+1. Defines a helper function `_fill` to compute a single entry in N.
+2. Initializes N with zeros.
+3. For each node in the tree, and for each state in its optimal set of states, calls `_fill` to compute the corresponding entry in N.
+4. Returns N.
+
+### `_C_fitch_count`
+#### Description
+Helper function for `fitch_count` that computes the dynamic programming table C.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | CassiopeiaTree | The tree object. |
+| N | np.array | The N array computed by `_N_fitch_count`. |
+| unique_states | List[str] | The state space for the categorical variable. |
+| node_to_i | Dict[str, int] | A mapping from nodes to unique integers. |
+| label_to_j | Dict[str, int] | A mapping from states to unique integers. |
+| state_key | str | The attribute key storing the inferred ancestral states. Defaults to "S1". |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| C | np.array(int) | A 4-dimensional array storing C[v, s, s1, s2], the number of transitions from state s1 to state s2 below node v given v takes on state s. |
+
+#### Internal Logic
+1. Defines a helper function `_fill` to compute a single entry in C.
+2. Initializes C with zeros.
+3. For each node in the tree, for each state in its optimal set of states, and for each pair of states (s1, s2), calls `_fill` to compute the corresponding entry in C.
+4. Returns C.

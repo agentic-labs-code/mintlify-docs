@@ -1,0 +1,68 @@
+---
+title: "VanillaGreedySolver.py"
+---
+
+## High-level description
+The `VanillaGreedySolver` class in `VanillaGreedySolver.py` implements a top-down greedy algorithm for reconstructing phylogenetic trees. It recursively splits a set of samples into mutually exclusive groups based on the presence or absence of the most frequently occurring mutation, optimizing for parsimony. The solver handles missing data using various imputation methods and allows for weighting character-state pairs based on provided priors.
+
+## Code Structure
+The `VanillaGreedySolver` class inherits from the `GreedySolver` class. It primarily implements the `perform_split` method, which determines the optimal split based on mutation frequencies. The `solve` method, inherited from `GreedySolver`, orchestrates the tree building process by recursively calling `perform_split`. The `compute_mutation_frequencies` method calculates the frequencies of each character-state pair, considering ambiguous states. The `__add_duplicates_to_tree` method, also inherited, handles the reinsertion of duplicate samples into the tree after the main solving process.
+
+## References
+- `GreedySolver`: The parent class defining the general structure of greedy solvers.
+- `missing_data_methods`: A module containing various missing data imputation methods.
+- `solver_utilities`: A module providing utility functions for tree solvers.
+
+## Symbols
+
+### `VanillaGreedySolver`
+#### Description
+This class implements the vanilla Cassiopeia-Greedy algorithm for phylogenetic tree reconstruction. It identifies the most frequent mutation and splits the sample set based on the presence or absence of that mutation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| missing_data_classifier | Callable | A function to handle missing data during character splits. Defaults to `missing_data_methods.assign_missing_average`. |
+| prior_transformation | str | The method for transforming priors into weights. Defaults to "negative_log". |
+
+#### Outputs
+None
+
+#### Internal Logic
+The `perform_split` method calculates mutation frequencies and identifies the most frequent mutation. It then partitions the samples based on the presence or absence of this mutation, using the specified `missing_data_classifier` to handle missing data.
+
+### `perform_split`
+#### Description
+This method partitions a set of samples based on the most frequent (character, state) pair in the character matrix.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| character_matrix | pd.DataFrame | The character matrix representing the mutation profiles of the samples. |
+| samples | List[int] | A list of sample indices to be partitioned. |
+| weights | Optional[Dict[int, Dict[int, float]]] | A dictionary of weights for each (character, state) pair, derived from priors. |
+| missing_state_indicator | int | The character representing missing data in the character matrix. Defaults to -1. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| left_set | List[str] | The list of samples belonging to the left partition (possessing the most frequent mutation). |
+| right_set | List[str] | The list of samples belonging to the right partition (not possessing the most frequent mutation). |
+
+#### Internal Logic
+1. Calculate mutation frequencies using `compute_mutation_frequencies`.
+2. Identify the (character, state) pair with the highest frequency, considering weights if provided.
+3. Partition the samples into `left_set` and `right_set` based on the presence or absence of the chosen mutation.
+4. Use the `missing_data_classifier` to assign samples with missing data at the chosen character to either partition.
+
+## Error Handling
+The code raises a `GreedySolverError` if the input character matrix contains ambiguous states and the solver is not configured to handle them (`self.allow_ambiguous` is False).
+
+## Dependencies
+- pandas
+- networkx
+- ete3
+- numpy
+
+## TODOs
+None specified in the code.

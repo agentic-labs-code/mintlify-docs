@@ -1,0 +1,331 @@
+---
+title: "tree.py"
+---
+
+## High-level description
+The `Tree` class represents a phylogenetic tree and provides methods for manipulating, analyzing, and visualizing it. It supports constructing trees from Newick files, generating trees by simulation, and performing various operations like annotating nodes with features, calculating tree statistics, and inferring fitness.
+
+## Code Structure
+The `Tree` class encapsulates an `ete3.Tree` object and extends its functionality with custom methods. It utilizes external libraries like `ete3` for tree manipulation, `Bio.Phylo` for interfacing with Biopython, and other modules for specific tasks like site frequency spectrum analysis and fitness inference.
+
+## References
+This code references the following external libraries and modules:
+- `ete3`: Used for phylogenetic tree manipulation and visualization.
+- `Bio.Phylo`: Used for interfacing with Biopython's phylogenetic tree representation.
+- `.resources.betatree.src.betatree`: Used for simulating trees using the beta-tree model.
+- `.resources.FitnessInference.prediction_src.node_ranking`: Used for inferring fitness metrics of nodes.
+- `jungle.sfs.SFS`: Used for calculating and analyzing site frequency spectra.
+
+## Symbols
+
+### `Tree`
+#### Description
+This class represents a phylogenetic tree and provides methods for its manipulation, analysis, and visualization.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| T | ete3.Tree | An ete3.Tree object representing the phylogenetic tree. |
+| name | str | The name of the tree. |
+| params | dict | A dictionary of parameters used to generate or analyze the tree. |
+
+#### Outputs
+This class does not have a return value. It is used to create and manipulate Tree objects.
+
+#### Internal Logic
+The `Tree` class stores the tree structure in an `ete3.Tree` object and provides methods for:
+- Loading and saving trees from/to files.
+- Generating trees by simulation.
+- Annotating nodes with various features like depth, number of descendants, imbalance, etc.
+- Calculating tree statistics like total branch length, site frequency spectrum, and various diversity indices.
+- Inferring fitness of nodes using external packages.
+- Visualizing the tree with node coloring and rendering.
+
+## Side Effects
+Some methods of the `Tree` class modify the internal state of the `ete3.Tree` object, such as adding new attributes to nodes or changing branch lengths.
+
+#### Performance Considerations
+The performance of some methods, especially those involving tree traversal or complex calculations, may vary depending on the size and complexity of the tree.
+
+### `from_newick`
+#### Description
+Constructs a `Tree` object from a Newick file.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filename | str | The path to the Newick file. |
+| name | str | The name of the tree (optional). |
+| params | dict | A dictionary of parameters (optional). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | Tree | A `Tree` object representing the tree from the Newick file. |
+
+#### Internal Logic
+- Reads the Newick file using `ete3.Tree`.
+- Ladderizes the tree for consistent visualization.
+- Assigns names to internal nodes if not already present.
+
+### `from_pickle`
+#### Description
+Loads a `Tree` object from a pickle file.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filename | str | The path to the pickle file. |
+| gzip | bool | Whether the file is gzipped (optional, inferred from filename if not provided). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | Tree | A `Tree` object loaded from the pickle file. |
+
+#### Internal Logic
+- Opens the pickle file, handling gzip compression if necessary.
+- Loads the `Tree` object using `pickle.load`.
+
+### `generate`
+#### Description
+Generates a random `Tree` object using the beta-tree model.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params | dict | A dictionary of parameters for tree generation, including 'n_leaves' (number of leaves) and 'alpha' (shape parameter of the beta distribution). |
+| name | str | The name of the tree (optional). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | Tree | A randomly generated `Tree` object. |
+
+#### Internal Logic
+- Uses the `betatree` module to simulate a tree with the given parameters.
+- Converts the simulated tree to an `ete3.Tree` object.
+- Ladderizes the tree and assigns names to internal nodes.
+
+### `to_newick`
+#### Description
+Writes the `Tree` object to a Newick file.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| outfile | str | The path to the output Newick file. |
+| **kwargs | keyword arguments | Additional arguments passed to `ete3.Tree.write`. |
+
+#### Outputs
+This method does not return any value. It writes the tree to a file.
+
+#### Internal Logic
+- Uses the `ete3.Tree.write` method to write the tree to the specified file in Newick format.
+
+### `annotate_standard_node_features`
+#### Description
+Annotates each node in the tree with standard features like depth, number of children, and number of descendants.
+
+#### Inputs
+This method does not take any inputs.
+
+#### Outputs
+This method does not return any value. It modifies the tree in place.
+
+#### Internal Logic
+- Traverses the tree in postorder.
+- For each node, calculates and sets the following attributes:
+    - `depth`: Distance from the root.
+    - `num_children`: Number of direct children.
+    - `num_descendants`: Total number of descendants, including the node itself.
+    - `num_leaf_descendants`: Total number of leaf nodes that descend from this node.
+- Sets the `is_depth_annotated` flag to True.
+- Calculates and sets the `depth_normalized` attribute for each node, normalized by the maximum depth.
+
+### `node_features`
+#### Description
+Returns a Pandas DataFrame containing selected features of all nodes in the tree.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subset | list | A list of feature names to include in the DataFrame (optional, defaults to all available features). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| features | pandas.DataFrame | A DataFrame with rows representing nodes and columns representing selected features. |
+
+#### Internal Logic
+- Determines the set of features to include in the DataFrame.
+- Iterates through each feature and each node, retrieving the feature value (or None if not available) and storing it in the DataFrame.
+- Adds an 'is_leaf' column indicating whether each node is a leaf.
+
+### `annotate_imbalance`
+#### Description
+Calculates and annotates each node with its imbalance, defined as the ratio of the maximum number of descendants among its children to the total number of descendants.
+
+#### Inputs
+This method does not take any inputs.
+
+#### Outputs
+This method does not return any value. It modifies the tree in place.
+
+#### Internal Logic
+- Traverses the tree.
+- For each non-leaf node:
+    - Retrieves the number of descendants for each child node.
+    - Calculates the imbalance as the maximum number of descendants divided by the total number of descendants.
+    - Sets the 'imbalance' attribute of the node.
+
+### `annotate_colless`
+#### Description
+Calculates and annotates each node with its Colless index, a measure of tree balance.
+
+#### Inputs
+This method does not take any inputs.
+
+#### Outputs
+This method does not return any value. It modifies the tree in place.
+
+#### Internal Logic
+- Traverses the tree in postorder.
+- For each node:
+    - If it's a leaf node, sets the 'colless' attribute to 0.
+    - If it's an internal node:
+        - Calculates the absolute difference in the number of descendants between its two children.
+        - Recursively calculates the Colless index for each child.
+        - Calculates the Colless index for the current node by summing the difference in descendants and the Colless indices of its children.
+    - Sets the 'difference_num_descendants', 'colless', and 'log10p_colless' attributes of the node.
+- Sets the 'colless' and 'log10p_colless' attributes of the `Tree` object itself.
+
+### `max_depth`
+#### Description
+Returns the maximum depth of the tree.
+
+#### Inputs
+This method does not take any inputs.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| max_depth | int | The maximum depth of the tree. |
+
+#### Internal Logic
+- Checks if the `is_depth_annotated` flag is True. If not, raises an error.
+- Retrieves the 'depth' attribute of all nodes and returns the maximum value.
+
+### `total_branch_length`
+#### Description
+Calculates and returns the total branch length of the tree.
+
+#### Inputs
+This method does not take any inputs.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| total_branch_length | float | The total branch length of the tree. |
+
+#### Internal Logic
+- Sums the 'dist' attribute (branch length) of all nodes in the tree.
+
+### `rescale`
+#### Description
+Rescales the tree so that its total branch length equals a given value.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| total_branch_length | float | The desired total branch length after rescaling. |
+
+#### Outputs
+This method does not return any value. It modifies the tree in place.
+
+#### Internal Logic
+- Calculates the current total branch length.
+- Calculates the scaling factor as the desired length divided by the current length.
+- Multiplies the 'dist' attribute (branch length) of each node by the scaling factor.
+
+### `resolve_polytomy`
+#### Description
+Resolves any polytomies (nodes with more than two children) in the tree by creating an arbitrary dichotomous structure.
+
+#### Inputs
+This method does not take any inputs.
+
+#### Outputs
+This method does not return any value. It modifies the tree in place.
+
+#### Internal Logic
+- Uses the `ete3.Tree.resolve_polytomy` method to resolve polytomies.
+- Ladderizes the tree to maintain a consistent visualization.
+
+### `site_frequency_spectrum`
+#### Description
+Calculates and returns the site frequency spectrum (SFS) of the tree.
+
+#### Inputs
+This method does not take any inputs.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sfs | SFS | An `SFS` object representing the site frequency spectrum of the tree. |
+
+#### Internal Logic
+- If the `_site_frequency_spectrum` attribute is not already calculated:
+    - Calculates the SFS using the `SFS.from_tree` method.
+    - Stores the result in the `_site_frequency_spectrum` attribute.
+- Returns the `_site_frequency_spectrum` attribute.
+
+### `bin_site_frequency_spectrum`
+#### Description
+Bins the site frequency spectrum (SFS) of the tree using specified bins.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bins | array-like | An array-like object defining the bin edges. |
+| *args | tuple | Additional positional arguments passed to the `SFS.bin` method. |
+| **kwargs | dict | Additional keyword arguments passed to the `SFS.bin` method. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| binned_sfs | array-like | An array-like object containing the binned and normalized SFS values. |
+
+#### Internal Logic
+- Calls the `SFS.bin` method on the tree's SFS with the provided arguments.
+- Returns the `binned_normalized_cut` attribute of the SFS object, which represents the binned and normalized SFS values.
+
+### `fay_and_wus_H`
+#### Description
+Calculates and returns Fay and Wu's H statistic, a measure of genetic diversity, from the tree's SFS.
+
+#### Inputs
+This method does not take any inputs.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| H | float | Fay and Wu's H statistic. |
+
+#### Internal Logic
+- If the `_fay_and_wus_H` attribute is not already calculated:
+    - Calculates H using the `SFS.fay_and_wus_H` method.
+    - Stores the result in the `_fay_and_wus_H` attribute.
+- Returns the `_fay_and_wus_H` attribute.
+
+### `zengs_E`
+#### Description
+Calculates and returns Zeng's E statistic, a measure of genetic diversity, from the tree's SFS.
+
+#### Inputs
+This method does not take any inputs.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|

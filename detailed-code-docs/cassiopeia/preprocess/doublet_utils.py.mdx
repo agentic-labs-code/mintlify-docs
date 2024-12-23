@@ -1,0 +1,102 @@
+---
+title: "doublet_utils.py"
+---
+
+## High-level description
+The `doublet_utils.py` file provides functions for identifying and filtering potential cell doublets in single-cell sequencing data. It offers methods to detect both intra-lineage and inter-lineage doublets based on the consistency of allele information within and across lineage groups.
+
+## Code Structure
+The `filter_intra_doublets` function identifies cells with conflicting allele information within themselves, while `get_intbc_set` and `compute_lg_membership` are used by `filter_inter_doublets` to identify cells with ambiguous lineage assignments.
+
+## Symbols
+### `filter_intra_doublets`
+#### Description
+This function identifies and filters out cells that exhibit a high degree of conflicting allele information within themselves, suggesting they might be doublets. It calculates the proportion of UMIs supporting conflicting alleles for each cell and filters those exceeding a specified threshold.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| molecule_table | pandas.DataFrame | A DataFrame representing a molecule table with cellBC-UMI pairs. |
+| prop | float | The threshold for the proportion of conflicting UMIs above which a cell is considered a doublet. Defaults to 0.1. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| pandas.DataFrame | A filtered molecule table with potential intra-lineage doublets removed. |
+
+#### Internal Logic
+1. Groups UMIs by cell barcode (cellBC), integration barcode (intBC), and allele, counting UMIs per group.
+2. Identifies the most common allele for each cellBC-intBC pair.
+3. Calculates the proportion of UMIs supporting alleles different from the most common one for each cellBC.
+4. Filters out cellBCs with a conflicting UMI proportion exceeding the specified `prop` threshold.
+
+### `get_intbc_set`
+#### Description
+This function identifies the set of intBCs present in a lineage group, optionally filtering out intBCs with low prevalence within the group.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lg | pandas.DataFrame | A DataFrame representing an allele table for a single lineage group. |
+| thresh | int | The minimum proportion of cells in the lineage group required to have an intBC for it to be included in the set. If None, no filtering is performed. Defaults to None. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tuple | A tuple containing: (1) a set of intBCs present in the lineage group (potentially filtered by `thresh`), and (2) a dictionary mapping each intBC to the proportion of cells in the lineage group lacking that intBC. |
+
+#### Internal Logic
+1. Calculates the number of unique cells in the lineage group.
+2. Counts the number of unique cellBCs associated with each intBC.
+3. Calculates the proportion of cells lacking each intBC.
+4. If `thresh` is provided, filters out intBCs with proportions exceeding the threshold.
+5. Returns the set of intBCs and the dictionary of dropout proportions.
+
+### `compute_lg_membership`
+#### Description
+This function calculates a "kinship" score for a given cell against each lineage group, representing the weighted proportion of shared intBCs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cell | pandas.DataFrame | A DataFrame representing an allele table subsetted to a single cellBC. |
+| intbc_sets | dict | A dictionary mapping lineage group identifiers to their corresponding sets of intBCs. |
+| lg_dropouts | dict | A dictionary mapping lineage group identifiers to dictionaries of intBC dropout proportions within that group. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dict | A dictionary mapping lineage group identifiers to the calculated kinship score for the given cell. |
+
+#### Internal Logic
+1. Identifies the set of intBCs present in the given cell.
+2. For each lineage group:
+    - Calculates the intersection between the cell's intBC set and the lineage group's intBC set.
+    - Calculates a weighted intersection size, considering the dropout proportions of shared intBCs within the lineage group.
+    - Normalizes the weighted intersection by the total weighted size of the lineage group's intBC set.
+3. Normalizes the kinship scores across all lineage groups to sum to 1.
+
+### `filter_inter_doublets`
+#### Description
+This function identifies and filters out cells with ambiguous lineage assignments, suggesting they might be doublets formed from cells belonging to different lineages. It calculates a kinship score between each cell and its assigned lineage group and filters out cells with scores below a specified threshold.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| at | pandas.DataFrame | An allele table containing cellBC-intBC-allele information. |
+| rule | float | The minimum kinship score required for a cell to be retained. Cells with kinship scores below this threshold are considered potential inter-lineage doublets. Defaults to 0.35. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| pandas.DataFrame | A filtered allele table with potential inter-lineage doublets removed. |
+
+#### Internal Logic
+1. Determines the set of intBCs and their dropout proportions for each lineage group.
+2. For each cell:
+    - Calculates the kinship score between the cell and each lineage group using the `compute_lg_membership` function.
+    - Compares the kinship score of the cell's assigned lineage group to the `rule` threshold.
+    - Filters out the cell if its kinship score with its assigned lineage group is below the threshold.
+
+## Error Handling
+The `error_correct_umis` function raises a `PreprocessError` if it encounters non-unique cellBC-UMI pairs, indicating an issue with prior UMI resolution steps.

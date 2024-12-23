@@ -1,0 +1,61 @@
+---
+title: "fitness_inference.py"
+---
+
+## High-level description
+The code defines a `fitness_inference` class in Python for inferring the ancestral fitness distribution of nodes in a phylogenetic tree. It leverages a message-passing algorithm to propagate fitness information up and down the tree, ultimately calculating the posterior fitness distribution for each node. This analysis helps understand the evolutionary trajectory of fitness within the tree.
+
+## Code Structure
+The `fitness_inference` class inherits from the `survival_gen_func` class, suggesting that the fitness inference process builds upon a survival analysis framework. The code defines methods for setting up the tree, calculating messages and polarizers that propagate fitness information, and ultimately computing marginal probabilities and fitness statistics for each node.
+
+## References
+- `solve_survival`: The code imports `survival_gen_func` from `.solve_survival`, indicating a dependency on this module likely for survival analysis functionalities.
+
+## Symbols
+
+### `fitness_inference`
+#### Description
+This class performs fitness inference on a phylogenetic tree, calculating the ancestral fitness distribution for each node. It uses a message-passing algorithm, propagating fitness information up and down the tree structure.
+
+#### Inputs
+The class constructor (`__init__`) takes the following inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| eps_branch_length | float |  A small value added to branch lengths to avoid zero-length issues. Defaults to 1e-7. |
+| D | float | Diffusion constant representing the rate of fitness change over time. Defaults to 0.2. |
+| fit_grid | numpy.ndarray, optional |  A user-defined grid of fitness values. If not provided, a default grid is used. |
+| samp_frac | float | Sampling fraction, likely related to the proportion of individuals sampled. Defaults to 0.01. |
+| mem | float | Memory parameter, potentially influencing the persistence of fitness information over time. Defaults to 1.0. |
+
+#### Outputs
+The class itself doesn't directly return an output. However, after calling the `infer_ancestral_fitness` method, the tree nodes are populated with inferred fitness information, including:
+- `prob`: Marginal probability distribution of fitness for the node.
+- `mean_fitness`: Mean of the posterior fitness distribution.
+- `var_fitness`: Variance of the posterior fitness distribution.
+
+#### Internal Logic
+1. **Tree Initialization (`set_tree`):**
+   - The input tree is ladderized.
+   - Terminal nodes are identified and ranked.
+   - Time to present is calculated for each node.
+   - A time scale is determined, either from input or estimated from the tree.
+   - Nodes are initialized with probability vectors.
+
+2. **Message Passing:**
+   - **Downward Messages (`calc_down_messages`):** Fitness information is propagated from parent nodes to children.
+   - **Upward Messages (`calc_up_messages`):** Fitness information is propagated from children to parent nodes.
+   - **Polarizers (`calc_down_polarizers`, `calc_up_polarizers`):**  These likely contribute to adjusting the fitness propagation based on branch lengths and the memory parameter.
+
+3. **Marginal Probability Calculation (`calc_marginal_probabilities`):**  The product of incoming messages at each node is used to calculate the marginal probability of each fitness state.
+
+4. **Fitness Statistics (`calc_mean_and_variance`):**  The mean and variance of the fitness distribution are calculated for each node based on the marginal probabilities.
+
+#### Performance Considerations
+The code precomputes and stores the propagator function for different time intervals using `integrate_phi` and `integrate_prop` to optimize the message-passing steps.
+
+## Dependencies
+- `numpy`: Used for numerical operations and array manipulation.
+- `biopython`:  Assumed to be used for handling phylogenetic trees (not explicitly imported in this file).
+
+## Error Handling
+The code includes basic error handling by setting values below a certain threshold (`non_negativity_cutoff`) to the threshold itself, preventing potential issues with zero probabilities. However, more robust error handling mechanisms are not explicitly implemented in this code snippet.

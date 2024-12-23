@@ -1,0 +1,200 @@
+---
+title: "DistanceSolver.py"
+---
+
+## High-level description
+The `DistanceSolver` class is a base class for distance-based phylogenetic tree solvers in Cassiopeia. It provides a general framework for solving trees using a dissimilarity map, iteratively joining samples into cherries and updating the map. Subclasses like `NeighborJoiningSolver` and `UPGMASolver` implement specific cherry-finding and map-updating logic.
+
+## Code Structure
+The `DistanceSolver` class defines the general structure and common methods for distance-based solvers. It relies on abstract methods like `find_cherry` and `update_dissimilarity_map` to be implemented by subclasses. The `solve` method orchestrates the tree-solving process, while helper methods like `get_dissimilarity_map` and `setup_dissimilarity_map` manage the dissimilarity matrix.
+
+## References
+- `CassiopeiaSolver`: The parent class defining the general solver interface.
+- `solver_utilities`: Provides utility functions for tree manipulation and data handling.
+- `dissimilarity_functions`: Offers various dissimilarity functions for comparing samples.
+
+## Symbols
+
+### `DistanceSolver`
+#### Description
+This class provides a general framework for distance-based phylogenetic tree solvers. It defines the overall structure and common methods, leaving the specific cherry-finding and dissimilarity map updating logic to be implemented by subclasses.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dissimilarity_function | Optional[Callable[[np.array, np.array, int, Dict[int, Dict[int, float]]], float]] | Function to compute dissimilarity between samples. |
+| add_root | bool | Whether to add an implicit root to the tree (default: False). |
+| prior_transformation | str | Function to transform priors into weights (default: "negative_log"). |
+| threads | int | Number of threads to use for solver (default: 1). |
+
+#### Outputs
+None
+
+#### Internal Logic
+The `solve` method orchestrates the tree-solving process:
+1. **Setup:** Initializes the dissimilarity map and creates a basic tree with all samples as leaves.
+2. **Iteration:** Iteratively finds cherries, joins them in the tree, and updates the dissimilarity map until only two nodes remain.
+3. **Rooting:** Roots the tree using the specified or implicit root.
+4. **Population:** Populates the `CassiopeiaTree` with the solved tree topology.
+
+### `get_dissimilarity_map`
+#### Description
+Obtains or generates the dissimilarity map used throughout the solver. This method can be overridden by subclasses to use other types of sample comparison maps.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | CassiopeiaTree | The tree object to obtain the dissimilarity map from. |
+| layer | Optional[str] | Layer storing the character matrix for solving (default: None). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dissimilarity_map | pd.DataFrame | The dissimilarity matrix used for solving. |
+
+### `solve`
+#### Description
+Solves the phylogenetic tree using the distance-based approach. It iteratively finds cherries, joins them, and updates the dissimilarity map.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | CassiopeiaTree | The `CassiopeiaTree` object to populate with the solved tree. |
+| layer | Optional[str] | Layer storing the character matrix for solving (default: None). |
+| collapse_mutationless_edges | bool | Whether to collapse mutationless edges in the final tree (default: False). |
+| logfile | str | File location to log output (default: "stdout.log"). |
+
+#### Outputs
+None
+
+#### Internal Logic
+1. **Initialization:** Obtains the dissimilarity map and creates a basic tree with all samples as leaves.
+2. **Cherry Finding:** Iteratively calls the subclass-specific `find_cherry` method to identify a pair of samples to join.
+3. **Joining and Updating:** Joins the identified cherry in the tree and updates the dissimilarity map using the subclass-specific `update_dissimilarity_map` method.
+4. **Rooting:** Roots the tree using the `root_tree` method, which is also implemented by subclasses.
+5. **Population:** Populates the input `CassiopeiaTree` with the solved tree topology.
+
+### `_ccphylo_solve`
+#### Description
+Solves the tree using fast distance-based algorithms implemented by CCPhylo. Requires CCPhylo to be installed and configured.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | CassiopeiaTree | The `CassiopeiaTree` object to populate with the solved tree. |
+| layer | Optional[str] | Layer storing the character matrix for solving (default: None). |
+| collapse_mutationless_edges | bool | Whether to collapse mutationless edges in the final tree (default: False). |
+| logfile | str | File location to log output (default: "stdout.log"). |
+| method | str | The CCPhylo algorithm to use (default: "dnj"). |
+
+#### Outputs
+None
+
+#### Internal Logic
+1. **Preparation:** Saves the dissimilarity map as a phylip file.
+2. **CCPhylo Execution:** Runs the specified CCPhylo algorithm using the saved dissimilarity map.
+3. **Conversion and Rooting:** Converts the resulting tree to a NetworkX graph and roots it using `root_tree`.
+4. **Population:** Populates the input `CassiopeiaTree` with the solved tree topology.
+
+### `_setup_ccphylo`
+#### Description
+Sets up the CCPhylo solver by retrieving the path from the configuration file and validating it.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+1. **Path Retrieval:** Reads the `ccphylo_path` from the configuration file.
+2. **Validation:** Checks if the path exists and is executable. Raises a `DistanceSolverError` if not.
+
+### `setup_dissimilarity_map`
+#### Description
+Sets up the solver by creating the dissimilarity map if needed and setting up the root sample.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | CassiopeiaTree | The `CassiopeiaTree` object to set up the dissimilarity map for. |
+| layer | Optional[str] | Layer storing the character matrix for solving (default: None). |
+
+#### Outputs
+None
+
+#### Internal Logic
+1. **Root Handling:** If no root sample is specified, either sets up an implicit root or raises a `DistanceSolverError`.
+2. **Dissimilarity Map Creation:** If the dissimilarity map is not present, computes it using the provided `dissimilarity_function` or raises a `DistanceSolverError`.
+
+### `root_tree`
+#### Description
+(Abstract method) Roots the tree at the specified root sample.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | nx.Graph | The unrooted tree topology. |
+| root_sample | str | The sample to treat as the root. |
+| remaining_samples | List[str] | The last two unjoined nodes in the tree. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| rooted_tree | nx.DiGraph | The rooted tree. |
+
+### `find_cherry`
+#### Description
+(Abstract method) Selects two samples to join together as a cherry.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dissimilarity_map | np.array(float) | The dissimilarity map relating samples. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cherry | Tuple[int, int] | A tuple of sample indices to join. |
+
+### `update_dissimilarity_map`
+#### Description
+(Abstract method) Updates the dissimilarity map after joining a cherry.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dissimilarity_map | pd.DataFrame | The dissimilarity map to update. |
+| cherry | Tuple[str, str] | The joined cherry nodes. |
+| new_node | str | The new node name to add to the map. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| updated_map | pd.DataFrame | The updated dissimilarity map. |
+
+### `setup_root_finder`
+#### Description
+(Abstract method) Defines how an implicit root is to be added to the tree.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | CassiopeiaTree | The `CassiopeiaTree` object to set up the root for. |
+
+#### Outputs
+None
+
+## Side Effects
+The `solve` method modifies the input `CassiopeiaTree` object by populating its tree attribute with the solved tree topology.
+
+## Dependencies
+- `ete3`: Used for tree manipulation and visualization.
+- `networkx`: Used for graph representation and algorithms.
+- `numpy`: Used for numerical operations.
+- `pandas`: Used for data manipulation and representation.
+- `configparser`: Used for reading configuration files.
+- `subprocess`: Used for running external commands (CCPhylo).
+
+## Configuration
+The `_ccphylo_solve` method relies on the `ccphylo_path` option defined in the configuration file to locate the CCPhylo executable.

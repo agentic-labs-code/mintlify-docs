@@ -1,0 +1,124 @@
+---
+title: "ecDNABirthDeathSimulator.py"
+---
+
+## High-level description
+The `ecDNABirthDeathSimulator` class simulates the evolution of a cell population with extrachromosomal DNA (ecDNA) using a forward birth-death process. It extends the `BirthDeathFitnessSimulator` class to incorporate ecDNA-specific dynamics, including co-segregation and fitness effects based on ecDNA copy number. The simulator generates a phylogenetic tree representing the evolutionary history of the cell population, along with metadata about ecDNA copy numbers and observed ecDNA counts in each cell.
+
+## Code Structure
+The `ecDNABirthDeathSimulator` class inherits from the `BirthDeathFitnessSimulator` class. It overrides several methods to incorporate ecDNA-specific logic, including `initialize_tree`, `update_fitness`, `sample_lineage_event`, and `get_ecdna_array`. The `populate_tree_from_simulation` method is used to create a `CassiopeiaTree` object from the simulated tree, including metadata about ecDNA copy numbers and observed counts.
+
+## References
+- `BirthDeathFitnessSimulator`: The parent class that provides the basic framework for simulating a birth-death process with fitness.
+- `CassiopeiaTree`: The data structure used to represent the simulated phylogenetic tree and associated metadata.
+
+## Symbols
+
+### `ecDNABirthDeathSimulator`
+#### Description
+This class simulates the evolution of a cell population with ecDNA using a forward birth-death process. It allows for various birth and death waiting time distributions, fitness regimes, and ecDNA co-segregation patterns.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| birth_waiting_distribution | Callable[[float], float] | A function that samples waiting times from the birth distribution. |
+| initial_birth_scale | float | The initial scale parameter for the birth distribution. |
+| death_waiting_distribution | Optional[Callable[[], float]] | A function that samples waiting times from the death distribution. Defaults to no death. |
+| mutation_distribution | Optional[Callable[[], int]] | A function that samples the number of mutations occurring at a division event. Defaults to no mutations. |
+| fitness_distribution | Optional[Callable[[], float]] | A function that samples the exponential that the fitness base is raised by. Determines the distribution of fitness mutation strengths. |
+| fitness_base | float | The base that is raised by the value given by the fitness distribution. Determines the base strength of fitness mutations. Defaults to Euler's constant. |
+| num_extant | Optional[int] | The number of extant lineages at which to stop the simulation. |
+| experiment_time | Optional[float] | The time at which to stop the simulation. |
+| collapse_unifurcations | bool | Whether to collapse unifurcations in the resulting tree. Defaults to True. |
+| prune_dead_lineages | bool | Whether to prune dead lineages from the resulting tree. Defaults to True. |
+| random_seed | int | A seed for reproducibility. |
+| initial_copy_number | np.array | The initial copy number of each ecDNA species in the root cell. Defaults to [1]. |
+| cosegregation_coefficient | float | A coefficient describing the likelihood of co-segregation between ecDNA species. Defaults to 0.0. |
+| splitting_function | Callable[[int], int] | A function that describes the segregation of ecDNA at cell division. Defaults to a binomial distribution with p=0.5. |
+| fitness_array | np.array | A matrix defining the fitness of a cell based on the presence or absence of each ecDNA species. |
+| fitness_function | Optional[Callable[[int, int, float], float]] | A function that calculates the fitness of a cell based on ecDNA copy numbers and the fitness array. |
+| capture_efficiency | float | The probability of observing an ecDNA species in a cell. Defaults to 1.0. |
+| initial_tree | Optional[CassiopeiaTree] | A tree used to initialize the simulation. |
+
+#### Outputs
+A `CassiopeiaTree` object representing the simulated phylogenetic tree with ecDNA copy number and observation data.
+
+#### Internal Logic
+The simulator works by maintaining a priority queue of lineages, sorted by their next event time. At each step, the lineage with the earliest event time is popped from the queue. If the event is a birth, a new lineage is created with updated fitness and ecDNA copy number, and both lineages are added back to the queue. If the event is a death, the lineage is removed from the queue. The simulation continues until one of the stopping conditions is met.
+
+### `initialize_tree`
+#### Description
+Initializes the tree with a single root node or from a provided initial tree.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| names | Generator | A generator for unique node names. |
+
+#### Outputs
+An `nx.DiGraph` object representing the initialized tree.
+
+#### Internal Logic
+If an initial tree is provided, the method copies its topology and attributes. Otherwise, it creates a new tree with a single root node and sets its initial attributes.
+
+### `update_fitness`
+#### Description
+Calculates the fitness of a lineage based on its ecDNA copy number.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ecdna_array | np.array | The ecDNA copy number array of the lineage. |
+
+#### Outputs
+The updated birth scale parameter representing the lineage's fitness.
+
+#### Internal Logic
+The method calculates the fitness based on the provided `fitness_array` and `fitness_function`. If no `fitness_function` is provided, it uses a simple additive model based on the presence or absence of each ecDNA species.
+
+### `sample_lineage_event`
+#### Description
+Simulates the next event (birth or death) for a given lineage.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lineage | Dict[str, Union[int, float]] | A dictionary representing the lineage. |
+| current_lineages | PriorityQueue | The priority queue of active lineages. |
+| tree | nx.DiGraph | The tree being constructed. |
+| names | Generator | A generator for unique node names. |
+| observed_nodes | List[str] | A list of observed nodes. |
+
+#### Outputs
+None. The method modifies the `tree`, `current_lineages`, and `observed_nodes` in place.
+
+#### Internal Logic
+The method samples birth and death waiting times for the lineage. If the birth time is less than the death time, a new lineage is created with updated fitness and ecDNA copy number, and both lineages are added to the queue. If the death time is less than the birth time, the lineage is marked as inactive and added to the queue. If both times exceed the experiment time, the lineage is cut off at the experiment time and marked as observed.
+
+### `get_ecdna_array`
+#### Description
+Generates the ecDNA copy number array for a child cell given its parent's copy number and co-segregation parameters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| parent_id | str | The ID of the parent node in the tree. |
+| tree | nx.DiGraph | The tree being constructed. |
+
+#### Outputs
+A `np.array` representing the ecDNA copy number array for the child cell.
+
+#### Internal Logic
+The method first doubles the parent's ecDNA copy number array. If the parent already has a child, it subtracts the child's copy number from the doubled array. Otherwise, it uses the `splitting_function` and `cosegregation_coefficient` to simulate the segregation of ecDNA into the child cell.
+
+## Side Effects
+The `ecDNABirthDeathSimulator` modifies the `tree`, `current_lineages`, and `observed_nodes` objects in place during the simulation.
+
+## Dependencies
+- `networkx`: Used for representing and manipulating the tree topology.
+- `numpy`: Used for numerical operations and random number generation.
+- `pandas`: Used for storing and manipulating cell metadata.
+- `queue`: Used for the priority queue of active lineages.
+
+## Error Handling
+The `ecDNABirthDeathSimulator` raises `TreeSimulatorError` exceptions for various invalid input conditions, such as specifying no stopping conditions or a negative number of mutations. It also raises `ecDNABirthDeathSimulatorError` if a child's ecDNA copy number exceeds its parent's.

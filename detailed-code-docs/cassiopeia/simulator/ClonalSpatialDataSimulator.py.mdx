@@ -1,0 +1,49 @@
+---
+title: "ClonalSpatialDataSimulator.py"
+---
+
+## High-level description
+The `ClonalSpatialDataSimulator` class simulates spatial data with a clonal spatial autocorrelation constraint, meaning that cells within the same subclone are more likely to be located near each other. It achieves this by first randomly sampling points in a defined space and then assigning these points to cells in a given `CassiopeiaTree` in a way that enforces spatial proximity within subclones.
+
+## Code Structure
+The `ClonalSpatialDataSimulator` class inherits from the `SpatialDataSimulator` class. It primarily utilizes the `__init__`, `sample_points`, and `overlay_data` methods to simulate and assign spatial coordinates to cells in a tree. The `__triangulation_graph`, `__nearest_neighbors_graph`, `__points_to_graph`, and `__split_graph` methods are helper functions used within `overlay_data` to partition points based on the tree structure.
+
+## References
+This class references the `CassiopeiaTree` class for tree manipulation and data storage. It also uses several external libraries like `networkx`, `numpy`, `scipy`, `cv2`, `poisson_disc`, and `sklearn.neighbors`.
+
+## Symbols
+
+### `ClonalSpatialDataSimulator`
+#### Description
+This class simulates spatial data with a clonal spatial autocorrelation constraint. It assigns spatial coordinates to cells in a `CassiopeiaTree` such that cells within the same subclone are more likely to be spatially clustered.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| shape | Optional[Tuple[int, ...]] | Shape of the space to place cells on. Defaults to None. |
+| space | Optional[np.ndarray] | Numpy array mask representing the space where cells can be placed. Defaults to None. |
+| random_seed | Optional[int] | A seed for reproducibility. Defaults to None. |
+
+#### Outputs
+This class doesn't directly return any values. It modifies the input `CassiopeiaTree` object in-place.
+
+#### Internal Logic
+1. **Initialization (`__init__`)**: The constructor initializes the simulator with either a `shape` or a `space` parameter. If `shape` is provided, it generates a space (e.g., an ellipse in 2D) within a grid of that shape. If `space` is provided, it uses the given space directly.
+2. **Point Sampling (`sample_points`)**: This method samples points within the defined space using Poisson-Disc sampling, ensuring an approximately even distribution of points.
+3. **Data Overlay (`overlay_data`)**: This method assigns the sampled points to cells in the `CassiopeiaTree`. It starts by assigning all points to the root node. Then, it traverses the tree from root to leaves, splitting the points assigned to each parent node among its children. The splitting process considers spatial proximity, assigning each point to the spatially closest child node. This process ensures that cells within the same subclone are more likely to be located near each other.
+
+#### Side Effects
+The `overlay_data` method modifies the input `CassiopeiaTree` object in-place by adding spatial coordinates as node attributes and cell metadata.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| networkx | Graph manipulation and algorithms. |
+| numpy | Numerical operations and array manipulation. |
+| scipy | Scientific computing, including spatial algorithms. |
+| cv2 | Image processing (used for generating elliptical spaces). |
+| poisson_disc | Poisson-Disc sampling for generating evenly spaced points. |
+| sklearn.neighbors | Nearest neighbor search for spatial point assignment. |
+
+## Error Handling
+The class raises `DataSimulatorError` for various invalid input scenarios, such as providing both `shape` and `space` or if required dependencies are not installed.

@@ -1,0 +1,72 @@
+---
+title: "infer_fitness.py"
+---
+
+## High-level description
+This script performs fitness inference on a given sequence alignment to predict evolutionary relationships and rank sequences based on their inferred fitness. It uses a phylogenetic approach, considering an outgroup sequence to root the tree and inferring ancestral states.
+
+## Code Structure
+The code first parses command-line arguments, reads and processes the input alignment, and identifies the outgroup sequence. Then, it instantiates a `sequence_ranking` object from the imported module and uses it to perform the fitness inference. Finally, it outputs the inferred tree, ancestral sequences, and sequence rankings.
+
+## References
+This script references the following code symbols:
+- `alignment` (from `sequence_ranking` module)
+- `sequence_ranking` (from `sequence_ranking` module)
+- `tree_utils` (imported module)
+
+## Symbols
+### `ofunc`
+#### Description
+This function determines the appropriate file opening method based on the file extension. It uses `gzip.open` for '.gz' files and the built-in `open` function otherwise.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fname | str | The name of the file to open. |
+| mode | str | The mode in which to open the file (e.g., 'r' for reading, 'w' for writing). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| file object | file | A file object representing the opened file. |
+
+### main execution block
+#### Description
+This block of code executes the main functionality of the script. It reads the alignment file, identifies the outgroup sequence, performs fitness inference, and writes the results to files.
+
+#### Internal Logic
+1. **Read alignment and outgroup:**
+    - Reads the alignment file in FASTA format.
+    - Identifies the outgroup sequence based on the provided `--outgroup` argument.
+2. **Set up sequence data and perform prediction:**
+    - Creates an `alignment` object from the input alignment and outgroup.
+    - Instantiates a `sequence_ranking` object with specified parameters.
+    - Predicts the best node using the `predict()` method of the `sequence_ranking` object.
+3. **Output results:**
+    - Creates a directory for output files based on the current date and time.
+    - Writes the reconstructed tree in Newick format to `reconstructed_tree.nwk`.
+    - Writes inferred ancestral sequences to `ancestral_sequences.fasta`.
+    - Writes sequence rankings for terminal and non-terminal nodes to separate files.
+    - Optionally plots the marked-up tree if the `--plot` flag is set.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| argparse | Parsing command-line arguments. |
+| matplotlib | Plotting the marked-up tree (optional). |
+| Bio | Handling sequence alignments and phylogenetic trees. |
+| numpy | Numerical operations. |
+| tree_utils | Utility functions for tree manipulation and visualization. |
+| sequence_ranking | Module containing classes and functions for sequence ranking and fitness inference. |
+
+### Configuration
+This script uses command-line arguments for configuration. See the "parse the command line arguments" section for details on available options and their descriptions.
+
+## Error Handling
+The script includes a basic check for the presence of the outgroup sequence in the alignment. If not found, it prints an error message and exits.
+
+## Logging
+This script does not implement specific logging mechanisms.
+
+## TODOs
+This script does not contain any TODOs or notes.

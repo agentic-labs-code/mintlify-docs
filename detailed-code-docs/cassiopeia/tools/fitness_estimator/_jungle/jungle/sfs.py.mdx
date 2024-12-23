@@ -1,0 +1,237 @@
+---
+title: "sfs.py"
+---
+
+## High-level description
+The code defines a class `SFS` that represents a Site Frequency Spectrum (SFS), a fundamental concept in population genetics used to summarize genetic variation within a population. It provides methods to calculate various statistics from the SFS, such as Tajima's D, Fay and Wu's H, Zeng's E, and Ferretti's L, which are used to infer demographic history and selection pressures.
+
+## Code Structure
+The `SFS` class is the main component of the code. It holds the SFS data (`counts`) and provides methods to calculate different statistics. The statistics calculation methods (`fay_and_wus_H`, `zengs_E`, `tajimas_D`, `ferrettis_L`) rely on the SFS data and use helper methods (`_calculate_fay_and_wus_H`, `_calculate_zengs_E`, `_calculate_tajimas_D`, `_calculate_ferrettis_L`) to perform the actual calculations. The `bin` method is used to group the SFS data into bins for easier visualization and analysis.
+
+## Symbols
+### Symbol Name
+```python
+SFS
+```
+
+#### Description
+This class represents a Site Frequency Spectrum (SFS) and provides methods for calculating various statistics from it.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| counts | numpy.ndarray | An array representing the counts of mutations at different frequencies. |
+| T | cassiopeia.data.CassiopeiaTree | Optional. A CassiopeiaTree object representing the phylogenetic tree. |
+
+#### Outputs
+An `SFS` object.
+
+#### Internal Logic
+The constructor initializes the `counts` and `T` attributes. It also initializes several attributes to `None`, which will be calculated lazily when their corresponding methods are called.
+
+---
+
+### Symbol Name
+```python
+SFS.from_tree
+```
+
+#### Description
+This class method constructs an SFS object from a given phylogenetic tree.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| T | cassiopeia.data.CassiopeiaTree | A CassiopeiaTree object representing the phylogenetic tree. |
+
+#### Outputs
+An `SFS` object.
+
+#### Internal Logic
+The method iterates through the clades of the tree and counts the number of mutations at each frequency (number of leaves in each clade). It then creates an `SFS` object with the calculated counts and the input tree.
+
+---
+
+### Symbol Name
+```python
+SFS.bin
+```
+
+#### Description
+This method bins the SFS data into specified bins for easier visualization and analysis.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bins | str or array-like | Specifies the binning strategy. Can be "linear", "log", "logit", or an array-like object defining the bin edges. |
+| n_bins | int | Optional. Number of bins to use if `bins` is "linear" or "log". |
+| min_edge | float | Optional. Minimum edge for binning if `bins` is "linear" or "log". |
+| max_edge | float | Optional. Maximum edge for binning if `bins` is "linear" or "log". |
+
+#### Outputs
+None. The method modifies the `SFS` object in place, adding attributes related to the binning.
+
+#### Internal Logic
+The method first determines the bin edges and centers based on the `bins` argument and optional parameters. It then bins the SFS data by counting the number of mutations falling into each bin. The binned data is normalized by the bin size. If a tree is provided, the method also calculates a cut version of the normalized binned data, setting bins beyond the tree size to `np.nan`.
+
+---
+
+### Symbol Name
+```python
+SFS.fay_and_wus_H
+```
+
+#### Description
+This method calculates and returns Fay and Wu's H statistic from the SFS.
+
+#### Inputs
+None.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fay_and_wus_H | float | Fay and Wu's H statistic. |
+
+#### Internal Logic
+The method first checks if the statistic has been previously calculated and cached. If not, it calls the `_calculate_fay_and_wus_H` method to calculate it.
+
+---
+
+### Symbol Name
+```python
+SFS._calculate_fay_and_wus_H
+```
+
+#### Description
+This private method calculates Fay and Wu's H statistic from the SFS data.
+
+#### Inputs
+None.
+
+#### Outputs
+None. The method modifies the `SFS` object in place, setting the `_fay_and_wus_H` attribute.
+
+#### Internal Logic
+The method calculates the statistic based on the formula: `theta_pi - theta_H`, where `theta_pi` and `theta_H` are calculated from the SFS data.
+
+---
+
+### Symbol Name
+```python
+SFS.zengs_E
+```
+
+#### Description
+This method calculates and returns Zeng's E statistic from the SFS.
+
+#### Inputs
+None.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| zengs_E | float | Zeng's E statistic. |
+
+#### Internal Logic
+The method first checks if the statistic has been previously calculated and cached. If not, it calls the `_calculate_zengs_E` method to calculate it.
+
+---
+
+### Symbol Name
+```python
+SFS._calculate_zengs_E
+```
+
+#### Description
+This private method calculates Zeng's E statistic from the SFS data.
+
+#### Inputs
+None.
+
+#### Outputs
+None. The method modifies the `SFS` object in place, setting the `_zengs_E` attribute.
+
+#### Internal Logic
+The method calculates the statistic based on the formula: `theta_L - theta_W`, where `theta_L` and `theta_W` are calculated from the SFS data.
+
+---
+
+### Symbol Name
+```python
+SFS.tajimas_D
+```
+
+#### Description
+This method calculates and returns Tajima's D statistic from the SFS.
+
+#### Inputs
+None.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tajimas_D | float | Tajima's D statistic. |
+
+#### Internal Logic
+The method first checks if the statistic has been previously calculated and cached. If not, it calls the `_calculate_tajimas_D` method to calculate it.
+
+---
+
+### Symbol Name
+```python
+SFS._calculate_tajimas_D
+```
+
+#### Description
+This private method calculates Tajima's D statistic from the SFS data.
+
+#### Inputs
+None.
+
+#### Outputs
+None. The method modifies the `SFS` object in place, setting the `_tajimas_D` attribute.
+
+#### Internal Logic
+The method calculates the statistic based on the formula: `theta_pi - theta_W`, where `theta_pi` and `theta_W` are calculated from the SFS data.
+
+---
+
+### Symbol Name
+```python
+SFS.ferrettis_L
+```
+
+#### Description
+This method calculates and returns Ferretti's L statistic from the SFS.
+
+#### Inputs
+None.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ferrettis_L | float | Ferretti's L statistic. |
+
+#### Internal Logic
+The method first checks if the statistic has been previously calculated and cached. If not, it calls the `_calculate_ferrettis_L` method to calculate it.
+
+---
+
+### Symbol Name
+```python
+SFS._calculate_ferrettis_L
+```
+
+#### Description
+This private method calculates Ferretti's L statistic from the SFS data.
+
+#### Inputs
+None.
+
+#### Outputs
+None. The method modifies the `SFS` object in place, setting the `_ferrettis_L` attribute.
+
+#### Internal Logic
+The method calculates the statistic based on the formula: `theta_W - theta_H`, where `theta_W` and `theta_H` are calculated from the SFS data.
+
+---

@@ -1,0 +1,137 @@
+---
+title: "size_matched_model.py"
+---
+
+## High-level description
+The code defines a `SizeMatchedModel` class that represents a statistical model where parameters vary based on the size of the input data. It provides methods for loading and saving the model, calculating p-values, and determining model means based on input size.
+
+## Code Structure
+The `SizeMatchedModel` class is the central component. It uses a list of bins to partition the input size range and associates a set of parameters with each bin. The `distribution` attribute holds a statistical distribution object (not defined in this file) used for calculations.
+
+## Symbols
+
+### `SizeMatchedModel`
+#### Description
+This class represents a statistical model where parameters are determined by the size of the input data. It uses bins to divide the size range and associates a set of parameters with each bin.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bins | list | List of bin edges defining the size ranges. |
+| params | list | List of parameter sets, one for each bin. |
+| distribution | object | An instance of a statistical distribution class (e.g., from scipy.stats). |
+| name | str | Optional name for the model. |
+
+#### Outputs
+N/A - This is a class definition, not a function.
+
+#### Internal Logic
+The class stores the bins, parameters, distribution, and name. It provides methods for:
+- Loading and saving the model from/to JSON files.
+- Finding the appropriate parameters for a given size using `_params_for_size`.
+- Calculating p-values using the provided distribution and parameters.
+- Determining the model mean for a given size.
+
+### `SizeMatchedModel.from_json`
+#### Description
+This class method loads a `SizeMatchedModel` instance from a JSON file.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filename | str | Path to the JSON file containing the model data. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| model | SizeMatchedModel | A new `SizeMatchedModel` instance loaded from the file. |
+
+#### Internal Logic
+- Opens the JSON file and loads the data.
+- Converts string representations of lists and the distribution name to their respective Python objects.
+- Instantiates a new `SizeMatchedModel` with the loaded data.
+
+### `SizeMatchedModel.to_json`
+#### Description
+This method saves the `SizeMatchedModel` instance to a JSON file.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| outfile | str | Path to the output JSON file. |
+
+#### Outputs
+N/A - The method writes data to a file as a side effect.
+
+#### Internal Logic
+- Creates a dictionary containing the model's attributes.
+- Converts lists to JSON-serializable strings.
+- Extracts the distribution's class name for serialization.
+- Writes the dictionary to the specified JSON file.
+
+### `SizeMatchedModel._params_for_size`
+#### Description
+This private method retrieves the appropriate parameters for a given size based on the defined bins.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| size | float | The size value for which to find the parameters. |
+| strict_bounds | bool | If True, raises an error if the size is outside the defined bins. If False, uses the parameters of the nearest bin. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| params_match | tuple | The parameters associated with the bin containing the given size. |
+
+#### Internal Logic
+- Uses `np.digitize` to find the index of the bin corresponding to the input size.
+- Handles cases where the size is outside the defined bins based on `strict_bounds`.
+- Adjusts the bin index to match the zero-based indexing of the `params` list.
+- Returns the parameters for the selected bin.
+
+### `SizeMatchedModel.pvalue`
+#### Description
+This method calculates the p-value of a given value `x` under the model for a specific size.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| x | float | The value for which to calculate the p-value. |
+| size | float | The size value used to determine the model parameters. |
+| invert_cdf | bool | If True, calculates 1 - CDF(x) instead of CDF(x). |
+| strict_bounds | bool | Passed to `_params_for_size` to control behavior for sizes outside the defined bins. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| p | float | The calculated p-value. |
+
+#### Internal Logic
+- Retrieves the model parameters for the given size using `_params_for_size`.
+- Calculates the cumulative distribution function (CDF) of `x` using the model's distribution and parameters.
+- Inverts the CDF if `invert_cdf` is True.
+- Returns the calculated p-value.
+
+### `SizeMatchedModel.model_mean`
+#### Description
+This method calculates the mean of the model for a given size.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| size | float | The size value used to determine the model parameters. |
+| strict_bounds | bool | Passed to `_params_for_size` to control behavior for sizes outside the defined bins. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| mean | float | The calculated mean of the model. |
+
+#### Internal Logic
+- Retrieves the model parameters for the given size using `_params_for_size`.
+- Calculates the mean of the distribution using the retrieved parameters.
+- Returns the calculated mean.
+
+## TODOs
+- Evaluate distribution in global namespace, so that import is not necessary here

@@ -1,0 +1,156 @@
+---
+title: "NeighborJoiningSolver.py"
+---
+
+## High-level description
+The `NeighborJoiningSolver` class implements the Neighbor-Joining algorithm for phylogenetic tree reconstruction. It iteratively joins pairs of samples (or cherries) that minimize the Q-criterion based on a dissimilarity map, ultimately building an unrooted tree. The class provides options for rooting the tree and using fast implementations from the CCPhylo library.
+
+## Code Structure
+The `NeighborJoiningSolver` class inherits from the `DistanceSolver` class and overrides several methods to implement the Neighbor-Joining algorithm. The main methods are `find_cherry`, `update_dissimilarity_map`, and `root_tree`. The `find_cherry` method identifies the pair of samples to join based on the Q-criterion. The `update_dissimilarity_map` method updates the dissimilarity map after joining a cherry. The `root_tree` method roots the tree at a specified sample.
+
+## References
+- `DistanceSolver`: The parent class that defines the general structure for distance-based solvers.
+- `dissimilarity_functions`: A module containing various dissimilarity functions, including the weighted Hamming distance used by default.
+- `solver_utilities`: A module containing utility functions for tree solvers.
+
+## Symbols
+
+### `NeighborJoiningSolver`
+#### Description
+This class implements the Neighbor-Joining algorithm for phylogenetic tree reconstruction. It inherits from the `DistanceSolver` class and overrides several methods to implement the specific logic of the Neighbor-Joining algorithm.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dissimilarity_function | Optional[Callable[[np.array, np.array, int, Dict[int, Dict[int, float]]], float]] | A function to compute the dissimilarity between samples. Defaults to `weighted_hamming_distance`. |
+| add_root | bool | Whether to add an implicit root to the tree. Defaults to `False`. |
+| prior_transformation | str | The transformation to apply to priors when calculating weights. Defaults to `"negative_log"`. |
+| fast | bool | Whether to use a fast implementation of Neighbor-Joining. Defaults to `False`. |
+| implementation | str | The fast implementation to use. Options are: `"ccphylo_dnj"`, `"ccphylo_hnj"`, `"ccphylo_nj"`. Defaults to `"ccphylo_dnj"`. |
+| threads | int | The number of threads to use for the solver. Defaults to `1`. |
+
+#### Outputs
+The `solve` method populates the `tree` attribute of the input `CassiopeiaTree` object with the reconstructed tree.
+
+#### Internal Logic
+The `solve` method iteratively joins pairs of samples (cherries) that minimize the Q-criterion, updating the dissimilarity map at each step. The process continues until only two samples remain, which are then joined to form the final unrooted tree. The tree can be rooted using the `root_tree` method.
+
+### `root_tree`
+#### Description
+This method roots the tree produced by the Neighbor-Joining algorithm at the specified root sample.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | nx.Graph | The unrooted tree topology represented as a NetworkX graph. |
+| root_sample | str | The sample to treat as the root. |
+| remaining_samples | List[str] | The last two unjoined nodes in the tree. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| rooted_tree | nx.DiGraph | The rooted tree topology represented as a NetworkX directed graph. |
+
+#### Internal Logic
+The method first joins the last two remaining samples in the tree. Then, it performs a depth-first search from the specified root sample and creates a directed graph based on the edges traversed.
+
+### `find_cherry`
+#### Description
+This method finds a pair of samples to join into a cherry by minimizing the Q-criterion.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dissimilarity_matrix | np.array | A sample x sample dissimilarity matrix. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cherry | Tuple[int, int] | A tuple of integers representing the indices of the two samples to join in the dissimilarity matrix. |
+
+#### Internal Logic
+The method calculates the Q-criterion for every pair of samples using the `compute_q` method. The pair with the minimum Q-criterion is selected as the cherry.
+
+### `compute_q`
+#### Description
+This static method computes the Q-criterion for every pair of samples in the dissimilarity map.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dissimilarity_map | np.array(int) | A sample x sample dissimilarity map. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| q | np.array | A matrix storing the Q-criterion for every pair of samples. |
+
+#### Internal Logic
+The method iterates through all pairs of samples and calculates the Q-criterion using the formula: Q(i,j) = d(i, j) - 1/(n-2) (sum(d(i, :)) + sum(d(j,:))), where d(i,j) is the dissimilarity between samples i and j, and n is the number of samples.
+
+### `update_dissimilarity_map`
+#### Description
+This method updates the dissimilarity map after joining two nodes into a cherry.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dissimilarity_map | pd.DataFrame | The dissimilarity map to update. |
+| cherry | Tuple[str, str] | A tuple of strings representing the names of the two samples joined in the cherry. |
+| new_node | str | The name of the new node representing the cherry. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dissimilarity_map | pd.DataFrame | The updated dissimilarity map. |
+
+#### Internal Logic
+The method calculates the new dissimilarities between the new node and all other nodes using the formula: d'(m, v) = 0.5 * (d(v, m1) + d(v, m2) - d(m1, m2)), where m is the new node, v is any other node, and m1 and m2 are the two samples joined in the cherry. The original cherry nodes are then removed from the dissimilarity map.
+
+### `__update_dissimilarity_map_numba`
+#### Description
+This private static method provides a faster, Numba-optimized implementation for updating the dissimilarity map.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dissimilarity_map | np.array | The dissimilarity map to update, represented as a NumPy array. |
+| cherry_i | int | The index of the first sample in the cherry. |
+| cherry_j | int | The index of the second sample in the cherry. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| updated_map | np.array | The updated dissimilarity map. |
+
+#### Internal Logic
+The method adds a new row and column to the dissimilarity map for the new node and calculates the new dissimilarities using the same formula as `update_dissimilarity_map`.
+
+### `setup_root_finder`
+#### Description
+This method defines the implicit rooting strategy for the NeighborJoiningSolver.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | CassiopeiaTree | The input CassiopeiaTree object. |
+
+#### Outputs
+This method modifies the `cassiopeia_tree` object in place.
+
+#### Internal Logic
+The method adds an implicit root with all-zero character states to the character matrix and recalculates the dissimilarity map. If a dissimilarity map already exists, only the new dissimilarities involving the root are calculated.
+
+## Dependencies
+- `networkx`: For representing and manipulating tree topologies.
+- `numba`: For optimizing performance-critical code sections.
+- `pandas`: For handling data in tabular format.
+- `ete3`: For parsing and manipulating trees in Newick format (used in the `_ccphylo_solve` method).
+- `configparser`: For reading configuration settings (used in the `_setup_ccphylo` method).
+- `subprocess`: For running external commands (used in the `_ccphylo_solve` method).
+
+### Configuration
+The `_ccphylo_solve` method requires the path to the CCPhylo executable to be specified in the `config.ini` file under the `Paths` section with the key `ccphylo_path`.
+
+## Error Handling
+The `NeighborJoiningSolver` class raises `DistanceSolverError` exceptions for various error conditions, such as missing dissimilarity function, invalid rooting parameters, or errors encountered during the execution of CCPhylo.
