@@ -1,0 +1,106 @@
+---
+title: "SharedMutationJoiningSolver.py"
+---
+
+## High-level description
+The `SharedMutationJoiningSolver` class implements an agglomerative clustering algorithm for phylogenetic tree reconstruction. It iteratively joins samples with the highest similarity based on shared mutations in their character data, building the tree bottom-up. This solver is particularly suitable for lineage tracing data with a large number of characters and limited mutation rates.
+
+## Code Structure
+The `SharedMutationJoiningSolver` class is structured around the `solve` method, which orchestrates the tree reconstruction process. It utilizes helper functions like `find_cherry` to identify the most similar samples and `update_similarity_map_and_character_matrix` to merge nodes and update the similarity matrix. The class also leverages Numba for performance optimization.
+
+## References
+This solver references the following key components:
+- `dissimilarity_functions`: Provides various similarity/dissimilarity functions for comparing character vectors.
+- `solver_utilities`: Offers utility functions for tree manipulation and prior transformation.
+- `data_utilities`: Includes functions for computing dissimilarity maps and handling character data.
+
+## Symbols
+### `SharedMutationJoiningSolver`
+#### Description
+This class implements the Shared-Mutation-Joining algorithm for phylogenetic tree reconstruction. It takes a similarity function and a prior transformation method as inputs and constructs a tree by iteratively joining the most similar samples based on shared mutations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| similarity_function | Optional[Callable[[np.array, np.array, int, Optional[Dict[int, Dict[int, float]]]], float]] | Function to compute similarity between samples. Defaults to Hamming similarity without considering missing data. |
+| prior_transformation | str | Method for transforming priors into weights. Defaults to "negative_log". |
+
+#### Outputs
+This class doesn't directly return any output. It modifies the input `CassiopeiaTree` object to store the reconstructed tree.
+
+#### Internal Logic
+1. Initializes the solver with the provided similarity function and prior transformation method.
+2. Attempts to optimize the similarity function and internal methods using Numba for performance improvement.
+3. In the `solve` method:
+    - Retrieves the character matrix and priors (if available) from the input `CassiopeiaTree`.
+    - Computes the initial pairwise similarity matrix.
+    - Iteratively identifies the most similar pair (cherry) using `find_cherry`.
+    - Merges the cherry into a new internal node and updates the similarity matrix using `update_similarity_map_and_character_matrix`.
+    - Repeats the process until all samples are joined into a single tree.
+    - Populates the `CassiopeiaTree` with the reconstructed tree.
+    - Optionally collapses mutationless edges based on inferred ancestral states.
+
+#### Performance Considerations
+- Utilizes Numba to optimize the similarity function and key internal methods for improved performance.
+- Computes the dissimilarity map only once and updates it iteratively, reducing redundant calculations.
+
+### `find_cherry`
+#### Description
+Identifies the pair of samples (cherry) with the highest similarity in the given similarity matrix.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| similarity_matrix | np.array | A square matrix representing pairwise similarities between samples. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cherry | Tuple[int, int] | A tuple containing the row and column indices of the most similar pair in the similarity matrix. |
+
+#### Internal Logic
+1. Sets the diagonal elements of the similarity matrix to negative infinity to avoid self-comparison.
+2. Finds the indices of the maximum element in the matrix, which represents the most similar pair.
+
+### `update_similarity_map_and_character_matrix`
+#### Description
+Updates the similarity matrix and character matrix after merging a cherry into a new internal node.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| character_matrix | pd.DataFrame | The character matrix storing mutation information for all nodes. |
+| similarity_function | Callable[[np.array, np.array, int, Dict[int, Dict[int, float]]], float] | The function used to compute pairwise similarity. |
+| similarity_map | pd.DataFrame | The current similarity matrix to be updated. |
+| cherry | Tuple[str, str] | A tuple containing the names of the two samples being merged. |
+| new_node | str | The name of the new internal node created by merging the cherry. |
+| missing_state_indicator | int | The character representing missing data in the character matrix. Defaults to -1. |
+| weights | Optional[Dict[int, Dict[int, float]]] | Weights for each character/state pair, derived from priors. Defaults to None. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| updated_similarity_map | pd.DataFrame | The updated similarity matrix with the new internal node included. |
+
+#### Internal Logic
+1. Identifies the character vectors of the two samples in the cherry.
+2. Computes the character vector of the new internal node (LCA) by taking shared mutations.
+3. Adds the new node and its character vector to the character matrix.
+4. Calculates the pairwise similarities between the new node and all other nodes using the provided similarity function and weights.
+5. Updates the similarity matrix with the new similarities and removes the merged cherry nodes.
+
+#### Performance Considerations
+- Employs Numba to optimize the internal `__update_similarity_map` function for faster similarity updates.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| numba | Used for optimizing code performance. |
+| numpy | Used for numerical operations and array manipulation. |
+| pandas | Used for handling data in DataFrames. |
+| scipy | Used for scientific computing, including distance calculations. |
+| networkx | Used for creating and manipulating graph structures representing trees. |
+
+## Error Handling
+- Raises `SharedMutationJoiningSolverError` for specific issues encountered during tree reconstruction, such as invalid input parameters or inconsistencies in data.
+- Issues a `SharedMutationJoiningSolverWarning` if Numba optimization fails, falling back to Python implementation.

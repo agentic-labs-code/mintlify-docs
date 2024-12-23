@@ -1,0 +1,98 @@
+---
+title: "solver_utilities.py"
+---
+
+## High-level description
+This file provides utility functions for the solver module in Cassiopeia. These functions are used for tasks such as generating unique node names, collapsing unifurcations in a tree, transforming prior probabilities into weights, and converting sample names to indices.
+
+## Code Structure
+The file contains several independent functions that are used by other modules in the solver package. These functions are not directly interconnected but serve as helper functions for various solver algorithms.
+
+## References
+This file references the `ete3`, `numpy`, `pandas`, and `time` libraries. It also references the `PriorTransformationError` exception from the `cassiopeia.mixins` module.
+
+## Symbols
+
+### `node_name_generator`
+#### Description
+This function creates a generator that yields unique node names by hashing timestamps. This is used to ensure that each node in the reconstructed tree has a unique identifier.
+
+#### Inputs
+None
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| generator | Generator[str, None, None] | A generator object that yields unique node names |
+
+#### Internal Logic
+The function uses the `blake2b` hash function from the `hashlib` library to generate a 12-byte hash of the current timestamp. This hash is then converted to a hexadecimal string and appended to the prefix "cassiopeia_internal_node" to create a unique node name.
+
+### `collapse_unifurcations`
+#### Description
+This function collapses all unifurcations in a given `ete3.Tree`. Unifurcations are nodes with only one child. Collapsing them simplifies the tree structure by removing unnecessary nodes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | ete3.Tree | The tree to collapse unifurcations in |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| collapsed_tree | ete3.Tree | A copy of the input tree with all unifurcations collapsed |
+
+#### Internal Logic
+The function iterates through all nodes in the tree and identifies those with only one child. For each unifurcation, it removes the node and connects its child directly to its parent.
+
+### `transform_priors`
+#### Description
+This function transforms prior probabilities into weights for use in greedy solver algorithms. It supports three transformations: negative log, inverse, and square root inverse.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| priors | Optional[Dict[int, Dict[int, float]]] | A dictionary of prior probabilities for each character/state pair |
+| prior_transformation | str | The transformation to apply to the priors. Defaults to "negative_log" |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| weights | Dict[int, Dict[int, float]] | A dictionary of weights for each character/state pair |
+
+#### Internal Logic
+The function first checks if the specified transformation is supported. Then, it applies the chosen transformation to each prior probability and stores the resulting weight in a new dictionary.
+
+### `convert_sample_names_to_indices`
+#### Description
+This function maps sample names to their corresponding integer indices in a given list of names. This is used for efficient indexing operations in the solver algorithms.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| names | List[str] | A list of sample names |
+| samples | List[str] | A subset of sample names to be mapped to indices |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| indices | List[int] | A list of integer indices corresponding to the input samples |
+
+#### Internal Logic
+The function creates a dictionary mapping each sample name to its index in the `names` list. Then, it uses this dictionary to map the input `samples` to their corresponding indices.
+
+### `save_dissimilarity_as_phylip`
+#### Description
+This function saves a dissimilarity map as a PHYLIP file. The PHYLIP format is a standard format for representing phylogenetic trees and distance matrices.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dissimilarity_map | pd.DataFrame | A dissimilarity map |
+| path | str | The path to save the PHYLIP file |
+
+#### Outputs
+None
+
+#### Internal Logic
+The function converts the dissimilarity map to a NumPy array and writes it to a file in the PHYLIP format. The file includes the number of samples and a lower triangular matrix of dissimilarities.

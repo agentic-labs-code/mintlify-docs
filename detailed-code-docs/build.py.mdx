@@ -1,0 +1,53 @@
+---
+title: "build.py"
+---
+
+## High-level description
+This Python script, `build.py`, is responsible for building and compiling Cython extensions for the Cassiopeia project. It defines three extensions, compiles them using Cython, and copies the built extensions back to the project directory.
+
+## Code Structure
+The script defines a `build()` function that handles the entire build process. It creates Extension objects, uses Cython to compile them, and then copies the compiled files to the appropriate locations. The main execution is controlled by the `if __name__ == "__main__":` block at the end.
+
+## Symbols
+
+### build()
+#### Description
+This function manages the entire process of building Cython extensions for the Cassiopeia project.
+
+#### Internal Logic
+1. Define a list of `Extension` objects for the Cython modules to be compiled.
+2. Use `cythonize()` to compile the extensions.
+3. Create a `Distribution` object with the compiled extensions.
+4. Initialize and run a `build_ext` command to build the extensions.
+5. Copy the built extensions back to the project directory and set appropriate file permissions.
+
+### Extension objects
+#### Description
+Three `Extension` objects are defined, each representing a Cython module to be compiled:
+
+1. `"cassiopeia.preprocess.collapse_cython"`
+2. `"cassiopeia.solver.ilp_solver_utilities"`
+3. `"cassiopeia.tools.branch_length_estimator._iid_exponential_bayesian"`
+
+Each extension specifies its source files and, where necessary, include directories and compile arguments.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| os | File and directory operations |
+| shutil | High-level file operations |
+| distutils.command.build_ext | Provides `build_ext` command for building extensions |
+| distutils.core | Provides `Distribution` and `Extension` classes |
+| numpy | Used for include directories in one of the extensions |
+| Cython.Build | Provides `cythonize` function for compiling Cython code |
+
+## Performance Considerations
+The third extension, `"cassiopeia.tools.branch_length_estimator._iid_exponential_bayesian"`, includes C++ source files and uses aggressive optimization flags (`-O3`), indicating that this module is likely performance-critical.
+
+## Error Handling
+This script does not implement explicit error handling. It relies on the default error handling provided by the libraries and functions it uses.
+
+## Side Effects
+The script modifies the file system by creating compiled extension files and copying them to the project directory. It also changes the file permissions of the copied extensions.
+
+This documentation provides a comprehensive overview of the `build.py` script, explaining its purpose, structure, and key components. It should help engineers and technical PMs understand how the Cython extensions for the Cassiopeia project are built and integrated.

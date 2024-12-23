@@ -1,0 +1,154 @@
+---
+title: "betatree.py"
+---
+
+## High-level description
+This code defines a `betatree` class that simulates a beta coalescent tree, a model used in population genetics to represent the ancestral relationships of a sample of individuals. The class allows for the generation of trees under different coalescent models, including the Kingman coalescent (α=2) and the Bolthausen-Sznitman coalescent (α=1).
+
+## Code Structure
+The `betatree` class contains methods for initializing the tree structure, simulating coalescence events, calculating waiting times between mergers, determining the number of lineages involved in each merger, and cleaning up the tree structure for visualization. The `__main__` section provides examples of how to use the class to generate and visualize trees under different coalescent models.
+
+## Symbols
+### `betatree`
+#### Description
+This class simulates a beta coalescent tree. It provides methods for initializing the tree, simulating coalescence events, and visualizing the resulting tree.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sample_size | int | The number of leaves in the tree, representing the sample size. |
+| alpha | float | The parameter of the beta coalescent model. Defaults to 2 (Kingman coalescent). |
+
+#### Outputs
+The class does not directly return any values. It modifies its internal state to represent the simulated tree.
+
+#### Internal Logic
+The `coalesce` method drives the simulation process:
+1. **Initialization:** Creates a list of `Clade` objects, each representing a single lineage.
+2. **Coalescence loop:** Iteratively performs coalescence events until a single root lineage remains.
+    - `waiting_time`: Calculates the time until the next coalescence event based on the current number of lineages and the `alpha` parameter.
+    - `whichp`: Determines the number of lineages involved in the next merger event.
+    - `coalescence_event`: Selects lineages to merge, updates branch lengths, and creates a new parent `Clade`.
+3. **Cleanup:** Adjusts branch lengths to reflect coalescence times and calculates the number of descendants for each node.
+
+#### Side Effects
+The `coalesce` method modifies the internal state of the `betatree` object, constructing a tree structure represented by interconnected `Clade` objects.
+
+### `init_tree`
+#### Description
+Initializes the tree structure by creating a list of `Clade` objects, each representing a single leaf node.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+Creates a list of `Phylo.BaseTree.Clade` objects, each with a unique name and an initial branch length of 0.
+
+### `coalescence_event`
+#### Description
+Simulates a single coalescence event, merging a random subset of lineages.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+1. `whichp`: Determines the number of lineages to merge.
+2. `waiting_time`: Calculates the time elapsed until this event.
+3. Updates the branch lengths of all existing lineages by the waiting time.
+4. Randomly selects lineages to merge.
+5. `merge_clades`: Creates a new parent `Clade` representing the merged lineages.
+
+### `merge_clades`
+#### Description
+Merges a given set of lineages into a new parent `Clade`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| merging_blocks | list | A list of indices representing the lineages to merge. |
+
+#### Outputs
+None
+
+#### Internal Logic
+1. Creates a new `Phylo.BaseTree.Clade` object.
+2. Assigns the selected lineages as children of the new `Clade`.
+3. Sets the branch length of the new `Clade` to the current branch length of its children.
+4. Removes the merged lineages from the list of active lineages.
+5. Adds the new parent `Clade` to the list of active lineages.
+
+### `clean_up_subtree`
+#### Description
+Recursively traverses the tree structure to calculate branch lengths and the number of descendants for each node.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| clade | Phylo.BaseTree.Clade | The current `Clade` being processed. |
+
+#### Outputs
+None
+
+#### Internal Logic
+1. If the `Clade` is a leaf node, sets its weight to 1 and returns.
+2. If the `Clade` is an internal node:
+    - Subtracts the branch length of its first child from its own branch length to avoid double-counting.
+    - Recursively calls `clean_up_subtree` for each child node.
+    - Calculates its own weight as the sum of its children's weights.
+
+### `waiting_time`
+#### Description
+Calculates the waiting time until the next coalescence event based on the current number of lineages and the `alpha` parameter.
+
+#### Inputs
+None
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dt | float | The waiting time until the next coalescence event. |
+
+#### Internal Logic
+The waiting time is drawn from an exponential distribution with a rate parameter determined by the coalescent model:
+- **Kingman coalescent (α=2):** Rate = 2 / (b * (b - 1)), where b is the number of lineages.
+- **Bolthausen-Sznitman coalescent (α=1):** Rate = 1 / (b - 1).
+- **General beta coalescent (1 &lt; α &lt; 2):** Rate is calculated using gamma functions and the `normalizer` precomputed during initialization.
+
+### `whichp`
+#### Description
+Determines the number of lineages involved in the next merger event based on the coalescent model.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| b | int | The current number of lineages. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| int | The number of lineages to merge in the next event. |
+
+#### Internal Logic
+- **Kingman coalescent (α=2):** Always merges 2 lineages.
+- **Bolthausen-Sznitman coalescent (α=1):** Samples the merger size from a distribution proportional to 1 / (k * (k - 1)).
+- **General beta coalescent (1 &lt; α &lt; 2):** Samples the merger size from a distribution calculated using gamma functions and precomputed values.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| random | Used for random number generation. |
+| numpy | Used for numerical operations and array manipulation. |
+| scipy.special | Used for the gamma function. |
+| Bio.Phylo | Used for creating and manipulating phylogenetic trees. |
+
+## Error Handling
+The code does not implement specific error handling beyond basic exception raising.
+
+## Logging
+The code does not implement logging.

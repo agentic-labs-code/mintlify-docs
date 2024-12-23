@@ -1,0 +1,77 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains unit tests for branch length estimators in the Cassiopeia library, specifically focusing on two classes: `IIDExponentialBayesian` and `IIDExponentialMLE`. These tests are designed to validate the functionality and accuracy of these estimators under various scenarios, including edge cases, hand-solvable problems, and simulated data.
+
+## What does it do?
+The tests in this directory serve several purposes:
+
+1. Validate the correctness of the `IIDExponentialBayesian` estimator by comparing its output to closed-form solutions and numerical approximations for log likelihood, log joints, and posterior time distributions.
+
+2. Verify the behavior of the `IIDExponentialMLE` estimator in various scenarios, including:
+   - Degenerate cases (no mutations or saturation)
+   - Hand-solvable problems with simple tree topologies
+   - Regression tests on small trees
+   - Performance on simulated data
+   - Handling of subtree collapses when no mutations are present
+   - Enforcement of minimum branch length constraints
+   - Incorporation of site-specific mutation rates
+
+3. Ensure proper error handling for invalid inputs or edge cases in both estimators.
+
+These tests help maintain the reliability and accuracy of the branch length estimation algorithms in the Cassiopeia library, which is crucial for phylogenetic analysis and lineage tracing applications.
+
+## Key Files
+
+1. `iid_exponential_bayesian_test.py`:
+   This file contains tests for the `IIDExponentialBayesian` class. It includes:
+   - Comparisons against closed-form solutions for small and medium-sized trees
+   - Validation of error handling for invalid inputs
+   - Numerical calculations of log likelihood, log joints, and posterior time distributions
+
+2. `iid_exponential_mle_test.py`:
+   This file contains tests for the `IIDExponentialMLE` class. It includes:
+   - Tests for degenerate cases (no mutations and saturation)
+   - Verification of results for hand-solvable problems
+   - Regression tests on small trees
+   - Tests using simulated data
+   - Validation of subtree collapse behavior
+   - Tests for minimum branch length enforcement
+   - Verification of site-specific mutation rate handling
+
+Both files use parameterized testing to run the same tests with different solvers (ECOS and SCS) where applicable.
+
+## Dependencies
+The tests rely on several external libraries and frameworks:
+
+1. `unittest`: The standard Python unit testing framework.
+2. `parameterized`: Used for creating parameterized tests, allowing the same test to be run with different inputs.
+3. `numpy`: Used for numerical operations and array manipulations.
+4. `scipy`: Specifically `scipy.integrate` is used for numerical integration in the Bayesian tests.
+5. `networkx`: Used for working with graph structures, particularly in creating and manipulating tree topologies.
+6. `cvxpy`: A Python-embedded modeling language for convex optimization problems, used in the MLE estimator.
+
+From the Cassiopeia library:
+- `cassiopeia.data.CassiopeiaTree`: Represents the phylogenetic tree structure.
+- `cassiopeia.simulator.Cas9LineageTracingDataSimulator`: Used for generating simulated data.
+- `cassiopeia.tools.IIDExponentialBayesian` and `cassiopeia.tools.IIDExponentialMLE`: The classes being tested.
+
+## Configuration
+The tests do not rely on external configuration files or environment variables. However, they do use various parameters to configure the estimators and test scenarios:
+
+1. For `IIDExponentialBayesian`:
+   - `mutation_rate`: The mutation rate of the model.
+   - `birth_rate`: The birth rate of the model.
+   - `sampling_probability`: The sampling probability of the model.
+   - `discretization_level`: The number of timesteps used to discretize time.
+
+2. For `IIDExponentialMLE`:
+   - `solver`: The optimization solver to use (ECOS or SCS).
+   - `minimum_branch_length`: A constraint on the minimum allowed branch length.
+   - `relative_mutation_rates`: Site-specific mutation rates.
+
+These parameters are set within the test methods to create various test scenarios and validate the estimators' behavior under different conditions.
+
+In summary, this directory contains comprehensive unit tests for two branch length estimators in the Cassiopeia library, ensuring their accuracy and reliability across a wide range of scenarios and input conditions.

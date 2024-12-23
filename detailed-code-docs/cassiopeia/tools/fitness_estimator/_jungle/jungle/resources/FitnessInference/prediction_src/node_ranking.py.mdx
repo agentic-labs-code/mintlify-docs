@@ -1,0 +1,205 @@
+---
+title: "node_ranking.py"
+---
+
+## High-level description
+The `node_ranking` class extends the `fitness_inference` class and is responsible for ranking nodes in a phylogenetic tree based on various methods, including mean posterior fitness, polarizer scores, branch length, depth, and expansion score. It provides functionalities to compute these rankings, color-code trees based on rankings, and assess the quality of rankings.
+
+## Code Structure
+The `node_ranking` class inherits from the `fitness_inference` class. It utilizes the tree structure and inferred fitness values from the parent class to compute and assign rankings to each node. The ranking methods can be customized during initialization.
+
+## References
+This class references the `fitness_inference` class for inheriting functionality related to fitness inference and the `tree_utils` module for tree manipulation and calculations. Additionally, it uses the `sort_leafs_in_time_bins` method internally for calculating the expansion score.
+
+## Symbols
+### `node_ranking`
+#### Description
+This class extends the `fitness_inference` class to rank nodes in a phylogenetic tree using various methods. It provides methods for computing rankings, coloring trees based on rankings, and evaluating ranking quality.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| methods | list | List of methods to use for ranking nodes (default: ['mean_fitness', 'polarizer', 'branch_length', 'depth', 'expansion_score']).  |
+| time_bins | list | List of time points defining temporal bins for expansion score calculation (default: None). |
+| pseudo_count | int | Pseudo-count added to frequencies when calculating expansion score (default: 5). |
+| *args | tuple | Variable length argument list passed to the parent class constructor. |
+| **kwargs | dict | Arbitrary keyword arguments passed to the parent class constructor. |
+
+#### Outputs
+None
+
+#### Internal Logic
+The class initializes by calling the constructor of its parent class (`fitness_inference`) and storing the provided ranking methods, time bins, and pseudo-count. The `compute_rankings` method calculates the scores for each specified ranking method. It first infers ancestral fitness and calculates polarizer scores if required. Then, it computes depth, expansion score, and any other custom ranking methods. The `expansion_score` method calculates the fraction of leaves under each node within each time bin and performs linear regression on the log-transformed frequencies to determine the expansion score. The `rank_by_method` method sorts a given set of nodes based on the chosen ranking method. The `color_tree` method assigns colors to nodes based on their ranking using a colormap.
+
+### `expansion_score`
+#### Description
+Calculates the expansion score for each internal node in the tree. The expansion score represents the rate of lineage expansion over time.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+The method first checks if time bins are provided. It then iterates through each internal node and calculates the number of leaves falling within each time bin. It then calculates the temporal frequency of the node within each bin, using a pseudo-count to avoid zero values. Finally, it performs linear regression on the log-transformed temporal frequencies against the time bins to obtain the expansion score (slope of the regression line).
+
+### `sort_leafs_in_time_bins`
+#### Description
+Groups leaf nodes into their corresponding time bins based on their depth in the tree.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| node | Node | The node for which to sort its descendant leaves into time bins (default: None, uses all terminal nodes). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tmp_leafs_by_bin | list | A list of lists, where each inner list contains leaf nodes belonging to a specific time bin. |
+
+#### Internal Logic
+The method first checks if time bins are defined. If a node is provided, it retrieves the descendant terminal nodes of that node; otherwise, it uses all terminal nodes in the tree. It then iterates through each terminal node and assigns it to the appropriate time bin based on its depth.
+
+### `rank_by_method`
+#### Description
+Sorts a given set of nodes based on a specified ranking method.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| nodes | list | List of nodes to be ranked (default: all terminal nodes). |
+| method | str | Attribute name representing the ranking method to use (default: 'mean_fitness'). |
+| scramble | bool | Whether to shuffle the nodes before sorting to remove any pre-existing order (default: True). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| nodes | list | The sorted list of nodes based on the specified ranking method. |
+
+#### Internal Logic
+The method first checks if a list of nodes is provided; otherwise, it uses all terminal nodes. It optionally shuffles the nodes to randomize the order. Then, it sorts the nodes in descending order based on the values of the specified ranking method attribute. Finally, it assigns a rank to each node based on its position in the sorted list.
+
+### `correlation_between_scores`
+#### Description
+Calculates the Spearman's rank correlation between two specified node attributes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| score1 | str | Attribute name of the first score to use for correlation calculation. |
+| score2 | str | Attribute name of the second score to use for correlation calculation. |
+| node_set | list | List of nodes to consider for correlation calculation (default: all terminal nodes). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| correlation | float | The Spearman's rank correlation coefficient between the two specified scores. Returns None if an error occurs. |
+
+#### Internal Logic
+The method retrieves the values of the two specified attributes for each node in the provided node set. It then calculates the Spearman's rank correlation coefficient between the two sets of values using the `spearmanr` function from the `scipy.stats` module.
+
+### `ranking_quality`
+#### Description
+Evaluates the quality of the ranking based on the mean fitness score. It determines the rank of the lowest terminal node that falls within one standard deviation of the highest mean fitness score.
+
+#### Inputs
+None
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ci | int | The rank of the lowest terminal node within one standard deviation of the top-ranked node. |
+
+#### Internal Logic
+The method sorts the terminal nodes based on their mean fitness in descending order. It then calculates the cutoff value as the mean fitness of the top-ranked node minus one standard deviation. It iterates through the sorted nodes and increments a counter until it encounters a node with a mean fitness score below the cutoff value. The final counter value represents the rank of the last node within the one standard deviation range.
+
+### `color_tree`
+#### Description
+Assigns colors to nodes in the tree based on their ranking using a specified colormap.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| nodes | list | List of nodes to color (default: all terminal nodes). |
+| method | str | Attribute name representing the ranking method to use for coloring (default: 'mean_fitness'). |
+| offset | float | Value to extend the branch length of terminal nodes for better visibility (default: 0.0). |
+| n_labels | int | Number of top-ranked nodes to display rank labels (default: 10). |
+| scramble | bool | Whether to shuffle the nodes before coloring to remove any pre-existing order (default: True). |
+| cmap | matplotlib.colors.Colormap | The colormap to use for assigning colors (default: matplotlib.cm.jet). |
+
+#### Outputs
+None
+
+#### Internal Logic
+The method first ranks the provided nodes based on the specified ranking method. It then iterates through the ranked nodes and assigns a color to each node based on its rank using the provided colormap. It also extends the branch length of terminal nodes for better visibility. Additionally, it adds rank labels to the top-ranked nodes.
+
+### `interpolate_color`
+#### Description
+Assigns colors to internal nodes by averaging the colors of their descendant leaf nodes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | Tree | The tree object to color (default: the tree stored in the object). |
+
+#### Outputs
+None
+
+#### Internal Logic
+The method iterates through each internal node in the tree. For each internal node, it retrieves its descendant leaf nodes and calculates the average color by summing the RGB values of each leaf node's color and dividing by the number of leaves. It then assigns the averaged color to the internal node.
+
+### `color_other_tree`
+#### Description
+Transfers the ranking scores from the current tree to another tree based on matching node names and then colors the other tree.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| nodes | list | List of nodes in the other tree to color. |
+| method | str | Attribute name representing the ranking method to use for coloring (default: 'mean_fitness'). |
+| offset | float | Value to extend the branch length of terminal nodes for better visibility (default: 0.0). |
+| n_labels | int | Number of top-ranked nodes to display rank labels (default: 10). |
+| scramble | bool | Whether to shuffle the nodes before coloring to remove any pre-existing order (default: True). |
+| cmap | matplotlib.colors.Colormap | The colormap to use for assigning colors (default: matplotlib.cm.jet). |
+
+#### Outputs
+None
+
+#### Internal Logic
+The method first creates a dictionary mapping node names to nodes in the current tree. It then iterates through the nodes in the other tree and checks if a matching node exists in the current tree based on their names. If a match is found, it assigns the ranking score from the matching node in the current tree to the node in the other tree. Finally, it calls the `color_tree` method to color the nodes in the other tree based on the transferred ranking scores.
+
+### `best_node`
+#### Description
+Returns the highest-ranked node from a given set of nodes based on a specified ranking method.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| method | str | Attribute name representing the ranking method to use (default: 'mean_fitness'). |
+| nodes | list | List of nodes to consider (default: all terminal nodes). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| best_node | Node | The node with the highest ranking score based on the specified method. |
+
+#### Internal Logic
+The method first ranks the provided nodes based on the specified ranking method. It then returns the first node in the sorted list, which represents the node with the highest ranking score.
+
+### `rank_labels`
+#### Description
+Retrieves the rank label of a given node.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| node | Node | The node for which to retrieve the rank label. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| rank_label | str | The rank label of the node, or None if the node does not have a rank label. |
+
+#### Internal Logic
+The method attempts to access the `rank_label` attribute of the provided node. If the attribute exists, it returns its value; otherwise, it returns None.

@@ -1,0 +1,77 @@
+---
+title: "error_correct_umi_test.py"
+---
+
+Here's a detailed documentation of the provided code:
+
+## High-level description
+This file contains unit tests for the error correction of UMI sequences in the Cassiopeia pipeline. It tests various scenarios of UMI error correction, including handling of conflicts and different distance thresholds.
+
+## Code Structure
+The code defines a single test class `TestErrorCorrectUMISequence` that inherits from `unittest.TestCase`. This class contains multiple test methods, each testing different aspects of the UMI error correction functionality.
+
+## Symbols
+
+### `TestErrorCorrectUMISequence`
+#### Description
+A test class that contains multiple test methods for validating the UMI error correction functionality in the Cassiopeia pipeline.
+
+#### Internal Logic
+The class sets up test data in the `setUp` method and defines several test methods to check different aspects of UMI error correction.
+
+### `setUp`
+#### Description
+Initializes test data for use in the test methods.
+
+#### Internal Logic
+Creates two pandas DataFrames:
+1. `self.multi_case`: A complex case with multiple cells and UMIs.
+2. `self.ambiguous`: A case with ambiguous alleles.
+
+Both DataFrames are populated with sample data including cell barcodes, UMIs, read counts, sequences, and other relevant information.
+
+### `test_format`
+#### Description
+Tests if the output of the error correction function has the expected format.
+
+#### Internal Logic
+1. Calls `cassiopeia.pp.error_correct_umis` on `self.multi_case`.
+2. Checks if the resulting DataFrame has all the expected columns.
+
+### `test_zero_dist`
+#### Description
+Tests the behavior of the error correction function when the maximum UMI distance is set to 0.
+
+#### Internal Logic
+1. Calls `cassiopeia.pp.error_correct_umis` with `max_umi_distance=0`.
+2. Verifies that the output has the same shape as the input.
+3. Checks if all original cell barcodes are present in the output.
+
+### `test_error_correct_two_dist`
+#### Description
+Tests the error correction function with a maximum UMI distance of 2.
+
+#### Internal Logic
+1. Calls `cassiopeia.pp.error_correct_umis` with `max_umi_distance=2`.
+2. Checks if the read counts in the output match the expected values for specific read names.
+
+### `test_error_correct_allow_conflicts`
+#### Description
+Tests the error correction function when allowing allele conflicts.
+
+#### Internal Logic
+1. Calls `cassiopeia.pp.error_correct_umis` with `allow_allele_conflicts=True`.
+2. Verifies if the read counts in the output match the expected values for specific read names.
+
+## Dependencies
+- unittest
+- numpy
+- pandas
+- cassiopeia
+
+## Error Handling
+The test methods use assertions to check if the output of the error correction function matches the expected results. If any assertion fails, the test will raise an AssertionError.
+
+## Notes
+- The tests cover various scenarios including zero distance, two-distance error correction, and handling of allele conflicts.
+- The test data includes cases with multiple cells, UMIs, and potential conflicts to ensure robust testing of the error correction functionality.

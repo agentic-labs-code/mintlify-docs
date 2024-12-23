@@ -1,0 +1,62 @@
+---
+title: "CompleteBinarySimulator.py"
+---
+
+## High-level description
+The `CompleteBinarySimulator` class simulates a complete binary tree, where each node has exactly two children except for the leaves. It provides a way to generate a balanced tree topology with specified depth or number of cells, which can be used for in silico simulations of single-cell phylogenies.
+
+## Code Structure
+The `CompleteBinarySimulator` class inherits from the `TreeSimulator` abstract class and implements the `simulate_tree` method. It uses the `networkx` library to generate a balanced binary tree and then converts it into a `CassiopeiaTree` object.
+
+## References
+This code references the following symbols:
+- `TreeSimulator`: The abstract base class for tree simulators.
+- `CassiopeiaTree`: The data structure representing a tree in Cassiopeia.
+- `TreeSimulatorError`: An exception class for tree simulator errors.
+- `nx.balanced_tree`: A function from the `networkx` library to generate a balanced binary tree.
+
+## Symbols
+
+### `CompleteBinarySimulator`
+#### Description
+This class simulates a complete binary tree with a specified depth or number of cells. It uses the `networkx` library to generate a balanced binary tree and then converts it into a `CassiopeiaTree` object. The branch lengths are normalized by the height of the tree, resulting in a tree with a height of 1.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| num_cells | Optional[int] | Number of cells to simulate (must be a power of 2). |
+| depth | Optional[int] | Depth of the tree. |
+
+#### Outputs
+This class doesn't directly return any output. It simulates a tree and stores it internally.
+
+#### Internal Logic
+1. **Initialization:**
+    - Checks if exactly one of `num_cells` or `depth` is provided.
+    - If `num_cells` is provided, calculates the `depth` and validates that `num_cells` is a power of 2.
+    - If `depth` is provided, validates that it is greater than 0.
+2. **Tree Simulation (`simulate_tree` method):**
+    - Generates a balanced binary tree using `nx.balanced_tree` with a branching factor of 2.
+    - Creates a mapping from the default integer node names to unique string names.
+    - Adds a root node ("root") and connects it to the root of the generated binary tree.
+    - Relabels the nodes using the generated mapping.
+    - Creates a `CassiopeiaTree` object from the generated tree.
+    - Initializes branch lengths by dividing the time of each node by the total depth of the tree plus 1.
+
+#### Side Effects
+- Creates and stores a `CassiopeiaTree` object internally.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| networkx | Used to generate the balanced binary tree. |
+| numpy | Used for logarithmic calculations. |
+| cassiopeia.data.CassiopeiaTree | Used to create the `CassiopeiaTree` object. |
+| cassiopeia.mixins | Used to raise `TreeSimulatorError` in case of invalid input. |
+| cassiopeia.simulator.TreeSimulator | The abstract base class for tree simulators. |
+
+## Error Handling
+- Raises `TreeSimulatorError` if:
+    - Neither or both `num_cells` and `depth` are provided.
+    - `num_cells` is not a power of 2.
+    - `depth` is not greater than 0. 

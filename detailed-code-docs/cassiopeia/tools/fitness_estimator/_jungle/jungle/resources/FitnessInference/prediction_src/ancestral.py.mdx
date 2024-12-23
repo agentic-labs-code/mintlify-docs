@@ -1,0 +1,169 @@
+---
+title: "ancestral.py"
+---
+
+## High-level description
+The code defines a class `ancestral_sequences` that takes a phylogenetic tree and a multiple sequence alignment as input. It then performs maximum likelihood estimation to infer the most likely ancestral sequences for each internal node in the tree, along with the marginal probabilities of different character states at each position.
+
+## Code Structure
+The `ancestral_sequences` class is the main component of the code. It uses Biopython's `Phylo` and `Seq` objects to represent the tree and sequences, respectively. The class methods implement a message-passing algorithm to calculate the ancestral sequences and marginal probabilities.
+
+## References
+This code references Biopython library (`Phylo`, `Seq`, `SeqRecord`).
+
+## Symbols
+
+### `ancestral_sequences`
+#### Description
+This class performs ancestral sequence reconstruction using a maximum likelihood approach. It takes a phylogenetic tree and aligned sequences as input and infers the most likely ancestral sequences for internal nodes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | Bio.Phylo.BaseTree.Tree | A Biopython phylogenetic tree object. |
+| aln | Bio.Align.MultipleSeqAlignment | A Biopython multiple sequence alignment object. |
+| alphabet | str | The set of allowed characters in the sequences (default: "ACGT"). |
+| sub_matrix | numpy.ndarray | A substitution matrix (optional, defaults to a flat matrix). |
+| eps_branch_length | float | A small value added to branch lengths to prevent division by zero (default: 1e-7). |
+| copy_tree | bool | Whether to create a copy of the input tree (default: True). |
+
+#### Outputs
+The class itself doesn't return any output. However, it modifies the input tree object by adding ancestral sequences and marginal probabilities to the internal nodes.
+
+#### Internal Logic
+The class uses a message-passing algorithm, similar to dynamic programming, to calculate the ancestral sequences. The algorithm works by passing messages up and down the tree, representing the likelihood of different ancestral states at each node. The messages are calculated based on the observed sequences at the leaves, the branch lengths, and the substitution matrix.
+
+1. **Initialization:** Each leaf node is assigned its observed sequence and a probability array representing the certainty of the observed state. Internal nodes are initialized with uniform probability arrays.
+2. **Upward Pass (calc_up_messages):** Starting from the leaves, messages are passed upwards towards the root. Each node combines the messages from its children, weighting them by the branch lengths and the substitution probabilities.
+3. **Downward Pass (calc_down_messages):** From the root, messages are passed downwards towards the leaves. Each node combines the message from its parent with the upward messages from its other children.
+4. **Marginal Probabilities (calc_marginal_probabilities):** The upward and downward messages are combined at each node to calculate the marginal probability of each character state at each position.
+5. **Most Likely Sequences (calc_most_likely_sequences):** The most likely ancestral sequence at each node is determined by selecting the character state with the highest marginal probability at each position.
+
+#### Side Effects
+The main side effect is the modification of the input tree object. The ancestral sequences and marginal probabilities are stored within the internal nodes of the tree.
+
+### `get_state_array`
+#### Description
+This method returns a NumPy array filled with ones, representing the initial state probabilities for a node.
+
+#### Inputs
+This method doesn't take any input arguments.
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| state_array | numpy.ndarray | A 2D NumPy array with dimensions (sequence length, number of states) filled with ones. |
+
+### `calc_eigendecomp`
+#### Description
+This method calculates the eigenvalues and eigenvectors of the substitution matrix. This decomposition is used to efficiently calculate the state probabilities over time.
+
+#### Inputs
+This method doesn't take any input arguments.
+
+#### Outputs
+The method stores the calculated eigenvalues and eigenvectors in the `self.evals` and `self.evecs` attributes, respectively.
+
+### `calc_state_probabilites`
+#### Description
+This method calculates the probabilities of different character states at a given time point, given an initial state probability vector and a time interval.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| P | numpy.ndarray | A probability vector representing the initial state probabilities. |
+| t | float | The time interval. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| state_probabilities | numpy.ndarray | A probability vector representing the state probabilities after time t. |
+
+### `normalize`
+#### Description
+This method normalizes the probability array of a given clade (node) such that the sum of probabilities at each position equals one.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| clade | Bio.Phylo.Clade | The clade (node) for which to normalize the probabilities. |
+
+#### Outputs
+This method doesn't return any output. It modifies the `clade.prob` array in place.
+
+### `log_normalize`
+#### Description
+This method converts unnormalized logarithmic probabilities to linear probabilities and then normalizes them.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| clade | Bio.Phylo.Clade | The clade (node) for which to normalize the probabilities. |
+
+#### Outputs
+This method doesn't return any output. It modifies the `clade.prob` array in place.
+
+### `calc_up_messages`
+#### Description
+This method recursively calculates the "up messages" for each node in the tree. These messages represent the likelihood of different ancestral states at a node, considering only the subtree below that node.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| clade | Bio.Phylo.Clade | The clade (node) for which to calculate the up message. |
+
+#### Outputs
+This method doesn't return any output. It modifies the `clade.up_message` attribute of the input clade and recursively updates the up messages of its descendants.
+
+### `calc_down_messages`
+#### Description
+This method recursively calculates the "down messages" for each node in the tree. These messages represent the likelihood of different ancestral states at a node, considering the entire tree except for the subtree below that node.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| clade | Bio.Phylo.Clade | The clade (node) for which to calculate the down message. |
+
+#### Outputs
+This method doesn't return any output. It modifies the `clade.down_message` attribute of the input clade and recursively updates the down messages of its descendants.
+
+### `calc_marginal_probabilities`
+#### Description
+This method calculates the marginal probabilities of different character states at each position for each internal node in the tree.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| clade | Bio.Phylo.Clade | The clade (node) for which to calculate the marginal probabilities. |
+
+#### Outputs
+This method doesn't return any output. It modifies the `clade.prob` attribute of the input clade and recursively updates the marginal probabilities of its descendants.
+
+### `calc_most_likely_sequences`
+#### Description
+This method recursively determines the most likely ancestral sequence for each internal node in the tree based on the calculated marginal probabilities.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| clade | Bio.Phylo.Clade | The clade (node) for which to determine the most likely sequence. |
+
+#### Outputs
+This method doesn't return any output. It modifies the `clade.seq` attribute of the input clade and recursively updates the most likely sequences of its descendants.
+
+### `calc_ancestral_sequences`
+#### Description
+This method orchestrates the entire ancestral sequence reconstruction process. It calls the necessary methods to calculate the up messages, down messages, marginal probabilities, and most likely sequences for all nodes in the tree.
+
+#### Inputs
+This method doesn't take any input arguments.
+
+#### Outputs
+This method doesn't return any output. It modifies the input tree object by adding ancestral sequences and marginal probabilities to the internal nodes.
+
+## Dependencies
+This code depends on the following external library:
+| Dependency | Purpose |
+|:-----------|:--------|
+| biopython | Handling phylogenetic trees and sequence data |
+

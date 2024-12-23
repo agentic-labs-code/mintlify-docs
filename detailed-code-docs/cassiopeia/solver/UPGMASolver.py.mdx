@@ -1,0 +1,151 @@
+---
+title: "UPGMASolver.py"
+---
+
+## High-level description
+The `UPGMASolver` class implements the Unweighted Pair Group Method with Arithmetic Mean (UPGMA) algorithm, a hierarchical clustering method used for phylogenetic tree reconstruction. It iteratively joins the most similar samples (or clusters) based on a dissimilarity matrix, updating the matrix after each join until a single cluster remains.
+
+## Code Structure
+The `UPGMASolver` class inherits from the `DistanceSolver` class and overrides methods for finding cherries (`find_cherry`), updating the dissimilarity map (`update_dissimilarity_map`), and rooting the tree (`root_tree`). It also uses a helper function `__update_dissimilarity_map_numba` for optimized dissimilarity map updates.
+
+## References
+- `DistanceSolver`: The parent class providing the general framework for distance-based solvers.
+- `dissimilarity_functions`: A module containing various dissimilarity functions, including `weighted_hamming_distance` used by default.
+
+## Symbols
+
+### `UPGMASolver`
+#### Description
+This class implements the UPGMA algorithm for phylogenetic tree reconstruction. It uses a dissimilarity matrix to iteratively join the most similar samples or clusters, updating the matrix after each join.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dissimilarity_function | Optional[Callable[[np.array, np.array, int, Dict[int, Dict[int, float]]], float]] | A function to compute the dissimilarity between samples. Defaults to `weighted_hamming_distance`. |
+| prior_transformation | str | Function to transform priors into weights. Defaults to "negative_log". |
+| fast | bool | Whether to use a fast implementation of UPGMA. Defaults to False. |
+| implementation | str | Which fast implementation to use. Defaults to "ccphylo_upgma". |
+| threads | int | Number of threads to use for dissimilarity map computation. Defaults to 1. |
+
+#### Outputs
+The `UPGMASolver` object itself, which can be used to solve a `CassiopeiaTree` object.
+
+#### Internal Logic
+The `solve` method performs the following steps:
+1. Initializes a dissimilarity map and a tree with all samples as leaves.
+2. Iteratively finds the most similar pair of samples or clusters (cherry) using `find_cherry`.
+3. Joins the cherry into a new node in the tree.
+4. Updates the dissimilarity map using `update_dissimilarity_map`.
+5. Repeats steps 2-4 until only two clusters remain.
+6. Roots the tree using `root_tree`.
+7. Populates the input `CassiopeiaTree` with the resulting tree.
+
+### `root_tree`
+#### Description
+Roots the tree produced by UPGMA by adding a root node as the parent of the last two unjoined nodes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | nx.Graph | The unrooted tree topology. |
+| root_sample | str | Ignored, as the root is implicitly defined. |
+| remaining_samples | List[str] | The last two unjoined nodes in the tree. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| rooted_tree | nx.DiGraph | The rooted tree. |
+
+#### Internal Logic
+1. Adds a "root" node to the tree.
+2. Connects the "root" node to the two remaining samples.
+3. Converts the undirected graph to a directed graph rooted at the "root" node.
+
+### `find_cherry`
+#### Description
+Finds the pair of samples or clusters with the minimum dissimilarity in the dissimilarity matrix.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dissimilarity_matrix | np.array | The dissimilarity matrix. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| (i, j) | Tuple[int, int] | A tuple of indices in the dissimilarity matrix representing the cherry. |
+
+#### Internal Logic
+1. Sets the diagonal of the dissimilarity matrix to infinity to avoid self-comparisons.
+2. Finds the indices of the minimum value in the matrix.
+
+### `update_dissimilarity_map`
+#### Description
+Updates the dissimilarity map after joining two nodes into a cherry. The new dissimilarity between the cherry and other nodes is calculated as a weighted average of the dissimilarities between the cherry's children and the other nodes.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dissimilarity_map | pd.DataFrame | The dissimilarity map to update. |
+| cherry | Tuple[str, str] | A tuple of node names representing the cherry. |
+| new_node | str | The name of the new node representing the cherry. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dissimilarity_map | pd.DataFrame | The updated dissimilarity map. |
+
+#### Internal Logic
+1. Calculates the size of each child cluster in the cherry.
+2. Updates the cluster size dictionary with the new node's size.
+3. Finds the indices of the cherry nodes in the dissimilarity map.
+4. Calls the optimized `__update_dissimilarity_map_numba` function to update the dissimilarity map.
+5. Creates a new DataFrame with the updated dissimilarity map and new node.
+6. Removes the cherry nodes from the dissimilarity map.
+
+### `__update_dissimilarity_map_numba`
+#### Description
+A private, optimized function for updating the dissimilarity map using Numba for performance improvement.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dissimilarity_map | np.array | The dissimilarity matrix to update. |
+| cherry_i | int | Index of the first cherry node in the matrix. |
+| cherry_j | int | Index of the second cherry node in the matrix. |
+| size_i | int | Size of the first cherry cluster. |
+| size_j | int | Size of the second cherry cluster. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| updated_map | np.array | The updated dissimilarity matrix. |
+
+#### Internal Logic
+1. Adds a new row and column for the new node.
+2. Calculates the new dissimilarities between the new node and all other nodes using a weighted average.
+3. Sets the self-dissimilarity of the new node to 0.
+
+### `setup_root_finder`
+#### Description
+Defines the implicit rooting strategy for UPGMA. Since UPGMA produces a rooted tree, this method simply sets the root sample name to "root".
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassiopeia_tree | CassiopeiaTree | The input CassiopeiaTree object. |
+
+#### Outputs
+None. The method modifies the `root_sample_name` attribute of the input `CassiopeiaTree` object.
+
+## Side Effects
+The `solve` method modifies the input `CassiopeiaTree` object by populating its `tree` attribute with the reconstructed tree.
+
+## Dependencies
+- `numba`: Used for optimizing the `__update_dissimilarity_map_numba` function.
+- `networkx`: Used for representing and manipulating the tree topology.
+- `pandas`: Used for representing the dissimilarity matrix.
+- `numpy`: Used for numerical operations.
+
+## Error Handling
+The `UPGMASolver` class raises `DistanceSolverError` if an invalid fast implementation is specified or if rooting parameters are incorrect.

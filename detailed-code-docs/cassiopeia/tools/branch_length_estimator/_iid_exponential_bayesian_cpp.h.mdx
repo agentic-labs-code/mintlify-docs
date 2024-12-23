@@ -1,0 +1,54 @@
+---
+title: "_iid_exponential_bayesian_cpp.h"
+---
+
+## High-level description
+The code defines a class `_InferPosteriorTimes` in C++ that estimates the posterior distribution of branch lengths in a phylogenetic tree under an infinite-sites model of evolution with an exponential prior on branch lengths. This is done using dynamic programming to efficiently compute the likelihoods of different branch length configurations.
+
+## Code Structure
+The code defines a single class `_InferPosteriorTimes` which encapsulates all the logic for inferring posterior times. The class has a public `run` method that takes the tree data and model parameters as input and computes the posterior distributions. The results can then be accessed through various getter methods. Internally, the class uses dynamic programming tables (`down_cache`, `up_cache`) to store intermediate results and avoid redundant computations.
+
+## Symbols
+### `_InferPosteriorTimes`
+#### Description
+This class implements a dynamic programming algorithm to infer the posterior distribution of branch lengths in a phylogenetic tree under an infinite-sites model of evolution with an exponential prior on branch lengths.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| N | int | Number of nodes in the tree |
+| children | vector&lt;vector&lt;int&gt;&gt; | Adjacency list representing the tree structure. `children[i]` contains the children of node `i` |
+| root | int | The index of the root node |
+| is_internal_node | vector&lt;int&gt; | Boolean vector indicating whether each node is an internal node (1) or a leaf (0) |
+| get_number_of_mutated_characters_in_node | vector&lt;int&gt; | Number of mutations observed on the branch leading to each node |
+| non_root_internal_nodes | vector&lt;int&gt; | List of indices of internal nodes excluding the root |
+| leaves | vector&lt;int&gt; | List of indices of leaf nodes |
+| parent | vector&lt;int&gt; | `parent[i]` is the parent of node `i` |
+| K | int | Total number of characters in the data |
+| K_non_missing | vector&lt;int&gt; | `K_non_missing[i]` is the number of characters that are not missing at node `i` |
+| T | int | Discretization level for time. Larger T leads to more accurate but slower computation |
+| r | double | Mutation rate per character per unit time |
+| lam | double | Cell division rate per unit time |
+| sampling_probability | double | Probability of sampling a lineage at the present time |
+| is_leaf | vector&lt;int&gt; | Boolean vector indicating whether each node is a leaf |
+
+#### Outputs
+The class does not directly return any output. Instead, the results are stored internally and can be accessed through the following getter methods:
+
+* `get_posterior_means_res()`: Returns a vector of pairs, where each pair represents a node and its posterior mean branch length.
+* `get_posteriors_res()`: Returns a vector of pairs, where each pair represents a node and its posterior distribution of branch lengths.
+* `get_log_joints_res()`: Returns a vector of pairs, where each pair represents a node and its log joint probability for each time point.
+* `get_log_likelihood_res()`: Returns the log-likelihood of the data given the tree and model parameters.
+
+#### Internal Logic
+The class uses a dynamic programming algorithm to compute the likelihood of the data given the tree and model parameters. The algorithm works by recursively computing the likelihood of subtrees, starting from the leaves and moving towards the root. Two dynamic programming tables are used:
+
+* `down_cache`: `down_cache[v][t][x]` stores the log-probability of generating all data at and below node `v`, starting from time `t` and with `x` mutations already accumulated on the branch leading to `v`.
+* `up_cache`: `up_cache[v][t][x]` stores the log-probability of generating all data above node `v`, with node `v` dividing at time `t` and having accumulated `x` mutations on the branch leading to it.
+
+The algorithm considers four cases at each step of the recursion: no event, mutation, cell division with both lineages sampled, and cell division with one lineage unsampled. The likelihoods of these cases are computed and combined using the log-sum-exp trick to avoid numerical underflow.
+
+Once the dynamic programming tables are populated, the posterior distributions of branch lengths are computed by marginalizing over all possible event times for each internal node.
+
+#### Performance Considerations
+The time complexity of the algorithm is O(N*T*K), where N is the number of nodes, T is the discretization level for time, and K is the number of characters. The space complexity is also O(N*T*K). The algorithm can be sped up by using a smaller value of T, but this will result in a less accurate approximation of the posterior distribution.

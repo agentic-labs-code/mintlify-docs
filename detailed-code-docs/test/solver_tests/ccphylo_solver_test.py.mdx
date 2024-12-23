@@ -1,0 +1,84 @@
+---
+title: "ccphylo_solver_test.py"
+---
+
+## High-level description
+This file contains unit tests for the CCPhylo solver implementations in the Cassiopeia package. It compares the results of CCPhylo solvers (NJ, DNJ, HNJ, and UPGMA) against standard Neighbor Joining (NJ) and UPGMA implementations for phylogenetic tree reconstruction.
+
+## Code Structure
+The code defines a test class `TestCCPhyloSolver` that inherits from `unittest.TestCase`. It includes several test methods to compare different solver implementations and their behavior under various conditions.
+
+## Symbols
+
+### `find_triplet_structure`
+#### Description
+This function determines the structure of a triplet in a given tree.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| triplet | tuple | A tuple containing three node labels |
+| T | networkx.Graph | The tree to analyze |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| structure | str | The structure of the triplet ("ab", "ac", "bc", or "-") |
+
+#### Internal Logic
+1. Find ancestors for each node in the triplet
+2. Calculate the number of common ancestors for each pair
+3. Determine the structure based on which pair has the most common ancestors
+
+### `delta_fn`
+#### Description
+This function calculates the dissimilarity between two arrays.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| x | np.array | First array |
+| y | np.array | Second array |
+| missing_state | int | Value representing missing data |
+| priors | Optional[Dict[int, Dict[int, float]]] | Prior probabilities |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| d | int | The number of differences between the two arrays |
+
+### `TestCCPhyloSolver`
+#### Description
+This is the main test class containing various test methods for CCPhylo solvers.
+
+#### Internal Logic
+1. Sets up test data and solver instances in the `setUp` method
+2. Defines test methods for different solver implementations and scenarios
+3. Compares the results of CCPhylo solvers with standard implementations
+
+### Test Methods
+1. `test_ccphylo_invalid_input`: Tests error handling for invalid solver inputs
+2. `test_ccphylo_nj_solver`: Compares CCPhylo NJ solver with standard NJ solver
+3. `test_ccphylo_dnj_solver`: Compares CCPhylo DNJ solver with standard NJ solver
+4. `test_ccphylo_hnj_solver`: Compares CCPhylo HNJ solver with standard NJ solver
+5. `test_ccphylo_upgma_solver`: Compares CCPhylo UPGMA solver with standard UPGMA solver
+6. `test_collapse_mutationless_edges_ccphylo`: Tests collapsing mutationless edges in CCPhylo NJ solver
+7. `test_duplicate_sample_ccphylo`: Tests CCPhylo NJ solver with duplicate samples
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| unittest | For creating and running unit tests |
+| mock | For mocking objects in tests |
+| configparser | For reading configuration files |
+| itertools | For generating combinations |
+| networkx | For working with graph structures |
+| numpy | For numerical operations |
+| pandas | For data manipulation |
+| cassiopeia | The main package being tested |
+
+## Configuration
+The tests check for the existence of a `config.ini` file and a `ccphylo_path` setting to determine if CCPhylo is configured.
+
+## Error Handling
+The code uses `unittest.skipUnless` to skip tests if CCPhylo is not configured. It also tests for `DistanceSolverError` when invalid inputs are provided to solvers.

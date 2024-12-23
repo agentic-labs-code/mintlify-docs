@@ -1,0 +1,149 @@
+---
+title: "Cas9LineageTracingDataSimulator.py"
+---
+
+## High-level description
+The `Cas9LineageTracingDataSimulator` class simulates Cas9-based lineage tracing data by overlaying mutations onto a CassiopeiaTree. It models Cas9 cutting as an exponential process and incorporates features like cassettes, state distributions, and silencing rates to mimic real-world lineage tracing experiments.
+
+## Code Structure
+The `Cas9LineageTracingDataSimulator` class inherits from the `LineageTracingDataSimulator` class. It defines several parameters in its constructor to control the simulation process, such as the number of cassettes, size of each cassette, mutation rate, state distribution, and silencing rates. The main functionality is implemented in the `overlay_data` method, which modifies the character states of the input CassiopeiaTree in place.
+
+## References
+- `cassiopeia.data.CassiopeiaTree`: The class representing the tree structure on which the data is overlaid.
+- `cassiopeia.simulator.LineageTracingDataSimulator`: The parent class defining the interface for lineage tracing data simulators.
+
+## Symbols
+
+### `Cas9LineageTracingDataSimulator`
+#### Description
+This class simulates Cas9-based lineage tracing data by overlaying mutations onto a CassiopeiaTree. It models Cas9 cutting as an exponential process and incorporates features like cassettes, state distributions, and silencing rates to mimic real-world lineage tracing experiments.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| number_of_cassettes | int | Number of cassettes (arrays of target sites). Defaults to 10. |
+| size_of_cassette | int | Number of editable target sites per cassette. Defaults to 3. |
+| mutation_rate | Union[float, List[float]] | Exponential parameter for the Cas9 cutting rate. Can be a float (all sites mutate at the same rate), a list of floats of length `size_of_cassette` (each site mutates at the specified rate across all cassettes), or a list of floats of length `number_of_cassettes * size_of_cassette` (each site and cassette mutates at the specified rate). Defaults to 0.01. |
+| state_generating_distribution | Callable[[], float] | Distribution from which to simulate state likelihoods. This is only used if `state_priors` is not specified. Defaults to an exponential distribution with parameter 1e-5. |
+| number_of_states | int | Number of states to simulate. This is only used if `state_priors` is not specified. Defaults to 100. |
+| state_priors | Optional[Dict[int, float]] | An optional dictionary mapping states to their prior probabilities. Can also be a list of dictionaries of length `size_of_cassette` or `number_of_cassettes * size_of_cassette` to specify per-site or per-site-per-cassette priors. If this argument is None, states will be generated using the `state_generating_distribution`. Defaults to None. |
+| heritable_silencing_rate | float | Silencing rate for the cassettes, per node, simulating heritable missing data events. Defaults to 1e-4. |
+| stochastic_silencing_rate | float | Rate at which to randomly drop out cassettes, to simulate dropout due to low sensitivity of assays. Defaults to 1e-2. |
+| heritable_missing_data_state | int | Integer representing data that has gone missing due to a heritable event (i.e. Cas9 resection or heritable silencing). Defaults to -1. |
+| stochastic_missing_data_state | int | Integer representing data that has gone missing due to the stochastic dropout from single-cell assay sensitivity. Defaults to -1. |
+| random_seed | Optional[int] | Numpy random seed to use for deterministic simulations. Note that the numpy random seed gets set during every call to `overlay_data`, thereby producing deterministic simulations every time this function is called. Defaults to None. |
+| collapse_sites_on_cassette | bool | Whether or not to collapse cuts that occur in the same cassette in a single iteration. This option only takes effect when `size_of_cassette` is greater than 1. Defaults to True. |
+
+#### Outputs
+None
+
+#### Internal Logic
+The constructor initializes the simulator with the provided parameters and performs several checks to ensure the validity of the input. It also pre-computes the mutation rate and state priors for each character in the lineage.
+
+### `overlay_data`
+#### Description
+This method overlays Cas9-based lineage tracing data onto the provided CassiopeiaTree. It simulates mutations, silencing events, and cassette dropouts based on the parameters specified in the constructor.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | CassiopeiaTree | The CassiopeiaTree on which to overlay the data. |
+
+#### Outputs
+None
+
+#### Internal Logic
+1. **Initialize character states:** Sets all character states to 0 (unmutated) for the root node and -1 (missing) for all other nodes.
+2. **Simulate mutations:** For each non-root node, calculate the mutation probability for each open site based on the node's lifetime and the site's mutation rate. Randomly introduce mutations based on these probabilities.
+3. **Collapse sites on cassettes:** If `collapse_sites_on_cassette` is True and `size_of_cassette` is greater than 1, collapse cuts that occur within the same cassette in a single iteration.
+4. **Introduce states at cut sites:** For each cut site, randomly select a state from the state distribution and assign it to the site.
+5. **Silence cassettes:** Randomly silence entire cassettes based on the heritable silencing rate.
+6. **Apply stochastic silencing:** Randomly drop out cassettes at the leaves based on the stochastic silencing rate.
+7. **Set character states:** Update the character states of all nodes in the tree based on the simulated mutations and silencing events.
+
+### `collapse_sites`
+#### Description
+This method collapses cassettes by identifying cuts that occur within the same cassette and collapsing the sites between them.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| character_array | List[int] | The character array being modified. |
+| cuts | List[int] | The sites in the character array that are being cut. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| updated_character_array | List[int] | The updated character array with collapsed cassettes. |
+| cuts_remaining | List[int] | The sites that are not part of a cassette collapse. |
+
+#### Internal Logic
+1. **Identify cassettes with multiple cuts:** Group the cuts by the cassette they belong to.
+2. **Collapse sites within cassettes:** For each cassette with multiple cuts, identify the leftmost and rightmost cut sites and set all sites between them to the heritable missing data state.
+3. **Return updated character array and remaining cuts:** Return the updated character array and the list of cuts that were not part of a cassette collapse.
+
+### `introduce_states`
+#### Description
+This method introduces new states at the specified cut sites in the character array.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| character_array | List[int] | The character array being modified. |
+| cuts | List[int] | The loci being cut. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| updated_character_array | List[int] | The updated character array with new states at the cut sites. |
+
+#### Internal Logic
+1. **Iterate over cut sites:** For each cut site, randomly select a state from the state distribution based on the site's prior probabilities.
+2. **Assign new states:** Assign the selected state to the corresponding site in the character array.
+3. **Return updated character array:** Return the updated character array.
+
+### `silence_cassettes`
+#### Description
+This method randomly silences cassettes based on the specified silencing rate.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| character_array | List[int] | The character array being modified. |
+| silencing_rate | float | The silencing rate. |
+| missing_state | int | The state to use for encoding missing data. Defaults to -1. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| updated_character_array | List[int] | The updated character array with silenced cassettes. |
+
+#### Internal Logic
+1. **Iterate over cassettes:** For each cassette, randomly decide whether to silence it based on the silencing rate.
+2. **Silence cassettes:** If a cassette is selected for silencing, set all sites within that cassette to the missing data state.
+3. **Return updated character array:** Return the updated character array.
+
+### `get_cassettes`
+#### Description
+This method returns a list of indices corresponding to the start positions of the cassettes in the character array.
+
+#### Inputs
+None
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| cassettes | List[int] | An array of indices corresponding to the start positions of the cassettes. |
+
+#### Internal Logic
+Calculates the start positions of each cassette based on the `size_of_cassette` and `number_of_cassettes` parameters.
+
+## Side Effects
+The `overlay_data` method modifies the character states of the input CassiopeiaTree in place.
+
+## Dependencies
+- `numpy`: Used for random number generation and array operations.
+- `pandas`: Used for representing the character matrix.
+
+## Error Handling
+The constructor raises `DataSimulatorError` if any of the input parameters are invalid.

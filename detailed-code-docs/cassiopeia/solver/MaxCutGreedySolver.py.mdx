@@ -1,0 +1,74 @@
+---
+title: "MaxCutGreedySolver.py"
+---
+
+## High-level description
+The `MaxCutGreedySolver` class, inheriting from `GreedySolver`, implements a phylogenetic tree reconstruction algorithm that combines a greedy approach with a max-cut optimization. It recursively partitions samples based on the most frequent mutation and then refines the split using a hill-climbing method to maximize the weight of edges cut in a connectivity graph built from shared mutations.
+
+## Code Structure
+The `MaxCutGreedySolver` class overrides the `perform_split` method of its parent class, `GreedySolver`. It leverages the `compute_mutation_frequencies` method from the parent class and utilizes functions like `construct_connectivity_graph` and `max_cut_improve_cut` from the `graph_utilities` module.
+
+## References
+This code references the following symbols from other files:
+- `GreedySolver` (from cassiopeia/solver/GreedySolver.py)
+- `missing_data_methods` (from cassiopeia/solver/missing_data_methods.py)
+- `solver_utilities` (from cassiopeia/solver/solver_utilities.py)
+- `graph_utilities` (from cassiopeia/solver/graph_utilities.py)
+
+## Symbols
+### `MaxCutGreedySolver`
+#### Description
+This class implements the MaxCut Greedy algorithm for phylogenetic tree reconstruction. It extends the basic GreedySolver by adding a max-cut optimization step to each split.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| missing_data_classifier | Callable | Function to handle missing data during character splits (default: `missing_data_methods.assign_missing_average`). |
+| prior_transformation | str |  Transformation function for converting priors to weights (default: `"negative_log"`). |
+
+#### Outputs
+This class doesn't directly return any output. It populates a `CassiopeiaTree` object during the `solve` method (inherited from `GreedySolver`).
+
+#### Internal Logic
+The core logic resides in the `perform_split` method:
+1. **Identify Splitting Character/State:** It identifies the most frequent character/state pair, considering potential weights derived from priors.
+2. **Initial Split:** Samples are initially partitioned based on the chosen character/state.
+3. **Handle Missing Data:** The `missing_data_classifier` function is used to assign samples with missing data to either side of the partition.
+4. **Construct Connectivity Graph:** A connectivity graph is built where nodes represent samples and edge weights reflect the similarity based on shared mutations.
+5. **Max-Cut Optimization:** The `max_cut_improve_cut` function refines the initial split by iteratively moving nodes between partitions to maximize the weight of edges cut, effectively grouping samples with similar mutations.
+6. **Return Refined Split:** The optimized left and right partitions are returned.
+
+### `perform_split`
+#### Description
+This method partitions a set of samples based on the most frequent mutation and optimizes the split using the max-cut criterion.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| character_matrix | pd.DataFrame | Character matrix containing character states for each sample. |
+| samples | List[int] | List of samples to be partitioned. |
+| weights | Optional[Dict[int, Dict[int, float]]] | Weights for each (character, state) pair, usually derived from priors. |
+| missing_state_indicator | int | Character representing missing data (default: -1). |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| improved_left_set | List[str] | List of samples in the left partition after optimization. |
+| improved_right_set | List[str] | List of samples in the right partition after optimization. |
+
+#### Internal Logic
+See the 'Internal Logic' section of the `MaxCutGreedySolver` class description.
+
+## Side Effects
+The `perform_split` method modifies the input `left_set` and `right_set` lists in-place during the missing data imputation and max-cut optimization steps.
+
+## Dependencies
+This code depends on the following external libraries:
+| Dependency | Purpose |
+|:-----------|:--------|
+| pandas | Handling and manipulating character matrices. |
+| networkx | Constructing and manipulating graphs for representing relationships between samples. |
+| numpy | Numerical operations, particularly in calculating scores and frequencies. |
+
+## Error Handling
+This code does not implement specific error handling beyond what is inherited from the parent class `GreedySolver`.

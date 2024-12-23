@@ -1,0 +1,188 @@
+---
+title: "lineage_utils.py"
+---
+
+## High-level description
+This file provides functions for calling lineage groups in single-cell sequencing data. It includes algorithms for identifying potential lineage groups, assigning cells to these groups based on shared integration barcodes (intBCs), and filtering out potential doublets.
+
+## Code Structure
+The code consists of several functions that work together to identify and assign cells to lineage groups. The main functions are `assign_lineage_groups`, `find_top_lg`, `filter_intbcs_lg_sets`, `score_lineage_kinships`, `annotate_lineage_groups`, `filter_intbcs_final_lineages`, and `filtered_lineage_group_to_allele_table`. These functions are called sequentially to process the input data and generate the final lineage group assignments. Additionally, there are helper functions for plotting and data manipulation.
+
+## References
+This file is referenced by `cassiopeia/preprocess/pipeline.py` in the function `call_lineage_groups`.
+
+## Symbols
+### `assign_lineage_groups`
+#### Description
+This function is a wrapper function that iteratively identifies and assigns cells to lineage groups. It repeatedly calls the `find_top_lg` function to find the next largest lineage group until the remaining unassigned cells form a group smaller than the specified minimum cluster size.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| pivot_in | pd.DataFrame | The input pivot table of UMI counts for each cellBC-intBC pair |
+| min_clust_size | int | The minimum number of cells required for a group |
+| min_intbc_thresh | float | Minimum proportion of cells shared between an intBC and the most frequent intBC to be included in the group (default: 0.2) |
+| kinship_thresh | float | Minimum proportion of intBCs a cell needs to share with a group to be included in that group (default: 0.2) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| piv_assigned | pd.DataFrame | A pivot table of cells labeled with their assigned lineage group |
+
+#### Internal Logic
+The function initializes two empty DataFrames, `piv_assigned` to store the assigned cells and `pivot_in` to keep track of the remaining unassigned cells. It then enters a while loop that continues until the number of cells in the latest identified lineage group (`prev_clust_size`) is less than or equal to the specified `min_clust_size`.
+
+Inside the loop, the function calls `find_top_lg` to identify the next largest lineage group based on the remaining unassigned cells in `pivot_in`. The identified lineage group is then concatenated with the `piv_assigned` DataFrame. The `pivot_in` DataFrame is updated by removing the cells that were assigned to the latest lineage group. This process repeats until the stopping criterion is met.
+
+### `find_top_lg`
+#### Description
+This function identifies the next largest lineage group from a pivot table of UMI counts for each cellBC-intBC pair. It first identifies the most frequent intBC and then selects all intBCs that share a certain proportion of cells with the most frequent one. This set of intBCs forms the initial lineage group. The function then expands this group by including cells that share a certain proportion of intBCs with the initial group.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| PIVOT_in | pd.DataFrame | The input pivot table of UMI counts for each cellBC-intBC pair |
+| iteration | int | The current iteration number of the lineage group assignment process |
+| min_intbc_prop | float | Minimum proportion of cells shared between an intBC and the most frequent intBC to be included in the group (default: 0.2) |
+| kinship_thresh | float | Minimum proportion of intBCs a cell needs to share with a group to be included in that group (default: 0.2) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| PIV_LG | pd.DataFrame | A pivot table of cells assigned to the identified lineage group |
+| PIV_noLG | pd.DataFrame | A pivot table of the remaining unassigned cells |
+
+#### Internal Logic
+1. **Identify the most frequent intBC:** Calculate the sum of UMIs for each intBC and select the intBC with the highest sum.
+2. **Select intBCs that share a significant proportion of cells with the most frequent intBC:** Create a subset of the input pivot table containing only cells that have the most frequent intBC. Calculate the proportion of cells that each intBC shares with the most frequent intBC and select those above the `min_intbc_prop` threshold.
+3. **Identify cells that share a significant proportion of intBCs with the selected intBCs:** Calculate the proportion of intBCs that each cell shares with the selected intBCs (kinship) and select cells above the `kinship_thresh` threshold.
+4. **Create output DataFrames:** Generate two DataFrames: one containing the cells assigned to the identified lineage group (`PIV_LG`) and another containing the remaining unassigned cells (`PIV_noLG`).
+
+### `filter_intbcs_lg_sets`
+#### Description
+This function filters out intBCs from each lineage group that are present in a low proportion of cells within that group. This step helps to remove noise and focus on the most informative intBCs for lineage reconstruction.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| PIV_assigned | pd.DataFrame | A pivot table of cells labeled with lineage group assignments |
+| min_intbc_thresh | float | The minimum proportion of cells in a lineage group that must have an intBC for it to be retained (default: 0.2) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| master_LGs | List[int] | A list of lineage group numbers |
+| master_intBCs | Dict[int, pd.DataFrame] | A dictionary mapping each lineage group number to a list of its retained intBCs |
+
+#### Internal Logic
+1. **Iterate through each lineage group:** For each lineage group, create a binary version of the pivot table where values greater than 0 are set to 1.
+2. **Calculate intBC proportions:** Calculate the proportion of cells in the lineage group that have each intBC.
+3. **Filter intBCs:** Retain only the intBCs with proportions greater than or equal to `min_intbc_thresh`.
+4. **Update master data structures:** Add the lineage group number to `master_LGs` and map the lineage group number to its retained intBCs in `master_intBCs`.
+
+### `score_lineage_kinships`
+#### Description
+This function calculates the kinship score between each cell and each lineage group based on the shared intBCs. The kinship score represents the total UMI count of shared intBCs between a cell and a lineage group.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| PIV | pd.DataFrame | A pivot table of cells labeled with lineage group assignments |
+| master_LGs | List[int] | A list of lineage group numbers |
+| master_intBCs | Dict[int, pd.DataFrame] | A dictionary mapping each lineage group number to a list of its retained intBCs |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| max_kinship_LG | pd.DataFrame | A DataFrame containing the lineage group with the highest kinship score for each cell |
+
+#### Internal Logic
+1. **Create a binary matrix of lineage groups and their intBCs:** Generate a DataFrame (`dfLG2intBC`) where rows represent lineage groups and columns represent intBCs. A value of 1 indicates that the intBC is present in the lineage group, and 0 indicates absence.
+2. **Subset the input pivot table:** Create a subset of the input pivot table (`subPIVOT`) containing only the retained intBCs.
+3. **Calculate kinship scores:** Perform matrix multiplication between `subPIVOT` and the transpose of `dfLG2intBC`. This results in a matrix where each row represents a cell and each column represents a lineage group, with the values representing the kinship scores.
+4. **Identify the lineage group with the highest kinship score:** For each cell, select the lineage group with the highest kinship score.
+
+### `annotate_lineage_groups`
+#### Description
+This function annotates the input allele table with the lineage group assignments determined by the `score_lineage_kinships` function.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dfMT | pd.DataFrame | An allele table of cellBC-UMI-allele groups |
+| max_kinship_LG | pd.DataFrame | A DataFrame containing the lineage group with the highest kinship score for each cell |
+| master_intBCs | Dict[int, pd.DataFrame] | A dictionary mapping each lineage group number to a list of its retained intBCs |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dfMT | pd.DataFrame | The input allele table annotated with lineage group assignments |
+
+#### Internal Logic
+1. **Create a dictionary mapping cellBCs to lineage groups:** Convert the `max_kinship_LG` DataFrame into a dictionary where keys are cellBCs and values are the corresponding lineage group assignments.
+2. **Map lineage group assignments to the allele table:** Add a new column named "lineageGrp" to the input allele table (`dfMT`) and map the cellBCs to their corresponding lineage group assignments using the dictionary created in the previous step.
+3. **Rename lineage groups based on size:** Rename the lineage groups in descending order of their size (number of cells).
+
+### `filter_intbcs_final_lineages`
+#### Description
+This function performs a final round of filtering on the intBCs within each lineage group after the final lineage group assignments have been determined. It removes alignments associated with intBCs that are present in a low proportion of cells within their assigned lineage group.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| at | pd.DataFrame | An allele table of cellBC-UMI-allele groups annotated with final lineage group assignments |
+| min_intbc_thresh | float | The minimum proportion of cells in a lineage group that must have an intBC for it to be retained (default: 0.05) |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| lgs | List[pd.DataFrame] | A list of DataFrames, where each DataFrame represents a lineage group and contains the filtered alignments |
+
+#### Internal Logic
+1. **Iterate through each lineage group:** For each lineage group, create a pivot table of cellBCs and intBCs, with the values representing the UMI counts.
+2. **Calculate intBC proportions:** Calculate the proportion of cells in the lineage group that have each intBC.
+3. **Filter intBCs:** Retain only the intBCs with proportions greater than `min_intbc_thresh`.
+4. **Filter alignments:** For each lineage group, keep only the alignments associated with the retained intBCs.
+
+### `filtered_lineage_group_to_allele_table`
+#### Description
+This function takes the list of filtered lineage group DataFrames generated by `filter_intbcs_final_lineages` and combines them into a final allele table.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filtered_lgs | List[pd.DataFrame] | A list of DataFrames, where each DataFrame represents a lineage group and contains the filtered alignments |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| final_df | pd.DataFrame | The final processed allele table with lineage group assignments |
+
+#### Internal Logic
+1. **Concatenate lineage group DataFrames:** Combine the list of lineage group DataFrames into a single DataFrame.
+2. **Group and aggregate:** Group the DataFrame by cellBC, intBC, allele, lineage group, and cutsite information, and aggregate the UMI and read counts.
+
+### `plot_overlap_heatmap`
+#### Description
+This function generates a heatmap showing the overlap of intBCs between cells, providing a visual representation of potential clonal populations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| at | pd.DataFrame | An allele table of cellBC-UMI-allele groups |
+| at_pivot_I | pd.DataFrame | A pivot table indicating which cellBCs have which UMIs |
+| output_directory | str | The directory to save the generated plot |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| None | | The function saves the plot to the specified output directory |
+
+#### Internal Logic
+1. **Create a list of all unique intBCs:** Extract all unique intBCs from the input allele table.
+2. **Subset the pivot table:** Select only the columns in the pivot table that correspond to the unique intBCs.
+3. **Generate and save the heatmap:** Create a heatmap using the subset pivot table, with cellBCs as rows and intBCs as columns. The heatmap visually represents the presence or absence of each intBC in each cell.
+
+### `plot_overlap_heatmap_lg`
+#### Description
+This function generates

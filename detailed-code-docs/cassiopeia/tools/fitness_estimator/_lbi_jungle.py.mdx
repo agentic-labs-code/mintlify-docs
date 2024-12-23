@@ -1,0 +1,67 @@
+---
+title: "_lbi_jungle.py"
+---
+
+## High-level description
+The `LBIJungle` class in `cassiopeia/tools/fitness_estimator/_lbi_jungle.py` implements the Lineage Branching Index (LBI) fitness estimator as described by Neher et al. (2014) using the `jungle` package, which is a wrapper around Neher et al.'s original code. This estimator calculates the fitness of each node in a tree based on its branching pattern, with more branching indicating higher fitness.
+
+## Code Structure
+The `LBIJungle` class is a subclass of `FitnessEstimator` and overrides the `estimate_fitness` method. It uses the `_to_newick` function to convert the tree to a newick string, which is then used by the `jungle` package to estimate fitness.
+
+## References
+- `cassiopeia.data.CassiopeiaTree`
+- `cassiopeia.tools.fitness_estimator._FitnessEstimator`
+- `jungle` package
+
+## Symbols
+### `LBIJungle`
+#### Description
+This class implements the LBI fitness estimator using the `jungle` package.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| random_seed | Optional[int] | Random seed to use for fitness estimation. Defaults to None. |
+
+#### Outputs
+This class does not directly return any outputs. It modifies the input `CassiopeiaTree` object in place.
+
+#### Internal Logic
+1. **Check for invalid leaf names:** Raises a `FitnessEstimatorError` if any leaf name starts with an underscore, as this is not supported by the `jungle` package.
+2. **Convert tree to newick format:** Uses the `_to_newick` function to convert the tree to a newick string.
+3. **Estimate fitness using `jungle` package:**
+    - Creates a temporary file to store the newick string.
+    - Reads the newick string into a `jungle.Tree` object.
+    - Annotates the tree with standard node features.
+    - Infers fitness using the `infer_fitness` method of the `jungle.Tree` object.
+4. **Set fitness attribute for each node:**
+    - Iterates through the nodes and their corresponding fitness values.
+    - Sets the `fitness` attribute of each node in the `CassiopeiaTree` object.
+
+## Side Effects
+- Modifies the input `CassiopeiaTree` object in place by setting the `fitness` attribute for each node.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| jungle | Used to estimate fitness using the LBI method. |
+| networkx | Used to represent and manipulate the tree topology. |
+| numpy | Used for random number generation and array manipulation. |
+
+### _to_newick
+#### Description
+This function converts a networkx graph to a newick string.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | nx.DiGraph | A networkx tree |
+| record_branch_lengths | bool | Whether to record branch lengths on the tree in the newick string. Defaults to False. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| newick_string | str | A newick string representing the topology of the tree |
+
+#### Internal Logic
+The function uses a recursive approach to traverse the tree and build the newick string. It starts from the root node and recursively visits each child node. For each node, it checks if it is a leaf node. If it is, it appends the node name to the string. Otherwise, it recursively calls the function for each child node and encloses the results in parentheses. Branch lengths are added to the string if `record_branch_lengths` is set to True.

@@ -1,0 +1,215 @@
+---
+title: "pipeline.py"
+---
+
+## High-level description
+This file contains functions for preprocessing sequencing data into a character matrix, which is suitable for phylogenetic inference. It provides a series of functions that perform various steps of the preprocessing pipeline, including converting FASTQ files to BAM, filtering reads, collapsing UMIs, aligning sequences, calling alleles, error correcting barcodes and UMIs, filtering molecule tables, and calling lineage groups.
+
+## Code Structure
+The code defines several functions that are used sequentially in a preprocessing pipeline. The functions are designed to be modular and can be invoked individually or as part of a larger pipeline. The main functions include `convert_fastqs_to_unmapped_bam`, `filter_bam`, `error_correct_cellbcs_to_whitelist`, `collapse_umis`, `resolve_umi_sequence`, `align_sequences`, `call_alleles`, `error_correct_intbcs_to_whitelist`, `error_correct_umis`, `filter_molecule_table`, and `call_lineage_groups`. Each function performs a specific step in the preprocessing pipeline and takes a DataFrame or a file path as input and returns a processed DataFrame or a file path.
+
+## References
+This file references constants defined in `cassiopeia.preprocess.constants`, utility functions from `cassiopeia.preprocess.utilities`, and alignment utilities from `cassiopeia.preprocess.alignment_utilities`. It also uses functions from external libraries such as `ngs_tools`, `pysam`, and `pandas`.
+
+## Symbols
+
+### `convert_fastqs_to_unmapped_bam`
+#### Description
+Converts FASTQ files to an unmapped BAM file based on the specified chemistry. It adds appropriate BAM tags based on the chemistry used.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| fastq_fps | List[str] | List of paths to FASTQ files. |
+| chemistry | Literal["dropseq", "10xv2", "10xv3", "indropsv3", "slideseq2"] | Sample-prep/sequencing chemistry used. |
+| output_directory | str | The output directory where the unmapped BAM will be written. |
+| name | Optional[str] | Name of the reads in the FASTQs. |
+| n_threads | int | Number of threads to use. Defaults to 1. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bam_fp | str | Path to the written BAM file. |
+
+#### Internal Logic
+The function first checks if the provided chemistry is supported. It then retrieves the appropriate BAM tags for the chemistry and converts the FASTQ files to an unmapped BAM file using the `ngs.fastq.fastqs_to_bam_with_chemistry` function from the `ngs_tools` library.
+
+### `filter_bam`
+#### Description
+Filters reads in a BAM file that have low quality barcode or UMIs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bam_fp | str | Input BAM filepath containing reads to filter. |
+| output_directory | str | The output directory where the filtered BAM will be written. |
+| quality_threshold | int | Every base of the barcode and UMI sequence for a given read must have at least this PHRED quality score to pass filtering. Defaults to 10. |
+| n_threads | int | Number of threads to use. Defaults to 1. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filtered_fp | str | Path to the filtered BAM file. |
+
+#### Internal Logic
+The function defines a filter function that checks the quality scores of the barcode and UMI sequences. It then uses the `ngs.bam.filter_bam` function from the `ngs_tools` library to filter the input BAM file based on the filter function.
+
+### `error_correct_cellbcs_to_whitelist`
+#### Description
+Error-corrects cell barcodes in the input BAM file to a provided whitelist.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bam_fp | str | Input BAM filepath containing raw barcodes. |
+| whitelist | Union[str, List[str]] | Either a path to a plaintext file containing the barcode whitelist or a list of barcodes. |
+| output_directory | str | The output directory where the corrected BAM will be written. |
+| n_threads | int | Number of threads to use. Defaults to 1. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| corrected_fp | str | Path to the corrected BAM file. |
+
+#### Internal Logic
+The function first reads the whitelist from the provided file or list. It then extracts the raw barcodes and their qualities from the input BAM file. It uses the `ngs.sequence.correct_sequences_to_whitelist` function from the `ngs_tools` library to correct the barcodes to the whitelist. Finally, it writes the corrected barcodes to a new BAM file.
+
+### `collapse_umis`
+#### Description
+Collapses close UMIs together from a BAM file.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bam_fp | str | File path of the BAM file. |
+| output_directory | str | The output directory where the sorted BAM directory, the collapsed BAM directory, and the final collapsed table are written. |
+| max_hq_mismatches | int | A threshold specifying the maximum number of high quality mismatches between the sequences of two aligned segments to be collapsed. Defaults to 3. |
+| max_indels | int | A threshold specifying the maximum number of differing indels allowed between the sequences of two aligned segments to be collapsed. Defaults to 2. |
+| method | Literal["cutoff", "likelihood"] | Which method to use to form initial sequence clusters. Defaults to "cutoff". |
+| n_threads | int | Number of threads to use. Defaults to 1. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| df | pd.DataFrame | A DataFrame of collapsed reads. |
+
+#### Internal Logic
+The function first sorts the input BAM file by cell barcode and UMI using the `sort_bam` function. It then forms collapsed clusters of UMIs using the `form_collapsed_clusters` function. Finally, it converts the collapsed BAM file to a DataFrame using the `utilities.convert_bam_to_df` function.
+
+### `resolve_umi_sequence`
+#### Description
+Resolves a consensus sequence for each UMI.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| molecule_table | pd.DataFrame | Molecule table to resolve. |
+| output_directory | str | Directory to store results. |
+| min_umi_per_cell | int | The threshold specifying the minimum number of UMIs in a cell needed to be retained during filtering. Defaults to 10. |
+| min_avg_reads_per_umi | float | The threshold specifying the minimum coverage (i.e. average) reads per UMI in a cell needed for that cell to be retained during filtering. Defaults to 2.0. |
+| plot | bool | Whether to plot the number of sequences per UMI and diagnostics after resolving. Defaults to True. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filt_molecule_table | pd.DataFrame | A molecule table with unique mappings between cellBC-UMI pairs. |
+
+#### Internal Logic
+The function first groups the molecule table by cell barcode and UMI. For each group, it selects the most abundant sequence as the consensus sequence and marks the remaining sequences for filtering. It then filters out the marked sequences and applies cell filtering based on the minimum number of UMIs per cell and the minimum average reads per UMI.
+
+### `align_sequences`
+#### Description
+Aligns reads to the TargetSite reference.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| queries | pd.DataFrame | DataFrame storing a list of sequences to align. |
+| ref_filepath | Optional[str] | Filepath to the reference FASTA. |
+| ref | Optional[str] | Reference sequence. |
+| gap_open_penalty | float | Gap open penalty. Defaults to 20. |
+| gap_extend_penalty | float | Gap extension penalty. Defaults to 1. |
+| method | Literal["local", "global"] | What alignment algorithm to use. Defaults to "local". |
+| n_threads | int | Number of threads to use. Defaults to 1. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| alignment_df | pd.DataFrame | A DataFrame mapping each sequence name to the CIGAR string, quality, and original query sequence. |
+
+#### Internal Logic
+The function first reads the reference sequence from the provided file or string. It then aligns all unique sequences to the reference using either local or global alignment, based on the `method` argument. The alignments are performed using the `alignment_utilities.align_local` or `alignment_utilities.align_global` functions. Finally, the alignments are merged into the input DataFrame.
+
+### `call_alleles`
+#### Description
+Calls indels from CIGAR strings.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| alignments | pd.DataFrame | Alignments provided in DataFrame. |
+| ref_filepath | Optional[str] | Filepath to the reference sequence. |
+| ref | Optional[str] | Nucleotide sequence of the reference. |
+| barcode_interval | Tuple[int, int] | Interval in reference corresponding to the integration barcode. Defaults to (20, 34). |
+| cutsite_locations | List[int] | A list of all cutsite positions in the reference. Defaults to [112, 166, 220]. |
+| cutsite_width | int | Number of nucleotides left and right of cutsite location that indels can appear in. Defaults to 12. |
+| context | bool | Include sequence context around indels. Defaults to True. |
+| context_size | int | Number of bases to the right and left to include as context. Defaults to 5. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| alignments | pd.DataFrame | A DataFrame mapping each sequence alignment to the called indels. |
+
+#### Internal Logic
+The function first reads the reference sequence from the provided file or string. It then iterates through the alignments and parses the CIGAR strings using the `alignment_utilities.parse_cigar` function to extract the indels at each cutsite. The extracted indels are then added to the input DataFrame.
+
+### `error_correct_intbcs_to_whitelist`
+#### Description
+Corrects all intBCs to the provided whitelist.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| input_df | pd.DataFrame | Input DataFrame of alignments. |
+| whitelist | Union[str, List[str]] | Either a path to a plaintext file containing the barcode whitelist or a list of barcodes. |
+| intbc_dist_thresh | int | The threshold specifying the maximum Levenshtein distance between the read sequence and whitelist to be corrected. Defaults to 1. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| input_df | pd.DataFrame | A DataFrame of error corrected intBCs. |
+
+#### Internal Logic
+The function first reads the whitelist from the provided file or list. It then iterates through the unique intBCs in the input DataFrame and calculates the Levenshtein distance to each whitelist intBC. If the distance is less than or equal to the threshold and there is only one matching whitelist intBC, the intBC is corrected.
+
+### `error_correct_umis`
+#### Description
+Within cellBC-intBC pairs, collapses UMIs that have close sequences.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| input_df | pd.DataFrame | Input DataFrame of alignments. |
+| max_umi_distance | int | The threshold specifying the Maximum Hamming distance between UMIs for one to be corrected to another. Defaults to 2. |
+| allow_allele_conflicts | bool | Whether or not to include the allele when splitting UMIs into allele groups. Defaults to False. |
+| n_threads | int | Number of threads to use. Defaults to 1. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| alignment_df | pd.DataFrame | A DataFrame of error corrected UMIs. |
+
+#### Internal Logic
+The function first groups the input DataFrame by cell barcode, intBC, and optionally allele. For each group, it corrects UMIs that have a Hamming distance less than or equal to the threshold using the `UMI_utils.correct_umis_in_group` function. The corrected UMIs are then merged back into the input DataFrame.
+
+### `filter_molecule_table`
+#### Description
+Filters and corrects a molecule table of cellBC-UMI pairs.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| input_df | pd.DataFrame | A molecule table, i.e. cellBC-UMI pairs. |
+| output_directory | str | The output directory path to store plots. |
+| min_umi_per_cell | int | The threshold specifying the minimum number of UMIs in a

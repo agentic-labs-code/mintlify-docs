@@ -1,0 +1,139 @@
+---
+title: "sharedmutationjoiner_test.py"
+---
+
+Here's a detailed documentation of the target file `test/solver_tests/sharedmutationjoiner_test.py`:
+
+## High-level description
+This file contains unit tests for the SharedMutationJoiningSolver in Cassiopeia's solver module. It tests various aspects of the solver, including initialization, cherry finding, similarity map updating, and tree solving for different scenarios.
+
+## Code Structure
+The main class `TestSharedMutationJoiningSolver` inherits from `unittest.TestCase` and contains multiple test methods. The `setUp` method initializes test data and solver instances used across different tests.
+
+## Symbols
+
+### `find_triplet_structure`
+#### Description
+A helper function that determines the structure of a triplet in a given tree.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| triplet | tuple | A tuple of three node names |
+| T | networkx.DiGraph | The tree to analyze |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| structure | str | The structure of the triplet ("-", "ab", "ac", or "bc") |
+
+#### Internal Logic
+1. Find ancestors for each node in the triplet
+2. Count common ancestors between pairs
+3. Determine the structure based on which pair has the most common ancestors
+
+### `TestSharedMutationJoiningSolver`
+#### Description
+The main test class containing various test methods for the SharedMutationJoiningSolver.
+
+#### Internal Logic
+- `setUp`: Initializes test data and solver instances
+- Test methods: Each method tests a specific aspect of the solver
+
+### `TestSharedMutationJoiningSolver.setUp`
+#### Description
+Initializes test data and solver instances used across different tests.
+
+#### Internal Logic
+1. Creates character matrices and dissimilarity maps for different test scenarios
+2. Initializes CassiopeiaTrees with the test data
+3. Creates SharedMutationJoiningSolver instances with different configurations
+
+### `TestSharedMutationJoiningSolver.test_init`
+#### Description
+Tests the initialization of the SharedMutationJoiningSolver.
+
+#### Internal Logic
+1. Checks if the similarity function is numbaized when possible
+2. Checks if a warning is raised when the similarity function can't be numbaized
+
+### `TestSharedMutationJoiningSolver.test_find_cherry`
+#### Description
+Tests the `find_cherry` method of the solver.
+
+#### Internal Logic
+1. Calls `find_cherry` on a test similarity map
+2. Checks if the returned cherry is correct
+
+### `TestSharedMutationJoiningSolver.test_create_similarity_map`
+#### Description
+Tests the creation of a similarity map with weighted priors.
+
+#### Internal Logic
+1. Creates a similarity map using test data and priors
+2. Checks if the similarity values are correct
+
+### `TestSharedMutationJoiningSolver.test_update_similarity_map_and_character_matrix`
+#### Description
+Tests the updating of the similarity map and character matrix after joining nodes.
+
+#### Internal Logic
+1. Updates the similarity map and character matrix for different joining scenarios
+2. Checks if the updated maps and matrices are correct
+
+### `TestSharedMutationJoiningSolver.test_basic_solver`
+#### Description
+Tests the basic functionality of the solver on a simple tree.
+
+#### Internal Logic
+1. Solves a basic tree
+2. Checks if the original data is unaltered
+3. Verifies the structure of the solved tree
+
+### `TestSharedMutationJoiningSolver.test_solver_no_numba`
+#### Description
+Tests the solver functionality without Numba optimization.
+
+#### Internal Logic
+Similar to `test_basic_solver`, but uses a solver instance without Numba optimization.
+
+### `TestSharedMutationJoiningSolver.test_smj_solver_weights`
+#### Description
+Tests the solver with weighted priors.
+
+#### Internal Logic
+1. Solves trees with weighted priors
+2. Checks the structure of the solved trees
+
+### `TestSharedMutationJoiningSolver.test_pp_solver`
+#### Description
+Tests the solver on a perfect phylogeny scenario.
+
+#### Internal Logic
+1. Solves a perfect phylogeny tree
+2. Checks the structure of the solved tree
+3. Tests with collapsing mutationless edges
+
+### `TestSharedMutationJoiningSolver.test_duplicate`
+#### Description
+Tests the solver's behavior with duplicate and missing data.
+
+#### Internal Logic
+1. Solves a tree with duplicate and missing data
+2. Checks the structure of the solved tree
+
+## Dependencies
+- unittest
+- functools (partial)
+- typing (Dict)
+- itertools
+- networkx (nx)
+- numba
+- numpy (np)
+- pandas (pd)
+- scipy
+- cassiopeia.data (CassiopeiaTree, utilities)
+- cassiopeia.solver (SharedMutationJoiningSolver, dissimilarity_functions, solver_utilities)
+
+## Error Handling
+The test methods use various assertions to check if the solver behaves correctly. If any assertion fails, the test will raise an AssertionError.

@@ -1,0 +1,63 @@
+---
+title: "Overview"
+---
+
+## High-level description
+This directory contains implementations of branch length estimation algorithms for phylogenetic trees in the Cassiopeia framework. It includes two main estimators: IIDExponentialMLE (Maximum Likelihood Estimator) and IIDExponentialBayesian (Bayesian estimator). These estimators are designed to infer branch lengths in phylogenetic trees under the assumption of independent and identically distributed (IID) exponential waiting times for mutations.
+
+## What does it do?
+The branch length estimators in this directory perform the following tasks:
+
+1. Estimate branch lengths of a given phylogenetic tree based on observed character data.
+2. Implement different statistical approaches (Maximum Likelihood and Bayesian) to infer branch lengths.
+3. Assume an IID exponential model for mutation events in the tree.
+4. Handle various input parameters such as mutation rates, birth rates, and sampling probabilities.
+5. Provide methods to access estimated branch lengths, posterior distributions, and log-likelihood values.
+
+These estimators are crucial for understanding the evolutionary relationships and timings in phylogenetic trees, particularly in the context of CRISPR/Cas9-induced mutations.
+
+## Entry points
+The main entry points for this directory are:
+
+1. `IIDExponentialMLE`: Implements a Maximum Likelihood Estimator for branch lengths.
+2. `IIDExponentialBayesian`: Implements a Bayesian estimator for branch lengths.
+
+Both classes inherit from the abstract base class `BranchLengthEstimator` and implement the `estimate_branch_lengths` method. This method takes a `CassiopeiaTree` object as input and modifies it in-place by updating its branch lengths.
+
+The workflow typically involves:
+1. Creating an instance of either `IIDExponentialMLE` or `IIDExponentialBayesian` with appropriate parameters.
+2. Calling the `estimate_branch_lengths` method on a `CassiopeiaTree` object.
+3. Accessing the estimated branch lengths and other relevant information from the modified tree or the estimator object.
+
+## Key Files
+1. `BranchLengthEstimator.py`: Defines the abstract base class `BranchLengthEstimator`.
+2. `IIDExponentialMLE.py`: Implements the Maximum Likelihood Estimator.
+3. `IIDExponentialBayesian.py`: Implements the Bayesian estimator.
+4. `_iid_exponential_bayesian_cpp.cpp` and `_iid_exponential_bayesian_cpp.h`: C++ implementation of the core Bayesian inference algorithm for improved performance.
+
+## Dependencies
+The main dependencies for this directory include:
+
+1. numpy: Used for numerical operations and array manipulations.
+2. cvxpy: Used in `IIDExponentialMLE` for defining and solving the convex optimization problem.
+3. scipy: Used in related code snippets for scientific computing.
+4. networkx: Used in related code snippets for graph operations.
+
+The C++ implementation also relies on standard C++ libraries for efficient computations.
+
+## Configuration
+The estimators can be configured through various parameters:
+
+For `IIDExponentialMLE`:
+- `minimum_branch_length`: Minimum allowed branch length (default: 0.01)
+- `relative_mutation_rates`: List of relative mutation rates for each character site (optional)
+- `verbose`: Whether to print verbose output during optimization (default: False)
+- `solver`: Convex optimization solver to use (default: "SCS", options: "ECOS", "SCS", "MOSEK")
+
+For `IIDExponentialBayesian`:
+- `mutation_rate`: The CRISPR/Cas9 mutation rate
+- `birth_rate`: The phylogeny birth rate
+- `sampling_probability`: The probability that a leaf in the ground truth tree was sampled (must be in (0, 1])
+- `discretization_level`: Number of timesteps used to discretize time (default: 600)
+
+These parameters allow users to fine-tune the estimators based on their specific phylogenetic analysis requirements and the characteristics of their data.

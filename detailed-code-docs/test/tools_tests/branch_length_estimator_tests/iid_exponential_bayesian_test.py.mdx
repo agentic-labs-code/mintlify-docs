@@ -1,0 +1,194 @@
+---
+title: "iid_exponential_bayesian_test.py"
+---
+
+## High-level description
+This file contains unit tests for the `IIDExponentialBayesian` class, which is a branch length estimator in the Cassiopeia library. The tests primarily focus on comparing the estimator's output with numerically computed values for log likelihood, log joints, and posterior time distributions.
+
+## Code Structure
+The code defines several helper functions for numerical calculations and error handling, followed by a `TestIIDExponentialBayesian` class containing multiple test methods. Each test method focuses on a specific aspect of the `IIDExponentialBayesian` class, such as comparing its output to closed-form solutions or numerical approximations.
+
+## References
+This code references the `IIDExponentialBayesian` class from `cassiopeia.tools` and the `CassiopeiaTree` class from `cassiopeia.data`.
+
+## Symbols
+
+### `TestIIDExponentialBayesian`
+#### Description
+A class containing unit tests for the `IIDExponentialBayesian` branch length estimator.
+
+#### Inputs
+This class does not take any inputs.
+
+#### Outputs
+This class does not return any outputs.
+
+#### Internal Logic
+The class contains several test methods, each designed to validate different aspects of the `IIDExponentialBayesian` class:
+
+* `test_against_closed_form_solution_small`: This test compares the estimator's output to closed-form solutions for a small tree with one internal node. It tests various hyperparameter settings and validates the log likelihood, log joints, posterior time distribution, and posterior mean.
+
+* `test_against_closed_form_solution_medium`: Similar to the previous test, but uses a slightly larger tree with two internal nodes. This test is marked as slow and only runs with one set of hyperparameters.
+
+* `test_small_discretization_level_raises_error`: This test ensures that the estimator raises a `ValueError` when the discretization level is too small.
+
+* `test_invalid_tree_topology_raises_error`: This test checks that the estimator raises a `ValueError` for invalid tree topologies, such as trees that are not rooted or have internal nodes with degrees other than 3.
+
+* `test_invalid_sampling_probability_raises_error`: This test ensures that the estimator raises a `ValueError` for invalid sampling probabilities (outside the range (0, 1]).
+
+#### Side Effects
+This class does not have any side effects.
+
+___
+
+### `calc_exact_log_full_joint`
+#### Description
+Calculates the exact log full joint probability density of the observed tree topology, state vectors, and branch lengths.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | CassiopeiaTree | The CassiopeiaTree object containing the tree topology and character states. |
+| mutation_rate | float | The mutation rate of the model. |
+| birth_rate | float | The birth rate of the model. |
+| sampling_probability | float | The sampling probability of the model. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ll | float | The log full joint probability density. |
+
+#### Internal Logic
+The function iterates through the edges of the tree and calculates the likelihood contribution from both the birth process and the mutation process. It considers the sampling probability and uses binomial coefficients to account for the number of mutations along each edge.
+
+___
+
+### `calc_numerical_log_likelihood`
+#### Description
+Calculates the numerical log likelihood of the observed data (character states and tree topology) using numerical integration.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | CassiopeiaTree | The CassiopeiaTree object containing the tree topology and character states. |
+| mutation_rate | float | The mutation rate of the model. |
+| birth_rate | float | The birth rate of the model. |
+| sampling_probability | float | The sampling probability of the model. |
+| epsrel | float | The relative error tolerance for numerical integration. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res | float | The numerical log likelihood. |
+
+#### Internal Logic
+The function defines an inner function `f` that calculates the full joint probability for a given set of internal node times. It then uses `scipy.integrate.nquad` to numerically integrate `f` over all possible internal node times, effectively marginalizing out the times and obtaining the likelihood of the observed data.
+
+___
+
+### `calc_numerical_log_joints`
+#### Description
+Calculates the numerical log joint probability density of the observed data and all possible times for a specific node in the tree.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | CassiopeiaTree | The CassiopeiaTree object containing the tree topology and character states. |
+| node | str | The name of the internal node for which to calculate the log joints. |
+| mutation_rate | float | The mutation rate of the model. |
+| birth_rate | float | The birth rate of the model. |
+| sampling_probability | float | The sampling probability of the model. |
+| discretization_level | int | The number of timesteps used to discretize time. |
+| epsrel | float | The relative error tolerance for numerical integration. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| res | np.array | An array of log joint probabilities for each possible time of the specified node. |
+
+#### Internal Logic
+The function iterates through all possible discretized times for the specified node. For each time, it defines an inner function `f` that calculates the full joint probability for a given set of times for the remaining internal nodes. It then uses `scipy.integrate.nquad` to numerically integrate `f` over all possible times for the other nodes, effectively marginalizing out their times and obtaining the joint probability of the observed data and the specified node's time.
+
+___
+
+### `numerical_posterior_time`
+#### Description
+Calculates the numerical posterior time distribution for a specific node in the tree.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | CassiopeiaTree | The CassiopeiaTree object containing the tree topology and character states. |
+| node | str | The name of the internal node for which to calculate the posterior time distribution. |
+| mutation_rate | float | The mutation rate of the model. |
+| birth_rate | float | The birth rate of the model. |
+| sampling_probability | float | The sampling probability of the model. |
+| discretization_level | int | The number of timesteps used to discretize time. |
+| epsrel | float | The relative error tolerance for numerical integration. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| numerical_posterior | np.array | An array representing the posterior time distribution of the specified node. |
+
+#### Internal Logic
+The function first calculates the numerical log joints using `calc_numerical_log_joints`. It then normalizes the log joints to obtain the posterior time distribution.
+
+___
+
+### `relative_error`
+#### Description
+Calculates the relative error between two positive floating-point numbers.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| x | float | The first number. |
+| y | float | The second number. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | float | The relative error between x and y. |
+
+#### Internal Logic
+The function calculates the maximum of the absolute differences between the ratios of the two numbers and their inverses.
+
+___
+
+### `_non_root_internal_nodes`
+#### Description
+Returns a list of internal nodes in the tree, excluding the root node.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | CassiopeiaTree | The CassiopeiaTree object. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | List[str] | A list of internal node names, excluding the root. |
+
+#### Internal Logic
+The function uses set operations to find the difference between the set of internal nodes and the set containing only the root node.
+
+___
+
+### `_get_number_of_mutated_characters_in_node`
+#### Description
+Counts the number of mutated characters (excluding missing characters) in a given node.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| tree | CassiopeiaTree | The CassiopeiaTree object. |
+| v | str | The name of the node. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+|  | int | The number of mutated characters in the node. |
+
+#### Internal Logic
+The function retrieves the character states of the node and counts the number of states that are neither 0 nor the missing state indicator.

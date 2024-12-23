@@ -1,0 +1,55 @@
+---
+title: "filter_bam_test.py"
+---
+
+## High-level description
+This file contains unit tests for the `filter_bam` function from the `cassiopeia.preprocess.pipeline` module. The tests verify that the function correctly filters BAM files based on a specified read quality threshold.
+
+## Symbols
+
+### `TestFilterBam`
+#### Description
+This is a test class that inherits from `unittest.TestCase`. It contains test methods to verify the functionality of the `filter_bam` function.
+
+#### Internal Logic
+1. Sets up the test environment by defining the path to a test BAM file.
+2. Implements a test method `test_filter` to check the filtering functionality with different quality thresholds.
+
+### `setUp`
+#### Description
+This method is called before each test method to set up the test environment.
+
+#### Internal Logic
+1. Determines the directory path of the current file.
+2. Constructs the path to the test files directory.
+3. Sets the path to a 10x Genomics v3 unmapped BAM file for testing.
+
+### `test_filter`
+#### Description
+This method tests the `filter_bam` function with different quality thresholds.
+
+#### Internal Logic
+1. Calls `filter_bam` with a quality threshold of 10 and verifies that 2 alignments pass the filter.
+2. Calls `filter_bam` with a quality threshold of 20 and verifies that 0 alignments pass the filter.
+3. Uses `pysam.AlignmentFile` to read the filtered BAM files and count the number of alignments.
+4. Uses `assertEqual` to check if the number of filtered alignments matches the expected count.
+
+## Dependencies
+| Dependency | Purpose |
+|:-----------|:--------|
+| os | File path operations |
+| unittest | Unit testing framework |
+| tempfile | Creating temporary directories |
+| pysam | Reading BAM files |
+| ngs_tools | Not directly used in the test file, but imported as `ngs` |
+| cassiopeia.preprocess.pipeline | Module containing the `filter_bam` function being tested |
+
+## Error Handling
+The test class uses the `unittest` framework's assertion methods to check for expected outcomes. If any assertion fails, the test will raise an exception, indicating a test failure.
+
+## Notes
+1. The test file uses a specific 10x Genomics v3 unmapped BAM file for testing, located in the "test_files" directory.
+2. The `filter_bam` function is called with temporary directories created using `tempfile.mkdtemp()` to store the output filtered BAM files.
+3. The tests check two scenarios: one where some reads pass the quality filter (threshold 10) and another where no reads pass the filter (threshold 20).
+4. The `pysam` library is used to read the filtered BAM files and count the number of alignments.
+5. The `ngs_tools` module is imported but not used directly in this test file.

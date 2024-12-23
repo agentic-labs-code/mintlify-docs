@@ -1,0 +1,42 @@
+---
+title: "map_utils.py"
+---
+
+## High-level description
+This code defines a function `map_intbcs` that processes a molecule table to resolve allele ambiguity for each cellBC/intBC pair. It identifies the most frequent allele based on read count and UMI count, then filters out alignments with other alleles for each pair.
+
+## Symbols
+### `map_intbcs`
+#### Description
+This function takes a molecule table as input and returns a modified allele table where each cellBC/intBC pair is associated with a single allele. It achieves this by grouping the input table by cellBC, intBC, and allele, then selecting the allele with the highest read count (and UMI count as a tie-breaker) for each group. Alignments with other alleles for the same cellBC/intBC pair are removed.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| molecule_table | pandas.DataFrame | A molecule table containing cellBC, intBC, allele, readCount, and UMI information. |
+
+#### Outputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| mapped_table | pandas.DataFrame | A modified allele table where each cellBC/intBC pair is associated with a single allele. |
+
+#### Internal Logic
+1. Drops rows with missing `intBC` values from the input `molecule_table`.
+2. Groups the remaining rows by `cellBC`, `intBC`, and `allele`.
+3. Aggregates the groups by summing `readCount` and counting `UMI`.
+4. Sorts the aggregated table first by `UMI` in descending order, then by `readCount` in descending order.
+5. Identifies duplicate `cellBC`/`intBC` pairs, keeping only the first occurrence (which corresponds to the highest read and UMI count).
+6. Creates a set of tuples representing the selected `cellBC`, `intBC`, and `allele` combinations.
+7. Filters the original `molecule_table` to keep only rows where the `cellBC`, `intBC`, and `allele` combination exists in the set created in step 6.
+8. Logs the number of removed alleles and UMIs during the filtering process.
+9. Returns the filtered `molecule_table`.
+
+## References
+- `logger`: Used for logging debug messages. Imported from `cassiopeia.mixins`.
+- `utilities.log_molecule_table`: A decorator function used to log statistics of the molecule table before and after the function execution. Imported from `cassiopeia.preprocess`.
+
+## Side Effects
+- Logs debug messages indicating the number of alleles and UMIs removed during the filtering process.
+
+## Performance Considerations
+The function uses pandas groupby and apply operations, which can be computationally expensive for large datasets. Consider optimizing these operations or using alternative data structures if performance becomes a bottleneck.

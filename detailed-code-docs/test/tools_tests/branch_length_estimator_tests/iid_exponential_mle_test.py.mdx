@@ -1,0 +1,250 @@
+---
+title: "iid_exponential_mle_test.py"
+---
+
+## High-level description
+This file contains unit tests for the `IIDExponentialMLE` class, which is a branch length estimator in the Cassiopeia package. The tests cover various scenarios, including degenerate cases (no mutations or saturation), hand-solvable problems, regression tests, and simulations.
+
+## Code Structure
+The code consists of a single class `TestIIDExponentialMLE` which inherits from `unittest.TestCase`. This class contains multiple test methods, each testing a specific aspect of the `IIDExponentialMLE` class. The test methods are decorated with `parameterized.expand` to run the same test with different solvers ("ECOS" and "SCS").
+
+## References
+The tests reference the following classes:
+- `cassiopeia.data.CassiopeiaTree`: Represents a phylogenetic tree with character states.
+- `cassiopeia.simulator.Cas9LineageTracingDataSimulator`: Simulates Cas9-based lineage tracing data.
+- `cassiopeia.tools.IIDExponentialMLE`: The branch length estimator being tested.
+
+## Symbols
+
+### `TestIIDExponentialMLE`
+#### Description
+This class contains unit tests for the `IIDExponentialMLE` class.
+
+#### Inputs
+None
+
+#### Outputs
+None
+
+#### Internal Logic
+The class defines several test methods, each testing a specific aspect of the `IIDExponentialMLE` class. The test methods use assertions to verify the expected behavior of the estimator.
+
+#### Side Effects
+The tests modify the `CassiopeiaTree` objects passed to the `IIDExponentialMLE` estimator.
+
+#### Performance Considerations
+None
+
+___
+
+### `test_no_mutations`
+#### Description
+Tests the behavior of the estimator when there are no mutations in the character matrix.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | str | Name of the test case |
+| solver | str | Solver to use ("ECOS" or "SCS") |
+
+#### Outputs
+None
+
+#### Internal Logic
+- Creates a simple tree with two nodes and no mutations.
+- Initializes an `IIDExponentialMLE` object.
+- Asserts that a `ValueError` is raised when calling `estimate_branch_lengths`.
+
+___
+
+### `test_saturation`
+#### Description
+Tests the behavior of the estimator when the character matrix is saturated (all characters are mutated).
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | str | Name of the test case |
+| solver | str | Solver to use ("ECOS" or "SCS") |
+
+#### Outputs
+None
+
+#### Internal Logic
+- Creates a simple tree with two nodes and a single mutated character.
+- Initializes an `IIDExponentialMLE` object.
+- Asserts that a `ValueError` is raised when calling `estimate_branch_lengths`.
+
+___
+
+### `test_hand_solvable_problem_1`, `test_hand_solvable_problem_2`, `test_hand_solvable_problem_3`
+#### Description
+These tests verify the estimator's results against hand-solvable problems with simple tree topologies and a small number of characters.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | str | Name of the test case |
+| solver | str | Solver to use ("ECOS" or "SCS") |
+
+#### Outputs
+None
+
+#### Internal Logic
+- Creates a simple tree with two nodes and a specified character matrix.
+- Initializes an `IIDExponentialMLE` object.
+- Calls `estimate_branch_lengths` and asserts that the estimated branch lengths, mutation rate, and log-likelihood match the expected values calculated by hand.
+
+___
+
+### `test_small_tree_with_one_mutation`
+#### Description
+Tests the estimator on a small perfect binary tree with a single mutation.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | str | Name of the test case |
+| solver | str | Solver to use ("ECOS" or "SCS") |
+
+#### Outputs
+None
+
+#### Internal Logic
+- Creates a perfect binary tree with one mutation at a specific node.
+- Initializes an `IIDExponentialMLE` object.
+- Calls `estimate_branch_lengths` and asserts that the estimated branch lengths, mutation rate, and log-likelihood match the expected values calculated by hand.
+
+___
+
+### `test_small_tree_regression`
+#### Description
+This is a regression test on a small perfect binary tree with a "normal" amount of mutations.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | str | Name of the test case |
+| solver | str | Solver to use ("ECOS" or "SCS") |
+
+#### Outputs
+None
+
+#### Internal Logic
+- Creates a perfect binary tree with a predefined character matrix.
+- Initializes an `IIDExponentialMLE` object.
+- Calls `estimate_branch_lengths` and asserts that the estimated branch lengths, mutation rate, and log-likelihood match the expected values from a previous run.
+
+___
+
+### `test_on_simulated_data`
+#### Description
+Tests the estimator on data simulated using the `Cas9LineageTracingDataSimulator`.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | str | Name of the test case |
+| solver | str | Solver to use ("ECOS" or "SCS") |
+
+#### Outputs
+None
+
+#### Internal Logic
+- Creates a perfect binary tree and sets predefined node times.
+- Simulates Cas9-based lineage tracing data using the `Cas9LineageTracingDataSimulator`.
+- Initializes an `IIDExponentialMLE` object.
+- Calls `estimate_branch_lengths` and asserts that the estimated node times and mutation rate are close to the ground truth values used for simulation.
+
+___
+
+### `test_subtree_collapses_when_no_mutations`
+#### Description
+Tests the behavior of the estimator when a subtree has no mutations, ensuring it collapses to 0 length.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | str | Name of the test case |
+| solver | str | Solver to use ("ECOS" or "SCS") |
+
+#### Outputs
+None
+
+#### Internal Logic
+- Creates a tree with a subtree containing no mutations.
+- Initializes an `IIDExponentialMLE` object.
+- Calls `estimate_branch_lengths` and asserts that the branch lengths of the mutationless subtree are 0 and the remaining branch lengths, mutation rate, and log-likelihood match the expected values.
+
+___
+
+### `test_minimum_branch_length`
+#### Description
+Tests the functionality of the `minimum_branch_length` parameter.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | str | Name of the test case |
+| solver | str | Solver to use ("ECOS" or "SCS") |
+
+#### Outputs
+None
+
+#### Internal Logic
+- Creates a perfect binary tree with a single mutation.
+- Initializes an `IIDExponentialMLE` object with a specified `minimum_branch_length`.
+- Calls `estimate_branch_lengths` and asserts that the estimated branch lengths, mutation rate, and log-likelihood match the expected values, taking into account the minimum branch length constraint.
+
+___
+
+### `test_hand_solvable_problem_with_site_rates`, `test_larger_hand_solvable_problem_with_site_rates`
+#### Description
+These tests verify the estimator's results against hand-solvable problems with specified site-specific mutation rates.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | str | Name of the test case |
+| solver_rates | List[float] | Site-specific mutation rates used by the solver |
+| math_rates | List[float] | Site-specific mutation rates used for hand calculations |
+
+#### Outputs
+None
+
+#### Internal Logic
+- Creates a tree with a specified character matrix.
+- Initializes an `IIDExponentialMLE` object with the `relative_mutation_rates` parameter set to `solver_rates`.
+- Calls `estimate_branch_lengths` and asserts that the estimated branch lengths, node times, and mutation rates match the expected values calculated by hand using `math_rates`.
+
+___
+
+### `test_invalid_site_rates`
+#### Description
+Tests the behavior of the estimator when invalid site-specific mutation rates are provided.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| name | str | Name of the test case |
+| rates | List[float] | Invalid site-specific mutation rates |
+
+#### Outputs
+None
+
+#### Internal Logic
+- Creates a tree with a specified character matrix.
+- Initializes an `IIDExponentialMLE` object with the `relative_mutation_rates` parameter set to `rates`.
+- Asserts that a `ValueError` is raised when calling `estimate_branch_lengths`.
+
+## Dependencies
+- `networkx`: For working with graph structures.
+- `numpy`: For numerical operations.
+- `parameterized`: For parameterized testing.
+- `cvxpy`: For convex optimization.
+
+## Error Handling
+The tests check for `ValueError` and `IIDExponentialMLEError` exceptions in various scenarios.
+
+## API/Interface Reference
+None

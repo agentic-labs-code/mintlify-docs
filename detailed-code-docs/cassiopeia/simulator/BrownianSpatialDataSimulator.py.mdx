@@ -1,0 +1,59 @@
+---
+title: "BrownianSpatialDataSimulator.py"
+---
+
+## High-level description
+The `BrownianSpatialDataSimulator` class simulates spatial data for a lineage tree using a Brownian motion process. This simulator assigns spatial coordinates to each cell in a `CassiopeiaTree`, mimicking the movement of cells in a spatial context.
+
+## Code Structure
+The `BrownianSpatialDataSimulator` class inherits from the `SpatialDataSimulator` class. It primarily implements the `overlay_data` method, which is responsible for assigning spatial coordinates to the nodes of a `CassiopeiaTree` based on a Brownian motion model.
+
+## References
+- `cassiopeia.data.CassiopeiaTree`: The class representing the lineage tree.
+- `cassiopeia.simulator.SpatialDataSimulator`: The parent class for spatial data simulators.
+
+## Symbols
+
+### `BrownianSpatialDataSimulator`
+#### Description
+This class simulates spatial data for a lineage tree using a Brownian motion process. It takes the dimensionality of the space, a diffusion coefficient, and optional scaling and random seed parameters as input.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| dim | int | The number of spatial dimensions. |
+| diffusion_coefficient | float | The diffusion coefficient for the Brownian motion process. |
+| scale_unit_area | bool | Whether to scale the spatial coordinates to a unit area. Defaults to `True`. |
+| random_seed | Optional[int] | A random seed for reproducibility. Defaults to `None`. |
+
+#### Outputs
+This class does not directly return any output. It modifies the input `CassiopeiaTree` object in-place.
+
+#### Internal Logic
+1. **Initialization:** The constructor initializes the simulator with the specified parameters and performs validation checks.
+2. **`overlay_data` Method:**
+    - Traverses the tree from root to leaves.
+    - Assigns the root cell to the origin (0, 0, ...) in the spatial space.
+    - For each edge (parent-child relationship) in the tree:
+        - Calculates the branch length (time since last cell division).
+        - Samples a random displacement vector from a normal distribution with mean 0 and variance proportional to the branch length and diffusion coefficient.
+        - Adds the displacement vector to the parent's coordinates to obtain the child's coordinates.
+    - Optionally scales the spatial coordinates to a unit area.
+    - Sets the spatial coordinates as a node attribute and in the `cell_meta` DataFrame of the `CassiopeiaTree`.
+
+## Side Effects
+- Modifies the input `CassiopeiaTree` object in-place by adding spatial coordinates to the nodes and cell metadata.
+
+## Dependencies
+- `numpy`: Used for numerical operations and random number generation.
+- `pandas`: Used for handling the `cell_meta` DataFrame.
+
+### Configuration
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| scale_unit_area | bool | True | Whether to scale the spatial coordinates to a unit area. |
+
+## Error Handling
+Raises `DataSimulatorError` if:
+- `dim` is less than or equal to zero.
+- `diffusion_coefficient` is negative.

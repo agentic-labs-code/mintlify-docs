@@ -1,0 +1,78 @@
+---
+title: "SupercellularSampler.py"
+---
+
+## High-level description
+The `SupercellularSampler` class is a subclass of `LeafSubsampler` that simulates the merging of cells in a lineage tree, creating "supercellular" states. This is achieved by iteratively merging pairs of leaves, chosen with probability inversely proportional to their branch distance, resulting in a tree with ambiguous character states.
+
+## Code Structure
+The `SupercellularSampler` class has a single public method, `subsample_leaves`, which takes a `CassiopeiaTree` as input and returns a new `CassiopeiaTree` with merged leaves. The merging process is controlled by either the `ratio` or `number_of_merges` parameter passed to the constructor.
+
+## References
+This class references the following code symbols:
+- `CassiopeiaTree`
+- `LeafSubsampler`
+- `LeafSubsamplerError`
+
+## Symbols
+### SupercellularSampler
+#### Description
+This class implements a leaf subsampling strategy where leaves are merged iteratively to create a tree with ambiguous character states, simulating the merging of cells.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| ratio | Optional[float] | The number of times to merge as a ratio of the total number of leaves. |
+| number_of_merges | Optional[float] | Explicit number of merges to perform. |
+
+#### Outputs
+This class does not directly return any output. It modifies the input `CassiopeiaTree` object.
+
+#### Internal Logic
+The `subsample_leaves` method performs the following steps:
+1. **Determine the number of merges:** Based on the provided `ratio` or `number_of_merges`, the number of merge operations is calculated.
+2. **Iterative merging:** For each merge operation:
+    - Randomly select a leaf node (`leaf1`).
+    - Calculate the branch distances from `leaf1` to all other leaves.
+    - Randomly select a second leaf node (`leaf2`) with probability inversely proportional to its distance from `leaf1`.
+    - Merge `leaf1` and `leaf2` into a new leaf node with a combined name and ambiguous character states.
+    - Connect the new leaf node to the LCA of the original leaves.
+    - Set the time of the new leaf node to the mean time of the original leaves.
+3. **Tree cleanup:**
+    - Collapse unifurcations in the tree.
+    - Optionally collapse duplicated character states in ambiguous nodes.
+4. **Return the modified tree:** The modified `CassiopeiaTree` object is returned.
+
+## Side Effects
+The `subsample_leaves` method modifies the input `CassiopeiaTree` object in-place.
+
+## Error Handling
+The class raises `LeafSubsamplerError` if:
+- Both `ratio` and `number_of_merges` are not specified or both are specified.
+- The number of merges exceeds the number of leaves in the tree.
+- No merges are to be performed.
+- The tree does not have a character matrix defined.
+
+## Dependencies
+This class depends on the following external libraries:
+| Dependency | Purpose |
+|:-----------|:--------|
+| numpy | Used for random sampling and array operations. |
+| pandas | Used for handling the character matrix. |
+| networkx | Used for tree manipulation. |
+| copy | Used for deep copying the tree. |
+
+```python
+import copy
+from typing import Optional
+
+import numpy as np
+import pandas as pd
+import networkx as nx
+
+from cassiopeia.data.CassiopeiaTree import CassiopeiaTree, CassiopeiaTreeError
+from cassiopeia.simulator.LeafSubsampler import (
+    LeafSubsampler,
+    LeafSubsamplerError,
+)
+```

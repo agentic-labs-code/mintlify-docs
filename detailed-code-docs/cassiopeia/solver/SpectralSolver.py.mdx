@@ -1,0 +1,53 @@
+---
+title: "SpectralSolver.py"
+---
+
+## High-level description
+The `SpectralSolver` class in `SpectralSolver.py` provides a method for reconstructing phylogenetic trees using a spectral algorithm. It leverages the similarity between samples based on shared mutations to partition them recursively, ultimately building a tree structure. This approach aims to minimize the separation of samples with shared mutations while accounting for the size of each partition.
+
+## Code Structure
+The `SpectralSolver` class inherits from the `GreedySolver` class. It primarily overrides the `perform_split` method to implement its specific partitioning logic using a spectral algorithm. The `SpectralSolver` utilizes functions from `graph_utilities` to construct and manipulate similarity graphs.
+
+## References
+This code references the following symbols:
+- `GreedySolver` (from `cassiopeia.solver.GreedySolver`)
+- `dissimilarity_functions` (from `cassiopeia.solver`)
+- `graph_utilities` (from `cassiopeia.solver`)
+
+## Symbols
+
+### `SpectralSolver`
+#### Description
+This class implements a spectral algorithm for phylogenetic tree reconstruction. It inherits from `GreedySolver` and overrides the `perform_split` method to partition samples based on a similarity graph.
+
+#### Inputs
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| similarity_function | Optional[Callable[[int, int, pd.DataFrame, int, Optional[Dict[int, Dict[str, float]]]], float]] | A function to calculate similarity between samples (default: `hamming_similarity_without_missing`). |
+| threshold | Optional[int] | Minimum similarity threshold for graph edges (default: 0). |
+| prior_transformation | str | Transformation function for priors (default: "negative_log"). |
+
+#### Outputs
+This class doesn't directly return any output. It modifies the input `CassiopeiaTree` object during the `solve` method.
+
+#### Internal Logic
+1. **Initialization:** Sets the similarity threshold, similarity function, and prior transformation.
+2. **`perform_split` Method:**
+    - Constructs a similarity graph using `graph_utilities.construct_similarity_graph`.
+    - Computes the normalized Laplacian matrix of the graph.
+    - Calculates the second eigenvector of the Laplacian matrix (Fiedler vector).
+    - Orders nodes based on their corresponding values in the Fiedler vector.
+    - Finds the optimal partition index that minimizes the normalized cut.
+    - Improves the initial partition using `graph_utilities.spectral_improve_cut`.
+    - Returns the left and right partitions.
+3. **`solve` Method (inherited from `GreedySolver`):**
+    - Prepares data and weights.
+    - Recursively partitions the samples using `perform_split` until individual samples are reached.
+    - Constructs the tree by connecting the partitions with ancestral nodes.
+    - Populates the input `CassiopeiaTree` with the reconstructed tree.
+
+#### Side Effects
+The `solve` method modifies the input `CassiopeiaTree` object by populating its tree structure.
+
+#### Performance Considerations
+The spectral algorithm's performance depends on the size and structure of the similarity graph. Larger datasets might require more computational resources. The `spectral_improve_cut` function performs a greedy hill-climbing optimization, which could be computationally intensive for complex graphs.

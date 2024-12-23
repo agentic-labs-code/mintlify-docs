@@ -1,0 +1,53 @@
+---
+title: "_iid_exponential_bayesian_cpp.cpp"
+---
+
+## High-level description
+This code implements a Bayesian inference algorithm to estimate branch lengths in a phylogenetic tree, assuming an IID exponential model of character evolution. It uses dynamic programming to efficiently calculate the posterior probabilities of branch lengths given observed character data.
+
+## Code Structure
+The code defines a class `_InferPosteriorTimes` that encapsulates the branch length estimation logic. The main components of this class are:
+- `run()`: This method orchestrates the entire inference process, taking input data and model parameters, performing calculations, and storing the results.
+- `down()`: This recursive function calculates the "down" probability, representing the likelihood of observing the data at and below a given node in the tree.
+- `up()`: This recursive function calculates the "up" probability, representing the likelihood of observing the data above a given node and the node dividing at a specific time.
+- `compute_log_joint()`: This function calculates the log joint probability of the data and a specific branch length.
+- `populate_*_res()`: These functions extract and format the calculated results for later access.
+
+The `main()` function is currently empty and serves no purpose in this file.
+
+## References
+This code does not reference other code symbols that require further explanation.
+
+## Symbols
+
+### `_InferPosteriorTimes`
+#### Description
+This class implements the Bayesian inference algorithm for estimating branch lengths in a phylogenetic tree.
+
+#### Inputs
+Refer to the `run()` method's parameters in the `_iid_exponential_bayesian_cpp.h` header file for a detailed description of the input data and model parameters.
+
+#### Outputs
+The class provides several getter methods to access the calculated results:
+- `get_posterior_means_res()`: Returns a vector of pairs, where each pair contains a node index and its estimated posterior mean branch length.
+- `get_posteriors_res()`: Returns a vector of pairs, where each pair contains a node index and a vector of its posterior probabilities for each time point.
+- `get_log_joints_res()`: Returns a vector of pairs, where each pair contains a node index and a vector of its log joint probabilities for each time point.
+- `get_log_likelihood_res()`: Returns the overall log-likelihood of the data given the model.
+
+#### Internal Logic
+The core logic of the algorithm lies within the `down()` and `up()` functions, which recursively calculate the "down" and "up" probabilities using dynamic programming. These probabilities are then combined to compute the log joint probabilities and subsequently the posterior probabilities of branch lengths. The algorithm also precomputes the probability of lineages not being sampled (`p_unsampled`) to account for incomplete lineage information.
+
+#### Performance Considerations
+The code utilizes dynamic programming with memoization (`down_cache` and `up_cache`) to avoid redundant computations, significantly improving performance. However, the memory usage scales with the size of the tree, the number of discretization time points (`T`), and the number of characters (`K`).
+
+## Side Effects
+This code has no notable side effects.
+
+## Dependencies
+This code uses the standard C++ library.
+
+## Error Handling
+The code includes basic error handling for memory allocation failures and invalid input parameters. It throws `std::invalid_argument` exceptions in such cases.
+
+## Logging
+This code does not implement any logging mechanisms.

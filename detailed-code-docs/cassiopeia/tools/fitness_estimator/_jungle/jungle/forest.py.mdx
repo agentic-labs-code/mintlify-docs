@@ -1,0 +1,323 @@
+---
+title: "forest.py"
+---
+
+## High-level description
+The code defines a `Forest` class in Python, representing a collection of phylogenetic trees. It provides functionalities for loading, generating, manipulating, analyzing, and saving these tree collections. This includes methods for calculating various phylogenetic statistics, annotating tree nodes with features, and visualizing the trees.
+
+## Code Structure
+The `Forest` class is the main component, containing methods for manipulating collections of `Tree` objects. The `Tree` class (defined in a separate file) represents a single phylogenetic tree and provides methods for manipulating and analyzing individual trees. The `Forest` class leverages the functionalities of the `Tree` class to operate on entire collections of trees.
+
+## References
+- `jungle.tree.Tree`: The `Forest` class heavily relies on the `Tree` class for individual tree operations.
+
+## Symbols
+### Symbol Name: `Forest`
+#### Description:
+This class represents a collection of phylogenetic trees and provides methods for their manipulation and analysis.
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| trees | list | A list of `Tree` objects representing the phylogenetic trees. |
+| name | str | Optional name for the forest. |
+| params | dict | Optional parameters for generating trees if the forest is created using the `generate` method. |
+
+#### Outputs:
+The class itself is the output, representing a `Forest` object.
+
+#### Internal Logic:
+The class stores the trees in a list and provides methods for:
+- Loading trees from various formats (Newick, pickle, tar.gz).
+- Generating trees.
+- Concatenating forests.
+- Annotating nodes with features.
+- Calculating phylogenetic statistics.
+- Fitting models to distributions of metrics.
+- Visualizing trees.
+- Saving the forest to disk.
+
+### Symbol Name: `from_newick`
+#### Description:
+Class method to construct a `Forest` object by loading trees from Newick files.
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filenames | list | A list of paths to Newick files. |
+| name | str | Optional name for the forest. |
+| params | dict | Optional parameters for the forest. |
+
+#### Outputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| forest | Forest | A `Forest` object containing the loaded trees. |
+
+#### Internal Logic:
+The method iterates through the provided filenames, creates a `Tree` object for each file using `Tree.from_newick`, and appends it to the `trees` list of the `Forest` object.
+
+### Symbol Name: `from_pickle`
+#### Description:
+Class method to load a `Forest` object from a pickle file.
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filename | str | Path to the pickle file. |
+| gzip | bool | Whether the file is gzipped. If None, it infers from the filename. |
+
+#### Outputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| forest | Forest | The loaded `Forest` object. |
+
+#### Internal Logic:
+The method opens the pickle file, optionally gzipped, and loads the `Forest` object using `pickle.load`.
+
+### Symbol Name: `generate`
+#### Description:
+Class method to generate a `Forest` object by simulating trees.
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| n_trees | int | The number of trees to generate. |
+| name | str | Optional name for the forest. |
+| params | dict | Optional parameters for generating the trees. |
+
+#### Outputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| forest | Forest | A `Forest` object containing the generated trees. |
+
+#### Internal Logic:
+The method generates `n_trees` number of trees using `Tree.generate` and appends them to the `trees` list of the `Forest` object.
+
+### Symbol Name: `from_newick_tar_gz`
+#### Description:
+Class method to load a `Forest` object from a gzipped tar archive of Newick files.
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| filename | str | Path to the tar.gz file. |
+| name | str | Optional name for the forest. |
+| params | dict | Optional parameters for the forest. |
+
+#### Outputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| forest | Forest | A `Forest` object containing the loaded trees. |
+
+#### Internal Logic:
+The method opens the tar.gz file, iterates through its members, extracts the content of each Newick file, creates a `Tree` object using `Tree.from_newick`, and appends it to the `trees` list of the `Forest` object.
+
+### Symbol Name: `to_newick`
+#### Description:
+Writes the trees in the `Forest` object to a gzipped tar archive of Newick files.
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| outfile | str | Path to the output tar.gz file. |
+| **kwargs | dict | Additional keyword arguments passed to the `Tree.to_newick` method. |
+
+#### Outputs:
+This method doesn't return any value. It writes the trees to the specified file.
+
+#### Internal Logic:
+The method iterates through the trees, writes each tree to a temporary Newick file using `Tree.to_newick`, adds all temporary files to a tar.gz archive, and finally deletes the temporary files.
+
+### Symbol Name: `concat`
+#### Description:
+Concatenates two `Forest` objects into a new one.
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| other | Forest | The other `Forest` object to concatenate. |
+
+#### Outputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| new_forest | Forest | A new `Forest` object containing the concatenated trees and attributes. |
+
+#### Internal Logic:
+The method combines the `trees` lists of both forests, concatenates other list-like attributes using `_concat_lists_safe`, and creates a new `Forest` object with the combined data.
+
+### Symbol Name: `annotate_standard_node_features`
+#### Description:
+Annotates each node of each tree in the forest with standard features: depth, depth_rank, num_children, num_descendants.
+
+#### Inputs:
+This method doesn't take any input arguments.
+
+#### Outputs:
+This method doesn't return any value. It modifies the trees in place.
+
+#### Internal Logic:
+The method iterates through the trees and calls the `annotate_standard_node_features` method of each `Tree` object.
+
+### Symbol Name: `annotate_imbalance`
+#### Description:
+Annotates each node of each tree in the forest with its imbalance (I), calculated as the maximum number of descendants among its children divided by the total number of descendants.
+
+#### Inputs:
+This method doesn't take any input arguments.
+
+#### Outputs:
+This method doesn't return any value. It modifies the trees in place.
+
+#### Internal Logic:
+The method iterates through the trees and calls the `annotate_imbalance` method of each `Tree` object.
+
+### Symbol Name: `annotate_colless`
+#### Description:
+Annotates each node of each tree in the forest with its Colless index.
+
+#### Inputs:
+This method doesn't take any input arguments.
+
+#### Outputs:
+This method doesn't return any value. It modifies the trees in place.
+
+#### Internal Logic:
+The method iterates through the trees and calls the `annotate_colless` method of each `Tree` object.
+
+### Symbol Name: `node_features`
+#### Description:
+Returns a Pandas DataFrame containing features for each node of each tree in the forest.
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| subset | list | Optional list of feature names to include in the DataFrame. |
+
+#### Outputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| features_df | pandas.DataFrame | A DataFrame containing the requested features for each node. |
+
+#### Internal Logic:
+The method retrieves the node features from each tree using `Tree.node_features`, concatenates them into a single DataFrame, and ensures unique tree names.
+
+### Symbol Name: `rescale`
+#### Description:
+Rescales all trees in the forest to have a specific total branch length.
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| total_branch_length | float | The desired total branch length for each tree. |
+
+#### Outputs:
+This method doesn't return any value. It modifies the trees in place.
+
+#### Internal Logic:
+The method iterates through the trees and calls the `rescale` method of each `Tree` object with the specified `total_branch_length`.
+
+### Symbol Name: `resolve_polytomy`
+#### Description:
+Resolves all polytomies (nodes with more than two children) in each tree by creating an arbitrary dichotomous structure.
+
+#### Inputs:
+This method doesn't take any input arguments.
+
+#### Outputs:
+This method doesn't return any value. It modifies the trees in place.
+
+#### Internal Logic:
+The method iterates through the trees and calls the `resolve_polytomy` method of each `Tree` object.
+
+### Symbol Name: `site_frequency_spectrum`
+#### Description:
+Calculates the site frequency spectrum (SFS) for each tree in the forest.
+
+#### Inputs:
+This method doesn't take any input arguments.
+
+#### Outputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| sfs_list | list | A list of SFS arrays, one for each tree. |
+
+#### Internal Logic:
+The method iterates through the trees, calculates the SFS for each tree using `Tree.site_frequency_spectrum`, and stores them in a list.
+
+### Symbol Name: `bin_site_frequency_spectrum`
+#### Description:
+Calculates the binned site frequency spectrum (SFS) for each tree in the forest.
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| bins | array-like | The bins to use for binning the SFS. |
+| *args | tuple | Additional positional arguments passed to `Tree.bin_site_frequency_spectrum`. |
+| **kwargs | dict | Additional keyword arguments passed to `Tree.bin_site_frequency_spectrum`. |
+
+#### Outputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| binned_sfs_list | list | A list of binned SFS arrays, one for each tree. |
+
+#### Internal Logic:
+The method iterates through the trees, calculates the binned SFS for each tree using `Tree.bin_site_frequency_spectrum`, and stores them in a list.
+
+### Symbol Name: `mean_site_frequency_spectrum`
+#### Description:
+Calculates the mean and standard error of the mean (SEM) of the site frequency spectrum (SFS) across all trees in the forest.
+
+#### Inputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| which | str | Specifies which SFS representation to use (e.g., "binned_normalized_cut"). Defaults to "binned_normalized_cut". |
+
+#### Outputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| mean | array-like | The mean of the SFS across all trees. |
+| sem | array-like | The SEM of the SFS across all trees. |
+
+#### Internal Logic:
+The method extracts the specified SFS representation from each tree, calculates the mean and SEM across all trees using `np.nanmean` and `scipy.stats.sem`, and returns the results.
+
+### Symbol Name: `fay_and_wus_H`
+#### Description:
+Calculates Fay and Wu's H statistic for each tree in the forest.
+
+#### Inputs:
+This method doesn't take any input arguments.
+
+#### Outputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| h_values | list | A list of Fay and Wu's H values, one for each tree. |
+
+#### Internal Logic:
+The method iterates through the trees, calculates Fay and Wu's H for each tree using `Tree.fay_and_wus_H`, and stores them in a list.
+
+### Symbol Name: `zengs_E`
+#### Description:
+Calculates Zeng's E statistic for each tree in the forest.
+
+#### Inputs:
+This method doesn't take any input arguments.
+
+#### Outputs:
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| e_values | list | A list of Zeng's E values, one for each tree. |
+
+#### Internal Logic:
+The method iterates through the trees, calculates Zeng's E for each tree using `Tree.zengs_E`, and stores them in a list.
+
+### Symbol Name: `tajimas_D`
+#### Description:
+Calculates Tajima's D statistic for each tree in the forest.
+
+#### Inputs:
+This method doesn't take any input arguments.
+
+#### Outputs:
+| Name | Type | Description |
+|:-----|:-----|:------------
