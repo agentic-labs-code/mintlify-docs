@@ -3,61 +3,62 @@ title: "Overview"
 ---
 
 ## High-level description
-This GitHub Actions workflow, named "cassiopeia", is designed to automate the testing and linting process for a Python project. It runs on push events to the master branch and pull requests targeting the master branch, using multiple Python versions to ensure compatibility.
+This directory contains GitHub Actions workflow files that define various automated processes for the project, including CI/CD pipelines, release processes, and operational tasks like restarting services. The workflows cover a range of activities such as running tests, deploying to different environments, releasing SDKs, and performing infrastructure updates.
 
-## Code Structure
-The workflow is defined as a single job named "build" with multiple steps that set up the environment, install dependencies, run tests, and report code coverage.
+## What does it do?
+The workflows in this directory automate several key processes:
 
-## Symbols
+1. Continuous Integration: Checking commits, running linters, and executing tests on pull requests for different packages.
+2. Continuous Deployment: Deploying the API, infrastructure, and other components to staging, production, and sandbox environments.
+3. SDK Management: Generating and releasing SDKs for multiple programming languages (Node.js, Java, Python).
+4. Service Management: Restarting API services in different environments.
+5. End-to-End Testing: Running E2E tests against staging environments.
+6. Infrastructure as Code: Deploying and updating AWS resources using CDK.
 
-### `name`
-#### Description
-Defines the name of the GitHub Actions workflow as "cassiopeia".
+These workflows help maintain code quality, automate repetitive tasks, and ensure consistent deployment processes across different environments.
 
-### `on`
-#### Description
-Specifies the events that trigger the workflow: pushes to the master branch and pull requests targeting the master branch.
+## Entry points
+The main entry points for these workflows are:
 
-### `jobs.build`
-#### Description
-Defines the main job of the workflow, named "build".
+1. Pull request workflows: Triggered when pull requests are opened or updated for specific packages.
+2. Deployment workflows: Triggered on pushes to main branches or manually for deploying to different environments.
+3. Release workflows: Manually triggered to release new versions of SDKs.
+4. Restart workflows: Manually triggered to restart services in different environments.
+5. E2E test workflows: Manually triggered to run end-to-end tests against staging environments.
 
-#### Internal Logic
-1. Runs on the latest Ubuntu environment
-2. Sets a timeout of 20 minutes
-3. Uses a matrix strategy to test with Python versions 3.8 and 3.9
+Each workflow file typically defines when it should be triggered (e.g., on pull request, on push, or manual dispatch) and what jobs and steps should be executed.
 
-### `jobs.build.steps`
-#### Description
-Defines the sequence of steps to be executed in the build job.
-
-#### Internal Logic
-1. Checks out the repository
-2. Sets up Python environment
-3. Caches pip dependencies
-4. Installs project dependencies
-5. Runs tests with pytest and generates coverage report
-6. Uploads coverage data to Codecov
-7. Lists installed packages
+## Key Files
+1. `_build.yml`: A reusable workflow for building and testing packages.
+2. `_check-commits.yml`: A reusable workflow for checking commit messages.
+3. `_deploy-api.yml`: A reusable workflow for deploying the API.
+4. `_deploy-cdk.yml`: A reusable workflow for deploying infrastructure using CDK.
+5. `_e2e-tests.yml`: A reusable workflow for running end-to-end tests.
+6. `deploy-production.yml`: Workflow for deploying to the production environment.
+7. `deploy-staging.yml`: Workflow for deploying to the staging environment.
+8. `release-all-sdks.yml`: Workflow for releasing SDKs for multiple languages.
+9. Various `pull-request_*.yml` files: Workflows for checking and building specific packages on pull requests.
+10. Various `restart_*.yml` files: Workflows for restarting services in different environments.
 
 ## Dependencies
-| Dependency | Purpose |
-|:-----------|:--------|
-| pytest-cov | For running tests with coverage reporting |
-| codecov | For uploading coverage data |
-| .[spatial] | Project-specific dependency (likely the main package with spatial extras) |
+The workflows rely on several external actions and services:
+
+1. GitHub Actions: The underlying platform for running the workflows.
+2. AWS Services: Many workflows interact with AWS services like ECR, ECS, and use AWS credentials.
+3. Docker: Used for containerization and authentication with DockerHub.
+4. Node.js: Used in many workflows for building and testing JavaScript/TypeScript packages.
+5. Fern: A tool used for generating and releasing SDKs.
+6. Various GitHub Actions: Such as `actions/checkout`, `actions/setup-node`, and `docker/login-action`.
 
 ## Configuration
-| Option | Type | Default | Description |
-|:-------|:-----|:--------|:------------|
-| python-version | list | [3.8, 3.9] | Python versions to test against |
-| timeout-minutes | integer | 20 | Maximum duration for the job |
+The workflows use a combination of GitHub secrets and variables for configuration:
 
-## Error Handling
-The workflow does not implement specific error handling beyond the default behavior of GitHub Actions, which will mark the workflow as failed if any step exits with a non-zero status code.
+1. AWS credentials: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
+2. Docker credentials: `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`
+3. Environment-specific variables: ECR URIs, ECS cluster names, API URLs, etc.
+4. SDK-related tokens: `FERN_TOKEN`, `NPM_TOKEN`, `PYPI_TOKEN`, `MAVEN_USERNAME`, `MAVEN_PASSWORD`
+5. Service-specific secrets: Various certificates and keys for different services
 
-## Logging
-The workflow uses default GitHub Actions logging. The `-vv` flag in the pytest command enables verbose output for test results.
+These configurations allow the workflows to be flexible and work across different environments while keeping sensitive information secure.
 
-## TODOs
-There are no explicit TODOs in the workflow file.
+Have fun!
